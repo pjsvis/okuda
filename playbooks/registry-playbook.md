@@ -19,7 +19,7 @@ All registries use the same JSONL structure — one line per document, one field
 | `file` | yes | Filename only (no path), relative to the registry directory |
 | `date` | yes | ISO date `YYYY-MM-DD` of creation or last meaningful update |
 | `status` | yes | Registry-specific state (see below) |
-| `summary` | yes | One-sentence description, no trailing period. Imperative: "Write post on X" not "Wrote post on X" |
+| `summary` | yes | One-sentence description, no trailing period. Imperative: "Add mermaid ASCII rendering" not "Added mermaid ASCII rendering" |
 | `meta` | no | Registry-specific fields (keep lightweight) |
 
 ## Registry-Specific Mappings
@@ -27,7 +27,7 @@ All registries use the same JSONL structure — one line per document, one field
 | Registry | Index file | `status` values | `meta` fields |
 |----------|------------|-----------------|---------------|
 | **briefs** | `briefs/INDEX.jsonl` | `open`, `in_progress`, `done` | — |
-| **debriefs** | `debriefs/INDEX.jsonl` | `done` | `adr`, `platforms` |
+| **debriefs** | `debriefs/INDEX.jsonl` | `done` | `adr`, `brief` |
 | **decisions** | `decisions/INDEX.jsonl` | `Proposed`, `Accepted`, `Superseded` | `supersedes`, `superseded_by` |
 | **playbooks** | `playbooks/REGISTRY.jsonl` | `canonical`, `project` | `source` |
 
@@ -93,7 +93,7 @@ bun scripts/reg-list.ts playbooks
 
 ### Summary style
 
-- Imperative mood: "Write post on conceptual entropy reduction" not "Writing post..."
+- Imperative mood: "Render mermaid fences through the Rust CLI" not "Rendering mermaid fences..."
 - Specific enough to distinguish from other entries
 - No trailing period
 
@@ -115,13 +115,15 @@ The index is the single source of truth for directory contents. Do not maintain 
 ## Justfile integration
 
 ```bash
-just reg-sync       # sync all registries
-just reg-list       # list all registries
+just reg-sync       # check all registries for drift
+just reg-sync-fix   # regenerate indexes from filesystem
 just reg-briefs     # list briefs registry
 just reg-debriefs   # list debriefs registry
 just reg-decisions  # list decisions registry
 just reg-playbooks  # list playbooks registry
 ```
+
+There is no aggregate `just reg-list` recipe — list a specific registry with the `reg-<name>` recipes above (each wraps `bun scripts/reg-list.ts <registry>`).
 
 `just check` includes `bun scripts/reg-sync.ts --all`.
 
@@ -132,4 +134,3 @@ just reg-playbooks  # list playbooks registry
 - `playbooks/briefs-playbook.md` — Brief format and process
 - `playbooks/debriefs-playbook.md` — Debrief format and process
 - `playbooks/decisions-playbook.md` — ADR format and process
-- `playbooks/conventions-playbook.md` — Active conventions and barnacle removal
