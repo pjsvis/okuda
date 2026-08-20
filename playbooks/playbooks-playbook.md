@@ -76,10 +76,8 @@ Filename convention: `topic-playbook.md` or `topic-subtopic-playbook.md`.
 | Playbook | When to read |
 |----------|-------------|
 | `td-playbook.md` | Session startup and task management |
-| `briefs-playbook.md` | Before drafting a post |
-| `debriefs-playbook.md` | After publishing a post |
+| `briefs-playbook.md` | Before proposing work |
+| `debriefs-playbook.md` | After completing a brief |
 | `decisions-playbook.md` | When making a significant choice |
-| `conventions-playbook.md` | Active conventions and barnacle removal |
-| `barnacle-playbook.md` | How to identify and remove barnacles |
-| `export-playbook.md` | Multi-platform distribution workflow |
-| `blog-posts-playbook.md` | Jekyll pipeline reference |
+| `registry-playbook.md` | Index schema and sync |
+| `silo-playbook.md` | Silo structure and conventions |

@@ -21,7 +21,7 @@ Pre-implementation. Design source: [`docs/2026-08-20-origin-doc.md`](docs/2026-0
 
 ## Repository Layout
 
-This repo is a **silo** — see [`SILO_MANIFEST.md`](SILO_MANIFEST.md) for the full asset map.
+This repo is a **silo** — external tool dependencies are inventoried in [`DEPENDENCIES.md`](DEPENDENCIES.md).
 
 ```bash
 just help     # workflow guide

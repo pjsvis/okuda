@@ -29,7 +29,7 @@ info:
     @echo "Named for Michael Okuda: high-contrast, functional, uncluttered."
     @echo ""
     @echo "Origin and design: docs/2026-08-20-origin-doc.md"
-    @echo "Silo map:           SILO_MANIFEST.md"
+    @echo "Dependencies:       DEPENDENCIES.md"
 
 # Current state: branch, status, last commit, registry counts
 orient:

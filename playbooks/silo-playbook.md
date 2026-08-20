@@ -31,9 +31,10 @@ is a claim about future work, and it carries obligations (an index, sync
 discipline) with no content to justify them. A directory is created the
 moment the first document that belongs in it is written — not before.
 
-Other root files (an agent-facing `AGENTS.md` for rules of engagement, a
-`SILO_MANIFEST.md` asset map) are optional additions when the silo
-warrants them.
+Other root files — an agent-facing `AGENTS.md` for rules of engagement,
+a `DEPENDENCIES.md` inventory of external tools — are optional additions
+when the silo warrants them. `DEPENDENCIES.md` records versions,
+locations, and verification dates; brief preconditions cite it.
 
 ## Document Compartments (on demand)
 

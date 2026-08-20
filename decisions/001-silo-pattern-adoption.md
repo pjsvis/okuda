@@ -7,7 +7,7 @@
 okuda begins as a greenfield repository with one design document (`docs/2026-08-20-origin-doc.md`) and a `playbooks/` folder imported wholesale from the blog-posts project. The imported playbooks define a proven knowledge architecture — briefs, playbooks, decisions, debriefs, each with a JSONL registry index, wired behind a `justfile` facade — but their content is blog-centric (Jekyll, Substack/Medium export, post briefs). A decision was needed on how much governance structure to carry over before any code is written.
 
 ## Decision
-Adopt the four-compartment silo pattern (briefs / playbooks / decisions / debriefs, JSONL registries, `justfile` facade, `SILO_MANIFEST.md`) from blog-posts, treating the imported playbooks as templates to adapt incrementally rather than verbatim operating rules.
+Adopt the four-compartment silo pattern (briefs / playbooks / decisions / debriefs, JSONL registries, `justfile` facade, `SILO_MANIFEST.md` — since renamed `DEPENDENCIES.md`) from blog-posts, treating the imported playbooks as templates to adapt incrementally rather than verbatim operating rules.
 
 ## Alternatives Considered
 | Alternative | Why Rejected |

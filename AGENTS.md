@@ -6,7 +6,7 @@ A terminal markdown viewer built on `Bun.markdown`, rendering mermaid fences via
 
 1. **Orient first.** `just orient` at session start. `td usage --new-session` for task identity.
 2. **Brief before build.** Non-trivial work gets a brief in `briefs/` before code is written.
-3. **Claim before edit.** `td start td-xxx` before touching files; `td log` after substantive changes.
+3. **td is the continuity system.** Brief-scale work (epics) and implementation tasks live in td: `td create` when work is defined, `td start` before touching files, `td log` after substantive changes, `td handoff --done/--remaining` at session end, `td review` to close. Work not in td isn't tracked.
 4. **Branch hygiene.** Never commit work directly to `main`. Branch `feat/<name>`, one logical change per commit.
 5. **Quality gate.** `just check` before every commit — it must pass.
 6. **Registry principle.** If a directory accumulates documents, it gets a JSONL index. Add document + index entry in the same commit (`just reg-sync-fix`, then review the derived entry).
@@ -30,4 +30,4 @@ okuda renders what this workflow generates: headers, loose lists, loose tables, 
 | Decisions | `decisions/` | Why did we choose X over Y? |
 | Debriefs | `debriefs/` | What happened and why? |
 
-Silo map: `SILO_MANIFEST.md`
+External dependencies: `DEPENDENCIES.md`

@@ -101,4 +101,3 @@ td ws end               # end current workspace
 ## Related
 
 - `AGENTS.md` — Project identity and coding rules
-- `playbooks/conventions-playbook.md` — Coding conventions and barnacle removal
