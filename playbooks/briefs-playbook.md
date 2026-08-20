@@ -14,7 +14,6 @@ Every brief is named `YYYY-MM-DD-brief-slug.md`. Strictly date-first.
 
 - Briefs are the record of intent; ISO date strings sort lexically = chronologically, so `ls briefs/` is a timeline — cadence and gaps in intent are visible by simple inspection, no tooling required.
 - The literal `brief` token keeps the document recognisable when its filename is quoted out of context (ADR Related sections, debriefs, commit messages).
-- Epics follow the same rule: `YYYY-MM-DD-epic-slug.md`.
 
 Example: `briefs/2026-08-20-brief-project-initialisation.md`
 
@@ -60,7 +59,7 @@ do not belong here; they go to ADRs (`decisions-playbook.md`).
 
 ## Writing Rules
 
-- One brief per deliverable. If the work is genuinely multi-deliverable, use an epic (below).
+- One brief per deliverable. Phased or multi-deliverable work is coordinated in td (`td epic create`), not in extra-large briefs — each phase's deliverable still gets its own brief.
 - The objective must be specific: "explain why flat code improves LLM comprehension", not "write about AI".
 - No ambiguous language: "should", "maybe", "consider" are banned. State what will happen.
 - Acceptance criteria are testable by inspection or command.
@@ -76,9 +75,14 @@ do not belong here; they go to ADRs (`decisions-playbook.md`).
 5. **Update** Status to `Done` only when all acceptance criteria hold.
 6. **Sync** the registry: the `briefs/INDEX.jsonl` entry follows `open` → `in_progress` → `done` (see `registry-playbook.md`).
 
-## Epics (Multi-Deliverable Work)
+## Phased Work
 
-An epic groups related briefs under one vision. Each deliverable still gets its own brief; the epic file (`YYYY-MM-DD-epic-slug.md`) holds only the vision, the list of briefs, and the exit criteria. If you find yourself writing implementation detail in an epic, it belongs in a brief.
+Multi-deliverable or phased work is coordinated in **td**, not in epic
+files: `td epic create` for the umbrella, one issue per phase, and each
+phase's deliverable still gets its own brief. td is the continuity
+system — it tracks implementation state (claimed, in progress, handed
+off with remaining work) across sessions, which a static document
+cannot. See `td-playbook.md`.
 
 ## Archiving
 

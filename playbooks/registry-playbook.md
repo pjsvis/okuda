@@ -26,7 +26,7 @@ All registries use the same JSONL structure — one line per document, one field
 
 | Registry | Index file | `status` values | `meta` fields |
 |----------|------------|-----------------|---------------|
-| **briefs** | `briefs/INDEX.jsonl` | `open`, `in_progress`, `done` | `epic` |
+| **briefs** | `briefs/INDEX.jsonl` | `open`, `in_progress`, `done` | — |
 | **debriefs** | `debriefs/INDEX.jsonl` | `done` | `adr`, `platforms` |
 | **decisions** | `decisions/INDEX.jsonl` | `Proposed`, `Accepted`, `Superseded` | `supersedes`, `superseded_by` |
 | **playbooks** | `playbooks/REGISTRY.jsonl` | `canonical`, `project` | `source` |
