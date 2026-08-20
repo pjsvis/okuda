@@ -64,8 +64,9 @@ Adding a document: write it → run `just reg-sync-fix` → review index entry �
 Playbooks were imported from the blog-posts silo on 2026-08-20. Tracked deviations:
 
 * `spacex-mermaid` (origin doc) → actual binary is `mermaid-to-md`
-* Blog-centric brief/export/Jekyll flows in `briefs-playbook.md` / `silo-playbook.md` are templates, not rules — okuda briefs follow the engineering format of `briefs/2026-08-20-brief-project-initialisation.md`
+* Blog-centric brief/export/Jekyll flows in `silo-playbook.md` are templates, not rules — its Jekyll tree and export recipes remain illustrative until a real need arrives
 * Topic-first brief filenames (`brief-[topic]-[date].md` in the import) — fixed 2026-08-20: strict date-first `YYYY-MM-DD-brief-slug.md` per ADR-002
+* `briefs-playbook.md` generalised 2026-08-20 — blog post framing excised, engineering format canonised (resolved; see git history)
 * References to non-existent playbooks (`conventions-`, `barnacle-`, `export-`, `blog-posts-playbook.md`) remain in Related tables until real need arises
 
 ## History
@@ -74,3 +75,4 @@ Playbooks were imported from the blog-posts silo on 2026-08-20. Tracked deviatio
 |------|-------|
 | 2026-08-20 | Origin doc; playbooks imported; silo provisioned (ADR-001); git baseline on `main` |
 | 2026-08-20 | ADR-002: date-first brief naming enforced (`YYYY-MM-DD-brief-slug.md`); provisioning brief renamed |
+| 2026-08-20 | Briefs playbook generalised — blog specifics excised, engineering format canonised (ADR-001 program) |

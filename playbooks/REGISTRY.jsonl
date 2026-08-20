@@ -1,4 +1,4 @@
-{"file":"briefs-playbook.md","date":"2026-08-20","status":"canonical","summary":"Brief format and execution process, imported from blog-posts pending okuda adaptation","meta":{"source":"blog-posts"}}
+{"file":"briefs-playbook.md","date":"2026-08-20","status":"canonical","summary":"Brief format, naming convention, and execution process — general, project-agnostic","meta":{"source":"blog-posts","adapted":"2026-08-20 generalised from blog-specific import"}}
 {"file":"debriefs-playbook.md","date":"2026-08-20","status":"canonical","summary":"Debrief format for retrospectives after completing a brief","meta":{"source":"blog-posts"}}
 {"file":"decisions-playbook.md","date":"2026-08-20","status":"canonical","summary":"ADR format, lifecycle, and the palimpsest mitigation protocol","meta":{"source":"blog-posts"}}
 {"file":"playbooks-playbook.md","date":"2026-08-20","status":"canonical","summary":"When and how to write playbooks; the four-tier knowledge system","meta":{"source":"blog-posts"}}
