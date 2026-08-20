@@ -1,6 +1,6 @@
 # TD Playbook — Solo Workflow
 
-> This playbook defines how to work on the blog-posts project using `td` for task management.
+> This playbook defines how to work on the okuda project using `td` for task management.
 
 ---
 
