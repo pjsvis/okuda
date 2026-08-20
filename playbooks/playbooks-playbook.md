@@ -17,7 +17,7 @@ Every playbook should follow this structure:
 
 ### 1. Title & Purpose
 
-* **H1 Title:** Clear, operational title (e.g., "Export Playbook").
+* **H1 Title:** Clear, operational title (e.g., "Registry Playbook").
 * **Purpose:** A single sentence explaining *what* this does and *why*.
 
 ### 2. Context & Prerequisites
@@ -37,13 +37,13 @@ This is the core. Use numbered lists. Be imperative.
 
 If the playbook defines a *style* rather than a *process*, list the rules here.
 * "Always use YAML front-matter."
-* "Never rename Jekyll underscore directories."
+* "Never hand-edit `INDEX.jsonl` — regenerate with `just reg-sync-fix`."
 
 ### 5. Validation (How do I know I'm done?)
 
 * Clear acceptance criteria.
-* "The export script runs without error."
-* "The post renders correctly on GitHub Pages."
+* "`just check` passes."
+* "The output renders correctly in the viewer."
 
 ## Maintenance
 
@@ -58,7 +58,7 @@ Playbooks are part of a three-tier knowledge architecture:
 
 | Tier | Directory | Contains | Answers |
 |------|-----------|----------|---------|
-| **Briefs** | `briefs/` | Work proposals and post outlines | "What should we write?" |
+| **Briefs** | `briefs/` | Work proposals | "What will we build?" |
 | **Playbooks** | `playbooks/` | Operational protocols and standards | "How do we do X?" |
 | **Decisions** | `decisions/` | Architecture decision records | "Why did we choose X over Y?" |
 | **Debriefs** | `debriefs/` | Retrospectives and lessons learned | "What happened and why?" |
@@ -76,10 +76,8 @@ Filename convention: `topic-playbook.md` or `topic-subtopic-playbook.md`.
 | Playbook | When to read |
 |----------|-------------|
 | `td-playbook.md` | Session startup and task management |
-| `briefs-playbook.md` | Before drafting a post |
-| `debriefs-playbook.md` | After publishing a post |
+| `briefs-playbook.md` | Before proposing work |
+| `debriefs-playbook.md` | After completing a brief |
 | `decisions-playbook.md` | When making a significant choice |
-| `conventions-playbook.md` | Active conventions and barnacle removal |
-| `barnacle-playbook.md` | How to identify and remove barnacles |
-| `export-playbook.md` | Multi-platform distribution workflow |
-| `blog-posts-playbook.md` | Jekyll pipeline reference |
+| `registry-playbook.md` | Index schema and sync |
+| `silo-playbook.md` | Silo structure and conventions |

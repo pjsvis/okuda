@@ -1,47 +1,84 @@
-# TD Playbook — Solo Workflow
+# TD Playbook
 
-> This playbook defines how to work on the blog-posts project using `td` for task management.
-
----
+> How to work on this project using `td` for task management. Verified against td v0.61.0 — when the binary and docs disagree, the binary wins. Re-verify on version bump.
 
 ## Session Startup
 
 At the start of every session:
 
 ```bash
-just orient    # see branch, git status, last commit
-git fetch origin
-td usage --new-session   # new session identity
+just orient              # branch, git status, last commit, registries
+td usage --new-session   # new session identity; see current state + open work
 ```
 
----
+Name the session if the auto-detected identity is opaque (review independence is session-scoped, and unnamed sessions are hard to read in the audit trail):
+
+```bash
+td whoami                # current session identity
+td session "feature-work"  # label the current session
+td session --new         # force a new session at context start (not mid-work — bypasses review)
+```
+
+`td usage` shows focused work, pending reviews, and open issues. Use `--new-session` only at conversation start or after `/clear` — forcing a new session mid-work bypasses the review-separation that gives the audit trail meaning.
 
 ## Claiming Work
 
 Before editing a file, claim its task:
 
 ```bash
-td start td-abc123       # start work on a task
+td start td-abc123       # begin work; sets status to in_progress, records this session as implementer
 td log "started"         # log progress
 ```
 
-If the task is claimed by another session, comment requesting handover:
+To track what you're looking at without formally starting (and without claiming implementer status):
+
+```bash
+td focus td-abc123       # set current focus; does not change status
+```
+
+If the task is already claimed by another session, comment requesting handover:
 
 ```bash
 td comment td-abc123 "I'd like to work on this — can you handoff?"
 ```
 
----
-
 ## Progress Logging
 
-After substantive changes:
+After substantive changes, log progress. **Use the structured flags** — they build the timeline future sessions read to avoid re-litigating decisions and to surface blockers:
 
 ```bash
-td log "completed phase 1, drafted outline for post X"
+td log "implemented the mermaid piping"                    # plain progress
+td log --decision "piping per-fence, not pre-parsing"     # a choice and why
+td log --blocker "mermaid-to-md segfaults on empty input" # something is in the way
+td log --hypothesis "the segfault is a stdin EOF race"    # a guess to test
+td log --tried "in-process parse — too complex, reverted" # an abandoned approach
+td log --result "benchmarks show 2ms per fence"           # a measured outcome
 ```
 
----
+Logs attach to the focused issue. The decision/blocker/hypothesis/tried/result types are what make the timeline worth reading — plain-text logs alone leave the next session to re-derive your reasoning.
+
+## Handoffs
+
+Handoffs are td's key feature: structured state so the next session resumes without guessing. **All four fields** is the standard, not two:
+
+```bash
+td handoff td-abc123 \
+  --done "mermaid piping, loose lists" \
+  --remaining "loose tables, --watch mode" \
+  --decision "pipe per-fence via stdin, not pre-parse" \
+  --uncertain "should --watch clear screen or scroll?"
+```
+
+Each field serves a purpose:
+
+| Field | Purpose |
+|------|---------|
+| `--done` | What was completed this session |
+| `--remaining` | What still needs to be done |
+| `--decision` | Choices made and why (prevents re-litigating) |
+| `--uncertain` | Open questions for the next session to resolve |
+
+Each flag is repeatable; stdin and `@file` forms also work (see `td handoff --help`). A handoff with only `--done`/`--remaining` loses decisions and open questions — the exact failure handoffs exist to prevent.
 
 ## Pre-Commit Gate
 
@@ -51,54 +88,128 @@ Before every commit:
 just check
 ```
 
----
-
 ## Ending Work
 
-Capture context before closing:
+Capture context, then submit for review:
 
 ```bash
-td handoff td-abc123 --done "post drafted and reviewed" --remaining "export and distribute"
-td review td-abc123           # submit for review
+td handoff td-abc123 --done "..." --remaining "..." --decision "..." --uncertain "..."
+td review td-abc123      # status -> in_review; records this session as review-requester
 ```
 
----
+`td review` auto-creates a minimal handoff if you didn't — but a real handoff is better documentation. For epics/parent issues, review cascades to open/in_progress descendants automatically.
+
+## Review Workflow
+
+**td enforces separation: the session that implemented cannot approve its own work.** This is the audit trail's spine — don't defeat it by spinning up a new session merely to look independent; use an genuinely separate context or acknowledge a trusted self-review.
+
+### As reviewer
+
+```bash
+td reviewable                       # issues in_review that this session can independently review
+td reviewable --include-approved    # also show reviewed issues you can close (delegated/trusted close)
+td context td-abc123                # read the handoff and full issue state
+td files td-abc123                  # files linked to the issue + change status
+```
+
+### Approve (close) or reject
+
+```bash
+td approve td-abc123                # approve + close in one step (independent reviewer)
+td reject td-abc123 --reason "missing error handling on empty input"   # back to open
+```
+
+Rejection returns the issue to `open` (re-pickable) with the reason attached, so the implementer knows what to fix.
+
+### Trusted mode (okuda's default — `review_policy_mode=trusted`)
+
+When you implemented the work yourself and cannot get an independent review, trusted mode asks you to say who reviewed it. Both forms are audited; naming a reviewer who did not review is worse than an honest self-review because it reads as independent in the trail.
+
+```bash
+# A different session/sub-agent reviewed it — credit them (no --reason required)
+td approve td-abc123 --reviewed-by "code-reviewer sub-agent"
+
+# You reviewed your own work — say so (requires --reason)
+td approve td-abc123 --self-review --reason "reviewed own diff; just check green"
+```
+
+### Record-only (orchestrator pattern)
+
+For orchestrator flows where a reviewer sub-agent attests and the orchestrator closes later — two steps:
+
+```bash
+td approve td-abc123 --record-only --reason "diff reviewed, tests pass"   # reviewer records
+td approve td-abc123 --reason "closing after recorded independent approval" # any session closes
+```
+
+A reviewer can also record a non-approving decision:
+
+```bash
+td approve td-abc123 --record-only --decision changes_requested --reason "fix X"
+```
+
+### Other review policy modes
+
+td exposes four modes via `review_policy_mode` (`trusted` default, `delegated`, `strict`, `balanced`). okuda runs `trusted`. See the core-workflow docs for switching; the legacy `balanced_review_policy` flag is deprecated — use `review_policy_mode=balanced` instead.
 
 ## Branch Hygiene
 
-- **Never commit directly to `main`**
-- **Always branch** before starting work: `git checkout -b feat/<name>`
-- **One epic per branch** — stack if dependent
+- **Never commit directly to `main`** — branch `feat/<name>` first
+- **One logical change per commit** — all files that must change together, no more
 - **Run `just check`** before every commit
+- **Fail-fast** — small change → `just check` → commit or revert; stuck >15 min: stop, revert, ask
 
----
+## Issue Lifecycle
 
-## TD Labels Convention
+```
+open --> in_progress --> in_review --> closed
+              |              |
+              v              | (reject)
+          blocked -----------+
+```
 
-| Label | Meaning |
-|-------|---------|
-| `claimed-by:<session>` | Active session working this task |
-| `blocked` | Task is blocked, not available |
-| `needs-review` | Ready for human review |
+- **open** — created, not yet started
+- **in_progress** — actively being worked (`td start`)
+- **blocked** — waiting on a dependency (`td block`; auto-unblocks when deps close)
+- **in_review** — implementation complete, awaiting review (`td review`)
+- **closed** — approved and done (`td approve`)
 
----
+Rejection sends an issue back to `open` with a reason attached.
 
 ## Common Commands
 
 ```bash
 td current              # what you're working on
-td list                 # all open tasks
-td list --status in_progress   # in-flight tasks
+td list                 # all open issues
+td list --status in_review   # in-flight review queue
 td next                 # highest priority open issue
-td context td-abc123    # full context for a task
-td ws start "Epic: X"   # start a work session for an epic
-td ws tag td-abc123 ... # tag tasks to workspace
-td ws end               # end current workspace
+td context td-abc123    # full context for an issue (handoff + state)
+td focus td-abc123      # set focus without starting
+td reviewable           # issues you can independently review
+td ready                # open issues by priority
+td blocked              # blocked issues
+td critical-path        # sequence that unblocks the most work
 ```
 
----
+### Multi-issue work sessions
+
+Group related issues under one work session — shared logging, shared handoff, cross-session continuity:
+
+```bash
+td ws start "Auth refactor"   # start a named work session
+td ws tag td-abc123 td-def456 # tag issues (auto-starts open ones)
+td ws log "shared migration"  # log to all tagged issues
+td ws handoff                 # handoff all tagged issues, end session
+td ws current                 # current work-session state
+td ws end                     # end without handoff
+```
+
+### Epics (hierarchy, not continuity)
+
+`td epic create` models a parent/child hierarchy for reporting and tree visualization — *not* session continuity. For phased work that spans sessions, prefer `td ws` (above); use epics when you need a reporting umbrella over issues that may be worked independently.
 
 ## Related
 
-- `AGENTS.md` — Project identity and coding rules
-- `playbooks/conventions-playbook.md` — Coding conventions and barnacle removal
+- `AGENTS.md` — project identity and rules of engagement
+- `playbooks/briefs-playbook.md` — how work is proposed
+- `playbooks/decisions-playbook.md` — where mid-execution choices go (ADR + palimpsest protocol)

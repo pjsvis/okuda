@@ -9,3 +9,6 @@ node_modules/
 # Build output
 dist/
 okuda
+
+# td task database (runtime state)
+.todos/

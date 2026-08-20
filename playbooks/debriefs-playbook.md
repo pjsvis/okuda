@@ -2,73 +2,76 @@
 
 ## Purpose
 
-A debrief is a retrospective document created after the completion of a post or series. It captures what was done, what went wrong, and what was learned to improve future writing.
+A debrief is a retrospective written after completing significant work. It captures what was built, what went wrong, and what was learned — so the next session starts from evidence, not folklore.
 
-**Critical:** Debriefs are **MANDATORY** for all significant posts per the writing process. A debrief documents what actually happened, not what was planned. It includes verification that the export pipeline worked correctly.
+**Debriefs are required for significant work** (AGENTS.md rule 8). A debrief documents what *actually happened*, not what the brief planned. Discrepancies between plan and reality are the interesting part — record them, don't smooth them over.
+
+**Frozen on completion.** A debrief is a record, not a living document. Once written it is never edited for content; corrections or later insights go in a new debrief or an ADR, not retroactive edits to the frozen record.
 
 ## File Naming
 
-- **Convention:** `YYYY-MM-DD-topic.md` (date first, always)
-- **Final Location:** `debriefs/` directory
+- **Convention:** `YYYY-MM-DD-topic.md` (date first, always — the silo sorts as a timeline)
+- **Final Location:** `debriefs/`
 
 ## Template
 
 ```markdown
 ---
 date: [YYYY-MM-DD]
-tags: [writing, distribution]
-agent: [claude | cursor | local-ai]
+tags: [area, tooling]
+agent: [agent identity]
 environment: [local | development | production]
 ---
 
-# Debrief: [Post Title]
+# Debrief: [Work Title]
 
 ## Accomplishments
 
-- **[What was published]:** [Platform and URL]
-- **[What was exported]:** [Platforms exported to]
+- **[What was built]:** [Feature, fix, or refactor shipped]
+- **[Scope]:** [What the work covered — and what it deliberately did not]
 
 ## Problems
 
-- **[Problem 1]:** [Issue encountered (export formatting, platform constraints, etc.)]
-- **[Problem 2]:** [Resolution or workaround applied]
+- **[Problem 1]:** [Issue encountered — defect, tooling failure, misestimate]
+- **[Resolution]:** [Fix or workaround applied; or "open" with a pointer to where it's tracked]
 
 ## Lessons Learned
 
-- **[Lesson 1]:** [Insight for future posts — framing, export process, platform differences]
+- **[Lesson 1]:** [Insight for future work — process, tooling, estimation]
 - **[Lesson 2]:** [What to do differently next time]
 
-## Platform Notes
+## Observations
 
-### Substack
-- What rendered well? What needed manual adjustment?
+Per-area notes on how the work revealed the system behaving:
 
-### Medium
-- What HTML elements broke? Any image handling issues?
+### [Component/area 1 — e.g. rendering]
+- [How it behaved under this work — surprises, rough edges]
 
-### Hacker News
-- Did the HN export format work? How was reception?
-
-### Twitter/X
-- Were the thread segments a good length? Any content loss?
+### [Component/area 2 — e.g. knowledge system]
+- [What helped, what got in the way]
 
 ## Metrics (if available)
 
-- **GitHub Pages views:**
-- **Substack opens:**
-- **Medium views:**
+- **`just check` runtime:**
+- **[Benchmark or measurable, if the work has one]:**
 
 ## Related
 
-- Brief: `briefs/brief-[topic]-[YYYY-MM-DD].md`
+- Brief: `briefs/YYYY-MM-DD-brief-slug.md`
 - Decision: `decisions/NNN-*.md`
-- Published post: `_posts/YYYY-MM-DD-slug.md`
-- Export output: `_exported/[platform]/`
+- Playbook: `playbooks/*-playbook.md` (if the work changed or exercised one)
 
 ## Post-Debrief Checklist
 
 - [ ] Frontmatter present: `date`, `tags`, `agent`, `environment`
-- [ ] Export output reviewed in `_exported/`
-- [ ] Platform distribution completed (or noted as deferred)
-- [ ] ADRs written for any framing/structural decisions made during drafting
-- [ ] Status of original brief updated to Done
+- [ ] Registered in `debriefs/INDEX.jsonl` — `status: done`, meta `adr`/`brief` as applicable
+- [ ] ADRs written for any decisions made during execution (not just those planned in the brief)
+- [ ] Status of the originating brief updated to `done`
+```
+
+## Guidance
+
+- **Honesty over polish.** A debrief that hides a mess is worse than no debrief — it launders failure into the record.
+- **Systems over villains.** When something went wrong, name the incentive or gap that allowed it, not the person who tripped it.
+- **Estimation is a measurement.** If the work took longer or shorter than the brief implied, record the delta and the suspected cause. The timeline of debriefs is how estimates calibrate.
+- **Cite forward.** Lessons that imply a process change should point at the playbook or ADR that will carry it — otherwise the lesson evaporates with the session.
