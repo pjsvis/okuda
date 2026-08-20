@@ -78,11 +78,22 @@ do not belong here; they go to ADRs (`decisions-playbook.md`).
 ## Phased Work
 
 Multi-deliverable or phased work is coordinated in **td**, not in epic
-files: `td epic create` for the umbrella, one issue per phase, and each
-phase's deliverable still gets its own brief. td is the continuity
-system — it tracks implementation state (claimed, in progress, handed
-off with remaining work) across sessions, which a static document
-cannot. See `td-playbook.md`.
+files. td offers two distinct constructs — pick by what you need:
+
+- **`td ws`** (work session) — the coordination tool for phased work:
+  `td ws start "<initiative>"`, one issue per phase, `td ws tag` them,
+  and `td ws handoff` carries shared state across sessions. Use this
+  when phases are worked sequentially and each phase's deliverable gets
+  its own brief.
+- **`td epic create`** — a parent/child hierarchy for reporting and
+  tree visualization. Use it when you need an umbrella over issues
+  that may be worked independently; it does not provide session
+  continuity.
+
+td is the continuity system — it tracks implementation state (claimed,
+in progress, handed off with remaining work) across sessions, which a
+static document cannot. For most phased brief work, `td ws` is the
+right tool. See `td-playbook.md`.
 
 ## Archiving
 
