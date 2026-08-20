@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# Bun / Node
+node_modules/
+*.log
+.env
+
+# Build output
+dist/
+okuda
