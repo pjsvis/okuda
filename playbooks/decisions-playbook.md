@@ -2,22 +2,22 @@
 
 ## Purpose
 
-An **Architecture Decision Record (ADR)** captures a significant choice — the *why* behind the *what*. Unlike briefs (aspirational, written before) and debriefs (retrospective, written after), ADRs are written *during* drafting, at the moment of decision.
+An **Architecture Decision Record (ADR)** captures a significant choice — the *why* behind the *what*. Unlike briefs (aspirational, written before) and debriefs (retrospective, written after), ADRs are written *during* execution, at the moment of decision.
 
-**The ADR answers the question nobody asked at the time but everyone will ask six months later: "Why did we frame it this way?"**
+**The ADR answers the question nobody asked at the time but everyone will ask six months later: "Why did we build it this way?"**
 
 ## When to Write an ADR
 
 Write an ADR when you:
-- Choose between two viable framings or structures for a post
-- Adopt a new tool or approach for the export pipeline
-- Discover a constraint that changes the content or format
+- Choose between two viable approaches for a component or subsystem
+- Adopt a new tool, dependency, or approach for the build pipeline
+- Discover a constraint that changes the architecture or scope
 - Deprecate or supersede a previous decision
 
 Don't write an ADR for:
-- Obvious choices with no real alternative ("we used Jekyll because it auto-deploys to GitHub Pages")
+- Obvious choices with no real alternative ("we use git for version control")
 - Temporary workarounds that don't shape the approach
-- Personal preference (sentence length, tone) — those don't go in docs
+- Personal preference (naming style, comment tone) — those don't go in docs
 
 ## ADR Format
 
@@ -30,7 +30,7 @@ Every ADR is a single `.md` file in `decisions/`. Use numbered prefixes (`001-`,
 **Status:** [Proposed | Accepted | Superseded]
 
 ## Context
-What situation led to this decision? One paragraph on the writing or technical context.
+What situation led to this decision? One paragraph on the technical context.
 
 ## Decision
 What did we choose? One sentence.
@@ -83,9 +83,9 @@ All ADRs reside in `decisions/`.
 | | Brief | ADR | Debrief |
 |---|-------|-----|---------|
 | **When** | Before | During | After |
-| **Answers** | "What will we write?" | "Why did we choose X?" | "What happened?" |
+| **Answers** | "What will we build?" | "Why did we choose X?" | "What happened?" |
 | **Audience** | Implementer | Future maintainer | Future agent |
-| **Lifespan** | Becomes irrelevant after publishing | Retains value indefinitely | Historical reference |
+| **Lifespan** | Becomes irrelevant after completion | Retains value indefinitely | Historical reference |
 | **Updates** | Status only (Open → Done) | Status only (Proposed → Accepted → Superseded) | Never (frozen on completion) |
 
 ## Review Checklist
