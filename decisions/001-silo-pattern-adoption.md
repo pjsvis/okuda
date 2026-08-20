@@ -35,4 +35,4 @@ Adopt the four-compartment silo pattern (briefs / playbooks / decisions / debrie
 ## Related
 - Playbook: `playbooks/silo-playbook.md`
 - Playbook: `playbooks/registry-playbook.md`
-- Brief: `briefs/brief-project-initialisation-2026-08-20.md`
+- Brief: `briefs/2026-08-20-brief-project-initialisation.md`

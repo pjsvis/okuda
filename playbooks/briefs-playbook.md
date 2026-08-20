@@ -56,8 +56,21 @@ When all `[ ]` items are checked and exports reviewed.
 **Rules:**
 - One brief per post or epic series
 - Epic = multi-post series, single brief = one deliverable post
-- File name: `brief-[topic]-[YYYY-MM-DD].md` or `epic-[name].md`
+- File name: `YYYY-MM-DD-brief-slug.md` — see Naming Convention below
 - Be specific in the objective — "write about AI" is not a brief, "explains why flat code improves LLM comprehension" is
+
+## Naming Convention
+
+Every brief is named `YYYY-MM-DD-brief-slug.md`. Strictly date-first.
+
+**Why this is non-negotiable:**
+
+- Briefs are the **record of intent** for the silo — every other document (decisions, debriefs) derives from and references a brief, never the reverse.
+- ISO date strings sort lexically = chronologically. `ls briefs/` is a timeline: cadence and gaps in intent are visible by simple inspection, no tooling required.
+- The literal `brief` token keeps the document recognisable when its filename is quoted out of context (ADR Related sections, debriefs, commit messages).
+- Epics, if ever used, follow the same rule: `YYYY-MM-DD-epic-slug.md`.
+
+Example: `briefs/2026-08-20-brief-project-initialisation.md`
 
 ## Executing a Brief
 
@@ -96,7 +109,7 @@ One paragraph. Why does this series matter? What's the through-line?
 
 **What:** [Description]
 **Platform:** [substack | medium | all]
-**Brief:** `briefs/brief-[topic]-[date].md`
+**Brief:** `briefs/YYYY-MM-DD-brief-slug.md`
 
 ### 02 — [Post name]
 
@@ -121,6 +134,7 @@ See `playbooks/decisions-playbook.md` for the ADR format and process.
 ## Review Checklist
 
 Before committing a brief:
+- [ ] Filename is `YYYY-MM-DD-brief-slug.md` (date-first — see Naming Convention)
 - [ ] Objective is specific and actionable
 - [ ] Content outline has clear structure (hook, body, resolution, CTA)
 - [ ] No ambiguous language ("should", "maybe", "consider")

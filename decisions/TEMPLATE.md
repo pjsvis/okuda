@@ -27,6 +27,6 @@ What did we choose? One sentence.
 -
 
 ## Related
-- Brief: `briefs/brief-[topic]-[YYYY-MM-DD].md`
+- Brief: `briefs/YYYY-MM-DD-brief-slug.md`
 - Playbook: `playbooks/*.md`
 - ADR: `decisions/NNN-*.md` (supersedes / superseded by)

@@ -60,7 +60,7 @@ environment: [local | development | production]
 
 ## Related
 
-- Brief: `briefs/brief-[topic]-[YYYY-MM-DD].md`
+- Brief: `briefs/YYYY-MM-DD-brief-slug.md`
 - Decision: `decisions/NNN-*.md`
 - Published post: `_posts/YYYY-MM-DD-slug.md`
 - Export output: `_exported/[platform]/`
