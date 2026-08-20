@@ -1,6 +1,6 @@
 # okuda — Project Identity
 
-A terminal markdown viewer built on `Bun.markdown`, rendering mermaid fences via the `mermaid-to-md` Rust CLI, compiled to a single binary. Design source of truth: `docs/2026-08-20-origin-doc.md`.
+A terminal markdown viewer built on `Bun.markdown`, rendering mermaid fences via the `mermaid-to-md` Rust CLI, compiled to a single binary. Design source of truth: `docs/2026-08-20-origin-doc.md`. Constitution: `system.md` (The Edinburgh Protocol).
 
 ## Rules of Engagement
 

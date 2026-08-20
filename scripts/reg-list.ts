@@ -67,4 +67,4 @@ for (const name of names) {
     console.log(`  ${e.date}  ${e.status.padEnd(wStatus)}  ${e.file.padEnd(wFile)}  ${e.summary}${src}`);
   }
 }
-console.log(`\n${total} document(s) across ${names.length} registri${names.length === 1 ? "y" : "es"}`);
+console.log(`\n${total} document(s) across ${names.length} registr${names.length === 1 ? "y" : "ies"}`);

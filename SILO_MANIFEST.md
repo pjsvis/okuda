@@ -13,28 +13,32 @@ A high-performance terminal markdown viewer built on `Bun.markdown`, compiled to
 
 ```
 okuda/
-├── docs/                    ← Origin and design documents
-│   └── 2026-08-20-origin-doc.md
-├── briefs/                  ← Work proposals (INDEX.jsonl)
-├── debriefs/                ← Retrospectives (INDEX.jsonl)
-├── decisions/               ← ADRs (INDEX.jsonl, TEMPLATE.md)
-├── playbooks/               ← Operational protocols (REGISTRY.jsonl)
-├── scripts/                 ← Registry tooling (Bun, zero deps)
+├── playbooks/               ← Operational protocols (REGISTRY.jsonl) — the first folder
+├── briefs/                   ← Records of intent (INDEX.jsonl)
+├── decisions/                ← ADRs (INDEX.jsonl, TEMPLATE.md)
+├── docs/                     ← Origin and design documents
+├── scripts/                  ← Registry tooling (Bun, zero deps)
 │   ├── reg-sync.ts
 │   └── reg-list.ts
-├── justfile                 ← Task runner facade
-├── AGENTS.md                ← Project identity and rules
-├── SILO_MANIFEST.md         ← This file
-└── README.md                ← Public overview
+├── justfile                  ← Shared operational lexicon
+├── system.md                 ← The Edinburgh Protocol — the silo's constitution
+├── AGENTS.md                 ← Agent rules of engagement
+├── SILO_MANIFEST.md          ← This file
+├── README.md                 ← Public overview
+└── .gitignore
 ```
+
+Compartments are created on demand (`debriefs/` appears with the first
+debrief; `.archive/<brief-name>/` receives completed work — see
+`playbooks/silo-playbook.md`).
 
 ## Compartments
 
 | Directory | Purpose | Index | Status values |
 |-----------|---------|-------|---------------|
-| `briefs/` | Work proposals — what we will build | `INDEX.jsonl` | `open`, `in_progress`, `done` |
-| `debriefs/` | Retrospectives — what happened | `INDEX.jsonl` | `done` |
+| `briefs/` | Records of intent — the spine | `INDEX.jsonl` | `open`, `in_progress`, `done` |
 | `decisions/` | ADRs — why we chose X | `INDEX.jsonl` | `Proposed`, `Accepted`, `Superseded` |
+| `debriefs/` | Retrospectives — created on demand | `INDEX.jsonl` | `done` |
 | `playbooks/` | Protocols — how we do X | `REGISTRY.jsonl` | `canonical`, `project` |
 | `docs/` | Design sources of truth | — (curated, not accumulated) | — |
 | `scripts/` | Tooling | — (code, not documents) | — |
@@ -64,7 +68,7 @@ Adding a document: write it → run `just reg-sync-fix` → review index entry �
 Playbooks were imported from the blog-posts silo on 2026-08-20. Tracked deviations:
 
 * `spacex-mermaid` (origin doc) → actual binary is `mermaid-to-md`
-* Blog-centric brief/export/Jekyll flows in `silo-playbook.md` are templates, not rules — its Jekyll tree and export recipes remain illustrative until a real need arrives
+* Blog-centric brief/export/Jekyll flows in `silo-playbook.md` — generalised 2026-08-20: minimum viable silo, on-demand folders, justfile-as-lexicon, system.md, .archive doctrine (resolved; see git history)
 * Topic-first brief filenames (`brief-[topic]-[date].md` in the import) — fixed 2026-08-20: strict date-first `YYYY-MM-DD-brief-slug.md` per ADR-002
 * `briefs-playbook.md` generalised 2026-08-20 — blog post framing excised, engineering format canonised (resolved; see git history)
 * References to non-existent playbooks (`conventions-`, `barnacle-`, `export-`, `blog-posts-playbook.md`) remain in Related tables until real need arises
@@ -76,3 +80,4 @@ Playbooks were imported from the blog-posts silo on 2026-08-20. Tracked deviatio
 | 2026-08-20 | Origin doc; playbooks imported; silo provisioned (ADR-001); git baseline on `main` |
 | 2026-08-20 | ADR-002: date-first brief naming enforced (`YYYY-MM-DD-brief-slug.md`); provisioning brief renamed |
 | 2026-08-20 | Briefs playbook generalised — blog specifics excised, engineering format canonised (ADR-001 program) |
+| 2026-08-20 | Silo playbook generalised: minimum viable silo, on-demand folders, system.md (Edinburgh Protocol), .archive scaling; empty debriefs/ scaffolding removed |

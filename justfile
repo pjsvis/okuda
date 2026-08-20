@@ -37,7 +37,7 @@ orient:
     @echo "status:  $(git status --short | wc -l | tr -d ' ') changed file(s)"
     @-git status --short
     @echo "last:    $(git log -1 --oneline)"
-    @echo "docs:    $(grep -c . briefs/INDEX.jsonl 2>/dev/null || echo 0) briefs, $(grep -c . decisions/INDEX.jsonl 2>/dev/null || echo 0) decisions, $(wc -l < debriefs/INDEX.jsonl 2>/dev/null | tr -d ' ') debriefs, $(grep -c . playbooks/REGISTRY.jsonl 2>/dev/null || echo 0) playbooks"
+    @echo "docs:    $(cat briefs/INDEX.jsonl 2>/dev/null | grep -c .) briefs, $(cat decisions/INDEX.jsonl 2>/dev/null | grep -c .) decisions, $(cat debriefs/INDEX.jsonl 2>/dev/null | grep -c .) debriefs, $(cat playbooks/REGISTRY.jsonl 2>/dev/null | grep -c .) playbooks"
 
 # ── Quality gate ─────────────────────────────────────────────
 
