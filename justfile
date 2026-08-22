@@ -7,25 +7,9 @@
 
 # ── Navigation ───────────────────────────────────────────────
 
-# Workflow guide — state-aware, user-facing commands only
+# Workflow guide — static; live state is `just orient`
 help:
-    @echo "okuda — silo workflow"
-    @echo ""
-    @echo "Current state: $(git branch --show-current), $(git status --short | wc -l | tr -d ' ') changed file(s)"
-    @echo "Pending:       $(grep -c '\"status\":\"pending\"' briefs/INDEX.jsonl 2>/dev/null) briefs, $(grep -c '\"status\":\"pending\"' decisions/INDEX.jsonl 2>/dev/null) decisions"
-    @echo "Last commit:   $(git log -1 --oneline)"
-    @echo ""
-    @echo "User commands:"
-    @echo "  just info      what is this project?"
-    @echo "  just orient    full state: branch, files, registries, last commit"
-    @echo "  just --list    all available recipes (including operator tools)"
-    @echo ""
-    @echo "Work cycle:  brief → branch → implement → check → review → debrief"
-    @echo ""
-    @echo "Operator commands (see just --list for full inventory):"
-    @echo "  just check        quality gate (registry sync) — run before every commit"
-    @echo "  just reg-sync     check registries for drift"
-    @echo "  just reg-sync-fix regenerate indexes from filesystem"
+    @cat docs/help.md
 
 # Project rationale and origin
 info:
