@@ -1,7 +1,7 @@
 # Brief: ANSI Emission Engine & Closed Grammar Contract
 
 **Date:** 2026-08-22
-**Status:** Pending
+**Status:** Done (contract accepted; implementation deferred to brief 003)
 **Depends on:** 2026-08-20-brief-project-initialisation.md (done)
 
 ---
@@ -156,23 +156,20 @@ This avoids premature WASM complexity. The rendering pipeline is a pure function
 
 ## Work Plan
 
-1. [ ] Write `src/grammar.ts`: closed AST node types matching the grammar table above. No `any`.
-2. [ ] Write `src/width.ts`: display column calculator using `Intl.Segmenter` + East Asian Width lookup.
-3. [ ] Write `src/ansi.ts`: palette loader, color mode detection, emitter functions for each semantic role.
-4. [ ] Write `src/wrap.ts`: hard-wrap engine with indentation continuation. Unit-test against CJK, emoji, combining marks, and inline ANSI.
-5. [ ] Write `src/render.ts`: Bun.markdown custom handlers wiring grammar → ansi + wrap. Mermaid blocks intercepted and piped to `mermaid-to-md`.
-6. [ ] Write `src/palette.ts`: default Rosé Pine palette + `~/.config/okuda/palette.json` override loader.
-7. [ ] Document the grammar rejection behavior: a test file containing every rejected element, asserting that output contains no unhandled markup.
-8. [ ] Run `just check` — registry indexes updated, no drift.
+*This brief's deliverable is the contract itself, not code (see Scope: implementation is explicitly out). The original draft carried implementation tasks in this section — a scope contradiction, reconciled 2026-08-22: those items now seed brief 003.*
+
+1. [x] Closed grammar specification (table above) — what renders, what strips, what flattens
+2. [x] ANSI emission rules: true-color palette, OSC 8 handling, escape hygiene (4 rules)
+3. [x] Layout rules: hard-wrap mandate, width math, indentation continuation table
+4. [x] Rust boundary decision: TS layout engine for Phase 1, with three profiling triggers for re-evaluation
+5. [x] Irreversible core contract recorded as ADR-004 (hard-wrap, never soft-wrap)
 
 ## Acceptance Criteria
 
-- A markdown file using only the closed grammar renders to stdout with correct alignment on CJK text, emoji, and combining diacritics.
-- A markdown file containing HTML tags, footnotes, task lists, and indented code blocks renders without crash and without emitting raw markup.
-- `NO_COLOR=1 okuda file.md` emits plain text with identical line breaks and spacing.
-- Mermaid blocks are replaced by `mermaid-to-md` ASCII output; the surrounding document layout is undisturbed.
-- Tables render with no ASCII box borders, amber first column, cyan header, and blank lines between rows.
-- Wrap math passes property tests: every emitted line ≤ `stdout.columns` display columns; ANSI byte length > display length.
+- The grammar table covers every element the workflow generates, with explicit rejection (strip/flatten, never error)
+- Every semantic role has a hex + ANSI byte mapping; `NO_COLOR`/`TERM=dumb`/`FORCE_COLOR` behavior specified
+- Width math rules are pinned: grapheme counting, EAW 2-column, zero-width escapes and combining marks
+- The contract is sufficient for brief 003 to implement without reopening spec decisions
 
 ## Notes — Barnacles & Decisions
 
@@ -186,4 +183,4 @@ This avoids premature WASM complexity. The rendering pipeline is a pure function
 
 ## Next Brief
 
-Implementation: the `src/` tree, `bun build --compile`, `--watch` mode, and `shiki` syntax highlighting integration.
+Implementation (brief 003): the `src/` tree (`grammar`, `width`, `ansi`, `wrap`, `render`, `palette` — the six modules scoped above), `bun build --compile`, `--watch` mode, and `shiki` syntax highlighting integration. Acceptance criteria from this brief's original draft (CJK/emoji alignment, rejection-file test, `NO_COLOR` parity, Mermaid piping, loose tables, wrap property tests) carry forward verbatim to brief 003.
