@@ -1,7 +1,9 @@
 # okuda — terminal markdown viewer (origin: docs/2026-08-20-origin-doc.md)
 # Silo facade: recipes are one-line delegations; logic lives in scripts/.
 
-default: help
+# Default: list all available recipes
+@default:
+    just --list
 
 # ── Navigation ───────────────────────────────────────────────
 
