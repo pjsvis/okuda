@@ -7,22 +7,25 @@
 
 # ── Navigation ───────────────────────────────────────────────
 
-# Workflow guide
+# Workflow guide — state-aware, user-facing commands only
 help:
     @echo "okuda — silo workflow"
     @echo ""
-    @echo "  just orient          current state: branch, git status, last commit, registries"
-    @echo "  just info            project rationale and origin"
+    @echo "Current state: $(git branch --show-current), $(git status --short | wc -l | tr -d ' ') changed file(s)"
+    @echo "Pending:       $(grep -c '\"status\":\"pending\"' briefs/INDEX.jsonl 2>/dev/null) briefs, $(grep -c '\"status\":\"pending\"' decisions/INDEX.jsonl 2>/dev/null) decisions"
+    @echo "Last commit:   $(git log -1 --oneline)"
     @echo ""
-    @echo "  Work:  brief → branch → implement → check → review → debrief"
+    @echo "User commands:"
+    @echo "  just info      what is this project?"
+    @echo "  just orient    full state: branch, files, registries, last commit"
+    @echo "  just --list    all available recipes (including operator tools)"
     @echo ""
-    @echo "  just check           quality gate (registry sync) — run before every commit"
-    @echo "  just reg-sync        check all registries for drift"
-    @echo "  just reg-sync-fix    regenerate indexes from filesystem"
-    @echo "  just reg-briefs      list briefs registry"
-    @echo "  just reg-debriefs    list debriefs registry"
-    @echo "  just reg-decisions   list decisions registry"
-    @echo "  just reg-playbooks   list playbooks registry"
+    @echo "Work cycle:  brief → branch → implement → check → review → debrief"
+    @echo ""
+    @echo "Operator commands (see just --list for full inventory):"
+    @echo "  just check        quality gate (registry sync) — run before every commit"
+    @echo "  just reg-sync     check registries for drift"
+    @echo "  just reg-sync-fix regenerate indexes from filesystem"
 
 # Project rationale and origin
 info:
