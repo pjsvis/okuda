@@ -4,6 +4,14 @@
 
 The justfile is the **facade of the silo**: the single public interface to the repository. Users and agents reach the workflow through `just <recipe>` and nothing else. All logic lives behind the facade in `scripts/` — recipes are one-line delegations, never implementations.
 
+**Two audiences, one facade.** Agents and humans use the justfile — sometimes separately, sometimes together (paired terminal: agent runs on the left, human audits on the right). The design consequence:
+
+- **Terse** — `just --list`: the grouped noun-phrase menu. Shared inventory, minimal tokens.
+- **Friendly** — `just help`: the narrative guide (workflow, standing rules) for beings who want a sentence, not a menu.
+- **Discoverable** — consistent prefixes (`reg-*`), groups mirroring sections, errors that list valid inputs (`reg-sync` does this), pointers from AGENTS.md and README.
+
+Recipe names are the shared vocabulary: `just check` must mean the same thing in the agent's shell and the human's head. **Treat recipe renames as API changes** — same-commit update to `docs/help.md`, commit message naming the rename.
+
 ## House Style
 
 The rules below are settled by usage (see `git log` on the justfile, Aug 2026). Follow them; change them only via this playbook.
