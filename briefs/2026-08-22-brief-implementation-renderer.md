@@ -42,7 +42,7 @@ Implement okuda per the accepted rendering contract: the `src/` tree, the `merma
 3. [ ] `src/ansi.ts` — color mode detection (`NO_COLOR`/`TERM=dumb`/`COLORTERM`/`FORCE_COLOR`), emitter functions per semantic role, escape hygiene (zero-width tracking, style re-emit at wrap boundaries, OSC 8 pairing, per-line reset).
 4. [ ] `src/palette.ts` — default Rosé Pine Base palette (contract's byte-exact mappings) + `~/.config/okuda/palette.json` override loader.
 5. [ ] `src/wrap.ts` — hard-wrap engine with indentation continuation per the contract's table. Never wraps code fences or Mermaid output.
-6. [ ] `src/render.ts` — Bun.markdown custom handlers: grammar → ansi + wrap. Mermaid fences intercepted pre-render, piped to `mermaid-to-md` via `Bun.spawn`, ASCII inserted verbatim.
+6. [ ] `src/render.ts` — Bun.markdown custom handlers: grammar → ansi + wrap. **Two additional contracts land here** (both added 2026-08-23, after the original work plan): (a) Mermaid fences intercepted pre-render, piped to `mermaid-to-md` via `Bun.spawn`, then the returned ASCII is **classified into border/arrow/text channels and coloured per the palette** — not inserted verbatim (per `briefs/2026-08-23-brief-diagram-colour-classification.md`); (b) the **table token handler** applies the uniform presentation layer — loose rows, no internal pipes, header rule kept, three-channel colour, alignment markers preserved, no provenance detection (per `briefs/2026-08-23-brief-table-rendering-policy.md`).
 7. [ ] `src/cli.ts` — argument parsing (`<file>`, `--watch`, `--no-color`), terminal width detection (`stdout.columns`, fallback 80), resize re-render under `--watch`.
 8. [ ] `tests/` — width property tests (every emitted line ≤ width; ANSI byte length > display length), rejection file (HTML, footnotes, task lists, indented code → no crash, no raw markup), `NO_COLOR` parity, palette override, CJK/emoji/combining-mark alignment.
 9. [ ] `justfile` — `dev` (bun run), `build` (compile), `test` (bun test) recipes, grouped per justfile playbook.
@@ -55,8 +55,8 @@ Implement okuda per the accepted rendering contract: the `src/` tree, the `merma
 * A markdown file using only the closed grammar renders to stdout with correct alignment on CJK text, emoji, and combining diacritics.
 * A markdown file containing HTML tags, footnotes, task lists, and indented code blocks renders without crash and without emitting raw markup.
 * `NO_COLOR=1 okuda file.md` (and `--no-color`) emits plain text with identical line breaks and spacing to the colored render.
-* Mermaid blocks are replaced by `mermaid-to-md` ASCII output; the surrounding document layout is undisturbed; blocks wider than the terminal overflow, never wrap.
-* Tables render with no ASCII box borders, amber first column, cyan header, blank lines between rows.
+* Mermaid blocks are replaced by `mermaid-to-md` ASCII output; the returned ASCII is classified into border/arrow/text channels and coloured per the palette; the surrounding document layout is undisturbed; blocks wider than the terminal overflow, never wrap.
+* Tables render with no ASCII box borders, amber first column, cyan header, blank lines between rows, **alignment markers preserved** (`:---:`/`--:`/`---:` carried through).
 * Wrap math passes property tests: every emitted line ≤ `stdout.columns` display columns; ANSI byte length > display length.
 * `bun build --compile` produces a single executable; it renders `docs/help.md` and the origin doc.
 * **Dogfood:** `just help` runs through okuda itself; the justfile playbook records the flip.
@@ -71,6 +71,8 @@ Implement okuda per the accepted rendering contract: the `src/` tree, the `merma
 | True-color only, `NO_COLOR` escape hatch | brief 002 | No 256/16-color fallback logic. |
 | TS layout engine, no Rust/WASM Phase 1 | brief 002 | Re-evaluate only on the three profiling triggers. |
 | Pure-function pipeline | brief 002 | `Token[] + Width + Palette → string[]` — ported trivially if ever needed. |
+| Mermaid colour classification in render layer, not on the binary | brief 2026-08-23-diagram-colour-classification | No `--color` flag on `mermaid-tui`; palette sovereignty stays with Okuda. |
+| Uniform table presentation, no provenance detection | brief 2026-08-23-table-rendering-policy | Alignment preserved; single-line cells; bake stays rejected. |
 
 ## Next Brief
 

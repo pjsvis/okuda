@@ -62,8 +62,8 @@ Okuda does not parse CommonMark. It parses **Okuda Markdown** — a strict subse
 | Code (inline) | Yes | Backtick delimited. Green ANSI, no padding. |
 | Blockquote | Yes | Single level only. Left pipe (`\x1b[90m│\x1b[0m`) + 2-space indent. Muted gray. |
 | Link | Yes | OSC 8 hyperlink escape (`\e]8;;URL\e\\`) wrapping styled text. If terminal does not support OSC 8, fall back to underlined cyan text. |
-| Table | Yes (loose) | No ASCII box borders. Column gutter spacing. Header row: cyan + horizontal rule. First column: amber/bold (row keys). Blank line between rows. |
-| Mermaid block | Yes | Intercepted pre-render. Content piped to `mermaid-to-md` Rust CLI. Returned ASCII inserted verbatim. No wrapping applied. |
+| Table | Yes (loose) | No ASCII box borders. Column gutter spacing. Header row: cyan + horizontal rule. First column: amber/bold (row keys). Blank line between rows. Alignment markers preserved. Uniform presentation — no provenance detection. See `briefs/2026-08-23-brief-table-rendering-policy.md`. |
+| Mermaid block | Yes | Intercepted pre-render. Content piped to `mermaid-to-md` Rust CLI. Returned ASCII classified into border/arrow/text channels and coloured per the palette. No wrapping applied. See `briefs/2026-08-23-brief-diagram-colour-classification.md`. |
 | Raw HTML | **No** | Stripped silently. No error. |
 | Footnotes | **No** | Not supported. Inline parenthetical URLs only. |
 | Image | **No** | Alt text emitted as `[image: alt]` if no link fallback. |
@@ -100,6 +100,9 @@ Okuda does not parse CommonMark. It parses **Okuda Markdown** — a strict subse
 | Table header | `#31748f` | `\x1b[1;38;2;49;116;143m` |
 | Table row key (col 0) | `#f6c177` | `\x1b[1;38;2;246;193;119m` |
 | Muted / rule | `#6e6a86` | `\x1b[38;2;110;106;134m` |
+| Diagram border | `#6e6a86` | `\x1b[38;2;110;106;134m` |
+| Diagram arrow | `#9ccfd8` | `\x1b[38;2;156;207;216m` |
+| Diagram text | `#e0def4` | `\x1b[38;2;224;222;244m` |
 | Reset | — | `\x1b[0m` |
 
 User override: `~/.config/okuda/palette.json` (JSON object mapping semantic role to `"#RRGGBB"`).
