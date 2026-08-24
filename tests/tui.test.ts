@@ -78,23 +78,21 @@ describe("tui — viewport slice", () => {
   });
 });
 
-describe("tui — footerLine (Glow layout: state left, identity right)", () => {
+describe("tui — footerLine (identity left, affordance right)", () => {
   const styler = makeStyler(DEFAULT_PALETTE, "truecolor");
   const muted = (s: string) => styler.role("muted", s);
   const badge = (s: string) => styler.badge(s);
   const FILE = "/Users/x/Dev/okuda/docs/audit.md";
 
-  test("compact: ? help left; badge + folder/file right", () => {
+  test("compact: badge + folder/file left; ? help right", () => {
     const f = footerLine(72, "Gloam", FILE, false, muted, badge);
-    expect(f.startsWith(muted("? help"))).toBe(true);
-    expect(f).toContain("\x1b[48;2;255;121;198m"); // badge pink bg
-    expect(f).toContain("\x1b[38;2;248;248;242m"); // badge near-white fg
-    expect(f.endsWith(" Gloam \x1b[0m " + muted("docs/audit.md"))).toBe(true);
+    expect(f.startsWith(badge("Gloam") + " " + muted("docs/audit.md"))).toBe(true);
+    expect(f.endsWith(muted("? help"))).toBe(true);
   });
-  test("toggled: verbose HINTS replace the compact left", () => {
+  test("toggled: verbose HINTS replace the compact right", () => {
     const f = footerLine(72, "Gloam", FILE, true, muted, badge);
-    expect(f.startsWith(muted(HINTS))).toBe(true);
-    expect(f).not.toContain("? help");
+    expect(f.startsWith(badge("Gloam") + " " + muted("docs/audit.md"))).toBe(true);
+    expect(f.endsWith(muted(HINTS))).toBe(true);
   });
   test("narrow width: at least one space gap, no throw", () => {
     const f = footerLine(10, "Gloam", FILE, false, muted, badge);
@@ -105,7 +103,8 @@ describe("tui — footerLine (Glow layout: state left, identity right)", () => {
     const f = footerLine(72, "Gloam", FILE, false,
       (s) => none.role("muted", s), (s) => none.badge(s));
     expect(f).not.toContain("\x1b");
-    expect(f.endsWith(" Gloam  docs/audit.md")).toBe(true);
+    expect(f.startsWith(" Gloam  docs/audit.md")).toBe(true);
+    expect(f.endsWith("? help")).toBe(true);
   });
 });
 

@@ -7,7 +7,7 @@
  *     read keystroke bytes
  *     advance scroll offset (or quit / reload)
  *     paint rendered lines through the viewport
- *     paint footer: keystroke hints left, Gloam right, muted
+ *     paint footer: Gloam badge + folder/file left, help right, muted
  *   } → raw mode off → alternate screen off
  *
  * Composes over the render plane (render.ts); never touches rendering.
@@ -101,11 +101,11 @@ function compactLeft(): string {
 }
 
 /**
- * Compose the footer (Glow layout): help-or-hints left, badge +
- * folder/filename right, plain gap between. Pure.
+ * Compose the footer: badge + folder/filename left (identity leads —
+ * the glance position), help-or-hints right (affordances trail). Pure.
  *
- * showHints=false (default): `? help` left — the toggle affordance.
- * showHints=true (toggled via `?`): the verbose HINTS line.
+ * showHints=false (default): `? help` right — the toggle affordance.
+ * showHints=true (toggled via `?`): the verbose HINTS line right.
  */
 export function footerLine(
   width: number,
@@ -115,12 +115,12 @@ export function footerLine(
   muted: (s: string) => string,
   badge: (s: string) => string,
 ): string {
-  const leftText = showHints ? HINTS : compactLeft();
   const name = displayPath(file);
-  // Right: badge (label + 2 padding) + space + folder/file.
-  const rightWidth = label.length + 2 + 1 + name.length;
-  const gap = Math.max(1, width - leftText.length - rightWidth);
-  return muted(leftText) + " ".repeat(gap) + badge(label) + " " + muted(name);
+  const rightText = showHints ? HINTS : compactLeft();
+  // Left: badge (label + 2 padding) + space + folder/file.
+  const leftWidth = label.length + 2 + 1 + name.length;
+  const gap = Math.max(1, width - leftWidth - rightText.length);
+  return badge(label) + " " + muted(name) + " ".repeat(gap) + muted(rightText);
 }
 
 // ── I/O loop ──────────────────────────────────────────────────────────
