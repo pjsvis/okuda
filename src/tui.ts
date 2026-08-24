@@ -32,6 +32,7 @@ export type KeyAction =
   | "page-down" | "page-up"
   | "half-down" | "half-up"
   | "top" | "bottom" | "reload"
+  | "help"
   | null;
 
 const ESC = 0x1b;
@@ -58,6 +59,7 @@ export function decodeKey(buf: Uint8Array): KeyAction {
     case 0x67: return "top";            // g
     case 0x47: return "bottom";         // G
     case 0x72: return "reload";         // r
+    case 0x3f: return "help";           // ? — toggle verbose hints
   }
   // Escape sequences: ESC [ <final> or ESC [ <n> ~.
   if (b0 === ESC && buf.length >= 3 && buf[1] === 0x5b) {
@@ -86,18 +88,46 @@ export function viewport(
 
 const HINTS = "q quit · j/k scroll · g/G top/bottom · Ctrl-D/U half · r reload";
 
-/** Compose the footer: hints left, badge right, plain gap between. Pure. */
+/** Scroll position as a percentage. Whole doc visible → 100. Pure. */
+export function scrollPercent(scroll: number, maxScroll: number): number {
+  if (maxScroll <= 0) return 100;
+  return Math.min(100, Math.max(0, Math.round((scroll / maxScroll) * 100)));
+}
+
+/** Display path: folder/basename (Glow convention). Pure. */
+export function displayPath(file: string): string {
+  const parts = file.split("/").filter(Boolean);
+  if (parts.length <= 1) return file;
+  return parts.slice(-2).join("/");
+}
+
+/** Compact LHS: live state + help affordance. Pure. */
+function compactLeft(pct: number): string {
+  return `${pct}% · ? help`;
+}
+
+/**
+ * Compose the footer (Glow layout): compact hints-or-percent left,
+ * badge + folder/filename right, plain gap between. Pure.
+ *
+ * showHints=false (default): `NN% · ? help` left — live state wins.
+ * showHints=true (toggled via `?`): the verbose HINTS line.
+ */
 export function footerLine(
   width: number,
   label: string,
+  file: string,
+  pct: number,
+  showHints: boolean,
   muted: (s: string) => string,
   badge: (s: string) => string,
 ): string {
-  // Badge pads with 1 space each side (" Gloam "), so its visible width
-  // is label.length + 2 — account for that in the gap or it overflows.
-  const badgeWidth = label.length + 2;
-  const gap = Math.max(1, width - HINTS.length - badgeWidth);
-  return muted(HINTS) + " ".repeat(gap) + badge(label);
+  const leftText = showHints ? HINTS : compactLeft(pct);
+  const name = displayPath(file);
+  // Right: badge (label + 2 padding) + space + folder/file.
+  const rightWidth = label.length + 2 + 1 + name.length;
+  const gap = Math.max(1, width - leftText.length - rightWidth);
+  return muted(leftText) + " ".repeat(gap) + badge(label) + " " + muted(name);
 }
 
 // ── I/O loop ──────────────────────────────────────────────────────────
@@ -130,6 +160,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
 
   let lines: string[] = await renderLines(await readSource(), opts.width);
   let scroll = 0;
+  let showHints = false; // `?` toggles: compact % footer ↔ verbose hints
 
   const dims = () => ({
     rows: process.stdout.rows || opts.rows || 24,
@@ -146,9 +177,10 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     }
     process.stdout.write("\x1b[2J\x1b[H"); // clear + home
     process.stdout.write(view.visible.join("\n"));
-    // Footer at the last row.
+    // Footer at the last row: % left, badge + folder/file right.
     process.stdout.write(`\x1b[${rows};1H`);
-    process.stdout.write(footerLine(cols, "Gloam", muted, badge));
+    const pct = scrollPercent(view.scroll, view.maxScroll);
+    process.stdout.write(footerLine(cols, "Gloam", opts.file, pct, showHints, muted, badge));
   };
 
   const reload = async (): Promise<void> => {
@@ -161,6 +193,11 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     const action = decodeKey(new Uint8Array(data));
     if (action === null) return;
     if (action === "quit") return cleanup();
+    if (action === "help") {
+      showHints = !showHints;
+      paint();
+      return;
+    }
     const { rows } = dims();
     const height = rows - 1;
     const { maxScroll } = viewport(lines, 0, height);
