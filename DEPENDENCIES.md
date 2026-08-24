@@ -18,9 +18,19 @@ the real dependency.
 
 ## Runtime dependency note
 
-The compiled okuda binary will have zero external npm runtime
-dependencies; `mermaid-to-md` is its one runtime dependency — invoked per
-`mermaid` code fence, never parsed in-process.
+The compiled okuda binary has zero external npm runtime dependencies;
+`mermaid-to-md` is its one runtime dependency — invoked per `mermaid`
+code fence via `Bun.spawn`, never parsed in-process.
+
+## Development dependencies
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `bun-types` | ^1.3.11 | TypeScript definitions for `Bun.markdown`, `Bun.spawn`, etc. Dev-only; not bundled into the compiled artifact. |
+
+Note: `bun-types` 1.3.11+ documents `listItem` metadata (index/depth/ordered)
+that the **runtime** on bun 1.3.8 does not deliver. The render engine does
+not rely on that metadata — see `decisions/005-render-engine-string-protocols.md`.
 
 ## Verification discipline
 
