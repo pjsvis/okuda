@@ -4,6 +4,19 @@
 **Status:** Done (contract accepted; implementation deferred to brief 003)
 **Depends on:** 2026-08-20-brief-project-initialisation.md (done)
 
+> **Palette superseded.** The Rosé Pine Base defaults specified in
+> this brief's palette table were replaced by the Glow (glamour) dark
+> palette on 2026-08-24. See `decisions/006-glow-dark-palette.md` for the
+> decision, alternatives, and palimpsest check. The rest of this brief
+> (grammar, ANSI emission rules, role set) stands unchanged.
+>
+> **H4-collapse rule superseded.** The grammar-table row "Heading | H1–H3
+> only ... H4+ collapsed to bold paragraph" was reversed on 2026-08-24.
+> Under ADR-007 ("Glow is the visual reference"), H4–H6 now render the
+> Glow way: `#`×level marker + heading colour on every level. The
+> grammar's other heading rules (ATX `# `, cyan/bold, trailing `\n\n`)
+> stand unchanged.
+
 ---
 
 ## Objective

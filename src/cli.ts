@@ -12,20 +12,23 @@
 import { detectColorMode } from "./ansi";
 import { loadPalette } from "./palette";
 import { renderDocument } from "./render";
+import { runTui } from "./tui";
 
 interface Args {
   file: string | null;
   watch: boolean;
   noColor: boolean;
+  tui: boolean;
 }
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { file: null, watch: false, noColor: false };
+  const args: Args = { file: null, watch: false, noColor: false, tui: false };
   for (const a of argv) {
     if (a === "--watch" || a === "-w") args.watch = true;
     else if (a === "--no-color") args.noColor = true;
+    else if (a === "--tui" || a === "-t") args.tui = true;
     else if (a === "--help" || a === "-h") {
-      process.stdout.write("usage: okuda <file.md> [--watch] [--no-color]\n");
+      process.stdout.write("usage: okuda <file.md> [--watch] [--tui] [--no-color]\n");
       process.exit(0);
     } else if (a === "--version") {
       process.stdout.write("okuda 0.1.0\n");
@@ -71,6 +74,29 @@ async function main(): Promise<void> {
     }
     process.stdout.write(out);
   };
+
+  // Control plane (brief: okuda-tui-control-plane). Gated: file present,
+  // both streams are TTYs, colour not suppressed. Otherwise fall back to
+  // the streaming renderer — the brief's NO_COLOR/TERM=dumb clause.
+  if (
+    args.tui &&
+    args.file &&
+    process.stdout.isTTY &&
+    process.stdin.isTTY &&
+    color !== "none"
+  ) {
+    await runTui({
+      file: args.file,
+      width: process.stdout.columns || 80,
+      rows: process.stdout.rows || 24,
+      palette,
+    });
+    return;
+  }
+  if (args.tui && !args.file) {
+    process.stderr.write("okuda: --tui requires a file\n");
+    process.exit(1);
+  }
 
   await draw();
 

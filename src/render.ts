@@ -16,7 +16,7 @@
  * depth, never-wrapped blocks ride in RAW tags.
  */
 
-import { type ColorMode, makeStyler } from "./ansi";
+import { type ColorMode, makeStyler, unwrapStrongSpan } from "./ansi";
 import {
   PARSER_OPTIONS,
   RE_INLINE_HTML,
@@ -38,6 +38,9 @@ import {
 } from "./width";
 import { wrapANSI } from "./wrap";
 
+/** Left indent for list blocks, inside the content margin (Glow list level_indent). */
+const LIST_INDENT = 2;
+
 export interface RenderOptions {
   width: number;
   palette?: Palette;
@@ -56,7 +59,7 @@ const MERMAID_BIN_CANDIDATES = [
 /** Run the mermaid binary; return its stdout (empty string on failure). */
 async function spawnMermaid(source: string, opts: RenderOptions): Promise<string> {
   const candidates = opts.mermaidBin
-    ? [opts.mermaidBin, ...MERMAID_BIN_CANDIDATES]
+    ? [opts.mermaidBin]
     : MERMAID_BIN_CANDIDATES;
   for (const bin of candidates) {
     try {
@@ -83,6 +86,13 @@ export function extractDiagramArt(binaryOutput: string): string {
   if (!m) return binaryOutput;
   // The binary pads the fence with blank lines — trim them (structural
   // padding, not art content; interior blank lines survive).
+  return m[1]!.replace(/^\n+/, "").replace(/\n+$/, "");
+}
+
+/** Extract the mermaid source checksum (the ```mmd fence the binary emits). */
+export function extractDiagramChecksum(binaryOutput: string): string | null {
+  const m = binaryOutput.match(/```mmd\n([\s\S]*?)\n?```/);
+  if (!m) return null;
   return m[1]!.replace(/^\n+/, "").replace(/\n+$/, "");
 }
 
@@ -176,7 +186,7 @@ interface Ctx {
   color: ColorMode;
   palette: Palette;
   table: TableState | null;
-  mermaid: Map<string, string>; // token id → classified ASCII lines
+  mermaid: Map<string, { art: string; checksum: string | null }>;
 }
 
 /** Render a closed-grammar markdown document to ANSI lines. */
@@ -188,7 +198,11 @@ export async function renderDocument(
   const palette = opts.palette ?? loadPalette();
   const styler = makeStyler(palette, color);
   const ctx: Ctx = {
-    width: opts.width,
+    // Content width reserves a 2-char left + 2-char right margin (Glow
+    // Document margin). Wrap, hr, and table-fit all respect this;
+    // raw blocks (code/diagrams) bypass it and may overflow the right
+    // gutter — art is art.
+    width: Math.max(10, opts.width - 4),
     styler,
     color,
     palette,
@@ -225,12 +239,13 @@ async function interceptMermaid(
   const arts = await Promise.all(
     fences.map(async (code) => {
       const out = await spawnMermaid(code, opts);
-      return out === "" ? null : extractDiagramArt(out);
+      if (out === "") return null;
+      return { art: extractDiagramArt(out), checksum: extractDiagramChecksum(out) };
     }),
   );
-  for (const [i, art] of arts.entries()) {
-    if (art === null) continue;
-    ctx.mermaid.set(String(i), art);
+  for (const [i, entry] of arts.entries()) {
+    if (entry === null) continue;
+    ctx.mermaid.set(String(i), entry);
   }
   return src;
 }
@@ -249,18 +264,14 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
   return {
     heading(children: string, meta: { level: number }) {
       const level = meta?.level ?? 1;
-      if (level <= 3) {
-        const lines = wrapANSI(stripHtml(children), { width });
-        return (
-          lines
-            .map((l) => (l === "" ? "" : styler.roleBold("heading", l)))
-            .join("\n") + "\n\n"
-        );
-      }
-      // H4+ collapse to bold paragraph (grammar table).
-      const lines = wrapBlock(stripHtml(children));
+      // Glow way: `#`×level marker + heading colour on every level.
+      // (ADR-007: H4+ no longer collapses; the marker count is the level.)
+      const marker = "#".repeat(level) + " ";
+      const lines = wrapANSI(marker + stripHtml(children), { width });
       return (
-        lines.map((l) => (l === "" ? "" : styler.bold(l))).join("\n") + "\n\n"
+        lines
+          .map((l) => (l === "" ? "" : styler.roleBold("heading", l)))
+          .join("\n") + "\n\n"
       );
     },
 
@@ -268,8 +279,8 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // Mermaid placeholder paragraph → the classified ASCII block.
       const m = children.trim().match(RE_MERMAID_TOKEN);
       if (m) {
-        const art = ctx.mermaid.get(m[1]!);
-        if (art !== undefined) return diagramBlock(art, ctx);
+        const entry = ctx.mermaid.get(m[1]!);
+        if (entry !== undefined) return diagramBlock(entry.art, entry.checksum, ctx);
         return ""; // pipe failed → drop the placeholder silently
       }
       const lines = wrapBlock(stripHtml(children));
@@ -284,6 +295,13 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       return styler.roleBold("strong", children);
     },
     emphasis(children: string) {
+      // ***bold italic*** nests as emphasis(strong(text)) post-order (Bun
+      // resolves children first; emphasis is the outer handler). Glow
+      // renders the combo in the EMPHASIS colour, not strong's — so detect
+      // a pure strong child and re-emit as one combined SGR. Otherwise a
+      // normal italic span. (The reverse nest **_x_** falls through; rare.)
+      const strongInner = unwrapStrongSpan(children, ctx.palette);
+      if (strongInner !== null) return styler.roleBoldItalic("emphasis", strongInner);
       return styler.roleItalic("emphasis", children);
     },
     strikethrough(children: string) {
@@ -379,15 +397,25 @@ function stripHtml(s: string): string {
   return s.replace(RE_INLINE_HTML, "");
 }
 
-/** Mermaid ASCII block: classified, coloured, never wrapped. */
-function diagramBlock(art: string, ctx: Ctx): string {
+/** Mermaid ASCII block: classified, coloured, never wrapped. The
+ *  checksum (original mermaid source) follows as a muted code block. */
+function diagramBlock(art: string, checksum: string | null, ctx: Ctx): string {
   const open = tagRawOpen("diagram");
   const lines = art.split("\n").map((l) => {
     if (l === "") return "";
     if (ctx.color === "none") return l; // byte-identical to the binary's output
     return classifyDiagramLine(l, ctx.palette, ctx.color) + "\x1b[0m";
   });
-  return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n\n`;
+  let out = `${open}${lines.join("\n")}${TAG_RAW_CLOSE}`;
+  // Checksum: the mermaid source, muted, beneath the diagram.
+  if (checksum) {
+    const csOpen = tagRawOpen("checksum");
+    const csLines = checksum.split("\n").map((l) =>
+      l === "" ? "" : ctx.styler.role("muted", "  " + l),
+    );
+    out += `\n${csOpen}${csLines.join("\n")}${TAG_RAW_CLOSE}`;
+  }
+  return out + "\n\n";
 }
 
 /** Blockquote: single-level pipe prefix, muted, re-wrapped at width-2. */
@@ -463,7 +491,7 @@ function renderList(
     const marker = meta.ordered ? `${(meta.start ?? 1) + i}.` : "•";
     const markerPrefix = `${marker} `;
     const textCol = displayWidth(markerPrefix);
-    const avail = Math.max(4, width - textCol);
+    const avail = Math.max(4, width - textCol - LIST_INDENT);
     const contIndent = " ".repeat(textCol);
 
     const parts = splitNested(item);
@@ -495,7 +523,13 @@ function renderList(
   });
 
   const body = itemBlocks.join("\n\n") + "\n\n";
-  return tagNestedOpen(myTag) + body + TAG_NESTED_CLOSE;
+  // Indent the whole list block by LIST_INDENT so list markers sit
+  // to the right of body paragraphs (Glow list level_indent).
+  const indented = body
+    .split("\n")
+    .map((l) => (l === "" ? "" : " ".repeat(LIST_INDENT) + l))
+    .join("\n");
+  return tagNestedOpen(myTag) + indented + TAG_NESTED_CLOSE;
 }
 
 /** Strip list markers and indent as continuation text (cap flatten). */
@@ -593,6 +627,11 @@ function renderTable(t: TableState, ctx: Ctx): string {
     }
     out.push(padded.join(" ".repeat(gutter)));
   }
+  // Closing rule under the table (Glow parity: tables are bracketed).
+  if (header.length > 0 || rows.length > 0) {
+    const ruleW = Math.min(total, width);
+    out.push(styler.rule(ruleW));
+  }
   // Loose rows: blank line between rows. The header rule sits directly
   // under the header — it belongs to the header, not the rows. Trailing
   // pad spaces are ours, not content — trim them per line.
@@ -623,10 +662,16 @@ function pad(c: Cell, i: number, colWidth: number[], mode: string): string {
   }
 }
 
-/** Final document assembly: strip residual protocol tags, tidy edges. */
+/** Final document assembly: strip tags, apply margins, tidy edges. */
 function finalize(rendered: string): string {
-  // No global newline collapsing or space trimming — code fences and
-  // diagram blocks carry verbatim bytes (blank lines included).
-  const out = stripTags(rendered);
-  return out.replace(/\n+$/, "") + "\n";
+  const stripped = stripTags(rendered);
+  // 2-char left margin on every non-empty line (Glow Document margin).
+  // Right margin is implicit: wrap used (width - 4), so content stops
+  // 2 cols short of the terminal edge.
+  const margined = stripped
+    .split("\n")
+    .map((l) => (l === "" ? "" : "  " + l))
+    .join("\n");
+  // Leading blank line — Glow parity: breathing room above the doc.
+  return "\n" + margined.replace(/\n+$/, "") + "\n";
 }

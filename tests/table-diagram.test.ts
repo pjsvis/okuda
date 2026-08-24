@@ -13,13 +13,13 @@ describe("render — tables (uniform presentation policy)", () => {
     );
     const ls = out.split("\n").map((l) => l.trim() === "" ? "" : l);
     // header row: pine bold
-    expect(out).toContain("\x1b[1;38;2;49;116;143m");
-    // rule under header
-    expect(ls[1]).toMatch(/^│?\x1b\[38;2;110;106;134m─+/);
+    expect(out).toContain("\x1b[38;2;0;175;255;1m");
+    // rule under header (shifted by top margin line, prefixed by 2-char margin)
+    expect(ls[2]).toMatch(/^  \x1b\[38;2;88;88;88m─+/);
     // amber key column
-    expect(out).toContain("\x1b[1;38;2;246;193;119m");
+    expect(out).toContain("\x1b[38;2;255;255;135;1m");
     // blank line between body rows
-    const bodyStart = ls.findIndex((l) => l.includes("246;193;119"));
+    const bodyStart = ls.findIndex((l) => l.includes("255;255;135"));
     expect(ls[bodyStart + 1]).toBe("");
     // no internal pipes or box borders in rendered rows
     expect(out).not.toMatch(/\x1b\[0m\s*\|/);
@@ -72,7 +72,7 @@ describe("render — tables (uniform presentation policy)", () => {
       "| k |\n|--|\n| **bold** cell |\n",
       { width: W },
     );
-    expect(out).toContain("\x1b[1;38;2;235;188;186mbold\x1b[0m");
+    expect(out).toContain("\x1b[38;2;255;215;0;1mbold\x1b[0m");
   });
 
   test("table inside code fence renders verbatim (no presentation layer)", async () => {
@@ -80,7 +80,7 @@ describe("render — tables (uniform presentation policy)", () => {
     const out = await renderDocument(src, { width: W });
     expect(out).toContain("| a | b |");
     expect(out).toContain("|---|---|");
-    expect(out).not.toContain("1;38;2;49;116;143"); // no header colour
+    expect(out).not.toContain("38;2;0;175;255;1"); // no header colour (colour-first form)
   });
 });
 
@@ -95,12 +95,12 @@ describe("render — mermaid pipe + colour classification", () => {
       palette: DEFAULT_PALETTE,
     });
     // border channel muted, arrow channel link-coloured, text full contrast
-    expect(out).toContain("\x1b[38;2;110;106;134m"); // border
-    expect(out).toContain("\x1b[38;2;156;207;216m"); // arrow
-    expect(out).toContain("\x1b[38;2;224;222;244m"); // text
-    // the mermaid source itself must not leak
-    expect(out).not.toContain("flowchart LR");
-    expect(out).not.toContain("-->");
+    expect(out).toContain("\x1b[38;2;88;88;88m"); // border
+    expect(out).toContain("\x1b[38;2;0;175;95m"); // arrow
+    expect(out).toContain("\x1b[38;2;215;215;215m"); // text
+    // the mermaid source appears as the muted checksum block beneath the art
+    expect(out).toContain("flowchart LR");
+    expect(out).toContain("-->");
     // node label survived
     expect(out).toContain("Input v2.0");
   });
@@ -121,7 +121,7 @@ describe("render — mermaid pipe + colour classification", () => {
     });
     // find the "Input v2.0" label span: text-channel coloured, and the
     // arrow colour sequence must never wrap an ASCII ^v>< or alphanumerics
-    const arrowRuns = out.match(/\x1b\[38;2;156;207;216m[^\x1b]*\x1b\[0m/g) ?? [];
+    const arrowRuns = out.match(/\x1b\[38;2;0;175;95m[^\x1b]*\x1b\[0m/g) ?? [];
     for (const run of arrowRuns) {
       const content = run.replace(/\x1b\[[0-9;]*m/g, "");
       for (const ch of content) {
@@ -173,7 +173,7 @@ describe("render — mermaid pipe + colour classification", () => {
     expect(out).toContain("Doc");
     expect(out).toContain("Tail");
     expect(out).not.toContain("okuda-mmd");
-    expect(out).not.toContain("flowchart");
+    expect(out).not.toContain("flowchart"); // binary missing → no checksum, source dropped
   });
 
   test("palette override of diagram-arrow takes effect", async () => {
@@ -183,7 +183,7 @@ describe("render — mermaid pipe + colour classification", () => {
       palette,
     });
     expect(out).toContain("\x1b[38;2;1;2;3m");
-    expect(out).not.toContain("38;2;156;207;216");
+    expect(out).not.toContain("38;2;0;175;95");
   });
 });
 

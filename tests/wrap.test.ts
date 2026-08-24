@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { displayWidth } from "../src/width";
 import { wrapANSI } from "../src/wrap";
 
-const OPEN = "\x1b[1;38;2;235;188;186m";
+const OPEN = "\x1b[1;38;2;215;215;215m";
 const RESET = "\x1b[0m";
 
 describe("wrap — hard-wrap mandate (ADR-004)", () => {

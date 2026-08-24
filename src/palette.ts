@@ -29,21 +29,40 @@ export type Role =
 
 export type Palette = Record<Role, string>;
 
-/** Rosé Pine Base defaults — hex per the contract's palette table. */
+/** Default palette — aligned to `glow` (the CLI) as dogfooded at the
+ *  terminal, which renders the Dracula truecolor palette. NB: this is NOT
+ *  glamour's ANSI-256 DarkStyleConfig (ADR-006's original sourcing was
+ *  wrong — see its 2026-08-24 amendment); the bytes from `glow <file>`
+ *  are the reference, not glamour's styles.go.
+ *
+ * SGR emission order is colour-then-attribute (\x1b[38;2;R;G;B;3m),
+ * matching glow. Hex values:
+ *   heading  #00afff  (39, bright blue)   — Glow H2-H6
+ *   strong   #ffd700  (gold)             — divergence pending: glow-CLI is #ffb86c orange
+ *   emphasis #f1fa8c  (Dracula yellow)  — glow-CLI faithful (converged from #ffff5f, 2026-08-24)
+ *   code     #5fd700 / #303030            — divergence pending: glow-CLI code is #50fa7b green
+ *   link     #00af5f  (35, sea green)     — Glow linkText, underlined via OSC 8
+ *   muted    #585858  (240, dim gray)     — Glow horizontal rule
+ *   blockquote #767676 (243, gray)        — quote pipe, recedes
+ * Diagram roles have no Glow equivalent; they reuse Glow channels:
+ *   border = muted, arrow = link green, text = doc near-white.
+ * Table roles keep okuda's semantic layer (brief: table policy), tuned
+ * to the Glow palette: header = heading blue, key = Glow H1 pale yellow.
+ */
 export const DEFAULT_PALETTE: Palette = {
-  heading: "#e0def4",
-  "code-text": "#eb6f92",
-  "code-background": "#26233a",
-  blockquote: "#6e6a86",
-  link: "#9ccfd8",
-  emphasis: "#f6c177",
-  strong: "#ebbcba",
-  "table-header": "#31748f",
-  "table-key": "#f6c177",
-  muted: "#6e6a86",
-  "diagram-border": "#6e6a86",
-  "diagram-arrow": "#9ccfd8",
-  "diagram-text": "#e0def4",
+  heading: "#00afff",
+  "code-text": "#5fd700",
+  "code-background": "#303030",
+  blockquote: "#767676",
+  link: "#00af5f",
+  emphasis: "#f1fa8c",
+  strong: "#ffd700",
+  "table-header": "#00afff",
+  "table-key": "#ffff87",
+  muted: "#585858",
+  "diagram-border": "#585858",
+  "diagram-arrow": "#00af5f",
+  "diagram-text": "#d7d7d7",
 };
 
 const RE_HEX = /^#[0-9a-fA-F]{6}$/;

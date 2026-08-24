@@ -51,10 +51,28 @@ dev file:
 build:
     @bun build --compile src/cli.ts --outfile okuda
 
+# Install/refresh the `okuda` shortcut (symlink to ~/.local/bin)
+[group('build')]
+install:
+    @mkdir -p ~/.local/bin
+    @ln -sf $(pwd)/okuda ~/.local/bin/okuda
+    @echo "okuda → ~/.local/bin/okuda  (run `just build` to refresh after edits)"
+
 # Run the test suite
 [group('build')]
 test:
     @bun test
+
+# Render the grammar showcase in the TUI (every closed-grammar element)
+# Falls back to streaming under NO_COLOR / TERM=dumb / non-TTY.
+[group('build')]
+showcase:
+    @./okuda docs/showcase.md --tui
+
+# Render the formatting & colour audit (stated expectations vs live output)
+[group('build')]
+audit:
+    @./okuda docs/audit.md --tui
 
 # ── Registries ───────────────────────────────────────────────
 

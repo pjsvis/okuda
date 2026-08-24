@@ -33,53 +33,58 @@ describe("ansi — colour mode detection (contract table)", () => {
 });
 
 describe("styler — byte-exact SGR sequences", () => {
-  test("heading: bold + \\x1b[1;38;2;224;222;244m", () => {
+  test("heading: bold + \\x1b[38;2;0;175;255;1m (colour-first, glow order)", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
     const out = s.roleBold("heading", "T");
-    expect(out).toBe("\x1b[1;38;2;224;222;244mT\x1b[0m");
+    expect(out).toBe("\x1b[38;2;0;175;255;1mT\x1b[0m");
   });
 
-  test("code text: \\x1b[38;2;235;111;146m", () => {
+  test("code text: \\x1b[38;2;95;215;0m", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.role("code-text", "x")).toBe("\x1b[38;2;235;111;146mx\x1b[0m");
+    expect(s.role("code-text", "x")).toBe("\x1b[38;2;95;215;0mx\x1b[0m");
   });
 
-  test("code background: \\x1b[48;2;38;35;58m", () => {
+  test("code background: \\x1b[48;2;48;48;48m", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.codeLine("x")).toContain("\x1b[48;2;38;35;58m");
+    expect(s.codeLine("x")).toContain("\x1b[48;2;48;48;48m");
   });
 
-  test("blockquote/muted: \\x1b[38;2;110;106;134m", () => {
+  test("blockquote: \\x1b[38;2;118;118;118m", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.role("blockquote", "q")).toBe("\x1b[38;2;110;106;134mq\x1b[0m");
+    expect(s.role("blockquote", "q")).toBe("\x1b[38;2;118;118;118mq\x1b[0m");
   });
 
-  test("link: \\x1b[4;38;2;156;207;216m (underline + cyan)", () => {
+  test("link: \\x1b[38;2;0;175;95;4m (underline + green, colour-first)", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
     const out = s.link("text", "https://x.example");
-    expect(out).toContain("\x1b[4;38;2;156;207;216m");
+    expect(out).toContain("\x1b[38;2;0;175;95;4m");
     expect(out).toStartWith("\x1b]8;;https://x.example\x1b\\");
     expect(out).toEndWith("\x1b]8;;\x1b\\");
   });
 
-  test("emphasis: italic + \\x1b[3;38;2;246;193;119m", () => {
+  test("emphasis: italic + \\x1b[38;2;241;250;140;3m (glow Dracula yellow, colour-first)", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.roleItalic("emphasis", "i")).toBe("\x1b[3;38;2;246;193;119mi\x1b[0m");
+    expect(s.roleItalic("emphasis", "i")).toBe("\x1b[38;2;241;250;140;3mi\x1b[0m");
   });
 
-  test("strong: bold + \\x1b[1;38;2;235;188;186m", () => {
+  test("bold-italic combo: \\x1b[38;2;241;250;140;1;3m — emphasis colour, not strong's", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.roleBold("strong", "b")).toBe("\x1b[1;38;2;235;188;186mb\x1b[0m");
+    expect(s.roleBoldItalic("emphasis", "bi")).toBe("\x1b[38;2;241;250;140;1;3mbi\x1b[0m");
   });
 
-  test("table header: bold + \\x1b[1;38;2;49;116;143m", () => {
+  test("strong: bold + \\x1b[38;2;255;215;0;1m (colour-first)", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.roleBold("table-header", "h")).toBe("\x1b[1;38;2;49;116;143mh\x1b[0m");
+    expect(s.roleBold("strong", "b")).toBe("\x1b[38;2;255;215;0;1mb\x1b[0m");
   });
 
-  test("table key: bold + \\x1b[1;38;2;246;193;119m", () => {
+  test("table header: bold + \\x1b[38;2;0;175;255;1m (colour-first)", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.roleBold("table-key", "k")).toBe("\x1b[1;38;2;246;193;119mk\x1b[0m");
+    expect(s.roleBold("table-header", "h")).toBe("\x1b[38;2;0;175;255;1mh\x1b[0m");
+  });
+
+  test("table key: bold + \\x1b[38;2;255;255;135;1m (colour-first)", () => {
+    const s = makeStyler(DEFAULT_PALETTE, "truecolor");
+    expect(s.roleBold("table-key", "k")).toBe("\x1b[38;2;255;255;135;1mk\x1b[0m");
   });
 
   test("none mode: identity, no escapes anywhere", () => {
@@ -93,19 +98,19 @@ describe("styler — byte-exact SGR sequences", () => {
 
 describe("palette — defaults + override loader", () => {
   test("defaults match the contract table byte-exactly", () => {
-    expect(DEFAULT_PALETTE.heading).toBe("#e0def4");
-    expect(DEFAULT_PALETTE["code-text"]).toBe("#eb6f92");
-    expect(DEFAULT_PALETTE["code-background"]).toBe("#26233a");
-    expect(DEFAULT_PALETTE.blockquote).toBe("#6e6a86");
-    expect(DEFAULT_PALETTE.link).toBe("#9ccfd8");
-    expect(DEFAULT_PALETTE.emphasis).toBe("#f6c177");
-    expect(DEFAULT_PALETTE.strong).toBe("#ebbcba");
-    expect(DEFAULT_PALETTE["table-header"]).toBe("#31748f");
-    expect(DEFAULT_PALETTE["table-key"]).toBe("#f6c177");
-    expect(DEFAULT_PALETTE.muted).toBe("#6e6a86");
-    expect(DEFAULT_PALETTE["diagram-border"]).toBe("#6e6a86");
-    expect(DEFAULT_PALETTE["diagram-arrow"]).toBe("#9ccfd8");
-    expect(DEFAULT_PALETTE["diagram-text"]).toBe("#e0def4");
+    expect(DEFAULT_PALETTE.heading).toBe("#00afff");
+    expect(DEFAULT_PALETTE["code-text"]).toBe("#5fd700");
+    expect(DEFAULT_PALETTE["code-background"]).toBe("#303030");
+    expect(DEFAULT_PALETTE.blockquote).toBe("#767676");
+    expect(DEFAULT_PALETTE.link).toBe("#00af5f");
+    expect(DEFAULT_PALETTE.emphasis).toBe("#f1fa8c");
+    expect(DEFAULT_PALETTE.strong).toBe("#ffd700");
+    expect(DEFAULT_PALETTE["table-header"]).toBe("#00afff");
+    expect(DEFAULT_PALETTE["table-key"]).toBe("#ffff87");
+    expect(DEFAULT_PALETTE.muted).toBe("#585858");
+    expect(DEFAULT_PALETTE["diagram-border"]).toBe("#585858");
+    expect(DEFAULT_PALETTE["diagram-arrow"]).toBe("#00af5f");
+    expect(DEFAULT_PALETTE["diagram-text"]).toBe("#d7d7d7");
   });
 
   test("override file replaces known roles, ignores junk", () => {
@@ -120,7 +125,7 @@ describe("palette — defaults + override loader", () => {
     );
     const p = loadPalette(path);
     expect(p["diagram-arrow"]).toBe("#ff0000");
-    expect(p.heading).toBe("#e0def4"); // invalid value ignored
+    expect(p.heading).toBe("#00afff"); // invalid value ignored
   });
 
   test("malformed JSON → defaults, no throw", () => {

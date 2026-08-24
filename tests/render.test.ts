@@ -13,17 +13,17 @@ function lines(out: string): string[] {
 }
 
 describe("render — headings", () => {
-  test("H1–H3 styled, blank line after", async () => {
+  test("H1–H3 styled, marker visible, blank line after", async () => {
     const out = await render("# Title\n\nBody");
-    expect(out).toContain("\x1b[1;38;2;224;222;244mTitle\x1b[0m");
-    expect(lines(out)[1]).toBe("");
+    expect(out).toContain("\x1b[38;2;0;175;255;1m# Title\x1b[0m");
+    expect(lines(out)[0]).toBe("");
+    expect(lines(out)[2]).toBe("");
   });
 
-  test("H4+ collapses to bold paragraph", async () => {
+  test("H4+ renders the Glow way: marker + heading colour", async () => {
     const out = await render("#### Deep");
-    expect(out).toContain("\x1b[1mDeep\x1b[0m");
-    expect(out).not.toContain("####");
-    expect(out).not.toContain("1;38;2;224;222;244");
+    expect(out).toContain("\x1b[38;2;0;175;255;1m#### Deep\x1b[0m");
+    expect(out).not.toContain("\x1b[1mDeep\x1b[0m"); // no longer a bold-paragraph collapse
   });
 
   test("long heading wraps within width", async () => {
@@ -35,16 +35,24 @@ describe("render — headings", () => {
 describe("render — paragraphs and inline styles", () => {
   test("bold, italic, strikethrough, codespan emit contract sequences", async () => {
     const out = await render("**b** *i* ~~s~~ `c`");
-    expect(out).toContain("\x1b[1;38;2;235;188;186mb\x1b[0m");
-    expect(out).toContain("\x1b[3;38;2;246;193;119mi\x1b[0m");
+    expect(out).toContain("\x1b[38;2;255;215;0;1mb\x1b[0m");
+    expect(out).toContain("\x1b[38;2;241;250;140;3mi\x1b[0m");
     expect(out).toContain("\x1b[9ms\x1b[0m");
-    expect(out).toContain("\x1b[38;2;235;111;146m`c`");
+    expect(out).toContain("\x1b[38;2;95;215;0m`c`");
   });
 
-  test("link wraps OSC 8 with underlined cyan", async () => {
+  test("***bold italic*** renders in the emphasis colour, not strong's", async () => {
+    const out = await render("***bi***");
+    // glow-faithful: single SGR, emphasis colour + bold + italic, colour-first
+    expect(out).toContain("\x1b[38;2;241;250;140;1;3mbi\x1b[0m");
+    // and NOT the nested form where strong's gold would override
+    expect(out).not.toContain("\x1b[38;2;255;215;0;1m");
+  });
+
+  test("link wraps OSC 8 with underlined green", async () => {
     const out = await render("[text](https://example.com)");
     expect(out).toContain("\x1b]8;;https://example.com\x1b\\");
-    expect(out).toContain("\x1b[4;38;2;156;207;216mtext\x1b[0m");
+    expect(out).toContain("\x1b[38;2;0;175;95;4mtext\x1b[0m");
     expect(out).toContain("\x1b]8;;\x1b\\");
   });
 
@@ -56,7 +64,7 @@ describe("render — paragraphs and inline styles", () => {
 
   test("soft return becomes a line break", async () => {
     const out = await render("line one\nline two");
-    expect(out).toContain("line one\nline two");
+    expect(out).toContain("line one\n  line two");
   });
 
   test("word wrap at width, no trailing spaces", async () => {
@@ -71,11 +79,14 @@ describe("render — paragraphs and inline styles", () => {
 describe("render — lists (loose, markers, continuation)", () => {
   test("loose spacing: blank line between items", async () => {
     const out = await render("- one\n- two\n- three");
-    const ls = lines(out);
+    const ls = lines(out).filter((l) => l.trim() !== "").map((l) => l.trimStart());
     expect(ls[0]).toBe("• one");
-    expect(ls[1]).toBe("");
-    expect(ls[2]).toBe("• two");
-    expect(ls[4]).toBe("• three");
+    expect(ls[1]).toBe("• two");
+    expect(ls[2]).toBe("• three");
+    // loose: blank line between items
+    const raw = lines(out);
+    const i = raw.findIndex((l) => l.includes("• one"));
+    expect(raw[i + 1]).toBe("");
   });
 
   test("ordered markers with start", async () => {
@@ -86,7 +97,8 @@ describe("render — lists (loose, markers, continuation)", () => {
 
   test("wrapped item continuation aligns under text (2 spaces)", async () => {
     const out = await render("- " + "word ".repeat(12), 24);
-    const ls = lines(out).filter((l) => l !== "");
+    // Strip the 4-char margin+list-indent prefix to check contIndent alone.
+    const ls = lines(out).filter((l) => l !== "").map((l) => l.slice(4));
     expect(ls[0]).toStartWith("• ");
     expect(ls[1]).toStartWith("  ");
   });
@@ -111,7 +123,7 @@ describe("render — lists (loose, markers, continuation)", () => {
 describe("render — blockquote", () => {
   test("muted pipe + indent, single level", async () => {
     const out = await render("> quoted line");
-    expect(out).toContain("\x1b[38;2;110;106;134m│\x1b[0m quoted line");
+    expect(out).toContain("\x1b[38;2;118;118;118m│\x1b[0m quoted line");
   });
 
   test("quote content re-wraps inside the pipe column", async () => {
@@ -135,7 +147,7 @@ describe("render — code fences", () => {
   test("interior blank lines preserved", async () => {
     const out = await render("```\na\n\nb\n```");
     const stripped = lines(out).map((l) => stripANSI(l));
-    expect(stripped).toEqual(["  a", "", "  b", ""]);
+    expect(stripped).toEqual(["", "    a", "", "    b", ""]);
   });
 
   test("indented code block rejected as plain text (no crash, no markup)", async () => {
@@ -150,7 +162,7 @@ describe("render — thematic break", () => {
     const out = await render("a\n\n---\n\nb");
     const rule = lines(out).find((l) => l.includes("─"));
     expect(rule).toBeDefined();
-    expect(displayWidth(rule!)).toBe(W);
+    expect(displayWidth(rule!)).toBe(W - 2);
   });
 });
 
