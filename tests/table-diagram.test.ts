@@ -62,6 +62,31 @@ describe("render — tables (uniform presentation policy)", () => {
     }
   });
 
+  test("in-cell wrap zips line-by-line — columns hold through wraps", async () => {
+    // The word-salad fault: a wrapped cell's \n used to dump its tail to
+    // the left margin and drag siblings out of column. The zip fix makes
+    // line N of every cell sit in its column.
+    const out = await renderDocument(
+      "| a | b |\n|---|---|\n| heading | long cell content here |\n",
+      { width: 24 },
+    );
+    const ls = out.split("\n");
+    // Find the wrapped body row (two lines). The first column "heading"
+    // wraps; its continuation "g" must be in column 1 (left-padded),
+    // and the second column's content must start on line 1, not after
+    // the wrapped tail.
+    const bodyStart = ls.findIndex((l) => stripANSI(l).includes("head"));
+    expect(bodyStart).toBeGreaterThan(-1);
+    const line1 = stripANSI(ls[bodyStart]!);
+    const line2 = stripANSI(ls[bodyStart + 1]!);
+    // line 1: "head" (wrapped from "heading") in col 1, col 2 content starts
+    expect(line1).toMatch(/^\s+head\s+long/);
+    // line 2: "ing" continuation in col 1, col 2 content continues in its lane
+    expect(line2).toMatch(/^\s+ing\s+content/);
+    // No line exceeds the width
+    for (const l of ls) expect(displayWidth(l)).toBeLessThanOrEqual(24);
+  });
+
   test("right-aligned column pads on the left", async () => {
     const out = await renderDocument(
       "| n |\n|--:|\n| 7 |\n| 42 |\n",

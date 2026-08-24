@@ -615,24 +615,30 @@ function renderTable(t: TableState, ctx: Ctx): string {
   // closing rule span the FULL content width (glow parity — the bar is
   // the table-scan signal, not the table's natural width). Body rows
   // keep a 3-space gutter so columns align with the header separators.
+  // In-cell wraps are zipped line-by-line (zipRow) so columns hold —
+  // the fix for the word-salad fault where a wrapped cell's \n dumped
+  // its tail to the left margin and dragged siblings out of column.
   const sep = ` ${styler.tablePipe()} `;
   const bodySep = " ".repeat(gutter);
   if (header.length > 0) {
     const cells = header.map((c, i) =>
-      styler.roleBold("table-header", pad(c, i, colWidth, styler.mode)),
+      padCell(
+        { text: styler.roleBold("table-header", c.text), align: c.align },
+        i, colWidth,
+      ),
     );
-    out.push(cells.join(sep));
+    out.push(zipRow(cells, colWidth, sep));
     out.push(styler.rule(width));
   }
   for (const r of rows) {
-    const padded: string[] = [];
+    const cells: string[][] = [];
     for (let i = 0; i < cols; i++) {
       const cell: Cell = i === 0
         ? { text: styler.roleBold("table-key", r[0]?.text ?? ""), align: r[0]?.align }
         : r[i] ?? { text: "" };
-      padded.push(pad(cell, i, colWidth, styler.mode));
+      cells.push(padCell(cell, i, colWidth));
     }
-    out.push(padded.join(bodySep));
+    out.push(zipRow(cells, colWidth, bodySep));
   }
   // Closing rule under the table (Glow parity: tables are bracketed,
   // full content width).
@@ -641,8 +647,11 @@ function renderTable(t: TableState, ctx: Ctx): string {
   }
   // Loose rows: blank line between rows. The header rule sits directly
   // under the header — it belongs to the header, not the rows. Trailing
-  // pad spaces are ours, not content — trim them per line.
-  const trimmed = out.map((l) => l.replace(/[ ]+$/, ""));
+  // pad spaces are ours, not content — trim them per line (a wrapped row
+  // is a multi-line block — trim each line within it).
+  const trimmed = out.map((block) =>
+    block.split("\n").map((l) => l.replace(/[ ]+$/, "")).join("\n"),
+  );
   if (header.length > 0) {
     return trimmed.slice(0, 2).join("\n") + "\n\n" +
       trimmed.slice(2).join("\n\n") + "\n\n";
@@ -650,23 +659,42 @@ function renderTable(t: TableState, ctx: Ctx): string {
   return trimmed.join("\n\n") + "\n\n";
 }
 
-function pad(c: Cell, i: number, colWidth: number[], mode: string): string {
+/** Pad a cell to its column width, returning one line per wrapped row.
+ *  Colour is applied by the caller (to `c.text` before this call);
+ *  wrapANSI is ANSI-state-aware and re-emits SGR at wrap boundaries, so
+ *  coloured-then-wrapped cells stay coloured through the wrap. Each
+ *  emitted line is padded to the column width (display-aware) so columns
+ *  align under the header separators. */
+function padCell(c: Cell, i: number, colWidth: number[]): string[] {
   const w = colWidth[i]!;
   const raw = c.text;
   if (displayWidth(raw) > w) {
-    // Cell content wider than its column (post-shrink): wrap in-cell.
-    return wrapANSI(raw, { width: w })
-      .map((l) => (mode === "none" ? l : padDisplay(l, w)))
-      .join("\n");
+    return wrapANSI(raw, { width: w }).map((l) => padDisplay(l, w));
   }
   switch (c.align) {
     case "right":
-      return padStartDisplay(raw, w);
+      return [padStartDisplay(raw, w)];
     case "center":
-      return padCenterDisplay(raw, w);
+      return [padCenterDisplay(raw, w)];
     default:
-      return padDisplay(raw, w);
+      return [padDisplay(raw, w)];
   }
+}
+
+/** Zip multi-line cells into aligned row lines. Each cell is an array
+ *  of pre-padded lines (padCell output); blank-pad short cells to the
+ *  row height, then join line N of every cell with the separator. This
+ *  is what holds columns through in-cell wraps — the single fix for the
+ *  word-salad fault on wide/crowded tables (sections 5/7/10 of the
+ *  table audit). */
+function zipRow(cells: string[][], colWidth: number[], sep: string): string {
+  const height = Math.max(...cells.map((c) => c.length));
+  const lines: string[] = [];
+  for (let n = 0; n < height; n++) {
+    const parts = cells.map((c, i) => c[n] ?? " ".repeat(colWidth[i]!));
+    lines.push(parts.join(sep));
+  }
+  return lines.join("\n");
 }
 
 /** Final document assembly: strip tags, apply margins, tidy edges. */
