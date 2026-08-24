@@ -74,6 +74,11 @@ showcase:
 audit:
     @./okuda docs/audit.md --tui
 
+# Render the table audit (sparse -> crowded; run at ~80 and ~140 widths)
+[group('build')]
+tables:
+    @./okuda docs/tables.md --tui
+
 # ── Registries ───────────────────────────────────────────────
 
 # Check registries for drift
