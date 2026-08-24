@@ -16,6 +16,24 @@
 > Glow way: `#`×level marker + heading colour on every level. The
 > grammar's other heading rules (ATX `# `, cyan/bold, trailing `\n\n`)
 > stand unchanged.
+>
+> **Inline-code backticks superseded.** The grammar-table row "Code
+> (inline) | Backtick delimited. Green ANSI, no padding" was reversed
+> on 2026-08-24 (Pass B, snagging item 4). The backtick delimiters are
+> now **stripped** from the codespan output in both colour modes — the
+> colour is the signal, not the delimiters. The code **background** is
+> also dropped (the `48;2` bg read as a blurry box; glow emits colour
+> only); the `code-background` role is retained for override-file compat.
+> See ADR-006 Amendment.
+>
+> **Link rendering superseded.** The grammar-table row "Link | OSC 8
+> hyperlink escape (`\e]8;;URL\e\\`) wrapping styled text..." was
+> reversed on 2026-08-24 (Pass C, snagging item 5). Links now render
+> **rose `#ff79c6` text + visible cyan-underlined `#8be9fd` URL inline**
+> — no OSC 8. The URL is displayed (the operator's terminal requires it
+> visible, not just clickable). New `link-text`/`link-url` roles; the
+> legacy `link` role is kept for override-file compat. See ADR-006
+> Amendment.
 
 ---
 

@@ -39,6 +39,8 @@ registry):
 | Hard-wrap mandate | ADR-004 | wrap never delegated to the terminal |
 | Two-level list cap | grammar | nesting beyond 2 flattens to continuation text |
 | Visible `#` markers on all heading levels | this ADR | `#`×level prefix kept on H1–H6 (Glow: H1 gets a background bar, no marker) |
+| Blockquote `│` pipe colour | this ADR (operator call, 2026-08-24 convergence) | pipe rendered gray `#767676` `│`; glow uses a `#6271a3` border bar. The blockquote **text** matches glow (yellow-italic, Pass B) — only the pipe colour diverges |
+| Emphasis colour | _(converged — no row needed)_ | ~~diverges~~ okuda now matches glow-CLI Dracula yellow `#f1fa8c` (converged 2026-08-24, ADR-006 Amendment). Recorded here as a non-divergence so a future agent doesn't re-flag it |
 
 Anything not in this table matches Glow.
 
@@ -49,10 +51,10 @@ specified "H4+ collapsed to bold paragraph." The origin doc scoped
 headers to `#`–`###` but never mandated collapse as a closed-grammar
 rejection — collapse was an ungrounded styling choice. Under this
 decision, H4–H6 now render the Glow way: `#`×level marker + heading
-colour (blue, bold). The visible-marker thing (above) means H1 keeps its
-`#` rather than Glow's background bar; H2–H6 match Glow's marker + blue
-bold, except H6 — Glow drops H6 to green non-bold; okuda keeps H6 blue
-bold for marker-rule uniformity (simplification, flagged for revisit).
+colour (~~blue~~ purple, bold). The visible-marker thing (above) means H1 keeps its
+`#` rather than Glow's background bar; H2–H6 match Glow's marker + ~~blue~~
+purple bold, except H6 — Glow drops H6 to green non-bold; okuda keeps H6 ~~blue~~
+purple bold for marker-rule uniformity (simplification, flagged for revisit).
 
 ## Alternatives Considered
 
@@ -90,7 +92,7 @@ demonstrated in `docs/showcase.md`. The reversal:
   paragraph" comment — removed.
 - **Shared:** the `heading` handler itself, the showcase's H4 section, the
   render test — updated in place.
-- **Valid:** the heading role colour (`#00afff`), the visible-marker
+- **Valid:** the heading role colour (~~`#00afff`~~ `#bd93f9` Dracula purple — converged 2026-08-24, see ADR-006 Amendment), the visible-marker
   rule, the wrap path — unchanged.
 
 No ghost of the collapse remains. The grammar table entry in brief 002
