@@ -112,6 +112,9 @@ Run `okuda docs/tables.md --tui` (or `just tables`). The real test is at **two t
 
 After reading all ten at both widths, the questions:
 
-1. **Do loose rows help at the crowded end?** If a 6-column table is crowded with or without loose rows, the thing may not be earning its keep — a tight grid (glow-faithful) might read better. 2. **Do loose rows help at the sparse end?** If they just add vertical space to a 2-row table, they're ceremony. 3. **Does the grid header hold at every width?** The `│` separators and full-width rules are the new addition — do they read as a table at 6 columns and at 2? 4. **Does the 3-space gutter keep columns aligned?** Body cells should sit under their header cells, not drift.
+1. **Do loose rows help at the crowded end?** If a 6-column table is crowded with or without loose rows, the thing may not be earning its keep — a tight grid (glow-faithful) might read better.
+2. **Do loose rows help at the sparse end?** If they just add vertical space to a 2-row table, they're ceremony.
+3. **Does the grid header hold at every width?** The `│` separators and full-width rules are the new addition — do they read as a table at 6 columns and at 2?
+4. **Does the 3-space gutter keep columns aligned?** Body cells should sit under their header cells, not drift.
 
 Where the answers surprise, that's a brief.

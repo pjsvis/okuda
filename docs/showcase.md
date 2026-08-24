@@ -65,7 +65,9 @@ indentation aligns under the text, not the marker.
 
 Ordered lists get the same breathing room:
 
-1. Brief before build. 2. Branch before commit. 3. Check before merge.
+1. Brief before build.
+2. Branch before commit.
+3. Check before merge.
 
 Nesting is capped at two levels — beyond that, the outline is broken and the child flattens to continuation text:
 
