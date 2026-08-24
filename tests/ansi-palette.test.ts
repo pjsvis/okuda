@@ -56,12 +56,12 @@ describe("styler — byte-exact SGR sequences", () => {
     expect(s.role("blockquote", "q")).toBe("\x1b[38;2;118;118;118mq\x1b[0m");
   });
 
-  test("link: \\x1b[38;2;0;175;95;4m (underline + green, colour-first)", () => {
+  test("link: rose text + cyan-underlined URL, no OSC 8 (glow-faithful)", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
     const out = s.link("text", "https://x.example");
-    expect(out).toContain("\x1b[38;2;0;175;95;4m");
-    expect(out).toStartWith("\x1b]8;;https://x.example\x1b\\");
-    expect(out).toEndWith("\x1b]8;;\x1b\\");
+    expect(out).toContain("\x1b[38;2;255;121;198mtext\x1b[0m"); // rose text
+    expect(out).toContain("\x1b[38;2;139;233;253;4mhttps://x.example\x1b[0m"); // cyan+underline url
+    expect(out).not.toContain("\x1b]8;;"); // no OSC 8
   });
 
   test("emphasis: italic + \\x1b[38;2;241;250;140;3m (glow Dracula yellow, colour-first)", () => {
@@ -89,11 +89,11 @@ describe("styler — byte-exact SGR sequences", () => {
     expect(s.roleBold("table-key", "k")).toBe("\x1b[38;2;255;255;135;1mk\x1b[0m");
   });
 
-  test("none mode: identity, no escapes anywhere; codespan strips backticks (parity)", () => {
+  test("none mode: identity, no escapes anywhere; codespan strips backticks (parity); link shows URL", () => {
     const s = makeStyler(DEFAULT_PALETTE, "none");
     expect(s.roleBold("heading", "T")).toBe("T");
     expect(s.codespan("c")).toBe("c");
-    expect(s.link("text", "url")).toBe("text");
+    expect(s.link("text", "url")).toBe("text url"); // parity: URL shown in both modes
     expect(s.rule(4)).toBe("────");
   });
 });

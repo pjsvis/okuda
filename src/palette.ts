@@ -18,6 +18,8 @@ export type Role =
   | "code-background"
   | "blockquote"
   | "link"
+  | "link-text"
+  | "link-url"
   | "emphasis"
   | "strong"
   | "table-header"
@@ -42,7 +44,12 @@ export type Palette = Record<Role, string>;
  *   strong   #ffb86c  (Dracula orange) — converged 2026-08-24 (was #ffd700 gold, ungrounded)
  *   emphasis #f1fa8c  (Dracula yellow)  — converged 2026-08-24 (was #ffff5f, wrong source)
  *   code     #50fa7b / #303030            — text converged 2026-08-24 (was #5fd700); bg pending (item 3b)
- *   link     #00af5f  (35, sea green)     — Glow linkText, underlined via OSC 8
+ *   link     #00af5f  (35, sea green)     — legacy hyperlink role (override-file
+ *             compat); live hyperlinks now use link-text/link-url below
+ *   link-text #ff79c6 (Dracula rose)   — converged 2026-08-24 (glow shows
+ *             the link text in rose, no underline)
+ *   link-url  #8be9fd (Dracula cyan)   — converged 2026-08-24 (glow shows
+ *             the URL inline in cyan + underline, no OSC 8)
  *   muted    #585858  (240, dim gray)     — Glow horizontal rule
  *   blockquote #767676 (243, gray)        — quote pipe, recedes
  * Diagram roles have no Glow equivalent; they reuse Glow channels:
@@ -56,6 +63,8 @@ export const DEFAULT_PALETTE: Palette = {
   "code-background": "#303030",
   blockquote: "#767676",
   link: "#00af5f",
+  "link-text": "#ff79c6",
+  "link-url": "#8be9fd",
   emphasis: "#f1fa8c",
   strong: "#ffb86c",
   "table-header": "#bd93f9",

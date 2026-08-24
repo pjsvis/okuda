@@ -50,11 +50,11 @@ describe("render — paragraphs and inline styles", () => {
     expect(out).not.toContain("\x1b[38;2;255;215;0;1m");
   });
 
-  test("link wraps OSC 8 with underlined green", async () => {
+  test("link renders rose text + visible cyan URL, no OSC 8", async () => {
     const out = await render("[text](https://example.com)");
-    expect(out).toContain("\x1b]8;;https://example.com\x1b\\");
-    expect(out).toContain("\x1b[38;2;0;175;95;4mtext\x1b[0m");
-    expect(out).toContain("\x1b]8;;\x1b\\");
+    expect(out).toContain("\x1b[38;2;255;121;198mtext\x1b[0m"); // rose text
+    expect(out).toContain("\x1b[38;2;139;233;253;4mhttps://example.com\x1b[0m"); // cyan+underline url
+    expect(out).not.toContain("\x1b]8;;"); // no OSC 8 (Pass C)
   });
 
   test("image rejected as [image: alt]", async () => {

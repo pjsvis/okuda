@@ -59,7 +59,10 @@ export interface Styler {
   codeLine(line: string): string;
   /** Inline codespan: backticks preserved, code colours. */
   codespan(text: string): string;
-  /** OSC 8 hyperlink wrapping styled text. */
+  /** Render a hyperlink: link text (rose) + visible URL (cyan underline),
+   *  glow-faithful. No OSC 8 — the URL is displayed, satisfying terminals
+   *  that need it visible. (Pass C, 2026-08-24; superseded the OSC 8-only
+   *  approach that hid the URL.) */
   link(text: string, url: string): string;
   /** Blockquote pipe prefix. */
   quotePipe(): string;
@@ -84,7 +87,9 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       strike: (text) => text,
       codeLine: (line) => line,
       codespan: (text) => text, // Pass B: backticks stripped in both modes (parity)
-      link: (text, _url) => text,
+      // Pass C: none-mode link still shows the URL (parity invariant —
+      // truecolor emits 'text url', none must too, or line breaks differ).
+      link: (text, url) => url ? `${text} ${url}` : text,
       quotePipe: () => "│",
       rule: (width) => "─".repeat(width),
       open: () => "",
@@ -108,8 +113,11 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     // the delimiters (supersedes brief 002's 'backticks preserved' row).
     codeLine: (line) => `${fg(palette["code-text"])}${line}${RESET}`,
     codespan: (text) => `${fg(palette["code-text"])}${text}${RESET}`,
+    // Pass C (2026-08-24): glow-faithful link — rose text + visible
+    // cyan-underlined URL, no OSC 8. The URL is displayed inline (the
+    // operator's terminal requires it visible, not just clickable).
     link: (text, url) =>
-      `\x1b]8;;${url}\x1b\\${wrap(sgr(fgParams(palette.link), "4"), text)}\x1b]8;;\x1b\\`,
+      `${wrap(sgr(fgParams(palette["link-text"])), text)} ${wrap(sgr(fgParams(palette["link-url"]), "4"), url)}`,
     quotePipe: () => `${fg(palette.blockquote)}│${RESET}`,
     rule: (width) => `${fg(palette.muted)}${"─".repeat(width)}${RESET}`,
     open: (name) => fg(palette[name]),
