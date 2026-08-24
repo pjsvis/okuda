@@ -88,12 +88,6 @@ export function viewport(
 
 const HINTS = "q quit · j/k scroll · g/G top/bottom · Ctrl-D/U half · r reload";
 
-/** Scroll position as a percentage. Whole doc visible → 100. Pure. */
-export function scrollPercent(scroll: number, maxScroll: number): number {
-  if (maxScroll <= 0) return 100;
-  return Math.min(100, Math.max(0, Math.round((scroll / maxScroll) * 100)));
-}
-
 /** Display path: folder/basename (Glow convention). Pure. */
 export function displayPath(file: string): string {
   const parts = file.split("/").filter(Boolean);
@@ -101,28 +95,27 @@ export function displayPath(file: string): string {
   return parts.slice(-2).join("/");
 }
 
-/** Compact LHS: live state + help affordance. Pure. */
-function compactLeft(pct: number): string {
-  return `${pct}% · ? help`;
+/** Compact LHS: the help affordance only. Pure. */
+function compactLeft(): string {
+  return "? help";
 }
 
 /**
- * Compose the footer (Glow layout): compact hints-or-percent left,
- * badge + folder/filename right, plain gap between. Pure.
+ * Compose the footer (Glow layout): help-or-hints left, badge +
+ * folder/filename right, plain gap between. Pure.
  *
- * showHints=false (default): `NN% · ? help` left — live state wins.
+ * showHints=false (default): `? help` left — the toggle affordance.
  * showHints=true (toggled via `?`): the verbose HINTS line.
  */
 export function footerLine(
   width: number,
   label: string,
   file: string,
-  pct: number,
   showHints: boolean,
   muted: (s: string) => string,
   badge: (s: string) => string,
 ): string {
-  const leftText = showHints ? HINTS : compactLeft(pct);
+  const leftText = showHints ? HINTS : compactLeft();
   const name = displayPath(file);
   // Right: badge (label + 2 padding) + space + folder/file.
   const rightWidth = label.length + 2 + 1 + name.length;
@@ -177,10 +170,9 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     }
     process.stdout.write("\x1b[2J\x1b[H"); // clear + home
     process.stdout.write(view.visible.join("\n"));
-    // Footer at the last row: % left, badge + folder/file right.
+    // Footer at the last row: help toggle left, badge + folder/file right.
     process.stdout.write(`\x1b[${rows};1H`);
-    const pct = scrollPercent(view.scroll, view.maxScroll);
-    process.stdout.write(footerLine(cols, "Gloam", opts.file, pct, showHints, muted, badge));
+    process.stdout.write(footerLine(cols, "Gloam", opts.file, showHints, muted, badge));
   };
 
   const reload = async (): Promise<void> => {

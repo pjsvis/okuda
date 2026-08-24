@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { decodeKey, footerLine, viewport, HINTS, scrollPercent, displayPath } from "../src/tui";
+import { decodeKey, footerLine, viewport, HINTS, displayPath } from "../src/tui";
 import { makeStyler } from "../src/ansi";
 import { DEFAULT_PALETTE } from "../src/palette";
 
@@ -84,44 +84,28 @@ describe("tui — footerLine (Glow layout: state left, identity right)", () => {
   const badge = (s: string) => styler.badge(s);
   const FILE = "/Users/x/Dev/okuda/docs/audit.md";
 
-  test("compact: % + ? help left; badge + folder/file right", () => {
-    const f = footerLine(72, "Gloam", FILE, 42, false, muted, badge);
-    expect(f.startsWith(muted("42% · ? help"))).toBe(true);
+  test("compact: ? help left; badge + folder/file right", () => {
+    const f = footerLine(72, "Gloam", FILE, false, muted, badge);
+    expect(f.startsWith(muted("? help"))).toBe(true);
     expect(f).toContain("\x1b[48;2;255;121;198m"); // badge pink bg
     expect(f).toContain("\x1b[38;2;248;248;242m"); // badge near-white fg
     expect(f.endsWith(" Gloam \x1b[0m " + muted("docs/audit.md"))).toBe(true);
   });
   test("toggled: verbose HINTS replace the compact left", () => {
-    const f = footerLine(72, "Gloam", FILE, 42, true, muted, badge);
+    const f = footerLine(72, "Gloam", FILE, true, muted, badge);
     expect(f.startsWith(muted(HINTS))).toBe(true);
-    expect(f).not.toContain("42%");
+    expect(f).not.toContain("? help");
   });
   test("narrow width: at least one space gap, no throw", () => {
-    const f = footerLine(10, "Gloam", FILE, 42, false, muted, badge);
+    const f = footerLine(10, "Gloam", FILE, false, muted, badge);
     expect(f).toContain("Gloam");
   });
   test("NO_COLOR: plain text, no escapes; padding kept (shape parity)", () => {
     const none = makeStyler(DEFAULT_PALETTE, "none");
-    const f = footerLine(72, "Gloam", FILE, 42, false,
+    const f = footerLine(72, "Gloam", FILE, false,
       (s) => none.role("muted", s), (s) => none.badge(s));
     expect(f).not.toContain("\x1b");
     expect(f.endsWith(" Gloam  docs/audit.md")).toBe(true);
-  });
-});
-
-describe("tui — scrollPercent", () => {
-  test("whole doc visible (maxScroll 0) → 100", () => {
-    expect(scrollPercent(0, 0)).toBe(100);
-  });
-  test("top → 0, bottom → 100, mid → rounded", () => {
-    expect(scrollPercent(0, 10)).toBe(0);
-    expect(scrollPercent(10, 10)).toBe(100);
-    expect(scrollPercent(5, 10)).toBe(50);
-    expect(scrollPercent(1, 3)).toBe(33);
-  });
-  test("clamps out-of-range scroll", () => {
-    expect(scrollPercent(-3, 10)).toBe(0);
-    expect(scrollPercent(99, 10)).toBe(100);
   });
 });
 
