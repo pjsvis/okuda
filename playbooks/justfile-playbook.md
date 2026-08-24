@@ -43,6 +43,8 @@ Reversing comment and attribute yields `error: extraneous attribute` pointing at
 
 **Static help via `cat`.** `help` cats a static markdown file (`docs/help.md`); it never embeds live state. Live state is `orient`'s sole job — one recipe, one concern, no duplication. The long-term plan: when okuda compiles, `help` becomes `@./okuda docs/help.md` — the project renders its own signage.
 
+**Dogfood flip (2026-08-24, realised).** `help` is now `@./okuda docs/help.md` — the project renders its own signage through its own compiled binary. The flip landed with the `build` group (`dev`/`build`/`test` recipes). `./okuda` is gitignored build output; run `just build` once after clone, then `just help` renders through okuda. A fresh clone without `just build` falls back to `bun run src/cli.ts docs/help.md` if you prefer not to commit to the binary.
+
 **No new runtime deps.** Piping help to glow (or any renderer) is declined on grounds of self-refutation: okuda's origin doc opens with glow's rap sheet. The facade must not depend on what the project exists to replace.
 
 ## Revit Protocol
@@ -57,6 +59,7 @@ The observed traps, in order of encounter:
 2. **Command echo** — a recipe without `@` prints its own command line before the output. Symptom appears only when you *run* the recipe; `--list` and `--check` stay silent about it.
 3. **`--list` is alphabetical within groups** — structure comes only from `[group()]`; there is no way to order recipes manually within a group. Name for alphabetical sense (`reg-briefs` before `reg-sync`) or accept the sort.
 4. **`docs/` is not a registry** — files there don't need index entries; `briefs/`, `debriefs/`, `decisions/`, `playbooks/` do. Check `scripts/reg-sync.ts` before assuming.
+5. **Dogfood `help` needs the binary** — `help: @./okuda docs/help.md` requires `just build` to have produced `./okuda` (gitignored). On a fresh clone, build first; the recipe does not auto-build (navigation should stay cheap).
 
 ## Cross-References
 

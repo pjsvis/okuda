@@ -8,10 +8,10 @@
 
 # ── Navigation ───────────────────────────────────────────────
 
-# Workflow guide
+# Workflow guide — rendered through okuda itself (dogfood flip)
 [group('navigation')]
 help:
-    @cat docs/help.md
+    @./okuda docs/help.md
 
 # Project rationale
 [group('navigation')]
@@ -38,6 +38,23 @@ orient:
 [group('quality gate')]
 check:
     @bun scripts/reg-sync.ts --all
+
+# ── Build ────────────────────────────────────────────────────
+
+# Run the viewer from source
+[group('build')]
+dev file:
+    @bun run src/cli.ts {{file}}
+
+# Compile the single-binary viewer
+[group('build')]
+build:
+    @bun build --compile src/cli.ts --outfile okuda
+
+# Run the test suite
+[group('build')]
+test:
+    @bun test
 
 # ── Registries ───────────────────────────────────────────────
 
