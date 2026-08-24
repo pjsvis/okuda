@@ -1,5 +1,13 @@
 # okuda ↔ Glow — Snagging List
 
+> **Status: RESOLVED 2026-08-24 — all six items converged.**
+> Pass A `a8e28ee`: items 1, 2, 3a (heading purple, strong orange, code
+> green). Pass B `f312b33`: items 3b, 4, 6 (code bg dropped, backticks
+> stripped, blockquote text styled — pipe kept, candidate ADR-007 row).
+> Pass C `c0dfe42`: item 5 (link rose text + visible cyan URL, no OSC 8).
+> The items below remain as the record of what was observed and measured;
+> okuda now byte-matches glow-CLI Dracula on every one.
+
 Observed at dogfood: `okuda docs/audit.md` and `glow docs/audit.md` side
 by side in a real terminal. Each entry states what the eye sees in each
 tool, the byte ground where it's already measured, and the likely class.
