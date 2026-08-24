@@ -1,0 +1,92 @@
+/**
+ * cli.ts — okuda entry point.
+ *
+ * Usage: okuda <file.md> [--watch] [--no-color]
+ *        cat doc.md | okuda
+ *
+ *  - Terminal width: process.stdout.columns, fallback 80.
+ *  - --watch: fs.watch + SIGWINCH re-render, debounced, screen cleared.
+ *  - --no-color: same as NO_COLOR (plain text, identical line breaks).
+ */
+
+import { detectColorMode } from "./ansi";
+import { loadPalette } from "./palette";
+import { renderDocument } from "./render";
+
+interface Args {
+  file: string | null;
+  watch: boolean;
+  noColor: boolean;
+}
+
+function parseArgs(argv: string[]): Args {
+  const args: Args = { file: null, watch: false, noColor: false };
+  for (const a of argv) {
+    if (a === "--watch" || a === "-w") args.watch = true;
+    else if (a === "--no-color") args.noColor = true;
+    else if (a === "--help" || a === "-h") {
+      process.stdout.write("usage: okuda <file.md> [--watch] [--no-color]\n");
+      process.exit(0);
+    } else if (a === "--version") {
+      process.stdout.write("okuda 0.1.0\n");
+      process.exit(0);
+    } else if (!args.file) {
+      args.file = a;
+    } else {
+      process.stderr.write(`okuda: unexpected argument: ${a}\n`);
+      process.exit(1);
+    }
+  }
+  return args;
+}
+
+async function readSource(file: string | null): Promise<string> {
+  if (file) {
+    const f = Bun.file(file);
+    if (!(await f.exists())) {
+      process.stderr.write(`okuda: no such file: ${file}\n`);
+      process.exit(1);
+    }
+    return await f.text();
+  }
+  // Stdin piping (origin doc): `cat doc.md | okuda`
+  if (!process.stdin.isTTY) return await new Response(process.stdin).text();
+  process.stderr.write("usage: okuda <file.md> [--watch] [--no-color]\n");
+  process.exit(1);
+}
+
+async function main(): Promise<void> {
+  const args = parseArgs(process.argv.slice(2));
+  const color = args.noColor
+    ? "none"
+    : detectColorMode(process.env as NodeJS.ProcessEnv);
+  const palette = loadPalette();
+
+  const draw = async (): Promise<void> => {
+    const source = await readSource(args.file);
+    const width = process.stdout.columns || 80;
+    const out = await renderDocument(source, { width, palette, color });
+    if (args.watch) {
+      process.stdout.write("\x1b[2J\x1b[3J\x1b[H"); // clear + home
+    }
+    process.stdout.write(out);
+  };
+
+  await draw();
+
+  if (args.watch) {
+    if (!args.file) {
+      process.stderr.write("okuda: --watch requires a file\n");
+      process.exit(1);
+    }
+    const { watch } = await import("node:fs");
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    watch(args.file, () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => void draw(), 50);
+    });
+    process.on("SIGWINCH", () => void draw());
+  }
+}
+
+await main();
