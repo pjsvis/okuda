@@ -5,10 +5,21 @@
 **Status:** pending[cite: 1]
 
 ## What
-A high-performance terminal markdown viewer built on `Bun.markdown` and compiled to a single binary. It replaces Glow by enforcing clean intra-list line spacing (loose lists), honoring soft returns, maintaining terminal-width word wrapping, and piping Mermaid code fences into the existing SpaceX Rust ASCII Mermaid renderer.
+A high-performance terminal markdown viewer built on `Bun.markdown` and compiled to a single binary. It replaces Glow by enforcing clean intra-list line spacing (loose lists), ~~honoring soft returns~~ maintaining terminal-width word wrapping, and piping Mermaid code fences into the existing SpaceX Rust ASCII Mermaid renderer.
+
+> **Soft-returns thing reversed (2026-08-24).** okuda no longer honors
+> single-`
+` soft returns in prose — they are stripped to spaces and the
+> text reflows to the terminal width. The thing was a user-side hack
+> against renderers that collapsed whitespace; okuda is the renderer now
+> and hard-wraps, so the hack's purpose is void (soft returns broke the
+> layout on resize). See the ADR-007 amendment. Code fences and raw
+> blocks remain verbatim; `
+
+` remains a paragraph break.
 
 ## Why
-Glow enforces CommonMark tight list rules that collapse list items, ignores soft returns without trailing whitespace, and renders Mermaid diagrams as raw, unformatted code fences. In an agentic paired-terminal workflow (e.g., Pi coding agent on the left, live preview on the right), markdown state diagrams and list-heavy execution plans need legible, immediate ASCII rendering without manually fighting renderer layout engines.
+Glow enforces CommonMark tight list rules that collapse list items, ~~ignores soft returns without trailing whitespace~~ renders Mermaid diagrams as raw, unformatted code fences. In an agentic paired-terminal workflow (e.g., Pi coding agent on the left, live preview on the right), markdown state diagrams and list-heavy execution plans need legible, immediate ASCII rendering without manually fighting renderer layout engines.
 
 ## How
 1. Build a CLI runner using `Bun.markdown.render()` compiling to a standalone binary via `bun build --compile`.

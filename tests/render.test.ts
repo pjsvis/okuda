@@ -63,9 +63,11 @@ describe("render — paragraphs and inline styles", () => {
     expect(out).not.toContain("pic.png");
   });
 
-  test("soft return becomes a line break", async () => {
+  test("soft return reflows to wrap width (ADR-007 amendment)", async () => {
+    // Single \n in prose is a word separator, not a line break — text
+    // reflows. Reversed 2026-08-24 (foxtrot oscar principle).
     const out = await render("line one\nline two");
-    expect(out).toContain("line one\n  line two");
+    expect(out).toContain("line one line two");
   });
 
   test("word wrap at width, no trailing spaces", async () => {

@@ -18,9 +18,11 @@ describe("wrap — hard-wrap mandate (ADR-004)", () => {
     expect(lines[0]).toBe("short");
   });
 
-  test("existing newlines are forced breaks (soft returns honoured)", () => {
+  test("existing newlines are word separators (soft returns stripped, ADR-007 amendment)", () => {
+    // Single \n is a word separator, not a forced break — text reflows
+    // to the wrap width. Reversed 2026-08-24 (foxtrot oscar principle).
     const lines = wrapANSI("line one\nline two", { width: 40 });
-    expect(lines).toEqual(["line one", "line two"]);
+    expect(lines).toEqual(["line one line two"]);
   });
 
   test("continuation indent aligns under text column", () => {

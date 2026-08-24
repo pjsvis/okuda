@@ -32,7 +32,7 @@ registry):
 | Thing | Ground | Behaviour vs Glow |
 |------|--------|-------------------|
 | Loose lists | origin doc, grammar | empty line between items regardless of source tightness (Glow: tight) |
-| Soft returns honored | origin doc | `\n` is a hard break, no trailing-double-space tax (Glow: soft break) |
+| Soft returns ~~honored~~ stripped (reflow) | ~~origin doc~~ this ADR (amended 2026-08-24) | ~~`\n` is a hard break, no trailing-double-space tax (Glow: soft break)~~ Single-`\n` in prose stripped to spaces; text reflows to terminal width. Reversed: the thing was a user-side hack against collapsing renderers; okuda is the renderer now and hard-wraps, so soft returns broke layout on resize. Converges to Glow/CommonMark default. Code/raw blocks verbatim; `\n\n` still a paragraph break |
 | Mermaid → ASCII pipe | origin doc, diagram brief | `mermaid` fences piped to `mermaid-to-md`, three-channel colour (Glow: raw fence) |
 | Loose tables + grid header | table policy brief (amended 2026-08-24) | blank line between body rows (loose; Glow: tight grid) + `│` separators between header cells + full-content-width `─` bars top and bottom (Glow: box-drawing grid). Body rows keep a 3-space gutter (header-separator width, columns align). The header grid is the table-scan cue; the loose body is the okuda readability thing |
 | Closed grammar | grammar | rejected elements (task lists, indented code, footnotes, images, raw/inline HTML) degrade silently to text, never error |
@@ -99,6 +99,42 @@ demonstrated in `docs/showcase.md`. The reversal:
 No ghost of the collapse remains. The grammar table entry in brief 002
 is superseded by this ADR (pointer added to the brief's supersession
 note); the brief's text is otherwise frozen.
+
+## Amendment (2026-08-24) — soft returns stripped (the foxtrot oscar principle)
+
+**Reversal:** the "Soft returns honored" divergence row is struck.
+okuda no longer honors single-`\n` soft returns in prose. They are
+stripped to spaces and the text reflows to the terminal width.
+
+**Root cause of the reversal.** The soft-returns thing was a *user-side*
+hack: authors sprinkled `\n` into prose to force breaks because other
+renderers collapsed whitespace and ran everything together. The author
+was defensively fighting the renderer. okuda is the renderer now; it
+hard-wraps at terminal width and doesn't collapse. The hack's purpose is
+void. Keeping it means the author still fights the renderer — but the
+fight now *breaks* the layout on resize (a source line wrapped at 75
+cols by the editor becomes two breaks layered on one phrase when the
+terminal is narrower: the author's soft return, then the engine's re-wrap
+of the still-too-long line). The fault surfaced as orphaned fragments
+("earning its" / "keep") in the table-audit page's list items.
+
+**The foxtrot oscar principle.** The willingness to remove what doesn't
+earn its place — the anti-palimpsest principle in operator language. The
+divergence table is a living registry, not a mausoleum. A thing that had
+evidence once (collapsing renderers) and has none now, goes.
+
+**What changes.** Single `\n` in wrapping contexts (paragraph, list
+item, blockquote) → space, reflow. `\n\n` remains a paragraph break
+(structural, not soft). Code fences and raw blocks are verbatim —
+intentional line structure survives where it belongs. The closed grammar
+has no hard-break syntax, so nothing is lost except edge cases the
+workflow doesn't generate (addresses, poems — the origin doc's own
+examples). Ironically this converges to the Glow/CommonMark default
+(single `\n` = soft break = space); the divergence was the thing,
+removing it is alignment.
+
+**What does not change.** The other origin-doc things (loose lists,
+mermaid pipe) stand. The rest of the divergence table stands.
 
 ## Related
 - Brief: `briefs/2026-08-22-brief-ansi-emission-and-closed-grammar.md` (grammar table H4-collapse row — superseded by this ADR)

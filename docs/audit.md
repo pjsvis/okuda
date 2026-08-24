@@ -1,12 +1,8 @@
 # okuda — Formatting & Colour Audit
 
-Each entry below states **what you should see**, then renders the example
-live. Read the rendered output against the stated expectation. Where they
-diverge, that's a bug or a terminal/font limit — not a mystery.
+Each entry below states **what you should see**, then renders the example live. Read the rendered output against the stated expectation. Where they diverge, that's a bug or a terminal/font limit — not a mystery.
 
-Run `okuda docs/audit.md --tui` (or `just audit`) and compare side-by-side
-with `glow docs/audit.md`. The eye is the judge; the code is innocent
-until proven guilty.
+Run `okuda docs/audit.md --tui` (or `just audit`) and compare side-by-side with `glow docs/audit.md`. The eye is the judge; the code is innocent until proven guilty.
 
 ---
 
@@ -18,9 +14,7 @@ until proven guilty.
 ### Italic — should see: yellow, slanted (italic)
 *italic word*
 
-If the slant is invisible but the yellow is visible, colour is masking the
-slant. Test: `okuda --no-color docs/audit.md` — if it slants without colour,
-the font has an italic face; the issue is perceptual, not emission.
+If the slant is invisible but the yellow is visible, colour is masking the slant. Test: `okuda --no-color docs/audit.md` — if it slants without colour, the font has an italic face; the issue is perceptual, not emission.
 
 ### Bold + italic — should see: gold, bold, slanted
 ***bold italic word***
@@ -41,10 +35,7 @@ plain word
 
 ## Combinations in prose
 
-A paragraph with **bold**, *italic*, ~~strike~~, `code`, and a
-[link](https://example.com) all mixed. Each should retain its style
-without bleeding into the next. The word after a styled span returns to
-plain — **bold then** plain then *italic then* plain.
+A paragraph with **bold**, *italic*, ~~strike~~, `code`, and a [link](https://example.com) all mixed. Each should retain its style without bleeding into the next. The word after a styled span returns to plain — **bold then** plain then *italic then* plain.
 
 ---
 
@@ -71,9 +62,7 @@ code fence — 2-char indent, verbatim, never wrapped
 
 ## Diagnostic: italic in isolation
 
-This section exists only to test italic rendering without competing
-styles. If nothing here slants, the terminal or font is the limit —
-not okuda.
+This section exists only to test italic rendering without competing styles. If nothing here slants, the terminal or font is the limit — not okuda.
 
 *italic one*
 

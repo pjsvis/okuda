@@ -1,22 +1,14 @@
 # okuda — Table Audit (sparse → crowded)
 
-Each section states **what you should see**, then renders a table live.
-The configurations walk from sparse to crowded — the territory loose
-tables are meant to fix. Read the rendered output against the stated
-expectation. Where loose rows help, note it; where they make a crowded
-table into a *tall* crowded table, note that too.
+Each section states **what you should see**, then renders a table live. The configurations walk from sparse to crowded — the territory loose tables are meant to fix. Read the rendered output against the stated expectation. Where loose rows help, note it; where they make a crowded table into a *tall* crowded table, note that too.
 
-Run `okuda docs/tables.md --tui` (or `just tables`). The real test is
-at **two terminal widths**: narrow (~80) and wide (~140). A 5-column
-table is crowded at 80 and sparse at 140 — the loose-rows judgement
-shifts with width. Resize and re-read.
+Run `okuda docs/tables.md --tui` (or `just tables`). The real test is at **two terminal widths**: narrow (~80) and wide (~140). A 5-column table is crowded at 80 and sparse at 140 — the loose-rows judgement shifts with width. Resize and re-read.
 
 ---
 
 ## 1. Sparse — 2 cols, 2 rows, short cells
 
-**Should see:** airy, readable, the grid header reads as a table. Loose
-rows add whitespace; nothing to overcrowd.
+**Should see:** airy, readable, the grid header reads as a table. Loose rows add whitespace; nothing to overcrowd.
 
 | Key | Value |
 | --- | --- |
@@ -25,8 +17,7 @@ rows add whitespace; nothing to overcrowd.
 
 ## 2. Dictionary — 2 cols, many rows, short key / medium value
 
-**Should see:** the first-column amber bold reads as a key column. Loose
-rows let the eye walk key→value. The grid header brackets it.
+**Should see:** the first-column amber bold reads as a key column. Loose rows let the eye walk key→value. The grid header brackets it.
 
 | Flag | Effect |
 | --- | --- |
@@ -37,9 +28,7 @@ rows let the eye walk key→value. The grid header brackets it.
 
 ## 3. Aligned — 3 cols, left / centre / right
 
-**Should see:** alignment carried through — `L` left, `C` centred
-(spaces both sides), `R` right (leading space). The `│` separators sit
-between header cells; body uses the 3-space gutter aligned underneath.
+**Should see:** alignment carried through — `L` left, `C` centred (spaces both sides), `R` right (leading space). The `│` separators sit between header cells; body uses the 3-space gutter aligned underneath.
 
 | L | C | R |
 | :--- | :---: | ---: |
@@ -49,8 +38,7 @@ between header cells; body uses the 3-space gutter aligned underneath.
 
 ## 4. Moderate — 4 cols, 4 rows, mixed-width cells
 
-**Should see:** the typical case. Header grid cues the columns; loose
-rows separate the records. First column amber, others default.
+**Should see:** the typical case. Header grid cues the columns; loose rows separate the records. First column amber, others default.
 
 | Element | Channel | Role | Hex |
 | --- | --- | --- | --- |
@@ -61,10 +49,7 @@ rows separate the records. First column amber, others default.
 
 ## 5. Wide — 5 cols, long cell content (forces width-shrink)
 
-**Should see:** the table fits the terminal width (never overflows).
-The widest columns shrink to a proportional budget; long cells wrap
-in-cell. This is where loose rows meet overcrowding — does the
-whitespace help you scan, or does the wrapped table just get taller?
+**Should see:** the table fits the terminal width (never overflows). The widest columns shrink to a proportional budget; long cells wrap in-cell. This is where loose rows meet overcrowding — does the whitespace help you scan, or does the wrapped table just get taller?
 
 | Name | Kind | Width | Colour | Notes |
 | --- | --- | --- | --- | --- |
@@ -76,10 +61,7 @@ whitespace help you scan, or does the wrapped table just get taller?
 
 ## 6. Crowded — 6 cols, short cells, many rows
 
-**Should see:** the overcrowded case loose tables are meant to fix. At
-narrow width the columns fight for space; at wide width they breathe.
-Does the loose-row spacing relieve the crowding, or does a 6-column
-table stay crowded regardless? This is the test of the hypothesis.
+**Should see:** the overcrowded case loose tables are meant to fix. At narrow width the columns fight for space; at wide width they breathe. Does the loose-row spacing relieve the crowding, or does a 6-column table stay crowded regardless? This is the test of the hypothesis.
 
 | a | b | c | d | e | f |
 | --- | --- | --- | --- | --- | --- |
@@ -91,11 +73,7 @@ table stay crowded regardless? This is the test of the hypothesis.
 
 ## 7. Crowded + long cells — 6 cols, mixed width, few rows
 
-**Should see:** the worst case for width-fit. Six columns, some with
-long content, forcing both shrink and in-cell wrap. The header grid and
-the full-width rules are the only things holding it together as a
-table. Watch whether the loose rows help or just stretch a broken
-layout vertically.
+**Should see:** the worst case for width-fit. Six columns, some with long content, forcing both shrink and in-cell wrap. The header grid and the full-width rules are the only things holding it together as a table. Watch whether the loose rows help or just stretch a broken layout vertically.
 
 | id | name | type | status | owner | notes |
 | --- | --- | --- | --- | --- | --- |
@@ -105,10 +83,7 @@ layout vertically.
 
 ## 8. Single data row — degenerate
 
-**Should see:** a header plus one row. The grid header + closing rule
-still bracket it as a table. Loose rows are moot (one row). Does the
-full-width rule under a single row read as a table or as an
-underline?
+**Should see:** a header plus one row. The grid header + closing rule still bracket it as a table. Loose rows are moot (one row). Does the full-width rule under a single row read as a table or as an underline?
 
 | Element | Status |
 | --- | --- |
@@ -116,18 +91,14 @@ underline?
 
 ## 9. Header only — no data rows
 
-**Should see:** a header and a rule, nothing else. The degenerate case.
-Does it read as an empty table or as a stray header?
+**Should see:** a header and a rule, nothing else. The degenerate case. Does it read as an empty table or as a stray header?
 
 | Column | A | B | C |
 | --- | --- | --- | --- |
 
 ## 10. All long cells — 3 cols, paragraph-length content
 
-**Should see:** every cell wraps in-cell. The table becomes a grid of
-paragraphs. Loose rows separate the "records," but each record is tall.
-This is where loose rows either shine (records are visually grouped) or
-fail (the table is a wall of text either way).
+**Should see:** every cell wraps in-cell. The table becomes a grid of paragraphs. Loose rows separate the "records," but each record is tall. This is where loose rows either shine (records are visually grouped) or fail (the table is a wall of text either way).
 
 | Section | What it tests | What to watch |
 | --- | --- | --- |
@@ -141,15 +112,6 @@ fail (the table is a wall of text either way).
 
 After reading all ten at both widths, the questions:
 
-1. **Do loose rows help at the crowded end?** If a 6-column table is
-   crowded with or without loose rows, the thing may not be earning its
-   keep — a tight grid (glow-faithful) might read better.
-2. **Do loose rows help at the sparse end?** If they just add vertical
-   space to a 2-row table, they're ceremony.
-3. **Does the grid header hold at every width?** The `│` separators and
-   full-width rules are the new addition — do they read as a table at
-   6 columns and at 2?
-4. **Does the 3-space gutter keep columns aligned?** Body cells should
-   sit under their header cells, not drift.
+1. **Do loose rows help at the crowded end?** If a 6-column table is crowded with or without loose rows, the thing may not be earning its keep — a tight grid (glow-faithful) might read better. 2. **Do loose rows help at the sparse end?** If they just add vertical space to a 2-row table, they're ceremony. 3. **Does the grid header hold at every width?** The `│` separators and full-width rules are the new addition — do they read as a table at 6 columns and at 2? 4. **Does the 3-space gutter keep columns aligned?** Body cells should sit under their header cells, not drift.
 
 Where the answers surprise, that's a brief.

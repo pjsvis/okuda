@@ -86,7 +86,7 @@ Okuda does not parse CommonMark. It parses **Okuda Markdown** — a strict subse
 | Element | Rendered | Rule / Constraint |
 |---|---|---|
 | Heading | H1–H3 only | ATX (`# `). H4+ collapsed to bold paragraph. Cyan, bold, trailing `\n\n`. |
-| Paragraph | Yes | Hard-wrapped to terminal width. Soft returns honored (output `\n` without trailing double spaces). |
+| Paragraph | Yes | Hard-wrapped to terminal width. ~~Soft returns honored (output `\n` without trailing double spaces).~~ Single-`\n` soft returns stripped to spaces; text reflows to the wrap width (reversed 2026-08-24, ADR-007 amendment — soft returns were a user-side hack against collapsing renderers; okuda hard-wraps, so the hack broke layout on resize). `\n\n` remains a paragraph break. |
 | Unordered List | Yes | `- ` or `* ` at depth 0–1. Max nesting depth: **2**. Enforced loose spacing: `\n\n` between items. Continuation indented to text column. |
 | Ordered List | Yes | `1. `, `2. `, etc. Same depth and spacing rules as unordered. |
 | Code (fenced) | Yes | Triple backticks only. Indented code blocks **rejected** — treated as plain text. |
