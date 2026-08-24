@@ -6,6 +6,20 @@
 **Extends:** the Table row of the grammar table in brief 002 (which states the core rule tersely; this brief adds the policy around it)
 **Related:** `decisions/005-no-markdown-table-rendering.md` in the `mermaid-to-md` silo — rejected *baking* tables as Unicode art; does not conflict (the Derrida tests there target the bake, not live rendering)
 
+> **Header separators + full-width rules superseded.** The presentation
+> rules "no ASCII box borders" / "no internal pipes" and the header-rule
+> width were reversed on 2026-08-24 (operator call, ADR-007 divergence
+> table). Dogfooding showed glow's grid cue — `│` between header cells +
+> full-content-width `─` bars top and bottom — is the stronger
+> table-scan signal; okuda's gutter-only header read as a tabbed list, not
+> a table. The change: header cells are now joined with ` │ ` (muted
+> pipe); the header rule and closing rule span the full content width
+> (`width`, not `min(total, width)`). Body rows keep the loose-rows thing
+> (blank line between rows) and use a 3-space gutter (matching the header
+> separator width so columns align). The rest of this brief — uniform
+> presentation, no detection, header-rule-kept, alignment preserved, no
+> artificial floor on *content*, authoring conventions — stands unchanged.
+
 ## Objective
 
 Define the policy around Okuda's table rendering: a **uniform presentation layer** applied to every pipe table, with **authoring conventions** separated out as the agent's concern. The renderer is dumb and uniform — it does not detect table provenance or decide whether to reformat.

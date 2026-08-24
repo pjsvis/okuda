@@ -34,7 +34,7 @@ registry):
 | Loose lists | origin doc, grammar | empty line between items regardless of source tightness (Glow: tight) |
 | Soft returns honored | origin doc | `\n` is a hard break, no trailing-double-space tax (Glow: soft break) |
 | Mermaid → ASCII pipe | origin doc, diagram brief | `mermaid` fences piped to `mermaid-to-md`, three-channel colour (Glow: raw fence) |
-| Loose tables | table policy brief | no internal pipes, header rule, semantic colour, width-shrink (Glow: box-drawing grid) |
+| Loose tables + grid header | table policy brief (amended 2026-08-24) | blank line between body rows (loose; Glow: tight grid) + `│` separators between header cells + full-content-width `─` bars top and bottom (Glow: box-drawing grid). Body rows keep a 3-space gutter (header-separator width, columns align). The header grid is the table-scan cue; the loose body is the okuda readability thing |
 | Closed grammar | grammar | rejected elements (task lists, indented code, footnotes, images, raw/inline HTML) degrade silently to text, never error |
 | Hard-wrap mandate | ADR-004 | wrap never delegated to the terminal |
 | Two-level list cap | grammar | nesting beyond 2 flattens to continuation text |

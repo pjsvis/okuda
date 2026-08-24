@@ -588,7 +588,7 @@ function renderTable(t: TableState, ctx: Ctx): string {
   header.forEach(measure);
   for (const r of rows) r.forEach(measure);
 
-  const gutter = 2;
+  const gutter = 3;
   let total = colWidth.reduce((a, b) => a + b, 0) + gutter * (cols - 1);
 
   // Fit the terminal width — never overflow (table policy). Shrink wide
@@ -611,14 +611,18 @@ function renderTable(t: TableState, ctx: Ctx): string {
   }
 
   const out: string[] = [];
-  // Header row: cyan + bold; header rule kept; alignment carried.
+  // Header row: purple bold + `│` separators (grid cue); header rule +
+  // closing rule span the FULL content width (glow parity — the bar is
+  // the table-scan signal, not the table's natural width). Body rows
+  // keep a 3-space gutter so columns align with the header separators.
+  const sep = ` ${styler.tablePipe()} `;
+  const bodySep = " ".repeat(gutter);
   if (header.length > 0) {
     const cells = header.map((c, i) =>
       styler.roleBold("table-header", pad(c, i, colWidth, styler.mode)),
     );
-    out.push(cells.join(" ".repeat(gutter)));
-    const ruleW = Math.min(total, width);
-    out.push(styler.rule(ruleW));
+    out.push(cells.join(sep));
+    out.push(styler.rule(width));
   }
   for (const r of rows) {
     const padded: string[] = [];
@@ -628,12 +632,12 @@ function renderTable(t: TableState, ctx: Ctx): string {
         : r[i] ?? { text: "" };
       padded.push(pad(cell, i, colWidth, styler.mode));
     }
-    out.push(padded.join(" ".repeat(gutter)));
+    out.push(padded.join(bodySep));
   }
-  // Closing rule under the table (Glow parity: tables are bracketed).
+  // Closing rule under the table (Glow parity: tables are bracketed,
+  // full content width).
   if (header.length > 0 || rows.length > 0) {
-    const ruleW = Math.min(total, width);
-    out.push(styler.rule(ruleW));
+    out.push(styler.rule(width));
   }
   // Loose rows: blank line between rows. The header rule sits directly
   // under the header — it belongs to the header, not the rows. Trailing

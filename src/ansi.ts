@@ -68,6 +68,8 @@ export interface Styler {
   link(text: string, url: string): string;
   /** Blockquote pipe prefix. */
   quotePipe(): string;
+  /** Table header cell separator: muted `│` (colour mode) / plain `│` (none). */
+  tablePipe(): string;
   /** Thematic rule to `width` columns. */
   rule(width: number): string;
   /** Open sequence for a role (for state-machine re-emission). */
@@ -94,6 +96,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       // truecolor emits 'text url', none must too, or line breaks differ).
       link: (text, url) => url ? `${text} ${url}` : text,
       quotePipe: () => "│",
+      tablePipe: () => "│",
       rule: (width) => "─".repeat(width),
       open: () => "",
       reset: () => "",
@@ -125,6 +128,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     link: (text, url) =>
       `${wrap(sgr(fgParams(palette["link-text"])), text)} ${wrap(sgr(fgParams(palette["link-url"]), "4"), url)}`,
     quotePipe: () => `${fg(palette.blockquote)}│${RESET}`,
+    tablePipe: () => `${fg(palette.muted)}│${RESET}`,
     rule: (width) => `${fg(palette.muted)}${"─".repeat(width)}${RESET}`,
     open: (name) => fg(palette[name]),
     reset: () => RESET,

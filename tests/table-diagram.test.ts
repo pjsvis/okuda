@@ -35,9 +35,31 @@ describe("render — tables (uniform presentation policy)", () => {
     expect(dataLine).toBeDefined();
     // centre: content has leading spaces within the padded cell
     expect(stripANSI(dataLine!)).toMatch(/left\s+centre\s+right/);
-    // the header "C" is centred: spaces on both sides
+    // the header "C" is centred: spaces on both sides; `│` separators
+    // between header cells (grid cue, ADR-007 divergence table).
     const headerLine = ls.find((l) => stripANSI(l).trim().startsWith("L"));
-    expect(stripANSI(headerLine!)).toMatch(/L\s+C\s+R/);
+    expect(stripANSI(headerLine!)).toMatch(/L\s*│\s*C\s*│\s*R/);
+  });
+
+  test("header grid: │ separators between header cells, full-width rules", async () => {
+    const out = await renderDocument(
+      "| Name | Qty |\n|---|---|\n| x | 1 |\n",
+      { width: W },
+    );
+    const ls = out.split("\n").map((l) => l);
+    // header row has │ between cells (muted pipe, colour mode)
+    const headerLine = ls.find((l) => stripANSI(l).includes("Name"))!;
+    expect(stripANSI(headerLine)).toMatch(/Name\s*│\s*Qty/);
+    // body rows do NOT have │ (loose body, gutter only)
+    const bodyLine = ls.find((l) => stripANSI(l).includes("x"))!;
+    expect(stripANSI(bodyLine)).not.toMatch(/│/);
+    // header rule + closing rule span the full content width (W - 4 margin)
+    const ruleLines = ls.filter((l) => /^\s*\x1b\[38;2;88;88;88m─+/.test(l));
+    expect(ruleLines.length).toBe(2);
+    for (const r of ruleLines) {
+      // 2-char left margin + full content-width rule = W - 2
+      expect(displayWidth(r)).toBeGreaterThanOrEqual(W - 4);
+    }
   });
 
   test("right-aligned column pads on the left", async () => {
@@ -61,10 +83,16 @@ describe("render — tables (uniform presentation policy)", () => {
     }
   });
 
-  test("no artificial floor — narrow table stays narrow", async () => {
+  test("no artificial floor — narrow table content stays narrow", async () => {
     const out = await renderDocument("| a | b |\n|--|--|\n| 1 | 2 |\n", { width: W });
-    const widest = Math.max(...out.split("\n").map((l) => displayWidth(l)));
-    expect(widest).toBeLessThan(20);
+    // Data rows stay narrow (no padding to 40); only the rule lines span
+    // the full content width (glow parity — the bar is the scan cue).
+    const dataRows = out.split("\n").filter((l) =>
+      stripANSI(l).includes("a") || stripANSI(l).includes("1"),
+    );
+    for (const l of dataRows) {
+      expect(displayWidth(l)).toBeLessThan(20);
+    }
   });
 
   test("inline styles inside cells survive", async () => {
