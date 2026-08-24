@@ -79,6 +79,11 @@ audit:
 tables:
     @./okuda docs/tables.md --tui
 
+# Render the manifesto (glow vs okuda; the dogfood is the argument)
+[group('build')]
+manifesto:
+    @./okuda docs/glow-vs-okuda.md --tui
+
 # ── Registries ───────────────────────────────────────────────
 
 # Check registries for drift
