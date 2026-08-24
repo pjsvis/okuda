@@ -78,21 +78,25 @@ describe("tui — viewport slice", () => {
 describe("tui — footerLine", () => {
   const styler = makeStyler(DEFAULT_PALETTE, "truecolor");
   const muted = (s: string) => styler.role("muted", s);
+  const badge = (s: string) => styler.badge(s);
 
-  test("label right-aligned, hints left, plain gap between", () => {
-    const f = footerLine(60, "Gloam", muted);
-    // Hints come first (muted-coloured), then spaces, then Gloam.
+  test("badge right-aligned: pink bg + white fg + padding, hints left", () => {
+    const f = footerLine(60, "Gloam", muted, badge);
+    // Hints come first (muted-coloured), then spaces, then the badge.
     expect(f).toContain(HINTS);
-    expect(f.endsWith("Gloam\x1b[0m")).toBe(true);
+    // Badge: pink bg (#ff79c6), near-white fg (#f8f8f2), space-padded.
+    expect(f).toContain("\x1b[48;2;255;121;198m"); // bg pink
+    expect(f).toContain("\x1b[38;2;248;248;242m"); // fg near-white
+    expect(f.endsWith(" Gloam \x1b[0m")).toBe(true); // padded + reset
   });
   test("narrow width: at least one space gap, no throw", () => {
-    const f = footerLine(10, "Gloam", muted);
+    const f = footerLine(10, "Gloam", muted, badge);
     expect(f).toContain("Gloam");
   });
-  test("NO_COLOR: plain text, no escapes", () => {
+  test("NO_COLOR: plain text, no escapes; padding kept (shape parity)", () => {
     const none = makeStyler(DEFAULT_PALETTE, "none");
-    const f = footerLine(60, "Gloam", (s) => none.role("muted", s));
+    const f = footerLine(60, "Gloam", (s) => none.role("muted", s), (s) => none.badge(s));
     expect(f).not.toContain("\x1b");
-    expect(f.endsWith("Gloam")).toBe(true);
+    expect(f.endsWith(" Gloam ")).toBe(true); // padding kept, no colour
   });
 });

@@ -51,6 +51,8 @@ export interface Styler {
   roleBoldItalic(name: keyof Palette, text: string): string;
   /** Underline + colour (links). */
   roleUnderline(name: keyof Palette, text: string): string;
+  /** Badge: bg + fg + space-padded text (TUI footer chrome). */
+  badge(text: string): string;
   /** Bold, no colour (H4+ collapse, table plain text). */
   bold(text: string): string;
   /** Strikethrough. */
@@ -83,6 +85,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       roleItalic: (_n, text) => text,
       roleBoldItalic: (_n, text) => text,
       roleUnderline: (_n, text) => text,
+      badge: (text) => ` ${text} `, // padding kept in both modes (shape parity)
       bold: (text) => text,
       strike: (text) => text,
       codeLine: (line) => line,
@@ -105,6 +108,9 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     roleItalic: (name, text) => wrap(sgr(fgParams(palette[name]), "3"), text),
     roleBoldItalic: (name, text) => wrap(sgr(fgParams(palette[name]), "1", "3"), text),
     roleUnderline: (name, text) => wrap(sgr(fgParams(palette[name]), "4"), text),
+    // Gloam footer badge: pink bg, near-white fg, 1-space padding each
+    // side so the bg reads as a contained pill, not a stripe.
+    badge: (text) => `${bg(palette["badge-bg"])}${fg(palette["badge-fg"])} ${text} ${RESET}`,
     bold: (text) => wrap("\x1b[1m", text),
     strike: (text) => wrap("\x1b[9m", text),
     // Pass B (2026-08-24): code background dropped — glow renders code

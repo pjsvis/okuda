@@ -20,6 +20,8 @@ export type Role =
   | "link"
   | "link-text"
   | "link-url"
+  | "badge-bg"
+  | "badge-fg"
   | "emphasis"
   | "strong"
   | "table-header"
@@ -50,6 +52,9 @@ export type Palette = Record<Role, string>;
  *             the link text in rose, no underline)
  *   link-url  #8be9fd (Dracula cyan)   — converged 2026-08-24 (glow shows
  *             the URL inline in cyan + underline, no OSC 8)
+ *   badge-bg #ff79c6 (Dracula pink)   — Gloam footer badge background
+ *             (TUI chrome, not markdown; design ref: glow's status badge)
+ *   badge-fg #f8f8f2 (Dracula near-white) — Gloam footer badge foreground
  *   muted    #585858  (240, dim gray)     — Glow horizontal rule
  *   blockquote #767676 (243, gray)        — quote pipe, recedes
  * Diagram roles have no Glow equivalent; they reuse Glow channels:
@@ -65,6 +70,8 @@ export const DEFAULT_PALETTE: Palette = {
   link: "#00af5f",
   "link-text": "#ff79c6",
   "link-url": "#8be9fd",
+  "badge-bg": "#ff79c6",
+  "badge-fg": "#f8f8f2",
   emphasis: "#f1fa8c",
   strong: "#ffb86c",
   "table-header": "#bd93f9",

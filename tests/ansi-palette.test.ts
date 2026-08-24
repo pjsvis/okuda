@@ -89,11 +89,17 @@ describe("styler — byte-exact SGR sequences", () => {
     expect(s.roleBold("table-key", "k")).toBe("\x1b[38;2;255;255;135;1mk\x1b[0m");
   });
 
+  test("badge: pink bg + near-white fg + padded (Gloam footer chrome)", () => {
+    const s = makeStyler(DEFAULT_PALETTE, "truecolor");
+    expect(s.badge("Gloam")).toBe("\x1b[48;2;255;121;198m\x1b[38;2;248;248;242m Gloam \x1b[0m");
+  });
+
   test("none mode: identity, no escapes anywhere; codespan strips backticks (parity); link shows URL", () => {
     const s = makeStyler(DEFAULT_PALETTE, "none");
     expect(s.roleBold("heading", "T")).toBe("T");
     expect(s.codespan("c")).toBe("c");
     expect(s.link("text", "url")).toBe("text url"); // parity: URL shown in both modes
+    expect(s.badge("G")).toBe(" G "); // padding kept, no colour
     expect(s.rule(4)).toBe("────");
   });
 });

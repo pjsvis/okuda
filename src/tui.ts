@@ -86,14 +86,18 @@ export function viewport(
 
 const HINTS = "q quit · j/k scroll · g/G top/bottom · Ctrl-D/U half · r reload";
 
-/** Compose the footer: hints left, label right, plain gap between. Pure. */
+/** Compose the footer: hints left, badge right, plain gap between. Pure. */
 export function footerLine(
   width: number,
   label: string,
   muted: (s: string) => string,
+  badge: (s: string) => string,
 ): string {
-  const gap = Math.max(1, width - HINTS.length - label.length);
-  return muted(HINTS) + " ".repeat(gap) + muted(label);
+  // Badge pads with 1 space each side (" Gloam "), so its visible width
+  // is label.length + 2 — account for that in the gap or it overflows.
+  const badgeWidth = label.length + 2;
+  const gap = Math.max(1, width - HINTS.length - badgeWidth);
+  return muted(HINTS) + " ".repeat(gap) + badge(label);
 }
 
 // ── I/O loop ──────────────────────────────────────────────────────────
@@ -112,6 +116,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   const color = detectColorMode(process.env as NodeJS.ProcessEnv);
   const styler = makeStyler(palette, color);
   const muted = (s: string) => styler.role("muted", s);
+  const badge = (s: string) => styler.badge(s);
 
   const readSource = async (): Promise<string> => {
     const f = Bun.file(opts.file);
@@ -143,7 +148,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     process.stdout.write(view.visible.join("\n"));
     // Footer at the last row.
     process.stdout.write(`\x1b[${rows};1H`);
-    process.stdout.write(footerLine(cols, "Gloam", muted));
+    process.stdout.write(footerLine(cols, "Gloam", muted, badge));
   };
 
   const reload = async (): Promise<void> => {
