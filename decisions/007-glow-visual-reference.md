@@ -39,6 +39,7 @@ registry):
 | Hard-wrap mandate | ADR-004 | wrap never delegated to the terminal |
 | Two-level list cap | grammar | nesting beyond 2 flattens to continuation text |
 | Visible `#` markers on all heading levels | this ADR | `#`×level prefix kept on H1–H6 (Glow: H1 gets a background bar, no marker) |
+| H6 uniform-bold-purple | this ADR (operator call, 2026-08-24) | H6 keeps `######` + purple bold like H1–H5; glow drops H6 to green non-bold. Ground: H6 is rarely produced by the workflow, so the cost of diverging from glow is low and marker-rule uniformity (every heading level: purple bold) is simpler than reproducing glow's one-off green-non-bold |
 | Blockquote `│` pipe colour | this ADR (operator call, 2026-08-24 convergence) | pipe rendered gray `#767676` `│`; glow uses a `#6271a3` border bar. The blockquote **text** matches glow (yellow-italic, Pass B) — only the pipe colour diverges |
 | Emphasis colour | _(converged — no row needed)_ | ~~diverges~~ okuda now matches glow-CLI Dracula yellow `#f1fa8c` (converged 2026-08-24, ADR-006 Amendment). Recorded here as a non-divergence so a future agent doesn't re-flag it |
 
@@ -54,7 +55,7 @@ decision, H4–H6 now render the Glow way: `#`×level marker + heading
 colour (~~blue~~ purple, bold). The visible-marker thing (above) means H1 keeps its
 `#` rather than Glow's background bar; H2–H6 match Glow's marker + ~~blue~~
 purple bold, except H6 — Glow drops H6 to green non-bold; okuda keeps H6 ~~blue~~
-purple bold for marker-rule uniformity (simplification, flagged for revisit).
+purple bold for marker-rule uniformity (~~simplification, flagged for revisit~~ grounded as the H6 uniform-bold-purple thing; see the divergence table above).
 
 ## Alternatives Considered
 
@@ -75,7 +76,7 @@ purple bold for marker-rule uniformity (simplification, flagged for revisit).
 **What became harder:**
 - The divergence table must be maintained; a divergence not listed is drift by definition
 - Glow's own evolution does not auto-propagate; "match Glow" is a manual intent, not a live sync (same constraint as ADR-006's palette coupling)
-- H6 uniform-bold is a deliberate simplification of Glow's green-non-bold; flagged here as the one heading-level judgement call
+- ~~H6 uniform-bold is a deliberate simplification of Glow's green-non-bold; flagged here as the one heading-level judgement call~~ H6 uniform-bold-purple is now grounded in the divergence table (operator call, 2026-08-24: H6 is rare, uniformity is simpler); no longer flagged
 
 **Constraints this imposes:**
 - **Every divergence needs a ground.** A styling choice that matches neither Glow nor a row in the divergence table is a defect, not a feature. Fix it toward Glow or name the thing.
