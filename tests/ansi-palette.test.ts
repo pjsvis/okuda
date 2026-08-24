@@ -44,9 +44,11 @@ describe("styler — byte-exact SGR sequences", () => {
     expect(s.role("code-text", "x")).toBe("\x1b[38;2;80;250;123mx\x1b[0m");
   });
 
-  test("code background: \\x1b[48;2;48;48;48m", () => {
+  test("code line: no background (dropped Pass B); \x1b[38;2;80;250;123m fg", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.codeLine("x")).toContain("\x1b[48;2;48;48;48m");
+    const out = s.codeLine("x");
+    expect(out).toBe("\x1b[38;2;80;250;123mx\x1b[0m");
+    expect(out).not.toContain("48;2"); // no background
   });
 
   test("blockquote: \\x1b[38;2;118;118;118m", () => {
@@ -87,10 +89,10 @@ describe("styler — byte-exact SGR sequences", () => {
     expect(s.roleBold("table-key", "k")).toBe("\x1b[38;2;255;255;135;1mk\x1b[0m");
   });
 
-  test("none mode: identity, no escapes anywhere", () => {
+  test("none mode: identity, no escapes anywhere; codespan strips backticks (parity)", () => {
     const s = makeStyler(DEFAULT_PALETTE, "none");
     expect(s.roleBold("heading", "T")).toBe("T");
-    expect(s.codespan("c")).toBe("`c`");
+    expect(s.codespan("c")).toBe("c");
     expect(s.link("text", "url")).toBe("text");
     expect(s.rule(4)).toBe("────");
   });

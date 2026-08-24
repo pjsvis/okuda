@@ -83,7 +83,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       bold: (text) => text,
       strike: (text) => text,
       codeLine: (line) => line,
-      codespan: (text) => "`" + text + "`",
+      codespan: (text) => text, // Pass B: backticks stripped in both modes (parity)
       link: (text, _url) => text,
       quotePipe: () => "│",
       rule: (width) => "─".repeat(width),
@@ -102,8 +102,12 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     roleUnderline: (name, text) => wrap(sgr(fgParams(palette[name]), "4"), text),
     bold: (text) => wrap("\x1b[1m", text),
     strike: (text) => wrap("\x1b[9m", text),
-    codeLine: (line) => `${bg(palette["code-background"])}${fg(palette["code-text"])}${line}${RESET}`,
-    codespan: (text) => `${bg(palette["code-background"])}${fg(palette["code-text"])}\`${text}\`${RESET}`,
+    // Pass B (2026-08-24): code background dropped — glow renders code
+    // spans/fences with colour only, no bg (the bg read as a blurry box).
+    // Backticks stripped from codespan — the colour is the signal, not
+    // the delimiters (supersedes brief 002's 'backticks preserved' row).
+    codeLine: (line) => `${fg(palette["code-text"])}${line}${RESET}`,
+    codespan: (text) => `${fg(palette["code-text"])}${text}${RESET}`,
     link: (text, url) =>
       `\x1b]8;;${url}\x1b\\${wrap(sgr(fgParams(palette.link), "4"), text)}\x1b]8;;\x1b\\`,
     quotePipe: () => `${fg(palette.blockquote)}│${RESET}`,

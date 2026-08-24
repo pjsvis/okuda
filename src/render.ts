@@ -435,9 +435,12 @@ function quoteBlock(children: string, ctx: Ctx): string {
       }
       continue;
     }
+    // Pass B (2026-08-24): blockquote text styled to match glow —
+    // yellow (#f1fa8c) italic, the same SGR as emphasis. (snagging item 6)
+    // The │ pipe stays as an okuda divergence (candidate ADR-007 row).
     const lines = wrapANSI(seg.text, { width: width - 2 });
     for (const line of lines) {
-      out.push(line === "" ? "" : styler.quotePipe() + " " + line);
+      out.push(line === "" ? "" : styler.quotePipe() + " " + styler.roleItalic("emphasis", line));
     }
   }
   return out.join("\n") + "\n\n";

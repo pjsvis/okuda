@@ -38,7 +38,8 @@ describe("render — paragraphs and inline styles", () => {
     expect(out).toContain("\x1b[38;2;255;184;108;1mb\x1b[0m");
     expect(out).toContain("\x1b[38;2;241;250;140;3mi\x1b[0m");
     expect(out).toContain("\x1b[9ms\x1b[0m");
-    expect(out).toContain("\x1b[38;2;80;250;123m`c`");
+    expect(out).toContain("\x1b[38;2;80;250;123mc\x1b[0m");
+    expect(out).not.toContain("`c`"); // backticks stripped (Pass B)
   });
 
   test("***bold italic*** renders in the emphasis colour, not strong's", async () => {
@@ -123,7 +124,7 @@ describe("render — lists (loose, markers, continuation)", () => {
 describe("render — blockquote", () => {
   test("muted pipe + indent, single level", async () => {
     const out = await render("> quoted line");
-    expect(out).toContain("\x1b[38;2;118;118;118m│\x1b[0m quoted line");
+    expect(out).toContain("\x1b[38;2;118;118;118m│\x1b[0m \x1b[38;2;241;250;140;3mquoted line\x1b[0m");
   });
 
   test("quote content re-wraps inside the pipe column", async () => {
