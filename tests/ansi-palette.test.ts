@@ -33,15 +33,15 @@ describe("ansi — colour mode detection (contract table)", () => {
 });
 
 describe("styler — byte-exact SGR sequences", () => {
-  test("heading: bold + \\x1b[38;2;0;175;255;1m (colour-first, glow order)", () => {
+  test("heading: bold + \\x1b[38;2;189;147;249;1m (glow purple, colour-first)", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
     const out = s.roleBold("heading", "T");
-    expect(out).toBe("\x1b[38;2;0;175;255;1mT\x1b[0m");
+    expect(out).toBe("\x1b[38;2;189;147;249;1mT\x1b[0m");
   });
 
-  test("code text: \\x1b[38;2;95;215;0m", () => {
+  test("code text: \\x1b[38;2;80;250;123m (glow green)", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.role("code-text", "x")).toBe("\x1b[38;2;95;215;0mx\x1b[0m");
+    expect(s.role("code-text", "x")).toBe("\x1b[38;2;80;250;123mx\x1b[0m");
   });
 
   test("code background: \\x1b[48;2;48;48;48m", () => {
@@ -72,14 +72,14 @@ describe("styler — byte-exact SGR sequences", () => {
     expect(s.roleBoldItalic("emphasis", "bi")).toBe("\x1b[38;2;241;250;140;1;3mbi\x1b[0m");
   });
 
-  test("strong: bold + \\x1b[38;2;255;215;0;1m (colour-first)", () => {
+  test("strong: bold + \\x1b[38;2;255;184;108;1m (glow orange, colour-first)", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.roleBold("strong", "b")).toBe("\x1b[38;2;255;215;0;1mb\x1b[0m");
+    expect(s.roleBold("strong", "b")).toBe("\x1b[38;2;255;184;108;1mb\x1b[0m");
   });
 
-  test("table header: bold + \\x1b[38;2;0;175;255;1m (colour-first)", () => {
+  test("table header: bold + \\x1b[38;2;189;147;249;1m (glow purple, colour-first)", () => {
     const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.roleBold("table-header", "h")).toBe("\x1b[38;2;0;175;255;1mh\x1b[0m");
+    expect(s.roleBold("table-header", "h")).toBe("\x1b[38;2;189;147;249;1mh\x1b[0m");
   });
 
   test("table key: bold + \\x1b[38;2;255;255;135;1m (colour-first)", () => {
@@ -98,14 +98,14 @@ describe("styler — byte-exact SGR sequences", () => {
 
 describe("palette — defaults + override loader", () => {
   test("defaults match the contract table byte-exactly", () => {
-    expect(DEFAULT_PALETTE.heading).toBe("#00afff");
-    expect(DEFAULT_PALETTE["code-text"]).toBe("#5fd700");
+    expect(DEFAULT_PALETTE.heading).toBe("#bd93f9");
+    expect(DEFAULT_PALETTE["code-text"]).toBe("#50fa7b");
     expect(DEFAULT_PALETTE["code-background"]).toBe("#303030");
     expect(DEFAULT_PALETTE.blockquote).toBe("#767676");
     expect(DEFAULT_PALETTE.link).toBe("#00af5f");
     expect(DEFAULT_PALETTE.emphasis).toBe("#f1fa8c");
-    expect(DEFAULT_PALETTE.strong).toBe("#ffd700");
-    expect(DEFAULT_PALETTE["table-header"]).toBe("#00afff");
+    expect(DEFAULT_PALETTE.strong).toBe("#ffb86c");
+    expect(DEFAULT_PALETTE["table-header"]).toBe("#bd93f9");
     expect(DEFAULT_PALETTE["table-key"]).toBe("#ffff87");
     expect(DEFAULT_PALETTE.muted).toBe("#585858");
     expect(DEFAULT_PALETTE["diagram-border"]).toBe("#585858");
@@ -125,7 +125,7 @@ describe("palette — defaults + override loader", () => {
     );
     const p = loadPalette(path);
     expect(p["diagram-arrow"]).toBe("#ff0000");
-    expect(p.heading).toBe("#00afff"); // invalid value ignored
+    expect(p.heading).toBe("#bd93f9"); // invalid value ignored
   });
 
   test("malformed JSON → defaults, no throw", () => {

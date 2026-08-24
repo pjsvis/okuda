@@ -38,9 +38,10 @@ export type Palette = Record<Role, string>;
  * SGR emission order is colour-then-attribute (\x1b[38;2;R;G;B;3m),
  * matching glow. Hex values:
  *   heading  #00afff  (39, bright blue)   — Glow H2-H6
- *   strong   #ffd700  (gold)             — divergence pending: glow-CLI is #ffb86c orange
- *   emphasis #f1fa8c  (Dracula yellow)  — glow-CLI faithful (converged from #ffff5f, 2026-08-24)
- *   code     #5fd700 / #303030            — divergence pending: glow-CLI code is #50fa7b green
+ *   heading  #bd93f9  (Dracula purple) — converged 2026-08-24 (was #00afff blue, wrong source)
+ *   strong   #ffb86c  (Dracula orange) — converged 2026-08-24 (was #ffd700 gold, ungrounded)
+ *   emphasis #f1fa8c  (Dracula yellow)  — converged 2026-08-24 (was #ffff5f, wrong source)
+ *   code     #50fa7b / #303030            — text converged 2026-08-24 (was #5fd700); bg pending (item 3b)
  *   link     #00af5f  (35, sea green)     — Glow linkText, underlined via OSC 8
  *   muted    #585858  (240, dim gray)     — Glow horizontal rule
  *   blockquote #767676 (243, gray)        — quote pipe, recedes
@@ -50,14 +51,14 @@ export type Palette = Record<Role, string>;
  * to the Glow palette: header = heading blue, key = Glow H1 pale yellow.
  */
 export const DEFAULT_PALETTE: Palette = {
-  heading: "#00afff",
-  "code-text": "#5fd700",
+  heading: "#bd93f9",
+  "code-text": "#50fa7b",
   "code-background": "#303030",
   blockquote: "#767676",
   link: "#00af5f",
   emphasis: "#f1fa8c",
-  strong: "#ffd700",
-  "table-header": "#00afff",
+  strong: "#ffb86c",
+  "table-header": "#bd93f9",
   "table-key": "#ffff87",
   muted: "#585858",
   "diagram-border": "#585858",

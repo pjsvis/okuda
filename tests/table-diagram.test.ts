@@ -13,7 +13,7 @@ describe("render — tables (uniform presentation policy)", () => {
     );
     const ls = out.split("\n").map((l) => l.trim() === "" ? "" : l);
     // header row: pine bold
-    expect(out).toContain("\x1b[38;2;0;175;255;1m");
+    expect(out).toContain("\x1b[38;2;189;147;249;1m");
     // rule under header (shifted by top margin line, prefixed by 2-char margin)
     expect(ls[2]).toMatch(/^  \x1b\[38;2;88;88;88m─+/);
     // amber key column
@@ -72,7 +72,7 @@ describe("render — tables (uniform presentation policy)", () => {
       "| k |\n|--|\n| **bold** cell |\n",
       { width: W },
     );
-    expect(out).toContain("\x1b[38;2;255;215;0;1mbold\x1b[0m");
+    expect(out).toContain("\x1b[38;2;255;184;108;1mbold\x1b[0m");
   });
 
   test("table inside code fence renders verbatim (no presentation layer)", async () => {
@@ -80,7 +80,7 @@ describe("render — tables (uniform presentation policy)", () => {
     const out = await renderDocument(src, { width: W });
     expect(out).toContain("| a | b |");
     expect(out).toContain("|---|---|");
-    expect(out).not.toContain("38;2;0;175;255;1"); // no header colour (colour-first form)
+    expect(out).not.toContain("38;2;189;147;249;1"); // no header colour
   });
 });
 

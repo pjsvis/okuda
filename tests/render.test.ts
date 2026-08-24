@@ -15,14 +15,14 @@ function lines(out: string): string[] {
 describe("render — headings", () => {
   test("H1–H3 styled, marker visible, blank line after", async () => {
     const out = await render("# Title\n\nBody");
-    expect(out).toContain("\x1b[38;2;0;175;255;1m# Title\x1b[0m");
+    expect(out).toContain("\x1b[38;2;189;147;249;1m# Title\x1b[0m");
     expect(lines(out)[0]).toBe("");
     expect(lines(out)[2]).toBe("");
   });
 
   test("H4+ renders the Glow way: marker + heading colour", async () => {
     const out = await render("#### Deep");
-    expect(out).toContain("\x1b[38;2;0;175;255;1m#### Deep\x1b[0m");
+    expect(out).toContain("\x1b[38;2;189;147;249;1m#### Deep\x1b[0m");
     expect(out).not.toContain("\x1b[1mDeep\x1b[0m"); // no longer a bold-paragraph collapse
   });
 
@@ -35,10 +35,10 @@ describe("render — headings", () => {
 describe("render — paragraphs and inline styles", () => {
   test("bold, italic, strikethrough, codespan emit contract sequences", async () => {
     const out = await render("**b** *i* ~~s~~ `c`");
-    expect(out).toContain("\x1b[38;2;255;215;0;1mb\x1b[0m");
+    expect(out).toContain("\x1b[38;2;255;184;108;1mb\x1b[0m");
     expect(out).toContain("\x1b[38;2;241;250;140;3mi\x1b[0m");
     expect(out).toContain("\x1b[9ms\x1b[0m");
-    expect(out).toContain("\x1b[38;2;95;215;0m`c`");
+    expect(out).toContain("\x1b[38;2;80;250;123m`c`");
   });
 
   test("***bold italic*** renders in the emphasis colour, not strong's", async () => {
