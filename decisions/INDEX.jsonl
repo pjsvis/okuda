@@ -2,3 +2,4 @@
 {"file":"002-date-first-brief-naming.md","date":"2026-08-20","status":"Accepted","summary":"Briefs are named YYYY-MM-DD-brief-slug.md — date-first so the record of intent sorts as a timeline","meta":{}}
 {"file":"003-machine-configs-live-in-machines-repo.md","date":"2026-08-22","status":"Accepted","summary":"Machine configuration lives in pjsvis/machines (Omarchy as reference, Mac converging) — okuda hosts no machine configs; reverses docs/starship-mac.toml placement","meta":{}}
 {"file":"004-hard-wrap-mandate.md","date":"2026-08-22","status":"Accepted","summary":"Hard-wrap always — Okuda never delegates wrapping to the terminal","meta":{}}
+{"file":"005-render-engine-string-protocols.md","date":"2026-08-24","status":"Accepted","summary":"Render engine uses string protocols over Bun.markdown's string-in/string-out callbacks","meta":{}}
