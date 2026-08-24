@@ -1,0 +1,15 @@
+{
+  "name": "okuda",
+  "version": "0.1.0",
+  "private": true,
+  "module": "src/cli.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run src/cli.ts",
+    "build": "bun build --compile src/cli.ts --outfile okuda",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "bun-types": "^1.3.11"
+  }
+}
