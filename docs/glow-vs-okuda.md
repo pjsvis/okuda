@@ -3,6 +3,17 @@
 > Named for Michael Okuda: high-contrast, functional, uncluttered. The terminal is the
 > display, not a browser in denial. Colour is *functional* — it signals structure, not mood.
 
+> We are not just opinioned; we are attitudinal. The moat is a stance, not a feature
+> list — and a stance can't be copied without understanding it.
+
+> No light mode. Dark is the only mode, because the terminal emits signal, not
+> background noise. Light is a palette file we don't ship; the override is the light
+> mode, if someone wants it.
+
+> If the author didn't structure it for the eye, the eye has no reason to stay. Bad
+> framing is a signal of bad authoring, and the crowd rejects the document before the
+> critic gets a hearing.
+
 This document is a comparison and an argument. It is rendered by okuda, and it argues for
 okuda — which is either a neat trick or circular reasoning, depending on your generosity.
 Read it as both: a real document you might actually read, and a dogfood test of whether the

@@ -6,6 +6,17 @@ A single document that exercises every element of the closed Okuda Markdown gram
 > the display, not a browser in denial. Colour is *functional* — it signals structure,
 > not mood.
 
+> We are not just opinioned; we are attitudinal. The moat is a stance, not a feature
+> list — and a stance can't be copied without understanding it.
+
+> No light mode. Dark is the only mode, because the terminal emits signal, not
+> background noise. Light is a palette file we don't ship; the override is the light
+> mode, if someone wants it.
+
+> If the author didn't structure it for the eye, the eye has no reason to stay. Bad
+> framing is a signal of bad authoring, and the crowd rejects the document before the
+> critic gets a hearing.
+
 ---
 
 ## Structure: headings
