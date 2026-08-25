@@ -73,8 +73,26 @@ Lament Configuration, the Cenobites, the rules of summoning and price:
 a complete metaphysic delivered through artefacts rather than
 exposition, with the horror living in the *system* rather than the
 monster. Barker's great gift was object-logic — the box that is a
-door that is a contract — a mythology you could hold. But Barker's
-worlds come to you; the town waits for you. His geometry
+door that is a contract — a mythology you could hold.
+
+*Nightbreed* is the sleeper of the catalogue, and the sleeper for a
+structural reason: Midian — a hidden city where the monsters are the
+refugees and the horror is the persecution — is the deepest world he
+built, *Frankenstein*'s moral engine rebuilt as a cosmology. The studio
+sold it as a slasher and hid the monsters; the film bombed on a lie,
+and it took the restored Cabal Cut for audiences to see what had
+actually been made. The general audience was always there.
+
+And that is Barker's real edge: the two-audiences problem, solved. His
+stories run on folklore chassis anyone can ride — puzzle, door, price,
+temptation, the second skin — dressed in leather where the wolf wore
+fur. The general viewer rides the fairy tale; the devotee reads the
+cosmology. That is why the same film plays for your mum and for the
+weird-fiction lifer, and why the stories survive translation between
+film and book in either order: the unit of story is the idea-object,
+whose power lives in the logic, not in the sentence or the shot.
+
+But Barker's worlds come to you; the town waits for you. His geometry
 interrogates; Silent Hill *absorbs*. Both are world building; only one
 of them is a place you can get lost in.
 
