@@ -59,6 +59,12 @@ belongs to the producer; meaning belongs to the wire.
 
 ## How
 
+0. **Fix `r` first (the manual epoch).** `r` reload exists in the TUI
+today but does `scroll = 0` — a top-jump, the crime ADR-010 abolished.
+Manual refresh is the correct v0 (the reader is the clock — poll rate
+owned by the only party who can measure attention budget); make it
+re-anchor like the resize path does, so the manual epoch is fully
+pleasant before any watch code exists.
 1. **Watch the directory, not the file.** The runbook mandates atomic
    writes (temp + rename), which swaps the inode — a path-based
    `fs.watch` fires once and goes stale. Watch the parent directory,
