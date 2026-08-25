@@ -361,14 +361,18 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // block the width of the level (LCARS tab). The glyph stays in the
       // stream for NO_COLOR parity (strip escapes → `## Heading` as before).
       //
-      // RHS chip (brief: right-edge LCARS tab) — DIAGNOSTIC STATE: the
-      // chip is placed immediately after the heading text on every line,
-      // no padding, no far-right logic. This isolates the variable
-      // (position) from the question (does bg-on-a-bare-space render).
-      // Visible here → bg works, reposition to the right. Invisible here
-      // → terminal won't paint bg on a bare space; pivot to a glyph.
+      // RHS chip (brief: right-edge LCARS tab): a `▌` in heading colour
+      // at the extreme right column of the terminal — the visible right
+      // bound, bookend to the left badge. fg-only on a visible glyph
+      // (renders reliably; no bg needed). The chip eats the body's 2-col
+      // right margin so it sits at the visible edge. Headers wrap at
+      // `width` (content_width = body parity); each line is padded to
+      // `fullWidth - 2 - 1` (terminal width - left margin - chip cell)
+      // and the chip fills the last column. Every line (the bar form)
+      // bounds the reflow on resize.
       const markers = "#".repeat(level);
       const lines = wrapANSI(markers + " " + stripHtml(children), { width });
+      const target = Math.max(width + 1, ctx.fullWidth - 2); // pre-left-margin
       return (
         lines
           .map((l, i) => {
@@ -378,7 +382,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
                 ? styler.headingBadge(markers) +
                   styler.roleBold("heading", l.slice(markers.length))
                 : styler.roleBold("heading", l);
-            return body + styler.headingChip();
+            return padDisplay(body, target - 1) + styler.headingChip();
           })
           .join("\n") + "\n\n"
       );

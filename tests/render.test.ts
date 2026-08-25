@@ -32,9 +32,7 @@ describe("render — headings", () => {
 
   test("long heading wraps within width", async () => {
     const out = await render("# " + "heading ".repeat(12), 30);
-    // Diagnostic: chip width (5 cols for [XXX]) is not yet accounted for
-    // in the wrap budget — relax the bound until the chip design settles.
-    for (const l of lines(out)) expect(displayWidth(l)).toBeLessThanOrEqual(35);
+    for (const l of lines(out)) expect(displayWidth(l)).toBeLessThanOrEqual(30);
   });
 });
 
@@ -43,26 +41,26 @@ describe("render — headings", () => {
 //    bookend to the left badge. The chip IS the rhs margin for headers.
 //    Structural parity: plain space in NO_COLOR (strip escapes → identical).
 describe("render — heading RHS chip (right-edge tab)", () => {
-  // Default-palette heading colour is #bd93f9 → fg on `XXX` (diagnostic).
-  const CHIP = "\x1b[38;2;189;147;249m[XXX]\x1b[0m";
+  // Default-palette heading colour is #bd93f9 → fg on `▌` (left half-block).
+  const CHIP = "\x1b[38;2;189;147;249m▌\x1b[0m";
 
-  test("chip present at the right bound of a header line", async () => {
-    const out = await render("# Title\n\nbody");
+  test("chip present at the extreme right column of a header line", async () => {
+    const w = 40;
+    const out = await render("# Title\n\nbody", w);
     expect(out).toContain(CHIP);
-    // The chip closes the header line — it sits after the heading text.
     const hdr = lines(out)[1]!; // line 0 is the leading blank
-    expect(hdr).toContain(CHIP);
     expect(hdr.endsWith(CHIP)).toBe(true);
+    // The chip is at the terminal right edge: full line = w.
+    expect(displayWidth(stripANSI(hdr))).toBe(w);
   });
 
-  test("short header still gets the chip immediately after the text", async () => {
+  test("short header still gets the chip at the extreme right column", async () => {
     const w = 20;
     const out = await render("# Hi", w);
     const hdr = lines(out)[1]!;
     expect(hdr.endsWith(CHIP)).toBe(true);
-    // Diagnostic state: chip sits right after the body (no padding to the
-    // right edge), so the line is short — left margin + badge + text + chip.
-    expect(displayWidth(stripANSI(hdr))).toBeLessThan(w);
+    // The chip is at the terminal right edge, not floating after the text.
+    expect(displayWidth(stripANSI(hdr))).toBe(w);
   });
 
   test("chip on every line of a wrapped header (the bar form)", async () => {
@@ -70,29 +68,30 @@ describe("render — heading RHS chip (right-edge tab)", () => {
       "# " + "heading word ".repeat(8),
       28,
     );
-    // Header lines are 1..N (after the leading blank); each ends with the
-    // chip — the bar bounds the full height of the header block.
+    // Each wrapped header line ends with the chip — the bar bounds the
+    // full height of the header block.
     const hdrLines = lines(out).slice(1).filter((l) => l.includes(CHIP));
     expect(hdrLines.length).toBeGreaterThan(1); // wrapped → multiple
     for (const l of hdrLines) expect(l.endsWith(CHIP)).toBe(true);
   });
 
-  test("header text wraps at content_width (chip follows the wrapped text)", async () => {
-    // Diagnostic state: the chip trails the wrapped text on each line.
-    // (XXX is 3 cols; wrap accounting is a post-diagnostic concern.)
+  test("header text wraps at content_width (chip at the edge, not in the text)", async () => {
     const w = 24;
     const out = await render("# " + "x".repeat(40), w);
     const chipLines = lines(out).filter((l) => l.includes(CHIP));
     expect(chipLines.length).toBeGreaterThan(0);
-    for (const l of chipLines) expect(l.endsWith(CHIP)).toBe(true);
+    for (const l of chipLines) {
+      expect(l.endsWith(CHIP)).toBe(true);
+      expect(displayWidth(stripANSI(l))).toBe(w);
+    }
   });
 
-  test("NO_COLOR parity: chip is plain `XXX`, lines identical", async () => {
+  test("NO_COLOR parity: chip is a plain `▌`, lines identical", async () => {
     const src = "# " + "heading word ".repeat(6);
     const tc = await render(src, 26, "truecolor");
     const none = await render(src, 26, "none");
     expect(none).not.toContain("\x1b");
-    expect(none).toContain("XXX"); // visible in plain mode too
+    expect(none).toContain("▌"); // glyph present in plain mode too
     // Structural parity: strip escapes from truecolor → identical lines.
     expect(stripANSI(tc).split("\n")).toEqual(none.split("\n"));
   });

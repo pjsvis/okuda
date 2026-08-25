@@ -77,11 +77,11 @@ export interface Styler {
    *  Under `none`, returns the markers unchanged (NO_COLOR parity: the
    *  hashes are still there, just invisible in colour mode). */
   headingBadge(markers: string): string;
-  /** Heading RHS chip: visible marker after the heading text, at the
-   *  last content column — the visible right bound (LCARS right-edge tab).
-   *  DIAGNOSTIC: rendered as visible ASCII `XXX` in heading colour (no
-   *  bg) to verify the pipeline (handler → styler → TUI) independently
-   *  of the bg-on-trailing-cell question. Under `none`, the plain `XXX`. */
+  /** Heading RHS chip: a left half-block `▌` in heading colour (fg-only),
+   *  at the extreme right column — the visible right bound (LCARS right-
+   *  edge tab). fg-on-glyph renders reliably; no bg needed. Under `none`, the
+   *  plain `▌` (visible in both modes — parity is structural: same glyph,
+   *  same width, coloured vs plain). */
   headingChip(): string;
   /** Open sequence for a role (for state-machine re-emission). */
   open(name: keyof Palette): string;
@@ -110,7 +110,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       tablePipe: () => "│",
       rule: (width) => "─".repeat(width),
       headingBadge: (markers) => markers,
-      headingChip: () => "[XXX]",
+      headingChip: () => "▌",
       open: () => "",
       reset: () => "",
     };
@@ -154,11 +154,12 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     // block the width of the level (1 char H1, 6 chars H6). LCARS tab.
     headingBadge: (markers) =>
       `${bg(palette.heading)}${fg(palette.heading)}${markers}${RESET}`,
-    // Heading RHS chip — DIAGNOSTIC: visible ASCII `XXX` in heading
-    // colour, no bg. Isolates the pipeline (handler → styler → TUI)
-    // from the bg-on-trailing-cell question. fg-only on a real char
-    // reliably renders (heading colour on `#` proves it).
-    headingChip: () => `${fg(palette.heading)}[XXX]${RESET}`,
+    // Heading RHS chip — a left half-block `▌` in heading colour (fg-only),
+    // positioned at the extreme right column. fg-on-glyph renders reliably
+    // (proven by the heading text itself); no bg needed. The `▌` reads as a
+    // vertical edge tab — the LCARS right bound, bookend to the left badge.
+    // One cell; padding between text and chip is plain spaces.
+    headingChip: () => `${fg(palette.heading)}▌${RESET}`,
     open: (name) => fg(palette[name]),
     reset: () => RESET,
   };
