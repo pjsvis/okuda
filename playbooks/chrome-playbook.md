@@ -96,6 +96,36 @@ looking at?" The badge is the frame that keeps the pane a pane. This is
 environmental readability in the service of comparison readability —
 the sixth layer enabling the second.
 
+## No copy key — foxtrot oscar then copy
+
+The temptation: add a `y` (yank) keystroke to copy the mermaid source
+(or the document) to the system clipboard from inside the TUI. The
+Leith position rejects it, and the order inversion is the principle.
+
+**Foxtrot oscar then copy — not copy then foxtrot oscar.** The content
+is all in a document on disk. The viewer is a view; the document is the
+source of truth. Copying from the view duplicates what the file already
+provides. The right order: quit the viewer (foxtrot oscar), then copy
+from the document with your shell tools (`cat`, `pbcopy < file`, `grep`,
+whatever). The viewer was the thing standing between you and the raw
+document; quitting it gives direct access to the source.
+
+**Why no copy key.** The document is persistent; the viewer is ephemeral.
+Copying from the ephemeral view when the persistent source is right there
+is solving the problem in the wrong place — the same class of error as
+the mermaid `--color` flag (binary reaching into the consumer's palette).
+The diagram's mermaid source is already surfaced as the muted checksum
+block; the document is already on disk. The escape hatch exists; okuda
+doesn't need to be the agent that opens it. The operator's tools (shell,
+multiplexer) open it.
+
+**The Derrida question, answered.** Is copy okuda's job, or the host's?
+The host's. okuda renders; the document persists; the shell copies.
+Adding `y` would be okuda reaching into the host's competence — scope
+creep dressed as a feature. Parked behind a real need (none evidenced:
+the operator runs okuda in a terminal, the terminal has a shell, the
+shell has clipboard tools).
+
 ## Heuristics, emerging
 
 Chrome-side conventions, added as they surface from dogfooding. Each
@@ -111,3 +141,7 @@ property it serves.
   for alignment where a plain line does not. Leading.
 - **Loose-row continuation.** Vertical spacing promises more below the
   fold; scrolling is inviting, not a discovery. Calming.
+- **No copy key (foxtrot oscar then copy).** The document is the source
+  of truth; the viewer is a view. Copy from the file, not the view.
+  Scope discipline — okuda doesn't accrete host competence. Calming
+  (one less key to learn) + scope integrity.
