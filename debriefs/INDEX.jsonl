@@ -1,3 +1,5 @@
 {"file":"2026-08-20-debrief-playbook-generalisation.md","date":"2026-08-20","status":"done","summary":"Close out the two-session playbook generalisation — silo fully de-blogged, review workflow exercised, template dogfooded","meta":{"brief":"2026-08-20-brief-project-initialisation.md"}}
 {"file":"2026-08-22-debrief-justfile-facade.md","date":"2026-08-22","status":"done","summary":"Facade cleanup arc (td-fab1d1): echo-wall→cat, grouped menu, justfile playbook; just attribute-order and @-echo traps; scrape-the-barnacles lesson","meta":{"source":"observed","td":"td-fab1d1","branch":"feat/help-recipe (merged 3107de6)"}}
 {"file":"2026-08-24-debrief-renderer-implementation.md","date":"2026-08-24","status":"done","summary":"Debrief: okuda renderer implementation (td-11e977)","meta":{}}
+{"file":"2026-08-24-debrief-tweak-phase-and-moat.md","date":"2026-08-24","status":"done","summary":"Debrief: the tweak phase, the table audit, and the moat forming in perception","meta":{}}
+{"file":"2026-08-26-debrief-resize-anchor-boundary-conditions.md","date":"2026-08-26","status":"done","summary":"Debrief: the resize anchor and the three boundary conditions","meta":{}}

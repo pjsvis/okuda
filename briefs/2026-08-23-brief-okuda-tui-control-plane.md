@@ -1,8 +1,9 @@
 # Brief: Okuda TUI — the Control Plane (parked)
 
 **Date:** 2026-08-23
-**Status:** Parked
-**Depends on:** 2026-08-22-brief-implementation-renderer.md (the render plane — open; the control plane composes over the render plane)
+**Status:** Open (unparked 2026-08-24; gate met — render plane shipped at `ce96414`, brief 003 done)
+**Depends on:** 2026-08-22-brief-implementation-renderer.md (done — the render plane; the control plane composes over it)
+**TD:** td-52db41
 **Unparks:** 2026-08-23-brief-gloam-tui-footer.md (Gloam is the footer content this TUI displays)
 **Gated on:** the render plane shipping (brief 003); the control plane is a frame around the render, and the render must exist first
 

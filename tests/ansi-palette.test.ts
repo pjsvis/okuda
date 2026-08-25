@@ -3,7 +3,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { detectColorMode, makeStyler } from "../src/ansi";
-import { DEFAULT_PALETTE, loadPalette } from "../src/palette";
+import { DRACULA_PALETTE, loadPalette } from "../src/palette";
 
 function tempFile(name: string): string {
   return join(mkdtempSync(join(tmpdir(), "okuda-pal-")), name);
@@ -33,82 +33,98 @@ describe("ansi — colour mode detection (contract table)", () => {
 });
 
 describe("styler — byte-exact SGR sequences", () => {
-  test("heading: bold + \\x1b[1;38;2;224;222;244m", () => {
-    const s = makeStyler(DEFAULT_PALETTE, "truecolor");
+  test("heading: bold + \\x1b[38;2;189;147;249;1m (glow purple, colour-first)", () => {
+    const s = makeStyler(DRACULA_PALETTE, "truecolor");
     const out = s.roleBold("heading", "T");
-    expect(out).toBe("\x1b[1;38;2;224;222;244mT\x1b[0m");
+    expect(out).toBe("\x1b[38;2;189;147;249;1mT\x1b[0m");
   });
 
-  test("code text: \\x1b[38;2;235;111;146m", () => {
-    const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.role("code-text", "x")).toBe("\x1b[38;2;235;111;146mx\x1b[0m");
+  test("code text: \\x1b[38;2;80;250;123m (glow green)", () => {
+    const s = makeStyler(DRACULA_PALETTE, "truecolor");
+    expect(s.role("code-text", "x")).toBe("\x1b[38;2;80;250;123mx\x1b[0m");
   });
 
-  test("code background: \\x1b[48;2;38;35;58m", () => {
-    const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.codeLine("x")).toContain("\x1b[48;2;38;35;58m");
+  test("code line: no background (dropped Pass B); \x1b[38;2;80;250;123m fg", () => {
+    const s = makeStyler(DRACULA_PALETTE, "truecolor");
+    const out = s.codeLine("x");
+    expect(out).toBe("\x1b[38;2;80;250;123mx\x1b[0m");
+    expect(out).not.toContain("48;2"); // no background
   });
 
-  test("blockquote/muted: \\x1b[38;2;110;106;134m", () => {
-    const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.role("blockquote", "q")).toBe("\x1b[38;2;110;106;134mq\x1b[0m");
+  test("blockquote: \\x1b[38;2;118;118;118m", () => {
+    const s = makeStyler(DRACULA_PALETTE, "truecolor");
+    expect(s.role("blockquote", "q")).toBe("\x1b[38;2;118;118;118mq\x1b[0m");
   });
 
-  test("link: \\x1b[4;38;2;156;207;216m (underline + cyan)", () => {
-    const s = makeStyler(DEFAULT_PALETTE, "truecolor");
+  test("link: rose text + cyan-underlined URL, no OSC 8 (glow-faithful)", () => {
+    const s = makeStyler(DRACULA_PALETTE, "truecolor");
     const out = s.link("text", "https://x.example");
-    expect(out).toContain("\x1b[4;38;2;156;207;216m");
-    expect(out).toStartWith("\x1b]8;;https://x.example\x1b\\");
-    expect(out).toEndWith("\x1b]8;;\x1b\\");
+    expect(out).toContain("\x1b[38;2;255;121;198mtext\x1b[0m"); // rose text
+    expect(out).toContain("\x1b[38;2;139;233;253;4mhttps://x.example\x1b[0m"); // cyan+underline url
+    expect(out).not.toContain("\x1b]8;;"); // no OSC 8
   });
 
-  test("emphasis: italic + \\x1b[3;38;2;246;193;119m", () => {
-    const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.roleItalic("emphasis", "i")).toBe("\x1b[3;38;2;246;193;119mi\x1b[0m");
+  test("emphasis: italic + \\x1b[38;2;241;250;140;3m (glow Dracula yellow, colour-first)", () => {
+    const s = makeStyler(DRACULA_PALETTE, "truecolor");
+    expect(s.roleItalic("emphasis", "i")).toBe("\x1b[38;2;241;250;140;3mi\x1b[0m");
   });
 
-  test("strong: bold + \\x1b[1;38;2;235;188;186m", () => {
-    const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.roleBold("strong", "b")).toBe("\x1b[1;38;2;235;188;186mb\x1b[0m");
+  test("bold-italic combo: \\x1b[38;2;241;250;140;1;3m — emphasis colour, not strong's", () => {
+    const s = makeStyler(DRACULA_PALETTE, "truecolor");
+    expect(s.roleBoldItalic("emphasis", "bi")).toBe("\x1b[38;2;241;250;140;1;3mbi\x1b[0m");
   });
 
-  test("table header: bold + \\x1b[1;38;2;49;116;143m", () => {
-    const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.roleBold("table-header", "h")).toBe("\x1b[1;38;2;49;116;143mh\x1b[0m");
+  test("strong: bold + \\x1b[38;2;255;184;108;1m (glow orange, colour-first)", () => {
+    const s = makeStyler(DRACULA_PALETTE, "truecolor");
+    expect(s.roleBold("strong", "b")).toBe("\x1b[38;2;255;184;108;1mb\x1b[0m");
   });
 
-  test("table key: bold + \\x1b[1;38;2;246;193;119m", () => {
-    const s = makeStyler(DEFAULT_PALETTE, "truecolor");
-    expect(s.roleBold("table-key", "k")).toBe("\x1b[1;38;2;246;193;119mk\x1b[0m");
+  test("table header: bold + \\x1b[38;2;189;147;249;1m (glow purple, colour-first)", () => {
+    const s = makeStyler(DRACULA_PALETTE, "truecolor");
+    expect(s.roleBold("table-header", "h")).toBe("\x1b[38;2;189;147;249;1mh\x1b[0m");
   });
 
-  test("none mode: identity, no escapes anywhere", () => {
-    const s = makeStyler(DEFAULT_PALETTE, "none");
+  test("table key: bold + \\x1b[38;2;255;255;135;1m (colour-first)", () => {
+    const s = makeStyler(DRACULA_PALETTE, "truecolor");
+    expect(s.roleBold("table-key", "k")).toBe("\x1b[38;2;255;255;135;1mk\x1b[0m");
+  });
+
+  test("badge: pink bg + near-white fg + padded (Gloam footer chrome)", () => {
+    const s = makeStyler(DRACULA_PALETTE, "truecolor");
+    expect(s.badge("Gloam")).toBe("\x1b[48;2;255;121;198m\x1b[38;2;248;248;242m Gloam \x1b[0m");
+  });
+
+  test("none mode: identity, no escapes anywhere; codespan strips backticks (parity); link shows URL", () => {
+    const s = makeStyler(DRACULA_PALETTE, "none");
     expect(s.roleBold("heading", "T")).toBe("T");
-    expect(s.codespan("c")).toBe("`c`");
-    expect(s.link("text", "url")).toBe("text");
+    expect(s.codespan("c")).toBe("c");
+    expect(s.link("text", "url")).toBe("text url"); // parity: URL shown in both modes
+    expect(s.badge("G")).toBe(" G "); // padding kept, no colour
     expect(s.rule(4)).toBe("────");
   });
 });
 
-describe("palette — defaults + override loader", () => {
-  test("defaults match the contract table byte-exactly", () => {
-    expect(DEFAULT_PALETTE.heading).toBe("#e0def4");
-    expect(DEFAULT_PALETTE["code-text"]).toBe("#eb6f92");
-    expect(DEFAULT_PALETTE["code-background"]).toBe("#26233a");
-    expect(DEFAULT_PALETTE.blockquote).toBe("#6e6a86");
-    expect(DEFAULT_PALETTE.link).toBe("#9ccfd8");
-    expect(DEFAULT_PALETTE.emphasis).toBe("#f6c177");
-    expect(DEFAULT_PALETTE.strong).toBe("#ebbcba");
-    expect(DEFAULT_PALETTE["table-header"]).toBe("#31748f");
-    expect(DEFAULT_PALETTE["table-key"]).toBe("#f6c177");
-    expect(DEFAULT_PALETTE.muted).toBe("#6e6a86");
-    expect(DEFAULT_PALETTE["diagram-border"]).toBe("#6e6a86");
-    expect(DEFAULT_PALETTE["diagram-arrow"]).toBe("#9ccfd8");
-    expect(DEFAULT_PALETTE["diagram-text"]).toBe("#e0def4");
+describe("palette — dracula contract + override loader", () => {
+  test("dracula palette (DRACULA_PALETTE) matches the contract table byte-exactly", () => {
+    expect(DRACULA_PALETTE.heading).toBe("#bd93f9");
+    expect(DRACULA_PALETTE["code-text"]).toBe("#50fa7b");
+    expect(DRACULA_PALETTE["code-background"]).toBe("");
+    expect(DRACULA_PALETTE.blockquote).toBe("#767676");
+    expect(DRACULA_PALETTE.link).toBe("#00af5f");
+    expect(DRACULA_PALETTE.emphasis).toBe("#f1fa8c");
+    expect(DRACULA_PALETTE.strong).toBe("#ffb86c");
+    expect(DRACULA_PALETTE["table-header"]).toBe("#bd93f9");
+    expect(DRACULA_PALETTE["table-key"]).toBe("#ffff87");
+    expect(DRACULA_PALETTE.muted).toBe("#585858");
+    expect(DRACULA_PALETTE["diagram-border"]).toBe("#585858");
+    expect(DRACULA_PALETTE["diagram-arrow"]).toBe("#00af5f");
+    expect(DRACULA_PALETTE["diagram-text"]).toBe("#d7d7d7");
   });
 
   test("override file replaces known roles, ignores junk", () => {
+    // Pinned to the dracula preset (brief option b): the assertions anchor
+    // to Dracula bytes, and the override mechanism is base-independent —
+    // the runtime default is the okuda preset since the 2026-08-25 flip.
     const path = tempFile("palette.json");
     writeFileSync(
       path,
@@ -118,24 +134,26 @@ describe("palette — defaults + override loader", () => {
         "unknown-role": "#00ff00",
       }),
     );
-    const p = loadPalette(path);
+    const p = loadPalette({ name: "dracula", path });
     expect(p["diagram-arrow"]).toBe("#ff0000");
-    expect(p.heading).toBe("#e0def4"); // invalid value ignored
+    expect(p.heading).toBe("#bd93f9"); // invalid value ignored
   });
 
-  test("malformed JSON → defaults, no throw", () => {
+  test("malformed JSON → base preset, no throw", () => {
     const path = tempFile("palette.json");
     writeFileSync(path, "{broken");
-    const p = loadPalette(path);
-    expect(p).toEqual(DEFAULT_PALETTE);
+    const p = loadPalette({ name: "dracula", path });
+    expect(p).toEqual(DRACULA_PALETTE);
   });
 
-  test("missing file → defaults", () => {
-    expect(loadPalette("/nonexistent/path/palette.json")).toEqual(DEFAULT_PALETTE);
+  test("missing file → base preset", () => {
+    expect(
+      loadPalette({ name: "dracula", path: "/nonexistent/path/palette.json" }),
+    ).toEqual(DRACULA_PALETTE);
   });
 
   test("override takes effect through the styler", () => {
-    const p = { ...DEFAULT_PALETTE, "diagram-arrow": "#123456" };
+    const p = { ...DRACULA_PALETTE, "diagram-arrow": "#123456" };
     const s = makeStyler(p, "truecolor");
     expect(s.role("diagram-arrow", "→")).toContain("38;2;18;52;86");
   });

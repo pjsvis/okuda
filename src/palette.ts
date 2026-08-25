@@ -1,5 +1,5 @@
 /**
- * palette.ts — semantic colour roles, Rosé Pine Base defaults, and the
+ * palette.ts — semantic colour roles, named presets, and the
  * ~/.config/okuda/palette.json override loader.
  *
  * Contract: briefs/2026-08-22-brief-ansi-emission-and-closed-grammar.md
@@ -11,6 +11,7 @@
  */
 
 import { existsSync, readFileSync } from "node:fs";
+import okudaPreset from "./palettes/okuda.json";
 
 export type Role =
   | "heading"
@@ -18,6 +19,10 @@ export type Role =
   | "code-background"
   | "blockquote"
   | "link"
+  | "link-text"
+  | "link-url"
+  | "badge-bg"
+  | "badge-fg"
   | "emphasis"
   | "strong"
   | "table-header"
@@ -29,21 +34,67 @@ export type Role =
 
 export type Palette = Record<Role, string>;
 
-/** Rosé Pine Base defaults — hex per the contract's palette table. */
-export const DEFAULT_PALETTE: Palette = {
-  heading: "#e0def4",
-  "code-text": "#eb6f92",
-  "code-background": "#26233a",
-  blockquote: "#6e6a86",
-  link: "#9ccfd8",
-  emphasis: "#f6c177",
-  strong: "#ebbcba",
-  "table-header": "#31748f",
-  "table-key": "#f6c177",
-  muted: "#6e6a86",
-  "diagram-border": "#6e6a86",
-  "diagram-arrow": "#9ccfd8",
-  "diagram-text": "#e0def4",
+/** The Dracula palette — glow parity: aligned to `glow` (the CLI) as
+ *  dogfooded at the terminal, which renders the Dracula truecolor palette. NB: this is NOT
+ *  glamour's ANSI-256 DarkStyleConfig (ADR-006's original sourcing was
+ *  wrong — see its 2026-08-24 amendment); the bytes from `glow <file>`
+ *  are the reference, not glamour's styles.go.
+ *
+ * SGR emission order is colour-then-attribute (\x1b[38;2;R;G;B;3m),
+ * matching glow. Hex values:
+ *   heading  #00afff  (39, bright blue)   — Glow H2-H6
+ *   heading  #bd93f9  (Dracula purple) — converged 2026-08-24 (was #00afff blue, wrong source)
+ *   strong   #ffb86c  (Dracula orange) — converged 2026-08-24 (was #ffd700 gold, ungrounded)
+ *   emphasis #f1fa8c  (Dracula yellow)  — converged 2026-08-24 (was #ffff5f, wrong source)
+ *   code     #50fa7b / #303030            — text converged 2026-08-24 (was #5fd700); bg pending (item 3b)
+ *   link     #00af5f  (35, sea green)     — legacy hyperlink role (override-file
+ *             compat); live hyperlinks now use link-text/link-url below
+ *   link-text #ff79c6 (Dracula rose)   — converged 2026-08-24 (glow shows
+ *             the link text in rose, no underline)
+ *   link-url  #8be9fd (Dracula cyan)   — converged 2026-08-24 (glow shows
+ *             the URL inline in cyan + underline, no OSC 8)
+ *   badge-bg #ff79c6 (Dracula pink)   — Gloam footer badge background
+ *             (TUI chrome, not markdown; design ref: glow's status badge)
+ *   badge-fg #f8f8f2 (Dracula near-white) — Gloam footer badge foreground
+ *   muted    #585858  (240, dim gray)     — Glow horizontal rule
+ *   blockquote #767676 (243, gray)        — quote pipe, recedes
+ * Diagram roles have no Glow equivalent; they reuse Glow channels:
+ *   border = muted, arrow = link green, text = doc near-white.
+ * Table roles keep okuda's semantic layer (brief: table policy), tuned
+ * to the Glow palette: header = heading blue, key = Glow H1 pale yellow.
+ *
+ * code-background: empty string ("") here = no background emitted
+ * (glow parity, Pass B). The okuda preset (the default) or a user
+ * override sets a real hex to emit a code panel (the Okuda affordance — a
+ * content-sized coloured block behind fenced code, LCARS-style).
+ */
+export const DRACULA_PALETTE: Palette = {
+  heading: "#bd93f9",
+  "code-text": "#50fa7b",
+  "code-background": "",
+  blockquote: "#767676",
+  link: "#00af5f",
+  "link-text": "#ff79c6",
+  "link-url": "#8be9fd",
+  "badge-bg": "#ff79c6",
+  "badge-fg": "#f8f8f2",
+  emphasis: "#f1fa8c",
+  strong: "#ffb86c",
+  "table-header": "#bd93f9",
+  "table-key": "#ffff87",
+  muted: "#585858",
+  "diagram-border": "#585858",
+  "diagram-arrow": "#00af5f",
+  "diagram-text": "#d7d7d7",
+};
+
+/** Named presets — the identity layers. The default is the okuda
+ *  preset (LCARS identity, 2026-08-25 divergence); the Dracula/glow
+ *  palette is retained as a named preset (`--palette dracula`) for
+ *  parity comparison. Convergence is achieved; we are now diverging. */
+const PRESETS: Record<string, Palette> = {
+  okuda: okudaPreset as Palette,
+  dracula: DRACULA_PALETTE,
 };
 
 const RE_HEX = /^#[0-9a-fA-F]{6}$/;
@@ -71,14 +122,28 @@ export function bg(hex: string): string {
 export const RESET = "\x1b[0m";
 
 /**
- * Load the user palette override from `path` (default
- * ~/.config/okuda/palette.json). Malformed files and invalid values are
- * ignored — the default palette applies. Unknown roles are ignored.
+ * Load a palette. Resolution order (later wins):
+ *   1. The okuda preset (the default, LCARS identity — ADR-011) if no
+ *      `name` is given.
+ *   2. Named preset if given (`dracula` = glow parity, `okuda`).
+ *   3. User override file (`~/.config/okuda/palette.json`, or `path`).
+ *
+ * Malformed override files and invalid values are ignored — the base
+ * palette (default or preset) applies. Unknown roles are ignored.
+ * `code-background` may be the empty string ("" = no bg, glow parity) or
+ * a valid hex (panel emitted).
  */
-export function loadPalette(path?: string): Palette {
-  const merged: Palette = { ...DEFAULT_PALETTE };
+export function loadPalette(
+  opts?: { name?: string; path?: string },
+): Palette {
+  // Default is the okuda preset (identity, 2026-08-25 divergence).
+  // `--palette dracula` selects the glow-parity palette for comparison.
+  const base = opts?.name && PRESETS[opts.name]
+    ? PRESETS[opts.name]!
+    : PRESETS.okuda!;
+  const merged: Palette = { ...base };
   const file =
-    path ?? `${process.env.HOME ?? ""}/.config/okuda/palette.json`;
+    opts?.path ?? `${process.env.HOME ?? ""}/.config/okuda/palette.json`;
   if (!file || !existsSync(file)) return merged;
   try {
     const parsed: unknown = JSON.parse(readFileSync(file, "utf8"));
@@ -86,8 +151,15 @@ export function loadPalette(path?: string): Palette {
       for (const [key, value] of Object.entries(
         parsed as Record<string, unknown>,
       )) {
-        if (key in merged && typeof value === "string" && RE_HEX.test(value)) {
-          merged[key as Role] = value.toLowerCase();
+        // code-background may be "" (no bg) or a hex; other roles must be hex.
+        const ok =
+          key === "code-background"
+            ? value === "" || RE_HEX.test(value)
+            : RE_HEX.test(value);
+        if (key in merged && typeof value === "string" && ok) {
+          merged[key as Role] = key === "code-background"
+            ? (value as string)
+            : (value as string).toLowerCase();
         }
       }
     }

@@ -1,11 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { renderDocument } from "../src/render";
+import { DRACULA_PALETTE } from "../src/palette";
 import { displayWidth, stripANSI } from "../src/width";
 
 const W = 60;
 
 async function render(src: string, width = W, color: "truecolor" | "none" = "truecolor") {
-  return await renderDocument(src, { width, color });
+  return await renderDocument(src, { width, color, palette: DRACULA_PALETTE });
 }
 
 function lines(out: string): string[] {
@@ -13,17 +14,21 @@ function lines(out: string): string[] {
 }
 
 describe("render — headings", () => {
-  test("H1–H3 styled, blank line after", async () => {
+  test("H1–H3 styled, marker badged, blank line after", async () => {
     const out = await render("# Title\n\nBody");
-    expect(out).toContain("\x1b[1;38;2;224;222;244mTitle\x1b[0m");
-    expect(lines(out)[1]).toBe("");
+    // Marker is badged: bg = fg = heading colour (solid block, glyph hidden).
+    expect(out).toContain("\x1b[48;2;189;147;249m\x1b[38;2;189;147;249m#\x1b[0m");
+    // Rest of line (space + text) in heading colour bold.
+    expect(out).toContain("\x1b[38;2;189;147;249;1m Title\x1b[0m");
+    expect(lines(out)[0]).toBe("");
+    expect(lines(out)[2]).toBe("");
   });
 
-  test("H4+ collapses to bold paragraph", async () => {
+  test("H4+ renders the Glow way: marker badged + heading colour", async () => {
     const out = await render("#### Deep");
-    expect(out).toContain("\x1b[1mDeep\x1b[0m");
-    expect(out).not.toContain("####");
-    expect(out).not.toContain("1;38;2;224;222;244");
+    expect(out).toContain("\x1b[48;2;189;147;249m\x1b[38;2;189;147;249m####\x1b[0m");
+    expect(out).toContain("\x1b[38;2;189;147;249;1m Deep\x1b[0m");
+    expect(out).not.toContain("\x1b[1mDeep\x1b[0m"); // no longer a bold-paragraph collapse
   });
 
   test("long heading wraps within width", async () => {
@@ -32,20 +37,168 @@ describe("render — headings", () => {
   });
 });
 
+// ── RHS chip (brief: right-edge LCARS tab). A heading-bg space at the
+//    last content column of every header line — the visible right bound,
+//    bookend to the left badge. The chip IS the rhs margin for headers.
+//    Structural parity: plain space in NO_COLOR (strip escapes → identical).
+describe("render — heading RHS chip (right-edge tab)", () => {
+  // Default-palette muted colour is #585858 → bg=fg on `█` (solid block).
+  const CHIP = "\x1b[48;2;88;88;88m\x1b[38;2;88;88;88m█\x1b[0m";
+
+  test("chip present at the RHS edge of the text (content boundary)", async () => {
+    const w = 40;
+    const out = await render("# Title\n\nbody", w);
+    expect(out).toContain(CHIP);
+    const hdr = lines(out)[1]!; // line 0 is the leading blank
+    expect(hdr.endsWith(CHIP)).toBe(true);
+    // The chip lines up with the body's right margin: content_width +
+    // left_margin = (w-4) + 2 = w-2.
+    expect(displayWidth(stripANSI(hdr))).toBe(w - 2);
+  });
+
+  test("short header still gets the chip at the content boundary", async () => {
+    const w = 20;
+    const out = await render("# Hi", w);
+    const hdr = lines(out)[1]!;
+    expect(hdr.endsWith(CHIP)).toBe(true);
+    // The chip lines up with the body's right margin, not floating past it.
+    expect(displayWidth(stripANSI(hdr))).toBe(w - 2);
+  });
+
+  test("chip on every line of a wrapped header (the bar form)", async () => {
+    const out = await render(
+      "# " + "heading word ".repeat(8),
+      28,
+    );
+    // Each wrapped header line ends with the chip — the bar bounds the
+    // full height of the header block.
+    const hdrLines = lines(out).slice(1).filter((l) => l.includes(CHIP));
+    expect(hdrLines.length).toBeGreaterThan(1); // wrapped → multiple
+    for (const l of hdrLines) expect(l.endsWith(CHIP)).toBe(true);
+  });
+
+  test("header text wraps at content_width (chip lines up with body edge)", async () => {
+    const w = 24;
+    const out = await render("# " + "x".repeat(40), w);
+    const chipLines = lines(out).filter((l) => l.includes(CHIP));
+    expect(chipLines.length).toBeGreaterThan(0);
+    for (const l of chipLines) {
+      expect(l.endsWith(CHIP)).toBe(true);
+      // Chip at content boundary = content_width + left_margin = w-2.
+      expect(displayWidth(stripANSI(l))).toBe(w - 2);
+    }
+  });
+
+  test("NO_COLOR parity: chip is a plain `█`, lines identical", async () => {
+    const src = "# " + "heading word ".repeat(6);
+    const tc = await render(src, 26, "truecolor");
+    const none = await render(src, 26, "none");
+    expect(none).not.toContain("\x1b");
+    expect(none).toContain("█"); // glyph present in plain mode too
+    // Structural parity: strip escapes from truecolor → identical lines.
+    expect(stripANSI(tc).split("\n")).toEqual(none.split("\n"));
+  });
+
+  test("reflow on resize keeps the chip at the right bound", async () => {
+    const src = "# " + "heading word ".repeat(10);
+    const prev = await render(src, 30, "truecolor");
+    const next = await render(src, 20, "truecolor");
+    // Narrower width → more header lines, every one still chip-terminated.
+    const prevChipLines = lines(prev).filter((l) => l.endsWith(CHIP)).length;
+    const nextChipLines = lines(next).filter((l) => l.endsWith(CHIP)).length;
+    expect(nextChipLines).toBeGreaterThan(prevChipLines);
+    for (const l of lines(next)) if (l.includes(CHIP)) expect(l.endsWith(CHIP)).toBe(true);
+  });
+
+  test("chip is constant 1 cell (the H1 unit) regardless of level", async () => {
+    const h1 = await render("# One", 40);
+    const h2 = await render("## Two", 40);
+    const h3 = await render("### Three", 40);
+    // The RHS chip is the H1 unit, constant — a fixed reference the LHS
+    // badge (which grows with level) is measured against.
+    expect(lines(h1)[1]).toEndWith(CHIP);
+    expect(lines(h2)[1]).toEndWith(CHIP);
+    expect(lines(h3)[1]).toEndWith(CHIP);
+  });
+});
+
+// ── Grammar pre-passes (brief 2026-08-25): front matter elided, setext
+//    neutralised. These are the bear-trap leg of the moat — CommonMark
+//    parses a closing `---` as a setext h2 underline, silently corrupting
+//    renders. Regression coverage for the grammar decision (ADR-009).
+describe("render — grammar pre-passes (front matter, setext)", () => {
+  test("YAML front matter elided — not parsed as setext h2", async () => {
+    const out = await render("---\ntitle: x\ndate: 2026\n---\n# Real\n\nbody");
+    // The keys must not surface as content (setext h2 / heading / paragraph).
+    expect(out).not.toContain("title:");
+    expect(out).not.toContain("date:");
+    // The first real content survives as the ATX heading.
+    expect(stripANSI(out)).toContain("# Real");
+    expect(stripANSI(out)).toContain("body");
+  });
+
+  test("`---` under a paragraph is a thematic break, not a setext h2", async () => {
+    const tc = await render("para text\n---\n");
+    // Neutralised → hr line present (muted rule)…
+    expect(tc).toContain("\x1b[38;2;88;88;88m");
+    // …and "para text" is NOT promoted to a heading (no heading colour).
+    expect(tc).not.toContain("\x1b[38;2;189;147;249mpara text");
+    // Structural parity in plain mode: hr rule emitted, no escapes.
+    const none = await render("para text\n---\n", W, "none");
+    expect(none).toContain("──");
+    expect(none).not.toContain("\x1b");
+  });
+
+  test("`===` under a paragraph is stripped — text stays a paragraph", async () => {
+    const tc = await render("para text\n===\n");
+    // The underline is gone, the text is not a heading.
+    expect(tc).not.toContain("===");
+    expect(tc).not.toContain("\x1b[38;2;189;147;249mpara text");
+    expect(tc).toContain("para text");
+    const none = await render("para text\n===\n", W, "none");
+    expect(none).not.toContain("===");
+  });
+
+  test("setext-like lines inside a code fence are untouched", async () => {
+    const none = await render("```text\npara\n---\n===\n```", W, "none");
+    // Fence body preserved verbatim — not neutralised, not turned into hr.
+    expect(none).toContain("para");
+    expect(none).toContain("---");
+    expect(none).toContain("===");
+    expect(none).not.toContain("──"); // no hr manufactured inside the fence
+  });
+
+  test("standalone thematic break (blank line above) still renders as hr", async () => {
+    const out = await render("a\n\n---\n\nb");
+    expect(out).toContain("\x1b[38;2;88;88;88m"); // hr present
+    expect(out).toContain("a");
+    expect(out).toContain("b");
+  });
+});
+
 describe("render — paragraphs and inline styles", () => {
   test("bold, italic, strikethrough, codespan emit contract sequences", async () => {
     const out = await render("**b** *i* ~~s~~ `c`");
-    expect(out).toContain("\x1b[1;38;2;235;188;186mb\x1b[0m");
-    expect(out).toContain("\x1b[3;38;2;246;193;119mi\x1b[0m");
+    expect(out).toContain("\x1b[38;2;255;184;108;1mb\x1b[0m");
+    expect(out).toContain("\x1b[38;2;241;250;140;3mi\x1b[0m");
     expect(out).toContain("\x1b[9ms\x1b[0m");
-    expect(out).toContain("\x1b[38;2;235;111;146m`c`");
+    expect(out).toContain("\x1b[38;2;80;250;123mc\x1b[0m");
+    expect(out).not.toContain("`c`"); // backticks stripped (Pass B)
   });
 
-  test("link wraps OSC 8 with underlined cyan", async () => {
+  test("***bold italic*** renders in the emphasis colour, not strong's", async () => {
+    const out = await render("***bi***");
+    // glow-faithful: single SGR, emphasis colour + bold + italic, colour-first
+    expect(out).toContain("\x1b[38;2;241;250;140;1;3mbi\x1b[0m");
+    // and NOT the nested form where strong's gold would override
+    expect(out).not.toContain("\x1b[38;2;255;215;0;1m");
+  });
+
+  test("link renders rose text + visible cyan URL, no OSC 8", async () => {
     const out = await render("[text](https://example.com)");
-    expect(out).toContain("\x1b]8;;https://example.com\x1b\\");
-    expect(out).toContain("\x1b[4;38;2;156;207;216mtext\x1b[0m");
-    expect(out).toContain("\x1b]8;;\x1b\\");
+    expect(out).toContain("\x1b[38;2;255;121;198mtext\x1b[0m"); // rose text
+    expect(out).toContain("\x1b[38;2;139;233;253;4mhttps://example.com\x1b[0m"); // cyan+underline url
+    expect(out).not.toContain("\x1b]8;;"); // no OSC 8 (Pass C)
   });
 
   test("image rejected as [image: alt]", async () => {
@@ -54,9 +207,11 @@ describe("render — paragraphs and inline styles", () => {
     expect(out).not.toContain("pic.png");
   });
 
-  test("soft return becomes a line break", async () => {
+  test("soft return reflows to wrap width (ADR-007 amendment)", async () => {
+    // Single \n in prose is a word separator, not a line break — text
+    // reflows. Reversed 2026-08-24 (foxtrot oscar principle).
     const out = await render("line one\nline two");
-    expect(out).toContain("line one\nline two");
+    expect(out).toContain("line one line two");
   });
 
   test("word wrap at width, no trailing spaces", async () => {
@@ -71,11 +226,14 @@ describe("render — paragraphs and inline styles", () => {
 describe("render — lists (loose, markers, continuation)", () => {
   test("loose spacing: blank line between items", async () => {
     const out = await render("- one\n- two\n- three");
-    const ls = lines(out);
+    const ls = lines(out).filter((l) => l.trim() !== "").map((l) => l.trimStart());
     expect(ls[0]).toBe("• one");
-    expect(ls[1]).toBe("");
-    expect(ls[2]).toBe("• two");
-    expect(ls[4]).toBe("• three");
+    expect(ls[1]).toBe("• two");
+    expect(ls[2]).toBe("• three");
+    // loose: blank line between items
+    const raw = lines(out);
+    const i = raw.findIndex((l) => l.includes("• one"));
+    expect(raw[i + 1]).toBe("");
   });
 
   test("ordered markers with start", async () => {
@@ -86,7 +244,8 @@ describe("render — lists (loose, markers, continuation)", () => {
 
   test("wrapped item continuation aligns under text (2 spaces)", async () => {
     const out = await render("- " + "word ".repeat(12), 24);
-    const ls = lines(out).filter((l) => l !== "");
+    // Strip the 4-char margin+list-indent prefix to check contIndent alone.
+    const ls = lines(out).filter((l) => l !== "").map((l) => l.slice(4));
     expect(ls[0]).toStartWith("• ");
     expect(ls[1]).toStartWith("  ");
   });
@@ -111,7 +270,7 @@ describe("render — lists (loose, markers, continuation)", () => {
 describe("render — blockquote", () => {
   test("muted pipe + indent, single level", async () => {
     const out = await render("> quoted line");
-    expect(out).toContain("\x1b[38;2;110;106;134m│\x1b[0m quoted line");
+    expect(out).toContain("\x1b[38;2;118;118;118m│\x1b[0m \x1b[38;2;241;250;140;3mquoted line\x1b[0m");
   });
 
   test("quote content re-wraps inside the pipe column", async () => {
@@ -135,7 +294,7 @@ describe("render — code fences", () => {
   test("interior blank lines preserved", async () => {
     const out = await render("```\na\n\nb\n```");
     const stripped = lines(out).map((l) => stripANSI(l));
-    expect(stripped).toEqual(["  a", "", "  b", ""]);
+    expect(stripped).toEqual(["", "    a", "", "    b", ""]);
   });
 
   test("indented code block rejected as plain text (no crash, no markup)", async () => {
@@ -150,7 +309,7 @@ describe("render — thematic break", () => {
     const out = await render("a\n\n---\n\nb");
     const rule = lines(out).find((l) => l.includes("─"));
     expect(rule).toBeDefined();
-    expect(displayWidth(rule!)).toBe(W);
+    expect(displayWidth(rule!)).toBe(W - 2);
   });
 });
 

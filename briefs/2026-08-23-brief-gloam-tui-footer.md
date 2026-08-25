@@ -1,8 +1,8 @@
 # Brief: Gloam — the TUI Footer Signature
 
 **Date:** 2026-08-23
-**Status:** Parked
-**Gated on:** Okuda's TUI mode (currently out of scope — briefs 002 and 003 cover only the streaming renderer + `--watch`; a full TUI with a status bar is a future decision)
+**Status:** Open (unparked 2026-08-24; TUI control plane in flight — `briefs/2026-08-23-brief-okuda-tui-control-plane.md`, td-52db41)
+**Gated on:** Okuda's TUI mode (unparked — the control plane is being implemented; the footer ships with it)
 
 ## What
 

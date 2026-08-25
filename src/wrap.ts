@@ -8,7 +8,9 @@
  *    style re-emitted at the continuation line (rule 2).
  *  - OSC 8 zones are closed at line ends and reopened on continuation
  *    (rule 3). Every formatted line ends in \\x1b[0m (rule 4).
- *  - Existing \\n in input is a forced break (soft returns honoured).
+ *  - Existing newline in input is a word separator, not a forced
+ *    break (soft returns stripped 2026-08-24, ADR-007 amendment — the
+ *    foxtrot oscar principle; see the ADR for the rationale).
  *  - Words longer than the width are hard-split; every emitted line is
  *    ≤ `width` display columns (the property-test invariant).
  *
@@ -205,7 +207,6 @@ export function wrapANSI(text: string, opts: WrapOptions): string[] {
     const g = run.raw;
     if (g === "\n") {
       appendWord();
-      flushLine();
       continue;
     }
     if (g === " ") {

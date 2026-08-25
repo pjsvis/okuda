@@ -51,10 +51,76 @@ dev file:
 build:
     @bun build --compile src/cli.ts --outfile okuda
 
+# Install/refresh the `okuda` shortcut (symlink to ~/.local/bin)
+[group('build')]
+install:
+    @mkdir -p ~/.local/bin
+    @ln -sf $(pwd)/okuda ~/.local/bin/okuda
+    @echo "okuda → ~/.local/bin/okuda  (run `just build` to refresh after edits)"
+
 # Run the test suite
 [group('build')]
 test:
     @bun test
+
+# Render the grammar showcase in the TUI (every closed-grammar element)
+# Falls back to streaming under NO_COLOR / TERM=dumb / non-TTY.
+[group('build')]
+showcase:
+    @./okuda docs/showcase.md --tui
+
+# Render the showcase in the TUI (default = Okuda palette)
+[group('build')]
+okuda:
+    @./okuda docs/showcase.md --tui
+
+# Render the manifesto in the Okuda palette (the dogfood is the argument)
+[group('build')]
+manifesto-okuda:
+    @./okuda docs/glow-vs-okuda.md --tui
+
+# Resize dogfood — open a doc, then narrow/widen the terminal.
+# Watch the line under your eye: it should hold its screen row across
+# reflow. Drift = the anchor is wrong (brief: resize-content-anchor).
+[group('build')]
+resize-okuda file="docs/glow-vs-okuda.md":
+    @./okuda {{file}} --tui
+
+# Render any file in the TUI (Okuda palette, the default): just view docs/foo.md
+[group('build')]
+view file:
+    @./okuda {{file}} --tui
+
+# Render any file in the Dracula/glow palette (parity comparison): just view-glow docs/foo.md
+[group('build')]
+view-glow file:
+    @./okuda {{file}} --tui --palette dracula
+
+# Render the blog post (the common control surface)
+[group('build')]
+post:
+    @./okuda docs/2026-08-25-the-common-control-surface.md --tui
+
+# Render the formatting & colour audit (stated expectations vs live output)
+[group('build')]
+audit:
+    @./okuda docs/audit.md --tui
+
+# Render the table audit (sparse -> crowded; run at ~80 and ~140 widths)
+[group('build')]
+tables:
+    @./okuda docs/tables.md --tui
+
+# Render the RHS-chip dogfood in the TUI (Okuda palette)
+[group('build')]
+chip:
+    @just build >/dev/null
+    @./okuda docs/chip-dogfood.md --tui
+
+# Render the manifesto in the Dracula/glow palette (parity comparison)
+[group('build')]
+manifesto:
+    @./okuda docs/glow-vs-okuda.md --tui --palette dracula
 
 # ── Registries ───────────────────────────────────────────────
 

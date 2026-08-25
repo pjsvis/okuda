@@ -1,0 +1,99 @@
+# Authoring Playbook
+
+## What this is
+
+A playbook for the markdown **authoring style** okuda is tuned to render. Most markdown documents in this silo are created by AI agents; a playbook gives them a house style to write to instead of the CommonMark default. The renderer is tuned to this style; the style is tuned to the renderer; the calming effect lives in the coupling. Neither half works alone.
+
+This is not a style guide for general markdown. It is the house style for this workflow's output: briefs, debriefs, ADRs, playbooks, docs. Add to it as operational heuristics emerge.
+
+## The thesis
+
+We are not embracing the CommonMark standard. We are plundering it for the benefit of the interested reader. Every convention here is justified by a perceptual property — a stress it removes or a scan it enables. If a convention stops earning its place, it goes (foxtrot oscar).
+
+## The bold-lead list pattern
+
+The house-style signature. A loose list where each item opens with a **bold lead** (the key), followed by prose (the value):
+
+```markdown
+- **Record reconciliation (tweak-phase items 1–3).** The code had
+  converged to glow-CLI Dracula across Passes A/B/C, but the ADRs still
+  taught the wrong sourcing…
+- **H6 grounded (item 6).** H6 uniform-bold-purple, previously "flagged
+  for revisit," grounded in ADR-007's divergence table…
+```
+
+**Why it earns its place — the three-pass scan:**
+
+1. **Count.** The eye sees how many items there are before reading any. This is the table-scan equivalent — the reader knows the scope of the list before committing.
+2. **Keys.** The bold leads render in a high-contrast hue (amber under Okuda, orange under default). The reader scans the keys alone, as if reading a table's first column. Each key is a promise of what the item covers.
+3. **Detail on demand.** The reader drops into the items that interest them and reads the trailing prose. The uninteresting items are skipped, not skimmed.
+
+**The trade is explicit.** You give up column alignment (the eye can't vertical-scan a column of values), you gain vertical rhythm and wrap freedom. The author chose breathing room over alignment, and the bold lead preserves the scan path that alignment would have given. The trade is not a loss; it's a redirection of the scan from horizontal (column) to vertical (item).
+
+**Coupling rule.** The bold lead only scans if the renderer colours `strong` in a high-contrast hue. Plain bold on plain text doesn't scan — it's slightly heavier prose. The renderer enables the pattern; the author creates it. Write the lead bold; trust the renderer to make it visible.
+
+## Loose lists, always
+
+Lists are loose — a blank line between items regardless of source tightness. The renderer enforces this; the author should write tight source (`- a\n- b`) and let the renderer breathe it. Do not insert blank lines between list items in the source; that fights the renderer and produces double-spaced output.
+
+Rationale: loose rows reduce scan tension (the "calming" property). Tight lists read as a slab; loose lists read as discrete blocks with a beat between them.
+
+## Hash headers, never setext
+
+Headers use `#` markers, exclusively. Never `===` under text (setext h1) or `---` under text (setext h2). The renderer neutralises setext anyway — `---` becomes a thematic break, `===` is stripped — so setext source won't render as you might expect.
+
+Rationale: `#` is unambiguous; `---` is context-dependent (rule or h2?). Context-dependence is stress. The hashes are rendered as LCARS tabs (bg-coloured blocks), so the marker is a visual signal, not countable text.
+
+## Front matter
+
+YAML front matter (`---\n…\n---` at document start) is **elided** by the renderer. It is for tools (date, tags, agent, session, td-id), not readers. Put provenance there; do not expect the reader to see it.
+
+If a reader needs provenance inline, put it in the body — front matter is invisible in the rendered output.
+
+## The trade-off appendix: "left as an exercise for the interested reader"
+
+This playbook is a twisted pun on the textbook line. The textbooks said "this should be easy to prove" and hid an amazing discovery in the margin (Fermat: "I have discovered a truly marvelous proof of this, which this margin is too narrow to contain" — 1637, proved 1994, 358 years later). The line was a polite refusal to do the work.
+
+Our version inverts it. The bold-lead pattern is the opposite of a margin note: it surfaces the discovery, makes it scannable, lets the interested reader find it without reading everything. The trade is explicit, and the trade is the point — we give the reader the keys and let them choose the doors. Nothing is left as an exercise; everything is either a key or a door, and the reader picks.
+
+## The vertical-pipe blockquote
+
+A blockquote renders as a single muted `│` pipe down the left edge, with
+the quoted text wrapped to content width beside it. It is a *pull-aside*, not
+a flow element:
+
+```markdown
+> Named for Michael Okuda: high-contrast, functional, uncluttered. The
+> terminal is the display, not a browser in denial.
+```
+
+renders as:
+
+```
+  │ Named for Michael Okuda: high-contrast, functional, uncluttered. The
+  │ terminal is the display, not a browser in denial.
+```
+
+**Why it earns its place.** The pipe sets the block apart from the through-line.
+It signals: *this is worth remembering, but it is not part of the argument's
+flow — read it, hold it, then return to the thread.* An aphorism, a definition,
+a memorable statement the reader should carry forward. Glow's version (a `|` on
+every line, tightly wrapped) reads as quoted prose; okuda's reads as a
+pull-quote. The pipe recedes (muted gray) so the *content* pops; the pipe's
+*presence* is the signal, its colour the silence.
+
+**Authoring rule.** Use blockquotes for statements the reader should remember,
+not for long quoted passages. If the quote is more than ~3 lines of argument,
+it belongs in the body prose. The pipe is for the aphorism, the maxim, the
+definition — the thing you'd underline.
+
+## Heuristics, emerging
+
+Add here as they surface from dogfooding. Each entry: the pattern, why it earns its place, the perceptual property it serves.
+
+- **Bold leads in lists.** Table-scan affordance via house style + colour. Calming + leading.
+- **Loose lists.** Discrete blocks, reduced scan tension. Calming.
+- **Hash headers only.** Unambiguous structure, LCARS-tab rendering. Calming.
+- **Front matter elided.** Provenance is not content. Calming.
+- **Vertical-pipe blockquote.** Pull-aside signal — worth remembering, not in the flow. Leading (sets the block apart).
+- **Short paragraphs.** Wrap-early prose reads as discrete blocks; long paragraphs read as a wall. The renderer hard-wraps at width, but short source paragraphs add an extra beat. (Dogfood to confirm.)

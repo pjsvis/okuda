@@ -16,7 +16,7 @@
  * depth, never-wrapped blocks ride in RAW tags.
  */
 
-import { type ColorMode, makeStyler } from "./ansi";
+import { type ColorMode, makeStyler, unwrapStrongSpan } from "./ansi";
 import {
   PARSER_OPTIONS,
   RE_INLINE_HTML,
@@ -38,6 +38,9 @@ import {
 } from "./width";
 import { wrapANSI } from "./wrap";
 
+/** Left indent for list blocks, inside the content margin (Glow list level_indent). */
+const LIST_INDENT = 2;
+
 export interface RenderOptions {
   width: number;
   palette?: Palette;
@@ -56,7 +59,7 @@ const MERMAID_BIN_CANDIDATES = [
 /** Run the mermaid binary; return its stdout (empty string on failure). */
 async function spawnMermaid(source: string, opts: RenderOptions): Promise<string> {
   const candidates = opts.mermaidBin
-    ? [opts.mermaidBin, ...MERMAID_BIN_CANDIDATES]
+    ? [opts.mermaidBin]
     : MERMAID_BIN_CANDIDATES;
   for (const bin of candidates) {
     try {
@@ -83,6 +86,13 @@ export function extractDiagramArt(binaryOutput: string): string {
   if (!m) return binaryOutput;
   // The binary pads the fence with blank lines — trim them (structural
   // padding, not art content; interior blank lines survive).
+  return m[1]!.replace(/^\n+/, "").replace(/\n+$/, "");
+}
+
+/** Extract the mermaid source checksum (the ```mmd fence the binary emits). */
+export function extractDiagramChecksum(binaryOutput: string): string | null {
+  const m = binaryOutput.match(/```mmd\n([\s\S]*?)\n?```/);
+  if (!m) return null;
   return m[1]!.replace(/^\n+/, "").replace(/\n+$/, "");
 }
 
@@ -172,11 +182,15 @@ function newTableState(): TableState {
 
 interface Ctx {
   width: number;
+  /** Full terminal width (opts.width), for header chip placement at the
+   *  extreme right column. Body wraps at `width` (content); the header chip
+   *  eats the 2-col right margin so it sits at the visible right edge. */
+  fullWidth: number;
   styler: ReturnType<typeof makeStyler>;
   color: ColorMode;
   palette: Palette;
   table: TableState | null;
-  mermaid: Map<string, string>; // token id → classified ASCII lines
+  mermaid: Map<string, { art: string; checksum: string | null }>;
 }
 
 /** Render a closed-grammar markdown document to ANSI lines. */
@@ -188,7 +202,12 @@ export async function renderDocument(
   const palette = opts.palette ?? loadPalette();
   const styler = makeStyler(palette, color);
   const ctx: Ctx = {
-    width: opts.width,
+    // Content width reserves a 2-char left + 2-char right margin (Glow
+    // Document margin). Wrap, hr, and table-fit all respect this;
+    // raw blocks (code/diagrams) bypass it and may overflow the right
+    // gutter — art is art.
+    width: Math.max(10, opts.width - 4),
+    fullWidth: opts.width,
     styler,
     color,
     palette,
@@ -196,14 +215,100 @@ export async function renderDocument(
     mermaid: new Map(),
   };
 
-  // Pre-pass: intercept mermaid fences → pipe to binary → placeholder tokens.
-  const source2 = await interceptMermaid(source, opts, ctx);
+  // Pre-pass 1: elide YAML front matter (document-start `---\n…\n---`).
+  // CommonMark parses this as setext h2 (the keys promoted to a heading)
+  // because the closing `---` is an h2 underline. Front matter is provenance,
+  // not content — elide entirely (foxtrot oscar on the setext trap).
+  const source1 = stripFrontMatter(source);
 
-  const rendered = Bun.markdown.render(source2, handlers(ctx), {
+  // Pre-pass 2: neutralise mid-document setext headings. A `---` (or `***`,
+  // `___`) line directly under non-blank text is a setext h2 underline, not
+  // a thematic break. Headers use hashes (gravitas, not underlines); insert
+  // a blank line before the rule so Bun.markdown sees a paragraph + hr.
+  const source2 = neutraliseSetext(source1);
+
+  // Pre-pass 3: intercept mermaid fences → pipe to binary → placeholder tokens.
+  const source3 = await interceptMermaid(source2, opts, ctx);
+
+  const rendered = Bun.markdown.render(source3, handlers(ctx), {
     ...PARSER_OPTIONS,
   });
 
   return finalize(rendered);
+}
+
+/**
+ * Strip YAML front matter from document start: `^---\n…\n---\n`.
+ * Elided entirely — provenance is not content. (Glow strips it silently;
+ * okuda's position is the same: front matter is for tools, not readers.)
+ */
+function stripFrontMatter(source: string): string {
+  const m = source.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/);
+  return m ? source.slice(m[0].length) : source;
+}
+
+/**
+ * A line is a thematic-break rule if it is ONLY 3+ of `-`, `*`, or `_`,
+ * optionally with 1-3 leading spaces and trailing spaces/tabs.
+ * (CommonMark thematic break form — the same characters that, when directly
+ * under non-blank text, double as a setext h2 underline.)
+ */
+function isThematicBreakLine(line: string): boolean {
+  const s = line.replace(/[ \t]+$/, ""); // trailing ws
+  if (s.length < 3) return false;
+  const c = s[0];
+  if (c !== "-" && c !== "*" && c !== "_") return false;
+  return [...s].every((ch) => ch === c);
+}
+
+/**
+ * A line is a setext h1 underline if it is ONLY 1+ `=`, optionally with
+ * trailing spaces/tabs. (No leading-space form per CommonMark.) `===` has no
+ * alternate valid meaning in okuda's grammar — it is setext-only, so it is
+ * stripped; the text above becomes a plain paragraph.
+ */
+function isSetextH1Line(line: string): boolean {
+  const s = line.replace(/[ \t]+$/, "");
+  if (s.length < 1) return false;
+  return [...s].every((ch) => ch === "=");
+}
+
+/**
+ * Neutralise setext headings, *outside* fenced code blocks. Headers use `#`
+ * only — gravitas, not underlines. Two cases:
+ *
+ *  - h2 underline (`---`/`***`/`___` under non-blank text): the line is also a
+ *    valid thematic break, so insert a blank line before it → Bun.markdown
+ *    parses it as hr (the operator's "`---` is a horizontal line").
+ *  - h1 underline (`===` under non-blank text): `=` has no alternate meaning,
+ *    so strip the line; the text above becomes a plain paragraph.
+ */
+function neutraliseSetext(source: string): string {
+  const lines = source.split("\n");
+  let inFence = false;
+  let fence = "";
+  for (let i = 0; i < lines.length; i++) {
+    const cur = lines[i];
+    // Toggle fenced-code state (``` or ~~~). Must run for line 0 too —
+    // a document may open with a code fence.
+    const open = cur.match(/^( {0,3})(`{3,}|~{3,})/);
+    if (open && (fence === "" || open[2][0] === fence[0])) {
+      inFence = !inFence;
+      fence = inFence ? open[2][0] : "";
+      continue;
+    }
+    if (inFence) continue;
+    if (i === 0) continue; // no previous line to form a setext pair
+    if (lines[i - 1].trim() === "") continue;
+    if (isThematicBreakLine(cur)) {
+      lines.splice(i, 0, "");
+      i++; // skip the inserted blank line
+    } else if (isSetextH1Line(cur)) {
+      lines.splice(i, 1); // strip the `===` underline
+      i--; // re-examine this index (next line shifted up)
+    }
+  }
+  return lines.join("\n");
 }
 
 /** Replace mermaid fences with placeholder tokens; stash classified art. */
@@ -225,12 +330,13 @@ async function interceptMermaid(
   const arts = await Promise.all(
     fences.map(async (code) => {
       const out = await spawnMermaid(code, opts);
-      return out === "" ? null : extractDiagramArt(out);
+      if (out === "") return null;
+      return { art: extractDiagramArt(out), checksum: extractDiagramChecksum(out) };
     }),
   );
-  for (const [i, art] of arts.entries()) {
-    if (art === null) continue;
-    ctx.mermaid.set(String(i), art);
+  for (const [i, entry] of arts.entries()) {
+    if (entry === null) continue;
+    ctx.mermaid.set(String(i), entry);
   }
   return src;
 }
@@ -249,18 +355,36 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
   return {
     heading(children: string, meta: { level: number }) {
       const level = meta?.level ?? 1;
-      if (level <= 3) {
-        const lines = wrapANSI(stripHtml(children), { width });
-        return (
-          lines
-            .map((l) => (l === "" ? "" : styler.roleBold("heading", l)))
-            .join("\n") + "\n\n"
-        );
-      }
-      // H4+ collapse to bold paragraph (grammar table).
-      const lines = wrapBlock(stripHtml(children));
+      // Glow way: `#`×level marker + heading colour on every level.
+      // (ADR-007: H4+ no longer collapses; the marker count is the level.)
+      // The marker is badged: bg = fg = heading colour → a solid colour
+      // block the width of the level (LCARS tab). The glyph stays in the
+      // stream for NO_COLOR parity (strip escapes → `## Heading` as before).
+      //
+      // RHS chip (brief: right-edge LCARS tab): a solid heading-coloured
+      // block (bg=fg=heading on `█`), constant 1 cell, at the RHS edge of
+      // the text (the content boundary = body's right margin). The chip is
+      // the H1 unit — a fixed reference the LHS badge is measured against
+      // (LHS encodes depth by growing; RHS references it by staying
+      // constant). Same visual language as the H1 LHS badge. bg=fg-on-glyph
+      // renders reliably (the badge proves it). Headers wrap at `width-1`
+      // (reserving 1 column); each line padded to `width-1`, chip fills the
+      // last column. Every line (the bar form) bounds the reflow.
+      const markers = "#".repeat(level);
+      const wrapW = width - 1;
+      const lines = wrapANSI(markers + " " + stripHtml(children), { width: wrapW });
       return (
-        lines.map((l) => (l === "" ? "" : styler.bold(l))).join("\n") + "\n\n"
+        lines
+          .map((l, i) => {
+            if (l === "") return "";
+            const body =
+              i === 0
+                ? styler.headingBadge(markers) +
+                  styler.roleBold("heading", l.slice(markers.length))
+                : styler.roleBold("heading", l);
+            return padDisplay(body, wrapW) + styler.headingChip();
+          })
+          .join("\n") + "\n\n"
       );
     },
 
@@ -268,8 +392,8 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // Mermaid placeholder paragraph → the classified ASCII block.
       const m = children.trim().match(RE_MERMAID_TOKEN);
       if (m) {
-        const art = ctx.mermaid.get(m[1]!);
-        if (art !== undefined) return diagramBlock(art, ctx);
+        const entry = ctx.mermaid.get(m[1]!);
+        if (entry !== undefined) return diagramBlock(entry.art, entry.checksum, ctx);
         return ""; // pipe failed → drop the placeholder silently
       }
       const lines = wrapBlock(stripHtml(children));
@@ -284,6 +408,13 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       return styler.roleBold("strong", children);
     },
     emphasis(children: string) {
+      // ***bold italic*** nests as emphasis(strong(text)) post-order (Bun
+      // resolves children first; emphasis is the outer handler). Glow
+      // renders the combo in the EMPHASIS colour, not strong's — so detect
+      // a pure strong child and re-emit as one combined SGR. Otherwise a
+      // normal italic span. (The reverse nest **_x_** falls through; rare.)
+      const strongInner = unwrapStrongSpan(children, ctx.palette);
+      if (strongInner !== null) return styler.roleBoldItalic("emphasis", strongInner);
       return styler.roleItalic("emphasis", children);
     },
     strikethrough(children: string) {
@@ -379,15 +510,25 @@ function stripHtml(s: string): string {
   return s.replace(RE_INLINE_HTML, "");
 }
 
-/** Mermaid ASCII block: classified, coloured, never wrapped. */
-function diagramBlock(art: string, ctx: Ctx): string {
+/** Mermaid ASCII block: classified, coloured, never wrapped. The
+ *  checksum (original mermaid source) follows as a muted code block. */
+function diagramBlock(art: string, checksum: string | null, ctx: Ctx): string {
   const open = tagRawOpen("diagram");
   const lines = art.split("\n").map((l) => {
     if (l === "") return "";
     if (ctx.color === "none") return l; // byte-identical to the binary's output
     return classifyDiagramLine(l, ctx.palette, ctx.color) + "\x1b[0m";
   });
-  return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n\n`;
+  let out = `${open}${lines.join("\n")}${TAG_RAW_CLOSE}`;
+  // Checksum: the mermaid source, muted, beneath the diagram.
+  if (checksum) {
+    const csOpen = tagRawOpen("checksum");
+    const csLines = checksum.split("\n").map((l) =>
+      l === "" ? "" : ctx.styler.role("muted", "  " + l),
+    );
+    out += `\n${csOpen}${csLines.join("\n")}${TAG_RAW_CLOSE}`;
+  }
+  return out + "\n\n";
 }
 
 /** Blockquote: single-level pipe prefix, muted, re-wrapped at width-2. */
@@ -407,9 +548,12 @@ function quoteBlock(children: string, ctx: Ctx): string {
       }
       continue;
     }
+    // Pass B (2026-08-24): blockquote text styled to match glow —
+    // yellow (#f1fa8c) italic, the same SGR as emphasis. (snagging item 6)
+    // The │ pipe stays as an okuda divergence (candidate ADR-007 row).
     const lines = wrapANSI(seg.text, { width: width - 2 });
     for (const line of lines) {
-      out.push(line === "" ? "" : styler.quotePipe() + " " + line);
+      out.push(line === "" ? "" : styler.quotePipe() + " " + styler.roleItalic("emphasis", line));
     }
   }
   return out.join("\n") + "\n\n";
@@ -463,7 +607,7 @@ function renderList(
     const marker = meta.ordered ? `${(meta.start ?? 1) + i}.` : "•";
     const markerPrefix = `${marker} `;
     const textCol = displayWidth(markerPrefix);
-    const avail = Math.max(4, width - textCol);
+    const avail = Math.max(4, width - textCol - LIST_INDENT);
     const contIndent = " ".repeat(textCol);
 
     const parts = splitNested(item);
@@ -495,7 +639,13 @@ function renderList(
   });
 
   const body = itemBlocks.join("\n\n") + "\n\n";
-  return tagNestedOpen(myTag) + body + TAG_NESTED_CLOSE;
+  // Indent the whole list block by LIST_INDENT so list markers sit
+  // to the right of body paragraphs (Glow list level_indent).
+  const indented = body
+    .split("\n")
+    .map((l) => (l === "" ? "" : " ".repeat(LIST_INDENT) + l))
+    .join("\n");
+  return tagNestedOpen(myTag) + indented + TAG_NESTED_CLOSE;
 }
 
 /** Strip list markers and indent as continuation text (cap flatten). */
@@ -551,7 +701,7 @@ function renderTable(t: TableState, ctx: Ctx): string {
   header.forEach(measure);
   for (const r of rows) r.forEach(measure);
 
-  const gutter = 2;
+  const gutter = 3;
   let total = colWidth.reduce((a, b) => a + b, 0) + gutter * (cols - 1);
 
   // Fit the terminal width — never overflow (table policy). Shrink wide
@@ -574,29 +724,47 @@ function renderTable(t: TableState, ctx: Ctx): string {
   }
 
   const out: string[] = [];
-  // Header row: cyan + bold; header rule kept; alignment carried.
+  // Header row: purple bold + `│` separators (grid cue); header rule +
+  // closing rule span the FULL content width (glow parity — the bar is
+  // the table-scan signal, not the table's natural width). Body rows
+  // keep a 3-space gutter so columns align with the header separators.
+  // In-cell wraps are zipped line-by-line (zipRow) so columns hold —
+  // the fix for the word-salad fault where a wrapped cell's \n dumped
+  // its tail to the left margin and dragged siblings out of column.
+  const sep = ` ${styler.tablePipe()} `;
+  const bodySep = " ".repeat(gutter);
   if (header.length > 0) {
     const cells = header.map((c, i) =>
-      styler.roleBold("table-header", pad(c, i, colWidth, styler.mode)),
+      padCell(
+        { text: styler.roleBold("table-header", c.text), align: c.align },
+        i, colWidth,
+      ),
     );
-    out.push(cells.join(" ".repeat(gutter)));
-    const ruleW = Math.min(total, width);
-    out.push(styler.rule(ruleW));
+    out.push(zipRow(cells, colWidth, sep));
+    out.push(styler.rule(width));
   }
   for (const r of rows) {
-    const padded: string[] = [];
+    const cells: string[][] = [];
     for (let i = 0; i < cols; i++) {
       const cell: Cell = i === 0
         ? { text: styler.roleBold("table-key", r[0]?.text ?? ""), align: r[0]?.align }
         : r[i] ?? { text: "" };
-      padded.push(pad(cell, i, colWidth, styler.mode));
+      cells.push(padCell(cell, i, colWidth));
     }
-    out.push(padded.join(" ".repeat(gutter)));
+    out.push(zipRow(cells, colWidth, bodySep));
+  }
+  // Closing rule under the table (Glow parity: tables are bracketed,
+  // full content width).
+  if (header.length > 0 || rows.length > 0) {
+    out.push(styler.rule(width));
   }
   // Loose rows: blank line between rows. The header rule sits directly
   // under the header — it belongs to the header, not the rows. Trailing
-  // pad spaces are ours, not content — trim them per line.
-  const trimmed = out.map((l) => l.replace(/[ ]+$/, ""));
+  // pad spaces are ours, not content — trim them per line (a wrapped row
+  // is a multi-line block — trim each line within it).
+  const trimmed = out.map((block) =>
+    block.split("\n").map((l) => l.replace(/[ ]+$/, "")).join("\n"),
+  );
   if (header.length > 0) {
     return trimmed.slice(0, 2).join("\n") + "\n\n" +
       trimmed.slice(2).join("\n\n") + "\n\n";
@@ -604,29 +772,54 @@ function renderTable(t: TableState, ctx: Ctx): string {
   return trimmed.join("\n\n") + "\n\n";
 }
 
-function pad(c: Cell, i: number, colWidth: number[], mode: string): string {
+/** Pad a cell to its column width, returning one line per wrapped row.
+ *  Colour is applied by the caller (to `c.text` before this call);
+ *  wrapANSI is ANSI-state-aware and re-emits SGR at wrap boundaries, so
+ *  coloured-then-wrapped cells stay coloured through the wrap. Each
+ *  emitted line is padded to the column width (display-aware) so columns
+ *  align under the header separators. */
+function padCell(c: Cell, i: number, colWidth: number[]): string[] {
   const w = colWidth[i]!;
   const raw = c.text;
   if (displayWidth(raw) > w) {
-    // Cell content wider than its column (post-shrink): wrap in-cell.
-    return wrapANSI(raw, { width: w })
-      .map((l) => (mode === "none" ? l : padDisplay(l, w)))
-      .join("\n");
+    return wrapANSI(raw, { width: w }).map((l) => padDisplay(l, w));
   }
   switch (c.align) {
     case "right":
-      return padStartDisplay(raw, w);
+      return [padStartDisplay(raw, w)];
     case "center":
-      return padCenterDisplay(raw, w);
+      return [padCenterDisplay(raw, w)];
     default:
-      return padDisplay(raw, w);
+      return [padDisplay(raw, w)];
   }
 }
 
-/** Final document assembly: strip residual protocol tags, tidy edges. */
+/** Zip multi-line cells into aligned row lines. Each cell is an array
+ *  of pre-padded lines (padCell output); blank-pad short cells to the
+ *  row height, then join line N of every cell with the separator. This
+ *  is what holds columns through in-cell wraps — the single fix for the
+ *  word-salad fault on wide/crowded tables (sections 5/7/10 of the
+ *  table audit). */
+function zipRow(cells: string[][], colWidth: number[], sep: string): string {
+  const height = Math.max(...cells.map((c) => c.length));
+  const lines: string[] = [];
+  for (let n = 0; n < height; n++) {
+    const parts = cells.map((c, i) => c[n] ?? " ".repeat(colWidth[i]!));
+    lines.push(parts.join(sep));
+  }
+  return lines.join("\n");
+}
+
+/** Final document assembly: strip tags, apply margins, tidy edges. */
 function finalize(rendered: string): string {
-  // No global newline collapsing or space trimming — code fences and
-  // diagram blocks carry verbatim bytes (blank lines included).
-  const out = stripTags(rendered);
-  return out.replace(/\n+$/, "") + "\n";
+  const stripped = stripTags(rendered);
+  // 2-char left margin on every non-empty line (Glow Document margin).
+  // Right margin is implicit: wrap used (width - 4), so content stops
+  // 2 cols short of the terminal edge.
+  const margined = stripped
+    .split("\n")
+    .map((l) => (l === "" ? "" : "  " + l))
+    .join("\n");
+  // Leading blank line — Glow parity: breathing room above the doc.
+  return "\n" + margined.replace(/\n+$/, "") + "\n";
 }

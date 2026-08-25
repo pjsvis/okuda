@@ -1,0 +1,19 @@
+{
+  "heading": "#99ccff",
+  "code-text": "#ffcc99",
+  "code-background": "#1a1530",
+  "blockquote": "#7788aa",
+  "link": "#66ddff",
+  "link-text": "#ff9966",
+  "link-url": "#66ddff",
+  "badge-bg": "#ffaa00",
+  "badge-fg": "#000000",
+  "emphasis": "#ffcc66",
+  "strong": "#ffaa00",
+  "table-header": "#99ccff",
+  "table-key": "#ffcc66",
+  "muted": "#445566",
+  "diagram-border": "#5e8bbf",
+  "diagram-arrow": "#ffaa00",
+  "diagram-text": "#c8b894"
+}

@@ -4,6 +4,37 @@
 **Status:** Done (contract accepted; implementation deferred to brief 003)
 **Depends on:** 2026-08-20-brief-project-initialisation.md (done)
 
+> **Palette superseded.** The Rosé Pine Base defaults specified in
+> this brief's palette table were replaced by the Glow (glamour) dark
+> palette on 2026-08-24. See `decisions/006-glow-dark-palette.md` for the
+> decision, alternatives, and palimpsest check. The rest of this brief
+> (grammar, ANSI emission rules, role set) stands unchanged.
+>
+> **H4-collapse rule superseded.** The grammar-table row "Heading | H1–H3
+> only ... H4+ collapsed to bold paragraph" was reversed on 2026-08-24.
+> Under ADR-007 ("Glow is the visual reference"), H4–H6 now render the
+> Glow way: `#`×level marker + heading colour on every level. The
+> grammar's other heading rules (ATX `# `, cyan/bold, trailing `\n\n`)
+> stand unchanged.
+>
+> **Inline-code backticks superseded.** The grammar-table row "Code
+> (inline) | Backtick delimited. Green ANSI, no padding" was reversed
+> on 2026-08-24 (Pass B, snagging item 4). The backtick delimiters are
+> now **stripped** from the codespan output in both colour modes — the
+> colour is the signal, not the delimiters. The code **background** is
+> also dropped (the `48;2` bg read as a blurry box; glow emits colour
+> only); the `code-background` role is retained for override-file compat.
+> See ADR-006 Amendment.
+>
+> **Link rendering superseded.** The grammar-table row "Link | OSC 8
+> hyperlink escape (`\e]8;;URL\e\\`) wrapping styled text..." was
+> reversed on 2026-08-24 (Pass C, snagging item 5). Links now render
+> **rose `#ff79c6` text + visible cyan-underlined `#8be9fd` URL inline**
+> — no OSC 8. The URL is displayed (the operator's terminal requires it
+> visible, not just clickable). New `link-text`/`link-url` roles; the
+> legacy `link` role is kept for override-file compat. See ADR-006
+> Amendment.
+
 ---
 
 ## Objective
@@ -55,7 +86,7 @@ Okuda does not parse CommonMark. It parses **Okuda Markdown** — a strict subse
 | Element | Rendered | Rule / Constraint |
 |---|---|---|
 | Heading | H1–H3 only | ATX (`# `). H4+ collapsed to bold paragraph. Cyan, bold, trailing `\n\n`. |
-| Paragraph | Yes | Hard-wrapped to terminal width. Soft returns honored (output `\n` without trailing double spaces). |
+| Paragraph | Yes | Hard-wrapped to terminal width. ~~Soft returns honored (output `\n` without trailing double spaces).~~ Single-`\n` soft returns stripped to spaces; text reflows to the wrap width (reversed 2026-08-24, ADR-007 amendment — soft returns were a user-side hack against collapsing renderers; okuda hard-wraps, so the hack broke layout on resize). `\n\n` remains a paragraph break. |
 | Unordered List | Yes | `- ` or `* ` at depth 0–1. Max nesting depth: **2**. Enforced loose spacing: `\n\n` between items. Continuation indented to text column. |
 | Ordered List | Yes | `1. `, `2. `, etc. Same depth and spacing rules as unordered. |
 | Code (fenced) | Yes | Triple backticks only. Indented code blocks **rejected** — treated as plain text. |
