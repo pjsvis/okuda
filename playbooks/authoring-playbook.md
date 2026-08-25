@@ -97,3 +97,4 @@ Add here as they surface from dogfooding. Each entry: the pattern, why it earns 
 - **Front matter elided.** Provenance is not content. Calming.
 - **Vertical-pipe blockquote.** Pull-aside signal — worth remembering, not in the flow. Leading (sets the block apart).
 - **Short paragraphs.** Wrap-early prose reads as discrete blocks; long paragraphs read as a wall. The renderer hard-wraps at width, but short source paragraphs add an extra beat. (Dogfood to confirm.)
+- **Mermaid diagrams must fit the medium.** The binary renders ASCII art into a character grid; a wide `flowchart LR` with long labels overflows and degrades to a "too wide" notice plus source. Prefer `flowchart TD`, short node labels, short edge labels — the diagram earns its place only as art, not as a fenced slab of source. (Found persisting the okuda-stack riff doc: the LR version degraded; the TD version rendered.)
