@@ -77,12 +77,13 @@ export interface Styler {
    *  Under `none`, returns the markers unchanged (NO_COLOR parity: the
    *  hashes are still there, just invisible in colour mode). */
   headingBadge(markers: string): string;
-  /** Heading RHS chip: a left half-block `▌` in heading colour (fg-only),
-   *  at the extreme right column — the visible right bound (LCARS right-
-   *  edge tab). fg-on-glyph renders reliably; no bg needed. Under `none`, the
-   *  plain `▌` (visible in both modes — parity is structural: same glyph,
-   *  same width, coloured vs plain). */
-  headingChip(): string;
+  /** Heading RHS chip: `▌`×level in heading colour (fg-only), at the
+   *  content boundary — the visible right bound (LCARS right-edge tab).
+   *  Width matches the LHS badge (1 cell H1, 2 H2… 6 H6) so left and right
+   *  read as a kin pair — bracketed on the H1 line, tapering with level.
+   *  fg-on-glyph renders reliably; no bg needed. Under `none`, the plain
+   *  `▌`×level (visible in both — structural parity). */
+  headingChip(level: number): string;
   /** Open sequence for a role (for state-machine re-emission). */
   open(name: keyof Palette): string;
   /** Reset sequence (empty string under `none`). */
@@ -110,7 +111,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       tablePipe: () => "│",
       rule: (width) => "─".repeat(width),
       headingBadge: (markers) => markers,
-      headingChip: () => "▌",
+      headingChip: (level: number) => "▌".repeat(level),
       open: () => "",
       reset: () => "",
     };
@@ -154,12 +155,12 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     // block the width of the level (1 char H1, 6 chars H6). LCARS tab.
     headingBadge: (markers) =>
       `${bg(palette.heading)}${fg(palette.heading)}${markers}${RESET}`,
-    // Heading RHS chip — a left half-block `▌` in heading colour (fg-only),
-    // positioned at the extreme right column. fg-on-glyph renders reliably
-    // (proven by the heading text itself); no bg needed. The `▌` reads as a
-    // vertical edge tab — the LCARS right bound, bookend to the left badge.
-    // One cell; padding between text and chip is plain spaces.
-    headingChip: () => `${fg(palette.heading)}▌${RESET}`,
+    // Heading RHS chip — `▌`×level in heading colour (fg-only), at the
+    // content boundary. Width matches the LHS badge (1 cell H1, 2 H2…) so
+    // left and right read as a kin pair — bracketed on the H1 line,
+    // tapering with level vertically. fg-on-glyph renders reliably; no bg.
+    headingChip: (level: number) =>
+      `${fg(palette.heading)}${"▌".repeat(level)}${RESET}`,
     open: (name) => fg(palette[name]),
     reset: () => RESET,
   };

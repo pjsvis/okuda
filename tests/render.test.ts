@@ -108,6 +108,16 @@ describe("render — heading RHS chip (right-edge tab)", () => {
     expect(nextChipLines).toBeGreaterThan(prevChipLines);
     for (const l of lines(next)) if (l.includes(CHIP)) expect(l.endsWith(CHIP)).toBe(true);
   });
+
+  test("chip width matches the LHS badge (▌×level: H1=1, H2=2, H3=3)", async () => {
+    const h1 = await render("# One", 40);
+    const h2 = await render("## Two", 40);
+    const h3 = await render("### Three", 40);
+    // H1: 1-cell chip `▌`, H2: `▌▌`, H3: `▌▌▌` — mirrors the badge width.
+    expect(lines(h1)[1]).toEndWith("\x1b[38;2;189;147;249m▌\x1b[0m");
+    expect(lines(h2)[1]).toEndWith("\x1b[38;2;189;147;249m▌▌\x1b[0m");
+    expect(lines(h3)[1]).toEndWith("\x1b[38;2;189;147;249m▌▌▌\x1b[0m");
+  });
 });
 
 // ── Grammar pre-passes (brief 2026-08-25): front matter elided, setext
