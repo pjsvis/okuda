@@ -75,6 +75,48 @@ export function decodeKey(buf: Uint8Array): KeyAction {
   return null;
 }
 
+/** Strip ANSI SGR codes and the 2-char render margin, for anchor matching.
+ *  The margin is the outermost layer (`finalize` adds it last), so strip it
+ *  after ANSI. A blank line has no margin (`finalize` skips empties). Pure. */
+export function stripForAnchor(line: string): string {
+  return line.replace(/\x1b\[[0-9;]*m/g, "").replace(/^  /, "");
+}
+
+/** The stripped text of the first visible non-blank line, or null if the
+ *  viewport is empty/all-blank. The anchor that survives reflow. Pure. */
+export function anchorFor(
+  lines: string[],
+  scroll: number,
+  height: number,
+): string | null {
+  const end = Math.min(lines.length, scroll + height);
+  for (let i = scroll; i < end; i++) {
+    const s = stripForAnchor(lines[i] ?? "");
+    if (s !== "") return s;
+  }
+  return null;
+}
+
+/** Find the physical index of `anchor` in re-rendered lines, biased to
+ *  start near `hint` (reflow shifts by a few lines, not thousands). Returns
+ *  the matched index (unclamped), or `hint` if not found (the honest
+ *  "lost the place" fallback). Pure. */
+export function findAnchor(lines: string[], anchor: string, hint: number): number {
+  const n = lines.length;
+  // Outward from the hint until every valid index is probed. The radius
+  // must reach both 0 and n-1, so bound by the farther of the two.
+  const radius = Math.max(hint, n - 1);
+  for (let r = 0; r <= radius; r++) {
+    const lo = hint - r;
+    const hi = hint + r;
+    if (lo >= 0 && stripForAnchor(lines[lo] ?? "") === anchor) return lo;
+    if (hi < n && hi !== lo && stripForAnchor(lines[hi] ?? "") === anchor) {
+      return hi;
+    }
+  }
+  return hint;
+}
+
 /** Viewport slice: visible lines + the clamped max scroll. Pure. */
 export function viewport(
   lines: string[],
@@ -226,10 +268,22 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   process.stdin.resume();
   process.stdin.on("data", onKey);
 
-  // Resize: re-render at the new width, clamp scroll.
+  // Resize: re-render at the new width. Preserve the reading position by
+  // anchoring on the stripped text of the first visible non-blank line —
+  // physical-line index would lie when wrapping reflows (brief:
+  // resize-content-anchor). Vertical resize doesn't reflow, so the clamp
+  // path (anchor null) keeps index-preservation, which is honest there.
   const onWinch = (): void => { void (async () => {
+    const height = dims().rows - 1;
+    const anchor = anchorFor(lines, scroll, height);
     lines = await renderLines(await readSource(), dims().cols);
-    scroll = Math.min(scroll, viewport(lines, 0, dims().rows - 1).maxScroll);
+    const { maxScroll } = viewport(lines, 0, height);
+    if (anchor !== null) {
+      const idx = findAnchor(lines, anchor, scroll);
+      scroll = Math.min(Math.max(0, idx), maxScroll);
+    } else {
+      scroll = Math.min(scroll, maxScroll);
+    }
     paint();
   })(); };
   process.on("SIGWINCH", onWinch);

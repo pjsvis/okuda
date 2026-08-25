@@ -1,5 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { decodeKey, footerLine, viewport, HINTS, displayPath } from "../src/tui";
+import {
+  decodeKey,
+  footerLine,
+  viewport,
+  HINTS,
+  displayPath,
+  stripForAnchor,
+  anchorFor,
+  findAnchor,
+} from "../src/tui";
 import { makeStyler } from "../src/ansi";
 import { DEFAULT_PALETTE } from "../src/palette";
 
@@ -115,5 +124,72 @@ describe("tui — displayPath", () => {
   });
   test("bare filename → itself", () => {
     expect(displayPath("audit.md")).toBe("audit.md");
+  });
+});
+
+describe("tui — stripForAnchor (ANSI + 2-char margin removed)", () => {
+  test("strips SGR codes then the leading 2-char margin", () => {
+    // finalize emits: "  " + coloured content.
+    const line = "  \x1b[1m# Heading\x1b[0m";
+    expect(stripForAnchor(line)).toBe("# Heading");
+  });
+  test("blank line (no margin) → empty", () => {
+    expect(stripForAnchor("")).toBe("");
+  });
+  test("content with its own indent keeps it after margin strip", () => {
+    // margin 2 + code indent 4 → after strip: 4-space indent preserved.
+    expect(stripForAnchor("      code")).toBe("    code");
+  });
+  test("NO_COLOR line: margin stripped, no escapes to remove", () => {
+    expect(stripForAnchor("  # Plain heading")).toBe("# Plain heading");
+  });
+});
+
+describe("tui — anchorFor (first visible non-blank line)", () => {
+  test("returns stripped text of first non-blank visible line", () => {
+    // Leading blank + margin line, scroll 0.
+    const lines = ["", "  \x1b[1m# Title\x1b[0m", "  body"];
+    expect(anchorFor(lines, 0, 3)).toBe("# Title");
+  });
+  test("scrolls past leading blanks to the first non-blank", () => {
+    const lines = ["", "", "  body", "  more"];
+    // scroll 0, height 2: visible = ["", ""], all blank → null.
+    expect(anchorFor(lines, 0, 2)).toBeNull();
+    // scroll 1, height 2: visible includes "  body".
+    expect(anchorFor(lines, 1, 2)).toBe("body");
+  });
+  test("all-blank viewport → null", () => {
+    expect(anchorFor(["", "", ""], 0, 3)).toBeNull();
+  });
+  test("empty doc → null", () => {
+    expect(anchorFor([], 0, 5)).toBeNull();
+  });
+});
+
+describe("tui — findAnchor (reflow-stable index lookup)", () => {
+  test("finds the anchor near the hint", () => {
+    const lines = ["  alpha", "  beta", "  gamma"];
+    expect(findAnchor(lines, "gamma", 2)).toBe(2);
+  });
+  test("biased search returns the nearest of duplicates", () => {
+    // Two "  dup" lines; hint near the second should pick index 3.
+    const lines = ["  dup", "  x", "  dup", "  dup"];
+    expect(findAnchor(lines, "dup", 3)).toBe(3);
+    // hint near the first picks index 0.
+    expect(findAnchor(lines, "dup", 0)).toBe(0);
+  });
+  test("anchor shifted by reflow: found at the new index", () => {
+    // Old scroll was 5; after reflow the anchor landed at index 3.
+    const lines = ["  a", "  b", "  c", "  TARGET", "  e"];
+    expect(findAnchor(lines, "TARGET", 5)).toBe(3);
+  });
+  test("not found → returns hint (honest fallback)", () => {
+    const lines = ["  a", "  b"];
+    expect(findAnchor(lines, "missing", 1)).toBe(1);
+  });
+  test("hint beyond bounds → clamps to within range", () => {
+    const lines = ["  a", "  b", "  c"];
+    // hint 99, anchor "a" at 0 → search finds it at 0.
+    expect(findAnchor(lines, "a", 99)).toBe(0);
   });
 });
