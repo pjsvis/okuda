@@ -77,11 +77,13 @@ export interface Styler {
    *  Under `none`, returns the markers unchanged (NO_COLOR parity: the
    *  hashes are still there, just invisible in colour mode). */
   headingBadge(markers: string): string;
-  /** Heading RHS chip: a single space wearing heading bg, at the last
-   *  content column — the visible right bound (LCARS right-edge tab).
-   *  The chip IS the rhs margin for headers (body keeps an implicit
-   *  margin). Under `none`, a plain space (structural parity: the
-   *  trailing space is present in both modes, line counts identical). */
+  /** Heading RHS chip: a full-block glyph wearing heading colour, at the
+   *  last content column — the visible right bound (LCARS right-edge tab).
+   *  A real glyph rather than a dressed space: bg-on-bare-space does not
+   *  render in some terminals, but bg/fg-on-glyph reliably does (the left
+   *  badge proves it). The chip IS the rhs margin for headers (body keeps
+   *  an implicit margin). Under `none`, the plain `█` (visible in both
+   *  modes — parity is structural: same glyph, same width, coloured vs plain). */
   headingChip(): string;
   /** Open sequence for a role (for state-machine re-emission). */
   open(name: keyof Palette): string;
@@ -110,7 +112,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       tablePipe: () => "│",
       rule: (width) => "─".repeat(width),
       headingBadge: (markers) => markers,
-      headingChip: () => " ",
+      headingChip: () => "█",
       open: () => "",
       reset: () => "",
     };
@@ -154,12 +156,12 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     // block the width of the level (1 char H1, 6 chars H6). LCARS tab.
     headingBadge: (markers) =>
       `${bg(palette.heading)}${fg(palette.heading)}${markers}${RESET}`,
-    // Heading RHS chip: a heading-bg space at the last content column —
-    // the visible right bound, bookend to the left badge. The chip IS
-    // the rhs margin for headers (LCARS right-edge tab). One cell only;
-    // the padding between text and chip is plain spaces (no full coloured
-    // bar — that is a different, out-of-scope element).
-    headingChip: () => `${bg(palette.heading)} ${RESET}`,
+    // Heading RHS chip: a full-block `█` wearing heading colour — the
+    // visible right bound, bookend to the left badge. A real glyph, not a
+    // dressed space: bg-on-bare-space does not render in some terminals,
+    // but bg=fg-on-glyph reliably does (the left badge proves it). One
+    // cell; the padding between text and chip is plain spaces.
+    headingChip: () => `${bg(palette.heading)}${fg(palette.heading)}█${RESET}`,
     open: (name) => fg(palette[name]),
     reset: () => RESET,
   };

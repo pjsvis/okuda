@@ -41,8 +41,8 @@ describe("render — headings", () => {
 //    bookend to the left badge. The chip IS the rhs margin for headers.
 //    Structural parity: plain space in NO_COLOR (strip escapes → identical).
 describe("render — heading RHS chip (right-edge tab)", () => {
-  // Default-palette heading colour is #bd93f9 → bg escape for the chip.
-  const CHIP = "\x1b[48;2;189;147;249m \x1b[0m";
+  // Default-palette heading colour is #bd93f9 → bg+fg on a full-block `█`.
+  const CHIP = "\x1b[48;2;189;147;249m\x1b[38;2;189;147;249m█\x1b[0m";
 
   test("chip present at the right bound of a header line", async () => {
     const out = await render("# Title\n\nbody");
@@ -87,13 +87,14 @@ describe("render — heading RHS chip (right-edge tab)", () => {
     }
   });
 
-  test("NO_COLOR parity: chip is a plain trailing space, lines identical", async () => {
+  test("NO_COLOR parity: chip is a plain `█`, lines identical", async () => {
     const src = "# " + "heading word ".repeat(6);
     const tc = await render(src, 26, "truecolor");
     const none = await render(src, 26, "none");
     expect(none).not.toContain("\x1b");
+    expect(none).toContain("█"); // glyph present in plain mode too
     // Structural parity: strip escapes from truecolor → identical lines
-    // (the chip space is present in both; line counts match).
+    // (the `█` is present in both; line counts match).
     expect(stripANSI(tc).split("\n")).toEqual(none.split("\n"));
   });
 
