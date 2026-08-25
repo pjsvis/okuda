@@ -1,7 +1,7 @@
 # Brief: Viewport padding — upper and lower render margins
 
 **Date:** 2026-08-25
-**Status:** Open
+**Status:** Rejected (2026-08-25, same day — operator call: "doing less to get more")
 **Branch:** feat/rhs-chip-headers → feat/tui-control-plane
 **Context:** follows the RHS chip work (td-9fdca0). The chip established
 the panel frame on the LHS (heading badge) and RHS (muted chip). The
@@ -72,3 +72,23 @@ ADR-007 (alongside the RHS chip divergence), not a silent drift.
   margin is the frame; per-block padding is a different element.
 - A coloured top/bottom rule. The frame is whitespace, not a line —
   consistent with how the LHS margin is whitespace, not a bar.
+
+## Rejection (2026-08-25)
+
+Rejected at the dogfood gate, before any code was written. Nothing was
+built, so nothing was reversed — no ADR.
+
+1. **A blank line only carries information at a boundary.** At
+   scroll-top and scroll-bottom the edge itself is the signal; mid-scroll
+   an injected blank is indistinguishable from a paragraph break — zero
+   bits of information, pure decoration.
+2. **The top blank already exists** (`finalize` leading `\n`, Glow
+   parity); the terminal viewport plus the footer already say "this is
+   the bottom" for free.
+3. **A viewport pad would fight the content-anchor.** The resize anchor
+   (`6471146`) keys on the non-blank line nearest the viewport middle;
+   paint-loop padding perturbs the line↔screen-row mapping at every
+   scroll position — complexity in service of whitespace nobody reads.
+
+Pivot note: the project is deliberately doing less to get more. This
+brief is the pivot's first recorded refusal.
