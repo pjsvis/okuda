@@ -82,17 +82,34 @@ export function stripForAnchor(line: string): string {
   return line.replace(/\x1b\[[0-9;]*m/g, "").replace(/^  /, "");
 }
 
-/** The stripped text of the first visible non-blank line, or null if the
- *  viewport is empty/all-blank. The anchor that survives reflow. Pure. */
+/** The anchor that survives reflow: the stripped text of the non-blank
+ *  visible line nearest the viewport middle (the eye proxy), plus the
+ *  screen row it occupied (0-based from the viewport top). Pinning the
+ *  anchor back to `offset` after re-render minimises apparent vertical
+ *  movement — the line under the eye stays under the eye (brief:
+ *  resize-content-anchor). Returns null if the viewport is all-blank. Pure. */
+export interface Anchor {
+  text: string;
+  offset: number;
+}
 export function anchorFor(
   lines: string[],
   scroll: number,
   height: number,
-): string | null {
+): Anchor | null {
   const end = Math.min(lines.length, scroll + height);
-  for (let i = scroll; i < end; i++) {
-    const s = stripForAnchor(lines[i] ?? "");
-    if (s !== "") return s;
+  const mid = scroll + (height >> 1); // middle screen row, as a line index
+  for (let r = 0; r < height; r++) {
+    const lo = mid - r;
+    const hi = mid + r;
+    if (lo >= scroll) {
+      const s = stripForAnchor(lines[lo] ?? "");
+      if (s !== "") return { text: s, offset: lo - scroll };
+    }
+    if (hi < end && hi !== lo) {
+      const s = stripForAnchor(lines[hi] ?? "");
+      if (s !== "") return { text: s, offset: hi - scroll };
+    }
   }
   return null;
 }
@@ -269,18 +286,19 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   process.stdin.on("data", onKey);
 
   // Resize: re-render at the new width. Preserve the reading position by
-  // anchoring on the stripped text of the first visible non-blank line —
-  // physical-line index would lie when wrapping reflows (brief:
-  // resize-content-anchor). Vertical resize doesn't reflow, so the clamp
-  // path (anchor null) keeps index-preservation, which is honest there.
+  // anchoring on the non-blank line nearest the viewport middle (the eye
+  // proxy) and pinning it back to the same screen row — physical-line
+  // index would lie when wrapping reflows, and pinning the top line drifts
+  // the eye (brief: resize-content-anchor). Vertical resize doesn't reflow,
+  // so the clamp path (anchor null) keeps index-preservation, honest there.
   const onWinch = (): void => { void (async () => {
     const height = dims().rows - 1;
     const anchor = anchorFor(lines, scroll, height);
     lines = await renderLines(await readSource(), dims().cols);
     const { maxScroll } = viewport(lines, 0, height);
     if (anchor !== null) {
-      const idx = findAnchor(lines, anchor, scroll);
-      scroll = Math.min(Math.max(0, idx), maxScroll);
+      const idx = findAnchor(lines, anchor.text, scroll);
+      scroll = Math.min(Math.max(0, idx - anchor.offset), maxScroll);
     } else {
       scroll = Math.min(scroll, maxScroll);
     }

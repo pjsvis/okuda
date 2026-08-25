@@ -79,6 +79,13 @@ okuda:
 manifesto-okuda:
     @./okuda docs/glow-vs-okuda.md --tui
 
+# Resize dogfood — open a doc, then narrow/widen the terminal.
+# Watch the line under your eye: it should hold its screen row across
+# reflow. Drift = the anchor is wrong (brief: resize-content-anchor).
+[group('build')]
+resize-okuda file="docs/glow-vs-okuda.md":
+    @./okuda {{file}} --tui
+
 # Render any file in the TUI (Okuda palette, the default): just view docs/foo.md
 [group('build')]
 view file:

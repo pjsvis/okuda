@@ -38,7 +38,17 @@ Ghostty reflows wrapped lines itself — the terminal owns the wrap, so
 resize keeps the reading position for free. okuda owns its wrap
 (`wrapANSI` in `render.ts`), so it cannot delegate. But the goal is the
 same one the herdr/Ghostty dogfood demonstrated: **on horizontal resize,
-the line currently under the eye stays under the eye.**
+minimise apparent vertical movement — the line under the eye stays
+under the eye.**
+
+(The first implementation anchored the *top* visible line and pinned it
+to the top. Dogfood (`just manifesto-okuda`, narrowing the terminal)
+showed the eye drifting down on width-reduce and up on widen: the top
+was a fixed point but the eye is in the middle, so the lines between
+moved. The fix: anchor the non-blank line nearest the viewport *middle*
+and pin it back to the *same screen row*. This trades a stable top for a
+stable eye — the correct trade, since you read in the middle, not at
+the edge. Logged here so it's a decision, not a drift.)
 
 ## What (the simplest thing)
 
@@ -78,21 +88,25 @@ the board. **No second consumer → no heavy prerequisite.**
 
 In `tui.ts`, `onWinch`:
 
-1. Before re-render, read the current viewport. Find the first line
-   whose **stripped** text (ANSI removed, 2-char margin removed) is
-   non-empty. That string is the anchor. (Empty viewport → no anchor;
-   fall back to scroll 0.)
+1. Before re-render, find the non-blank visible line **nearest the
+   viewport middle** (the eye proxy). Capture its stripped text (ANSI
+   removed, 2-char margin removed) and its screen-row offset (0-based
+   from the viewport top). (Empty/all-blank viewport → no anchor;
+   fall back to index-preservation + clamp.)
 2. Re-render at the new width.
-3. Walk the new lines, stripped, for the first index whose text equals
-   the anchor. Bias the search to start near the old scroll (cheap
-   common case: reflow shifts by a few lines, not thousands).
-4. If found, set scroll so the matched line is the first visible line
-   (or as close as clamp allows). If not found, keep the clamped index
-   (the old behaviour — the honest "we lost the place" case, rare).
+3. Walk the new lines, stripped, for the index whose text equals the
+   anchor. Bias the search to start near the old scroll (cheap common
+   case: reflow shifts by a few lines, not thousands).
+4. If found, set scroll so the matched line lands at its **original
+   screen row** (`scroll = idx - offset`, clamped). Pinning the middle
+   line to the middle row minimises apparent vertical movement — the
+   lines above and below reflow around a stable eye. If not found, keep
+   the clamped index (the honest "lost the place" case, rare).
 
-A `stripForAnchor(line)` helper: strip ANSI escapes (`\x1b\[[0-9;]*m`)
-and the leading 2-char margin. Pure, ~4 lines. Keep it in `tui.ts` — it
-is a control-plane concern, not render. (Render's `stripTags` is about
+Helpers: `stripForAnchor(line)` (strip ANSI + margin), `anchorFor(lines,
+scroll, height)` (returns `{ text, offset } | null`), `findAnchor(lines,
+anchor, hint)` (outward-biased index lookup). All pure, in `tui.ts` — a
+control-plane concern, not render. (Render's `stripTags` is about
 internal markers, not ANSI; do not reuse it for this.)
 
 ## Scope

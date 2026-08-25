@@ -145,18 +145,16 @@ describe("tui — stripForAnchor (ANSI + 2-char margin removed)", () => {
   });
 });
 
-describe("tui — anchorFor (first visible non-blank line)", () => {
-  test("returns stripped text of first non-blank visible line", () => {
-    // Leading blank + margin line, scroll 0.
-    const lines = ["", "  \x1b[1m# Title\x1b[0m", "  body"];
-    expect(anchorFor(lines, 0, 3)).toBe("# Title");
+describe("tui — anchorFor (non-blank line nearest the viewport middle)", () => {
+  test("returns stripped text + screen-row offset of the mid line", () => {
+    // height 4: middle row is index 2 (scroll+2). Anchor lands there.
+    const lines = ["", "  \x1b[1m# Title\x1b[0m", "  body", "  tail"];
+    expect(anchorFor(lines, 0, 4)).toEqual({ text: "body", offset: 2 });
   });
-  test("scrolls past leading blanks to the first non-blank", () => {
-    const lines = ["", "", "  body", "  more"];
-    // scroll 0, height 2: visible = ["", ""], all blank → null.
-    expect(anchorFor(lines, 0, 2)).toBeNull();
-    // scroll 1, height 2: visible includes "  body".
-    expect(anchorFor(lines, 1, 2)).toBe("body");
+  test("mid blank → nearest non-blank (search outward)", () => {
+    // height 6: mid row 3 is blank; nearest non-blank is row 2.
+    const lines = ["", "", "  x", "", "  y", ""];
+    expect(anchorFor(lines, 0, 6)).toEqual({ text: "x", offset: 2 });
   });
   test("all-blank viewport → null", () => {
     expect(anchorFor(["", "", ""], 0, 3)).toBeNull();
