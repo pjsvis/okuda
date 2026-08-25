@@ -140,3 +140,32 @@ If you are reading this in `okuda --tui`, every element above is live:
 If any block above reads wrong, the regression is localised here. If the document reads as
 pleasing, the bet holds: a terminal document does not need to be ugly, and discrete blocks
 placed with rhythm form a structure that is calming to read.
+
+## The side-by-side verdict (2026-08-26, handoff doc, both viewers)
+
+Run on `briefs/2026-08-26-session-handoff-okuda-net.md`. Glow starts
+well and becomes a wall of colours — seventeen saturated hues of equal
+apparent weight, assigned by syntax class, so the eye tracks inventory
+instead of structure. Informative? No: psychotic.
+
+- **Glow has palettes; okuda has a grammar.** Glow's colour budget is
+  spent on distinctions between syntax classes. okuda's is spent on
+  distinctions that survive repetition — a small channel budget where
+  each hue promises a *kind of thing*: blue for structure, amber for
+  emphasis.
+- **Bold-and-gold.** The bold-lead list scans in okuda (amber keys,
+  detail on demand — the three-pass scan working). The same construct
+  in glow's palette renders strong as one more saturated shout among
+  seventeen; the pattern the layout grammar inherited from glow is the
+  pattern glow's palette drowns.
+- **The blue is a statement of invariants.** The LCARS header block
+  occupies space *and defines its extents*. Its job is not to be looked
+  at but to be relied on — structure here is stable. Decoration varies
+  to hold attention; invariants hold so attention can vary elsewhere.
+  Nothing more, and you can't get much less.
+
+**The verdict:** glow optimises for encounter — the first screen
+dazzles. okuda optimises for inhabitation — the hundredth screen is
+still legible, because the colour budget went to distinctions that
+survive repetition. A document read once can afford fireworks; a
+document read daily cannot.
