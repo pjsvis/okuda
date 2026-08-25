@@ -36,6 +36,60 @@ describe("render — headings", () => {
   });
 });
 
+// ── Grammar pre-passes (brief 2026-08-25): front matter elided, setext
+//    neutralised. These are the bear-trap leg of the moat — CommonMark
+//    parses a closing `---` as a setext h2 underline, silently corrupting
+//    renders. Regression coverage for the grammar decision (ADR-009).
+describe("render — grammar pre-passes (front matter, setext)", () => {
+  test("YAML front matter elided — not parsed as setext h2", async () => {
+    const out = await render("---\ntitle: x\ndate: 2026\n---\n# Real\n\nbody");
+    // The keys must not surface as content (setext h2 / heading / paragraph).
+    expect(out).not.toContain("title:");
+    expect(out).not.toContain("date:");
+    // The first real content survives as the ATX heading.
+    expect(stripANSI(out)).toContain("# Real");
+    expect(stripANSI(out)).toContain("body");
+  });
+
+  test("`---` under a paragraph is a thematic break, not a setext h2", async () => {
+    const tc = await render("para text\n---\n");
+    // Neutralised → hr line present (muted rule)…
+    expect(tc).toContain("\x1b[38;2;88;88;88m");
+    // …and "para text" is NOT promoted to a heading (no heading colour).
+    expect(tc).not.toContain("\x1b[38;2;189;147;249mpara text");
+    // Structural parity in plain mode: hr rule emitted, no escapes.
+    const none = await render("para text\n---\n", W, "none");
+    expect(none).toContain("──");
+    expect(none).not.toContain("\x1b");
+  });
+
+  test("`===` under a paragraph is stripped — text stays a paragraph", async () => {
+    const tc = await render("para text\n===\n");
+    // The underline is gone, the text is not a heading.
+    expect(tc).not.toContain("===");
+    expect(tc).not.toContain("\x1b[38;2;189;147;249mpara text");
+    expect(tc).toContain("para text");
+    const none = await render("para text\n===\n", W, "none");
+    expect(none).not.toContain("===");
+  });
+
+  test("setext-like lines inside a code fence are untouched", async () => {
+    const none = await render("```text\npara\n---\n===\n```", W, "none");
+    // Fence body preserved verbatim — not neutralised, not turned into hr.
+    expect(none).toContain("para");
+    expect(none).toContain("---");
+    expect(none).toContain("===");
+    expect(none).not.toContain("──"); // no hr manufactured inside the fence
+  });
+
+  test("standalone thematic break (blank line above) still renders as hr", async () => {
+    const out = await render("a\n\n---\n\nb");
+    expect(out).toContain("\x1b[38;2;88;88;88m"); // hr present
+    expect(out).toContain("a");
+    expect(out).toContain("b");
+  });
+});
+
 describe("render — paragraphs and inline styles", () => {
   test("bold, italic, strikethrough, codespan emit contract sequences", async () => {
     const out = await render("**b** *i* ~~s~~ `c`");
