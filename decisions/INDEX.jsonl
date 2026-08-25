@@ -8,3 +8,4 @@
 {"file":"008-diagram-borders-are-blueline.md","date":"2026-08-25","status":"Accepted","summary":"Diagram borders are blueline, not recessive","meta":{}}
 {"file":"009-front-matter-elided-setext-neutralised.md","date":"2026-08-25","status":"Accepted","summary":"Front matter elided, setext headings neutralised","meta":{}}
 {"file":"010-bounded-anchor-proportional-fallback.md","date":"2026-08-26","status":"Accepted","summary":"Bounded anchor search + proportional fallback for resize scroll-preservation","meta":{}}
+{"file":"011-default-palette-okuda-identity.md","date":"2026-08-25","status":"Accepted","summary":"The default palette is the okuda preset — identity over parity","meta":{}}

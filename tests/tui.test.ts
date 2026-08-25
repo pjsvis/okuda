@@ -11,7 +11,7 @@ import {
   proportionalScroll,
 } from "../src/tui";
 import { makeStyler } from "../src/ansi";
-import { DEFAULT_PALETTE } from "../src/palette";
+import { DRACULA_PALETTE } from "../src/palette";
 
 function buf(...bytes: number[]): Uint8Array {
   return new Uint8Array(bytes);
@@ -89,7 +89,7 @@ describe("tui — viewport slice", () => {
 });
 
 describe("tui — footerLine (identity left, affordance right)", () => {
-  const styler = makeStyler(DEFAULT_PALETTE, "truecolor");
+  const styler = makeStyler(DRACULA_PALETTE, "truecolor");
   const muted = (s: string) => styler.role("muted", s);
   const badge = (s: string) => styler.badge(s);
   const FILE = "/Users/x/Dev/okuda/docs/audit.md";
@@ -109,7 +109,7 @@ describe("tui — footerLine (identity left, affordance right)", () => {
     expect(f).toContain("Gloam");
   });
   test("NO_COLOR: plain text, no escapes; padding kept (shape parity)", () => {
-    const none = makeStyler(DEFAULT_PALETTE, "none");
+    const none = makeStyler(DRACULA_PALETTE, "none");
     const f = footerLine(72, "Gloam", FILE, false,
       (s) => none.role("muted", s), (s) => none.badge(s));
     expect(f).not.toContain("\x1b");

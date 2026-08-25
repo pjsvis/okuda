@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { renderDocument } from "../src/render";
-import { DEFAULT_PALETTE } from "../src/palette";
+import { DRACULA_PALETTE } from "../src/palette";
 import { displayWidth, stripANSI } from "../src/width";
 
 const W = 64;
@@ -9,7 +9,7 @@ describe("render — tables (uniform presentation policy)", () => {
   test("header cyan+bold, rule kept, amber first column, loose rows", async () => {
     const out = await renderDocument(
       "| Name | Qty |\n|---|---|\n| x | 1 |\n| y | 2 |\n",
-      { width: W, palette: DEFAULT_PALETTE },
+      { width: W, palette: DRACULA_PALETTE },
     );
     const ls = out.split("\n").map((l) => l.trim() === "" ? "" : l);
     // header row: pine bold
@@ -44,7 +44,7 @@ describe("render — tables (uniform presentation policy)", () => {
   test("header grid: │ separators between header cells, full-width rules", async () => {
     const out = await renderDocument(
       "| Name | Qty |\n|---|---|\n| x | 1 |\n",
-      { width: W, palette: DEFAULT_PALETTE },
+      { width: W, palette: DRACULA_PALETTE },
     );
     const ls = out.split("\n").map((l) => l);
     // header row has │ between cells (muted pipe, colour mode)
@@ -123,7 +123,7 @@ describe("render — tables (uniform presentation policy)", () => {
   test("inline styles inside cells survive", async () => {
     const out = await renderDocument(
       "| k |\n|--|\n| **bold** cell |\n",
-      { width: W, palette: DEFAULT_PALETTE },
+      { width: W, palette: DRACULA_PALETTE },
     );
     expect(out).toContain("\x1b[38;2;255;184;108;1mbold\x1b[0m");
   });
@@ -145,7 +145,7 @@ describe("render — mermaid pipe + colour classification", () => {
   test("mermaid fence replaced by classified ASCII art", async () => {
     const out = await renderDocument("```mermaid\n" + MERMAID_SRC + "```\n", {
       width: W,
-      palette: DEFAULT_PALETTE,
+      palette: DRACULA_PALETTE,
     });
     // border channel muted, arrow channel link-coloured, text full contrast
     expect(out).toContain("\x1b[38;2;88;88;88m"); // border
@@ -161,7 +161,7 @@ describe("render — mermaid pipe + colour classification", () => {
   test("every coloured diagram line ends with reset (hygiene rule 4)", async () => {
     const out = await renderDocument("```mermaid\n" + MERMAID_SRC + "```\n", {
       width: W,
-      palette: DEFAULT_PALETTE,
+      palette: DRACULA_PALETTE,
     });
     const art = out.split("\n").filter((l) => l.includes("38;2;"));
     for (const l of art) expect(l.endsWith("\x1b[0m")).toBe(true);
@@ -170,7 +170,7 @@ describe("render — mermaid pipe + colour classification", () => {
   test("no ASCII character is ever an arrow: v2.0 label stays text", async () => {
     const out = await renderDocument("```mermaid\n" + MERMAID_SRC + "```\n", {
       width: W,
-      palette: DEFAULT_PALETTE,
+      palette: DRACULA_PALETTE,
     });
     // find the "Input v2.0" label span: text-channel coloured, and the
     // arrow colour sequence must never wrap an ASCII ^v>< or alphanumerics
@@ -211,7 +211,7 @@ describe("render — mermaid pipe + colour classification", () => {
       "flowchart LR\n  A[Alpha] --> B[Beta] --> C[Gamma] --> B[Delta] --> E[Epsilon] --> F[Zeta] --> G[Eta]";
     const out = await renderDocument("```mermaid\n" + wide + "```\n", {
       width: 30,
-      palette: DEFAULT_PALETTE,
+      palette: DRACULA_PALETTE,
     });
     // The widest art line must exceed the terminal width — okuda did not wrap it.
     const widest = Math.max(...out.split("\n").map((l) => displayWidth(l)));
@@ -230,7 +230,7 @@ describe("render — mermaid pipe + colour classification", () => {
   });
 
   test("palette override of diagram-arrow takes effect", async () => {
-    const palette = { ...DEFAULT_PALETTE, "diagram-arrow": "#010203" };
+    const palette = { ...DRACULA_PALETTE, "diagram-arrow": "#010203" };
     const out = await renderDocument("```mermaid\n" + MERMAID_SRC + "```\n", {
       width: W,
       palette,

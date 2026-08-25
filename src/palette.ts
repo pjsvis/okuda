@@ -1,5 +1,5 @@
 /**
- * palette.ts — semantic colour roles, Rosé Pine Base defaults, and the
+ * palette.ts — semantic colour roles, named presets, and the
  * ~/.config/okuda/palette.json override loader.
  *
  * Contract: briefs/2026-08-22-brief-ansi-emission-and-closed-grammar.md
@@ -34,8 +34,8 @@ export type Role =
 
 export type Palette = Record<Role, string>;
 
-/** Default palette — aligned to `glow` (the CLI) as dogfooded at the
- *  terminal, which renders the Dracula truecolor palette. NB: this is NOT
+/** The Dracula palette — glow parity: aligned to `glow` (the CLI) as
+ *  dogfooded at the terminal, which renders the Dracula truecolor palette. NB: this is NOT
  *  glamour's ANSI-256 DarkStyleConfig (ADR-006's original sourcing was
  *  wrong — see its 2026-08-24 amendment); the bytes from `glow <file>`
  *  are the reference, not glamour's styles.go.
@@ -63,12 +63,12 @@ export type Palette = Record<Role, string>;
  * Table roles keep okuda's semantic layer (brief: table policy), tuned
  * to the Glow palette: header = heading blue, key = Glow H1 pale yellow.
  *
- * code-background: empty string ("") in the default = no background emitted
- * (glow parity, Pass B). A named preset (e.g. okuda) or a user override
- * sets a real hex to emit a code panel (the Okuda affordance — a
+ * code-background: empty string ("") here = no background emitted
+ * (glow parity, Pass B). The okuda preset (the default) or a user
+ * override sets a real hex to emit a code panel (the Okuda affordance — a
  * content-sized coloured block behind fenced code, LCARS-style).
  */
-export const DEFAULT_PALETTE: Palette = {
+export const DRACULA_PALETTE: Palette = {
   heading: "#bd93f9",
   "code-text": "#50fa7b",
   "code-background": "",
@@ -94,7 +94,7 @@ export const DEFAULT_PALETTE: Palette = {
  *  parity comparison. Convergence is achieved; we are now diverging. */
 const PRESETS: Record<string, Palette> = {
   okuda: okudaPreset as Palette,
-  dracula: DEFAULT_PALETTE,
+  dracula: DRACULA_PALETTE,
 };
 
 const RE_HEX = /^#[0-9a-fA-F]{6}$/;
@@ -123,8 +123,9 @@ export const RESET = "\x1b[0m";
 
 /**
  * Load a palette. Resolution order (later wins):
- *   1. DEFAULT_PALETTE (Dracula/glow parity) if no `name`.
- *   2. Named preset (`name` → src/palettes/<name>.json) if given.
+ *   1. The okuda preset (the default, LCARS identity — ADR-011) if no
+ *      `name` is given.
+ *   2. Named preset if given (`dracula` = glow parity, `okuda`).
  *   3. User override file (`~/.config/okuda/palette.json`, or `path`).
  *
  * Malformed override files and invalid values are ignored — the base

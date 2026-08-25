@@ -1,7 +1,11 @@
 # Decision: Glow (glamour) dark palette as the default
 
 **Date:** 2026-08-24
-**Status:** Accepted
+**Status:** Accepted (default-palette choice superseded 2026-08-25 by
+ADR-011 — the okuda-identity preset is now the default; the Dracula
+palette survives as `DRACULA_PALETTE` / `--palette dracula`. Everything
+else here — the contract table, byte-exact tests, override loader,
+NO_COLOR parity — remains in force)
 
 ## Context
 
@@ -76,19 +80,20 @@ document.
 - Reviewers familiar with Rosé Pine defaults must recalibrate; the byte-exact contract tests were retuned (the sequences are still byte-exact, just to new values)
 
 **Constraints this imposes:**
-- **`DEFAULT_PALETTE` in `src/palette.ts` is the single source of truth.** The contract tests assert its values byte-exactly; any palette change retunes those tests in the same commit. No other file may hardcode palette hex.
+- **`DRACULA_PALETTE` in `src/palette.ts` is the single source of truth.** The contract tests assert its values byte-exactly; any palette change retunes those tests in the same commit. No other file may hardcode palette hex.
 - **Diagram roles reuse document roles, not introduce new ones.** If a future diagram channel needs a distinct hue, it must justify why the existing channels fail first — the three-channel classification (border/arrow/text) is the grammar, not the colour.
 - **Re-evaluation trigger:** if a future brief establishes okuda's own visual identity (e.g. an Okuda/LCARS-inspired palette grounded in the origin doc's functional-colour doctrine), this ADR is superseded. Until then, Glow-dark is the floor.
 
 ## Palimpsest check (reversal of brief 002's palette)
 
-The Rosé Pine palette was a single source of truth (`DEFAULT_PALETTE` in
-`src/palette.ts`), consumed only through the `Styler` role API. The swap
+The Rosé Pine palette was a single source of truth (a palette object in
+`src/palette.ts`, now `DRACULA_PALETTE`), consumed only through the
+`Styler` role API. The swap
 left no orphaned code:
 
 - **Orphaned:** none — no Rosé-Pine-specific helpers, constants, or
   branches existed; the palette is a plain `Record<Role, string>`.
-- **Shared:** `DEFAULT_PALETTE`, the `Styler` API, the override loader —
+- **Shared:** `DRACULA_PALETTE`, the `Styler` API, the override loader —
   all role-keyed and palette-agnostic; updated in place, still live.
 - **Valid:** the role set itself (`heading`, `strong`, `emphasis`,
   `code-text`, `code-background`, `blockquote`, `link`, `muted`,
@@ -150,10 +155,10 @@ fixed (snagging items 1–6, `docs/glow-delta-snagging.md`).
 
 - The decision itself (Glow-dark default; override file as escape hatch).
 - The role set and the `Styler` role API.
-- The constraint that `DEFAULT_PALETTE` in `src/palette.ts` is the single
+- The constraint that `DRACULA_PALETTE` in `src/palette.ts` is the single
   source of truth, and contract tests assert its values byte-exactly.
 - The re-evaluation trigger (a future okuda-identity palette supersedes
-  this ADR).
+  this ADR). **Fired 2026-08-25** — see ADR-011.
 
 ### NO_COLOR parity invariant (load-bearing, founded here)
 

@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { renderDocument } from "../src/render";
-import { DEFAULT_PALETTE } from "../src/palette";
+import { DRACULA_PALETTE } from "../src/palette";
 import { displayWidth, stripANSI } from "../src/width";
 
 const W = 60;
 
 async function render(src: string, width = W, color: "truecolor" | "none" = "truecolor") {
-  return await renderDocument(src, { width, color, palette: DEFAULT_PALETTE });
+  return await renderDocument(src, { width, color, palette: DRACULA_PALETTE });
 }
 
 function lines(out: string): string[] {
