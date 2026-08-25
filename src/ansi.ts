@@ -77,6 +77,12 @@ export interface Styler {
    *  Under `none`, returns the markers unchanged (NO_COLOR parity: the
    *  hashes are still there, just invisible in colour mode). */
   headingBadge(markers: string): string;
+  /** Heading RHS chip: a single space wearing heading bg, at the last
+   *  content column — the visible right bound (LCARS right-edge tab).
+   *  The chip IS the rhs margin for headers (body keeps an implicit
+   *  margin). Under `none`, a plain space (structural parity: the
+   *  trailing space is present in both modes, line counts identical). */
+  headingChip(): string;
   /** Open sequence for a role (for state-machine re-emission). */
   open(name: keyof Palette): string;
   /** Reset sequence (empty string under `none`). */
@@ -104,6 +110,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       tablePipe: () => "│",
       rule: (width) => "─".repeat(width),
       headingBadge: (markers) => markers,
+      headingChip: () => " ",
       open: () => "",
       reset: () => "",
     };
@@ -147,6 +154,12 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     // block the width of the level (1 char H1, 6 chars H6). LCARS tab.
     headingBadge: (markers) =>
       `${bg(palette.heading)}${fg(palette.heading)}${markers}${RESET}`,
+    // Heading RHS chip: a heading-bg space at the last content column —
+    // the visible right bound, bookend to the left badge. The chip IS
+    // the rhs margin for headers (LCARS right-edge tab). One cell only;
+    // the padding between text and chip is plain spaces (no full coloured
+    // bar — that is a different, out-of-scope element).
+    headingChip: () => `${bg(palette.heading)} ${RESET}`,
     open: (name) => fg(palette[name]),
     reset: () => RESET,
   };

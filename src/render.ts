@@ -355,18 +355,27 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // The marker is badged: bg = fg = heading colour → a solid colour
       // block the width of the level (LCARS tab). The glyph stays in the
       // stream for NO_COLOR parity (strip escapes → `## Heading` as before).
+      //
+      // RHS chip (brief: right-edge LCARS tab): a heading-bg space at the
+      // last content column of every header line — the visible right
+      // bound, bookend to the left badge. The chip IS the rhs margin for
+      // headers (body keeps an implicit margin). Headers wrap at
+      // `width - 1` so the chip fills the last column; text is padded with
+      // plain spaces to the wrap width (no full coloured bar), then the
+      // chip. Every line (the bar form) bounds the reflow on resize.
       const markers = "#".repeat(level);
-      const lines = wrapANSI(markers + " " + stripHtml(children), { width });
+      const wrapW = width - 1;
+      const lines = wrapANSI(markers + " " + stripHtml(children), { width: wrapW });
       return (
         lines
           .map((l, i) => {
             if (l === "") return "";
-            if (i === 0) {
-              // Badge the leading markers; the rest (space + text) in heading colour.
-              const rest = l.slice(markers.length);
-              return styler.headingBadge(markers) + styler.roleBold("heading", rest);
-            }
-            return styler.roleBold("heading", l);
+            const body =
+              i === 0
+                ? styler.headingBadge(markers) +
+                  styler.roleBold("heading", l.slice(markers.length))
+                : styler.roleBold("heading", l);
+            return padDisplay(body, wrapW) + styler.headingChip();
           })
           .join("\n") + "\n\n"
       );

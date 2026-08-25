@@ -1,7 +1,7 @@
 # Brief: Right-edge LCARS tab on headers — the visible right bound
 
 **Date:** 2026-08-25
-**Status:** Open (not started; captured before new-up)
+**Status:** Implemented (feat/rhs-chip-headers; td-9fdca0) — resolved to the fixed-column bar form per operator direction. Dogfood before extending to non-header blocks.
 **Context:** dogfood finding during the stacked comparison — the left
 margin implies the LHS of the render area, but the RHS is unbounded
 visually. Reflow on horizontal resize has no visible bound, so the

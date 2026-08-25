@@ -36,6 +36,80 @@ describe("render — headings", () => {
   });
 });
 
+// ── RHS chip (brief: right-edge LCARS tab). A heading-bg space at the
+//    last content column of every header line — the visible right bound,
+//    bookend to the left badge. The chip IS the rhs margin for headers.
+//    Structural parity: plain space in NO_COLOR (strip escapes → identical).
+describe("render — heading RHS chip (right-edge tab)", () => {
+  // Default-palette heading colour is #bd93f9 → bg escape for the chip.
+  const CHIP = "\x1b[48;2;189;147;249m \x1b[0m";
+
+  test("chip present at the right bound of a header line", async () => {
+    const out = await render("# Title\n\nbody");
+    expect(out).toContain(CHIP);
+    // The chip closes the header line — it sits after the heading text.
+    const hdr = lines(out)[1]!; // line 0 is the leading blank
+    expect(hdr).toContain(CHIP);
+    expect(hdr.endsWith(CHIP)).toBe(true);
+  });
+
+  test("short header still gets the chip at the fixed right column (not floating)", async () => {
+    const out = await render("# Hi", 20);
+    const hdr = lines(out)[1]!;
+    expect(hdr.endsWith(CHIP)).toBe(true);
+    // The chip is at the last content column: display width of the line
+    // (escapes stripped) = content area (width - 4) + 2-char left margin
+    // = width - 2. Padding fills between the short text and the chip.
+    expect(displayWidth(stripANSI(hdr))).toBe(20 - 2);
+  });
+
+  test("chip on every line of a wrapped header (the bar form)", async () => {
+    const out = await render(
+      "# " + "heading word ".repeat(8),
+      28,
+    );
+    // Header lines are 1..N (after the leading blank); each ends with the
+    // chip — the bar bounds the full height of the header block.
+    const hdrLines = lines(out).slice(1).filter((l) => l.includes(CHIP));
+    expect(hdrLines.length).toBeGreaterThan(1); // wrapped → multiple
+    for (const l of hdrLines) expect(l.endsWith(CHIP)).toBe(true);
+  });
+
+  test("header text wraps at content_width - 1 (chip reserves a column)", async () => {
+    // The text region of the header line (badge+text+padding, before the
+    // chip) must be ≤ content_width - 1 so the chip fills the last column.
+    const w = 24;
+    const out = await render("# " + "x".repeat(40), w);
+    for (const l of lines(out)) {
+      if (!l.includes(CHIP)) continue;
+      const withoutChip = l.slice(0, l.lastIndexOf(CHIP));
+      // +2 for the left margin; chip excluded → text region ≤ w-4-1+2 = w-3.
+      expect(displayWidth(stripANSI(withoutChip))).toBeLessThanOrEqual(w - 3);
+    }
+  });
+
+  test("NO_COLOR parity: chip is a plain trailing space, lines identical", async () => {
+    const src = "# " + "heading word ".repeat(6);
+    const tc = await render(src, 26, "truecolor");
+    const none = await render(src, 26, "none");
+    expect(none).not.toContain("\x1b");
+    // Structural parity: strip escapes from truecolor → identical lines
+    // (the chip space is present in both; line counts match).
+    expect(stripANSI(tc).split("\n")).toEqual(none.split("\n"));
+  });
+
+  test("reflow on resize keeps the chip at the right bound", async () => {
+    const src = "# " + "heading word ".repeat(10);
+    const prev = await render(src, 30, "truecolor");
+    const next = await render(src, 20, "truecolor");
+    // Narrower width → more header lines, every one still chip-terminated.
+    const prevChipLines = lines(prev).filter((l) => l.endsWith(CHIP)).length;
+    const nextChipLines = lines(next).filter((l) => l.endsWith(CHIP)).length;
+    expect(nextChipLines).toBeGreaterThan(prevChipLines);
+    for (const l of lines(next)) if (l.includes(CHIP)) expect(l.endsWith(CHIP)).toBe(true);
+  });
+});
+
 // ── Grammar pre-passes (brief 2026-08-25): front matter elided, setext
 //    neutralised. These are the bear-trap leg of the moat — CommonMark
 //    parses a closing `---` as a setext h2 underline, silently corrupting
