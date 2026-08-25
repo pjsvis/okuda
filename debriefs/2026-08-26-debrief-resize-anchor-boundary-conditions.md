@@ -205,3 +205,15 @@ thing that handles both regimes without that refactor.
   fingerprint can be upgraded to a source-position map; the bounded +
   proportional TUI logic stays.
 - `td-bf594e` (palette test fix) — separate, untouched by this work.
+
+## Dogfood addendum (2026-08-25, post-freeze)
+
+Operator confirmation after the palette-rename rebuild (`8a2824d` —
+smoke pass, no regression through the palette plane):
+
+**The round-trip use case emerged in practice:** widen the terminal to
+view a wide table, squich it narrow again to read the prose — vertical
+position in the content holds through both reflows. Nobody designed
+"resize as a reading tool"; the anchor's keep-the-line-under-the-eye
+promise delivers it for free. The resize is not a viewport
+accommodation, it's a zoom for structure.
