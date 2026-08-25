@@ -77,13 +77,11 @@ export interface Styler {
    *  Under `none`, returns the markers unchanged (NO_COLOR parity: the
    *  hashes are still there, just invisible in colour mode). */
   headingBadge(markers: string): string;
-  /** Heading RHS chip: a full-block glyph wearing heading colour, at the
+  /** Heading RHS chip: visible marker after the heading text, at the
    *  last content column — the visible right bound (LCARS right-edge tab).
-   *  A real glyph rather than a dressed space: bg-on-bare-space does not
-   *  render in some terminals, but bg/fg-on-glyph reliably does (the left
-   *  badge proves it). The chip IS the rhs margin for headers (body keeps
-   *  an implicit margin). Under `none`, the plain `█` (visible in both
-   *  modes — parity is structural: same glyph, same width, coloured vs plain). */
+   *  DIAGNOSTIC: rendered as visible ASCII `XXX` in heading colour (no
+   *  bg) to verify the pipeline (handler → styler → TUI) independently
+   *  of the bg-on-trailing-cell question. Under `none`, the plain `XXX`. */
   headingChip(): string;
   /** Open sequence for a role (for state-machine re-emission). */
   open(name: keyof Palette): string;
@@ -112,7 +110,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       tablePipe: () => "│",
       rule: (width) => "─".repeat(width),
       headingBadge: (markers) => markers,
-      headingChip: () => "█",
+      headingChip: () => "XXX",
       open: () => "",
       reset: () => "",
     };
@@ -156,12 +154,11 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     // block the width of the level (1 char H1, 6 chars H6). LCARS tab.
     headingBadge: (markers) =>
       `${bg(palette.heading)}${fg(palette.heading)}${markers}${RESET}`,
-    // Heading RHS chip: a full-block `█` wearing heading colour — the
-    // visible right bound, bookend to the left badge. A real glyph, not a
-    // dressed space: bg-on-bare-space does not render in some terminals,
-    // but bg=fg-on-glyph reliably does (the left badge proves it). One
-    // cell; the padding between text and chip is plain spaces.
-    headingChip: () => `${bg(palette.heading)}${fg(palette.heading)}█${RESET}`,
+    // Heading RHS chip — DIAGNOSTIC: visible ASCII `XXX` in heading
+    // colour, no bg. Isolates the pipeline (handler → styler → TUI)
+    // from the bg-on-trailing-cell question. fg-only on a real char
+    // reliably renders (heading colour on `#` proves it).
+    headingChip: () => `${fg(palette.heading)}XXX${RESET}`,
     open: (name) => fg(palette[name]),
     reset: () => RESET,
   };
