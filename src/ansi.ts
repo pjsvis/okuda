@@ -110,7 +110,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       tablePipe: () => "│",
       rule: (width) => "─".repeat(width),
       headingBadge: (markers) => markers,
-      headingChip: () => "XXX",
+      headingChip: () => "[XXX]",
       open: () => "",
       reset: () => "",
     };
@@ -158,7 +158,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     // colour, no bg. Isolates the pipeline (handler → styler → TUI)
     // from the bg-on-trailing-cell question. fg-only on a real char
     // reliably renders (heading colour on `#` proves it).
-    headingChip: () => `${fg(palette.heading)}XXX${RESET}`,
+    headingChip: () => `${fg(palette.heading)}[XXX]${RESET}`,
     open: (name) => fg(palette[name]),
     reset: () => RESET,
   };

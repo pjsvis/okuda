@@ -107,6 +107,7 @@ tables:
 # Render the RHS-chip dogfood in the Okuda palette TUI
 [group('build')]
 chip:
+    @just build >/dev/null
     @./okuda docs/chip-dogfood.md --tui --palette okuda
 
 # Render the manifesto (glow vs okuda; the dogfood is the argument)

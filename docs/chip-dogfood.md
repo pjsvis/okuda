@@ -1,4 +1,4 @@
-# RHS Chip Dogfood
+# RHS CHIP TEST XYZ
 
 A short document built to make the right-edge LCARS tab obvious.
 
