@@ -13,16 +13,20 @@ function lines(out: string): string[] {
 }
 
 describe("render — headings", () => {
-  test("H1–H3 styled, marker visible, blank line after", async () => {
+  test("H1–H3 styled, marker badged, blank line after", async () => {
     const out = await render("# Title\n\nBody");
-    expect(out).toContain("\x1b[38;2;189;147;249;1m# Title\x1b[0m");
+    // Marker is badged: bg = fg = heading colour (solid block, glyph hidden).
+    expect(out).toContain("\x1b[48;2;189;147;249m\x1b[38;2;189;147;249m#\x1b[0m");
+    // Rest of line (space + text) in heading colour bold.
+    expect(out).toContain("\x1b[38;2;189;147;249;1m Title\x1b[0m");
     expect(lines(out)[0]).toBe("");
     expect(lines(out)[2]).toBe("");
   });
 
-  test("H4+ renders the Glow way: marker + heading colour", async () => {
+  test("H4+ renders the Glow way: marker badged + heading colour", async () => {
     const out = await render("#### Deep");
-    expect(out).toContain("\x1b[38;2;189;147;249;1m#### Deep\x1b[0m");
+    expect(out).toContain("\x1b[48;2;189;147;249m\x1b[38;2;189;147;249m####\x1b[0m");
+    expect(out).toContain("\x1b[38;2;189;147;249;1m Deep\x1b[0m");
     expect(out).not.toContain("\x1b[1mDeep\x1b[0m"); // no longer a bold-paragraph collapse
   });
 

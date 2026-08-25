@@ -352,11 +352,22 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       const level = meta?.level ?? 1;
       // Glow way: `#`×level marker + heading colour on every level.
       // (ADR-007: H4+ no longer collapses; the marker count is the level.)
-      const marker = "#".repeat(level) + " ";
-      const lines = wrapANSI(marker + stripHtml(children), { width });
+      // The marker is badged: bg = fg = heading colour → a solid colour
+      // block the width of the level (LCARS tab). The glyph stays in the
+      // stream for NO_COLOR parity (strip escapes → `## Heading` as before).
+      const markers = "#".repeat(level);
+      const lines = wrapANSI(markers + " " + stripHtml(children), { width });
       return (
         lines
-          .map((l) => (l === "" ? "" : styler.roleBold("heading", l)))
+          .map((l, i) => {
+            if (l === "") return "";
+            if (i === 0) {
+              // Badge the leading markers; the rest (space + text) in heading colour.
+              const rest = l.slice(markers.length);
+              return styler.headingBadge(markers) + styler.roleBold("heading", rest);
+            }
+            return styler.roleBold("heading", l);
+          })
           .join("\n") + "\n\n"
       );
     },

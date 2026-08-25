@@ -72,6 +72,11 @@ export interface Styler {
   tablePipe(): string;
   /** Thematic rule to `width` columns. */
   rule(width: number): string;
+  /** Heading badge: the `#` markers rendered as a solid colour block
+   *  (bg = fg = heading colour → the glyph disappears into the block).
+   *  Under `none`, returns the markers unchanged (NO_COLOR parity: the
+   *  hashes are still there, just invisible in colour mode). */
+  headingBadge(markers: string): string;
   /** Open sequence for a role (for state-machine re-emission). */
   open(name: keyof Palette): string;
   /** Reset sequence (empty string under `none`). */
@@ -98,6 +103,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       quotePipe: () => "│",
       tablePipe: () => "│",
       rule: (width) => "─".repeat(width),
+      headingBadge: (markers) => markers,
       open: () => "",
       reset: () => "",
     };
@@ -136,6 +142,11 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     quotePipe: () => `${fg(palette.blockquote)}│${RESET}`,
     tablePipe: () => `${fg(palette.muted)}│${RESET}`,
     rule: (width) => `${fg(palette.muted)}${"─".repeat(width)}${RESET}`,
+    // Heading badge: bg = fg = heading colour. The `#` glyph renders in
+    // heading colour on a heading-coloured background → a solid colour
+    // block the width of the level (1 char H1, 6 chars H6). LCARS tab.
+    headingBadge: (markers) =>
+      `${bg(palette.heading)}${fg(palette.heading)}${markers}${RESET}`,
     open: (name) => fg(palette[name]),
     reset: () => RESET,
   };
