@@ -53,14 +53,15 @@ describe("render — heading RHS chip (right-edge tab)", () => {
     expect(hdr.endsWith(CHIP)).toBe(true);
   });
 
-  test("short header still gets the chip at the fixed right column (not floating)", async () => {
-    const out = await render("# Hi", 20);
+  test("short header still gets the chip at the terminal right edge (not floating)", async () => {
+    const w = 20;
+    const out = await render("# Hi", w);
     const hdr = lines(out)[1]!;
     expect(hdr.endsWith(CHIP)).toBe(true);
-    // The chip is at the last content column: display width of the line
-    // (escapes stripped) = content area (width - 4) + 2-char left margin
-    // = width - 2. Padding fills between the short text and the chip.
-    expect(displayWidth(stripANSI(hdr))).toBe(20 - 2);
+    // The chip is at the extreme right column: the full line display
+    // width (escapes stripped) = terminal width (the chip eats the
+    // body's 2-col right margin so it sits at the visible edge).
+    expect(displayWidth(stripANSI(hdr))).toBe(w);
   });
 
   test("chip on every line of a wrapped header (the bar form)", async () => {
@@ -75,16 +76,16 @@ describe("render — heading RHS chip (right-edge tab)", () => {
     for (const l of hdrLines) expect(l.endsWith(CHIP)).toBe(true);
   });
 
-  test("header text wraps at content_width - 1 (chip reserves a column)", async () => {
-    // The text region of the header line (badge+text+padding, before the
-    // chip) must be ≤ content_width - 1 so the chip fills the last column.
+  test("header text wraps at content_width (body parity — no wrap inconsistency)", async () => {
+    // Headers wrap at the same content_width as body paragraphs; the
+    // chip eats the 2-col right margin beyond that. The full header
+    // line (left margin + text region + gap + chip) = terminal width.
     const w = 24;
     const out = await render("# " + "x".repeat(40), w);
     for (const l of lines(out)) {
       if (!l.includes(CHIP)) continue;
-      const withoutChip = l.slice(0, l.lastIndexOf(CHIP));
-      // +2 for the left margin; chip excluded → text region ≤ w-4-1+2 = w-3.
-      expect(displayWidth(stripANSI(withoutChip))).toBeLessThanOrEqual(w - 3);
+      // The chip sits at the extreme right column: full line = w.
+      expect(displayWidth(stripANSI(l))).toBe(w);
     }
   });
 

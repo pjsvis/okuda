@@ -182,6 +182,10 @@ function newTableState(): TableState {
 
 interface Ctx {
   width: number;
+  /** Full terminal width (opts.width), for header chip placement at the
+   *  extreme right column. Body wraps at `width` (content); the header chip
+   *  eats the 2-col right margin so it sits at the visible right edge. */
+  fullWidth: number;
   styler: ReturnType<typeof makeStyler>;
   color: ColorMode;
   palette: Palette;
@@ -203,6 +207,7 @@ export async function renderDocument(
     // raw blocks (code/diagrams) bypass it and may overflow the right
     // gutter — art is art.
     width: Math.max(10, opts.width - 4),
+    fullWidth: opts.width,
     styler,
     color,
     palette,
@@ -357,15 +362,19 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // stream for NO_COLOR parity (strip escapes → `## Heading` as before).
       //
       // RHS chip (brief: right-edge LCARS tab): a heading-bg space at the
-      // last content column of every header line — the visible right
-      // bound, bookend to the left badge. The chip IS the rhs margin for
-      // headers (body keeps an implicit margin). Headers wrap at
-      // `width - 1` so the chip fills the last column; text is padded with
-      // plain spaces to the wrap width (no full coloured bar), then the
-      // chip. Every line (the bar form) bounds the reflow on resize.
+      // extreme right column of the terminal — the visible right bound,
+      // bookend to the left badge. The chip eats the body's 2-col right
+      // margin so it sits at the visible edge (not 2 cols short). Headers
+      // wrap at `width` (content_width = body parity — no wrap
+      // inconsistency); the line is then padded to `fullWidth - 1` (the
+      // pre-left-margin width that reaches the terminal edge minus the
+      // chip cell) and the chip fills the last column. Every line (the bar
+      // form) bounds the reflow on resize.
       const markers = "#".repeat(level);
-      const wrapW = width - 1;
-      const lines = wrapANSI(markers + " " + stripHtml(children), { width: wrapW });
+      const lines = wrapANSI(markers + " " + stripHtml(children), { width });
+      // Pre-left-margin line width that fills the terminal: fullWidth - 2
+      // (left margin) ; the chip occupies the last of those columns.
+      const target = Math.max(width + 1, ctx.fullWidth - 2);
       return (
         lines
           .map((l, i) => {
@@ -375,7 +384,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
                 ? styler.headingBadge(markers) +
                   styler.roleBold("heading", l.slice(markers.length))
                 : styler.roleBold("heading", l);
-            return padDisplay(body, wrapW) + styler.headingChip();
+            return padDisplay(body, target - 1) + styler.headingChip();
           })
           .join("\n") + "\n\n"
       );
