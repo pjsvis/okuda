@@ -44,23 +44,24 @@ describe("render — heading RHS chip (right-edge tab)", () => {
   // Default-palette heading colour is #bd93f9 → fg on `▌` (left half-block).
   const CHIP = "\x1b[38;2;189;147;249m▌\x1b[0m";
 
-  test("chip present at the extreme right column of a header line", async () => {
+  test("chip present at the RHS edge of the text (content boundary)", async () => {
     const w = 40;
     const out = await render("# Title\n\nbody", w);
     expect(out).toContain(CHIP);
     const hdr = lines(out)[1]!; // line 0 is the leading blank
     expect(hdr.endsWith(CHIP)).toBe(true);
-    // The chip is at the terminal right edge: full line = w.
-    expect(displayWidth(stripANSI(hdr))).toBe(w);
+    // The chip lines up with the body's right margin: content_width +
+    // left_margin = (w-4) + 2 = w-2.
+    expect(displayWidth(stripANSI(hdr))).toBe(w - 2);
   });
 
-  test("short header still gets the chip at the extreme right column", async () => {
+  test("short header still gets the chip at the content boundary", async () => {
     const w = 20;
     const out = await render("# Hi", w);
     const hdr = lines(out)[1]!;
     expect(hdr.endsWith(CHIP)).toBe(true);
-    // The chip is at the terminal right edge, not floating after the text.
-    expect(displayWidth(stripANSI(hdr))).toBe(w);
+    // The chip lines up with the body's right margin, not floating past it.
+    expect(displayWidth(stripANSI(hdr))).toBe(w - 2);
   });
 
   test("chip on every line of a wrapped header (the bar form)", async () => {
@@ -75,14 +76,15 @@ describe("render — heading RHS chip (right-edge tab)", () => {
     for (const l of hdrLines) expect(l.endsWith(CHIP)).toBe(true);
   });
 
-  test("header text wraps at content_width (chip at the edge, not in the text)", async () => {
+  test("header text wraps at content_width (chip lines up with body edge)", async () => {
     const w = 24;
     const out = await render("# " + "x".repeat(40), w);
     const chipLines = lines(out).filter((l) => l.includes(CHIP));
     expect(chipLines.length).toBeGreaterThan(0);
     for (const l of chipLines) {
       expect(l.endsWith(CHIP)).toBe(true);
-      expect(displayWidth(stripANSI(l))).toBe(w);
+      // Chip at content boundary = content_width + left_margin = w-2.
+      expect(displayWidth(stripANSI(l))).toBe(w - 2);
     }
   });
 

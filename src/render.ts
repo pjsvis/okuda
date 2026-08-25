@@ -362,17 +362,15 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // stream for NO_COLOR parity (strip escapes → `## Heading` as before).
       //
       // RHS chip (brief: right-edge LCARS tab): a `▌` in heading colour
-      // at the extreme right column of the terminal — the visible right
-      // bound, bookend to the left badge. fg-only on a visible glyph
-      // (renders reliably; no bg needed). The chip eats the body's 2-col
-      // right margin so it sits at the visible edge. Headers wrap at
-      // `width` (content_width = body parity); each line is padded to
-      // `fullWidth - 2 - 1` (terminal width - left margin - chip cell)
-      // and the chip fills the last column. Every line (the bar form)
-      // bounds the reflow on resize.
+      // at the RHS edge of the text (the content boundary, = body's right
+      // margin). fg-only on a visible glyph (renders reliably; no bg
+      // needed). The chip lines up with where body paragraphs wrap — the
+      // visible form of the body's right margin, not a thing floating
+      // past it. Headers wrap at `width - 1` (reserving a column for the
+      // chip); each line is padded to `width - 1` and the chip fills the
+      // last content column. Every line (the bar form) bounds the reflow.
       const markers = "#".repeat(level);
-      const lines = wrapANSI(markers + " " + stripHtml(children), { width });
-      const target = Math.max(width + 1, ctx.fullWidth - 2); // pre-left-margin
+      const lines = wrapANSI(markers + " " + stripHtml(children), { width: width - 1 });
       return (
         lines
           .map((l, i) => {
@@ -382,7 +380,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
                 ? styler.headingBadge(markers) +
                   styler.roleBold("heading", l.slice(markers.length))
                 : styler.roleBold("heading", l);
-            return padDisplay(body, target - 1) + styler.headingChip();
+            return padDisplay(body, width - 1) + styler.headingChip();
           })
           .join("\n") + "\n\n"
       );
