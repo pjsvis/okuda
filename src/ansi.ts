@@ -77,13 +77,13 @@ export interface Styler {
    *  Under `none`, returns the markers unchanged (NO_COLOR parity: the
    *  hashes are still there, just invisible in colour mode). */
   headingBadge(markers: string): string;
-  /** Heading RHS chip: `▌`×level in heading colour (fg-only), at the
-   *  content boundary — the visible right bound (LCARS right-edge tab).
-   *  Width matches the LHS badge (1 cell H1, 2 H2… 6 H6) so left and right
-   *  read as a kin pair — bracketed on the H1 line, tapering with level.
-   *  fg-on-glyph renders reliably; no bg needed. Under `none`, the plain
-   *  `▌`×level (visible in both — structural parity). */
-  headingChip(level: number): string;
+  /** Heading RHS chip: a solid heading-coloured block (bg=fg=heading
+   *  on `█`), constant 1 cell — the H1 unit, a fixed reference the LHS
+   *  badge is measured against (LHS encodes depth; RHS references it).
+   *  Same visual language as the H1 LHS badge (a solid colour block).
+   *  fg-on-glyph + bg=fg renders reliably (the badge proves it). Under
+   *  `none`, the plain `█` (visible in both — structural parity). */
+  headingChip(): string;
   /** Open sequence for a role (for state-machine re-emission). */
   open(name: keyof Palette): string;
   /** Reset sequence (empty string under `none`). */
@@ -111,7 +111,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       tablePipe: () => "│",
       rule: (width) => "─".repeat(width),
       headingBadge: (markers) => markers,
-      headingChip: (level: number) => "▌".repeat(level),
+      headingChip: () => "█",
       open: () => "",
       reset: () => "",
     };
@@ -155,12 +155,12 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     // block the width of the level (1 char H1, 6 chars H6). LCARS tab.
     headingBadge: (markers) =>
       `${bg(palette.heading)}${fg(palette.heading)}${markers}${RESET}`,
-    // Heading RHS chip — `▌`×level in heading colour (fg-only), at the
-    // content boundary. Width matches the LHS badge (1 cell H1, 2 H2…) so
-    // left and right read as a kin pair — bracketed on the H1 line,
-    // tapering with level vertically. fg-on-glyph renders reliably; no bg.
-    headingChip: (level: number) =>
-      `${fg(palette.heading)}${"▌".repeat(level)}${RESET}`,
+    // Heading RHS chip — a solid heading-coloured block (bg=fg=heading
+    // on `█`), constant 1 cell. The H1 unit, a fixed reference the LHS
+    // badge is measured against (LHS encodes depth; RHS references it).
+    // Same visual language as the H1 LHS badge. bg=fg-on-glyph renders
+    // reliably (the badge proves it).
+    headingChip: () => `${bg(palette.heading)}${fg(palette.heading)}█${RESET}`,
     open: (name) => fg(palette[name]),
     reset: () => RESET,
   };

@@ -361,18 +361,17 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // block the width of the level (LCARS tab). The glyph stays in the
       // stream for NO_COLOR parity (strip escapes → `## Heading` as before).
       //
-      // RHS chip (brief: right-edge LCARS tab): `▌`×level in heading
-      // colour at the RHS edge of the text (the content boundary, = body's
-      // right margin). Width matches the LHS badge (1 cell H1, 2 H2…) so
-      // left and right read as a kin pair — bracketed on the H1 line,
-      // tapering with level vertically. fg-only on a visible glyph (renders
-      // reliably; no bg needed). Headers wrap at `width - level` (reserving
-      // `level` columns for the chip); each line padded to `width - level`
-      // and the chip fills the last `level` columns. Every line (the bar
-      // form) bounds the reflow.
+      // RHS chip (brief: right-edge LCARS tab): a solid heading-coloured
+      // block (bg=fg=heading on `█`), constant 1 cell, at the RHS edge of
+      // the text (the content boundary = body's right margin). The chip is
+      // the H1 unit — a fixed reference the LHS badge is measured against
+      // (LHS encodes depth by growing; RHS references it by staying
+      // constant). Same visual language as the H1 LHS badge. bg=fg-on-glyph
+      // renders reliably (the badge proves it). Headers wrap at `width-1`
+      // (reserving 1 column); each line padded to `width-1`, chip fills the
+      // last column. Every line (the bar form) bounds the reflow.
       const markers = "#".repeat(level);
-      const chipW = level;
-      const wrapW = width - chipW;
+      const wrapW = width - 1;
       const lines = wrapANSI(markers + " " + stripHtml(children), { width: wrapW });
       return (
         lines
@@ -383,7 +382,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
                 ? styler.headingBadge(markers) +
                   styler.roleBold("heading", l.slice(markers.length))
                 : styler.roleBold("heading", l);
-            return padDisplay(body, wrapW) + styler.headingChip(level);
+            return padDisplay(body, wrapW) + styler.headingChip();
           })
           .join("\n") + "\n\n"
       );

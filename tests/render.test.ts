@@ -41,8 +41,8 @@ describe("render — headings", () => {
 //    bookend to the left badge. The chip IS the rhs margin for headers.
 //    Structural parity: plain space in NO_COLOR (strip escapes → identical).
 describe("render — heading RHS chip (right-edge tab)", () => {
-  // Default-palette heading colour is #bd93f9 → fg on `▌` (left half-block).
-  const CHIP = "\x1b[38;2;189;147;249m▌\x1b[0m";
+  // Default-palette heading colour is #bd93f9 → bg=fg on `█` (solid block).
+  const CHIP = "\x1b[48;2;189;147;249m\x1b[38;2;189;147;249m█\x1b[0m";
 
   test("chip present at the RHS edge of the text (content boundary)", async () => {
     const w = 40;
@@ -88,12 +88,12 @@ describe("render — heading RHS chip (right-edge tab)", () => {
     }
   });
 
-  test("NO_COLOR parity: chip is a plain `▌`, lines identical", async () => {
+  test("NO_COLOR parity: chip is a plain `█`, lines identical", async () => {
     const src = "# " + "heading word ".repeat(6);
     const tc = await render(src, 26, "truecolor");
     const none = await render(src, 26, "none");
     expect(none).not.toContain("\x1b");
-    expect(none).toContain("▌"); // glyph present in plain mode too
+    expect(none).toContain("█"); // glyph present in plain mode too
     // Structural parity: strip escapes from truecolor → identical lines.
     expect(stripANSI(tc).split("\n")).toEqual(none.split("\n"));
   });
@@ -109,14 +109,15 @@ describe("render — heading RHS chip (right-edge tab)", () => {
     for (const l of lines(next)) if (l.includes(CHIP)) expect(l.endsWith(CHIP)).toBe(true);
   });
 
-  test("chip width matches the LHS badge (▌×level: H1=1, H2=2, H3=3)", async () => {
+  test("chip is constant 1 cell (the H1 unit) regardless of level", async () => {
     const h1 = await render("# One", 40);
     const h2 = await render("## Two", 40);
     const h3 = await render("### Three", 40);
-    // H1: 1-cell chip `▌`, H2: `▌▌`, H3: `▌▌▌` — mirrors the badge width.
-    expect(lines(h1)[1]).toEndWith("\x1b[38;2;189;147;249m▌\x1b[0m");
-    expect(lines(h2)[1]).toEndWith("\x1b[38;2;189;147;249m▌▌\x1b[0m");
-    expect(lines(h3)[1]).toEndWith("\x1b[38;2;189;147;249m▌▌▌\x1b[0m");
+    // The RHS chip is the H1 unit, constant — a fixed reference the LHS
+    // badge (which grows with level) is measured against.
+    expect(lines(h1)[1]).toEndWith(CHIP);
+    expect(lines(h2)[1]).toEndWith(CHIP);
+    expect(lines(h3)[1]).toEndWith(CHIP);
   });
 });
 
