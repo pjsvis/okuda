@@ -9,7 +9,7 @@ describe("render — tables (uniform presentation policy)", () => {
   test("header cyan+bold, rule kept, amber first column, loose rows", async () => {
     const out = await renderDocument(
       "| Name | Qty |\n|---|---|\n| x | 1 |\n| y | 2 |\n",
-      { width: W },
+      { width: W, palette: DEFAULT_PALETTE },
     );
     const ls = out.split("\n").map((l) => l.trim() === "" ? "" : l);
     // header row: pine bold
@@ -44,7 +44,7 @@ describe("render — tables (uniform presentation policy)", () => {
   test("header grid: │ separators between header cells, full-width rules", async () => {
     const out = await renderDocument(
       "| Name | Qty |\n|---|---|\n| x | 1 |\n",
-      { width: W },
+      { width: W, palette: DEFAULT_PALETTE },
     );
     const ls = out.split("\n").map((l) => l);
     // header row has │ between cells (muted pipe, colour mode)
@@ -123,7 +123,7 @@ describe("render — tables (uniform presentation policy)", () => {
   test("inline styles inside cells survive", async () => {
     const out = await renderDocument(
       "| k |\n|--|\n| **bold** cell |\n",
-      { width: W },
+      { width: W, palette: DEFAULT_PALETTE },
     );
     expect(out).toContain("\x1b[38;2;255;184;108;1mbold\x1b[0m");
   });

@@ -122,6 +122,9 @@ describe("palette — defaults + override loader", () => {
   });
 
   test("override file replaces known roles, ignores junk", () => {
+    // Pinned to the dracula preset (brief option b): the assertions anchor
+    // to Dracula bytes, and the override mechanism is base-independent —
+    // the runtime default is the okuda preset since the 2026-08-25 flip.
     const path = tempFile("palette.json");
     writeFileSync(
       path,
@@ -131,20 +134,22 @@ describe("palette — defaults + override loader", () => {
         "unknown-role": "#00ff00",
       }),
     );
-    const p = loadPalette({ path });
+    const p = loadPalette({ name: "dracula", path });
     expect(p["diagram-arrow"]).toBe("#ff0000");
     expect(p.heading).toBe("#bd93f9"); // invalid value ignored
   });
 
-  test("malformed JSON → defaults, no throw", () => {
+  test("malformed JSON → base preset, no throw", () => {
     const path = tempFile("palette.json");
     writeFileSync(path, "{broken");
-    const p = loadPalette({ path });
+    const p = loadPalette({ name: "dracula", path });
     expect(p).toEqual(DEFAULT_PALETTE);
   });
 
-  test("missing file → defaults", () => {
-    expect(loadPalette({ path: "/nonexistent/path/palette.json" })).toEqual(DEFAULT_PALETTE);
+  test("missing file → base preset", () => {
+    expect(
+      loadPalette({ name: "dracula", path: "/nonexistent/path/palette.json" }),
+    ).toEqual(DEFAULT_PALETTE);
   });
 
   test("override takes effect through the styler", () => {

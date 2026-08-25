@@ -1,7 +1,7 @@
 # Brief: Fix tests after default-palette flip (Dracula → Okuda)
 
 **Date:** 2026-08-25
-**Status:** Open
+**Status:** Done (2026-08-25, `fix/test-default-palette-explicit` — 140/140 green; loader tests pinned to `name: "dracula"` per option (b))
 **Branch:** feat/rhs-chip-headers
 **Context:** the default palette was flipped from Dracula (glow parity)
 to Okuda (LCARS identity) — convergence achieved, now diverging. Tests
