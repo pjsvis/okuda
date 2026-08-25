@@ -28,6 +28,13 @@ The house-style signature. A loose list where each item opens with a **bold lead
 2. **Keys.** The bold leads render in a high-contrast hue (amber under Okuda, orange under default). The reader scans the keys alone, as if reading a table's first column. Each key is a promise of what the item covers.
 3. **Detail on demand.** The reader drops into the items that interest them and reads the trailing prose. The uninteresting items are skipped, not skimmed.
 
+**Dogfood confirmation (2026-08-26).** Reading the okuda-net post, the
+operator found themselves reading *critically* — the structure invited
+challenge rather than asking to be believed. A slab demands sequential
+faith; a scannable document gives criticism somewhere to stand. The
+pattern is therefore epistemically load-bearing, not decorative: errors
+are findable only in documents that afford the search.
+
 **The trade is explicit.** You give up column alignment (the eye can't vertical-scan a column of values), you gain vertical rhythm and wrap freedom. The author chose breathing room over alignment, and the bold lead preserves the scan path that alignment would have given. The trade is not a loss; it's a redirection of the scan from horizontal (column) to vertical (item).
 
 **Coupling rule.** The bold lead only scans if the renderer colours `strong` in a high-contrast hue. Plain bold on plain text doesn't scan — it's slightly heavier prose. The renderer enables the pattern; the author creates it. Write the lead bold; trust the renderer to make it visible.
