@@ -115,15 +115,19 @@ export function anchorFor(
 }
 
 /** Find the physical index of `anchor` in re-rendered lines, biased to
- *  start near `hint` (reflow shifts by a few lines, not thousands). Returns
- *  the matched index (unclamped), or `hint` if not found (the honest
- *  "lost the place" fallback). Pure. */
-export function findAnchor(lines: string[], anchor: string, hint: number): number {
+ *  start near `hint` and bounded to `maxRadius` (one viewport covers
+ *  small-moderate reflow; a big resize correctly misses and the caller
+ *  falls back to proportional). Returns the matched index, or `-1` if not
+ *  found within the radius — never grabs a distant duplicate, the bug
+ *  that jumped to the top. Pure. */
+export function findAnchor(
+  lines: string[],
+  anchor: string,
+  hint: number,
+  maxRadius: number,
+): number {
   const n = lines.length;
-  // Outward from the hint until every valid index is probed. The radius
-  // must reach both 0 and n-1, so bound by the farther of the two.
-  const radius = Math.max(hint, n - 1);
-  for (let r = 0; r <= radius; r++) {
+  for (let r = 0; r <= maxRadius; r++) {
     const lo = hint - r;
     const hi = hint + r;
     if (lo >= 0 && stripForAnchor(lines[lo] ?? "") === anchor) return lo;
@@ -131,7 +135,20 @@ export function findAnchor(lines: string[], anchor: string, hint: number): numbe
       return hi;
     }
   }
-  return hint;
+  return -1;
+}
+
+/** Proportional scroll: preserve the reading fraction across reflow. The
+ *  robust floor when a text anchor can't be found (big resize, every line
+ *  split). Imprecise but never jumps to the top — the failure mode that
+ *  lost the reader's place. Pure. */
+export function proportionalScroll(
+  oldScroll: number,
+  oldMax: number,
+  newMax: number,
+): number {
+  if (oldMax <= 0) return 0;
+  return Math.round((oldScroll / oldMax) * newMax);
 }
 
 /** Viewport slice: visible lines + the clamped max scroll. Pure. */
@@ -287,18 +304,26 @@ export async function runTui(opts: TuiOptions): Promise<void> {
 
   // Resize: re-render at the new width. Preserve the reading position by
   // anchoring on the non-blank line nearest the viewport middle (the eye
-  // proxy) and pinning it back to the same screen row — physical-line
-  // index would lie when wrapping reflows, and pinning the top line drifts
-  // the eye (brief: resize-content-anchor). Vertical resize doesn't reflow,
-  // so the clamp path (anchor null) keeps index-preservation, honest there.
+  // proxy) and pinning it back to the same screen row. The text-match is
+  // bounded to one viewport — small-moderate reflow hits a near match
+  // precisely; a big resize correctly misses and falls back to
+  // proportional (preserve the reading fraction), which is imprecise but
+  // never jumps to the top. Vertical resize doesn't reflow, so the null
+  // path keeps index-preservation, honest there. (brief:
+  // resize-content-anchor)
   const onWinch = (): void => { void (async () => {
     const height = dims().rows - 1;
+    const oldMax = viewport(lines, 0, height).maxScroll;
     const anchor = anchorFor(lines, scroll, height);
     lines = await renderLines(await readSource(), dims().cols);
     const { maxScroll } = viewport(lines, 0, height);
     if (anchor !== null) {
-      const idx = findAnchor(lines, anchor.text, scroll);
-      scroll = Math.min(Math.max(0, idx - anchor.offset), maxScroll);
+      const idx = findAnchor(lines, anchor.text, scroll, height);
+      if (idx >= 0) {
+        scroll = Math.min(Math.max(0, idx - anchor.offset), maxScroll);
+      } else {
+        scroll = proportionalScroll(scroll, oldMax, maxScroll);
+      }
     } else {
       scroll = Math.min(scroll, maxScroll);
     }

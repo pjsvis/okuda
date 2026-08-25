@@ -95,19 +95,29 @@ In `tui.ts`, `onWinch`:
    fall back to index-preservation + clamp.)
 2. Re-render at the new width.
 3. Walk the new lines, stripped, for the index whose text equals the
-   anchor. Bias the search to start near the old scroll (cheap common
-   case: reflow shifts by a few lines, not thousands).
+   anchor — **bounded to one viewport radius** around the old scroll.
+   Small-moderate reflow hits a near match precisely. A big resize
+   correctly misses (returns `-1`) rather than grabbing a distant
+   duplicate — the bug that jumped to the top.
 4. If found, set scroll so the matched line lands at its **original
    screen row** (`scroll = idx - offset`, clamped). Pinning the middle
-   line to the middle row minimises apparent vertical movement — the
-   lines above and below reflow around a stable eye. If not found, keep
-   the clamped index (the honest "lost the place" case, rare).
+   line to the middle row minimises apparent vertical movement. If not
+   found, fall back to **proportional** (`scroll ≈ oldScroll / oldMax ×
+   newMax`) — imprecise but never jumps to the top, the failure mode
+   that lost the reader's place.
 
 Helpers: `stripForAnchor(line)` (strip ANSI + margin), `anchorFor(lines,
 scroll, height)` (returns `{ text, offset } | null`), `findAnchor(lines,
-anchor, hint)` (outward-biased index lookup). All pure, in `tui.ts` — a
-control-plane concern, not render. (Render's `stripTags` is about
-internal markers, not ANSI; do not reuse it for this.)
+anchor, hint, maxRadius)` (bounded outward-biased lookup, returns `-1` on
+miss), `proportionalScroll(oldScroll, oldMax, newMax)` (the robust floor).
+All pure, in `tui.ts` — a control-plane concern, not render. (Render's
+`stripTags` is about internal markers, not ANSI; do not reuse it.)
+
+**The proportional fallback** is the muppet the brief rejected as a
+*primary* strategy (always imprecise). As a *fallback* for the rare
+big-reflow case, it's the robust floor that stops the jump. The brief's
+rejection was of "proportional *instead of* anchoring"; this is
+"proportional *when* anchoring fails." Different gate.
 
 ## Scope
 

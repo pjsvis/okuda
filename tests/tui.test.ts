@@ -8,6 +8,7 @@ import {
   stripForAnchor,
   anchorFor,
   findAnchor,
+  proportionalScroll,
 } from "../src/tui";
 import { makeStyler } from "../src/ansi";
 import { DEFAULT_PALETTE } from "../src/palette";
@@ -164,30 +165,46 @@ describe("tui — anchorFor (non-blank line nearest the viewport middle)", () =>
   });
 });
 
-describe("tui — findAnchor (reflow-stable index lookup)", () => {
-  test("finds the anchor near the hint", () => {
+describe("tui — findAnchor (bounded reflow-stable index lookup)", () => {
+  test("finds the anchor near the hint within radius", () => {
     const lines = ["  alpha", "  beta", "  gamma"];
-    expect(findAnchor(lines, "gamma", 2)).toBe(2);
+    expect(findAnchor(lines, "gamma", 2, 3)).toBe(2);
   });
   test("biased search returns the nearest of duplicates", () => {
     // Two "  dup" lines; hint near the second should pick index 3.
     const lines = ["  dup", "  x", "  dup", "  dup"];
-    expect(findAnchor(lines, "dup", 3)).toBe(3);
+    expect(findAnchor(lines, "dup", 3, 4)).toBe(3);
     // hint near the first picks index 0.
-    expect(findAnchor(lines, "dup", 0)).toBe(0);
+    expect(findAnchor(lines, "dup", 0, 4)).toBe(0);
   });
   test("anchor shifted by reflow: found at the new index", () => {
     // Old scroll was 5; after reflow the anchor landed at index 3.
     const lines = ["  a", "  b", "  c", "  TARGET", "  e"];
-    expect(findAnchor(lines, "TARGET", 5)).toBe(3);
+    expect(findAnchor(lines, "TARGET", 5, 5)).toBe(3);
   });
-  test("not found → returns hint (honest fallback)", () => {
+  test("not found within radius → returns -1 (never grabs distant dup)", () => {
     const lines = ["  a", "  b"];
-    expect(findAnchor(lines, "missing", 1)).toBe(1);
+    expect(findAnchor(lines, "missing", 1, 2)).toBe(-1);
   });
-  test("hint beyond bounds → clamps to within range", () => {
-    const lines = ["  a", "  b", "  c"];
-    // hint 99, anchor "a" at 0 → search finds it at 0.
-    expect(findAnchor(lines, "a", 99)).toBe(0);
+  test("distant duplicate beyond radius → returns -1 (the top-jump bug fix)", () => {
+    // Anchor at index 0, hint at 50, radius 2: the match is too far.
+    const lines = ["  dup", "", "", "", "", "", "", "", "", "", "  dup"];
+    expect(findAnchor(lines, "dup", 50, 2)).toBe(-1);
+  });
+});
+
+describe("tui — proportionalScroll (the robust floor)", () => {
+  test("preserves the reading fraction across reflow", () => {
+    // Halfway through a 100-line doc → halfway through a 200-line doc.
+    expect(proportionalScroll(50, 100, 200)).toBe(100);
+  });
+  test("oldMax 0 (doc shorter than viewport) → 0", () => {
+    expect(proportionalScroll(0, 0, 50)).toBe(0);
+  });
+  test("top of doc stays top", () => {
+    expect(proportionalScroll(0, 100, 200)).toBe(0);
+  });
+  test("bottom of doc stays bottom", () => {
+    expect(proportionalScroll(100, 100, 200)).toBe(200);
   });
 });
