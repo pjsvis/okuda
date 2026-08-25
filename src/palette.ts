@@ -13,13 +13,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import okudaPreset from "./palettes/okuda.json";
 
-/** Named presets — the identity layers. The default (Dracula/glow) is
- *  DEFAULT_PALETTE below; named presets live in `src/palettes/<name>.json`
- *  and are selectable via `--palette <name>`. */
-const PRESETS: Record<string, Palette> = {
-  okuda: okudaPreset as Palette,
-};
-
 export type Role =
   | "heading"
   | "code-text"
@@ -95,6 +88,15 @@ export const DEFAULT_PALETTE: Palette = {
   "diagram-text": "#d7d7d7",
 };
 
+/** Named presets — the identity layers. The default is the okuda
+ *  preset (LCARS identity, 2026-08-25 divergence); the Dracula/glow
+ *  palette is retained as a named preset (`--palette dracula`) for
+ *  parity comparison. Convergence is achieved; we are now diverging. */
+const PRESETS: Record<string, Palette> = {
+  okuda: okudaPreset as Palette,
+  dracula: DEFAULT_PALETTE,
+};
+
 const RE_HEX = /^#[0-9a-fA-F]{6}$/;
 
 function hexToRgb(hex: string): [number, number, number] {
@@ -133,9 +135,11 @@ export const RESET = "\x1b[0m";
 export function loadPalette(
   opts?: { name?: string; path?: string },
 ): Palette {
+  // Default is the okuda preset (identity, 2026-08-25 divergence).
+  // `--palette dracula` selects the glow-parity palette for comparison.
   const base = opts?.name && PRESETS[opts.name]
     ? PRESETS[opts.name]!
-    : DEFAULT_PALETTE;
+    : PRESETS.okuda!;
   const merged: Palette = { ...base };
   const file =
     opts?.path ?? `${process.env.HOME ?? ""}/.config/okuda/palette.json`;

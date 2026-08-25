@@ -69,30 +69,30 @@ test:
 showcase:
     @./okuda docs/showcase.md --tui
 
-# Render the showcase in the Okuda palette (LCARS identity layer)
+# Render the showcase in the TUI (default = Okuda palette)
 [group('build')]
 okuda:
-    @./okuda docs/showcase.md --tui --palette okuda
+    @./okuda docs/showcase.md --tui
 
 # Render the manifesto in the Okuda palette (the dogfood is the argument)
 [group('build')]
 manifesto-okuda:
-    @./okuda docs/glow-vs-okuda.md --tui --palette okuda
+    @./okuda docs/glow-vs-okuda.md --tui
 
-# Render any file in the TUI (default palette): just view docs/foo.md
+# Render any file in the TUI (Okuda palette, the default): just view docs/foo.md
 [group('build')]
 view file:
     @./okuda {{file}} --tui
 
-# Render any file in the TUI (Okuda palette): just view-ok docs/foo.md
+# Render any file in the Dracula/glow palette (parity comparison): just view-glow docs/foo.md
 [group('build')]
-view-ok file:
-    @./okuda {{file}} --tui --palette okuda
+view-glow file:
+    @./okuda {{file}} --tui --palette dracula
 
-# Render the blog post (the common control surface) in the Okuda palette
+# Render the blog post (the common control surface)
 [group('build')]
 post:
-    @./okuda docs/2026-08-25-the-common-control-surface.md --tui --palette okuda
+    @./okuda docs/2026-08-25-the-common-control-surface.md --tui
 
 # Render the formatting & colour audit (stated expectations vs live output)
 [group('build')]
@@ -104,16 +104,16 @@ audit:
 tables:
     @./okuda docs/tables.md --tui
 
-# Render the RHS-chip dogfood in the Okuda palette TUI
+# Render the RHS-chip dogfood in the TUI (Okuda palette)
 [group('build')]
 chip:
     @just build >/dev/null
-    @./okuda docs/chip-dogfood.md --tui --palette okuda
+    @./okuda docs/chip-dogfood.md --tui
 
-# Render the manifesto (glow vs okuda; the dogfood is the argument)
+# Render the manifesto in the Dracula/glow palette (parity comparison)
 [group('build')]
 manifesto:
-    @./okuda docs/glow-vs-okuda.md --tui
+    @./okuda docs/glow-vs-okuda.md --tui --palette dracula
 
 # ── Registries ───────────────────────────────────────────────
 

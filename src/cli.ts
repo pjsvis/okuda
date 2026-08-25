@@ -7,7 +7,8 @@
  *  - Terminal width: process.stdout.columns, fallback 80.
  *  - --watch: fs.watch + SIGWINCH re-render, debounced, screen cleared.
  *  - --no-color: same as NO_COLOR (plain text, identical line breaks).
- *  - --palette <name>: named preset (e.g. 'okuda'). Default: Dracula/glow.
+ *  - --palette <name>: named preset (e.g. 'dracula' for glow parity).
+ *    Default: okuda (LCARS identity).
  */
 
 import { detectColorMode } from "./ansi";
@@ -33,7 +34,7 @@ function parseArgs(argv: string[]): Args {
     else if (a === "--palette") {
       args.palette = argv[++i] ?? null;
       if (!args.palette) {
-        process.stderr.write("okuda: --palette requires a name (e.g. okuda)\n");
+        process.stderr.write("okuda: --palette requires a name (e.g. dracula)\n");
         process.exit(1);
       }
     } else if (a === "--help" || a === "-h") {
@@ -53,7 +54,7 @@ function parseArgs(argv: string[]): Args {
 }
 
 /** Known preset names, for error messages. */
-const KNOWN_PRESETS = ["okuda"];
+const KNOWN_PRESETS = ["okuda", "dracula"];
 
 async function readSource(file: string | null): Promise<string> {
   if (file) {
