@@ -361,20 +361,14 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // block the width of the level (LCARS tab). The glyph stays in the
       // stream for NO_COLOR parity (strip escapes → `## Heading` as before).
       //
-      // RHS chip (brief: right-edge LCARS tab): a heading-bg space at the
-      // extreme right column of the terminal — the visible right bound,
-      // bookend to the left badge. The chip eats the body's 2-col right
-      // margin so it sits at the visible edge (not 2 cols short). Headers
-      // wrap at `width` (content_width = body parity — no wrap
-      // inconsistency); the line is then padded to `fullWidth - 1` (the
-      // pre-left-margin width that reaches the terminal edge minus the
-      // chip cell) and the chip fills the last column. Every line (the bar
-      // form) bounds the reflow on resize.
+      // RHS chip (brief: right-edge LCARS tab) — DIAGNOSTIC STATE: the
+      // chip is placed immediately after the heading text on every line,
+      // no padding, no far-right logic. This isolates the variable
+      // (position) from the question (does bg-on-a-bare-space render).
+      // Visible here → bg works, reposition to the right. Invisible here
+      // → terminal won't paint bg on a bare space; pivot to a glyph.
       const markers = "#".repeat(level);
       const lines = wrapANSI(markers + " " + stripHtml(children), { width });
-      // Pre-left-margin line width that fills the terminal: fullWidth - 2
-      // (left margin) ; the chip occupies the last of those columns.
-      const target = Math.max(width + 1, ctx.fullWidth - 2);
       return (
         lines
           .map((l, i) => {
@@ -384,7 +378,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
                 ? styler.headingBadge(markers) +
                   styler.roleBold("heading", l.slice(markers.length))
                 : styler.roleBold("heading", l);
-            return padDisplay(body, target - 1) + styler.headingChip();
+            return body + styler.headingChip();
           })
           .join("\n") + "\n\n"
       );

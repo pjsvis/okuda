@@ -53,15 +53,14 @@ describe("render — heading RHS chip (right-edge tab)", () => {
     expect(hdr.endsWith(CHIP)).toBe(true);
   });
 
-  test("short header still gets the chip at the terminal right edge (not floating)", async () => {
+  test("short header still gets the chip immediately after the text", async () => {
     const w = 20;
     const out = await render("# Hi", w);
     const hdr = lines(out)[1]!;
     expect(hdr.endsWith(CHIP)).toBe(true);
-    // The chip is at the extreme right column: the full line display
-    // width (escapes stripped) = terminal width (the chip eats the
-    // body's 2-col right margin so it sits at the visible edge).
-    expect(displayWidth(stripANSI(hdr))).toBe(w);
+    // Diagnostic state: chip sits right after the body (no padding to the
+    // right edge), so the line is short — left margin + badge + text + chip.
+    expect(displayWidth(stripANSI(hdr))).toBeLessThan(w);
   });
 
   test("chip on every line of a wrapped header (the bar form)", async () => {
@@ -76,16 +75,15 @@ describe("render — heading RHS chip (right-edge tab)", () => {
     for (const l of hdrLines) expect(l.endsWith(CHIP)).toBe(true);
   });
 
-  test("header text wraps at content_width (body parity — no wrap inconsistency)", async () => {
-    // Headers wrap at the same content_width as body paragraphs; the
-    // chip eats the 2-col right margin beyond that. The full header
-    // line (left margin + text region + gap + chip) = terminal width.
+  test("header text wraps at content_width (chip follows the wrapped text)", async () => {
+    // Diagnostic state: the chip trails the wrapped text on each line;
+    // the line stays within the terminal width.
     const w = 24;
     const out = await render("# " + "x".repeat(40), w);
     for (const l of lines(out)) {
       if (!l.includes(CHIP)) continue;
-      // The chip sits at the extreme right column: full line = w.
-      expect(displayWidth(stripANSI(l))).toBe(w);
+      expect(displayWidth(stripANSI(l))).toBeLessThanOrEqual(w);
+      expect(l.endsWith(CHIP)).toBe(true);
     }
   });
 
