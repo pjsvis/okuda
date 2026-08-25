@@ -5,3 +5,4 @@
 {"file":"005-render-engine-string-protocols.md","date":"2026-08-24","status":"Accepted","summary":"Render engine uses string protocols over Bun.markdown's string-in/string-out callbacks","meta":{}}
 {"file":"006-glow-dark-palette.md","date":"2026-08-24","status":"Accepted","summary":"Glow (glamour) dark palette as the default","meta":{}}
 {"file":"007-glow-visual-reference.md","date":"2026-08-24","status":"Accepted","summary":"Glow is the visual reference; diverge only for an okuda thing","meta":{}}
+{"file":"008-diagram-borders-are-blueline.md","date":"2026-08-25","status":"Accepted","summary":"Diagram borders are blueline, not recessive","meta":{}}
