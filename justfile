@@ -79,6 +79,16 @@ okuda:
 manifesto-okuda:
     @./okuda docs/glow-vs-okuda.md --tui --palette okuda
 
+# Render any file in the TUI (default palette): just view docs/foo.md
+[group('build')]
+view file:
+    @./okuda {{file}} --tui
+
+# Render any file in the TUI (Okuda palette): just view-ok docs/foo.md
+[group('build')]
+view-ok file:
+    @./okuda {{file}} --tui --palette okuda
+
 # Render the blog post (the common control surface) in the Okuda palette
 [group('build')]
 post:
