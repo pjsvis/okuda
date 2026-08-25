@@ -79,6 +79,11 @@ okuda:
 manifesto-okuda:
     @./okuda docs/glow-vs-okuda.md --tui --palette okuda
 
+# Render the blog post (the common control surface) in the Okuda palette
+[group('build')]
+post:
+    @./okuda docs/2026-08-25-the-common-control-surface.md --tui --palette okuda
+
 # Render the formatting & colour audit (stated expectations vs live output)
 [group('build')]
 audit:
