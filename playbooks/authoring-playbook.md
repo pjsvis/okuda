@@ -56,6 +56,37 @@ This playbook is a twisted pun on the textbook line. The textbooks said "this sh
 
 Our version inverts it. The bold-lead pattern is the opposite of a margin note: it surfaces the discovery, makes it scannable, lets the interested reader find it without reading everything. The trade is explicit, and the trade is the point — we give the reader the keys and let them choose the doors. Nothing is left as an exercise; everything is either a key or a door, and the reader picks.
 
+## The vertical-pipe blockquote
+
+A blockquote renders as a single muted `│` pipe down the left edge, with
+the quoted text wrapped to content width beside it. It is a *pull-aside*, not
+a flow element:
+
+```markdown
+> Named for Michael Okuda: high-contrast, functional, uncluttered. The
+> terminal is the display, not a browser in denial.
+```
+
+renders as:
+
+```
+  │ Named for Michael Okuda: high-contrast, functional, uncluttered. The
+  │ terminal is the display, not a browser in denial.
+```
+
+**Why it earns its place.** The pipe sets the block apart from the through-line.
+It signals: *this is worth remembering, but it is not part of the argument's
+flow — read it, hold it, then return to the thread.* An aphorism, a definition,
+a memorable statement the reader should carry forward. Glow's version (a `|` on
+every line, tightly wrapped) reads as quoted prose; okuda's reads as a
+pull-quote. The pipe recedes (muted gray) so the *content* pops; the pipe's
+*presence* is the signal, its colour the silence.
+
+**Authoring rule.** Use blockquotes for statements the reader should remember,
+not for long quoted passages. If the quote is more than ~3 lines of argument,
+it belongs in the body prose. The pipe is for the aphorism, the maxim, the
+definition — the thing you'd underline.
+
 ## Heuristics, emerging
 
 Add here as they surface from dogfooding. Each entry: the pattern, why it earns its place, the perceptual property it serves.
@@ -64,4 +95,5 @@ Add here as they surface from dogfooding. Each entry: the pattern, why it earns 
 - **Loose lists.** Discrete blocks, reduced scan tension. Calming.
 - **Hash headers only.** Unambiguous structure, LCARS-tab rendering. Calming.
 - **Front matter elided.** Provenance is not content. Calming.
+- **Vertical-pipe blockquote.** Pull-aside signal — worth remembering, not in the flow. Leading (sets the block apart).
 - **Short paragraphs.** Wrap-early prose reads as discrete blocks; long paragraphs read as a wall. The renderer hard-wraps at width, but short source paragraphs add an extra beat. (Dogfood to confirm.)
