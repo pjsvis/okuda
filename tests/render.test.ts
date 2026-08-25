@@ -41,8 +41,8 @@ describe("render — headings", () => {
 //    bookend to the left badge. The chip IS the rhs margin for headers.
 //    Structural parity: plain space in NO_COLOR (strip escapes → identical).
 describe("render — heading RHS chip (right-edge tab)", () => {
-  // Default-palette heading colour is #bd93f9 → bg=fg on `█` (solid block).
-  const CHIP = "\x1b[48;2;189;147;249m\x1b[38;2;189;147;249m█\x1b[0m";
+  // Default-palette muted colour is #585858 → bg=fg on `█` (solid block).
+  const CHIP = "\x1b[48;2;88;88;88m\x1b[38;2;88;88;88m█\x1b[0m";
 
   test("chip present at the RHS edge of the text (content boundary)", async () => {
     const w = 40;

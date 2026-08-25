@@ -77,12 +77,14 @@ export interface Styler {
    *  Under `none`, returns the markers unchanged (NO_COLOR parity: the
    *  hashes are still there, just invisible in colour mode). */
   headingBadge(markers: string): string;
-  /** Heading RHS chip: a solid heading-coloured block (bg=fg=heading
-   *  on `█`), constant 1 cell — the H1 unit, a fixed reference the LHS
-   *  badge is measured against (LHS encodes depth; RHS references it).
-   *  Same visual language as the H1 LHS badge (a solid colour block).
-   *  fg-on-glyph + bg=fg renders reliably (the badge proves it). Under
-   *  `none`, the plain `█` (visible in both — structural parity). */
+  /** Heading RHS chip: a solid muted-coloured block (bg=fg=muted on `█`),
+   *  constant 1 cell — the H1 unit, a fixed reference the LHS badge is
+   *  measured against (LHS encodes depth; RHS references it). Muted, not
+   *  heading-coloured: the chip does structural work (coordinate frame),
+   *  not declarative work — it orients without demanding attention. Same
+   *  colour as the Gloam footer's structural text, completing the diagonal:
+   *  heading blue on top+LHS (content), muted on RHS+footer (viewer chrome).
+   *  Under `none`, the plain `█` (structural parity). */
   headingChip(): string;
   /** Open sequence for a role (for state-machine re-emission). */
   open(name: keyof Palette): string;
@@ -155,12 +157,13 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     // block the width of the level (1 char H1, 6 chars H6). LCARS tab.
     headingBadge: (markers) =>
       `${bg(palette.heading)}${fg(palette.heading)}${markers}${RESET}`,
-    // Heading RHS chip — a solid heading-coloured block (bg=fg=heading
-    // on `█`), constant 1 cell. The H1 unit, a fixed reference the LHS
-    // badge is measured against (LHS encodes depth; RHS references it).
-    // Same visual language as the H1 LHS badge. bg=fg-on-glyph renders
-    // reliably (the badge proves it).
-    headingChip: () => `${bg(palette.heading)}${fg(palette.heading)}█${RESET}`,
+    // Heading RHS chip — a solid muted-coloured block (bg=fg=muted on
+    // `█`), constant 1 cell. The chip does structural work (coordinate
+    // frame), not declarative — muted, not heading-coloured, so it orients
+    // without demanding attention. Same colour as the Gloam footer's
+    // structural text, completing the diagonal: heading blue top+LHS
+    // (content), muted RHS+footer (viewer chrome).
+    headingChip: () => `${bg(palette.muted)}${fg(palette.muted)}█${RESET}`,
     open: (name) => fg(palette[name]),
     reset: () => RESET,
   };
