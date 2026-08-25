@@ -108,7 +108,7 @@ describe("palette — defaults + override loader", () => {
   test("defaults match the contract table byte-exactly", () => {
     expect(DEFAULT_PALETTE.heading).toBe("#bd93f9");
     expect(DEFAULT_PALETTE["code-text"]).toBe("#50fa7b");
-    expect(DEFAULT_PALETTE["code-background"]).toBe("#303030");
+    expect(DEFAULT_PALETTE["code-background"]).toBe("");
     expect(DEFAULT_PALETTE.blockquote).toBe("#767676");
     expect(DEFAULT_PALETTE.link).toBe("#00af5f");
     expect(DEFAULT_PALETTE.emphasis).toBe("#f1fa8c");
@@ -131,7 +131,7 @@ describe("palette — defaults + override loader", () => {
         "unknown-role": "#00ff00",
       }),
     );
-    const p = loadPalette(path);
+    const p = loadPalette({ path });
     expect(p["diagram-arrow"]).toBe("#ff0000");
     expect(p.heading).toBe("#bd93f9"); // invalid value ignored
   });
@@ -139,12 +139,12 @@ describe("palette — defaults + override loader", () => {
   test("malformed JSON → defaults, no throw", () => {
     const path = tempFile("palette.json");
     writeFileSync(path, "{broken");
-    const p = loadPalette(path);
+    const p = loadPalette({ path });
     expect(p).toEqual(DEFAULT_PALETTE);
   });
 
   test("missing file → defaults", () => {
-    expect(loadPalette("/nonexistent/path/palette.json")).toEqual(DEFAULT_PALETTE);
+    expect(loadPalette({ path: "/nonexistent/path/palette.json" })).toEqual(DEFAULT_PALETTE);
   });
 
   test("override takes effect through the styler", () => {

@@ -11,6 +11,14 @@
  */
 
 import { existsSync, readFileSync } from "node:fs";
+import okudaPreset from "./palettes/okuda.json";
+
+/** Named presets — the identity layers. The default (Dracula/glow) is
+ *  DEFAULT_PALETTE below; named presets live in `src/palettes/<name>.json`
+ *  and are selectable via `--palette <name>`. */
+const PRESETS: Record<string, Palette> = {
+  okuda: okudaPreset as Palette,
+};
 
 export type Role =
   | "heading"
@@ -61,11 +69,16 @@ export type Palette = Record<Role, string>;
  *   border = muted, arrow = link green, text = doc near-white.
  * Table roles keep okuda's semantic layer (brief: table policy), tuned
  * to the Glow palette: header = heading blue, key = Glow H1 pale yellow.
+ *
+ * code-background: empty string ("") in the default = no background emitted
+ * (glow parity, Pass B). A named preset (e.g. okuda) or a user override
+ * sets a real hex to emit a code panel (the Okuda affordance — a
+ * content-sized coloured block behind fenced code, LCARS-style).
  */
 export const DEFAULT_PALETTE: Palette = {
   heading: "#bd93f9",
   "code-text": "#50fa7b",
-  "code-background": "#303030",
+  "code-background": "",
   blockquote: "#767676",
   link: "#00af5f",
   "link-text": "#ff79c6",
@@ -107,14 +120,25 @@ export function bg(hex: string): string {
 export const RESET = "\x1b[0m";
 
 /**
- * Load the user palette override from `path` (default
- * ~/.config/okuda/palette.json). Malformed files and invalid values are
- * ignored — the default palette applies. Unknown roles are ignored.
+ * Load a palette. Resolution order (later wins):
+ *   1. DEFAULT_PALETTE (Dracula/glow parity) if no `name`.
+ *   2. Named preset (`name` → src/palettes/<name>.json) if given.
+ *   3. User override file (`~/.config/okuda/palette.json`, or `path`).
+ *
+ * Malformed override files and invalid values are ignored — the base
+ * palette (default or preset) applies. Unknown roles are ignored.
+ * `code-background` may be the empty string ("" = no bg, glow parity) or
+ * a valid hex (panel emitted).
  */
-export function loadPalette(path?: string): Palette {
-  const merged: Palette = { ...DEFAULT_PALETTE };
+export function loadPalette(
+  opts?: { name?: string; path?: string },
+): Palette {
+  const base = opts?.name && PRESETS[opts.name]
+    ? PRESETS[opts.name]!
+    : DEFAULT_PALETTE;
+  const merged: Palette = { ...base };
   const file =
-    path ?? `${process.env.HOME ?? ""}/.config/okuda/palette.json`;
+    opts?.path ?? `${process.env.HOME ?? ""}/.config/okuda/palette.json`;
   if (!file || !existsSync(file)) return merged;
   try {
     const parsed: unknown = JSON.parse(readFileSync(file, "utf8"));
@@ -122,8 +146,15 @@ export function loadPalette(path?: string): Palette {
       for (const [key, value] of Object.entries(
         parsed as Record<string, unknown>,
       )) {
-        if (key in merged && typeof value === "string" && RE_HEX.test(value)) {
-          merged[key as Role] = value.toLowerCase();
+        // code-background may be "" (no bg) or a hex; other roles must be hex.
+        const ok =
+          key === "code-background"
+            ? value === "" || RE_HEX.test(value)
+            : RE_HEX.test(value);
+        if (key in merged && typeof value === "string" && ok) {
+          merged[key as Role] = key === "code-background"
+            ? (value as string)
+            : (value as string).toLowerCase();
         }
       }
     }

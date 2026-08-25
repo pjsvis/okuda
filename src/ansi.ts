@@ -116,11 +116,17 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     badge: (text) => `${bg(palette["badge-bg"])}${fg(palette["badge-fg"])} ${text} ${RESET}`,
     bold: (text) => wrap("\x1b[1m", text),
     strike: (text) => wrap("\x1b[9m", text),
-    // Pass B (2026-08-24): code background dropped — glow renders code
-    // spans/fences with colour only, no bg (the bg read as a blurry box).
-    // Backticks stripped from codespan — the colour is the signal, not
-    // the delimiters (supersedes brief 002's 'backticks preserved' row).
-    codeLine: (line) => `${fg(palette["code-text"])}${line}${RESET}`,
+    // Pass B (2026-08-24): code background dropped for glow parity (the
+    // bg read as a blurry box). The `okuda` preset re-activates it
+    // (2026-08-25): a content-sized coloured panel behind fenced code —
+    // the LCARS affordance, a deliberate divergence from glow.
+    // Empty code-background = no bg (default); hex = bg emitted.
+    codeLine: (line) => {
+      const cdbg = palette["code-background"];
+      return cdbg
+        ? `${bg(cdbg)}${fg(palette["code-text"])}${line}${RESET}`
+        : `${fg(palette["code-text"])}${line}${RESET}`;
+    },
     codespan: (text) => `${fg(palette["code-text"])}${text}${RESET}`,
     // Pass C (2026-08-24): glow-faithful link — rose text + visible
     // cyan-underlined URL, no OSC 8. The URL is displayed inline (the

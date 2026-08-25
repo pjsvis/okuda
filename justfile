@@ -69,6 +69,16 @@ test:
 showcase:
     @./okuda docs/showcase.md --tui
 
+# Render the showcase in the Okuda palette (LCARS identity layer)
+[group('build')]
+okuda:
+    @./okuda docs/showcase.md --tui --palette okuda
+
+# Render the manifesto in the Okuda palette (the dogfood is the argument)
+[group('build')]
+manifesto-okuda:
+    @./okuda docs/glow-vs-okuda.md --tui --palette okuda
+
 # Render the formatting & colour audit (stated expectations vs live output)
 [group('build')]
 audit:

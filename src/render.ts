@@ -210,14 +210,100 @@ export async function renderDocument(
     mermaid: new Map(),
   };
 
-  // Pre-pass: intercept mermaid fences → pipe to binary → placeholder tokens.
-  const source2 = await interceptMermaid(source, opts, ctx);
+  // Pre-pass 1: elide YAML front matter (document-start `---\n…\n---`).
+  // CommonMark parses this as setext h2 (the keys promoted to a heading)
+  // because the closing `---` is an h2 underline. Front matter is provenance,
+  // not content — elide entirely (foxtrot oscar on the setext trap).
+  const source1 = stripFrontMatter(source);
 
-  const rendered = Bun.markdown.render(source2, handlers(ctx), {
+  // Pre-pass 2: neutralise mid-document setext headings. A `---` (or `***`,
+  // `___`) line directly under non-blank text is a setext h2 underline, not
+  // a thematic break. Headers use hashes (gravitas, not underlines); insert
+  // a blank line before the rule so Bun.markdown sees a paragraph + hr.
+  const source2 = neutraliseSetext(source1);
+
+  // Pre-pass 3: intercept mermaid fences → pipe to binary → placeholder tokens.
+  const source3 = await interceptMermaid(source2, opts, ctx);
+
+  const rendered = Bun.markdown.render(source3, handlers(ctx), {
     ...PARSER_OPTIONS,
   });
 
   return finalize(rendered);
+}
+
+/**
+ * Strip YAML front matter from document start: `^---\n…\n---\n`.
+ * Elided entirely — provenance is not content. (Glow strips it silently;
+ * okuda's position is the same: front matter is for tools, not readers.)
+ */
+function stripFrontMatter(source: string): string {
+  const m = source.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/);
+  return m ? source.slice(m[0].length) : source;
+}
+
+/**
+ * A line is a thematic-break rule if it is ONLY 3+ of `-`, `*`, or `_`,
+ * optionally with 1-3 leading spaces and trailing spaces/tabs.
+ * (CommonMark thematic break form — the same characters that, when directly
+ * under non-blank text, double as a setext h2 underline.)
+ */
+function isThematicBreakLine(line: string): boolean {
+  const s = line.replace(/[ \t]+$/, ""); // trailing ws
+  if (s.length < 3) return false;
+  const c = s[0];
+  if (c !== "-" && c !== "*" && c !== "_") return false;
+  return [...s].every((ch) => ch === c);
+}
+
+/**
+ * A line is a setext h1 underline if it is ONLY 1+ `=`, optionally with
+ * trailing spaces/tabs. (No leading-space form per CommonMark.) `===` has no
+ * alternate valid meaning in okuda's grammar — it is setext-only, so it is
+ * stripped; the text above becomes a plain paragraph.
+ */
+function isSetextH1Line(line: string): boolean {
+  const s = line.replace(/[ \t]+$/, "");
+  if (s.length < 1) return false;
+  return [...s].every((ch) => ch === "=");
+}
+
+/**
+ * Neutralise setext headings, *outside* fenced code blocks. Headers use `#`
+ * only — gravitas, not underlines. Two cases:
+ *
+ *  - h2 underline (`---`/`***`/`___` under non-blank text): the line is also a
+ *    valid thematic break, so insert a blank line before it → Bun.markdown
+ *    parses it as hr (the operator's "`---` is a horizontal line").
+ *  - h1 underline (`===` under non-blank text): `=` has no alternate meaning,
+ *    so strip the line; the text above becomes a plain paragraph.
+ */
+function neutraliseSetext(source: string): string {
+  const lines = source.split("\n");
+  let inFence = false;
+  let fence = "";
+  for (let i = 0; i < lines.length; i++) {
+    const cur = lines[i];
+    // Toggle fenced-code state (``` or ~~~). Must run for line 0 too —
+    // a document may open with a code fence.
+    const open = cur.match(/^( {0,3})(`{3,}|~{3,})/);
+    if (open && (fence === "" || open[2][0] === fence[0])) {
+      inFence = !inFence;
+      fence = inFence ? open[2][0] : "";
+      continue;
+    }
+    if (inFence) continue;
+    if (i === 0) continue; // no previous line to form a setext pair
+    if (lines[i - 1].trim() === "") continue;
+    if (isThematicBreakLine(cur)) {
+      lines.splice(i, 0, "");
+      i++; // skip the inserted blank line
+    } else if (isSetextH1Line(cur)) {
+      lines.splice(i, 1); // strip the `===` underline
+      i--; // re-examine this index (next line shifted up)
+    }
+  }
+  return lines.join("\n");
 }
 
 /** Replace mermaid fences with placeholder tokens; stash classified art. */
