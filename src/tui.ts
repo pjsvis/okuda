@@ -165,6 +165,30 @@ export function viewport(
 const HINTS = "q quit · j/k scroll · g/G top/bottom · Ctrl-D/U half · r reload";
 
 /** Display path: folder/basename (Glow convention). Pure. */
+/** ADR-010 re-anchor as a pure function: given the pre- and post-re-render
+ *  lines and the old scroll, return the scroll that pins the old anchor
+ *  (non-blank line nearest the viewport middle — the eye proxy) back to
+ *  its screen row; bounded text-match first, proportional fallback when
+ *  the match misses, index-preservation when there is no anchor.
+ *  Shared by reload (r) and resize (SIGWINCH); fs.watch joins them later
+ *  (brief: tui-live-documents). Pure. */
+export function reanchoredScroll(
+  oldLines: string[],
+  newLines: string[],
+  oldScroll: number,
+  height: number,
+): number {
+  const oldMax = viewport(oldLines, 0, height).maxScroll;
+  const anchor = anchorFor(oldLines, oldScroll, height);
+  const { maxScroll } = viewport(newLines, 0, height);
+  if (anchor !== null) {
+    const idx = findAnchor(newLines, anchor.text, oldScroll, height);
+    if (idx >= 0) return Math.min(Math.max(0, idx - anchor.offset), maxScroll);
+    return proportionalScroll(oldScroll, oldMax, maxScroll);
+  }
+  return Math.min(oldScroll, maxScroll);
+}
+
 export function displayPath(file: string): string {
   const parts = file.split("/").filter(Boolean);
   if (parts.length <= 1) return file;
@@ -251,11 +275,18 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     process.stdout.write(footerLine(cols, "Gloam", opts.file, showHints, muted, badge));
   };
 
-  const reload = async (): Promise<void> => {
+  /** Re-render from source, re-anchored (ADR-010 semantics) — the one
+   *  repaint path: resize, manual reload, and (brief: tui-live-documents)
+   *  fs.watch all pin the line under the eye to its screen row. */
+  const rerenderAnchored = async (): Promise<void> => {
+    const height = dims().rows - 1;
+    const oldLines = lines;
     lines = await renderLines(await readSource(), dims().cols);
-    scroll = 0;
+    scroll = reanchoredScroll(oldLines, lines, scroll, height);
     paint();
   };
+
+  const reload = (): void => { void rerenderAnchored(); };
 
   const onKey = (data: Buffer): void => {
     const action = decodeKey(new Uint8Array(data));
@@ -311,24 +342,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   // never jumps to the top. Vertical resize doesn't reflow, so the null
   // path keeps index-preservation, honest there. (brief:
   // resize-content-anchor)
-  const onWinch = (): void => { void (async () => {
-    const height = dims().rows - 1;
-    const oldMax = viewport(lines, 0, height).maxScroll;
-    const anchor = anchorFor(lines, scroll, height);
-    lines = await renderLines(await readSource(), dims().cols);
-    const { maxScroll } = viewport(lines, 0, height);
-    if (anchor !== null) {
-      const idx = findAnchor(lines, anchor.text, scroll, height);
-      if (idx >= 0) {
-        scroll = Math.min(Math.max(0, idx - anchor.offset), maxScroll);
-      } else {
-        scroll = proportionalScroll(scroll, oldMax, maxScroll);
-      }
-    } else {
-      scroll = Math.min(scroll, maxScroll);
-    }
-    paint();
-  })(); };
+  const onWinch = (): void => { void rerenderAnchored(); };
   process.on("SIGWINCH", onWinch);
 
   // Clean exit on signal.

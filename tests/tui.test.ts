@@ -9,6 +9,7 @@ import {
   anchorFor,
   findAnchor,
   proportionalScroll,
+  reanchoredScroll,
 } from "../src/tui";
 import { makeStyler } from "../src/ansi";
 import { DRACULA_PALETTE } from "../src/palette";
@@ -206,5 +207,38 @@ describe("tui — proportionalScroll (the robust floor)", () => {
   });
   test("bottom of doc stays bottom", () => {
     expect(proportionalScroll(100, 100, 200)).toBe(200);
+  });
+});
+
+describe("tui — reanchoredScroll (the one repaint path: reload / resize / watch)", () => {
+  // height 6: mid row is scroll+3. 20 content lines, scrolled to 10:
+  // viewport rows 10..15, anchor = lines[13] ("  line-13"), offset 3.
+  const doc = Array.from({ length: 20 }, (_, i) => `  line-${i}`);
+
+  test("reload on unchanged content keeps the scroll (regression: was reset to 0)", () => {
+    expect(reanchoredScroll(doc, doc, 10, 6)).toBe(10);
+  });
+
+  test("content inserted above the viewport advances the scroll with it", () => {
+    // Three lines prepended: the anchor text moves from 13 to 16.
+    const grown = Array.from({ length: 3 }, (_, i) => `  new-${i}`).concat(doc);
+    expect(reanchoredScroll(doc, grown, 10, 6)).toBe(13);
+  });
+
+  test("content removed above the viewport pulls the scroll back", () => {
+    const shrunk = doc.slice(3); // anchor "line-13" now at index 10
+    expect(reanchoredScroll(doc, shrunk, 10, 6)).toBe(7);
+  });
+
+  test("anchor gone (big edit) → proportional fallback, never top", () => {
+    const rewritten = Array.from({ length: 40 }, (_, i) => `  x-${i}`);
+    const s = reanchoredScroll(doc, rewritten, 10, 6);
+    expect(s).toBeGreaterThan(0); // not the old top-jump
+    expect(s).toBe(Math.round((10 / 14) * 34)); // old fraction of new max
+  });
+
+  test("scroll clamps to the new max when the doc shrinks hard", () => {
+    const tiny = ["  only", "  lines"];
+    expect(reanchoredScroll(doc, tiny, 10, 6)).toBe(0); // maxScroll 0
   });
 });
