@@ -115,6 +115,16 @@ human decides. The computer retrieves; the person acts. In four
 decades of starship bridges, nobody fills in a form; they read a panel,
 and then they do something.
 
+And the design constraints were brutal in exactly the instructive way:
+Okuda was designing for a television picture — NTSC, interlaced, chroma
+smeared, on a CRT watched from across the room. Big flat colour blocks,
+heavy contrast, sparse bold text: the look is the error-correction
+scheme, form following channel capacity. The two audiences were one
+artefact — atmosphere for the casual viewer at broadcast speed, real
+content for the interested reader who paused the tape. The screens
+seldom disappointed because the pauser was the design target, not an
+afterthought.
+
 Which means the sentence at the heart of this architecture — *there is
 no interactivity, just structured information in a readable form,
 reasonably up to date; you decide what to do* — is not reminiscent of
