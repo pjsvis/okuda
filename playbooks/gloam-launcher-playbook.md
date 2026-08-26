@@ -21,7 +21,7 @@ fzf picks, Gloam reads, the loop joins them:
 # ~/.zshrc — gloam launcher: browse → read → browse.
 gloam() {
   local out q="" f
-  printf '\e[?1007l'   # alt-scroll off: dead wheel in the picker
+  printf '\e[?1007h'   # alt-scroll on, one policy: wheel scrolls list AND doc
   while :; do
     out=$(fd -e md |
           env FZF_DEFAULT_OPTS= fzf --no-mouse --prompt='gloam ❯ ' \
@@ -30,11 +30,8 @@ gloam() {
     q=$(head -1 <<<"$out")            # reseed the query next round
     f=$(tail -n +2 <<<"$out")         # the selection
     [[ -n "$f" ]] || break
-    printf '\e[?1007h'   # alt-scroll on: the wheel scrolls Gloam while reading
     okuda --tui "$f"
-    printf '\e[?1007l'   # and off again for the picker
   done
-  printf '\e[?1007h'     # leave the terminal as we found it
 }
 ```
 
@@ -57,16 +54,24 @@ gloam() {
   scroll turns the wheel into a burst of line-events that flies the list.
   `wheel-up` is not a bindable key (fzf 0.73.1: "unsupported key"), so
   mouse is all-or-nothing; all-off is right for a picker.
-- `printf '\e[?1007l'` / `h` — **alt-scroll mode (DECSET 1007), the
-  wheel's last routing layer.** With mouse off and no scrollback,
-  Alacritty still translates wheel events into ↑/↓ arrows for alt-screen
-  apps — a courtesy for `less`/`man` that made the wheel the arrow keys.
-  Off around the picker; **on around the read** — in Gloam those
-  translated arrows hit `decodeKey`'s up/down and the wheel scrolls the
-  document natively. The same terminal courtesy that sabotaged the
-  picker is exactly what the reader wants. (1007 is implemented in
-  Alacritty 0.17.0, `alacritty-escapes(7)`; sources: alacritty issues
-  #2727/#4583.)
+- `printf '\e[?1007h'` — **alt-scroll mode (DECSET 1007), one policy,
+  both surfaces — the wheel's fifth and final incarnation: it came
+  home.** History: with mouse off and no scrollback, Alacritty still
+  translates wheel events into ↑/↓ arrows for alt-screen apps — a
+  courtesy for `less`/`man`. That was killed around the picker in the
+  preview era (a misfire re-ran the preview process — chaos). With the
+  preview retired, a misfire costs one visible row — mild overshoot —
+  so the off/on dance collapsed to a single enable at entry, never
+  disabled: the wheel scrolls whatever alt-screen surface is active
+  (list in the picker, document in the reader), which is exactly what
+  both surfaces want. **Revert criterion:** if Magic Mouse momentum
+  flies the picker list again (the original cause — momentum vs a short
+  discrete list — never changed, only the consequence did), restore the
+  dance from git history. 1007 is implemented in Alacritty 0.17.0
+  (`alacritty-escapes(7)`); sources: alacritty issues #2727/#4583.
+  Portability caveat: the single enable is a no-op on default-on
+  terminals and forces the mode on — leaves it on — for terminals
+  configured alt-scroll-off; accepted for simplicity.
 - Full-screen fzf (no `--height`) — inline mode put the window inside
   terminal scrollback, where `resize:refresh-preview` corrupted geometry
   and the wheel dragged the whole window. The alt screen has no
