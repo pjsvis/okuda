@@ -28,6 +28,14 @@ loop's absence is *observed* to hurt, not anticipated.
 
 ## Constraints when unparked
 
+- **First non-flag fix observed (2026-08-26):** killing the wheel's fourth
+  incarnation required a DECSET 1007 disable/restore dance around fzf —
+  raw terminal-state management from the shell function. The launcher now
+  owns terminal state, not just flags; a binary picker would save/restore
+  it robustly (query + restore). Still config-not-code, so the gate holds,
+  but the environment-config accretion is the thing to watch: reopen the
+  gate if it keeps growing.
+
 - **Amend the Gloam brief, don't bend it silently.**
   `briefs/2026-08-23-brief-gloam-tui-footer.md` scopes Gloam as "a footer,
   not a product name; no second binary, no subcommand." argv[0] dispatch is

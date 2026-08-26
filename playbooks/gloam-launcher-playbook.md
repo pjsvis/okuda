@@ -44,10 +44,11 @@ gloam() {
   bogus-action control) corrupts the window during resize bursts — no
   debounce knob exists — and (b) with `--no-mouse` the wheel, routed to
   scrollback, drags the inline window around instead of the list. The
-  alternate screen retires both: resize repaints natively, and with no
-  scrollback an unhandled wheel does nothing. This is also Glow's own
-  mode. Residual cost: the preview shows stale width after a resize until
-  the next selection change re-runs `okuda` with fresh
+  alternate screen retires the resize corruption (repaints natively) and
+  removes scrollback — necessary but, as it turned out, not sufficient for
+  the wheel: alt-scroll (below) still translated it into arrows. This is
+  Glow's own mode. Residual cost: the preview shows stale width after a
+  resize until the next selection change re-runs `okuda` with fresh
   `FZF_PREVIEW_COLUMNS` — one keystroke.
 - `--no-mouse` — keyboard-only picking. Mouse is on by default, and an
   Apple Magic Mouse's momentum scrolling turns the wheel into a machine-gun
@@ -56,19 +57,30 @@ gloam() {
   a bindable key (fzf 0.73.1: "unsupported key"), so there is no
   scroll-off-click-on middle setting; mouse is all-or-nothing, and all-off
   is right for a picker. Cost: click-to-select goes too (arrows + Enter are
-  the way). With mouse off, the terminal routes the wheel to its own
-  scrollback — fatal in inline `--height` mode (the window lives in the
-  scrollback; momentum scrolling drags the whole picker around, same
-  symptom as the list-scroll bug, new victim), harmless in full-screen
-  mode: the alternate screen has no scrollback, so an unhandled wheel is a
-  dead wheel. That is the point. Flag verified: bogus-flag control
-  rejected, `--no-mouse` accepted (hidden from terse `--help`, listed in
-  `--man`).
+  the way). Flag verified: bogus-flag control rejected, `--no-mouse`
+  accepted (hidden from terse `--help`, listed in `--man`). The wheel
+  itself survived — see alt-scroll below.
 - `|| return` — a cancelled pick (Esc) is not an error; the function
   returns silently instead of launching okuda with an empty path.
 - `[[ -n "$f" ]] || return` — fzf's exit-0 empty-selection case (Enter on
   an empty list, e.g. no `.md` files in scope): exit silently rather than
   feed `okuda --tui ""` a usage error.
+- `printf '\e[?1007l'` / `printf '\e[?1007h'` — **the wheel's fourth and
+  final incarnation: alt-scroll.** With mouse off and no scrollback, the
+  wheel *still* ran the list: Alacritty's alternate scroll mode (DECSET
+  1007, on by default) translates wheel events into ↑/↓ key sequences
+  when an alt-screen app hasn't enabled mouse reporting — a courtesy for
+  `less`/`man` that made the wheel literally the arrow keys. Disabling
+  before fzf takes the alt screen (maintainer guidance: the mode is
+  honoured at entry) and restoring after kills the last routing layer:
+  alt screen (no scrollback) + no mouse reporting + alt-scroll off = a
+  genuinely dead wheel. 1007 is in Alacritty's implemented escape list
+  (0.17.0, `alacritty-escapes(7)`); sources: alacritty issues #2727/#4583.
+  Restore caveat: `?1007h` restores Alacritty's *default*; a terminal
+  configured with alt-scroll globally off would be flipped on — acceptable
+  here, noted for portability. Telemetry dividend: at momentum-scroll
+  rates every wheel tick spawned a fresh `okuda` preview process and the
+  renderer kept pace — the pipeline's unplanned stress test, passed.
 
 ## The width fix the preview depends on
 
