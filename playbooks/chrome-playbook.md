@@ -172,6 +172,15 @@ speaks the standard escape protocols.
 inside the reader) would cost native selection and add terminal-state
 management — the parked `reader-mouse-wheel` brief exists, and this
 ledger is the argument for keeping it parked. Pick terminals that gift
-capabilities; write less code. (URL tuning note: `link-url` sits at
-`#5e8bbf` — heading's blue family at 40% luminance — so links whisper
-while headings speak.)
+capabilities; write less code.
+
+- **Hue-per-role census (2026-08-26).** Blue was two hexes over four
+  roles (heading + table-header shared `#99ccff`; link-url +
+  diagram-border shared `#5e8bbf`) — tables and URLs masqueraded as
+  headings. The settled map: **blue = document structure** (headings,
+  diagram blueline per ADR-008), **warm gold/amber/sand = voice and
+  data** (emphasis, strong, badge, table-key `#ffcc66`, table-header
+  `#c8b878` — quieter than key: headers repeat, keys carry), **sea
+  green = links** (`link-url` `#4d9e7a`, reviving the palette's legacy
+  link role — and the web's own link affordance). URLs are the quietest
+  chromatic role (27% luminance): plumbing, readable when sought.
