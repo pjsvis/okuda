@@ -179,8 +179,16 @@ capabilities; write less code.
   diagram-border shared `#5e8bbf`) — tables and URLs masqueraded as
   headings. The settled map: **blue = document structure** (headings,
   diagram blueline per ADR-008), **warm gold/amber/sand = voice and
-  data** (emphasis, strong, badge, table-key `#ffcc66`, table-header
+  data** (emphasis/table-key `#e0b45c`, strong `#cc8800`, table-header
   `#c8b878` — quieter than key: headers repeat, keys carry), **sea
   green = links** (`link-url` `#4d9e7a`, reviving the palette's legacy
   link role — and the web's own link affordance). URLs are the quietest
   chromatic role (27% luminance): plumbing, readable when sought.
+
+  **Census addendum (same day): luminance is not perceptual weight.**
+  Strong at 50 luminance "overshadowed" a 57 heading — because census
+  luminance × typographic weight is perceived brightness, and bold gold
+  outshouts pale blue at equal numbers. Rule: a role that carries its
+  own typographic weight (bold) gets *less* colour — the weight already
+  speaks. Strong now #cc8800 (30.4): heading 57 > emphasis/key 49 >
+  table-header 48 > link-text 45 > strong 30 > URL 27 > muted 9.
