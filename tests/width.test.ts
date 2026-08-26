@@ -7,6 +7,7 @@ import {
   padDisplay,
   padStartDisplay,
   stripANSI,
+  terminalCols,
 } from "../src/width";
 
 describe("width — contract: graphemes, EAW, combining, escapes, tabs", () => {
@@ -67,5 +68,36 @@ describe("width — contract: graphemes, EAW, combining, escapes, tabs", () => {
     expect(displayWidth(padCenterDisplay("\x1b[1mab\x1b[0m", 5))).toBe(5);
     // centre leans left on odd remainder
     expect(padCenterDisplay("ab", 5)).toBe(" ab  ");
+  });
+});
+
+describe("terminalCols — fzf preview width (FZF_PREVIEW_COLUMNS)", () => {
+  const ENV_KEY = "FZF_PREVIEW_COLUMNS";
+
+  test("preview env overrides the fallback when stdout is a pipe", () => {
+    process.env[ENV_KEY] = "42";
+    try {
+      // In the test runner stdout is not a TTY, so terminalSize() is null —
+      // exactly the fzf-preview condition. The env value must win.
+      expect(terminalCols(80)).toBe(42);
+    } finally {
+      delete process.env[ENV_KEY];
+    }
+  });
+
+  test("garbage and non-positive values fall through to the fallback", () => {
+    for (const bad of ["", "0", "-3", "not-a-number"]) {
+      process.env[ENV_KEY] = bad;
+      try {
+        expect(terminalCols(97)).toBe(97);
+      } finally {
+        delete process.env[ENV_KEY];
+      }
+    }
+  });
+
+  test("unset env: fallback path unchanged", () => {
+    delete process.env[ENV_KEY];
+    expect(terminalCols(80)).toBe(80);
   });
 });

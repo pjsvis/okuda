@@ -296,8 +296,21 @@ export function terminalSize(): { cols: number; rows: number } | null {
 }
 
 /** Convenience: terminal columns with a fallback (default 80). The single
- *  width source for both the streaming path and the TUI. */
+ *  width source for both the streaming path and the TUI.
+ *
+ *  fzf previews: the preview command runs with stdout as a pipe, so
+ *  `terminalSize()` returns null and callers would wrap to the 80 fallback
+ *  while the preview pane is visibly wider/narrower — okuda behaving like
+ *  Glow, the thing this project exists to abolish. fzf exports the pane's
+ *  real width to its preview processes as FZF_PREVIEW_COLUMNS; when set,
+ *  it is authoritative (its presence *means* "you are in a preview pane"),
+ *  so it takes precedence over both the TTY read and the fallback. */
 export function terminalCols(fallback = 80): number {
+  const preview = process.env.FZF_PREVIEW_COLUMNS;
+  if (preview !== undefined) {
+    const n = parseInt(preview, 10);
+    if (Number.isFinite(n) && n > 0) return n;
+  }
   return terminalSize()?.cols ?? fallback;
 }
 
