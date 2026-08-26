@@ -140,15 +140,17 @@ function syncOne(name: string, fix: boolean): { missing: number; stale: number }
     console.log(`  ${name}: MISSING ${f}${fix ? ` → added (${entry!.status}, ${entry!.date})` : ""}`);
     if (entry) entries.push(entry);
   }
+  const staleFiles = new Set(stale.map((e) => e.file));
   for (const e of stale) {
     console.log(`  ${name}: STALE ${e.file}${fix ? " → removed" : ""}`);
   }
 
   if (fix) {
     if (missing.length || stale.length) {
-      entries.sort((a, b) => a.file.localeCompare(b.file));
-      writeFileSync(indexPath, entries.map((e) => JSON.stringify(e)).join("\n") + "\n");
-      console.log(`  ${name}: index rewritten (${entries.length} entries)`);
+      const kept = entries.filter((e) => !staleFiles.has(e.file));
+      kept.sort((a, b) => a.file.localeCompare(b.file));
+      writeFileSync(indexPath, kept.map((e) => JSON.stringify(e)).join("\n") + "\n");
+      console.log(`  ${name}: index rewritten (${kept.length} entries)`);
     } else {
       console.log(`  ${name}: OK (0 missing, 0 stale)`);
     }
