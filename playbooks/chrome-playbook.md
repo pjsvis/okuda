@@ -145,3 +145,33 @@ property it serves.
   of truth; the viewer is a view. Copy from the file, not the view.
   Scope discipline — okuda doesn't accrete host competence. Calming
   (one less key to learn) + scope integrity.
+
+## Terminal-gifted capabilities — the restraint ledger
+
+The reader deliberately advertises for **none** of the terminal's input
+facilities: no mouse reporting (DECSET 1000/1002/1006 never emitted), no
+bracketed-paste handling, no focus reporting. Every capability below is
+therefore owned and implemented by the *terminal*, not by okuda — free
+features, zero code, zero maintenance, present on every terminal that
+speaks the standard escape protocols.
+
+- **Text selection + copy.** With no app owning the mouse, native drag
+  selection works everywhere (Alacritty ⌘C, iPad SSH long-drag). An app
+  that enables mouse reporting forfeits this — drags route to the app.
+- **OSC 8 hyperlinks.** `wrap.ts` embeds `\x1b]8;;URL\x1b\\` around link
+  text; any OSC-8 terminal (Alacritty, most modern clients) renders
+  tappable/clickable links. SSH is a byte pipe — the sequences cross it
+  intact, so the feature rides to the iPad for free if the client speaks it.
+- **Alt-scroll arrows (DECSET 1007).** When the terminal translates wheel
+  to ↑/↓ for alt-screen apps, the reader's keymap (CSI + SS3 arrows)
+  receives them — mouse-wheel scroll without owning the mouse.
+- **Scrollback, resize, bracketed paste.** The alternate screen handles
+  geometry; the terminal handles the rest.
+
+**The trade this ledger records:** owning the mouse (wheel/swipe scroll
+inside the reader) would cost native selection and add terminal-state
+management — the parked `reader-mouse-wheel` brief exists, and this
+ledger is the argument for keeping it parked. Pick terminals that gift
+capabilities; write less code. (URL tuning note: `link-url` sits at
+`#5e8bbf` — heading's blue family at 40% luminance — so links whisper
+while headings speak.)
