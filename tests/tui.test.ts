@@ -3,7 +3,7 @@ import {
   decodeKey,
   footerLine,
   viewport,
-  HINTS,
+  contentHeight,
   displayPath,
   stripForAnchor,
   anchorFor,
@@ -112,26 +112,25 @@ describe("tui — footerLine (identity left, affordance right)", () => {
   const FILE = "/Users/x/Dev/okuda/docs/audit.md";
 
   test("compact: badge + folder/file left; ? help right", () => {
-    const f = footerLine(72, "Gloam", FILE, false, muted, badge);
+    const f = footerLine(72, "Gloam", FILE, muted, badge);
     expect(f.startsWith(badge("Gloam") + " " + muted("docs/audit.md"))).toBe(true);
     expect(f.endsWith(muted("? help"))).toBe(true);
   });
-  test("toggled: verbose HINTS replace the compact right", () => {
-    const f = footerLine(72, "Gloam", FILE, true, muted, badge);
-    expect(f.startsWith(badge("Gloam") + " " + muted("docs/audit.md"))).toBe(true);
-    expect(f.endsWith(muted(HINTS))).toBe(true);
-  });
   test("narrow width: at least one space gap, no throw", () => {
-    const f = footerLine(10, "Gloam", FILE, false, muted, badge);
+    const f = footerLine(10, "Gloam", FILE, muted, badge);
     expect(f).toContain("Gloam");
   });
   test("NO_COLOR: plain text, no escapes; padding kept (shape parity)", () => {
     const none = makeStyler(DRACULA_PALETTE, "none");
-    const f = footerLine(72, "Gloam", FILE, false,
+    const f = footerLine(72, "Gloam", FILE,
       (s) => none.role("muted", s), (s) => none.badge(s));
     expect(f).not.toContain("\x1b");
     expect(f.startsWith(" Gloam  docs/audit.md")).toBe(true);
     expect(f.endsWith("? help")).toBe(true);
+  });
+  test("contentHeight: hints row reserved when toggled", () => {
+    expect(contentHeight(24, false)).toBe(23); // footer only
+    expect(contentHeight(24, true)).toBe(22);  // footer + own hints row
   });
 });
 

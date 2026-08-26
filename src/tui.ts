@@ -214,23 +214,27 @@ function compactLeft(): string {
   return "? help";
 }
 
+/** Viewport height: total rows minus the footer, minus the hints row
+ *  when verbose hints are toggled on — they get a row of their own;
+ *  the verbose line never fits the footer without wrapping. Pure. */
+export function contentHeight(rows: number, showHints: boolean): number {
+  return rows - 1 - (showHints ? 1 : 0);
+}
+
 /**
  * Compose the footer: badge + folder/filename left (identity leads —
- * the glance position), help-or-hints right (affordances trail). Pure.
- *
- * showHints=false (default): `? help` right — the toggle affordance.
- * showHints=true (toggled via `?`): the verbose HINTS line right.
+ * the glance position), `? help` right (affordance trails). Always
+ * compact — verbose hints live on their own row (see contentHeight).
  */
 export function footerLine(
   width: number,
   label: string,
   file: string,
-  showHints: boolean,
   muted: (s: string) => string,
   badge: (s: string) => string,
 ): string {
   const name = displayPath(file);
-  const rightText = showHints ? HINTS : compactLeft();
+  const rightText = compactLeft();
   // Left: badge (label + 2 padding) + space + folder/file.
   const leftWidth = label.length + 2 + 1 + name.length;
   const gap = Math.max(1, width - leftWidth - rightText.length);
@@ -278,7 +282,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
 
   const paint = (): void => {
     const { rows, cols } = dims();
-    const height = rows - 1; // reserve the last row for the footer
+    const height = contentHeight(rows, showHints); // footer + optional hints row
     let view = viewport(lines, scroll, height);
     if (scroll > view.maxScroll) {
       scroll = view.maxScroll;
@@ -286,16 +290,21 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     }
     process.stdout.write("\x1b[2J\x1b[H"); // clear + home
     process.stdout.write(view.visible.join("\n"));
-    // Footer at the last row: help toggle left, badge + folder/file right.
+    // Hints: own row above the footer, muted (they never fit the footer).
+    if (showHints) {
+      process.stdout.write(`\x1b[${rows - 1};1H`);
+      process.stdout.write(muted(HINTS));
+    }
+    // Footer at the last row: badge + folder/file left, ? help right.
     process.stdout.write(`\x1b[${rows};1H`);
-    process.stdout.write(footerLine(cols, "Gloam", opts.file, showHints, muted, badge));
+    process.stdout.write(footerLine(cols, "Gloam", opts.file, muted, badge));
   };
 
   /** Re-render from source, re-anchored (ADR-010 semantics) — the one
    *  repaint path: resize, manual reload, and (brief: tui-live-documents)
    *  fs.watch all pin the line under the eye to its screen row. */
   const rerenderAnchored = async (): Promise<void> => {
-    const height = dims().rows - 1;
+    const height = contentHeight(dims().rows, showHints);
     const oldLines = lines;
     lines = await renderLines(await readSource(), dims().cols);
     scroll = reanchoredScroll(oldLines, lines, scroll, height);
@@ -314,7 +323,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       return;
     }
     const { rows } = dims();
-    const height = rows - 1;
+    const height = contentHeight(rows, showHints);
     const { maxScroll } = viewport(lines, 0, height);
     const half = Math.max(1, Math.floor(height / 2));
     switch (action) {
