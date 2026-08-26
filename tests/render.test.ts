@@ -260,6 +260,30 @@ describe("render — lists (loose, markers, continuation)", () => {
     expect(out2).not.toContain("\u0000");
   });
 
+  // ADR-004 invariant: okuda owns every \n — no emitted line exceeds the
+  // terminal width. Composition shifts nested blocks +4 per level AFTER
+  // wrapping (item continuation + LIST_INDENT); the wrap must budget it.
+  test("nested list lines respect terminal width (ADR-004)", async () => {
+    // 7-char words tile the (pre-fix) avail budget so wrapped lines hit
+    // the width limit exactly — shorter words can leave slack and miss.
+    const src = "- " + "outerr ".repeat(16) + "\n  - " + "innerr ".repeat(16);
+    const out = await render(src, 40);
+    for (const l of lines(out)) {
+      expect(displayWidth(l)).toBeLessThanOrEqual(40);
+    }
+  });
+
+  test("flattened third-level lines respect terminal width (ADR-004)", async () => {
+    const src =
+      "- " + "alpha ".repeat(14) +
+      "\n  - " + "beta ".repeat(14) +
+      "\n    - " + "gamma ".repeat(14);
+    const out = await render(src, 40);
+    for (const l of lines(out)) {
+      expect(displayWidth(l)).toBeLessThanOrEqual(40);
+    }
+  });
+
   test("task list checkbox markup stays literal", async () => {
     const out = await render("- [ ] todo\n- [x] done");
     expect(out).toContain("[ ] todo");

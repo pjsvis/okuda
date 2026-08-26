@@ -21,12 +21,15 @@ import {
   PARSER_OPTIONS,
   RE_INLINE_HTML,
   RE_MERMAID_TOKEN,
+  RE_PB_TAG,
   TAG_ITEM,
   TAG_NESTED_CLOSE,
+  TAG_PROBE_CLOSE,
   TAG_RAW_CLOSE,
   mermaidToken,
   stripTags,
   tagNestedOpen,
+  tagProbeOpen,
   tagRawOpen,
 } from "./grammar";
 import { loadPalette, type Palette } from "./palette";
@@ -191,6 +194,13 @@ interface Ctx {
   palette: Palette;
   table: TableState | null;
   mermaid: Map<string, { art: string; checksum: string | null }>;
+  /** When set, `list` handlers record structure instead of rendering
+   *  (the probe pass — see probeListDepths). */
+  listProbe?: (children: string) => string;
+  /** Per-list nesting depth from the probe pass, consumed in call order. */
+  listDepths?: number[];
+  /** Call-order cursor into listDepths (the render pass). */
+  listSeq: number;
 }
 
 /** Render a closed-grammar markdown document to ANSI lines. */
@@ -213,6 +223,7 @@ export async function renderDocument(
     palette,
     table: null,
     mermaid: new Map(),
+    listSeq: 0,
   };
 
   // Pre-pass 1: elide YAML front matter (document-start `---\n…\n---`).
@@ -230,11 +241,60 @@ export async function renderDocument(
   // Pre-pass 3: intercept mermaid fences → pipe to binary → placeholder tokens.
   const source3 = await interceptMermaid(source2, opts, ctx);
 
+  // Pre-pass 4 (structural probe): each list's nesting depth. Post-order
+  // callbacks mean a nested list renders before its parent fires — depth
+  // (top-down) can't reach it in one pass. The probe renders once with
+  // list handlers swapped for identity tags; parents' children name their
+  // descendants, giving the containment chain. The render pass then draws
+  // depths from it in identical call order (same source, same parser —
+  // deterministic sequence).
+  ctx.listDepths = probeListDepths(source3, ctx);
+  ctx.listSeq = 0;
+
   const rendered = Bun.markdown.render(source3, handlers(ctx), {
     ...PARSER_OPTIONS,
   });
 
   return finalize(rendered);
+}
+
+/**
+ * Render once with probe list handlers to map each list call to its
+ * nesting depth. Each probe call wraps its (already-rendered) children
+ * in a PB tag; a parent's children therefore name every descendant list.
+ * The nearest LATER call containing tag i is i's immediate parent
+ * (post-order: ancestors fire after descendants; the minimum index beats
+ * every grandparent). Depth = ancestor-chain length. Probe output is
+ * discarded — only the depth map survives.
+ */
+function probeListDepths(source: string, ctx: Ctx): number[] {
+  const RE_PB_ALL = new RegExp(RE_PB_TAG.source, "g");
+  const contained: number[][] = [];
+  ctx.listProbe = (children: string): string => {
+    const id = contained.length;
+    contained.push([...children.matchAll(RE_PB_ALL)].map((m) => Number(m[1])));
+    return tagProbeOpen(id) + children + TAG_PROBE_CLOSE;
+  };
+  try {
+    Bun.markdown.render(source, handlers(ctx), { ...PARSER_OPTIONS });
+  } finally {
+    ctx.listProbe = undefined;
+  }
+
+  const parentOf = new Array<number>(contained.length).fill(-1);
+  for (let j = 0; j < contained.length; j++) {
+    for (const id of contained[j]!) {
+      if (parentOf[id] === -1) parentOf[id] = j; // first (nearest) wins
+    }
+  }
+  const depths = new Array<number>(contained.length).fill(-1);
+  const depthOf = (i: number): number => {
+    if (depths[i] !== -1) return depths[i]!;
+    const p = parentOf[i]!;
+    return (depths[i] = p === -1 ? 0 : depthOf(p) + 1);
+  };
+  for (let i = 0; i < contained.length; i++) depthOf(i);
+  return depths;
 }
 
 /**
@@ -462,6 +522,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
     },
 
     list(children: string, meta: { ordered: boolean; start?: number }) {
+      if (ctx.listProbe) return ctx.listProbe(children);
       return renderList(children, meta, ctx);
     },
 
@@ -593,6 +654,9 @@ function renderList(
   ctx: Ctx,
 ): string {
   const { width } = ctx;
+  // Nesting depth from the probe pass (0 = top-level), drawn in the
+  // same call order the probe recorded it.
+  const depth = ctx.listDepths?.[ctx.listSeq++] ?? 0;
   const embedded = [...children.matchAll(/\u0000NL:(\d)\u0000/g)].map((m) =>
     Number(m[1]),
   );
@@ -607,7 +671,12 @@ function renderList(
     const marker = meta.ordered ? `${(meta.start ?? 1) + i}.` : "•";
     const markerPrefix = `${marker} `;
     const textCol = displayWidth(markerPrefix);
-    const avail = Math.max(4, width - textCol - LIST_INDENT);
+    // Composition shifts a nested block +4 per level AFTER wrapping
+    // (item continuation +2 and the parent's LIST_INDENT +2 — or the
+    // flatten equivalent at the depth cap). Budget it here, at wrap
+    // time, so every emitted line lands inside the terminal (ADR-004:
+    // okuda owns every \n; nested overflow was the violation).
+    const avail = Math.max(4, width - 4 * depth - textCol - LIST_INDENT);
     const contIndent = " ".repeat(textCol);
 
     const parts = splitNested(item);

@@ -54,6 +54,21 @@ export function tagNestedOpen(depth: number): string {
 }
 export const TAG_NESTED_CLOSE = "\u0000/NL\u0000";
 
+/**
+ * Structural probe tags — list call identity for the width probe pass.
+ * Bun.markdown is post-order: a nested list renders before its parent
+ * fires, so ancestry can't reach it in one pass. The probe renders once
+ * with list handlers swapped for these tags; a parent's children then
+ * name its descendants, and the containment chain yields each list's
+ * true depth (see render.ts probeListDepths). Probe tags never reach
+ * the final document — probe output is discarded.
+ */
+export function tagProbeOpen(id: number): string {
+  return `\u0000PB:${id}\u0000`;
+}
+export const TAG_PROBE_CLOSE = "\u0000/PB\u0000";
+export const RE_PB_TAG = /\u0000PB:(\d+)\u0000/;
+
 /** Strip every protocol tag from a rendered document. */
 export function stripTags(s: string): string {
   return s.replace(/\u0000[^\u0000]*\u0000/g, "");

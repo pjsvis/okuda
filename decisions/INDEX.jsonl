@@ -9,3 +9,4 @@
 {"file":"009-front-matter-elided-setext-neutralised.md","date":"2026-08-25","status":"Accepted","summary":"Front matter elided, setext headings neutralised","meta":{}}
 {"file":"010-bounded-anchor-proportional-fallback.md","date":"2026-08-26","status":"Accepted","summary":"Bounded anchor search + proportional fallback for resize scroll-preservation","meta":{}}
 {"file":"011-default-palette-okuda-identity.md","date":"2026-08-25","status":"Accepted","summary":"The default palette is the okuda preset — identity over parity","meta":{}}
+{"file":"012-structural-probe-for-list-depth.md","date":"2026-08-27","status":"Accepted","summary":"Depth is top-down info in a post-order protocol — a PB-tag probe render maps containment to depth so renderList budgets the +4/level composition shift; counters can't work, re-wrapping doubles failure surface","meta":{"td":"td-6aa648","fixes":"ADR-004 violation: nested list lines at term+2 (term+6 flattened)"}}
