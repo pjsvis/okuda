@@ -60,6 +60,8 @@ export function decodeKey(buf: Uint8Array): KeyAction {
     case 0x67: return "top";            // g
     case 0x47: return "bottom";         // G
     case 0x72: return "reload";         // r
+    case 0x20: return "page-down";      // space — less/man convention
+    case 0x62: return "page-up";        // b — less/man back convention
     case 0x3f: return "help";           // ? — toggle verbose hints
   }
   // Escape sequences: ESC [ <final> or ESC [ <n> ~.
@@ -174,7 +176,7 @@ export function viewport(
   return { visible: lines.slice(s, s + height), maxScroll, scroll: s };
 }
 
-const HINTS = "q quit · j/k scroll · g/G top/bottom · Ctrl-D/U half · r reload";
+const HINTS = "q quit · j/k scroll · ␣/b page · g/G top/bottom · Ctrl-D/U half · r reload";
 
 /** Display path: folder/basename (Glow convention). Pure. */
 /** ADR-010 re-anchor as a pure function: given the pre- and post-re-render

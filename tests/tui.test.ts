@@ -60,6 +60,10 @@ describe("tui — decodeKey (escape sequences)", () => {
     expect(decodeKey(buf(0x1b, 0x5b, 0x35, 0x7e))).toBe("page-up");
     expect(decodeKey(buf(0x1b, 0x5b, 0x36, 0x7e))).toBe("page-down");
   });
+  test("space → page-down, b → page-up (less/man convention)", () => {
+    expect(decodeKey(buf(0x20))).toBe("page-down");
+    expect(decodeKey(buf(0x62))).toBe("page-up");
+  });
   test("unknown escape sequence → null", () => {
     expect(decodeKey(buf(0x1b, 0x5b, 0x43))).toBeNull(); // ESC [ C — right, unbound
   });
