@@ -4,6 +4,7 @@ import {
   footerLine,
   viewport,
   contentHeight,
+  hintsLine,
   displayPath,
   stripForAnchor,
   anchorFor,
@@ -136,7 +137,19 @@ describe("tui — footerLine (identity left, affordance right)", () => {
   });
   test("contentHeight: hints row reserved when toggled", () => {
     expect(contentHeight(24, false)).toBe(23); // footer only
-    expect(contentHeight(24, true)).toBe(22);  // footer + own hints row
+    expect(contentHeight(24, true)).toBe(22);  // badge row + hints row
+  });
+  test("hintsLine: right-justified on the last row, corner column blank", () => {
+    const plain = (s: string) => s;
+    const h = hintsLine(80, plain);
+    expect(h.endsWith(" ")).toBe(true); // corner pad
+    expect(h.startsWith(" ")).toBe(true); // right-justified
+    expect(h.trimStart().startsWith("q quit")).toBe(true);
+    expect(displayWidth(h)).toBe(80); // fills the row exactly
+  });
+  test("hintsLine: too narrow → no left pad, text starts at col 1 (legible)", () => {
+    const plain = (s: string) => s;
+    expect(hintsLine(60, plain).startsWith("q")).toBe(true);
   });
 });
 

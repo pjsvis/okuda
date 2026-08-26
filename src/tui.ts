@@ -18,7 +18,7 @@
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
 import { loadPalette, type Palette } from "./palette";
 import { renderDocument } from "./render";
-import { terminalCols, terminalRows } from "./width";
+import { padStartDisplay, terminalCols, terminalRows } from "./width";
 
 export interface TuiOptions {
   file: string;
@@ -215,16 +215,24 @@ function compactLeft(): string {
 }
 
 /** Viewport height: total rows minus the footer, minus the hints row
- *  when verbose hints are toggled on — they get a row of their own;
- *  the verbose line never fits the footer without wrapping. Pure. */
+ *  when verbose hints are toggled on — the hints own the last row,
+ *  beneath the badge row (identity above, transient affordances below).
+ *  Pure. */
 export function contentHeight(rows: number, showHints: boolean): number {
   return rows - 1 - (showHints ? 1 : 0);
+}
+
+/** The verbose hints line, right-justified on the last row with the
+ *  corner column reserved. If it can't fit, it wraps — a legible
+ *  'you are too narrow' rather than silent truncation. Pure. */
+export function hintsLine(width: number, muted: (s: string) => string): string {
+  return muted(padStartDisplay(HINTS, width - 1)) + " ";
 }
 
 /**
  * Compose the footer: badge + folder/filename left (identity leads —
  * the glance position), `? help` right (affordance trails). Always
- * compact — verbose hints live on their own row (see contentHeight).
+ * compact — verbose hints live on the last row (see hintsLine).
  */
 export function footerLine(
   width: number,
@@ -292,14 +300,16 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     }
     process.stdout.write("\x1b[2J\x1b[H"); // clear + home
     process.stdout.write(view.visible.join("\n"));
-    // Hints: own row above the footer, muted (they never fit the footer).
     if (showHints) {
+      // Badge row up one; hints own the last row, right-justified, corner pad.
       process.stdout.write(`\x1b[${rows - 1};1H`);
-      process.stdout.write(muted(HINTS));
+      process.stdout.write(footerLine(cols, "Gloam", opts.file, muted, badge));
+      process.stdout.write(`\x1b[${rows};1H`);
+      process.stdout.write(hintsLine(cols, muted));
+    } else {
+      process.stdout.write(`\x1b[${rows};1H`);
+      process.stdout.write(footerLine(cols, "Gloam", opts.file, muted, badge));
     }
-    // Footer at the last row: badge + folder/file left, ? help right.
-    process.stdout.write(`\x1b[${rows};1H`);
-    process.stdout.write(footerLine(cols, "Gloam", opts.file, muted, badge));
   };
 
   /** Re-render from source, re-anchored (ADR-010 semantics) — the one
