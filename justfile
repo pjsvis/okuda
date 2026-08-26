@@ -1,19 +1,19 @@
 # okuda — terminal markdown viewer (origin: docs/2026-08-20-origin-doc.md)
 # Silo facade: recipes are one-line delegations; logic lives in scripts/.
 
-# Default: list all recipes
+# List recipes
 [group('navigation')]
 @default:
     just --list
 
 # ── Navigation ───────────────────────────────────────────────
 
-# Workflow guide — rendered through okuda itself (dogfood flip)
+# Guide
 [group('navigation')]
 help:
     @./okuda docs/help.md
 
-# Project rationale
+# Rationale
 [group('navigation')]
 info:
     @echo "okuda — a terminal markdown viewer built on Bun.markdown,"
@@ -23,7 +23,7 @@ info:
     @echo "Origin and design: docs/2026-08-20-origin-doc.md"
     @echo "Dependencies:       DEPENDENCIES.md"
 
-# Current state
+# State
 [group('navigation')]
 orient:
     @echo "branch:  $(git branch --show-current)"
@@ -34,122 +34,135 @@ orient:
 
 # ── Quality gate ─────────────────────────────────────────────
 
-# Registry sync gate
+# Sync gate
 [group('quality gate')]
 check:
-    @bun scripts/reg-sync.ts --all
+    @bun scripts/reg-sync.ts --all && bash scripts/facade-lint.sh
 
 # ── Build ────────────────────────────────────────────────────
 
-# Run the viewer from source
 [group('build')]
 dev file:
     @bun run src/cli.ts {{file}}
 
-# Compile the single-binary viewer
+# Compile
 [group('build')]
 build:
     @bun build --compile src/cli.ts --outfile okuda
 
-# Install/refresh the `okuda` shortcut (symlink to ~/.local/bin)
+# Install
 [group('build')]
 install:
     @mkdir -p ~/.local/bin
     @ln -sf $(pwd)/okuda ~/.local/bin/okuda
+    @ln -sf $(pwd)/okuda ~/.local/bin/gloam
     @echo "okuda → ~/.local/bin/okuda  (run `just build` to refresh after edits)"
 
-# Run the test suite
+# Tests
 [group('build')]
 test:
     @bun test
 
-# Render the grammar showcase in the TUI (every closed-grammar element)
-# Falls back to streaming under NO_COLOR / TERM=dumb / non-TTY.
+# Grammar tour
 [group('build')]
 showcase:
     @./okuda docs/showcase.md --tui
 
-# Render the showcase in the TUI (default = Okuda palette)
+# Showcase
 [group('build')]
 okuda:
     @./okuda docs/showcase.md --tui
 
-# Render the manifesto in the Okuda palette (the dogfood is the argument)
+# Manifesto (okuda)
 [group('build')]
 manifesto-okuda:
     @./okuda docs/glow-vs-okuda.md --tui
 
-# Resize dogfood — open a doc, then narrow/widen the terminal.
-# Watch the line under your eye: it should hold its screen row across
-# reflow. Drift = the anchor is wrong (brief: resize-content-anchor).
 [group('build')]
-resize-okuda file="docs/glow-vs-okuda.md":
+resize-okuda file:
     @./okuda {{file}} --tui
 
-# Render any file in the TUI (Okuda palette, the default): just view docs/foo.md
 [group('build')]
 view file:
     @./okuda {{file}} --tui
 
-# Render any file in the Dracula/glow palette (parity comparison): just view-glow docs/foo.md
 [group('build')]
 view-glow file:
     @./okuda {{file}} --tui --palette dracula
 
-# Render the blog post (the common control surface)
+# Blog post
 [group('build')]
 post:
     @./okuda docs/2026-08-25-the-common-control-surface.md --tui
 
-# Render the formatting & colour audit (stated expectations vs live output)
+# Colour audit
 [group('build')]
 audit:
     @./okuda docs/audit.md --tui
 
-# Render the table audit (sparse -> crowded; run at ~80 and ~140 widths)
+# Table audit
 [group('build')]
 tables:
     @./okuda docs/tables.md --tui
 
-# Render the RHS-chip dogfood in the TUI (Okuda palette)
+# Chip dogfood
 [group('build')]
 chip:
     @just build >/dev/null
     @./okuda docs/chip-dogfood.md --tui
 
-# Render the manifesto in the Dracula/glow palette (parity comparison)
+# Manifesto (glow)
 [group('build')]
 manifesto:
     @./okuda docs/glow-vs-okuda.md --tui --palette dracula
 
 # ── Registries ───────────────────────────────────────────────
 
-# Check registries for drift
+# Check drift
 [group('registries')]
 reg-sync:
     @bun scripts/reg-sync.ts --all
 
-# Regenerate registry indexes
+# Fix drift
 [group('registries')]
 reg-sync-fix:
     @bun scripts/reg-sync.ts --all --fix
 
-# List briefs registry
+# List briefs
 [group('registries')]
 reg-briefs:
     @bun scripts/reg-list.ts briefs
 
-# List debriefs registry
+# List debriefs
 [group('registries')]
 reg-debriefs:
     @bun scripts/reg-list.ts debriefs
 
-# List decisions registry
+# List decisions
 [group('registries')]
 reg-decisions:
     @bun scripts/reg-list.ts decisions
 
-# List playbooks registry
+# List playbooks
 [group('registries')]
 reg-playbooks:
     @bun scripts/reg-list.ts playbooks
+
+# ── SSH serving (sandboxed ForceCommand) ─────────────────────
+
+[group('ssh')]
+ssh-test doc:
+    @bash scripts/sshd-test.sh smoke {{doc}}
+
+[group('ssh')]
+ssh-serve doc:
+    @bash scripts/sshd-test.sh serve {{doc}}
+
+[group('ssh')]
+ssh-view doc:
+    @bash scripts/sshd-test.sh view {{doc}}
+
+# Teardown
+[group('ssh')]
+ssh-stop:
+    @bash scripts/sshd-test.sh stop

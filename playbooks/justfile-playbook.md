@@ -27,6 +27,35 @@ check:
 
 `just --list` is a menu, not a manual. It names the items; details live in `docs/help.md` for those who delve. Failure modes, arguments, caveats belong there — one delve surface, kept out of the menu.
 
+**Comments: one or two words, terse.** The menu is an okudagram — a uniform left block of names, a uniform comment column. Comments are labels, not sentences:
+
+```make
+# Colour audit      ✓
+audit:
+
+# Render the formatting & colour audit (stated expectations vs live output)   ✗
+```
+
+**No comments on parameterized recipes.** A recipe whose signature names its argument (`view file`, `ssh-test doc`) is self-documenting — the signature *is* the label. A comment after it only shoves the column right for every other recipe:
+
+```make
+[group('build')]
+view file:                          ✓
+
+# Render any file in the TUI        ✗ (and the default arg below is the other half of the crime)
+[group('build')]
+view file="docs/foo.md":
+```
+
+**No default values on parameterized recipes.** `just --list` aligns the comment column to the *longest signature including its default values*. A default like `file="docs/glow-vs-okuda.md"` pins the column at 47 for the whole menu — ragged, and the raggedness is the repo contradicting its own thesis (restful rendering). Defaults are a private convenience for one recipe; the column is a public artifact seen on every `--list`. The many outweigh the few. The only lever on the column is the signature length; use it.
+
+```make
+resize-okuda file:                  ✓ (column lands ~25, in band)
+resize-okuda file="docs/glow-vs-okuda.md":   ✗ (pins column at 47)
+```
+
+The target band is **column 20–30**. Both rules above are how you stay in it. The gate (`scripts/facade-lint.ts`, run by `just check`) asserts the band and the rules — regression fails the build, not the eyeball.
+
 **Recipe order: comment, attribute, recipe.** Just's parser requires the doc comment *above* the `[attribute]`:
 
 ```make
@@ -47,9 +76,9 @@ Reversing comment and attribute yields `error: extraneous attribute` pointing at
 
 **No new runtime deps.** Piping help to glow (or any renderer) is declined on grounds of self-refutation: okuda's origin doc opens with glow's rap sheet. The facade must not depend on what the project exists to replace.
 
-## Revit Protocol
+## Revisit Protocol
 
-As development continues, revit the facade: when a recipe is added, changed, or removed, check this playbook in the same commit. If a new trap is observed (not speculated — observed), record it under Tricky Parts. If a style rule proves wrong in practice, amend the rule and note why — this document is the living record of how the facade is kept.
+As development continues, revisit the facade: when a recipe is added, changed, or removed, check this playbook in the same commit. If a new trap is observed (not speculated — observed), record it under Tricky Parts. If a style rule proves wrong in practice, amend the rule and note why — this document is the living record of how the facade is kept.
 
 ## Tricky Parts
 
@@ -60,6 +89,8 @@ The observed traps, in order of encounter:
 3. **`--list` is alphabetical within groups** — structure comes only from `[group()]`; there is no way to order recipes manually within a group. Name for alphabetical sense (`reg-briefs` before `reg-sync`) or accept the sort.
 4. **`docs/` is not a registry** — files there don't need index entries; `briefs/`, `debriefs/`, `decisions/`, `playbooks/` do. Check `scripts/reg-sync.ts` before assuming.
 5. **Dogfood `help` needs the binary** — `help: @./okuda docs/help.md` requires `just build` to have produced `./okuda` (gitignored). On a fresh clone, build first; the recipe does not auto-build (navigation should stay cheap).
+6. **The comment column is set by the longest signature, defaults included** — `just --list` auto-aligns comments to the longest recipe signature *whether or not that recipe has a comment*. Stripping comments from long-signature recipes does not move the column. The only lever is the signature itself: drop default values from parameterized recipes. Symptom: a 47-column gap after 4-letter recipe names, in a repo that sells restful rendering. Cause: `resize-okuda file="docs/glow-vs-okuda.md"` pinning the column. The gate (`scripts/facade-lint.ts`) asserts the band.
+7. **Mechanize the causes of raggedness, not raggedness itself** — the gate checks column band, comment word count, and no-defaults-on-params because those *cause* the menu to look ragged and are measurable. It does not check "looks restful" — that's the eyeball's job, and a metric for it would be benchmaxxing. The agent measures the floor; the human eyeballs the ceiling.
 
 ## Cross-References
 
