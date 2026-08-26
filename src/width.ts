@@ -261,6 +261,52 @@ export function displayWidth(s: string): number {
 }
 
 /**
+ * Terminal size detection — robust against the Bun `--compile` bug where
+ * `process.stdout.columns`/`rows` report **0** (not undefined) even when
+ * `isTTY` is true. `0 || fallback` catches undefined but NOT 0, so a naive
+ * `columns || 80` regresses to 80 on the affected terminals (observed in
+ * Alacritty; Ghostty reports the real winsize). Confirmed by a published
+ * polyfill (critique@0.1.140, patch-terminal-dimensions.ts) and Bun issue
+ * #23224. The fix: treat 0 as falsy and fall back to `tput cols`/`tput lines`
+ * (terminfo reads the winsize directly via ioctl, bypassing Bun's broken
+ * path). `tput` is present on every POSIX system with a terminfo db.
+ *
+ * Returns `{ cols, rows }` or `null` if no measurement is possible
+ * (non-TTY, no tput, etc.). Callers apply their own fallback.
+ */
+export function terminalSize(): { cols: number; rows: number } | null {
+  const out = process.stdout;
+  // The real path: Bun's winsize worked. `> 0` excludes the 0-from-compile bug.
+  if (typeof out.columns === "number" && out.columns > 0 && typeof out.rows === "number" && out.rows > 0) {
+    return { cols: out.columns, rows: out.rows };
+  }
+  // The 0/undefined path: ask terminfo directly. Only meaningful on a TTY;
+  // tput on a non-TTY returns the db default (often 80) which is no worse
+  // than our fallback, but we gate on isTTY to avoid a misleading measurement.
+  if (!out.isTTY) return null;
+  try {
+    const { execSync } = require("node:child_process");
+    const cols = parseInt(execSync("tput cols", { encoding: "utf-8", stdio: ["inherit", "pipe", "pipe"] }).trim(), 10);
+    const rows = parseInt(execSync("tput lines", { encoding: "utf-8", stdio: ["inherit", "pipe", "pipe"] }).trim(), 10);
+    if (cols > 0 && rows > 0) return { cols, rows };
+  } catch {
+    // tput missing or failed — caller falls back.
+  }
+  return null;
+}
+
+/** Convenience: terminal columns with a fallback (default 80). The single
+ *  width source for both the streaming path and the TUI. */
+export function terminalCols(fallback = 80): number {
+  return terminalSize()?.cols ?? fallback;
+}
+
+/** Convenience: terminal rows with a fallback (default 24). */
+export function terminalRows(fallback = 24): number {
+  return terminalSize()?.rows ?? fallback;
+}
+
+/**
  * Tokenize a string into zero-width escapes and measured graphemes.
  * The wrap engine consumes this stream to track style state and column
  * positions in one pass.

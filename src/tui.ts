@@ -18,6 +18,7 @@
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
 import { loadPalette, type Palette } from "./palette";
 import { renderDocument } from "./render";
+import { terminalCols, terminalRows } from "./width";
 
 export interface TuiOptions {
   file: string;
@@ -256,8 +257,10 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   let showHints = false; // `?` toggles: compact % footer ↔ verbose hints
 
   const dims = () => ({
-    rows: process.stdout.rows || opts.rows || 24,
-    cols: process.stdout.columns || opts.width || 80,
+    // terminalCols/Rows handle the Bun --compile columns=0 bug (tput fallback);
+    // opts.width/rows are the caller's fallbacks for the non-TTY case.
+    rows: terminalRows(opts.rows || 24),
+    cols: terminalCols(opts.width || 80),
   });
 
   const paint = (): void => {

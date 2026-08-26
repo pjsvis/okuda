@@ -4,7 +4,7 @@
  * Usage: okuda <file.md> [--watch] [--tui] [--no-color] [--palette <name>]
  *        cat doc.md | okuda
  *
- *  - Terminal width: process.stdout.columns, fallback 80.
+ *  - Terminal width: terminalCols() (handles Bun's columns=0 bug; fallback 80).
  *  - --watch: fs.watch + SIGWINCH re-render, debounced, screen cleared.
  *  - --no-color: same as NO_COLOR (plain text, identical line breaks).
  *  - --palette <name>: named preset (e.g. 'dracula' for glow parity).
@@ -15,6 +15,7 @@ import { detectColorMode } from "./ansi";
 import { loadPalette } from "./palette";
 import { renderDocument } from "./render";
 import { runTui } from "./tui";
+import { terminalCols, terminalRows } from "./width";
 
 interface Args {
   file: string | null;
@@ -84,7 +85,7 @@ async function main(): Promise<void> {
 
   const draw = async (): Promise<void> => {
     const source = await readSource(args.file);
-    const width = process.stdout.columns || 80;
+    const width = terminalCols(80);
     const out = await renderDocument(source, { width, palette, color });
     if (args.watch) {
       process.stdout.write("\x1b[2J\x1b[3J\x1b[H"); // clear + home
@@ -104,8 +105,8 @@ async function main(): Promise<void> {
   ) {
     await runTui({
       file: args.file,
-      width: process.stdout.columns || 80,
-      rows: process.stdout.rows || 24,
+      width: terminalCols(80),
+      rows: terminalRows(24),
       palette,
     });
     return;
