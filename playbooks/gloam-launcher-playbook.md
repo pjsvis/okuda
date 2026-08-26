@@ -26,6 +26,7 @@ gloam() {
     out=$(fd -e md |
           LC_ALL=C sort |
           env FZF_DEFAULT_OPTS= fzf --layout=reverse --no-mouse \
+              --exact --tiebreak=index \
               --prompt='gloam ❯ ' --query="$q" --print-query \
               --header='enter: read · esc: done') || break
     q=$(head -1 <<<"$out")            # reseed the query next round
@@ -53,6 +54,20 @@ gloam() {
   cursor on the first item: AGENTS.md at the top of the screen, where
   the alphabet starts. Prompt-at-top is also the layout every list-app
   (Glow, lazygit, gh dash) trains the eye to expect.
+- `--exact --tiebreak=index` — **filter, don't re-rank.** Default fzf
+  fuzzy is (a) *overinclusive* — a query's chars match scattered
+  anywhere in the string, not as a contiguous substring — and (b)
+  *score-ranked* — match offset/length differ per candidate, so results
+  sort by score, not input order. The ISO-date prefixes exposed both:
+  query `2026-08-2` returned 08-20, 08-26, 08-24, 08-25… — scrambled.
+  `--exact` = literal substring matching only (kills overinclusion);
+  `--tiebreak=index` = preserve input order (the `LC_ALL=C sort`)
+  among matches. A date-prefixed corpus has a canonical order; the
+  picker narrows it in place. Trade-off: scattered-token fuzzy power is
+  gone (`gloamfooter` no longer matches `gloam-tui-footer`); acceptable
+  for filenames — and a `toggle-exact` bind is the escape hatch if the
+  itch ever arrives. Verified on fzf 0.73.1: `2026-08-2` → strict
+  chronology.
 - The `while` loop — browse→read→back, the one gap composition had.
   Quit Gloam (`q`) and the picker is back, query intact. Esc in the
   picker ends the session.
