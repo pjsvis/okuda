@@ -20,7 +20,7 @@ is a shell function; the binary stays a viewer.
 gloam() {
   local f
   f=$(fd -e md |
-      fzf --prompt='gloam ❯ ' --height=80% \
+      fzf --no-mouse --prompt='gloam ❯ ' --height=80% \
           --preview='okuda {}' --preview-window=right,60% \
           --header='enter: read · esc: cancel') || return
   [[ -n "$f" ]] || return
@@ -54,6 +54,17 @@ gloam() {
   `--height` for full-screen fzf (alternate-screen repaint, no inline
   windowing to corrupt — also Glow's own mode). Not worth it while a
   keystroke suffices.
+- `--no-mouse` — keyboard-only picking. Mouse is on by default, and an
+  Apple Magic Mouse's momentum scrolling turns the wheel into a machine-gun
+  of line-events that flies the list past every candidate — an analog
+  momentum device matched against a 40-row discrete list. `wheel-up` is not
+  a bindable key (fzf 0.73.1: "unsupported key"), so there is no
+  scroll-off-click-on middle setting; mouse is all-or-nothing, and all-off
+  is right for a picker. Cost: click-to-select goes too (arrows + Enter are
+  the way), and the wheel now scrolls Alacritty's scrollback instead — in
+  `--height` mode that scrolls the inline window out of view until you
+  scroll back down. Flag verified: bogus-flag control rejected, `--no-mouse`
+  accepted (hidden from terse `--help`, listed in `--man`).
 - `|| return` — a cancelled pick (Esc) is not an error; the function
   returns silently instead of launching okuda with an empty path.
 - `[[ -n "$f" ]] || return` — fzf's exit-0 empty-selection case (Enter on
