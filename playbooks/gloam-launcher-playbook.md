@@ -20,7 +20,7 @@ is a shell function; the binary stays a viewer.
 gloam() {
   local f
   f=$(fd -e md |
-      fzf --no-mouse --prompt='gloam ❯ ' --height=80% \
+      fzf --no-mouse --prompt='gloam ❯ ' \
           --preview='okuda {}' --preview-window=right,60% \
           --header='enter: read · esc: cancel') || return
   [[ -n "$f" ]] || return
@@ -38,22 +38,17 @@ gloam() {
   committing. This requires the width fix below.
 - `okuda --tui "$f"` — the TUI opens at `scroll = 0`: the top of the
   document, which is where a reader belongs.
-- **Resize shows the old width until the next selection change — accepted.**
-  fzf does not re-run the preview command on resize; it caches process
-  output and re-clips it to the new pane, so after a resize the preview
-  renders at the stale width until a new candidate re-runs `okuda` (fresh
-  `FZF_PREVIEW_COLUMNS`). Cost: one arrow key. The obvious fix was tested
-  and **rejected**: `--bind 'resize:refresh-preview'` (a real binding —
-  verified on fzf 0.73.1 with a bogus-action control) does reflow the
-  preview, but in `--height` inline mode a resize burst (e.g. maximising
-  Alacritty) makes each WINCH spawn a preview repaint mid-relayout; fzf's
-  inline pane desyncs from the terminal grid and the window corrupts —
-  fragments wandering with each resize. fzf has no debounce knob for
-  bindings. Stale width costs a keystroke; corruption costs the session.
-  If reflow-on-resize ever matters, the robust path is dropping
-  `--height` for full-screen fzf (alternate-screen repaint, no inline
-  windowing to corrupt — also Glow's own mode). Not worth it while a
-  keystroke suffices.
+- **Full-screen (no `--height`), by conviction.** Inline mode was tried and
+  retired: inline fzf maintains its window inside terminal scrollback, so
+  (a) `--bind 'resize:refresh-preview'` (a real binding, verified with a
+  bogus-action control) corrupts the window during resize bursts — no
+  debounce knob exists — and (b) with `--no-mouse` the wheel, routed to
+  scrollback, drags the inline window around instead of the list. The
+  alternate screen retires both: resize repaints natively, and with no
+  scrollback an unhandled wheel does nothing. This is also Glow's own
+  mode. Residual cost: the preview shows stale width after a resize until
+  the next selection change re-runs `okuda` with fresh
+  `FZF_PREVIEW_COLUMNS` — one keystroke.
 - `--no-mouse` — keyboard-only picking. Mouse is on by default, and an
   Apple Magic Mouse's momentum scrolling turns the wheel into a machine-gun
   of line-events that flies the list past every candidate — an analog
@@ -61,10 +56,14 @@ gloam() {
   a bindable key (fzf 0.73.1: "unsupported key"), so there is no
   scroll-off-click-on middle setting; mouse is all-or-nothing, and all-off
   is right for a picker. Cost: click-to-select goes too (arrows + Enter are
-  the way), and the wheel now scrolls Alacritty's scrollback instead — in
-  `--height` mode that scrolls the inline window out of view until you
-  scroll back down. Flag verified: bogus-flag control rejected, `--no-mouse`
-  accepted (hidden from terse `--help`, listed in `--man`).
+  the way). With mouse off, the terminal routes the wheel to its own
+  scrollback — fatal in inline `--height` mode (the window lives in the
+  scrollback; momentum scrolling drags the whole picker around, same
+  symptom as the list-scroll bug, new victim), harmless in full-screen
+  mode: the alternate screen has no scrollback, so an unhandled wheel is a
+  dead wheel. That is the point. Flag verified: bogus-flag control
+  rejected, `--no-mouse` accepted (hidden from terse `--help`, listed in
+  `--man`).
 - `|| return` — a cancelled pick (Esc) is not an error; the function
   returns silently instead of launching okuda with an empty path.
 - `[[ -n "$f" ]] || return` — fzf's exit-0 empty-selection case (Enter on
