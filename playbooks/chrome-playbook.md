@@ -172,7 +172,8 @@ speaks the standard escape protocols.
 inside the reader) would cost native selection and add terminal-state
 management — the parked `reader-mouse-wheel` brief exists, and this
 ledger is the argument for keeping it parked. Pick terminals that gift
-capabilities; write less code.
+capabilities; write less code. The doctrine's story:
+`docs/2026-08-26-the-porch-without-the-zapper.md`.
 
 - **Hue-per-role census (2026-08-26).** Blue was two hexes over four
   roles (heading + table-header shared `#99ccff`; link-url +
