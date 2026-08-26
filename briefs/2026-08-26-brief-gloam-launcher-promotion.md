@@ -28,13 +28,13 @@ loop's absence is *observed* to hurt, not anticipated.
 
 ## Constraints when unparked
 
-- **First non-flag fix observed (2026-08-26):** killing the wheel's fourth
-  incarnation required a DECSET 1007 disable/restore dance around fzf —
-  raw terminal-state management from the shell function. The launcher now
-  owns terminal state, not just flags; a binary picker would save/restore
-  it robustly (query + restore). Still config-not-code, so the gate holds,
-  but the environment-config accretion is the thing to watch: reopen the
-  gate if it keeps growing.
+- **Gate status (2026-08-26): the itch arrived; the shell loop satisfied
+  it.** The browse→read→back gap genuinely itched (reader exit dropped to
+  shell; preview retirement made the loop the natural shape). A zsh loop
+  (fd | fzf --print-query reseed → okuda --tui, repeat) delivers the loop
+  config-not-code. Promotion is now gated on *loop friction*: query-reseed
+  mechanics, lost list scroll position per round, fd re-run cost, or
+  wanting Gloam-native chrome in the picker.
 
 - **Amend the Gloam brief, don't bend it silently.**
   `briefs/2026-08-23-brief-gloam-tui-footer.md` scopes Gloam as "a footer,
