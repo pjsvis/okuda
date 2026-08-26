@@ -22,7 +22,6 @@ gloam() {
   f=$(fd -e md |
       fzf --prompt='gloam ❯ ' --height=80% \
           --preview='okuda {}' --preview-window=right,60% \
-          --bind 'resize:refresh-preview' \
           --header='enter: read · esc: cancel') || return
   [[ -n "$f" ]] || return
   okuda --tui "$f"
@@ -39,14 +38,22 @@ gloam() {
   committing. This requires the width fix below.
 - `okuda --tui "$f"` — the TUI opens at `scroll = 0`: the top of the
   document, which is where a reader belongs.
-- `--bind 'resize:refresh-preview'` — fzf does **not** re-run the preview
-  command on window resize; it caches the process output and re-clips it to
-  the new pane, so a resize shows the old width's render chopped or padded
-  (and `FZF_PREVIEW_COLUMNS` is only re-read when the command re-runs —
-  selection changes re-run it, which is why re-picking "fixes" it). The
-  binding makes resize behave like a re-pick: fresh process, fresh env,
-  true reflow. Verified against fzf 0.73.1 (bogus-action control rejected
-  with `unknown action`, so the binding is real, not a silent no-op).
+- **Resize shows the old width until the next selection change — accepted.**
+  fzf does not re-run the preview command on resize; it caches process
+  output and re-clips it to the new pane, so after a resize the preview
+  renders at the stale width until a new candidate re-runs `okuda` (fresh
+  `FZF_PREVIEW_COLUMNS`). Cost: one arrow key. The obvious fix was tested
+  and **rejected**: `--bind 'resize:refresh-preview'` (a real binding —
+  verified on fzf 0.73.1 with a bogus-action control) does reflow the
+  preview, but in `--height` inline mode a resize burst (e.g. maximising
+  Alacritty) makes each WINCH spawn a preview repaint mid-relayout; fzf's
+  inline pane desyncs from the terminal grid and the window corrupts —
+  fragments wandering with each resize. fzf has no debounce knob for
+  bindings. Stale width costs a keystroke; corruption costs the session.
+  If reflow-on-resize ever matters, the robust path is dropping
+  `--height` for full-screen fzf (alternate-screen repaint, no inline
+  windowing to corrupt — also Glow's own mode). Not worth it while a
+  keystroke suffices.
 - `|| return` — a cancelled pick (Esc) is not an error; the function
   returns silently instead of launching okuda with an empty path.
 - `[[ -n "$f" ]] || return` — fzf's exit-0 empty-selection case (Enter on
