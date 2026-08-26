@@ -25,8 +25,8 @@ gloam() {
   while :; do
     out=$(fd -e md |
           LC_ALL=C sort |
-          env FZF_DEFAULT_OPTS= fzf --no-mouse --prompt='gloam ❯ ' \
-              --query="$q" --print-query \
+          env FZF_DEFAULT_OPTS= fzf --layout=reverse --no-mouse \
+              --prompt='gloam ❯ ' --query="$q" --print-query \
               --header='enter: read · esc: done') || break
     q=$(head -1 <<<"$out")            # reseed the query next round
     f=$(tail -n +2 <<<"$out")         # the selection
@@ -40,13 +40,19 @@ gloam() {
 
 - `fd -e md` — respects `.gitignore`, skips hidden files, current folder
   down. Exactly Glow's local discovery scope, minus the cloud stash.
-- `LC_ALL=C sort` — fd emits directory-walk order, not alphabetical;
-  fzf retains input order for equal-relevance matches, so the walk order
-  surfaced as a "weird reverse-ish alpha" list. `LC_ALL=C` pins ASCII
-  collation (uppercase-first: `briefs/…` before `docs/…`) — deterministic
-  across machines instead of per-locale. The top of the list is then
-  stable: round 1 starts at the first file; reseeded rounds start at the
-  fuzzy match nearest the top — deterministic every time.
+- `LC_ALL=C sort` — deterministic ASCII collation (uppercase-first:
+  `briefs/…` before `docs/…`), identical across machines instead of
+  per-locale. (The original "weird order" report turned out to be
+  layout, not collation — fd was already alpha on this machine; the
+  sort stays as a determinism guarantee.)
+- `--layout=reverse` — **the actual "reverse alpha" culprit.** fzf's
+  default layout puts the prompt at the bottom and stacks the list
+  bottom-up: item #1 sits directly above the prompt, the alphabet's end
+  at the screen top — an alphabetical list *displayed* in reverse.
+  `reverse` puts the prompt at top, the list in reading order below,
+  cursor on the first item: AGENTS.md at the top of the screen, where
+  the alphabet starts. Prompt-at-top is also the layout every list-app
+  (Glow, lazygit, gh dash) trains the eye to expect.
 - The `while` loop — browse→read→back, the one gap composition had.
   Quit Gloam (`q`) and the picker is back, query intact. Esc in the
   picker ends the session.
