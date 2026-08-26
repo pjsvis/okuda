@@ -15,6 +15,7 @@
 {"file":"2026-08-25-brief-right-edge-lcars-tab.md","date":"2026-08-25","status":"open","summary":"Right-edge LCARS tab on headers — the visible right bound","meta":{}}
 {"file":"2026-08-25-brief-viewport-padding.md","date":"2026-08-25","status":"rejected","summary":"Viewport padding — upper and lower render margins (rejected same day: blank only signals at a boundary; viewport pad fights the content-anchor)","meta":{}}
 {"file":"2026-08-26-brief-gloam-launcher-promotion.md","date":"2026-08-26","status":"open","summary":"Gloam Launcher Promotion — argv[0] No-Arg Mode (parked)","meta":{}}
+{"file":"2026-08-26-brief-palette-lightness-knob.md","date":"2026-08-26","status":"open","summary":"Palette Lightness Knob — Global Brightness, Hue Preserved (parked)","meta":{}}
 {"file":"2026-08-26-brief-resize-content-anchor.md","date":"2026-08-26","status":"open","summary":"Resize content-anchor — keep the line under the eye","meta":{}}
 {"file":"2026-08-26-brief-ssh-served-markdown.md","date":"2026-08-26","status":"open","summary":"SSH-served markdown — option 1 (OpenSSH ForceCommand)","meta":{}}
 {"file":"2026-08-26-brief-tty-reverse-print.md","date":"2026-08-26","status":"open","summary":"TTY Reverse-Print — Land at the Top","meta":{}}
