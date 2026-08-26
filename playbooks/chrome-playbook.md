@@ -189,6 +189,11 @@ capabilities; write less code.
   Strong at 50 luminance "overshadowed" a 57 heading — because census
   luminance × typographic weight is perceived brightness, and bold gold
   outshouts pale blue at equal numbers. Rule: a role that carries its
-  own typographic weight (bold) gets *less* colour — the weight already
-  speaks. Strong now #cc8800 (30.4): heading 57 > emphasis/key 49 >
-  table-header 48 > link-text 45 > strong 30 > URL 27 > muted 9.
+  own typographic weight (bold) gets *less* colour — but never *below
+  its plain-text peers*: weight may discount colour, not demote the role
+  beneath non-bold neighbours (contradictory signals — bold weight says
+  'prominent', buried colour says 'recede' — read as unsettlement, the
+  page's texture lies). Dogfood bracket: 50 (#ffaa00) overshadowed the
+  heading; 30 (#cc8800) sank beneath khaki table chrome; 41.6
+  (#dfa21a) settles — heading 57 > emphasis/key 49 > table-header 48 >
+  link-text 45 > strong 42×bold-weight > URL 27 > muted 9.
