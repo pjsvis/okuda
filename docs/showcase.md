@@ -47,7 +47,12 @@ Inline styles carry the semantic load: **bold for emphasis**, *italic for asides
 ## Diagrams: mermaid → ASCII
 
 ```mermaid
-flowchart LR Draft --> Review Review -->|approved| Ship Review -->|rejected| Draft Ship -->|incident| Rollback Rollback --> Draft
+flowchart LR
+  Draft --> Review
+  Review -->|approved| Ship
+  Review -->|rejected| Draft
+  Ship -->|incident| Rollback
+  Rollback --> Draft
 ```
 
 The fence is intercepted pre-render, piped to the `mermaid-to-md` Rust binary, and the returned ASCII is coloured by channel: borders recede, arrows lead the eye, text sits in the foreground. The diagram never wraps — a wrapped state machine is a lie about the system's topology.
