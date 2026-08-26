@@ -284,6 +284,25 @@ describe("render — lists (loose, markers, continuation)", () => {
     }
   });
 
+  // ADR-006 NO_COLOR parity for nested lists: the depth budget is
+  // structural and color-independent, so plain output is the coloured
+  // output minus escapes with identical line breaks — including the
+  // wrapped nested lines where the ADR-004 violation used to live.
+  // The existing parity test uses a top-level list only; this pins the
+  // nested case so a future palette/depth change can't silently diverge.
+  test("nested list plain output is coloured output minus escapes (NO_COLOR parity)", async () => {
+    const src =
+      "- " + "outerr ".repeat(16) +
+      "\n  - " + "innerr ".repeat(16) +
+      "\n    - " + "flattened ".repeat(14);
+    const colored = await render(src, 40, "truecolor");
+    const plain = await render(src, 40, "none");
+    expect(plain).not.toContain("\x1b");
+    const cLines = colored.split("\n").map((l) => stripANSI(l).replace(/ +$/, ""));
+    const pLines = plain.split("\n").map((l) => l.replace(/ +$/, ""));
+    expect(cLines).toEqual(pLines);
+  });
+
   test("task list checkbox markup stays literal", async () => {
     const out = await render("- [ ] todo\n- [x] done");
     expect(out).toContain("[ ] todo");

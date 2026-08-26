@@ -279,6 +279,12 @@ function probeListDepths(source: string, ctx: Ctx): number[] {
     Bun.markdown.render(source, handlers(ctx), { ...PARSER_OPTIONS });
   } finally {
     ctx.listProbe = undefined;
+    // The probe runs every handler, not just `list` — table handlers can
+    // mutate ctx.table. A well-formed table self-resets (the `table`
+    // handler sets ctx.table = null), but a malformed unclosed table would
+    // leave stale state for the render pass to inherit via ensureTable.
+    // Reset here so probe state never leaks into the render pass.
+    ctx.table = null;
   }
 
   const parentOf = new Array<number>(contained.length).fill(-1);
