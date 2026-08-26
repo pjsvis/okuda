@@ -11,6 +11,8 @@ an assumption.
 | `git` | 2.54.0 | Version control; the permanent record | `/opt/homebrew/bin/git` | 2026-08-20 |
 | `td` | 0.61.0 | Task management and session continuity (epics/tasks) | `/opt/homebrew/bin/td` | 2026-08-27 |
 | `mermaid-to-md` | 0.1.0* | Rust CLI: mermaid source on stdin → ASCII diagram on stdout | `~/.local/bin/mermaid-to-md` | 2026-08-20 |
+| `fzf` | 0.73.1 | Optional — gloam launcher fuzzy picker (composition; see `playbooks/gloam-launcher-playbook.md`). Not required by the binary. | `/opt/homebrew/bin/fzf` | 2026-08-26 |
+| `fd` | 10.4.2 | Optional — gloam launcher file discovery (respects `.gitignore`). Not required by the binary. | `/opt/homebrew/bin/fd` | 2026-08-26 |
 
 \* Self-reports as `mermaid-tui 0.1.0` — binary name and package name
 differ. The origin doc's `spacex-mermaid` is stale; `mermaid-to-md` is
