@@ -16,10 +16,12 @@
 {"file":"2026-08-25-brief-viewport-padding.md","date":"2026-08-25","status":"rejected","summary":"Viewport padding — upper and lower render margins (rejected same day: blank only signals at a boundary; viewport pad fights the content-anchor)","meta":{}}
 {"file":"2026-08-26-brief-document-links.md","date":"2026-08-26","status":"open","summary":"Document Links — Gopher Hypertext in the Reader","meta":{}}
 {"file":"2026-08-26-brief-gloam-launcher-promotion.md","date":"2026-08-26","status":"open","summary":"Gloam Launcher Promotion — argv[0] No-Arg Mode (parked)","meta":{}}
+{"file":"2026-08-26-brief-herdr-dashboard.md","date":"2026-08-26","status":"open","summary":"Herdr Dashboard — the Build's Exhaust, Composed","meta":{}}
 {"file":"2026-08-26-brief-palette-lightness-knob.md","date":"2026-08-26","status":"open","summary":"Palette Lightness Knob — Global Brightness, Hue Preserved (parked)","meta":{}}
 {"file":"2026-08-26-brief-resize-content-anchor.md","date":"2026-08-26","status":"open","summary":"Resize content-anchor — keep the line under the eye","meta":{}}
 {"file":"2026-08-26-brief-ssh-blog-feed.md","date":"2026-08-26","status":"open","summary":"SSH Blog Feed — the Gopher-Serve v1","meta":{}}
 {"file":"2026-08-26-brief-ssh-served-markdown.md","date":"2026-08-26","status":"open","summary":"SSH-served markdown — option 1 (OpenSSH ForceCommand)","meta":{}}
+{"file":"2026-08-26-brief-telemetry-conventions.md","date":"2026-08-26","status":"open","summary":"Telemetry Conventions — Markdown as Message Bus","meta":{}}
 {"file":"2026-08-26-brief-tty-reverse-print.md","date":"2026-08-26","status":"open","summary":"TTY Reverse-Print — Land at the Top","meta":{}}
 {"file":"2026-08-26-brief-tui-live-documents.md","date":"2026-08-26","status":"open","summary":"TUI live documents — fs.watch → anchored re-render","meta":{}}
 {"file":"2026-08-26-session-handoff-okuda-net.md","date":"2026-08-26","status":"open","summary":"Session handoff — the okuda-net riff epoch","meta":{}}
