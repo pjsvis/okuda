@@ -23,6 +23,7 @@ gloam() {
       fzf --prompt='gloam ❯ ' --height=80% \
           --preview='okuda {}' --preview-window=right,60% \
           --header='enter: read · esc: cancel') || return
+  [[ -n "$f" ]] || return
   okuda --tui "$f"
 }
 ```
@@ -39,6 +40,9 @@ gloam() {
   document, which is where a reader belongs.
 - `|| return` — a cancelled pick (Esc) is not an error; the function
   returns silently instead of launching okuda with an empty path.
+- `[[ -n "$f" ]] || return` — fzf's exit-0 empty-selection case (Enter on
+  an empty list, e.g. no `.md` files in scope): exit silently rather than
+  feed `okuda --tui ""` a usage error.
 
 ## The width fix the preview depends on
 
