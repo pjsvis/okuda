@@ -24,6 +24,7 @@ gloam() {
   printf '\e[?1007h'   # alt-scroll on, one policy: wheel scrolls list AND doc
   while :; do
     out=$(fd -e md |
+          LC_ALL=C sort |
           env FZF_DEFAULT_OPTS= fzf --no-mouse --prompt='gloam ❯ ' \
               --query="$q" --print-query \
               --header='enter: read · esc: done') || break
@@ -39,6 +40,13 @@ gloam() {
 
 - `fd -e md` — respects `.gitignore`, skips hidden files, current folder
   down. Exactly Glow's local discovery scope, minus the cloud stash.
+- `LC_ALL=C sort` — fd emits directory-walk order, not alphabetical;
+  fzf retains input order for equal-relevance matches, so the walk order
+  surfaced as a "weird reverse-ish alpha" list. `LC_ALL=C` pins ASCII
+  collation (uppercase-first: `briefs/…` before `docs/…`) — deterministic
+  across machines instead of per-locale. The top of the list is then
+  stable: round 1 starts at the first file; reseeded rounds start at the
+  fuzzy match nearest the top — deterministic every time.
 - The `while` loop — browse→read→back, the one gap composition had.
   Quit Gloam (`q`) and the picker is back, query intact. Esc in the
   picker ends the session.
