@@ -24,7 +24,8 @@ gloam() {
   printf '\e[?1007l'   # alt-scroll off: dead wheel in the picker
   while :; do
     out=$(fd -e md |
-          fzf --no-mouse --prompt='gloam ❯ ' --query="$q" --print-query \
+          env FZF_DEFAULT_OPTS= fzf --no-mouse --prompt='gloam ❯ ' \
+              --query="$q" --print-query \
               --header='enter: read · esc: done') || break
     q=$(head -1 <<<"$out")            # reseed the query next round
     f=$(tail -n +2 <<<"$out")         # the selection
@@ -44,6 +45,11 @@ gloam() {
 - The `while` loop — browse→read→back, the one gap composition had.
   Quit Gloam (`q`) and the picker is back, query intact. Esc in the
   picker ends the session.
+- `env FZF_DEFAULT_OPTS=` — **hermetic by default.** A global
+  `FZF_DEFAULT_OPTS` (this machine's ships a `bat` preview with forced
+  wrap — the "rubbish preview" that haunted the preview-less launcher)
+  applies to every fzf invocation; the launcher blanks it for its own call.
+  The picker's flags are exactly what's written here — nothing inherited.
 - `--print-query` + `--query="$q"` — fzf exits on selection, so each
   round is a fresh process; the query is carried across rounds by
   printing it (first line of `--print-query` output) and reseeding.
