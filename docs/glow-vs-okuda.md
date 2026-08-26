@@ -32,12 +32,13 @@ only option.
 
 | Property | Glow | okuda |
 | --- | --- | --- |
-| Engine | glamour (ANSI-256 palette) | hand-translated Dracula truecolor |
+| Engine | glamour (Dracula truecolor) | okuda truecolor (LCARS identity default; `--palette dracula` is the parity anchor) |
 | Lists | tight (CommonMark) | loose (blank line between items) |
 | Tables | box-drawing grid, all near-white | grid header + loose body, semantic colour |
 | Soft returns | soft break (joined) | stripped (reflow to width) |
 | Mermaid | raw code fence | piped to ASCII, three-channel colour |
 | Finish | last line lingers (pager artefact) | Gloam footer badge (deliberate sign-off) |
+| Place-keeping | pager-owned (no reflow anchor) | content-anchor — the eye line holds its screen row across resize and reload |
 | Grammar | full CommonMark | closed subset (the agent workflow's output) |
 
 The table is the comparison in miniature. Glow's grid is tighter; okuda's colour carries
@@ -91,9 +92,12 @@ The trade is explicit:
 2. **Density for rhythm.** A loose list is taller than a tight one. The cost is vertical
    space; the return is that each item is a discrete block the eye can land on, not a line
    in a wall.
-3. **Colour for signal.** Where glow uses near-white and lets the grid carry the structure,
-   okuda uses purple headers, amber keys, green code, rose links. The colour is not
-   decoration — it is the scan path, and the whitespace lets it breathe.
+3. **Colour for signal.** Where glow spends its colour budget on distinctions between syntax
+   classes, okuda spends it on distinctions that survive repetition — blue headers as the
+   structural invariant, amber for keys and emphasis, peach for code. The colour is not
+   decoration — it is the scan path, and the whitespace lets it breathe. (`--palette dracula`
+   flips to the glow-parity palette for side-by-side comparison; the identity is the default,
+   Dracula is the anchor you reach for to check the identity still earns its keep.)
 
 ---
 
@@ -122,19 +126,26 @@ ASCII art with three colours. A paragraph is wrapped prose. None of these is cle
 discretely, with vertical rhythm between them, they form a structure that reads as composed.
 Placed densely, they form a wall. The viewer's job is the placement.
 
+The calming holds across time, not just space. A reflow — a terminal losing ten columns, or
+an `r` reload after the file changed — re-renders the whole document, and the line under the eye
+stays on its screen row. The anchor is a text-match fingerprint bounded to one viewport, with a
+proportional fallback when reflow is large; the reader never jumps to the top because a width
+changed. A document that holds its place is calmer than one that betrays it — the anchor is the
+temporal analogue of the loose layout: discreteness in space, stability in time.
+
 ---
 
 ## What this document tests
 
 If you are reading this in `okuda --tui`, every element above is live:
 
-- **Headers** — purple bold, uniform across levels, the scan path.
+- **Headers** — blue bold, uniform across levels, the scan path.
 - **Lists** — ordered (the trade list) and unordered (this list), loose, each item a block.
 - **Tables** — grid header with `│` separators, full-width rules, amber first column,
   columns that hold through wraps.
 - **Diagrams** — the development loop, piped to ASCII, borders receding, arrows leading.
 - **Prose** — reflowed to your terminal width, no soft-return fragments, inline emphasis in
-  Dracula colours.
+  the okuda palette (amber emphasis, peach code, cyan links).
 - **The finish** — the Gloam badge below, a deliberate sign-off.
 
 If any block above reads wrong, the regression is localised here. If the document reads as
