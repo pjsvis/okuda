@@ -3,3 +3,4 @@
 {"file":"2026-08-24-debrief-renderer-implementation.md","date":"2026-08-24","status":"done","summary":"Debrief: okuda renderer implementation (td-11e977)","meta":{}}
 {"file":"2026-08-24-debrief-tweak-phase-and-moat.md","date":"2026-08-24","status":"done","summary":"Debrief: the tweak phase, the table audit, and the moat forming in perception","meta":{}}
 {"file":"2026-08-26-debrief-resize-anchor-boundary-conditions.md","date":"2026-08-26","status":"done","summary":"Debrief: the resize anchor and the three boundary conditions","meta":{}}
+{"file":"2026-08-27-debrief-okuda-pi-theme-sweep.md","date":"2026-08-27","status":"done","summary":"Debrief: first dogfood sweep of the okuda pi theme — states fired, untestables, promoted to default","meta":{"theme":"~/.pi/agent/themes/okuda.json","default":true}}
