@@ -237,8 +237,10 @@ export function footerLine(
   const rightText = compactLeft();
   // Left: badge (label + 2 padding) + space + folder/file.
   const leftWidth = label.length + 2 + 1 + name.length;
-  const gap = Math.max(1, width - leftWidth - rightText.length);
-  return badge(label) + " " + muted(name) + " ".repeat(gap) + muted(rightText);
+  // Reserve the last column: Apple's rounded window corner clips the
+  // bottom-right cell — the footer never writes it.
+  const gap = Math.max(1, width - leftWidth - rightText.length - 1);
+  return badge(label) + " " + muted(name) + " ".repeat(gap) + muted(rightText) + " ";
 }
 
 // ── I/O loop ──────────────────────────────────────────────────────────

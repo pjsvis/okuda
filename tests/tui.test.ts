@@ -13,6 +13,7 @@ import {
 } from "../src/tui";
 import { makeStyler } from "../src/ansi";
 import { DRACULA_PALETTE } from "../src/palette";
+import { displayWidth, stripANSI } from "../src/width";
 
 function buf(...bytes: number[]): Uint8Array {
   return new Uint8Array(bytes);
@@ -114,7 +115,12 @@ describe("tui — footerLine (identity left, affordance right)", () => {
   test("compact: badge + folder/file left; ? help right", () => {
     const f = footerLine(72, "Gloam", FILE, muted, badge);
     expect(f.startsWith(badge("Gloam") + " " + muted("docs/audit.md"))).toBe(true);
-    expect(f.endsWith(muted("? help"))).toBe(true);
+    expect(f.endsWith(muted("? help") + " ")).toBe(true);
+  });
+  test("RHS corner pad: the last column is blank, never ink", () => {
+    const f = footerLine(72, "Gloam", FILE, muted, badge);
+    expect(displayWidth(stripANSI(f))).toBe(72); // exactly fills the row…
+    expect(stripANSI(f).endsWith(" ")).toBe(true); // …but the last column is the pad
   });
   test("narrow width: at least one space gap, no throw", () => {
     const f = footerLine(10, "Gloam", FILE, muted, badge);
@@ -126,7 +132,7 @@ describe("tui — footerLine (identity left, affordance right)", () => {
       (s) => none.role("muted", s), (s) => none.badge(s));
     expect(f).not.toContain("\x1b");
     expect(f.startsWith(" Gloam  docs/audit.md")).toBe(true);
-    expect(f.endsWith("? help")).toBe(true);
+    expect(f.endsWith("? help ")).toBe(true);
   });
   test("contentHeight: hints row reserved when toggled", () => {
     expect(contentHeight(24, false)).toBe(23); // footer only
