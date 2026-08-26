@@ -71,6 +71,17 @@ export function decodeKey(buf: Uint8Array): KeyAction {
       case 0x36: return "page-down";     // ESC [ 6 ~ — PgDn
     }
   }
+  // SS3 arrows: ESC O <final>. Sent when DECCKM (application cursor
+  // mode) is on — commonly left set by the shell's line editor. The same
+  // keys as CSI arrows; alt-scroll wheels emit this form too.
+  if (b0 === ESC && buf.length >= 3 && buf[1] === 0x4f) {
+    switch (buf[2]) {
+      case 0x41: return "up";            // ESC O A — ↑
+      case 0x42: return "down";          // ESC O B — ↓
+      case 0x35: return buf[3] === 0x7e ? "page-up" : null;    // ESC O 5 ~
+      case 0x36: return buf[3] === 0x7e ? "page-down" : null;  // ESC O 6 ~
+    }
+  }
   // Lone Esc (length 1) — treat as quit; common pager convention.
   if (b0 === ESC && buf.length === 1) return "quit";
   return null;

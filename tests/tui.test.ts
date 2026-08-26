@@ -63,6 +63,18 @@ describe("tui — decodeKey (escape sequences)", () => {
   test("unknown escape sequence → null", () => {
     expect(decodeKey(buf(0x1b, 0x5b, 0x43))).toBeNull(); // ESC [ C — right, unbound
   });
+  // ESC O A/B = ↑/↓ under DECCKM (application cursor mode) — the form the
+  // shell's line editor leaves active, and what alt-scroll wheels emit.
+  test("SS3 arrows (DECCKM on) → up/down", () => {
+    expect(decodeKey(buf(0x1b, 0x4f, 0x41))).toBe("up");
+    expect(decodeKey(buf(0x1b, 0x4f, 0x42))).toBe("down");
+  });
+  test("SS3 page keys → page-up/page-down; malformed → null", () => {
+    expect(decodeKey(buf(0x1b, 0x4f, 0x35, 0x7e))).toBe("page-up");
+    expect(decodeKey(buf(0x1b, 0x4f, 0x36, 0x7e))).toBe("page-down");
+    expect(decodeKey(buf(0x1b, 0x4f, 0x35))).toBeNull(); // ESC O 5 (no tilde)
+    expect(decodeKey(buf(0x1b, 0x4f, 0x43))).toBeNull(); // ESC O C — right, unbound
+  });
 });
 
 describe("tui — viewport slice", () => {
