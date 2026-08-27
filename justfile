@@ -56,6 +56,12 @@ install:
     @mkdir -p ~/.local/bin
     @ln -sf $(pwd)/okuda ~/.local/bin/okuda
     @ln -sf $(pwd)/okuda ~/.local/bin/gloam
+
+# Gloam launcher
+[group('build')]
+gloam:
+    @just build >/dev/null
+    @bash -c 'exec -a gloam ./okuda'
     @echo "okuda → ~/.local/bin/okuda  (run `just build` to refresh after edits)"
 
 # Tests

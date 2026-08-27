@@ -13,3 +13,4 @@
 {"file":"013-ssh-serving-forcecommand.md","date":"2026-08-27","status":"Accepted","summary":"SSH serving shape — OpenSSH ForceCommand (Option 1)","meta":{"brief":"2026-08-26-brief-ssh-served-markdown.md","debrief":"2026-08-27-debrief-ssh-forcecommand-feasibility.md"}}
 {"file":"014-table-elision-over-shrink-wrap.md","date":"2026-08-27","status":"Accepted","summary":"Table elision over in-cell shrink-wrap","meta":{}}
 {"file":"015-alert-palette-role.md","date":"2026-08-27","status":"Accepted","summary":"An `alert` palette role for the fetch-state stamp's `failed` channel","meta":{}}
+{"file":"016-argv0-launcher-dispatch.md","date":"2026-08-27","status":"Accepted","summary":"argv[0] dispatch — `gloam` is the launcher entry point","meta":{}}

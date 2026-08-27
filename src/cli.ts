@@ -15,6 +15,7 @@ import { detectColorMode } from "./ansi";
 import { loadPalette } from "./palette";
 import { renderDocument } from "./render";
 import { runTui } from "./tui";
+import { runLauncher, invokedAsGloam } from "./launcher";
 import { terminalCols, terminalRows } from "./width";
 
 interface Args {
@@ -74,6 +75,13 @@ async function readSource(file: string | null): Promise<string> {
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
+  // Gloam launcher (ADR-016): invoked as `gloam` with no file arg and a TTY
+  // stdin → run the browse → read → browse picker loop. `okuda <file>` is
+  // unaffected; two names, two entry contracts, one binary.
+  if (invokedAsGloam() && !args.file && process.stdin.isTTY) {
+    await runLauncher();
+    return;
+  }
   const color = args.noColor
     ? "none"
     : detectColorMode(process.env as NodeJS.ProcessEnv);

@@ -21,7 +21,7 @@ When Okuda grows a TUI with a status bar (Glow shows "Glow" in the bottom-right)
 ## Scope when unparked
 
 * Footer text in the TUI status bar, bottom-right, muted (`#6e6a86` / Muted palette role).
-* No second binary, no subcommand, no separate brand. Gloam is a 4-letter flourish in one render path, not a product surface.
+* No second binary, no subcommand, no separate brand. Gloam is a 4-letter flourish in one render path, not a product surface. **Amended 2026-08-27 (ADR-016):** argv[0] dispatch makes `gloam` an entry point (the browse → read → browse launcher, `src/launcher.ts`), but not a second binary (the `gloam` symlink points at the `okuda` binary) and not a subcommand. Two names, two entry contracts, one binary — the footer's "a footer, not a product name" still holds; `gloam` as an invocation is the picker, `gloam` as a footer is the signature.
 * Visible only in the TUI; the streaming renderer (`okuda <file>`, `okuda <file> --watch`) stays footer-free — it prints the document and exits.
 
 ## Out of scope

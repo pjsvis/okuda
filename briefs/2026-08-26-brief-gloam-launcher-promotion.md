@@ -1,7 +1,12 @@
 # Brief: Gloam Launcher Promotion — argv[0] No-Arg Mode (parked)
 
 **Date:** 2026-08-26
-**Status:** Parked — gated on dogfooding
+**Status:** Unparked 2026-08-27 (ADR-016) — the gate fired on
+*Gloam-native chrome in the picker*, not loop friction. The fzf
+key-grammar parity work (`e041f4f`) established that owning the
+picker's behaviour means owning the fzf invocation, which a shell
+function the user maintains cannot guarantee (it drifts). The binary
+spawns fzf with the binds; the user never touches dotfiles.
 **Gate:** the shell-function launcher (`playbooks/gloam-launcher-playbook.md`)
 used for ≥ 1 week, and the browse→read→back gap (no return-to-picker after
 quitting a document) demonstrated to actually itch. If one up-arrow + Enter

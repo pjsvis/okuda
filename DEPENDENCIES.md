@@ -4,19 +4,25 @@ External tools this silo depends on. Brief preconditions verify against
 this file — an entry with a verified date is a claim we have checked, not
 an assumption.
 
-| Tool | Version | Purpose | Location | Verified |
-|------|---------|---------|----------|----------|
-| `bun` | 1.4.0 | Runtime; `Bun.markdown` renderer; runs `scripts/*.ts` | `~/.bun/bin/bun` | 2026-08-27 |
-| `just` | 1.53.0 | Task facade — the shared operational lexicon | `/opt/homebrew/bin/just` | 2026-08-20 |
-| `git` | 2.54.0 | Version control; the permanent record | `/opt/homebrew/bin/git` | 2026-08-20 |
-| `td` | 0.61.0 | Task management and session continuity (epics/tasks) | `/opt/homebrew/bin/td` | 2026-08-27 |
-| `mermaid-to-md` | 0.1.0* | Rust CLI: mermaid source on stdin → ASCII diagram on stdout | `~/.local/bin/mermaid-to-md` | 2026-08-20 |
-| `fzf` | 0.73.1 | Optional — gloam launcher fuzzy picker (composition; see `playbooks/gloam-launcher-playbook.md`). Not required by the binary. | `/opt/homebrew/bin/fzf` | 2026-08-26 |
-| `fd` | 10.4.2 | Optional — gloam launcher file discovery (respects `.gitignore`). Not required by the binary. | `/opt/homebrew/bin/fd` | 2026-08-26 |
+| Tool | Version | Purpose | Verified |
+|------|---------|---------|----------|
+| `bun` | 1.4.0 | Runtime & renderer | 2026-08-27 |
+| `just` | 1.53.0 | Task runner | 2026-08-20 |
+| `git` | 2.54.0 | Version control | 2026-08-20 |
+| `td` | 0.61.0 | Task management | 2026-08-27 |
+| `mermaid-to-md` | 0.1.0* | Mermaid → ASCII | 2026-08-20 |
+| `fzf` | 0.73.1 | Fuzzy picker — runtime dep of no-arg `gloam` mode | 2026-08-27 |
+| `fd` | 10.4.2 | File finder — preferred by `gloam` (in-process walk if absent) | 2026-08-27 |
 
-\* Self-reports as `mermaid-tui 0.1.0` — binary name and package name
-differ. The origin doc's `spacex-mermaid` is stale; `mermaid-to-md` is
-the real dependency.
+\* Self-reports as `mermaid-tui 0.1.0`, lives at `~/.local/bin/` — binary
+name and package name differ. The origin doc's `spacex-mermaid` is stale;
+`mermaid-to-md` is the real dependency.
+
+The pair (`fzf`, `fd`) serves the no-arg `gloam` launcher (see
+`src/launcher.ts`, ADR-016). `fzf` is a runtime dep of that mode
+(clean error + exit 1 if missing); `fd` is preferred but has an
+in-process recursive-walk fallback. The `okuda <file>` reader does
+not require either.
 
 ## Runtime dependency note
 
@@ -28,7 +34,7 @@ code fence via `Bun.spawn`, never parsed in-process.
 
 | Package | Version | Purpose |
 |---------|---------|---------|
-| `bun-types` | ^1.3.11 | TypeScript definitions for `Bun.markdown`, `Bun.spawn`, etc. Dev-only; not bundled into the compiled artifact. |
+| `bun-types` | ^1.3.11 | TypeScript definitions (dev-only) |
 
 Note: `bun-types` 1.3.11+ documents `listItem` metadata (index/depth/ordered)
 that the **runtime** on bun 1.3.8 did not deliver. The render engine does
