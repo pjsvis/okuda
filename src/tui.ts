@@ -429,7 +429,15 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     paint();
   };
 
+  // runTui blocks until the reader session ends. The `done` promise is
+  // resolved by cleanup — `q`/Esc/Ctrl-C (in raw mode, all decoded to
+  // `quit`) restore the terminal and *return* to the caller, so the
+  // launcher's browse → read → browse loop resumes the picker rather
+  // than dying (the bug that dropped the reader straight to the shell).
+  // External SIGINT/SIGTERM (kill from another process) still hard-exit.
   let cleaned = false;
+  let resolveDone: () => void = () => {};
+  const done = new Promise<void>((resolve) => { resolveDone = resolve; });
   const cleanup = (): void => {
     if (cleaned) return;
     cleaned = true;
@@ -437,7 +445,10 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     process.stdin.setRawMode?.(false);
     process.stdin.pause?.();
     process.stdout.write(SHOW_CURSOR + EXIT_ALT);
-    process.exit(0);
+    process.removeListener("SIGWINCH", onWinch);
+    process.removeListener("SIGINT", onSignal);
+    process.removeListener("SIGTERM", onSignal);
+    resolveDone();
   };
 
   // Enter.
@@ -458,12 +469,16 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   const onWinch = (): void => { void rerenderAnchored(); };
   process.on("SIGWINCH", onWinch);
 
-  // Clean exit on signal.
-  const onSignal = (): void => cleanup();
+  // Clean exit on signal: restore the terminal, then hard-exit. A signal
+  // from outside is a hard interrupt, not a return-to-picker; in raw mode
+  // Ctrl-C is byte 0x03 (decoded `quit`), so this path is for `kill -INT`
+  // only — cleanup runs first so the terminal is never left in alt-screen.
+  const onSignal = (): void => { cleanup(); process.exit(130); };
   process.on("SIGINT", onSignal);
   process.on("SIGTERM", onSignal);
 
   paint();
+  await done;
 }
 
 export { HINTS };

@@ -116,17 +116,23 @@ export async function runLauncher(): Promise<void> {
   }
   process.stdout.write("\x1b[?1007h"); // alt-scroll on, one policy both surfaces
   let query = "";
-  for (;;) {
-    const files = listMarkdownFiles();
-    const pick = await pickFile(files, query);
-    if (pick === null) break; // Esc / Ctrl-C in the picker
-    query = pick.query; // reseed next round
-    if (!pick.file) break; // empty selection (Enter on empty list)
-    await runTui({
-      file: pick.file,
-      width: terminalCols(80),
-      rows: terminalRows(24),
-    });
+  try {
+    for (;;) {
+      const files = listMarkdownFiles();
+      const pick = await pickFile(files, query);
+      if (pick === null) break; // Esc / Ctrl-C in the picker
+      query = pick.query; // reseed next round
+      if (!pick.file) break; // empty selection (Enter on empty list)
+      await runTui({
+        file: pick.file,
+        width: terminalCols(80),
+        rows: terminalRows(24),
+      });
+    }
+  } finally {
+    // alt-scroll off — don't leave the user's terminal in a mode gloam
+    // turned on. The reader's own alt-screen exit is paired in tui.ts.
+    process.stdout.write("\x1b[?1007l");
   }
 }
 
