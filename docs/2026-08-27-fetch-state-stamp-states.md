@@ -5,10 +5,13 @@
 **Brief:** `briefs/2026-08-27-brief-fetch-state-stamp.md` (td-a27b86)
 **Substrate landed:** `src/tui.ts` — `gateFetch`, `renderEqual`, the
 discriminated-union read path (commit `dbf1d17`).
+**Colour landed:** ADR-015 — the `alert` role (`#ff5555`, commit `b8e1a0a`).
 
 Three states, nine transitions, and one trap the three-state name hides.
 This doc exists to surface the trap *before* the chrome layer trips over
-it — map the machine, mark the decisions, then wire.
+it — map the machine, mark the decisions, then wire. The diagram below
+is the current one (glyph-labelled, post-ADR-015); the pre-ADR-015
+abstract graph is retained beneath it as the deprecated palimpsest.
 
 ---
 
@@ -29,7 +32,42 @@ NO_COLOR degrades to `*` / `.` / `!`.
 
 ---
 
-## The diagram
+## The diagram (current)
+
+States labelled with their decided glyph — the visual identity that
+landed with the substrate (`dbf1d17`) and the `alert` role (ADR-015,
+`b8e1a0a`). The glyph is the only state-coloured element in the real
+footer; here it carries the identity the colour attribute will paint
+onto (`●` amber, `○` muted, `✗` red).
+
+```mermaid
+stateDiagram-v2
+    [*] --> Changed●: first ok
+    [*] --> Failed✗: first fail
+    Changed● --> Same○: ok equal
+    Changed● --> Changed●: ok differs
+    Changed● --> Failed✗: fail
+    Same○ --> Changed●: ok differs
+    Same○ --> Same○: ok equal
+    Same○ --> Failed✗: fail
+    Failed✗ --> Changed●: ok differs
+    Failed✗ --> Same○: ok equal
+    Failed✗ --> Failed✗: fail
+```
+
+Three nodes, every pair connected both ways, plus two self-loops per
+node. The symmetry is the first tell: this is not a linear progression,
+it's a fully-connected graph where any state can reach any other. The
+glyphs are not decoration — they are the one character the reader
+glances at, and the colour is an attribute of that character, not a
+second signal.
+
+## The diagram (deprecated)
+
+> **Deprecated** in `b8e1a0a` (ADR-015): "pre-ADR-015 — states
+> uncoloured, the `alert` role unjustified; the two-gate structure
+> unmarked. Retained as the palimpsest layer — the abstract graph
+> before the identity landed."
 
 ```mermaid
 stateDiagram-v2
@@ -45,10 +83,6 @@ stateDiagram-v2
     Failed --> Same: ok equal
     Failed --> Failed: fail
 ```
-
-Three nodes, every pair connected both ways, plus two self-loops per
-node. The symmetry is the first tell: this is not a linear progression,
-it's a fully-connected graph where any state can reach any other.
 
 ---
 
