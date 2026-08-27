@@ -15,5 +15,6 @@
   "muted": "#445566",
   "diagram-border": "#5e8bbf",
   "diagram-arrow": "#ffaa00",
-  "diagram-text": "#c8b894"
+  "diagram-text": "#c8b894",
+  "alert": "#ff5555"
 }

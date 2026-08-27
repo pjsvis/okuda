@@ -30,7 +30,8 @@ export type Role =
   | "muted"
   | "diagram-border"
   | "diagram-arrow"
-  | "diagram-text";
+  | "diagram-text"
+  | "alert"; // chrome-only: the fetch-state stamp's `failed` channel (ADR-015)
 
 export type Palette = Record<Role, string>;
 
@@ -86,6 +87,7 @@ export const DRACULA_PALETTE: Palette = {
   "diagram-border": "#585858",
   "diagram-arrow": "#00af5f",
   "diagram-text": "#d7d7d7",
+  alert: "#ff5555", // Dracula red — the fetch-state `failed` channel (ADR-015)
 };
 
 /** Named presets — the identity layers. The default is the okuda

@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { detectColorMode, makeStyler } from "../src/ansi";
 import { DRACULA_PALETTE, loadPalette } from "../src/palette";
+import okudaPreset from "../src/palettes/okuda.json";
 
 function tempFile(name: string): string {
   return join(mkdtempSync(join(tmpdir(), "okuda-pal-")), name);
@@ -119,6 +120,25 @@ describe("palette — dracula contract + override loader", () => {
     expect(DRACULA_PALETTE["diagram-border"]).toBe("#585858");
     expect(DRACULA_PALETTE["diagram-arrow"]).toBe("#00af5f");
     expect(DRACULA_PALETTE["diagram-text"]).toBe("#d7d7d7");
+  });
+
+  test("alert role: red in both presets — the failed channel (ADR-015)", () => {
+    expect(DRACULA_PALETTE.alert).toBe("#ff5555");
+    expect((okudaPreset as Record<string, string>).alert).toBe("#ff5555");
+  });
+
+  test("alert is non-confusable: distinct from every other role in each preset", () => {
+    // The whole point of ADR-015: failed must not collide with changed (amber),
+    // same (muted), or the badge. Check against every other role.
+    for (const [role, hex] of Object.entries(DRACULA_PALETTE)) {
+      if (role === "alert") continue;
+      expect(hex).not.toBe(DRACULA_PALETTE.alert);
+    }
+    const okuda = okudaPreset as Record<string, string>;
+    for (const [role, hex] of Object.entries(okuda)) {
+      if (role === "alert") continue;
+      expect(hex).not.toBe(okuda.alert);
+    }
   });
 
   test("override file replaces known roles, ignores junk", () => {
