@@ -111,6 +111,31 @@ audit:
 tables:
     @./okuda docs/tables.md --tui
 
+# Monster tables
+[group('build')]
+tables-monster:
+    @./okuda docs/tables-monster.md --tui
+
+# Monster diagrams
+[group('build')]
+diagram-monster:
+    @./okuda docs/diagram-monster.md --tui
+
+# State glyphs
+[group('build')]
+state-glyphs:
+    @./okuda docs/state-glyphs.md --tui
+
+# State colours showcase
+[group('build')]
+state-colours-doc:
+    @./okuda docs/state-colours.md --tui
+
+# State colours A/B
+[group('build')]
+state-colours:
+    @bun scripts/state-colours.ts
+
 # Chip dogfood
 [group('build')]
 chip:

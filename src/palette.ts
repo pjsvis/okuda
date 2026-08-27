@@ -31,7 +31,16 @@ export type Role =
   | "diagram-border"
   | "diagram-arrow"
   | "diagram-text"
-  | "alert"; // chrome-only: the fetch-state stamp's `failed` channel (ADR-015)
+  | "alert" // chrome-only: the fetch-state stamp's `failed` channel (ADR-015)
+  // State-glyph vocabulary (brief: state-glyph-vocabulary, 2026-08-28):
+  // closed lexicon applied by the renderer to the glyphs themselves —
+  // not an author colourbrush. Converges across presets (traffic-lamp-
+  // universality, extending ADR-015's alert precedent). state-failed
+  // === alert by intent (same hex, two names).
+  | "state-ok"
+  | "state-todo"
+  | "state-parked"
+  | "state-failed";
 
 export type Palette = Record<Role, string>;
 
@@ -88,6 +97,16 @@ export const DRACULA_PALETTE: Palette = {
   "diagram-arrow": "#00af5f",
   "diagram-text": "#d7d7d7",
   alert: "#ff5555", // Dracula red — the fetch-state `failed` channel (ADR-015)
+  // State-glyph vocabulary — traffic-lamp colours, preset-independent
+  // (alarm/success-universality extends ADR-015). state-failed === alert.
+  // Distinct from document channels: the justification table in the brief
+  // names why each existing channel fails, so the hexes must not reuse them —
+  // green ≠ code-text (#50fa7b), yellow ≠ emphasis (#f1fa8c), orange ≠ strong
+  // (#ffb86c). state-failed === alert is the one allowed collision.
+  "state-ok": "#5fd35f",
+  "state-todo": "#ffe066",
+  "state-parked": "#ff9933",
+  "state-failed": "#ff5555",
 };
 
 /** Named presets — the identity layers. The default is the okuda

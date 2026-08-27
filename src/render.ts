@@ -39,10 +39,64 @@ import {
   padDisplay,
   padStartDisplay,
 } from "./width";
+import { stripANSI } from "./width";
 import { wrapANSI } from "./wrap";
 
 /** Left indent for list blocks, inside the content margin (Glow list level_indent). */
 const LIST_INDENT = 2;
+
+/** The closed state-glyph vocabulary — lexicon-applied, not author-editable.
+ *  The renderer colours a ✓ green because ✓ is in this set, not because
+ *  an author can tag arbitrary text green. Extends ADR-015's alert
+ *  discipline to the full traffic lamp. ◆ is NOT here — priority, not
+ *  state; colouring it would collapse two axes. (brief:
+ *  state-glyph-render-path.) */
+const STATE_GLYPH_ROLE: Record<string, keyof Palette> = {
+  "\u2713": "state-ok",      // ✓ done/shipped — green
+  "\u2610": "state-todo",    // ☐ todo/pending — yellow
+  "\u22ee": "state-parked",  // ⋮ parked/elided — orange
+  "\u2717": "state-failed",  // ✗ rejected/failed — red (= alert)
+};
+
+/** If `text` begins with a state glyph (the closed set), colour + bold
+ *  that leading glyph via its lexicon role; leave the rest unchanged.
+ *  Detects the glyph after any leading ANSI escapes (inline-styled
+ *  cells may carry SGR before the visible char). Pure; no-op in none
+ *  mode (roleBold returns the glyph plain — NO_COLOR parity). */
+function styleStateGlyph(text: string, styler: ReturnType<typeof makeStyler>): string {
+  if (text === "") return text;
+  // Find the first visible char by skipping leading ANSI SGR sequences.
+  const stripped = stripANSI(text);
+  const first = [...stripped][0];
+  if (first === undefined) return text;
+  const role = STATE_GLYPH_ROLE[first];
+  if (!role) return text;
+  // Locate the glyph in the original (with ANSI) by matching the
+  // stripped prefix length, then splice the styled glyph in.
+  const prefixLen = stripped.length - [...stripped].slice(1).join("").length;
+  // Walk the original text, counting visible chars until we hit the glyph.
+  let visStart = -1;
+  let visible = 0;
+  const re = /\x1b\[[0-9;]*m/g;
+  let m: RegExpExecArray | null;
+  let i = 0;
+  for (;;) {
+    re.lastIndex = i;
+    m = re.exec(text);
+    const ansiStart = m ? m.index : text.length;
+    if (visible === 0) { visStart = ansiStart; break; }
+    // count chars between i and ansiStart
+    if (ansiStart > i) {
+      const chunk = text.slice(i, ansiStart);
+      visible += [...chunk].length;
+    }
+    i = m ? m.index + m[0].length : text.length;
+    if (!m) break;
+  }
+  if (visStart < 0) visStart = 0;
+  const glyph = first;
+  return text.slice(0, visStart) + styler.roleBold(role, glyph) + text.slice(visStart + prefixLen);
+}
 
 export interface RenderOptions {
   width: number;
@@ -722,7 +776,12 @@ function renderList(
       const wrapped = wrapANSI(text, { width: avail });
       for (const line of wrapped) {
         if (firstLine) {
-          lines.push(markerPrefix + line);
+          // State-glyph lead: colour + bold the leading state glyph on
+          // the first line of a list item (brief: state-glyph-render-path).
+          // The glyph is content the author chose; the colour honours
+          // the lexicon. `◆` is NOT a state role — it stays on the
+          // heading/strong channel (priority, not lifecycle).
+          lines.push(markerPrefix + styleStateGlyph(line, ctx.styler));
           firstLine = false;
         } else {
           lines.push(contIndent + line);
@@ -841,9 +900,16 @@ function renderTable(t: TableState, ctx: Ctx): string {
   for (const r of rows) {
     const cells: string[][] = [];
     for (let i = 0; i < cols; i++) {
+      const raw = r[i]?.text ?? "";
+      // State-glyph column: colour + bold a leading state glyph via the
+      // lexicon role. Applied to non-key columns (i>0); the key column
+      // already gets table-key styling. The first column's glyph, if any,
+      // rides in table-key bold — a separate axis, not state. (brief:
+      // state-glyph-render-path.)
+      const styled = i === 0 ? raw : styleStateGlyph(raw, styler);
       const cell: Cell = i === 0
         ? { text: styler.roleBold("table-key", r[0]?.text ?? ""), align: r[0]?.align }
-        : r[i] ?? { text: "" };
+        : { text: styled, align: r[i]?.align };
       cells.push(padCell(cell, i, colWidth));
     }
     out.push(zipRow(cells, colWidth, bodySep));

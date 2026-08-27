@@ -16,5 +16,9 @@
   "diagram-border": "#5e8bbf",
   "diagram-arrow": "#ffaa00",
   "diagram-text": "#c8b894",
-  "alert": "#ff5555"
+  "alert": "#ff5555",
+  "state-ok": "#5fd35f",
+  "state-todo": "#ffe066",
+  "state-parked": "#ff9933",
+  "state-failed": "#ff5555"
 }
