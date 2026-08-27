@@ -18,6 +18,27 @@ an assumption.
 name and package name differ. The origin doc's `spacex-mermaid` is stale;
 `mermaid-to-md` is the real dependency.
 
+### `mermaid-to-md` known limits (verified 2026-08-28)
+
+- **`stateDiagram` and `stateDiagram-v2`** both render — flat state
+  boxes, `[*]` as a filled `●`, transition labels as `▼<label>`, terminal
+  states. The `-v2` syntax is accepted and produces the same output as
+  legacy.
+- **Composite (nested) states are flattened.** `state X { [*] --> A; A --> B }`
+  parses without error, but `X`, `A`, `B` render as **peer nodes**, not as
+  a containing box around its children. The containment is silently lost.
+  If a diagram's *containment is the point* (a composite state with
+  internal transitions), author it as a `flowchart` with `subgraph`
+  boxes, which the renderer *does* draw as containers — its native shape.
+  Don't ask the state grammar for nesting it flattens; ask the flowchart
+  grammar, which draws what it parses.
+- **Width guard.** A diagram whose rendered ASCII exceeds the binary's
+  internal width budget is emitted as the mermaid source in a bordered
+  box ("This diagram is too wide to display here") instead of ASCII art.
+  This is upstream elision — the binary gives up before okuda does.
+  Wide `flowchart LR` with long node labels hits this; short labels at the
+  same node count do not. (`docs/diagram-monster.md` is the live exhibit.)
+
 The pair (`fzf`, `fd`) serves the no-arg `gloam` launcher (see
 `src/launcher.ts`, ADR-016). `fzf` is a runtime dep of that mode
 (clean error + exit 1 if missing); `fd` is preferred but has an
