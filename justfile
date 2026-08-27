@@ -111,6 +111,12 @@ chip:
     @just build >/dev/null
     @./okuda docs/chip-dogfood.md --tui
 
+# Stamp state diagram
+[group('build')]
+stamp:
+    @just build >/dev/null
+    @./okuda docs/2026-08-27-fetch-state-stamp-states.md --tui
+
 # Manifesto (glow)
 [group('build')]
 manifesto:
