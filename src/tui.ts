@@ -203,6 +203,54 @@ export function reanchoredScroll(
   return Math.min(oldScroll, maxScroll);
 }
 
+/** Fetch outcome: the read path never coerces failure to empty success
+ *  (brief: fetch-state-stamp). A vanished source reported as `""` rendered
+ *  blank and the gate read `changed`; now failure is a distinct state the
+ *  gate retains the last-known-good against. */
+export type Fetch =
+  | { ok: true; text: string }
+  | { ok: false; reason: string };
+
+/** The three-way value the content gate produces and the footer stamp will
+ *  consume. `changed`/`same` fall out of the rendered-output comparison
+ *  (the mechanised "neither" — mtime is not meaning); `failed` is the
+ *  branch the coercing read path used to hide. One enum, three values,
+ *  no overlap. */
+export type FetchState = "changed" | "same" | "failed";
+
+/** Content gate: two renders are the same iff every line matches. `mtime
+ *  is not meaning` — a rewrite with identical content produces zero visual
+ *  events. Pure, exported for gate tests. */
+export function renderEqual(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
+}
+
+/** The gate decision, pure: given the previous rendered lines and the
+ *  outcome of a fresh fetch (with its rendered form when ok), return the
+ *  new fetch-state, the lines to display, and whether to repaint.
+ *  - failed:  retain the last-known-good (`prev`, or `[]` on the very first
+ *    load), mark `failed`, no repaint — honest-stale-with-label, not blank.
+ *  - same:    the content gate held, mark `same`, no repaint.
+ *  - changed: content moved, mark `changed`, repaint (the caller re-anchors
+ *    and paints).
+ *  `prev === null` is the initial-load sentinel: a successful first fetch
+ *  has no prior to compare against, so it reads as `changed`. */
+export function gateFetch(
+  prev: string[] | null,
+  fetch: Fetch,
+  next: string[],
+): { state: FetchState; lines: string[]; repaint: boolean } {
+  if (!fetch.ok) {
+    return { state: "failed", lines: prev ?? [], repaint: false };
+  }
+  if (prev !== null && renderEqual(prev, next)) {
+    return { state: "same", lines: prev, repaint: false };
+  }
+  return { state: "changed", lines: next, repaint: true };
+}
+
 export function displayPath(file: string): string {
   const parts = file.split("/").filter(Boolean);
   if (parts.length <= 1) return file;
@@ -269,9 +317,19 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   const muted = (s: string) => styler.role("muted", s);
   const badge = (s: string) => styler.badge(s);
 
-  const readSource = async (): Promise<string> => {
+  /** Read the source as a discriminated union — never coerce failure to
+   *  empty success. `f.exists()` false and any thrown IO (file unlinked
+   *  mid-session, permission revoked, mount vanished) both surface as
+   *  `{ok:false}`; the gate retains the last-known-good against it.
+   *  (brief: fetch-state-stamp — the empty-doc-on-fetch-failure lie.) */
+  const readSource = async (): Promise<Fetch> => {
     const f = Bun.file(opts.file);
-    return await f.exists() ? await f.text() : "";
+    try {
+      if (!(await f.exists())) return { ok: false, reason: "missing" };
+      return { ok: true, text: await f.text() };
+    } catch (err) {
+      return { ok: false, reason: String(err) };
+    }
   };
 
   const renderLines = async (source: string, width: number): Promise<string[]> => {
@@ -279,7 +337,16 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     return out.split("\n");
   };
 
-  let lines: string[] = await renderLines(await readSource(), opts.width);
+  // Initial fetch through the gate: prev=null is the initial-load sentinel,
+  // so a successful first read is `changed` (content arrived) and a failed
+  // first read is `failed` with empty lines (no last-known-good to retain).
+  const initialFetch = await readSource();
+  const initialRender = initialFetch.ok
+    ? await renderLines(initialFetch.text, opts.width)
+    : [];
+  const init = gateFetch(null, initialFetch, initialRender);
+  let lines: string[] = init.lines;
+  let fetchState: FetchState = init.state; // footer stamp reads this (brief: fetch-state-stamp)
   let scroll = 0;
   let showHints = false; // `?` toggles: compact % footer ↔ verbose hints
 
@@ -312,13 +379,22 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     }
   };
 
-  /** Re-render from source, re-anchored (ADR-010 semantics) — the one
-   *  repaint path: resize, manual reload, and (brief: tui-live-documents)
-   *  fs.watch all pin the line under the eye to its screen row. */
+  /** Re-render from source through the content gate, re-anchored (ADR-010
+   *  semantics) — the one repaint path: resize, manual reload, and (brief:
+   *  tui-live-documents) fs.watch all pin the line under the eye to its
+   *  screen row. The gate is the mechanised "neither": identical content
+   *  → `same`, no repaint; a failed fetch → `failed`, retain the
+   *  last-known-good, no repaint; only a real change repaints. */
   const rerenderAnchored = async (): Promise<void> => {
-    const height = contentHeight(dims().rows, showHints);
+    const { rows, cols } = dims();
+    const height = contentHeight(rows, showHints);
+    const fetch = await readSource();
+    const next = fetch.ok ? await renderLines(fetch.text, cols) : [];
+    const decision = gateFetch(lines, fetch, next);
+    fetchState = decision.state;
+    if (!decision.repaint) return; // gate held, or source lost — keep the screen
     const oldLines = lines;
-    lines = await renderLines(await readSource(), dims().cols);
+    lines = decision.lines;
     scroll = reanchoredScroll(oldLines, lines, scroll, height);
     paint();
   };

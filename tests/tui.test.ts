@@ -11,6 +11,10 @@ import {
   findAnchor,
   proportionalScroll,
   reanchoredScroll,
+  gateFetch,
+  renderEqual,
+  type Fetch,
+  type FetchState,
 } from "../src/tui";
 import { makeStyler } from "../src/ansi";
 import { DRACULA_PALETTE } from "../src/palette";
@@ -274,5 +278,81 @@ describe("tui — reanchoredScroll (the one repaint path: reload / resize / watc
   test("scroll clamps to the new max when the doc shrinks hard", () => {
     const tiny = ["  only", "  lines"];
     expect(reanchoredScroll(doc, tiny, 10, 6)).toBe(0); // maxScroll 0
+  });
+});
+
+describe("tui — renderEqual (the content gate primitive)", () => {
+  test("identical renders are equal", () => {
+    expect(renderEqual(["a", "b"], ["a", "b"])).toBe(true);
+  });
+  test("length differs → not equal", () => {
+    expect(renderEqual(["a"], ["a", "b"])).toBe(false);
+  });
+  test("any line differs → not equal", () => {
+    expect(renderEqual(["a", "b"], ["a", "x"])).toBe(false);
+  });
+  test("both empty → equal (the cron-rewrite-with-identical-content case)", () => {
+    expect(renderEqual([], [])).toBe(true);
+  });
+});
+
+describe("tui — gateFetch (changed / same / failed, retain-on-failure)", () => {
+  const ok = (text: string): Fetch => ({ ok: true, text });
+  const fail = (reason = "missing"): Fetch => ({ ok: false, reason });
+  const render = (text: string): string[] => text.split("\n");
+  const prev = render("alpha\nbeta\ngamma");
+
+  test("failed fetch retains the last-known-good and marks failed, no repaint", () => {
+    const d = gateFetch(prev, fail("mount gone"), []);
+    expect(d.state).toBe("failed");
+    expect(d.lines).toBe(prev); // last-known-good retained, not blanked
+    expect(d.repaint).toBe(false);
+  });
+
+  test("failed fetch with no prior (initial load) → empty lines, failed, no repaint", () => {
+    const d = gateFetch(null, fail(), []);
+    expect(d.state).toBe("failed");
+    expect(d.lines).toEqual([]); // nothing to retain
+    expect(d.repaint).toBe(false);
+  });
+
+  test("same content → same, no repaint (the mechanised ‘neither’)", () => {
+    const same = render("alpha\nbeta\ngamma");
+    const d = gateFetch(prev, ok("alpha\nbeta\ngamma"), same);
+    expect(d.state).toBe("same");
+    expect(d.repaint).toBe(false);
+    expect(d.lines).toBe(prev);
+  });
+
+  test("identical-bytes rewrite (mtime moved, content didn’t) → same, no repaint", () => {
+    // mtime is not meaning: a cron rewrite with identical content is a no-op.
+    const d = gateFetch(prev, ok("alpha\nbeta\ngamma"), [...prev]);
+    expect(d.state).toBe("same");
+    expect(d.repaint).toBe(false);
+  });
+
+  test("changed content → changed, repaint, new lines", () => {
+    const next = render("alpha\nBETA\ngamma");
+    const d = gateFetch(prev, ok("alpha\nBETA\ngamma"), next);
+    expect(d.state).toBe("changed");
+    expect(d.repaint).toBe(true);
+    expect(d.lines).toBe(next);
+  });
+
+  test("initial-load sentinel (prev null) + success → changed (content arrived)", () => {
+    const next = render("hello");
+    const d = gateFetch(null, ok("hello"), next);
+    expect(d.state).toBe("changed");
+    expect(d.lines).toBe(next);
+    expect(d.repaint).toBe(true);
+  });
+
+  test("the three states are mutually exclusive (no overlap)", () => {
+    const states: FetchState[] = [
+      gateFetch(prev, fail(), []).state,
+      gateFetch(prev, ok("alpha\nbeta\ngamma"), render("alpha\nbeta\ngamma")).state,
+      gateFetch(prev, ok("alpha\nBETA\ngamma"), render("alpha\nBETA\ngamma")).state,
+    ];
+    expect(new Set(states).size).toBe(3);
   });
 });
