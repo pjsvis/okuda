@@ -138,6 +138,23 @@ they either earn a brief or get foxtrot-oscar'd. The Edinburgh lexicon
   discipline and the launcher's fuzzy box degrades to `doc-001`
   territory overnight. (Sharpens *the lexicon is the moat*: the moat
   works because both conditions hold, not one.)
+- **The compass rose.** Four words — `help`, `readme`, `about`, `okuda` —
+  orient a stranger without a tutorial: `readme` the front door (what
+  this is), `help` the operator's view (what do I do), `about` the why
+  (what it's for), `okuda` the identity (the LCARS design language that
+  named the project). The same naive fuzzy matcher that finds a brief
+  from `state-stamp` finds orientation from these handles — one engine,
+  two jobs. The access layer *is* the documentation; no separate
+  tutorial survives because the words were chosen to be findable and
+  the namespace is bounded. The *discoverability* vocabulary extends the
+  lexicon-is-the-moat claim one layer out: the moat isn't just the
+  design vocabulary (`on screen now`, `tied to the mast`) — it's the
+  handles that get you to the design vocabulary in the first place.
+  The handles cost nothing to type; they cost effort to keep honest —
+  four words, four times a year — which is the right price for a
+  discovery layer that needs no UI, no guide, no session memory. Pen and
+  paper aren't required to find the door; they're required to keep the
+  door labelled.
 
 ---
 
