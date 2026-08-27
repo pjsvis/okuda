@@ -337,6 +337,14 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     return out.split("\n");
   };
 
+  // Enter the alt-screen *before* the first read+render: the file fetch and
+  // the markdown render are async, and doing them in the primary screen
+  // flashes the user's shell scrollback for a frame (the FUT — flash of
+  // unstyled terminal). A blank alt-screen during the read reads as
+  // "loading," not "glitch"; content of the transitional frame beats its
+  // duration (brief: launcher-fut — the ordering half of the fix).
+  process.stdout.write(ENTER_ALT + HIDE_CURSOR);
+
   // Initial fetch through the gate: prev=null is the initial-load sentinel,
   // so a successful first read is `changed` (content arrived) and a failed
   // first read is `failed` with empty lines (no last-known-good to retain).
@@ -451,8 +459,8 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     resolveDone();
   };
 
-  // Enter.
-  process.stdout.write(ENTER_ALT + HIDE_CURSOR);
+  // Enter (raw mode + listener only — the alt-screen switch happened
+  // before the first read so no FUT frames the launch).
   process.stdin.setRawMode?.(true);
   process.stdin.resume();
   process.stdin.on("data", onKey);
