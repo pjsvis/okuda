@@ -121,6 +121,36 @@ they either earn a brief or get foxtrot-oscar'd. The Edinburgh lexicon
   excuse. (Sharpens *the content is the content* and *one job; get on
   with it*: the viewer's constitution is presence without persuasion,
   and the persuasion it most refuses is self-promotion.)
+- **Three concerns, three owners.** Every other markdown viewer folds
+  them into one; okuda refuses all three folds. (1) **Compositing** —
+  where the text comes from, how it's assembled — belongs to the
+  environment: a filesystem, a chat, an agent's stream, another human's
+  keystrokes. Not okuda's job. (2) **Windowing** — where the text
+  appears, how panes split — belongs to the host (Herdr opens tabs for
+  free; okuda doesn't tax it by carrying its own window manager). (3)
+  **Rendering** — markdown in, coloured bytes out, fast — is the whole
+  job, and the only job. The filesystem is the message bus; the
+  documents are the messages; okuda reads bytes and paints bytes. The
+  widest possible integration surface, and it costs *negative* code —
+  the code you didn't write to be a compositor or a window manager is
+  the code that makes every integration free. (Sharpens *read here,
+  act there* and *one job; get on with it* into an operating principle:
+  the Derrida question for any future "should we build X" is *does X
+  touch the byte stream or the screen?* If it touches the screen before
+  the byte stream, it's okuda's; if it touches the byte stream's
+  origin, it's the environment's. One line, one gate, no exceptions.)
+- **The Heath Robinson machine.** The silo is a contraption that
+  communicates by writing files: an agent writes briefs to `briefs/`,
+  the td system writes state to its store, the registries index
+  themselves, a human writes a note in a text editor — and okuda
+  renders any of it because it never decided to be a compositor. *We
+  don't care where the text comes from* is not a deferral, it's the
+  moat: any tool that writes markdown to a file is already okuda's
+  compositor, by accident, without an API. The scratchpad's *pen and
+  paper* is the same claim from the human side — the complexity is in
+  the renderer's bytes; the simplicity is in the gestures, and the
+  gestures are "write a file, open a file." The workspace is emergent
+  because nothing new is built to make it emerge.
 - **The elision fringe.** The elision marker is not one discrete glyph
   but a *fringe* that runs along the edge it marks — three stacked, a
   block of nine dots, impossible to miss. The fringe runs along the
