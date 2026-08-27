@@ -14,3 +14,4 @@
 {"file":"014-table-elision-over-shrink-wrap.md","date":"2026-08-27","status":"Accepted","summary":"Table elision over in-cell shrink-wrap","meta":{"applies_to":"src/render.ts"}}
 {"file":"015-alert-palette-role.md","date":"2026-08-27","status":"Accepted","summary":"An `alert` palette role for the fetch-state stamp's `failed` channel","meta":{}}
 {"file":"016-argv0-launcher-dispatch.md","date":"2026-08-27","status":"Accepted","summary":"argv[0] dispatch — `gloam` is the launcher entry point","meta":{}}
+{"file":"017-session-handoffs-are-not-briefs.md","date":"2026-08-27","status":"Accepted","summary":"Session handoffs are not briefs","meta":{"tidy_commit":"4ab0f58","applies_to":"AGENTS.md,playbooks/briefs-playbook.md"}}

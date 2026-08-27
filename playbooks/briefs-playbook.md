@@ -97,7 +97,28 @@ right tool. See `td-playbook.md`.
 
 ## Archiving
 
-Completed briefs stay in `briefs/`. Keep them — they are the permanent record of what was intended, and the yardstick against which the debrief measures what actually happened.
+Completed briefs move to `.archive/briefs/` — same filename,
+checked in to git, excluded from Gloam search (`.archive` is
+dot-prefixed; `walkMarkdown` and `fd` both skip it). The INDEX entry
+is removed on move (`just reg-sync-fix`). A completed brief is work
+that shipped; keeping it in `briefs/` makes the open list a graveyard.
+The archive is the permanent record; the live list is the work queue.
+
+**What does not go in `briefs/` (ADR-017):**
+
+- **Session handoffs** — "where was I?" is not "what will we build?"
+  Ephemeral handoffs go to `td handoff`; rich context worth persisting
+  goes to `docs/`. Never `briefs/`.
+- **Raw research / pasted content** — a brief has frontmatter, a
+  `# Brief:` title, a date, and a status. A paste of external content
+  is research material; it goes to `docs/`. The INDEX enforces the
+  shape; a raw paste fails the gate.
+- **Debriefs** — "what happened and why?" is retrospective, not intent.
+  Goes to `debriefs/`.
+
+The test: if it answers "what will we build?" with a status and
+acceptance criteria, it's a brief. If it answers anything else, it's
+in the wrong folder.
 
 ## Review Checklist
 

@@ -29,5 +29,6 @@ okuda renders what this workflow generates: headers, loose lists, loose tables, 
 | Playbooks | `playbooks/` | How do we do X? |
 | Decisions | `decisions/` | Why did we choose X over Y? |
 | Debriefs | `debriefs/` | What happened and why? |
+| Session handoffs | `td handoff` (ephemeral) or `docs/` (persistent) | Where was I? — never `briefs/` (ADR-017) |
 
 External dependencies: `DEPENDENCIES.md`
