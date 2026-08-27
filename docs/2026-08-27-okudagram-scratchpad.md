@@ -106,6 +106,21 @@ they either earn a brief or get foxtrot-oscar'd. The Edinburgh lexicon
   reader's effort to find the change is the effort that makes the
   change *stick* — the elision principle one layer up. Whether the
   changes should be obvious is not our concern.
+- **Read here, act there.** The viewer is not a product; it does not
+  retain, suggest, or reward. You read a document in Gloam, you act on
+  it *somewhere else* — another pane, another session, another tool —
+  and you come back. The document is the shared substrate; the viewer
+  presents it and gets out of the way. The moment a viewer starts
+  demanding (recents, stacks, cloud sync, "smart" suggestions) it
+  stops being a viewer and becomes a chip pan fire: reactive, expensive,
+  out of control. The pizza-shop doctrine: consistent, acceptable,
+  sustainable. The viewer's secret is *restraint* — the closed grammar,
+  the LCARS frame, the two-chip bookend. A viewer that does less than
+  the competition but does that less reliably, legibly, and without
+  surprise has a moat; a viewer that adds a settings panel has an
+  excuse. (Sharpens *the content is the content* and *one job; get on
+  with it*: the viewer's constitution is presence without persuasion,
+  and the persuasion it most refuses is self-promotion.)
 - **The elision fringe.** The elision marker is not one discrete glyph
   but a *fringe* that runs along the edge it marks — three stacked, a
   block of nine dots, impossible to miss. The fringe runs along the
