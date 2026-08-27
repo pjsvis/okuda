@@ -39,12 +39,32 @@ A paragraph with **bold**, *italic*, ~~strike~~, `code`, and a [link](https://ex
 
 ---
 
+## Glyph coverage
+
+### Working set — should see: all glyphs rendered, one cell each, no tofu, table column aligned
+
+✓ yes ✗ no ⋮ elided ◆ note ☐ todo … more → flow ← return ↔ bidirectional ✓✓✗✗
+
+| Flag | Meaning |
+| --- | --- |
+| ✓ | verified |
+| ✗ | rejected |
+| ⋮ | elided |
+
+If any glyph shows as tofu (empty box) the font is the limit; if the table's
+Flag column misaligns, the terminal's width disagrees with the engine —
+report which glyph.
+
+---
+
 ## Margins and structure (verified good — reference)
 
-- Lists indent two chars past the paragraph margin.
-- Tables have a closing rule.
-- Code fences get a 2-char left indent.
-- An empty line sits at the very top of the document.
+### Bold-lead list — should see: amber key column, scannable before read
+
+- **Lists.** Indent two chars past the paragraph margin; the bold leads render high-contrast amber.
+- **Tables.** A closing rule beneath the last row.
+- **Code fences.** A 2-char left indent, verbatim.
+- **Top margin.** An empty line sits at the very top of the document.
 
 | Element | Channel |
 | --- | --- |

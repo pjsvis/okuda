@@ -17,7 +17,7 @@ Glow enforces CommonMark tight-list rules that collapse list items, ignores soft
 
 ## Status
 
-Pre-implementation. Design source: [`docs/2026-08-20-origin-doc.md`](docs/2026-08-20-origin-doc.md) — the *what*. Design rationale: [`docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md`](docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md) — the *why* (the Derrida gate, the Foxtrot Oscar, and the ventilator).
+Pre-implementation. Design source: [docs/2026-08-20-origin-doc.md](docs/2026-08-20-origin-doc.md) — the *what*. Design rationale: [docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md](docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md) — the *why* (the Derrida gate, the Foxtrot Oscar, and the ventilator).
 
 ## Repository Layout
 

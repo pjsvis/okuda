@@ -32,7 +32,23 @@ The viewer owns the layout. Under ADR-007, okuda matches Glow's heading renderin
 
 This is a single paragraph split across two source lines. The soft return between them becomes a hard break — no trailing double-space tax.
 
-Inline styles carry the semantic load: **bold for emphasis**, *italic for asides*, ~~strikethrough for the discarded~~, and `` `inline code` `` for the literal. A [hyperlink to the origin](https://example.com/origin) renders as an OSC 8 terminal hyperlink — clickable in any modern terminal, invisible to the scrollback. An image `![rejected alt](pic.png)` becomes `[image: rejected alt]`; the viewer renders text, not pixels.
+Inline styles carry the semantic load: **bold for emphasis**, *italic for asides*, ~~strikethrough for the discarded~~, and `` `inline code` `` for the literal. A [hyperlink to the origin](https://example.com/origin) renders as rose link text plus a visible cyan-underlined URL — the URL is always on screen (see *Links: browser invocation* below). An image `![rejected alt](pic.png)` becomes `[image: rejected alt]`; the viewer renders text, not pixels.
+
+---
+
+## Links: browser invocation
+
+okuda emits no OSC 8 hyperlink markup — the URL is displayed as text, so
+browser invocation is the terminal's job. These probes test URL
+detection and click-to-browser handoff:
+
+- **Labelled link.** [the origin doc](https://example.com) — the common case; the target is the cyan URL, not the rose label.
+- **Bare URL.** In prose, https://example.com/plain is plain text to okuda; detection is entirely the terminal's heuristic.
+- **Query string.** https://example.com/search?q=okuda&lang=en — a picker that stops at `?` truncates the target.
+- **List context.** [a link inside a list](https://example.com/list) must survive the bullet prefix and the adjacent bold lead intact.
+
+Ctrl/Cmd+Click (or plain click, terminal-dependent) on any URL above
+should hand off to the browser.
 
 ---
 
@@ -57,6 +73,24 @@ flowchart LR
 
 The fence is intercepted pre-render, piped to the `mermaid-to-md` Rust binary, and the returned ASCII is coloured by channel: borders recede, arrows lead the eye, text sits in the foreground. The diagram never wraps — a wrapped state machine is a lie about the system's topology.
 
+Orientation is a semantic choice, not a preference. The lifecycle above is a cycle — it reads across. The pipeline below is one-way — it reads down. Same renderer, same intercept, two shapes:
+
+```mermaid
+flowchart TD
+  Source --> Parse
+  Parse --> Intercept
+  Intercept --> ASCII
+  ASCII --> Colour
+  Colour --> Screen
+```
+
+That is the viewer's own path, top to bottom: markdown in, coloured ASCII out. A diagram is not a one-off ornament — it earns column space wherever the prose would otherwise be describing a shape.
+
+And beneath each diagram, the muted source: the invitation. Here is your
+art; here is the source if you want to give it a go yourself. Nothing is
+hidden — just presented at the volume each layer has earned: art in the
+foreground, structure receding, source waiting quietly underneath.
+
 ---
 
 ## Quotes: single-level, muted
@@ -78,6 +112,14 @@ inside it that honours the break.
 - Second item, wrapping across a wide terminal to demonstrate that continuation
 indentation aligns under the text, not the marker.
 - Third item.
+
+House style is the **bold lead**: each item opens with a bolded key followed
+by prose. The keys render as an amber column the eye scans without reading —
+the table's first column, rotated vertical:
+
+- **Count.** The eye sees how many items there are before reading any.
+- **Keys.** The bold leads scan like a table's first column; each key promises what its item covers.
+- **Detail on demand.** Drop into the items that interest you; skip the rest, unread.
 
 Ordered lists get the same breathing room:
 
@@ -105,9 +147,73 @@ Task lists are rejected — the checkbox markup stays literal text:
 | Header | bold cyan, rule beneath | structure |
 | Key column | bold amber | identity |
 | Data cell | high-contrast text | payload |
-| Wide table | shrinks to terminal width, wraps in-cell | containment |
+| Wide table | elides to terminal width, `…` marker, invites widening | truth |
 
-Alignment is honoured per-column: right, left, centre. A table that would overflow the terminal is shrunk proportionally and wrapped in-cell rather than allowed to blow out the pane.
+Alignment is honoured per-column: right, left, centre. A table that would overflow the terminal elides to the edge with `…` rather than shrink-wrapping — the table keeps its columns, the reader widens or pages. (Reverses the prior in-cell shrink-wrap; see `decisions/014-table-elision-over-shrink-wrap.md`.)
+
+---
+
+## Glyphs: joy with a job
+
+Glyphs are author content, not grammar — okuda imposes none and
+interprets none. But a document that uses them well reads faster than
+one that uses them never. The rule: **one glyph, one job** — a mark that
+duplicates an existing structure is noise; a mark that distinguishes what
+structure alone cannot is perception for free.
+
+◆ **Load-bearing.** A diamond before the bold lead marks the note that
+changes how you read everything after it. The eye catches it at three
+times the distance of italic — a priority flag, not a flourish.
+
+Elision in prose — item one ⋮ item nine — says "intervening items
+omitted" without lying that they were listed.
+
+Flow in prose: source → parse → render → screen. Arrows carry topology
+inline, no diagram required.
+
+Yes/no pairs: ✓ works, ✓ verified, ✗ rejected, ✗ out of scope — plain
+text colour, one cell each, no emoji presentation to disagree with the
+width engine.
+
+A glyph column in a table compresses state to a glance — each row is
+assessed before it is read, and the key beneath teaches the dialect in
+one line:
+
+| Subsystem | State | Note |
+| --- | --- | --- |
+| Wrap engine | ✓ | grapheme-true; CJK and emoji widths verified |
+| Mermaid intercept | ✓ | art plus muted source, both on show |
+| Autolink pass | ✗ | rejected — URL detection is the terminal's job |
+| OSC 8 hyperlinks | ⋮ | parked under Pass C; reopen on terminal evidence |
+| Lexer EAW audit | ☐ | next: token widths against the width table |
+
+Key: ☐ to do · ✓ done · ✗ rejected · ⋮ parked — elided into a further question.
+
+The same flags lead a list, carrying state the bullet cannot — ☐ to do,
+✓ done, ✗ rejected, and ⋮ elided: parked pending a question. The irony
+is the point — the elided item has not vanished, it has elided into a
+further question:
+
+- ☐ **Lexer audit.** Token widths against the EAW table — not yet checked.
+- ✓ **Wrap engine.** Grapheme segmentation verified on CJK, emoji, combining marks.
+- ✗ **Autolink pass.** Rejected — URL detection is the terminal's job.
+- ⋮ **OSC 8.** Parked under Pass C; reopen only if a terminal test demands clickability.
+
+Declare the legend once, trust it after. And note the boundary: an item
+with an owner or a date belongs in the task tracker — glyphs carry
+document-state, not workflow.
+
+Inside a quote, the diamond marks the load-bearing sentence, not the
+block:
+
+> ◆ The quote keeps its pipe; the diamond inside marks the sentence that
+> matters, so the skim finds it before the read does.
+
+What this section does *not* do: use a glyph to re-say what the bullet
+already says — the reader pays twice for one meaning — or reach for
+astral-plane emoji whose width terminals disagree on. The status-led
+list above is the exception that proves the rule: its glyphs carry state
+no other marker holds, one job each. Joy that costs alignment is not joy.
 
 ---
 
@@ -132,3 +238,23 @@ Body text wraps at the terminal column count. Raw blocks — code fences, mermai
 ---
 
 That is the whole grammar. Nothing more is promised; nothing more is wanted.
+
+How the document itself should end is the open question. The header opens
+the okudagram — badge left, title, chip right, spanning the width — but a
+bare rule cannot close it: the rule already has a job, separating
+sections, and a terminator that doubles as a separator closes nothing.
+The proposed closer mirrors the header's anchor instead:
+
+```text
+  ## Grammar Showcase                                     █
+
+    … the document …
+
+  ─────────────────────────────────────────────────────── █
+```
+
+Rule to the column the title reached, chip in the cell the header's chip
+occupies — a right-hand rail, top and bottom. The closing is quieter than
+the opening (muted rule for bold title), which is the correct direction:
+openings announce, closings release. And the bare rule keeps its old job
+unambiguously, because the terminator now looks like nothing else.

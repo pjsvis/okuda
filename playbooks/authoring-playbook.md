@@ -94,6 +94,81 @@ not for long quoted passages. If the quote is more than ~3 lines of argument,
 it belongs in the body prose. The pipe is for the aphorism, the maxim, the
 definition — the thing you'd underline.
 
+## The muted source echo
+
+A mermaid fence renders as two layers: the ASCII art (borders recede,
+arrows lead, text foregrounds), then the mermaid source beneath it, muted.
+The art is the offer; the source is the invitation.
+
+**Why it earns its place — availability without insistence.** The muted
+source does not ask to be read; it waits to be needed. A reader who wants
+the diagram takes the diagram; a reader who wants to *change* the diagram
+takes the source — copy it, edit it, give it a go yourself. Nothing is
+hidden. And because the echo is the renderer's own receipt (the binary's
+`mmd` fence — what it understood, not what you hoped), art and source can
+be compared on sight: a diagram that disagrees with its source is caught
+in one glance. Restraint is the register: the coolness of the feature is
+expressed by the completeness of the presentation, not the volume.
+
+**Authoring rule.** Never strip the source from a document because "the
+diagram already shows it" — the source is the reader's on-ramp. The
+corollary: if the art needs to shout to be understood, the structure it
+draws is weak.
+
+---
+
+## The status-led list
+
+A loose list whose items open with a status glyph, then the bold lead,
+then prose: ☐ to do, ✓ done, ✗ rejected, ⋮ elided — parked pending a
+question, elided into it rather than vanished.
+
+**Why it earns its place.** The GFM checkbox is binary — `[ ]` or `[x]` —
+and okuda renders it literally anyway (the grammar is closed; the
+markup stays text). Real documents accumulate a third and fourth state
+that binary cannot hold: *rejected* (considered, refused) and *parked*
+(neither planned nor done nor rejected — waiting on a question). The
+operator knows the state from the parked brief; the glyph gives the
+document the same honesty.
+
+**Authoring rules.**
+
+- **Declare the legend.** One line, first use, in the document. House readers skip it; strangers cannot — a private dialect must be taught once.
+- **Keep the set small.** Four states. A fifth and the eye stops scanning and starts decoding.
+- **Document state only.** If the item has an owner, a date, or a handoff, it belongs in the tracker, not the document. Glyphs travel with the prose; the tracker tracks.
+- **Width honesty.** ☐ U+2610, ✓ U+2713, ✗ U+2717, ⋮ U+22EE — one cell each, none emoji-presentation-default. Any new glyph joins the audit doc's working set before it is relied on.
+
+---
+
+## The decision matrix
+
+When a document's payload is "things to decide", the shape is known
+before the captain asks: a table.
+
+| Decision | State | The reasoning |
+| --- | --- | --- |
+| Wrap engine | ✓ | grapheme-true; verified on CJK and emoji |
+| OSC 8 | ⋮ | parked; reopen on terminal evidence |
+
+Key: ☐ open · ✓ decided · ✗ rejected · ⋮ parked.
+
+**Why it earns its place.** Decidability is a scan, not a read. The table
+puts state in its own column, so the eye counts the ☐ before reading a
+word — the open decisions are found in one fixation, which is the whole
+point of a decision list. A prose list buries state inside sentences;
+the reader re-derives it per item. The matrix also forces the third
+column — the reasoning — to justify itself in one cell, which is exactly
+as much as a decision log needs.
+
+**Authoring rule — the canon, not improvisation.** Reach for this shape
+by default when decisions are the payload: column one the decision
+(renders in the key channel), column two the state glyph, column three
+the constraint or reason, key line beneath. "On screen, now" is the
+test: the best format arrives without being specified, because the
+house already knows it.
+
+---
+
 ## Heuristics, emerging
 
 Add here as they surface from dogfooding. Each entry: the pattern, why it earns its place, the perceptual property it serves.

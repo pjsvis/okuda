@@ -53,6 +53,17 @@ they either earn a brief or get foxtrot-oscar'd. The Edinburgh lexicon
 - **The content is the content.** The viewer presents, it doesn't
   editorialise, it doesn't retain, it doesn't reward. Three words; the
   viewer's whole constitution. Presence without persuasion.
+- **Render for the car radio, not the studio monitor.** The Tamla
+  Motown test: mix for the medium you can't control — a car speaker,
+  road noise, a distracted driver. If the track survived that, it was
+  a track; if it only sounded good on the studio monitors, it was
+  production sheen. okuda's closed grammar is the same principle
+  applied to rendering. Every element in the grammar is one that
+  *degrades gracefully* under hostile conditions: a 30-column
+  half-width panel, no OSC8, a font without box-drawing glyphs. The
+  constraint isn't a limitation; it's a noise-tolerance design. Judge
+  the map by its survival in the territory, not by its fidelity on
+  the surveyor's desk.
 - **One job; get on with it.** Tawny Madison's job in *Galaxy Quest* —
   repeat what the computer says, in the uniform, and resist every
   invitation to do more. The viewer is the channel, not the content; a
