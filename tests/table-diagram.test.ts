@@ -53,8 +53,12 @@ describe("render — tables (uniform presentation policy)", () => {
     // body rows do NOT have │ (loose body, gutter only)
     const bodyLine = ls.find((l) => stripANSI(l).includes("x"))!;
     expect(stripANSI(bodyLine)).not.toMatch(/│/);
-    // header rule + closing rule span the full content width (W - 4 margin)
-    const ruleLines = ls.filter((l) => /^\s*\x1b\[38;2;88;88;88m─+/.test(l));
+    // header rule + closing rule span the full content width (W - 4 margin).
+    // The block terminator also draws a muted rail (same channel) — exclude
+    // it: it ends in the chip, table rules do not.
+    const ruleLines = ls.filter(
+      (l) => /^\s*\x1b\[38;2;88;88;88m─+/.test(l) && !stripANSI(l).endsWith("█"),
+    );
     expect(ruleLines.length).toBe(2);
     for (const r of ruleLines) {
       // 2-char left margin + full content-width rule = W - 2

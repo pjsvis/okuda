@@ -253,9 +253,23 @@ export async function renderDocument(
 
   const rendered = Bun.markdown.render(source3, handlers(ctx), {
     ...PARSER_OPTIONS,
-  });
+  }).replace(/\n+$/, "\n\n"); // terminator wants exactly one blank line above
 
-  return finalize(rendered);
+  // Block terminator — the okudagram's bottom (candidate B, verified
+  // 2026-08-27 against four prototypes). Rule to the column the title
+  // reaches, chip in the header chip's cell: the header's anchors,
+  // rotated. Completes the diagonal (heading blue top+LHS, muted
+  // RHS+footer) and closes the frame a bare rule cannot — a separator
+  // that doubles as a terminator terminates nothing. Emitted by the
+  // renderer, never authored: every document ends, so termination is a
+  // property of rendering (the TUI's closer is the Gloam footer, its
+  // own frame — the terminator belongs to the streaming canvas).
+  // none-mode parity via the styler: plain `─` rail, plain `█` chip.
+  let out = rendered;
+  if (stripTags(rendered).trim() !== "") {
+    out = rendered + styler.rule(ctx.width - 2) + " " + styler.headingChip() + "\n";
+  }
+  return finalize(out);
 }
 
 /**

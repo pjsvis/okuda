@@ -37,6 +37,34 @@ describe("render — headings", () => {
   });
 });
 
+// ── Block terminator (the okudagram's bottom; candidate B of the
+// 2026-08-27 four-way probe). Rule to the title's column, chip in the
+// header chip's cell — renderer-emitted, never authored.
+describe("render — block terminator", () => {
+  test("present on a non-empty document, chip in the header chip's column", async () => {
+    const out = await render("# Title\n\nBody");
+    const last = lines(out).map(stripANSI).filter((l) => l !== "").at(-1)!;
+    expect(last).toMatch(/^ {2}─+ █$/);
+    // Chip sits in the same column as the heading chip: content width is
+    // W-4, rail is width-2, gap, chip → same last column as heading lines.
+    const heading = lines(out).map(stripANSI).find((l) => l.includes("Title"))!;
+    expect(displayWidth(last)).toBe(displayWidth(heading));
+  });
+
+  test("absent on an empty document", async () => {
+    const out = await render("");
+    expect(out).not.toContain("─");
+    expect(out).not.toContain("█");
+  });
+
+  test("none-mode parity: plain rail, plain chip, same columns", async () => {
+    const out = await render("Body", W, "none");
+    const last = lines(out).map(stripANSI).filter((l) => l !== "").at(-1)!;
+    expect(last).toBe("  " + "─".repeat(W - 4 - 2) + " █");
+    expect(out).not.toContain("\x1b[");
+  });
+});
+
 // ── RHS chip (brief: right-edge LCARS tab). A heading-bg space at the
 //    last content column of every header line — the visible right bound,
 //    bookend to the left badge. The chip IS the rhs margin for headers.
@@ -165,7 +193,11 @@ describe("render — grammar pre-passes (front matter, setext)", () => {
     expect(none).toContain("para");
     expect(none).toContain("---");
     expect(none).toContain("===");
-    expect(none).not.toContain("──"); // no hr manufactured inside the fence
+    // No hr manufactured inside the fence: the only `──` run is the block
+    // terminator, and it is the document's last line.
+    const hrLines = lines(none).map(stripANSI).filter((l) => l.includes("──"));
+    expect(hrLines).toHaveLength(1);
+    expect(hrLines[0]).toMatch(/─+ █$/);
   });
 
   test("standalone thematic break (blank line above) still renders as hr", async () => {
@@ -337,7 +369,9 @@ describe("render — code fences", () => {
   test("interior blank lines preserved", async () => {
     const out = await render("```\na\n\nb\n```");
     const stripped = lines(out).map((l) => stripANSI(l));
-    expect(stripped).toEqual(["", "    a", "", "    b", ""]);
+    expect(stripped.slice(0, 5)).toEqual(["", "    a", "", "    b", ""]);
+    // The block terminator follows: muted rail + chip, last non-empty line.
+    expect(stripped.filter((l) => l !== "").at(-1)).toMatch(/^ {2}─+ █$/);
   });
 
   test("indented code block rejected as plain text (no crash, no markup)", async () => {
