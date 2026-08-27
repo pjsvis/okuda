@@ -255,19 +255,25 @@ export async function renderDocument(
     ...PARSER_OPTIONS,
   }).replace(/\n+$/, "\n\n"); // terminator wants exactly one blank line above
 
-  // Block terminator — the okudagram's bottom (candidate B, verified
-  // 2026-08-27 against four prototypes). Rule to the column the title
-  // reaches, chip in the header chip's cell: the header's anchors,
-  // rotated. Completes the diagonal (heading blue top+LHS, muted
-  // RHS+footer) and closes the frame a bare rule cannot — a separator
-  // that doubles as a terminator terminates nothing. Emitted by the
-  // renderer, never authored: every document ends, so termination is a
-  // property of rendering (the TUI's closer is the Gloam footer, its
-  // own frame — the terminator belongs to the streaming canvas).
-  // none-mode parity via the styler: plain `─` rail, plain `█` chip.
+  // Block terminator — the okudagram's bottom (candidate B of the
+  // 2026-08-27 four-way probe). Two chips bookend a muted rule: the
+  // LHS chip mirrors the H1 badge's column (subdued — muted, not
+  // heading-coloured, so it orients without declaring depth; the badge
+  // encodes level, the terminator encodes *exit*), the RHS chip mirrors
+  // the heading chip's cell. The eye, trained by the H1 badge on the
+  // left, lands on the muted LHS chip on scroll and reads "closed" —
+  // no false promise of more to read. Completes the diagonal (heading
+  // blue top+LHS, muted RHS+footer) and closes the frame a bare rule
+  // cannot — a separator that doubles as a terminator terminates
+  // nothing. Emitted by the renderer, never authored: every document
+  // ends, so termination is a property of rendering (the TUI's closer
+  // is the Gloam footer, its own frame — the terminator belongs to the
+  // streaming canvas). none-mode parity via the styler: plain `─` rail,
+  // plain `█` chips.
   let out = rendered;
   if (stripTags(rendered).trim() !== "") {
-    out = rendered + styler.rule(ctx.width - 2) + " " + styler.headingChip() + "\n";
+    const rail = ctx.width - 4; // chip + space + rail + space + chip = width
+    out = rendered + styler.headingChip() + " " + styler.rule(rail) + " " + styler.headingChip() + "\n";
   }
   return finalize(out);
 }

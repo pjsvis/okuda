@@ -41,14 +41,17 @@ describe("render — headings", () => {
 // 2026-08-27 four-way probe). Rule to the title's column, chip in the
 // header chip's cell — renderer-emitted, never authored.
 describe("render — block terminator", () => {
-  test("present on a non-empty document, chip in the header chip's column", async () => {
+  test("present on a non-empty document, two chips bookend the rail", async () => {
     const out = await render("# Title\n\nBody");
     const last = lines(out).map(stripANSI).filter((l) => l !== "").at(-1)!;
-    expect(last).toMatch(/^ {2}─+ █$/);
-    // Chip sits in the same column as the heading chip: content width is
-    // W-4, rail is width-2, gap, chip → same last column as heading lines.
+    // LHS chip mirrors the H1 badge column; RHS chip mirrors the heading chip.
+    expect(last).toMatch(/^ {2}█ ─+ █$/);
+    // Same total width as the heading line — the chips land at the same columns.
     const heading = lines(out).map(stripANSI).find((l) => l.includes("Title"))!;
     expect(displayWidth(last)).toBe(displayWidth(heading));
+    // LHS chip at the badge column (first content col), RHS chip at the last.
+    expect(last[2]).toBe("█");
+    expect(last[last.length - 1]).toBe("█");
   });
 
   test("absent on an empty document", async () => {
@@ -57,10 +60,11 @@ describe("render — block terminator", () => {
     expect(out).not.toContain("█");
   });
 
-  test("none-mode parity: plain rail, plain chip, same columns", async () => {
+  test("none-mode parity: plain rail, plain chips, same columns", async () => {
     const out = await render("Body", W, "none");
     const last = lines(out).map(stripANSI).filter((l) => l !== "").at(-1)!;
-    expect(last).toBe("  " + "─".repeat(W - 4 - 2) + " █");
+    // chip + space + rail(W-4-4) + space + chip = content width (W-4)
+    expect(last).toBe("  " + "█ " + "─".repeat(W - 4 - 4) + " █");
     expect(out).not.toContain("\x1b[");
   });
 });
@@ -370,8 +374,8 @@ describe("render — code fences", () => {
     const out = await render("```\na\n\nb\n```");
     const stripped = lines(out).map((l) => stripANSI(l));
     expect(stripped.slice(0, 5)).toEqual(["", "    a", "", "    b", ""]);
-    // The block terminator follows: muted rail + chip, last non-empty line.
-    expect(stripped.filter((l) => l !== "").at(-1)).toMatch(/^ {2}─+ █$/);
+    // The block terminator follows: two chips bookend a muted rail.
+    expect(stripped.filter((l) => l !== "").at(-1)).toMatch(/^ {2}█ ─+ █$/);
   });
 
   test("indented code block rejected as plain text (no crash, no markup)", async () => {
