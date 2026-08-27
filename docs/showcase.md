@@ -243,18 +243,24 @@ How the document itself should end is the open question. The header opens
 the okudagram — badge left, title, chip right, spanning the width — but a
 bare rule cannot close it: the rule already has a job, separating
 sections, and a terminator that doubles as a separator closes nothing.
-The proposed closer mirrors the header's anchor instead:
+The closer mirrors the header's anchors on both sides — a muted chip at
+the badge's column (left), a muted chip at the heading chip's column
+(right), a rule between:
 
 ```text
   ## Grammar Showcase                                     █
 
     … the document …
 
-  ─────────────────────────────────────────────────────── █
+  █ ──────────────────────────────────────────────────── █
 ```
 
-Rule to the column the title reached, chip in the cell the header's chip
-occupies — a right-hand rail, top and bottom. The closing is quieter than
-the opening (muted rule for bold title), which is the correct direction:
-openings announce, closings release. And the bare rule keeps its old job
-unambiguously, because the terminator now looks like nothing else.
+Two chips bookend the rail. The eye, trained by the H1 badge on the
+left, lands on the muted LHS chip on scroll and reads "closed" — no
+false promise of more to read, no asymmetry that reads as a broken
+frame. The LHS chip is subdued (muted, not heading-coloured): the badge
+encodes level, the terminator encodes exit. The closing is quieter than
+the opening (muted chips for bold badge, muted rule for bold title),
+which is the correct direction: openings announce, closings release. And
+the bare rule keeps its old job unambiguously, because the terminator now
+looks like nothing else.
