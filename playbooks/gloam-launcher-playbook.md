@@ -27,8 +27,9 @@ gloam() {
           LC_ALL=C sort |
           env FZF_DEFAULT_OPTS= fzf --layout=reverse --no-mouse \
               --exact --tiebreak=index \
+              --bind 'ctrl-d:page-down,ctrl-u:page-up,esc:cancel' \
               --prompt='gloam ❯ ' --query="$q" --print-query \
-              --header='enter: read · esc: done') || break
+              --header='enter: read · ctrl-w: clear word · esc: clear/done') || break
     q=$(head -1 <<<"$out")            # reseed the query next round
     f=$(tail -n +2 <<<"$out")         # the selection
     [[ -n "$f" ]] || break
@@ -83,6 +84,26 @@ gloam() {
   scroll turns the wheel into a burst of line-events that flies the list.
   `wheel-up` is not a bindable key (fzf 0.73.1: "unsupported key"), so
   mouse is all-or-nothing; all-off is right for a picker.
+- `--bind 'ctrl-d:page-down,ctrl-u:page-up,esc:cancel'` — **verb-grammar
+  parity with Gloam, the picker is a guest of the reader's key set.**
+  fzf's readline defaults contradict the reader on the two half-page
+  keys: `Ctrl-U` is *clear query* in fzf (destroys input) but
+  *half-page up* in Gloam; `Ctrl-D` is *delete-char* in fzf but
+  *half-page down* in Gloam. A reader who just scrolled the document
+  with `Ctrl-U`/`Ctrl-D`, hits `q` to the picker, and taps `Ctrl-U` to
+  scroll the list gets the query erased — the punch. Both are
+  rebound to the fzf nearest scroll verb (page-up/down): the verb
+  class matches (scroll), the grain is coarser honestly (no half-page
+  in a list view), no state is destroyed. `esc:cancel` is fzf's modern
+  default (1st press clears the query, 2nd exits) — both surfaces let
+  `Esc` leave; the brief that flagged it located the symptom right and
+  the cause wrong (it's the readline keys, not `Esc`).
+- **Clearing the query:** `Ctrl-W` (fzf's default backward-kill-word)
+  clears a word; a second `Esc` (via `esc:cancel`) clears the whole
+  string. Both are fzf's existing binds — nothing added, the ones that
+  work kept. The header advertises them: `ctrl-w: clear word · esc:
+  clear/done`. No `GLOAM_FZF_OPTS` env layer, no embedded UI engine —
+  the launcher composes two tools, it does not assimilate one.
 - `printf '\e[?1007h'` — **alt-scroll mode (DECSET 1007), one policy,
   both surfaces — the wheel's fifth and final incarnation: it came
   home.** History: with mouse off and no scrollback, Alacritty still

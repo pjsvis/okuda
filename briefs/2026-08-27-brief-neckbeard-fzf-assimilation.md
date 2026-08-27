@@ -1,5 +1,18 @@
 ### Playbook: Hardening `fzf` for Gloam
 
+> **Superseded** by `playbooks/gloam-launcher-playbook.md` (2026-08-27):
+> "Written without the okuda context, defaulting to pattern-matching
+> development. The preview pane it re-proposes is retired (with a
+> documented casualty list); the `GLOAM_FZF_OPTS` env layer it invents
+> is redundant (`env FZF_DEFAULT_OPTS=` already hermetics the picker);
+> the pointer/marker/border chrome it adds benchmaxxes a bounded
+> namespace; the clipboard grab is a different tool's verb. The one real
+> signal — key handling — landed as verb-grammar parity: `Ctrl-U`/`Ctrl-D`
+> rebound to page-up/down so they no longer contradict Gloam's
+> half-page keys, `esc:cancel` for clear/done, `Ctrl-W` kept as the
+> word-clear. Retired, not actioned."
+
+---
 When embedding `fzf` as an interactive document browser, relying on stock defaults guarantees user churn. By default, an accidental `Esc` destroys session state, queries get stuck, and raw terminal abort signals bubble up to your application layer.
 
 The objective is to make `fzf` behave like an integrated document reader without requiring every user to manually hack their shell environment.
