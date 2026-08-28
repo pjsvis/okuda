@@ -79,24 +79,28 @@ Orientation is a semantic choice. A cycle reads across; a pipeline reads down. S
 
 The pattern for the menu, the index, the status page — the docs an agent composes on demand and that have no depth to hide behind. The look *is* the legibility.
 
-☐ 01 Ephemeral index generation — briefs/2026-08-28-brief-index-and-jump.md
+%%okuda-chip:01%% *Ephemeral index generation*
+briefs/2026-08-28-brief-index-and-jump.md
 
-⋮ 02 Rooted gloam, silo badge and callsigns — briefs/2026-08-28-silo-mnemonics.md
+%%okuda-chip:02%% *Rooted gloam, silo badge and callsigns*
+briefs/2026-08-28-silo-mnemonics.md
 
-✓ 03 Zero-notification stillness — decisions/020-zero-notification-stillness.md
+%%okuda-chip:03%% *Zero-notification stillness*
+decisions/020-zero-notification-stillness.md
 
-The moves, in order on each line — state → chip → slug → path:
+The moves, two lines per item — chip → slug, then path beneath:
 
-- **State glyph.** The status, from the closed lexicon, coloured (warm, alerts). Scanned first, before reading. Only where there is real variance.
-- **Number chip.** A solid block — the action indicator. You type the number to jump. No brackets: the chip *is* the indicator, and brackets are decoration on top of an affordance the block already provides. The compositor emits a private-use token; the renderer paints it as a solid block (markdown has no "solid colour" semantic, so the chip is a renderer primitive, the mermaid precedent).
-- **Slug, bold.** The descriptive title — the one near thing, the core content. Date-first, greppable, registry-indexed. Everything else on the line exists to frame it.
-- **Muted path, last.** Where it lives, in the far register. Last, because the eye lands there after the title.
+- **Number chip.** A solid block — the action indicator. You type the number to jump. No brackets: the chip *is* the indicator, and brackets are decoration on top of an affordance the block already provides. The compositor emits a private-use token; the renderer paints it as a solid block (markdown has no "solid colour" semantic, so the chip is a renderer primitive, the mermaid precedent). It is the boldest thing on the line — the action outranks everything else.
+- **Slug, emphasis — near but lesser.** The descriptive title, the content. Coloured but not bold: the chip is the bold anchor; the slug is the coloured-but-lesser thing, so the eye lands on the action first and reads the content second. Strip the classification prefix (`Brief:`, `Decision:`) — the path's folder already says it; the slug is the name, not its category. Date-first, greppable, registry-indexed.
+- **Muted path, on its own line beneath.** Where it lives, in the far register. No dash separates slug and path — the line break *is* the separator; a dash on top of a break pays twice. The path recedes like the status bar's folder/file text.
 
-Then a **status key at the bottom** — the legend, once:
+No state glyph on the line — the chip (action) outranks the glyph (state) for the eye's first stop, and two warm things competing for "first" was the crowding. The glyph vocabulary is held in reserve for tables and status pages where state *is* the story.
+
+Then a **status key at the bottom** — the legend, kept in reserve:
 
 ☐ open · ⋮ parked · ✗ rejected · ✓ accepted
 
-The menu is bulletless, coloured, scannable, and self-documenting. The slug is near; the path is far; the chip is the action. An agent that emits this is a cool sophisticate; an agent that emits a flat numbered list is a wall of white with numbers on it.
+The menu is bulletless, coloured, scannable, and self-documenting. The chip is the action (bold); the slug is the content (near, lesser); the path is the provenance (far). An agent that emits this is a cool sophisticate; an agent that emits a flat numbered list is a wall of white with numbers on it.
 
 ---
 

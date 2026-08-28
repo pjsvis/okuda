@@ -394,17 +394,23 @@ describe("tui — digitOf (single-byte digit → char, else null)", () => {
 });
 
 describe("tui — extractJumps (scan source for chip-token + path.md lines)", () => {
-  test("lifts chip-token number + trailing path into a token→path map", () => {
+  test("lifts chip-token number + path across a soft break (path on its own line)", () => {
     const src = [
-      "# Index",
+      "# Menu",
       "",
-      "☐ %%okuda-chip:01%% **Foo** — briefs/foo.md",
-      "☐ %%okuda-chip:02%% **Bar** — decisions/bar.md",
+      "%%okuda-chip:01%% *Foo*",
+      "briefs/foo.md",
+      "",
+      "%%okuda-chip:02%% *Bar*",
+      "decisions/bar.md",
     ].join("\n");
     const j = extractJumps(src);
     expect(j.size).toBe(2);
     expect(j.get(1)).toBe("briefs/foo.md");
     expect(j.get(2)).toBe("decisions/bar.md");
+  });
+  test("same-line chip + path still works (the compact form)", () => {
+    expect(extractJumps("%%okuda-chip:01%% *Foo* — briefs/foo.md").get(1)).toBe("briefs/foo.md");
   });
   test("one-digit chip numbers: %%okuda-chip:5%% → token 5", () => {
     expect(extractJumps("%%okuda-chip:5%% X — x.md").get(5)).toBe("x.md");
@@ -425,7 +431,7 @@ describe("tui — extractJumps (scan source for chip-token + path.md lines)", ()
     expect(extractJumps("%%okuda-chip:01%% a title, no path").size).toBe(0);
   });
   test("paths with spaces: only the last space-free .md token is captured", () => {
-    const j = extractJumps("%%okuda-chip:01%% X — decisions/old name.md");
+    const j = extractJumps("%%okuda-chip:01%% X\ndecisions/old name.md");
     expect(j.get(1)).toBe("name.md");
   });
   test("empty source → empty map", () => {
@@ -457,9 +463,9 @@ describe("tui — advanceNumBuffer (the two-digit jump state machine)", () => {
   });
   test("the resolved token round-trips through extractJumps", () => {
     // End-to-end contract: typing '0'+'5' yields token 5, and a chip-token
-    // line lifts to token 5 → path. The two pure halves agree on the
+    // paragraph lifts to token 5 → path. The two pure halves agree on the
     // numbering convention.
-    const jumps = extractJumps("%%okuda-chip:05%% **Title** — docs/target.md");
+    const jumps = extractJumps("%%okuda-chip:05%% *Title*\ndocs/target.md");
     const step = advanceNumBuffer(advanceNumBuffer(null, "0").buffer, "5");
     expect(step.token).not.toBeNull();
     expect(jumps.get(step.token!)).toBe("docs/target.md");

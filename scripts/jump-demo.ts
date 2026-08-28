@@ -2,12 +2,16 @@
 /**
  * jump-demo.ts — the menu compositor (index-and-jump, td-9d9981).
  *
- * Composes a status-led menu over recent briefs. The line shape, under
- * the near/far pattern (the gloaming): state glyph (warm, alerts) →
- * number chip (solid block, the action indicator — type it to jump) →
- * slug (bold, near, the core content) → path (muted, far, provenance).
- * The chip is a private-use renderer token; the slug is the one bold
- * thing; the path recedes like the status bar's folder/file text.
+ * The line, under the near/far pattern (the gloaming):
+ *   chip (solid block, the action indicator — type it to jump) →
+ *   slug (emphasis, near-but-lesser, the content) →
+ *   path (muted, far — on its own line beneath, no dash: the line
+ *   break is the separator). No state glyph on the line — the chip
+ *   (action) outranks the glyph (state) for the eye's first stop; the
+ *   key below keeps the glyph vocabulary in reserve. The `Brief:` /
+ *   `Decision:` classification prefix is stripped — the path's folder
+ *   already says it.
+ *
  * Ephemeral — never registered, never a brief. The environment
  * composing (filesystem as the message bus), not okuda (ADR-020).
  *
@@ -34,30 +38,12 @@ function titleOf(file: string): string {
   }
 }
 
-/** The `**Status:**` value (first match), lower-cased, or "" if none. */
-function statusOf(file: string): string {
-  try {
-    const text = readFileSync(join(ROOT, file), "utf8");
-    const m = text.match(/^\*\*Status:\*\*\s*(.+)$/m);
-    return (m?.[1] ?? "").trim();
-  } catch {
-    return "";
-  }
+/** Strip the classification prefix the path's folder already carries —
+ *  `Brief: …`, `brief: …`, `Decision: …`, etc. The slug is the
+ *  descriptive name, not its classification. */
+function stripClass(title: string): string {
+  return title.replace(/^(brief|decision|debrief|playbook)\s*:\s*/i, "");
 }
-
-/** State-glyph vocabulary (brief: state-glyph-vocabulary). */
-function glyphFor(status: string): string {
-  const s = status.toLowerCase();
-  if (s.startsWith("rejected")) return "\u2717"; // ✗
-  if (s.startsWith("parked")) return "\u22ee";    // ⋮
-  if (s.startsWith("accepted")) return "\u2713"; // ✓
-  return "\u2610";                                 // ☐ open / pending / draft / ready
-}
-
-/** Sort: open first (the actionable), then parked, rejected, done. */
-const ORDER: Record<string, number> = {
-  "\u2610": 0, "\u22ee": 1, "\u2717": 2, "\u2713": 3,
-};
 
 if (import.meta.main) {
   const recent = readdirSync(join(ROOT, "briefs"))
@@ -66,25 +52,18 @@ if (import.meta.main) {
   const rejected = "briefs/2026-08-25-brief-viewport-padding.md";
   const files = [...recent, rejected].sort();
 
-  const rows = files.map((f) => ({
-    glyph: glyphFor(statusOf(f)),
-    file: f,
-    title: titleOf(f),
-  }));
-  rows.sort(
-    (a, b) =>
-      (ORDER[a.glyph] ?? 9) - (ORDER[b.glyph] ?? 9) ||
-      a.file.localeCompare(b.file),
-  );
+  const rows = files.map((f) => ({ file: f, title: stripClass(titleOf(f)) }));
+  rows.sort((a, b) => a.file.localeCompare(b.file));
 
   const lines = ["# Menu — recent briefs", ""];
   rows.forEach((r, i) => {
     const n = String(i + 1).padStart(2, "0");
-    // state → chip → slug (bold) → path (muted by the renderer heuristic)
-    lines.push(`${r.glyph} ${chipToken(n)} **${r.title}** — ${r.file}`);
-    lines.push(""); // separate paragraphs → bulletless, breathing
+    // chip → slug (emphasis, near-but-lesser) ; path on its own line
+    lines.push(`${chipToken(n)} *${r.title}*`);
+    lines.push(r.file);
+    lines.push(""); // blank line between items → bulletless, breathing
   });
-  lines.push("---", "", "**Key** — type the chip to jump · state glyphs:", "");
+  lines.push("---", "", "**Key** — type the chip to jump · state glyphs (held in reserve):", "");
   lines.push("☐ open · ⋮ parked · ✗ rejected · ✓ accepted (as an ADR)");
   lines.push("");
   console.log(lines.join("\n"));

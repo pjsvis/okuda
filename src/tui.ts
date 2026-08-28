@@ -328,33 +328,21 @@ export function advanceNumBuffer(
   return { buffer: next, token: null };
 }
 
-/** Scan markdown source for jump tokens, returning a token→path map.
- *
- *  The index line is plain text — *not* a markdown link. Rendering a
- *  file path as a hyperlink advertises a clickability the TUI lacks, and
- *  a destination that isn't a URL; the only legitimate links are URLs.
- *  So the token is a literal `[NN]` at the list-item start, and the
- *  target path is the trailing `.md`-ending token on the line. The
- *  compositor owns the line shape; `extractJumps` recognises:
- *
- *      - [01] Title — decisions/foo.md
- *      - [02] Another — briefs/bar.md
- *
- *  Tokens are two-digit (01–99); the compositor zero-pads. Duplicate
- *  tokens: last wins (a compositor error surfaces as the later entry).
- *  Lines without a trailing `.md` path are not jump lines (a `[01]`
- *  in prose with no path is inert). Pure. */
+/** Scan markdown source for chip-token jump entries, returning a
+ *  token→path map. Each menu item is a paragraph (blank-line
+ *  separated); within it the `%%okuda-chip:NN%%` token and the `.md`
+ *  path may sit on the same line or on two lines joined by a soft break
+ *  (slug line, then path line beneath). The path is the last `.md` token
+ *  in the paragraph. Duplicate tokens: last wins (compositor error
+ *  surfaces as the later entry). Pure. */
 export function extractJumps(source: string): Map<number, string> {
-  // The compositor emits the number as a chip token `%%okuda-chip:NN%%`
-  // (private-use, the mermaid precedent). extractJumps reads the number
-  // from the source token and pairs it with the trailing .md path on
-  // the same line. The chip is the renderer's concern; the number/path
-  // mapping is the TUI's. (brief: index-and-jump.)
-  const re = /^[^\n]*?%%okuda-chip:(\d{1,2})%%[^\n]*?(\S+\.md)\s*$/gm;
   const out = new Map<number, string>();
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(source)) !== null) {
-    out.set(Number(m[1]!), m[2]!);
+  for (const para of source.split(/\n{2,}/)) {
+    const chip = para.match(/%%okuda-chip:(\d{1,2})%%/);
+    if (!chip) continue;
+    const paths = [...para.matchAll(/\S+\.md/g)].map((m) => m[0]!);
+    const path = paths[paths.length - 1];
+    if (path) out.set(Number(chip[1]!), path);
   }
   return out;
 }
