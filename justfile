@@ -19,6 +19,12 @@ island:
     @bun scripts/status-doc.ts > NOW.md
     @./okuda NOW.md --tui
 
+# Jump demo
+[group('navigation')]
+jump-demo:
+    @bun scripts/jump-demo.ts > /tmp/okuda-jump-demo.md
+    @./okuda /tmp/okuda-jump-demo.md --tui
+
 # Rationale
 [group('navigation')]
 info:
