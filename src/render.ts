@@ -541,7 +541,17 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
     },
 
     text(children: string) {
-      return stripHtml(children);
+      // Bare .md-path tokens in prose get the doc-ref colour (experimental:
+      // index-and-jump). The heuristic is greedy — it colours any .md
+      // mention, not just index lines; the leap we learn the reach from.
+      // Links (URLs only) and codespans have their own handlers, so a
+      // path inside backticks or a real URL keeps its own colour.
+      const stripped = stripHtml(children);
+      if (!/\b[\w][\w/.-]*\.md\b/.test(stripped)) return stripped;
+      return stripped.replace(
+        /\b([\w][\w/.-]*\.md)\b/g,
+        (m) => styler.role("doc-ref", m),
+      );
     },
 
     strong(children: string) {

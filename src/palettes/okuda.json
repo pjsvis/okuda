@@ -20,5 +20,6 @@
   "state-ok": "#5fd35f",
   "state-todo": "#ffe066",
   "state-parked": "#ff9933",
-  "state-failed": "#ff5555"
+  "state-failed": "#ff5555",
+  "doc-ref": "#e8c44a"
 }

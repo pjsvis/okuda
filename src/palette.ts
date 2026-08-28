@@ -40,7 +40,15 @@ export type Role =
   | "state-ok"
   | "state-todo"
   | "state-parked"
-  | "state-failed";
+  | "state-failed"
+  // Document reference — a bare .md path token in prose (e.g. an index
+  // line's trailing `decisions/foo.md`). Distinct from links (URLs only,
+  // per the render policy), distinct from code, and held separate so a
+  // future mnemonic/callsign role can co-exist without collision.
+  // Experimental (brief: index-and-jump): a greedy heuristic — colours
+  // any .md mention in prose, not just index lines. The leap; learn the
+  // reach by seeing it over-reach.
+  | "doc-ref";
 
 export type Palette = Record<Role, string>;
 
@@ -107,6 +115,7 @@ export const DRACULA_PALETTE: Palette = {
   "state-todo": "#ffe066",
   "state-parked": "#ff9933",
   "state-failed": "#ff5555",
+  "doc-ref": "#e8c44a",
 };
 
 /** Named presets — the identity layers. The default is the okuda

@@ -495,3 +495,52 @@ describe("render — property invariants", () => {
     expect(out).not.toContain("\u0000");
   });
 });
+
+// ── doc-ref: bare .md path tokens in prose get the doc-ref colour ──
+// (experimental, brief: index-and-jump). The heuristic is greedy — it
+// colours any .md mention in prose, not just index lines. The leap.
+
+describe("render — doc-ref colour on bare .md path tokens", () => {
+  test("a trailing .md path in an index line is coloured doc-ref", async () => {
+    const out = await render("- [01] Title — decisions/foo.md");
+    // #e8c44a → 38;2;232;196;74, the doc-ref SGR on the dracula preset.
+    expect(out).toContain("\x1b[38;2;232;196;74mdecisions/foo.md\x1b[0m");
+  });
+
+  test("the [NN] token is NOT coloured doc-ref (only the .md path)", async () => {
+    const out = await render("- [01] Title — decisions/foo.md");
+    // The token [01] should not carry the doc-ref SGR.
+    expect(out).not.toMatch(/\x1b\[38;2;232;196;74m\[01\]/);
+  });
+
+  test("greedy: a .md mention in ordinary prose also colours (the leap)", async () => {
+    // This is the documented over-reach — the heuristic colours any .md
+    // path in prose, not just index lines. Pinned so a future tightening
+    // is a deliberate decision, not a silent regression.
+    const out = await render("See the notes in docs/essay.md for more.");
+    expect(out).toContain("\x1b[38;2;232;196;74mdocs/essay.md\x1b[0m");
+  });
+
+  test("over-reach: a .md path inside a codespan is coloured doc-ref (the leap)", async () => {
+    // The text handler runs before codespan (post-order), so the greedy
+    // heuristic reaches inside backticks — the path renders doc-ref, not
+    // code-green. This is the documented over-reach the experiment accepts;
+    // pinned so a future tightening (context guard) is a deliberate change.
+    const out = await render("run `decisions/foo.md` now");
+    expect(out).toContain("\x1b[38;2;232;196;74mdecisions/foo.md\x1b[0m");
+  });
+
+  test("plain prose without a .md token gets no doc-ref SGR", async () => {
+    const out = await render("Just a plain sentence about decisions.");
+    expect(out).not.toContain("\x1b[38;2;232;196;74m");
+  });
+
+  test("extractJumps still lifts the path from the coloured source", async () => {
+    // The colouring is render-plane; extractJumps reads source text
+    // (pre-render), so jump resolution is immune to the heuristic.
+    const { extractJumps } = await import("../src/tui");
+    const src = "- [02] Another — briefs/bar.md";
+    const j = extractJumps(src);
+    expect(j.get(2)).toBe("briefs/bar.md");
+  });
+});
