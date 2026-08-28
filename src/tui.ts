@@ -345,9 +345,12 @@ export function advanceNumBuffer(
  *  Lines without a trailing `.md` path are not jump lines (a `[01]`
  *  in prose with no path is inert). Pure. */
 export function extractJumps(source: string): Map<number, string> {
-  // `\*{0,2}` tolerates a bold wrapper (`**[01]**`) the compositor may
-  // emit to make the token read as a marker — the bullet's replacement.
-  const re = /^\s*[-*]?\s*\*{0,2}\[(\d{2})\]\*{0,2}[^\n]*?(\S+\.md)\s*$/gm;
+  // The compositor emits the number as a chip token `%%okuda-chip:NN%%`
+  // (private-use, the mermaid precedent). extractJumps reads the number
+  // from the source token and pairs it with the trailing .md path on
+  // the same line. The chip is the renderer's concern; the number/path
+  // mapping is the TUI's. (brief: index-and-jump.)
+  const re = /^[^\n]*?%%okuda-chip:(\d{1,2})%%[^\n]*?(\S+\.md)\s*$/gm;
   const out = new Map<number, string>();
   let m: RegExpExecArray | null;
   while ((m = re.exec(source)) !== null) {

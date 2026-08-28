@@ -22,6 +22,7 @@ import {
   RE_INLINE_HTML,
   RE_MERMAID_TOKEN,
   RE_PB_TAG,
+  RE_CHIP_TOKEN,
   TAG_ITEM,
   TAG_NESTED_CLOSE,
   TAG_PROBE_CLOSE,
@@ -541,28 +542,26 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
     },
 
     text(children: string) {
-      // Bare .md-path tokens in prose get the doc-ref colour (experimental:
-      // index-and-jump). The heuristic is greedy — it colours any .md
-      // mention, not just index lines; the leap we learn the reach from.
-      // Links (URLs only) and codespans have their own handlers, so a
-      // path inside backticks or a real URL keeps its own colour.
-      const stripped = stripHtml(children);
-      const withRefs = /\b[\w][\w/.-]*\.md\b/.test(stripped)
-        ? stripped.replace(/\b([\w][\w/.-]*\.md)\b/g, (m) => styler.role("doc-ref", m))
-        : stripped;
-      // A standalone state glyph colours in prose too — the vocabulary's
+      let out = stripHtml(children);
+      // Number-chip token → solid block (the menu's action indicator).
+      // Private-use token, the mermaid precedent; markdown has no
+      // "solid coloured block" semantic. (brief: index-and-jump.)
+      out = out.replace(RE_CHIP_TOKEN, (_m, n: string) => styler.numberChip(n));
+      // Bare .md-path tokens in prose recede to the muted (far) register
+      // — near/far: paths are provenance, not content. They read like
+      // the status bar's folder/file text. (brief: index-and-jump.)
+      out = out.replace(/\b([\w][\w/.-]*\.md)\b/g, (m) =>
+        styler.role("muted", m));
+      // A standalone state glyph colours in prose — the vocabulary's
       // "colour + bold" intent applies wherever the glyph appears as a
-      // glyph (standalone, not embedded in a word), not only in lists/
-      // tables. Lets a bulletless menu carry coloured status glyphs (the
-      // token is the marker; the glyph is the state) and a prose status
-      // key colour every glyph in the legend, not just the first.
-      // The leap: prose glyphs were "plain text colour" before; now the
-      // closed lexicon is consistent everywhere. (brief: state-glyph-vocab.)
-      return withRefs.replace(
+      // glyph (standalone, not embedded). The lexicon is consistent
+      // everywhere. (brief: state-glyph-vocab.)
+      out = out.replace(
         /(^|\s)([\u2713\u2610\u22ee\u2717])(?=\s|$)/g,
         (_whole, pre: string, g: string) =>
           pre + styler.roleBold(STATE_GLYPH_ROLE[g]!, g),
       );
+      return out;
     },
 
     strong(children: string) {

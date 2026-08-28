@@ -95,12 +95,19 @@ describe("styler — byte-exact SGR sequences", () => {
     expect(s.badge("Gloam")).toBe("\x1b[48;2;255;121;198m\x1b[38;2;248;248;242m Gloam \x1b[0m");
   });
 
+  test("numberChip: solid bg=fg=badge-bg block, no padding (menu action indicator)", () => {
+    const s = makeStyler(DRACULA_PALETTE, "truecolor");
+    // bg = fg = badge-bg (#ff79c6) — the solid-block pattern (LCARS tab).
+    expect(s.numberChip("01")).toBe("\x1b[48;2;255;121;198m\x1b[38;2;255;121;198m01\x1b[0m");
+  });
+
   test("none mode: identity, no escapes anywhere; codespan strips backticks (parity); link shows URL", () => {
     const s = makeStyler(DRACULA_PALETTE, "none");
     expect(s.roleBold("heading", "T")).toBe("T");
     expect(s.codespan("c")).toBe("c");
     expect(s.link("text", "url")).toBe("text url"); // parity: URL shown in both modes
     expect(s.badge("G")).toBe(" G "); // padding kept, no colour
+    expect(s.numberChip("01")).toBe("01"); // plain digits, no colour
     expect(s.rule(4)).toBe("────");
   });
 });

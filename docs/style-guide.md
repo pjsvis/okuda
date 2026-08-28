@@ -50,13 +50,15 @@ Tables earn their place when the eye needs to compare across rows. The key colum
 | Bold-lead list | amber key | items each have a name + payload |
 | State glyph | traffic-lamp | rows carry lifecycle variance |
 | ◆ diamond | strong | one line changes the read |
-| doc-ref path | yellow | an index or menu line |
+| Muted path | far | an index or menu line — provenance, not content |
 
 ---
 
-## doc-ref: paths as provenance, not prose
+## Near and far: the gloaming register
 
-A bare `.md` path in prose — `decisions/010-bounded-anchor-proportional-fallback.md` — colours as a document reference, distinct from links (URLs only), code, and emphasis. The filename reads as provenance: where the thing lives, not what it says. Put it last on a line, where the eye lands after the title.
+The colour register has one principle: *is this near or far?* **Near** is the content you're reading — bold, bright, the core. **Far** is provenance and chrome — muted, receding, like the status bar's folder/file text. The gloaming is the gradient between, and the okuda palette *is* the gloaming: blues (heading), browns (strong), yellows (emphasis, state-todo) — near dark when still light. Every colour decision asks one question: is this near or far?
+
+A bare `.md` path in prose — `decisions/010-bounded-anchor-proportional-fallback.md` — recedes to muted (far). The filename reads as provenance: where the thing lives, not what it says. Put it last on a line, where the eye lands after the title has done its work. Far things don't compete with near things; they anchor them.
 
 ---
 
@@ -77,24 +79,24 @@ Orientation is a semantic choice. A cycle reads across; a pipeline reads down. S
 
 The pattern for the menu, the index, the status page — the docs an agent composes on demand and that have no depth to hide behind. The look *is* the legibility.
 
-**[01]** ☐ Ephemeral index generation — briefs/2026-08-28-brief-index-and-jump.md
+☐ 01 Ephemeral index generation — briefs/2026-08-28-brief-index-and-jump.md
 
-**[02]** ⋮ Rooted gloam, silo badge and callsigns — briefs/2026-08-28-silo-mnemonics.md
+⋮ 02 Rooted gloam, silo badge and callsigns — briefs/2026-08-28-silo-mnemonics.md
 
-**[03]** ✓ Zero-notification stillness — decisions/020-zero-notification-stillness.md
+✓ 03 Zero-notification stillness — decisions/020-zero-notification-stillness.md
 
-The moves, in order on each line:
+The moves, in order on each line — state → chip → slug → path:
 
-- **Bold `[NN]` token.** The marker — what you type to jump. No bullet: the token *is* the marker, and a bullet that duplicates it violates "one glyph, one job." Emit each item as a separate paragraph (the parser already treats a soft return as a hard break; a blank line between items gives the breathing room a list would).
-- **State glyph.** The status, from the closed lexicon, coloured. Only where there is real variance.
-- **Title.** The descriptive name — date-first, greppable, registry-indexed.
-- **doc-ref path, last.** Where it lives, in yellow. Last, because the eye lands there after the title.
+- **State glyph.** The status, from the closed lexicon, coloured (warm, alerts). Scanned first, before reading. Only where there is real variance.
+- **Number chip.** A solid block — the action indicator. You type the number to jump. No brackets: the chip *is* the indicator, and brackets are decoration on top of an affordance the block already provides. The compositor emits a private-use token; the renderer paints it as a solid block (markdown has no "solid colour" semantic, so the chip is a renderer primitive, the mermaid precedent).
+- **Slug, bold.** The descriptive title — the one near thing, the core content. Date-first, greppable, registry-indexed. Everything else on the line exists to frame it.
+- **Muted path, last.** Where it lives, in the far register. Last, because the eye lands there after the title.
 
 Then a **status key at the bottom** — the legend, once:
 
 ☐ open · ⋮ parked · ✗ rejected · ✓ accepted
 
-The menu is bulletless, coloured, scannable, and self-documenting. An agent that emits this is a cool sophisticate; an agent that emits a flat numbered list is a wall of white with numbers on it.
+The menu is bulletless, coloured, scannable, and self-documenting. The slug is near; the path is far; the chip is the action. An agent that emits this is a cool sophisticate; an agent that emits a flat numbered list is a wall of white with numbers on it.
 
 ---
 

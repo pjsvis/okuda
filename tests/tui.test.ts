@@ -393,55 +393,40 @@ describe("tui — digitOf (single-byte digit → char, else null)", () => {
   });
 });
 
-describe("tui — extractJumps (scan source for [NN] … path.md lines)", () => {
-  test("lifts two-digit token + trailing path into a token→path map", () => {
+describe("tui — extractJumps (scan source for chip-token + path.md lines)", () => {
+  test("lifts chip-token number + trailing path into a token→path map", () => {
     const src = [
       "# Index",
       "",
-      "- [01] Foo — briefs/foo.md",
-      "- [02] Bar — decisions/bar.md",
+      "☐ %%okuda-chip:01%% **Foo** — briefs/foo.md",
+      "☐ %%okuda-chip:02%% **Bar** — decisions/bar.md",
     ].join("\n");
     const j = extractJumps(src);
     expect(j.size).toBe(2);
     expect(j.get(1)).toBe("briefs/foo.md");
     expect(j.get(2)).toBe("decisions/bar.md");
   });
-  test("zero-pads: [05] → token 5", () => {
-    const j = extractJumps("- [05] X — x.md");
-    expect(j.get(5)).toBe("x.md");
-    expect(j.has(5)).toBe(true);
+  test("one-digit chip numbers: %%okuda-chip:5%% → token 5", () => {
+    expect(extractJumps("%%okuda-chip:5%% X — x.md").get(5)).toBe("x.md");
+  });
+  test("zero-padded: %%okuda-chip:05%% → token 5", () => {
+    expect(extractJumps("%%okuda-chip:05%% X — x.md").get(5)).toBe("x.md");
   });
   test("duplicate tokens: last wins (compositor error surfaces)", () => {
-    const j = extractJumps("- [01] A — a.md\n- [01] B — b.md");
+    const j = extractJumps("%%okuda-chip:01%% A — a.md\n%%okuda-chip:01%% B — b.md");
     expect(j.get(1)).toBe("b.md");
     expect(j.size).toBe(1);
   });
-  test("a [NN] in prose with no trailing path is inert (not a jump line)", () => {
+  test("a line without a chip token is not a jump line", () => {
+    expect(extractJumps("- [01] a title — no path").size).toBe(0);
     expect(extractJumps("See [01] in the notes below.").size).toBe(0);
   });
-  test("one-digit tokens [5] are ignored — the convention is two-digit", () => {
-    expect(extractJumps("- [5] X — a.md").size).toBe(0);
-  });
-  test("a line without a trailing .md path is not a jump line", () => {
-    expect(extractJumps("- [01] a title, no path").size).toBe(0);
+  test("a chip token without a trailing .md path is not a jump line", () => {
+    expect(extractJumps("%%okuda-chip:01%% a title, no path").size).toBe(0);
   });
   test("paths with spaces: only the last space-free .md token is captured", () => {
-    // `decisions/old name.md` — \S+\.md$ grabs `name.md` (the last
-    // space-free run ending in .md). Compositors should emit space-free
-    // paths; this documents the fallback when they don't.
-    const j = extractJumps("- [01] X — decisions/old name.md");
+    const j = extractJumps("%%okuda-chip:01%% X — decisions/old name.md");
     expect(j.get(1)).toBe("name.md");
-  });
-  test("token need not be in a list item — bare [NN] … path works", () => {
-    expect(extractJumps("[01] X — docs/a.md").get(1)).toBe("docs/a.md");
-  });
-  test("bold-wrapped token **[NN]** lifts the same (the bulletless menu form)", () => {
-    // The compositor bolds the token to make it the marker (no bullet);
-    // extractJumps strips the `**` wrapper. Covers separate-paragraph and
-    // in-list forms.
-    const j = extractJumps("**[07]** Title — docs/seven.md");
-    expect(j.get(7)).toBe("docs/seven.md");
-    expect(extractJumps("- **[08]** Title — docs/eight.md").get(8)).toBe("docs/eight.md");
   });
   test("empty source → empty map", () => {
     expect(extractJumps("").size).toBe(0);
@@ -471,10 +456,10 @@ describe("tui — advanceNumBuffer (the two-digit jump state machine)", () => {
     expect(advanceNumBuffer(null, null)).toEqual({ buffer: null, token: null });
   });
   test("the resolved token round-trips through extractJumps", () => {
-    // End-to-end contract: typing '0'+'5' yields token 5, and an index
-    // line `[05] … path.md` lifts to token 5 → path. The two pure halves
-    // agree on the numbering convention.
-    const jumps = extractJumps("- [05] Title — docs/target.md");
+    // End-to-end contract: typing '0'+'5' yields token 5, and a chip-token
+    // line lifts to token 5 → path. The two pure halves agree on the
+    // numbering convention.
+    const jumps = extractJumps("%%okuda-chip:05%% **Title** — docs/target.md");
     const step = advanceNumBuffer(advanceNumBuffer(null, "0").buffer, "5");
     expect(step.token).not.toBeNull();
     expect(jumps.get(step.token!)).toBe("docs/target.md");

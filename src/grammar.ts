@@ -79,3 +79,12 @@ export function mermaidToken(id: string): string {
   return `%%okuda-mmd-${id}%%`;
 }
 export const RE_MERMAID_TOKEN = /%%okuda-mmd-([a-z0-9]+)%%/;
+
+/** Number-chip token — survives markdown parsing as inline text; the
+ *  renderer paints it as a solid block (the menu's action indicator).
+ *  Emitted by index compositors; `extractJumps` reads the number from
+ *  the source token directly. (brief: index-and-jump.) */
+export function chipToken(n: number | string): string {
+  return `%%okuda-chip:${n}%%`;
+}
+export const RE_CHIP_TOKEN = /%%okuda-chip:(\d{1,2})%%/g;

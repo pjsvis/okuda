@@ -496,50 +496,44 @@ describe("render — property invariants", () => {
   });
 });
 
-// ── doc-ref: bare .md path tokens in prose get the doc-ref colour ──
-// (experimental, brief: index-and-jump). The heuristic is greedy — it
-// colours any .md mention in prose, not just index lines. The leap.
+// ── near/far: .md path tokens recede to muted; chip tokens are solid blocks ──
+// (the gloaming — near = bold slug, far = muted path/chrome).
 
-describe("render — doc-ref colour on bare .md path tokens", () => {
-  test("a trailing .md path in an index line is coloured doc-ref", async () => {
-    const out = await render("- [01] Title — decisions/foo.md");
-    // #e8c44a → 38;2;232;196;74, the doc-ref SGR on the dracula preset.
-    expect(out).toContain("\x1b[38;2;232;196;74mdecisions/foo.md\x1b[0m");
+describe("render — near/far: .md paths muted, chip tokens solid", () => {
+  test("a trailing .md path in an index line recedes to muted (far)", async () => {
+    const out = await render("☐ %%okuda-chip:01%% **Title** — decisions/foo.md");
+    // muted #585858 → 88;88;88 (dracula). The path reads like the status
+    // bar's folder/file text — provenance, not content.
+    expect(out).toContain("\x1b[38;2;88;88;88mdecisions/foo.md\x1b[0m");
   });
 
-  test("the [NN] token is NOT coloured doc-ref (only the .md path)", async () => {
-    const out = await render("- [01] Title — decisions/foo.md");
-    // The token [01] should not carry the doc-ref SGR.
-    expect(out).not.toMatch(/\x1b\[38;2;232;196;74m\[01\]/);
+  test("a chip token renders as a solid bg block (the action indicator)", async () => {
+    const out = await render("%%okuda-chip:01%% **Title** — docs/foo.md");
+    // bg = fg = badge-bg (#ff79c6 → 255;121;198 on dracula): a solid block.
+    expect(out).toContain("\x1b[48;2;255;121;198m\x1b[38;2;255;121;198m01\x1b[0m");
   });
 
-  test("greedy: a .md mention in ordinary prose also colours (the leap)", async () => {
-    // This is the documented over-reach — the heuristic colours any .md
-    // path in prose, not just index lines. Pinned so a future tightening
-    // is a deliberate decision, not a silent regression.
+  test("the chip has no bracket decoration — the block IS the indicator", async () => {
+    const out = await render("%%okuda-chip:01%% **Title** — docs/foo.md");
+    expect(out).not.toContain("[01]");
+  });
+
+  test("greedy: a .md mention in ordinary prose also mutes (the far register)", async () => {
     const out = await render("See the notes in docs/essay.md for more.");
-    expect(out).toContain("\x1b[38;2;232;196;74mdocs/essay.md\x1b[0m");
+    expect(out).toContain("\x1b[38;2;88;88;88mdocs/essay.md\x1b[0m");
   });
 
-  test("over-reach: a .md path inside a codespan is coloured doc-ref (the leap)", async () => {
-    // The text handler runs before codespan (post-order), so the greedy
-    // heuristic reaches inside backticks — the path renders doc-ref, not
-    // code-green. This is the documented over-reach the experiment accepts;
-    // pinned so a future tightening (context guard) is a deliberate change.
-    const out = await render("run `decisions/foo.md` now");
-    expect(out).toContain("\x1b[38;2;232;196;74mdecisions/foo.md\x1b[0m");
+  test("the slug is the one bold (near) thing — strong role", async () => {
+    const out = await render("%%okuda-chip:01%% **The Slug** — docs/foo.md");
+    // strong #ffb86c → 255;184;108 ; bold (1) on dracula.
+    expect(out).toContain("\x1b[38;2;255;184;108;1mThe Slug\x1b[0m");
   });
 
-  test("plain prose without a .md token gets no doc-ref SGR", async () => {
-    const out = await render("Just a plain sentence about decisions.");
-    expect(out).not.toContain("\x1b[38;2;232;196;74m");
-  });
-
-  test("extractJumps still lifts the path from the coloured source", async () => {
+  test("extractJumps still lifts the path from the chip-token source", async () => {
     // The colouring is render-plane; extractJumps reads source text
     // (pre-render), so jump resolution is immune to the heuristic.
     const { extractJumps } = await import("../src/tui");
-    const src = "- [02] Another — briefs/bar.md";
+    const src = "%%okuda-chip:02%% **Another** — briefs/bar.md";
     const j = extractJumps(src);
     expect(j.get(2)).toBe("briefs/bar.md");
   });

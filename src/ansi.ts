@@ -53,6 +53,13 @@ export interface Styler {
   roleUnderline(name: keyof Palette, text: string): string;
   /** Badge: bg + fg + space-padded text (TUI footer chrome). */
   badge(text: string): string;
+  /** Number chip: a solid colour block for a 1–2 digit jump token —
+   *  bg = fg = badge-bg (the solid-block pattern from `headingBadge`),
+   *  no padding. The chip is the menu's action indicator: you type the
+   *  number to jump. Under `none`, the plain digits (the token still
+   *  reads as an action; the colour was the affordance, the digits the
+   *  content). (brief: index-and-jump.) */
+  numberChip(text: string): string;
   /** Bold, no colour (H4+ collapse, table plain text). */
   bold(text: string): string;
   /** Strikethrough. */
@@ -102,6 +109,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       roleBoldItalic: (_n, text) => text,
       roleUnderline: (_n, text) => text,
       badge: (text) => ` ${text} `, // padding kept in both modes (shape parity)
+      numberChip: (text) => text,
       bold: (text) => text,
       strike: (text) => text,
       codeLine: (line) => line,
@@ -130,6 +138,9 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     // Gloam footer badge: pink bg, near-white fg, 1-space padding each
     // side so the bg reads as a contained pill, not a stripe.
     badge: (text) => `${bg(palette["badge-bg"])}${fg(palette["badge-fg"])} ${text} ${RESET}`,
+    // Number chip: solid amber-gold block, bg=fg=badge-bg → the digits
+    // render as a solid block (LCARS tab, the menu's action indicator).
+    numberChip: (text) => `${bg(palette["badge-bg"])}${fg(palette["badge-bg"])}${text}${RESET}`,
     bold: (text) => wrap("\x1b[1m", text),
     strike: (text) => wrap("\x1b[9m", text),
     // Pass B (2026-08-24): code background dropped for glow parity (the
