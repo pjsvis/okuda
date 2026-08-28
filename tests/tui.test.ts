@@ -393,46 +393,37 @@ describe("tui — digitOf (single-byte digit → char, else null)", () => {
   });
 });
 
-describe("tui — extractJumps (scan source for **NN** + path.md)", () => {
-  test("lifts **NN** + path across a soft break (path on its own line)", () => {
+describe("tui — extractJumps (scan source for %%okuda-rhs:NN%% + path.md)", () => {
+  test("lifts the RHS number + the path from a comment in the paragraph", () => {
     const src = [
       "# Menu",
       "",
-      "**01** *Foo*",
-      "briefs/foo.md",
+      "*Foo* %%okuda-rhs:01%% <!-- briefs/foo.md -->",
       "",
-      "**02** *Bar*",
-      "decisions/bar.md",
+      "*Bar* %%okuda-rhs:02%% <!-- decisions/bar.md -->",
     ].join("\n");
     const j = extractJumps(src);
     expect(j.size).toBe(2);
     expect(j.get(1)).toBe("briefs/foo.md");
     expect(j.get(2)).toBe("decisions/bar.md");
   });
-  test("same-line **NN** + path still works (the compact form)", () => {
-    expect(extractJumps("**01** *Foo* — briefs/foo.md").get(1)).toBe("briefs/foo.md");
+  test("one-digit numbers: %%okuda-rhs:5%% → token 5", () => {
+    expect(extractJumps("*X* %%okuda-rhs:5%% <!-- x.md -->").get(5)).toBe("x.md");
   });
-  test("one-digit numbers: **5** → token 5", () => {
-    expect(extractJumps("**5** X — x.md").get(5)).toBe("x.md");
-  });
-  test("zero-padded: **05** → token 5", () => {
-    expect(extractJumps("**05** X — x.md").get(5)).toBe("x.md");
+  test("zero-padded: %%okuda-rhs:05%% → token 5", () => {
+    expect(extractJumps("*X* %%okuda-rhs:05%% <!-- x.md -->").get(5)).toBe("x.md");
   });
   test("duplicate tokens: last wins (compositor error surfaces)", () => {
-    const j = extractJumps("**01** A — a.md\n**01** B — b.md");
+    const j = extractJumps("*A* %%okuda-rhs:01%% <!-- a.md -->\n\n*B* %%okuda-rhs:01%% <!-- b.md -->");
     expect(j.get(1)).toBe("b.md");
     expect(j.size).toBe(1);
   });
-  test("a line without a bold number is not a jump line", () => {
+  test("a paragraph without an RHS token is not a jump line", () => {
     expect(extractJumps("- [01] a title — no path").size).toBe(0);
-    expect(extractJumps("See [01] in the notes below.").size).toBe(0);
+    expect(extractJumps("**01** a title, no rhs token").size).toBe(0);
   });
-  test("a **NN** without a trailing .md path is not a jump line", () => {
-    expect(extractJumps("**01** a title, no path").size).toBe(0);
-  });
-  test("paths with spaces: only the last space-free .md token is captured", () => {
-    const j = extractJumps("**01** X\ndecisions/old name.md");
-    expect(j.get(1)).toBe("name.md");
+  test("an RHS token without a .md path is not a jump line", () => {
+    expect(extractJumps("*X* %%okuda-rhs:01%% a title, no path").size).toBe(0);
   });
   test("empty source → empty map", () => {
     expect(extractJumps("").size).toBe(0);
@@ -462,9 +453,9 @@ describe("tui — advanceNumBuffer (the two-digit jump state machine)", () => {
     expect(advanceNumBuffer(null, null)).toEqual({ buffer: null, token: null });
   });
   test("the resolved token round-trips through extractJumps", () => {
-    // End-to-end contract: typing '0'+'5' yields token 5, and a **05**
+    // End-to-end contract: typing '0'+'5' yields token 5, and an RHS
     // paragraph lifts to token 5 → path. The two pure halves agree.
-    const jumps = extractJumps("**05** *Title*\ndocs/target.md");
+    const jumps = extractJumps("*Title* %%okuda-rhs:05%% <!-- docs/target.md -->");
     const step = advanceNumBuffer(advanceNumBuffer(null, "0").buffer, "5");
     expect(step.token).not.toBeNull();
     expect(jumps.get(step.token!)).toBe("docs/target.md");

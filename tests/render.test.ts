@@ -505,42 +505,55 @@ describe("render — property invariants", () => {
   });
 });
 
-// ── near/far: .md path tokens recede to muted; chip tokens are solid blocks ──
-// (the gloaming — near = bold slug, far = muted path/chrome).
+// ── near/far + RHS action: the one-line list pattern ──
+// (brief: index-and-jump). Slug left (consider), number RHS (execute),
+// path hidden in a comment. Truncate to fit, never wrap.
 
-describe("render — near/far: .md paths muted, white jump numbers", () => {
-  test("a .md path in a menu item recedes to muted (far)", async () => {
-    const out = await render("**01** *Title*\ndecisions/foo.md");
-    // muted #585858 → 88;88;88 (dracula). The path reads like the status
-    // bar's folder/file text — provenance, not content.
-    expect(out).toContain("\x1b[38;2;88;88;88mdecisions/foo.md\x1b[0m");
+describe("render — near/far + RHS number, the one-line list pattern", () => {
+  test("a .md path in an HTML comment is stripped (hidden wiring)", async () => {
+    const out = await render("*Title* %%okuda-rhs:01%% <!-- decisions/foo.md -->");
+    expect(out).not.toContain("decisions/foo.md");
+    expect(out).not.toContain("<!--");
   });
 
-  test("a digits-only **NN** renders white bold (the action indicator)", async () => {
-    const out = await render("**01** *Title*\ndocs/foo.md");
+  test("the RHS number renders white bold at the end of the line", async () => {
+    const out = await render("*Title* %%okuda-rhs:01%% <!-- docs/foo.md -->");
     // bold attribute (1), no colour → white bold. The number is the
-    // content; bold is the affordance. No chip, no block.
+    // content; bold is the affordance.
     expect(out).toContain("\x1b[1m01\x1b[0m");
   });
 
-  test("the number has no bracket or block decoration — just bold digits", async () => {
-    const out = await render("**01** *Title*\ndocs/foo.md");
-    expect(out).not.toContain("[01]");
-    // the number itself has no background — the closing rule's chips do,
-    // but the jump number is bold-only (no \x1b[48; immediately before 01)
-    expect(out).toContain("\x1b[1m01\x1b[0m");
-    expect(out).not.toMatch(/\x1b\[48;[^m]*m\x1b\[1m01/);
-  });
-
-  test("greedy: a .md mention in ordinary prose also mutes (the far register)", async () => {
-    const out = await render("See the notes in docs/essay.md for more.");
-    expect(out).toContain("\x1b[38;2;88;88;88mdocs/essay.md\x1b[0m");
-  });
-
-  test("the slug is the near-but-lesser thing — emphasis (yellow, italic)", async () => {
-    const out = await render("**01** *The Slug*\ndocs/foo.md");
+  test("the slug renders as emphasis (yellow, italic) on the left", async () => {
+    const out = await render("*The Slug* %%okuda-rhs:01%% <!-- docs/foo.md -->");
     // emphasis #f1fa8c → 241;250;140 ; italic (3) on dracula.
     expect(out).toContain("\x1b[38;2;241;250;140;3mThe Slug\x1b[0m");
+  });
+
+  test("the slug and number are on one line (no wrap)", async () => {
+    const out = await render("*Short* %%okuda-rhs:01%% <!-- docs/foo.md -->");
+    // The item is one line of body text (plus the header/footer rails).
+    const bodyLines = out.split("\n").filter((l) => l.trim() && !l.includes("─") && !l.includes("█"));
+    expect(bodyLines.length).toBe(1);
+  });
+
+  test("a long slug truncates with … and the number stays at the RHS", async () => {
+    const out = await render(
+      "*A very long slug that will not fit in a narrow terminal* %%okuda-rhs:05%% <!-- docs/x.md -->",
+      40,
+    );
+    const plain = out.replace(/\x1b\[[0-9;]*m/g, "");
+    expect(plain).toContain("…");
+    expect(plain).toContain("05");
+    // One body line (not wrapped): the body lines, excluding rails.
+    const bodyLines = plain.split("\n").filter((l) => l.trim() && !l.includes("─") && !l.includes("█"));
+    expect(bodyLines.length).toBe(1);
+    // The full uncut text is not present (truncated).
+    expect(plain).not.toContain("narrow terminal");
+  });
+
+  test("greedy: a .md mention in ordinary prose still mutes (the far register)", async () => {
+    const out = await render("See the notes in docs/essay.md for more.");
+    expect(out).toContain("\x1b[38;2;88;88;88mdocs/essay.md\x1b[0m");
   });
 
   test("a non-digit strong run keeps the amber strong colour (not white)", async () => {
@@ -550,9 +563,9 @@ describe("render — near/far: .md paths muted, white jump numbers", () => {
     expect(out).toContain("\x1b[38;2;255;184;108;1mnot-a-number\x1b[0m");
   });
 
-  test("extractJumps still lifts the path from the **NN** source", async () => {
+  test("extractJumps still lifts the path from the RHS-token source", async () => {
     const { extractJumps } = await import("../src/tui");
-    const j = extractJumps("**02** *Another*\nbriefs/bar.md");
+    const j = extractJumps("*Another* %%okuda-rhs:02%% <!-- briefs/bar.md -->");
     expect(j.get(2)).toBe("briefs/bar.md");
   });
 });

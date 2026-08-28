@@ -82,3 +82,10 @@ export function mermaidToken(id: string): string {
   return `%%okuda-mmd-${id}%%`;
 }
 export const RE_MERMAID_TOKEN = /%%okuda-mmd-([a-z0-9]+)%%/;
+
+/** RHS number token — a trailing `%%okuda-rhs:NN%%` in a paragraph marks
+ *  a one-line list item: the slug renders left, truncated to fit, the
+ *  number renders bold at the RHS (the action follows the content). The
+ *  compositor emits it; the paragraph handler renders the line;
+ *  `extractJumps` reads the number from source. (brief: index-and-jump.) */
+export const RE_RHS_TOKEN = /%%okuda-rhs:(\d{1,2})%%/;

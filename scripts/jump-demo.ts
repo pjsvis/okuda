@@ -57,11 +57,11 @@ if (import.meta.main) {
   const lines = ["# Menu — recent briefs", ""];
   rows.forEach((r, i) => {
     const n = String(i + 1).padStart(2, "0");
-    // bold number (white) → slug (emphasis, yellow). The path is wiring,
-    // not content: it lives in an HTML comment the renderer strips but
-    // extractJumps reads from source. Provenance arrives at the
-    // destination's footer, not in the menu.
-    lines.push(`**${n}** *${r.title}* <!-- ${r.file} -->`);
+    // slug (emphasis) → RHS number (the action). Visual order follows
+    // action order: consider the slug, then execute the number. The path
+    // is wiring in an HTML comment the renderer strips but extractJumps
+    // reads. One line — truncate to fit, never wrap (brief: index-and-jump).
+    lines.push(`*${r.title}* %%okuda-rhs:${n}%% <!-- ${r.file} -->`);
     lines.push(""); // blank line between items → bulletless, breathing
   });
   lines.push("---", "", "**Key** — type the number to jump · state glyphs (held in reserve):", "");

@@ -22,6 +22,7 @@ import {
   RE_INLINE_HTML,
   RE_MERMAID_TOKEN,
   RE_PB_TAG,
+  RE_RHS_TOKEN,
   TAG_ITEM,
   TAG_NESTED_CLOSE,
   TAG_PROBE_CLOSE,
@@ -39,7 +40,7 @@ import {
   padDisplay,
   padStartDisplay,
 } from "./width";
-import { stripANSI } from "./width";
+import { stripANSI, truncateDisplay } from "./width";
 import { wrapANSI } from "./wrap";
 
 /** Left indent for list blocks, inside the content margin (Glow list level_indent). */
@@ -535,6 +536,30 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         const entry = ctx.mermaid.get(m[1]!);
         if (entry !== undefined) return diagramBlock(entry.art, entry.checksum, ctx);
         return ""; // pipe failed → drop the placeholder silently
+      }
+      // One-line list item: `slug %%okuda-rhs:NN%%` — the RHS number is
+      // the action, the slug is the content. Render the slug left (truncated
+      // to fit, one line, `…` on overflow), the number bold at the RHS.
+      // Visual order follows action order: consider, then execute.
+      // (brief: index-and-jump — the pattern that repeats for any list
+      //  where the item is one line and the action is RHS.)
+      const rhs = children.match(RE_RHS_TOKEN);
+      if (rhs) {
+        const num = rhs[1]!;
+        // The slug is the paragraph minus the RHS token and any HTML
+        // comment (the path wiring). Strip both, then render the
+        // remaining inline content through wrapBlock and take the first
+        // line — one line, truncated to fit, the number at the RHS.
+        const slugSrc = children.replace(RE_RHS_TOKEN, "").replace(RE_INLINE_HTML, "");
+        const slugLines = wrapBlock(stripHtml(slugSrc));
+        const rendered = slugLines[0] ?? "";
+        // column budget: full width minus the 2-char margins (applied by
+        // finalize) minus the number + its leading space.
+        const numW = num.length + 1; // ' NN'
+        const avail = width - 2 - numW;
+        const body = truncateDisplay(rendered, avail);
+        const line = padDisplay(body, avail) + styler.bold(num);
+        return line + "\n\n";
       }
       const lines = wrapBlock(stripHtml(children));
       return lines.join("\n") + "\n\n";

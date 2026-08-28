@@ -376,3 +376,44 @@ export function padCenterDisplay(s: string, cols: number): string {
   const left = Math.floor((cols - w) / 2);
   return " ".repeat(left) + s + " ".repeat(cols - w - left);
 }
+
+/** Truncate ANSI-coloured text to `cols` display columns, ANSI-aware:
+ *  escapes are 0-width and preserved through the cut. If the text fits,
+ *  returns it unchanged. If it overflows, emits the text up to the cut
+ *  plus a `marker` (default `…`) — closing any open SGR with `reset`
+ *  first. Never exceeds `cols` (the marker is included in the budget).
+ *  Pure. (The one-line menu/list pattern — brief: index-and-jump.) */
+export function truncateDisplay(
+  s: string,
+  cols: number,
+  marker = "…",
+  reset = "\x1b[0m",
+): string {
+  const w = displayWidth(s);
+  if (w <= cols) return s;
+  const markerW = displayWidth(marker);
+  const budget = cols - markerW;
+  if (budget <= 0) return marker.slice(0, cols);
+  // Walk runs, accumulating visible width; cut at the budget.
+  let out = "";
+  let vis = 0;
+  let openSgr = false;
+  for (const run of scanRuns(s)) {
+    if (run.kind === "escape") {
+      out += run.raw;
+      if (/\x1b\[[0-9;]*m/.test(run.raw)) openSgr = !/\x1b\[0*m/.test(run.raw);
+      continue;
+    }
+    // visible run — take chars until the budget is spent.
+    let taken = "";
+    for (const ch of run.raw) {
+      if (vis >= budget) break;
+      taken += ch;
+      vis += 1;
+    }
+    out += taken;
+    if (vis >= budget) break;
+  }
+  // Close any open SGR before the marker (style hygiene at the cut).
+  return out + (openSgr ? reset : "") + marker;
+}

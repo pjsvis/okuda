@@ -328,18 +328,16 @@ export function advanceNumBuffer(
   return { buffer: next, token: null };
 }
 
-/** Scan markdown source for `**NN**` jump tokens paired with a
- *  `.md` path, returning a token→path map. The compositor emits each
- *  menu item as a paragraph (blank-line separated): a `**NN**` token,
- *  the slug, and the `.md` path (which may be on the same line or on
- *  a soft-break line beneath). The path is the last `.md` token in the
- *  paragraph. The renderer colours a digits-only strong run white-bold;
- *  extractJumps reads `**NN**` from source directly — no chip, no
- *  private-use token. Duplicate tokens: last wins. Pure. */
+/** Scan markdown source for `%%okuda-rhs:NN%%` jump tokens paired with
+ *  a `.md` path, returning a token→path map. The compositor emits each
+ *  menu item as a paragraph: the slug, a trailing `%%okuda-rhs:NN%%`
+ *  (the action, RHS), and a `.md` path in an HTML comment (wiring the
+ *  renderer strips but extractJumps reads from source). Duplicate tokens:
+ *  last wins. Pure. */
 export function extractJumps(source: string): Map<number, string> {
   const out = new Map<number, string>();
   for (const para of source.split(/\n{2,}/)) {
-    const tok = para.match(/\*\*(\d{1,2})\*\*/);
+    const tok = para.match(/%%okuda-rhs:(\d{1,2})%%/);
     if (!tok) continue;
     const paths = [...para.matchAll(/\S+\.md/g)].map((m) => m[0]!);
     const path = paths[paths.length - 1];
