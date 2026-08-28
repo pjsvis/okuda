@@ -18,6 +18,7 @@
 {"file":"2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md","date":"2026-08-28","status":"open","summary":"Inline Ask-the-Doc and Local SSH Transport","meta":{}}
 {"file":"2026-08-28-brief-elision-primitive.md","date":"2026-08-28","status":"open","summary":"Elision primitive — close ADR-014, fix the code-fence soft-wrap lie","meta":{}}
 {"file":"2026-08-28-brief-index-and-jump.md","date":"2026-08-28","status":"open","summary":"Ephemeral Index Generation and Numeric Jump Navigation","meta":{}}
+{"file":"2026-08-28-brief-jump-demo-honesty.md","date":"2026-08-28","status":"open","summary":"jump-demo honesty — slug derivation + state-glyph signal","meta":{}}
 {"file":"2026-08-28-brief-launcher-fut.md","date":"2026-08-28","status":"open","summary":"Launcher FUT — session-scoped alt-screen","meta":{}}
 {"file":"2026-08-28-brief-notification-style.md","date":"2026-08-28","status":"open","summary":"011-zero-notification-stillness-and-decoupled-inbox-watchers","meta":{}}
 {"file":"2026-08-28-brief-oklch-tuning.md","date":"2026-08-28","status":"open","summary":"OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling","meta":{}}
