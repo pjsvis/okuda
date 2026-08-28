@@ -7,7 +7,7 @@
 ## TL;DR
 
 okuda is the LCARS for an agent-and-human bridge crew operating a common
-control surface (the OKW silo) under the Edinburgh Protocol (the command
+control surface (the knowledge-system silo) under the Edinburgh Protocol (the command
 discipline). It renders the workflow's output so both officers can read
 it at a glance, foxtrot oscar'ing anything that doesn't earn its place
 at the station. This is a note on why that shape works, written in the
@@ -28,7 +28,7 @@ house style it argues for.
 - **That is environmental readability at crew scale.** Not just
   operator-scale — the legibility extends from one person's screen to
   the crew's shared field. The Gloam badge is the station label; the
-  house style is the rendering contract; OKW is the station layout.
+  house style is the rendering contract; the knowledge system is the station layout.
 
 ## Restraint as interoperability
 
@@ -49,7 +49,7 @@ house style it argues for.
 ## Agent and human, the same discipline
 
 - **The agent and the human are the bridge crew.** The control surface
-  is the silo — the OKW registries, the markdown documents, the task
+  is the silo — the registries, the markdown documents, the task
   graph, the terminal itself. The agent writes; the human reads; both
   navigate the same registries.
 - **Neither owns the surface; both operate it.** The agent's discipline
@@ -67,7 +67,7 @@ house style it argues for.
   dress.
 - **okuda is the LCARS.** The rendering layer that composes structure,
   colour, and layout into a glanceable surface.
-- **OKW is the station layout.** The named standard for the registries
+- **The knowledge system is the station layout.** The convention for the registries
   that make the crew legible to each other — briefs, decisions,
   debriefs, playbooks, each a station with a known function.
 - **The house style is the rendering contract.** The author writes bold

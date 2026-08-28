@@ -15,3 +15,5 @@
 {"file":"015-alert-palette-role.md","date":"2026-08-27","status":"Accepted","summary":"An `alert` palette role for the fetch-state stamp's `failed` channel","meta":{}}
 {"file":"016-argv0-launcher-dispatch.md","date":"2026-08-27","status":"Accepted","summary":"argv[0] dispatch — `gloam` is the launcher entry point","meta":{}}
 {"file":"017-session-handoffs-are-not-briefs.md","date":"2026-08-27","status":"Accepted","summary":"Session handoffs are not briefs","meta":{"tidy_commit":"4ab0f58","applies_to":"AGENTS.md,playbooks/briefs-playbook.md"}}
+{"file":"018-retire-the-okw-term.md","date":"2026-08-28","status":"Accepted","summary":"Retire the \"OKW\" term","meta":{}}
+{"file":"019-okf-v02-conformance.md","date":"2026-08-28","status":"Accepted","summary":"Adopt OKF v0.2 conformance for the document tree","meta":{}}
