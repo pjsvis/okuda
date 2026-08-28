@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { slugify, stateGlyph } from "../scripts/jump-demo";
+import { slugify, stateGlyph, jumpToken } from "../scripts/jump-demo";
 
 describe("jump-demo — slugify (the slug is a title, never a stem)", () => {
   test("strips the `Brief:` classification prefix", () => {
@@ -50,5 +50,31 @@ describe("jump-demo — stateGlyph (deviations earn their mark; default bare)", 
   });
   test("case-insensitive: REJECTED → ✗", () => {
     expect(stateGlyph("**Status:** REJECTED")).toBe("\u2717");
+  });
+});
+
+describe("jump-demo — jumpToken (numbers from 11, not 01 — ADR-021)", () => {
+  test("item 0 (the first) → 11, not 01", () => {
+    expect(jumpToken(0)).toBe("11");
+  });
+  test("item 1 → 12", () => {
+    expect(jumpToken(1)).toBe("12");
+  });
+  test("a ≤9-item list never pays the 0-key stretch (11–19 are 0-free)", () => {
+    for (let i = 0; i < 9; i++) expect(jumpToken(i)).not.toContain("0");
+  });
+  test("the 10th item (i=9 → 20) reintroduces the 0 — the decade boundary still bites", () => {
+    expect(jumpToken(9)).toBe("20");
+    expect(jumpToken(9)).toContain("0");
+  });
+  test("two digits through 89 items (item 88 → 99); the 0-free floor holds", () => {
+    expect(jumpToken(88)).toBe("99");
+    expect(jumpToken(0)).toBe("11");
+  });
+  test("01-09 is the reserved namespace — jumpToken never emits it", () => {
+    for (let i = 0; i < 100; i++) {
+      const n = Number(jumpToken(i));
+      if (i < 89) expect(n).toBeGreaterThanOrEqual(11);
+    }
   });
 });

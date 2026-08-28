@@ -66,6 +66,17 @@ export function stateGlyph(content: string): string {
   return "";  // open / pending / unknown — the default; no glyph
 }
 
+/** The jump token for a zero-based index. Numbers from 11, not 01 — the
+ *  0 key sits at the opposite end of the number row from 1, and the tokens
+ *  are ephemeral codes (never counts), so they should be easy to type. The
+ *  offset removes the 0-key stretch for the common <=~10-item list and
+ *  reserves 01-09 as a free namespace. Two digits cover 11-99 (89 items);
+ *  lists over ~10 are the compositor's concern, not the renderer's.
+ *  (ADR-021.) */
+export function jumpToken(index: number): string {
+  return String(index + 11);
+}
+
 if (import.meta.main) {
   const recent = readdirSync(join(ROOT, "briefs"))
     .filter((f) => /^2026-08-28.*\.md$/.test(f))
@@ -81,7 +92,7 @@ if (import.meta.main) {
 
   const lines = ["# Menu — recent briefs", ""];
   rows.forEach((r, i) => {
-    const n = String(i + 1).padStart(2, "0");
+    const n = jumpToken(i);
     const slug = slugify(r.title);
     const glyph = stateGlyph(r.content);
     const lead = glyph ? `${glyph} ` : "";  // deviation earns its mark; default bare
