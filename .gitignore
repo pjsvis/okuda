@@ -12,3 +12,7 @@ okuda
 
 # td task database (runtime state)
 .todos/
+
+# Island (ephemeral, regenerated — never registered)
+NOW.md
+STANCE.md

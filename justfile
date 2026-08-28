@@ -13,6 +13,12 @@
 help:
     @./okuda docs/help.md
 
+# Ephemeral status island
+[group('navigation')]
+island:
+    @bun scripts/status-doc.ts > NOW.md
+    @./okuda NOW.md --tui
+
 # Rationale
 [group('navigation')]
 info:
