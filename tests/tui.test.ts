@@ -393,13 +393,13 @@ describe("tui — digitOf (single-byte digit → char, else null)", () => {
   });
 });
 
-describe("tui — extractJumps (scan source for [NN](path) tokens)", () => {
-  test("lifts two-digit inline-link tokens into a token→path map", () => {
+describe("tui — extractJumps (scan source for [NN] … path.md lines)", () => {
+  test("lifts two-digit token + trailing path into a token→path map", () => {
     const src = [
       "# Index",
       "",
-      "- [01](briefs/foo.md) Foo",
-      "- [02](decisions/bar.md) Bar",
+      "- [01] Foo — briefs/foo.md",
+      "- [02] Bar — decisions/bar.md",
     ].join("\n");
     const j = extractJumps(src);
     expect(j.size).toBe(2);
@@ -407,36 +407,36 @@ describe("tui — extractJumps (scan source for [NN](path) tokens)", () => {
     expect(j.get(2)).toBe("decisions/bar.md");
   });
   test("zero-pads: [05] → token 5", () => {
-    const j = extractJumps("- [05](x.md)");
+    const j = extractJumps("- [05] X — x.md");
     expect(j.get(5)).toBe("x.md");
     expect(j.has(5)).toBe(true);
   });
   test("duplicate tokens: last wins (compositor error surfaces)", () => {
-    const j = extractJumps("- [01](a.md)\n- [01](b.md)");
+    const j = extractJumps("- [01] A — a.md\n- [01] B — b.md");
     expect(j.get(1)).toBe("b.md");
     expect(j.size).toBe(1);
   });
-  test("reference links [NN][ref] are NOT matched (path must be inline)", () => {
-    const j = extractJumps("- [01][ref]\n\n[ref]: a.md");
-    expect(j.size).toBe(0);
+  test("a [NN] in prose with no trailing path is inert (not a jump line)", () => {
+    expect(extractJumps("See [01] in the notes below.").size).toBe(0);
   });
   test("one-digit tokens [5] are ignored — the convention is two-digit", () => {
-    expect(extractJumps("- [5](a.md)").size).toBe(0);
+    expect(extractJumps("- [5] X — a.md").size).toBe(0);
   });
-  test("plain text [01] with no link → no entries", () => {
+  test("a line without a trailing .md path is not a jump line", () => {
     expect(extractJumps("- [01] a title, no path").size).toBe(0);
   });
-  test("paths with spaces are captured up to the closing paren", () => {
-    // [01](a b.md) → the destination may contain spaces (non-angle-bracketed).
-    const j = extractJumps("- [01](a b.md)");
-    expect(j.get(1)).toBe("a b.md");
+  test("paths with spaces: only the last space-free .md token is captured", () => {
+    // `decisions/old name.md` — \S+\.md$ grabs `name.md` (the last
+    // space-free run ending in .md). Compositors should emit space-free
+    // paths; this documents the fallback when they don't.
+    const j = extractJumps("- [01] X — decisions/old name.md");
+    expect(j.get(1)).toBe("name.md");
+  });
+  test("token need not be in a list item — bare [NN] … path works", () => {
+    expect(extractJumps("[01] X — docs/a.md").get(1)).toBe("docs/a.md");
   });
   test("empty source → empty map", () => {
     expect(extractJumps("").size).toBe(0);
-  });
-  test("URL links with two-digit text are captured (harmless if target fails)", () => {
-    const j = extractJumps("- [10](https://example.com)");
-    expect(j.get(10)).toBe("https://example.com");
   });
 });
 
@@ -463,10 +463,10 @@ describe("tui — advanceNumBuffer (the two-digit jump state machine)", () => {
     expect(advanceNumBuffer(null, null)).toEqual({ buffer: null, token: null });
   });
   test("the resolved token round-trips through extractJumps", () => {
-    // End-to-end contract: typing '0'+'5' yields token 5, and a
-    // [05](path) link lifts to token 5 → path. The two pure halves
+    // End-to-end contract: typing '0'+'5' yields token 5, and an index
+    // line `[05] … path.md` lifts to token 5 → path. The two pure halves
     // agree on the numbering convention.
-    const jumps = extractJumps("- [05](docs/target.md)");
+    const jumps = extractJumps("- [05] Title — docs/target.md");
     const step = advanceNumBuffer(advanceNumBuffer(null, "0").buffer, "5");
     expect(step.token).not.toBeNull();
     expect(jumps.get(step.token!)).toBe("docs/target.md");

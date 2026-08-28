@@ -328,13 +328,24 @@ export function advanceNumBuffer(
   return { buffer: next, token: null };
 }
 
-/** Scan markdown source for `[NN](path)` jump tokens, returning a
- *  token→path map. Tokens are two-digit (01–99); the compositor
- *  zero-pads. Duplicate tokens: last wins (a compositor error surfaces
- *  as the later entry). Reference links `[NN][ref]` are NOT matched
- *  (only inline links with the path in the `[..](..)` form). Pure. */
+/** Scan markdown source for jump tokens, returning a token→path map.
+ *
+ *  The index line is plain text — *not* a markdown link. Rendering a
+ *  file path as a hyperlink advertises a clickability the TUI lacks, and
+ *  a destination that isn't a URL; the only legitimate links are URLs.
+ *  So the token is a literal `[NN]` at the list-item start, and the
+ *  target path is the trailing `.md`-ending token on the line. The
+ *  compositor owns the line shape; `extractJumps` recognises:
+ *
+ *      - [01] Title — decisions/foo.md
+ *      - [02] Another — briefs/bar.md
+ *
+ *  Tokens are two-digit (01–99); the compositor zero-pads. Duplicate
+ *  tokens: last wins (a compositor error surfaces as the later entry).
+ *  Lines without a trailing `.md` path are not jump lines (a `[01]`
+ *  in prose with no path is inert). Pure. */
 export function extractJumps(source: string): Map<number, string> {
-  const re = /\[(\d{2})\]\(([^)]+)\)/g;
+  const re = /^\s*[-*]?\s*\[(\d{2})\][^\n]*?(\S+\.md)\s*$/gm;
   const out = new Map<number, string>();
   let m: RegExpExecArray | null;
   while ((m = re.exec(source)) !== null) {

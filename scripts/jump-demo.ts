@@ -3,14 +3,15 @@
  * jump-demo.ts — a demo compositor for the index-and-jump feature
  * (td-9d9981).
  *
- * Emits a numbered index document over decisions/00–09, each line an
- * inline-link `[NN](path)` token the TUI's jump buffer resolves. The
- * recipe writes this to a temp file and frames it in the TUI, so the
- * operator can type `01`–`09` to jump to a decision and `u`/Backspace
- * to come back. Ephemeral by design — never registered, never a brief.
+ * Emits a numbered index over decisions/00–09. Each line is plain text
+ * (not a markdown link): a `[NN]` token, the decision title, then the
+ * trailing path. The TUI's `extractJumps` lifts the token→path mapping
+ * from this shape; the renderer paints it as ordinary prose — no fake
+ * clickable styling for a file path that isn't a URL.
  *
- * This is the *environment* composing (filesystem as the message bus),
- * not okuda — the renderer just paints the links it's given (ADR-020).
+ * Ephemeral by design — never registered, never a brief. This is the
+ * *environment* composing (filesystem as the message bus), not okuda;
+ * the renderer just paints the bytes it's given (ADR-020).
  *
  * Usage:
  *   bun scripts/jump-demo.ts          # markdown to stdout
@@ -40,17 +41,11 @@ if (import.meta.main) {
     .filter((f) => /^0\d{2}-.*\.md$/.test(f))
     .sort()
     .slice(0, 9);
-  const lines = [
-    "# Jump demo — recent decisions",
-    "",
-    "> Type a two-digit number to jump (`01`–`09`); `u` or `Backspace`",
-    "> to come back. Press `?` to toggle the hints line. `q` to quit.",
-    "",
-  ];
+  const lines = ["# Jump demo — recent decisions", ""];
   files.forEach((f, i) => {
     const token = String(i + 1).padStart(2, "0");
     const title = titleOf(`decisions/${f}`);
-    lines.push(`- [${token}](decisions/${f}) ${title}`);
+    lines.push(`- [${token}] ${title} — decisions/${f}`);
   });
   lines.push("");
   console.log(lines.join("\n"));
