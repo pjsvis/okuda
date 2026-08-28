@@ -33,7 +33,7 @@ export type KeyAction =
   | "page-down" | "page-up"
   | "half-down" | "half-up"
   | "top" | "bottom" | "reload"
-  | "help"
+  | "help" | "back"
   | null;
 
 const ESC = 0x1b;
@@ -63,6 +63,9 @@ export function decodeKey(buf: Uint8Array): KeyAction {
     case 0x20: return "page-down";      // space — less/man convention
     case 0x62: return "page-up";        // b — less/man back convention
     case 0x3f: return "help";           // ? — toggle verbose hints
+    case 0x75: return "back";           // u — pop the backstack
+    case 0x7f: return "back";           // DEL (Backspace on most terminals)
+    case 0x08: return "back";           // BS  (Backspace on some terminals)
   }
   // Escape sequences: ESC [ <final> or ESC [ <n> ~.
   if (b0 === ESC && buf.length >= 3 && buf[1] === 0x5b) {
@@ -176,7 +179,7 @@ export function viewport(
   return { visible: lines.slice(s, s + height), maxScroll, scroll: s };
 }
 
-const HINTS = "q quit · j/k scroll · ␣/b page · g/G top/bottom · Ctrl-D/U half · r reload";
+const HINTS = "q quit · j/k · ␣/b page · g/G ends · ^D/^U · r reload · NN jump · u back";
 
 /** Display path: folder/basename (Glow convention). Pure. */
 /** ADR-010 re-anchor as a pure function: given the pre- and post-re-render
@@ -277,6 +280,69 @@ export function hintsLine(width: number, muted: (s: string) => string): string {
   return muted(padStartDisplay(HINTS, width - 1)) + " ";
 }
 
+/** Decode a single-byte digit ('0'–'9') to its character, else null.
+ *  Multi-byte sequences (escape codes, arrows) are never digits — only
+ *  a lone 0x30–0x39 qualifies. The two-digit jump buffer collects these
+ *  before falling to `decodeKey`; any non-digit cancels the buffer.
+ *  Pure. */
+export function digitOf(buf: Uint8Array): string | null {
+  if (buf.length !== 1) return null;
+  const b = buf[0]!;
+  return b >= 0x30 && b <= 0x39 ? String.fromCharCode(b) : null;
+}
+
+/** A jump target lifted from a markdown inline-link token `[NN](path)`.
+ *
+ *  The index document is an ordinary markdown file; its `[NN](path)`
+ *  links carry the target path in-band — the filesystem is the message
+ *  bus. ADR-020 holds: no `src/` file reads ambient directories to mutate
+ *  the frame; the TUI scans the source text it already holds. The
+ *  renderer paints the link per glow parity (rose text + visible URL);
+ *  callsign-column polish belongs to the silo-mnemonics brief, not here. */
+export interface JumpEntry {
+  token: number;
+  path: string;
+}
+
+/** The result of advancing the two-digit numeric buffer one keystroke.
+ *  `buffer` is the new pending state (null = empty); `token` is the
+ *  resolved two-digit number when the buffer completed, else null.
+ *  Pure. */
+export interface NumBufferStep {
+  buffer: string | null;
+  token: number | null;
+}
+
+/** Advance the numeric jump buffer: a digit accumulates; at two digits
+ *  the token resolves and the buffer resets to empty. A null digit (any
+ *  non-digit key — motion, escape, letters) cancels a pending buffer so
+ *  a stray keystroke never ambushes a half-typed token. Pure — the
+ *  caller performs the IO (jumpTo/back) the resolved token implies. */
+export function advanceNumBuffer(
+  prev: string | null,
+  digit: string | null,
+): NumBufferStep {
+  if (digit === null) return { buffer: null, token: null };
+  const next = (prev ?? "") + digit;
+  if (next.length >= 2) return { buffer: null, token: Number(next) };
+  return { buffer: next, token: null };
+}
+
+/** Scan markdown source for `[NN](path)` jump tokens, returning a
+ *  token→path map. Tokens are two-digit (01–99); the compositor
+ *  zero-pads. Duplicate tokens: last wins (a compositor error surfaces
+ *  as the later entry). Reference links `[NN][ref]` are NOT matched
+ *  (only inline links with the path in the `[..](..)` form). Pure. */
+export function extractJumps(source: string): Map<number, string> {
+  const re = /\[(\d{2})\]\(([^)]+)\)/g;
+  const out = new Map<number, string>();
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(source)) !== null) {
+    out.set(Number(m[1]!), m[2]!);
+  }
+  return out;
+}
+
 /**
  * Compose the footer: badge + folder/filename left (identity leads —
  * the glance position), `? help` right (affordance trails). Always
@@ -322,8 +388,11 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  mid-session, permission revoked, mount vanished) both surface as
    *  `{ok:false}`; the gate retains the last-known-good against it.
    *  (brief: fetch-state-stamp — the empty-doc-on-fetch-failure lie.) */
-  const readSource = async (): Promise<Fetch> => {
-    const f = Bun.file(opts.file);
+  // `currentFile` is the live document — jumps and back-nav swap it;
+  // reload/resize read it. `opts.file` only seeds the initial value.
+  let currentFile = opts.file;
+  const readSource = async (file: string = currentFile): Promise<Fetch> => {
+    const f = Bun.file(file);
     try {
       if (!(await f.exists())) return { ok: false, reason: "missing" };
       return { ok: true, text: await f.text() };
@@ -357,6 +426,13 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   let fetchState: FetchState = init.state; // footer stamp reads this (brief: fetch-state-stamp)
   let scroll = 0;
   let showHints = false; // `?` toggles: compact % footer ↔ verbose hints
+  // Index-and-jump state (brief 2026-08-28). The jump table is extracted
+  // from the live source whenever it changes; the backstack records
+  // {file, scroll} for `u`/Backspace traversal; numBuffer collects the
+  // two-digit token before a jump resolves.
+  let jumps = extractJumps(initialFetch.ok ? initialFetch.text : "");
+  let backstack: { file: string; scroll: number }[] = [];
+  let numBuffer: string | null = null;
 
   const dims = () => ({
     // terminalCols/Rows handle the Bun --compile columns=0 bug (tput fallback);
@@ -378,12 +454,12 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     if (showHints) {
       // Badge row up one; hints own the last row, right-justified, corner pad.
       process.stdout.write(`\x1b[${rows - 1};1H`);
-      process.stdout.write(footerLine(cols, "Gloam", opts.file, muted, badge));
+      process.stdout.write(footerLine(cols, "Gloam", currentFile, muted, badge));
       process.stdout.write(`\x1b[${rows};1H`);
       process.stdout.write(hintsLine(cols, muted));
     } else {
       process.stdout.write(`\x1b[${rows};1H`);
-      process.stdout.write(footerLine(cols, "Gloam", opts.file, muted, badge));
+      process.stdout.write(footerLine(cols, "Gloam", currentFile, muted, badge));
     }
   };
 
@@ -403,16 +479,70 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     if (!decision.repaint) return; // gate held, or source lost — keep the screen
     const oldLines = lines;
     lines = decision.lines;
+    if (fetch.ok) jumps = extractJumps(fetch.text); // re-extract on change
     scroll = reanchoredScroll(oldLines, lines, scroll, height);
     paint();
   };
 
   const reload = (): void => { void rerenderAnchored(); };
 
+  /** Present a freshly fetched doc: set lines, re-extract the jump table,
+   *  set scroll, repaint. Used by jump and back (forced loads — the gate's
+   *  same/changed comparison is meaningless across different files, so
+   *  prev=null semantics apply: the new doc always reads `changed`). The
+   *  caller has already verified fetch.ok and pushed the backstack. */
+  const present = (fetch: Fetch, next: string[], nextScroll: number): void => {
+    lines = next;
+    jumps = fetch.ok ? extractJumps(fetch.text) : jumps;
+    fetchState = fetch.ok ? "changed" : "failed";
+    scroll = nextScroll;
+    paint();
+  };
+
+  /** Jump to the document behind a two-digit token. Pushes the current
+   *  view onto the backstack, loads the target at scroll 0. A missing
+   *  token or a vanished target is a silent no-op (acceptance: "numeric
+   *  input is ignored if the requested index does not exist"). */
+  const jumpTo = async (token: number): Promise<void> => {
+    const path = jumps.get(token);
+    if (!path) return;
+    const fetch = await readSource(path);
+    if (!fetch.ok) return; // target gone — stay put, no backstack push
+    backstack.push({ file: currentFile, scroll });
+    currentFile = path;
+    const next = await renderLines(fetch.text, dims().cols);
+    present(fetch, next, 0);
+  };
+
+  /** Pop the backstack: return to the previous document with its scroll
+   *  intact. Empty stack → no-op. A vanished target is dropped (the file
+   *  is gone; the user stays on the current doc). */
+  const back = async (): Promise<void> => {
+    const prev = backstack.pop();
+    if (!prev) return;
+    const fetch = await readSource(prev.file);
+    if (!fetch.ok) return; // target gone — stay; entry dropped
+    currentFile = prev.file;
+    const next = await renderLines(fetch.text, dims().cols);
+    present(fetch, next, prev.scroll);
+  };
+
   const onKey = (data: Buffer): void => {
-    const action = decodeKey(new Uint8Array(data));
+    const bytes = new Uint8Array(data);
+    // Numeric jump buffer: two digits → token lookup. Any non-digit
+    // (motion, escape sequence, letters) cancels a pending buffer.
+    const digit = digitOf(bytes);
+    const step = advanceNumBuffer(numBuffer, digit);
+    numBuffer = step.buffer;
+    if (step.token !== null) {
+      void jumpTo(step.token);
+      return;
+    }
+    if (digit !== null) return; // first digit only — buffer pending
+    const action = decodeKey(bytes);
     if (action === null) return;
     if (action === "quit") return cleanup();
+    if (action === "back") { void back(); return; }
     if (action === "help") {
       showHints = !showHints;
       paint();

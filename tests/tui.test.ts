@@ -1,6 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import {
   decodeKey,
+  digitOf,
+  extractJumps,
+  advanceNumBuffer,
   footerLine,
   viewport,
   contentHeight,
@@ -354,5 +357,121 @@ describe("tui — gateFetch (changed / same / failed, retain-on-failure)", () =>
       gateFetch(prev, ok("alpha\nBETA\ngamma"), render("alpha\nBETA\ngamma")).state,
     ];
     expect(new Set(states).size).toBe(3);
+  });
+});
+
+// ── Index-and-jump (brief 2026-08-28) ───────────────────────────────
+
+describe("tui — decodeKey (back-nav: u / Backspace)", () => {
+  test("u → back", () => {
+    expect(decodeKey(buf(0x75))).toBe("back");
+  });
+  test("DEL (0x7f) → back (Backspace on most terminals)", () => {
+    expect(decodeKey(buf(0x7f))).toBe("back");
+  });
+  test("BS (0x08) → back (Backspace on some terminals)", () => {
+    expect(decodeKey(buf(0x08))).toBe("back");
+  });
+});
+
+describe("tui — digitOf (single-byte digit → char, else null)", () => {
+  test("digits 0–9 → their character", () => {
+    expect(digitOf(buf(0x30))).toBe("0");
+    expect(digitOf(buf(0x35))).toBe("5");
+    expect(digitOf(buf(0x39))).toBe("9");
+  });
+  test("letters → null (the buffer only collects digits)", () => {
+    expect(digitOf(buf(0x6a))).toBeNull(); // j
+    expect(digitOf(buf(0x75))).toBeNull(); // u — not a digit, clears buffer
+  });
+  test("multi-byte escape sequence → null (arrows, page keys)", () => {
+    expect(digitOf(buf(0x1b, 0x5b, 0x41))).toBeNull(); // ↑
+    expect(digitOf(buf(0x1b, 0x5b, 0x35, 0x7e))).toBeNull(); // PgUp
+  });
+  test("empty buffer → null", () => {
+    expect(digitOf(buf())).toBeNull();
+  });
+});
+
+describe("tui — extractJumps (scan source for [NN](path) tokens)", () => {
+  test("lifts two-digit inline-link tokens into a token→path map", () => {
+    const src = [
+      "# Index",
+      "",
+      "- [01](briefs/foo.md) Foo",
+      "- [02](decisions/bar.md) Bar",
+    ].join("\n");
+    const j = extractJumps(src);
+    expect(j.size).toBe(2);
+    expect(j.get(1)).toBe("briefs/foo.md");
+    expect(j.get(2)).toBe("decisions/bar.md");
+  });
+  test("zero-pads: [05] → token 5", () => {
+    const j = extractJumps("- [05](x.md)");
+    expect(j.get(5)).toBe("x.md");
+    expect(j.has(5)).toBe(true);
+  });
+  test("duplicate tokens: last wins (compositor error surfaces)", () => {
+    const j = extractJumps("- [01](a.md)\n- [01](b.md)");
+    expect(j.get(1)).toBe("b.md");
+    expect(j.size).toBe(1);
+  });
+  test("reference links [NN][ref] are NOT matched (path must be inline)", () => {
+    const j = extractJumps("- [01][ref]\n\n[ref]: a.md");
+    expect(j.size).toBe(0);
+  });
+  test("one-digit tokens [5] are ignored — the convention is two-digit", () => {
+    expect(extractJumps("- [5](a.md)").size).toBe(0);
+  });
+  test("plain text [01] with no link → no entries", () => {
+    expect(extractJumps("- [01] a title, no path").size).toBe(0);
+  });
+  test("paths with spaces are captured up to the closing paren", () => {
+    // [01](a b.md) → the destination may contain spaces (non-angle-bracketed).
+    const j = extractJumps("- [01](a b.md)");
+    expect(j.get(1)).toBe("a b.md");
+  });
+  test("empty source → empty map", () => {
+    expect(extractJumps("").size).toBe(0);
+  });
+  test("URL links with two-digit text are captured (harmless if target fails)", () => {
+    const j = extractJumps("- [10](https://example.com)");
+    expect(j.get(10)).toBe("https://example.com");
+  });
+});
+
+describe("tui — advanceNumBuffer (the two-digit jump state machine)", () => {
+  test("first digit → buffer holds it, no token yet", () => {
+    expect(advanceNumBuffer(null, "0")).toEqual({ buffer: "0", token: null });
+    expect(advanceNumBuffer(null, "5")).toEqual({ buffer: "5", token: null });
+  });
+  test("second digit → token resolves, buffer resets to empty", () => {
+    expect(advanceNumBuffer("0", "5")).toEqual({ buffer: null, token: 5 });
+    expect(advanceNumBuffer("1", "0")).toEqual({ buffer: null, token: 10 });
+    expect(advanceNumBuffer("9", "9")).toEqual({ buffer: null, token: 99 });
+  });
+  test("zero-pads: '0' then '1' → token 1 (not 10)", () => {
+    // The compositor zero-pads; [05] is token 5. Two-digit entry '0'+'5'
+    // must resolve to 5, matching extractJumps(…).get(5).
+    expect(advanceNumBuffer("0", "5").token).toBe(5);
+  });
+  test("non-digit after one digit → buffer cancelled, no token", () => {
+    // A stray j or u must not ambush a half-typed token.
+    expect(advanceNumBuffer("0", null)).toEqual({ buffer: null, token: null });
+  });
+  test("non-digit on empty buffer → still empty, no token", () => {
+    expect(advanceNumBuffer(null, null)).toEqual({ buffer: null, token: null });
+  });
+  test("the resolved token round-trips through extractJumps", () => {
+    // End-to-end contract: typing '0'+'5' yields token 5, and a
+    // [05](path) link lifts to token 5 → path. The two pure halves
+    // agree on the numbering convention.
+    const jumps = extractJumps("- [05](docs/target.md)");
+    const step = advanceNumBuffer(advanceNumBuffer(null, "0").buffer, "5");
+    expect(step.token).not.toBeNull();
+    expect(jumps.get(step.token!)).toBe("docs/target.md");
+  });
+  test("typing '0'+'0' → token 0 (matches [00] if the compositor emits it)", () => {
+    expect(advanceNumBuffer("0", "0").token).toBe(0);
   });
 });
