@@ -39,7 +39,10 @@ data, displayed beside jump tokens in index views and resolvable as
   across directory renames), fallback `basename(cwd)`. Passed on argv; the
   renderer paints it at the head of the footer identity run — muted, the same
   register as folder/file (provenance, not alarm, per the fetch-state grammar).
-  The renderer learns nothing about trees or registries.
+  The full identity run is **silo · callsign · filename** (ADR-020): when the
+  rooted registry knows the active document's callsign, the launcher composes
+  it into the run. The renderer learns nothing about trees or registries — it
+  paints the strings it is given.
 - **Callsigns (registry):** `callsign` key in document frontmatter — an OKF
   extension key, legal per ADR-019 §4.1 — lifted into `INDEX.jsonl` by
   `reg-sync`. Frontmatter is the source of truth (it travels with the file on
@@ -61,6 +64,8 @@ data, displayed beside jump tokens in index views and resolvable as
   across supported terminal widths — no truncation or wrap bugs (existing
   `footerLine` width math extended); unrooted shows no badge; pipe mode and
   `okuda <file>` unchanged.
+- Footer identity run reads *silo · callsign · filename* when all three are
+  known (ADR-020's status-line contract).
 - A callsign still resolves after its file is renamed (resolution keyed on
   registry/frontmatter, not filename).
 - Index lines carry jump token + callsign + title; jump mechanics per the

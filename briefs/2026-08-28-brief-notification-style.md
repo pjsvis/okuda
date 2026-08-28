@@ -1,7 +1,15 @@
 # decision: 011-zero-notification-stillness-and-decoupled-inbox-watchers
 
+> **Superseded in role (2026-08-28):** the accepted decision is now
+> **ADR-020** (`decisions/020-zero-notification-stillness.md`). This file is
+> the option weighing that fed it — kept as record, no longer a brief in
+> waiting. The "011" numbering above was this draft's own and collided with
+> `decisions/011`; it means nothing. The surviving requirement — status-line
+> organization (silo · callsign · filename) — lives in
+> `briefs/2026-08-28-silo-mnemonics.md`.
+
 **Date:** 2026-08-28  
-**Status:** accepted  
+**Status:** accepted (as ADR-020)  
 **Context:** Evaluating how to surface incoming artifacts in `inbox/` without compromising Okuda's viewport stillness or introducing notification fatigue.
 
 ---
