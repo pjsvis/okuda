@@ -60,10 +60,11 @@ data, displayed beside jump tokens in index views and resolvable as
 
 ## Acceptance criteria
 
-- Rooted gloam shows `[SILO: <name>]` at the head of the footer identity
+- Rooted gloam shows the silo name, muted, at the head of the footer
+  identity run (`silo · filename` until the callsign slot lands — ADR-020)
   across supported terminal widths — no truncation or wrap bugs (existing
-  `footerLine` width math extended); unrooted shows no badge; pipe mode and
-  `okuda <file>` unchanged.
+  `footerLine` width math extended); unrooted shows no *silo* badge (the
+  Gloam binary badge is unchanged); pipe mode and `okuda <file>` unchanged.
 - Footer identity run reads *silo · callsign · filename* when all three are
   known (ADR-020's status-line contract).
 - A callsign still resolves after its file is renamed (resolution keyed on
