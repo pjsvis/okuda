@@ -142,6 +142,26 @@ describe("tui — footerLine (identity left, affordance right)", () => {
     expect(f.startsWith(" Gloam  docs/audit.md")).toBe(true);
     expect(f.endsWith("? help ")).toBe(true);
   });
+  test("rooted: silo badge leads the identity run, muted (provenance)", () => {
+    const f = footerLine(72, "Gloam", FILE, muted, badge, "okuda");
+    expect(f.startsWith(badge("Gloam") + " " + muted("okuda") + " \u00b7 " + muted("docs/audit.md"))).toBe(true);
+  });
+  test("rooted NO_COLOR: silo run is plain text, no escapes added", () => {
+    const none = makeStyler(DRACULA_PALETTE, "none");
+    const f = footerLine(72, "Gloam", FILE,
+      (s) => none.role("muted", s), (s) => none.badge(s), "okuda");
+    expect(f.startsWith(" Gloam  okuda \u00b7 docs/audit.md")).toBe(true);
+  });
+  test("rooted: RHS corner pad still fills the row exactly", () => {
+    const f = footerLine(72, "Gloam", FILE, muted, badge, "okuda");
+    expect(displayWidth(stripANSI(f))).toBe(72);
+    expect(stripANSI(f).endsWith(" ")).toBe(true);
+  });
+  test("unrooted (no silo): byte-for-byte today's footer", () => {
+    const withSilo = footerLine(72, "Gloam", FILE, muted, badge, undefined);
+    const without = footerLine(72, "Gloam", FILE, muted, badge);
+    expect(withSilo).toBe(without);
+  });
   test("contentHeight: hints row reserved when toggled", () => {
     expect(contentHeight(24, false)).toBe(23); // footer only
     expect(contentHeight(24, true)).toBe(22);  // badge row + hints row

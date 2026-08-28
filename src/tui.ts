@@ -25,6 +25,10 @@ export interface TuiOptions {
   width: number;
   rows: number;
   palette?: Palette;
+  /** Silo badge (brief: silo-mnemonics). Undefined when unrooted → today's
+   *  footer, no silo badge. The renderer paints the string; it learns
+   *  nothing about trees or registries. */
+  silo?: string;
 }
 
 /** Decoded keystroke action. `null` = unhandled (no-op). */
@@ -347,9 +351,15 @@ export function extractJumps(source: string): Map<number, string> {
 }
 
 /**
- * Compose the footer: badge + folder/filename left (identity leads —
+ * Compose the footer: badge + silo? + folder/filename left (identity leads —
  * the glance position), `? help` right (affordance trails). Always
  * compact — verbose hints live on the last row (see hintsLine).
+ *
+ * The identity run is `silo · callsign · filename` (ADR-020); the silo is
+ * the head, muted (provenance, not alarm), passed in by the launcher when
+ * rooted. The callsign slot is reserved for td-bdfce0 — absent today, the
+ * run reads `silo · filename`. The binary badge (label) leads the run and
+ * is unchanged in every mode (brief: silo-mnemonics — okuda <file> unchanged).
  */
 export function footerLine(
   width: number,
@@ -357,15 +367,22 @@ export function footerLine(
   file: string,
   muted: (s: string) => string,
   badge: (s: string) => string,
+  silo?: string,
 ): string {
   const name = displayPath(file);
   const rightText = compactLeft();
-  // Left: badge (label + 2 padding) + space + folder/file.
-  const leftWidth = label.length + 2 + 1 + name.length;
+  // silo run: muted silo + ` · ` prefiguring the callsign slot. Empty when
+  // unrooted — the run collapses to today's badge + filename. The width
+  // math uses plain lengths (ANSI is zero-width), parity with `label.length`
+  // and `name.length` above — never the ANSI-wrapped `siloRun.length`.
+  const siloRun = silo ? muted(silo) + " \u00b7 " : "";
+  const siloWidth = silo ? silo.length + 3 : 0; // silo + " · "
+  // Left: badge (label + 2 padding) + space + silo run + folder/file.
+  const leftWidth = label.length + 2 + 1 + siloWidth + name.length;
   // Reserve the last column: Apple's rounded window corner clips the
   // bottom-right cell — the footer never writes it.
   const gap = Math.max(1, width - leftWidth - rightText.length - 1);
-  return badge(label) + " " + muted(name) + " ".repeat(gap) + muted(rightText) + " ";
+  return badge(label) + " " + siloRun + muted(name) + " ".repeat(gap) + muted(rightText) + " ";
 }
 
 // ── I/O loop ──────────────────────────────────────────────────────────
@@ -457,12 +474,12 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     if (showHints) {
       // Badge row up one; hints own the last row, right-justified, corner pad.
       process.stdout.write(`\x1b[${rows - 1};1H`);
-      process.stdout.write(footerLine(cols, "Gloam", currentFile, muted, badge));
+      process.stdout.write(footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo));
       process.stdout.write(`\x1b[${rows};1H`);
       process.stdout.write(hintsLine(cols, muted));
     } else {
       process.stdout.write(`\x1b[${rows};1H`);
-      process.stdout.write(footerLine(cols, "Gloam", currentFile, muted, badge));
+      process.stdout.write(footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo));
     }
   };
 

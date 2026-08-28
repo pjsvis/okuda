@@ -15,6 +15,7 @@
 
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, join } from "node:path";
+import { detectRoot } from "./root";
 import { runTui } from "./tui";
 import { terminalCols, terminalRows } from "./width";
 
@@ -115,6 +116,11 @@ export async function runLauncher(): Promise<void> {
     process.exit(1);
   }
   process.stdout.write("\x1b[?1007h"); // alt-scroll on, one policy both surfaces
+  // Rooted gloam carries a silo badge the renderer paints at the head of
+  // the footer identity run (brief: 2026-08-28-silo-mnemonics). Unrooted →
+  // undefined → today's footer, no silo badge. Resolved once per session:
+  // the root does not move while gloam is running.
+  const root = detectRoot();
   let query = "";
   try {
     for (;;) {
@@ -127,6 +133,7 @@ export async function runLauncher(): Promise<void> {
         file: pick.file,
         width: terminalCols(80),
         rows: terminalRows(24),
+        silo: root?.badge,
       });
     }
   } finally {
