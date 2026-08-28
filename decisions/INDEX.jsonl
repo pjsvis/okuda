@@ -18,3 +18,4 @@
 {"file":"018-retire-the-okw-term.md","date":"2026-08-28","status":"Accepted","summary":"Retire the \"OKW\" term","meta":{}}
 {"file":"019-okf-v02-conformance.md","date":"2026-08-28","status":"Accepted","summary":"Adopt OKF v0.2 conformance for the document tree","meta":{}}
 {"file":"020-zero-notification-stillness.md","date":"2026-08-28","status":"Accepted","summary":"Zero-notification stillness — identity lives on the status line","meta":{}}
+{"file":"021-jump-token-numbering-offset.md","date":"2026-08-28","status":"Accepted","summary":"Jump tokens number from 11, not 01 — the ergonomic offset","meta":{}}
