@@ -435,6 +435,14 @@ describe("tui — extractJumps (scan source for [NN] … path.md lines)", () => 
   test("token need not be in a list item — bare [NN] … path works", () => {
     expect(extractJumps("[01] X — docs/a.md").get(1)).toBe("docs/a.md");
   });
+  test("bold-wrapped token **[NN]** lifts the same (the bulletless menu form)", () => {
+    // The compositor bolds the token to make it the marker (no bullet);
+    // extractJumps strips the `**` wrapper. Covers separate-paragraph and
+    // in-list forms.
+    const j = extractJumps("**[07]** Title — docs/seven.md");
+    expect(j.get(7)).toBe("docs/seven.md");
+    expect(extractJumps("- **[08]** Title — docs/eight.md").get(8)).toBe("docs/eight.md");
+  });
   test("empty source → empty map", () => {
     expect(extractJumps("").size).toBe(0);
   });

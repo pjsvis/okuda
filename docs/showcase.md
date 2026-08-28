@@ -171,9 +171,10 @@ omitted" without lying that they were listed.
 Flow in prose: source → parse → render → screen. Arrows carry topology
 inline, no diagram required.
 
-Yes/no pairs: ✓ works, ✓ verified, ✗ rejected, ✗ out of scope — plain
-text colour, one cell each, no emoji presentation to disagree with the
-width engine.
+Yes/no pairs: ✓ works, ✓ verified, ✗ rejected, ✗ out of scope — coloured
+per the closed lexicon, one cell each, no emoji presentation to disagree
+with the width engine. A standalone state glyph colours in prose too
+(the lexicon is consistent everywhere, not only in lists and tables).
 
 A glyph column in a table compresses state to a glance — each row is
 assessed before it is read, and the key beneath teaches the dialect in

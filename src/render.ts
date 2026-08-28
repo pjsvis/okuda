@@ -547,10 +547,21 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // Links (URLs only) and codespans have their own handlers, so a
       // path inside backticks or a real URL keeps its own colour.
       const stripped = stripHtml(children);
-      if (!/\b[\w][\w/.-]*\.md\b/.test(stripped)) return stripped;
-      return stripped.replace(
-        /\b([\w][\w/.-]*\.md)\b/g,
-        (m) => styler.role("doc-ref", m),
+      const withRefs = /\b[\w][\w/.-]*\.md\b/.test(stripped)
+        ? stripped.replace(/\b([\w][\w/.-]*\.md)\b/g, (m) => styler.role("doc-ref", m))
+        : stripped;
+      // A standalone state glyph colours in prose too — the vocabulary's
+      // "colour + bold" intent applies wherever the glyph appears as a
+      // glyph (standalone, not embedded in a word), not only in lists/
+      // tables. Lets a bulletless menu carry coloured status glyphs (the
+      // token is the marker; the glyph is the state) and a prose status
+      // key colour every glyph in the legend, not just the first.
+      // The leap: prose glyphs were "plain text colour" before; now the
+      // closed lexicon is consistent everywhere. (brief: state-glyph-vocab.)
+      return withRefs.replace(
+        /(^|\s)([\u2713\u2610\u22ee\u2717])(?=\s|$)/g,
+        (_whole, pre: string, g: string) =>
+          pre + styler.roleBold(STATE_GLYPH_ROLE[g]!, g),
       );
     },
 

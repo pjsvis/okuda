@@ -1,17 +1,15 @@
 #!/usr/bin/env bun
 /**
- * jump-demo.ts — a demo compositor for the index-and-jump feature
- * (td-9d9981).
+ * jump-demo.ts — the menu compositor (index-and-jump, td-9d9981).
  *
- * Emits a numbered index over decisions/00–09. Each line is plain text
- * (not a markdown link): a `[NN]` token, the decision title, then the
- * trailing path. The TUI's `extractJumps` lifts the token→path mapping
- * from this shape; the renderer paints it as ordinary prose — no fake
- * clickable styling for a file path that isn't a URL.
- *
- * Ephemeral by design — never registered, never a brief. This is the
- * *environment* composing (filesystem as the message bus), not okuda;
- * the renderer just paints the bytes it's given (ADR-020).
+ * Composes a status-led menu over recent briefs: a bold `[NN]` jump
+ * token (the marker — no bullet, the token is the marker), a state
+ * glyph (real status variance, not noise), the title, and the trailing
+ * path (doc-ref yellow under the render heuristic). A status key at
+ * the bottom carries the legend. Ephemeral by design — never
+ * registered, never a brief. The environment composing (filesystem as
+ * the message bus), not okuda; the renderer just paints the bytes it's
+ * given (ADR-020).
  *
  * Usage:
  *   bun scripts/jump-demo.ts          # markdown to stdout
@@ -24,29 +22,80 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-/** Pull the first `# ` heading from a decision file, or fall back to
- *  its basename. Pure-ish (reads fs). */
+/** First `# ` heading, or the basename. Pure-ish (reads fs). */
 function titleOf(file: string): string {
   try {
     const text = readFileSync(join(ROOT, file), "utf8");
     const m = text.match(/^#\s+(.+)$/m);
-    return m?.[1]?.trim() ?? file;
+    return (m?.[1] ?? file).trim();
   } catch {
     return file;
   }
 }
 
+/** The `**Status:**` value (first match), lower-cased, or "" if none. */
+function statusOf(file: string): string {
+  try {
+    const text = readFileSync(join(ROOT, file), "utf8");
+    const m = text.match(/^\*\*Status:\*\*\s*(.+)$/m);
+    return (m?.[1] ?? "").trim();
+  } catch {
+    return "";
+  }
+}
+
+/** State-glyph vocabulary (brief: state-glyph-vocabulary). The closed
+ *  lexicon maps brief status to the traffic-lamp glyph that carries it.
+ *  "Ready" reads as open (a kind of pending); "accepted" as done. */
+function glyphFor(status: string): string {
+  const s = status.toLowerCase();
+  if (s.startsWith("rejected")) return "\u2717"; // ✗
+  if (s.startsWith("parked")) return "\u22ee";    // ⋮
+  if (s.startsWith("accepted")) return "\u2713"; // ✓
+  return "\u2610";                                 // ☐ open / pending / draft / ready
+}
+
+/** Sort: open first (the actionable), then parked, then rejected, then
+ *  done — a menu of work leads with what's live. */
+const ORDER: Record<string, number> = {
+  "\u2610": 0, // ☐ open
+  "\u22ee": 1, // ⋮ parked
+  "\u2717": 2, // ✗ rejected
+  "\u2713": 3, // ✓ done
+};
+
 if (import.meta.main) {
-  const files = readdirSync(join(ROOT, "decisions"))
-    .filter((f) => /^0\d{2}-.*\.md$/.test(f))
-    .sort()
-    .slice(0, 9);
-  const lines = ["# Jump demo — recent decisions", ""];
-  files.forEach((f, i) => {
-    const token = String(i + 1).padStart(2, "0");
-    const title = titleOf(`decisions/${f}`);
-    lines.push(`- [${token}] ${title} — decisions/${f}`);
+  // Recent briefs: the 2026-08-28 batch, plus the one rejected brief
+  // (so ✗ earns its place on the menu, not as decoration).
+  const recent = readdirSync(join(ROOT, "briefs"))
+    .filter((f) => /^2026-08-28.*\.md$/.test(f))
+    .map((f) => `briefs/${f}`);
+  const rejected = "briefs/2026-08-25-brief-viewport-padding.md";
+  const files = [...recent, rejected].sort();
+
+  const rows = files.map((f) => {
+    const glyph = glyphFor(statusOf(f));
+    return { glyph, file: f, title: titleOf(f) };
   });
+  rows.sort(
+    (a, b) =>
+      (ORDER[a.glyph] ?? 9) - (ORDER[b.glyph] ?? 9) ||
+      a.file.localeCompare(b.file),
+  );
+
+  const lines = [
+    "# Menu — recent briefs",
+    "",
+  ];
+  rows.forEach((r, i) => {
+    const token = String(i + 1).padStart(2, "0");
+    lines.push(`**[${token}]** ${r.glyph} ${r.title} — ${r.file}`);
+    lines.push(""); // separate paragraphs → bulletless, breathing
+  });
+  lines.push("---", "");
+  lines.push("**Key** — `**[NN]**` type to jump · state glyphs:");
+  lines.push("");
+  lines.push("☐ open · ⋮ parked · ✗ rejected · ✓ accepted (as an ADR)");
   lines.push("");
   console.log(lines.join("\n"));
 }

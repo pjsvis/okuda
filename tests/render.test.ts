@@ -544,3 +544,45 @@ describe("render — doc-ref colour on bare .md path tokens", () => {
     expect(j.get(2)).toBe("briefs/bar.md");
   });
 });
+
+// ── prose state glyphs: the closed lexicon colours standalone glyphs ──
+// (the leap — prose glyphs were plain before; now consistent everywhere).
+
+describe("render — state glyphs colour in prose (the lexicon leap)", () => {
+  test("a leading ☐ in a prose run colours state-todo yellow bold", async () => {
+    const out = await render("☐ open — title");
+    // state-todo #ffe066 → 255;224;102 ; bold (1)
+    expect(out).toContain("\x1b[38;2;255;224;102;1m☐\x1b[0m");
+  });
+  test("✓ colours state-ok green bold", async () => {
+    const out = await render("✓ done — landed");
+    expect(out).toContain("\x1b[38;2;95;211;95;1m✓\x1b[0m");
+  });
+  test("✗ colours state-failed red bold", async () => {
+    const out = await render("✗ rejected — out of scope");
+    expect(out).toContain("\x1b[38;2;255;85;85;1m✗\x1b[0m");
+  });
+  test("⋮ colours state-parked orange bold", async () => {
+    const out = await render("⋮ parked — gate not fired");
+    expect(out).toContain("\x1b[38;2;255;153;51;1m⋮\x1b[0m");
+  });
+  test("every standalone glyph in a legend line colours, not just the first", async () => {
+    // The status key at the bottom of a menu: all four glyphs colour.
+    const out = await render("☐ open · ⋮ parked · ✗ rejected · ✓ accepted");
+    expect(out).toContain("\x1b[38;2;255;224;102;1m☐\x1b[0m");
+    expect(out).toContain("\x1b[38;2;255;153;51;1m⋮\x1b[0m");
+    expect(out).toContain("\x1b[38;2;255;85;85;1m✗\x1b[0m");
+    expect(out).toContain("\x1b[38;2;95;211;95;1m✓\x1b[0m");
+  });
+  test("a glyph embedded in a word is NOT coloured (standalone only)", async () => {
+    // The lookahead requires the glyph to be followed by space/end, so
+    // an embedded use (no surrounding spaces) stays plain. Conservative.
+    const out = await render("foo✓bar");
+    expect(out).not.toContain("\x1b[38;2;95;211;95;1m✓");
+  });
+  test("a non-state glyph in prose stays plain (◆ is priority, not state)", async () => {
+    const out = await render("◆ priority — not a state glyph");
+    expect(out).not.toContain("\x1b[38;2;95;211;95;1m◆");
+    expect(out).not.toContain("\x1b[38;2;255;224;102;1m◆");
+  });
+});

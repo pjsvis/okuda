@@ -91,6 +91,11 @@ showcase:
 okuda:
     @./okuda docs/showcase.md --tui
 
+# Style guide
+[group('build')]
+style-guide:
+    @./okuda docs/style-guide.md --tui
+
 # Manifesto (okuda)
 [group('build')]
 manifesto-okuda:
