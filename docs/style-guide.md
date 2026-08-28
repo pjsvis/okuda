@@ -79,22 +79,19 @@ Orientation is a semantic choice. A cycle reads across; a pipeline reads down. S
 
 The pattern for the menu, the index, the status page — the docs an agent composes on demand and that have no depth to hide behind. The look *is* the legibility.
 
-%%okuda-chip:01%% *Ephemeral index generation*
-briefs/2026-08-28-brief-index-and-jump.md
+**01** *Ephemeral index generation*
 
-%%okuda-chip:02%% *Rooted gloam, silo badge and callsigns*
-briefs/2026-08-28-silo-mnemonics.md
+**02** *Rooted gloam, silo badge and callsigns*
 
-%%okuda-chip:03%% *Zero-notification stillness*
-decisions/020-zero-notification-stillness.md
+**03** *Zero-notification stillness*
 
-The moves, two lines per item — chip → slug, then path beneath:
+One line per item — number → slug:
 
-- **Number chip.** A solid block — the action indicator. You type the number to jump. No brackets: the chip *is* the indicator, and brackets are decoration on top of an affordance the block already provides. The compositor emits a private-use token; the renderer paints it as a solid block (markdown has no "solid colour" semantic, so the chip is a renderer primitive, the mermaid precedent). It is the boldest thing on the line — the action outranks everything else.
-- **Slug, emphasis — near but lesser.** The descriptive title, the content. Coloured but not bold: the chip is the bold anchor; the slug is the coloured-but-lesser thing, so the eye lands on the action first and reads the content second. Strip the classification prefix (`Brief:`, `Decision:`) — the path's folder already says it; the slug is the name, not its category. Date-first, greppable, registry-indexed.
-- **Muted path, on its own line beneath.** Where it lives, in the far register. No dash separates slug and path — the line break *is* the separator; a dash on top of a break pays twice. The path recedes like the status bar's folder/file text.
+- **Number, white bold.** The action indicator — you type it to jump. Plain `**01**`; the renderer colours a digits-only strong run white-bold (the chip experiment retired: a solid block swallowed the digits three times, and tricky is the last thing a navigation primitive needs). It is the boldest thing on the line — the action outranks everything else.
+- **Slug, emphasis — near but lesser.** The descriptive title, the content. Coloured but not bold: the number is the bold anchor; the slug is the coloured-but-lesser thing, so the eye lands on the action first and reads the content second. Strip the classification prefix (`Brief:`, `Decision:`) — the slug is the name, not its category. Date-first, greppable, registry-indexed.
+- **Path — hidden wiring, not content.** The path lives in an HTML comment (`<!-- briefs/foo.md -->`) the renderer strips but `extractJumps` reads from source. It is not provenance for the reader; it is wiring for the jump resolver. Provenance arrives at the destination's footer, not in the menu — when you land, the status line shows where you are.
 
-No state glyph on the line — the chip (action) outranks the glyph (state) for the eye's first stop, and two warm things competing for "first" was the crowding. The glyph vocabulary is held in reserve for tables and status pages where state *is* the story.
+No state glyph on the line — the number (action) outranks the glyph (state) for the eye's first stop. The glyph vocabulary is held in reserve for tables and status pages where state *is* the story.
 
 Then a **status key at the bottom** — the legend, kept in reserve:
 

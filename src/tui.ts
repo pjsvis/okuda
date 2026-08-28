@@ -328,21 +328,22 @@ export function advanceNumBuffer(
   return { buffer: next, token: null };
 }
 
-/** Scan markdown source for chip-token jump entries, returning a
- *  token→path map. Each menu item is a paragraph (blank-line
- *  separated); within it the `%%okuda-chip:NN%%` token and the `.md`
- *  path may sit on the same line or on two lines joined by a soft break
- *  (slug line, then path line beneath). The path is the last `.md` token
- *  in the paragraph. Duplicate tokens: last wins (compositor error
- *  surfaces as the later entry). Pure. */
+/** Scan markdown source for `**NN**` jump tokens paired with a
+ *  `.md` path, returning a token→path map. The compositor emits each
+ *  menu item as a paragraph (blank-line separated): a `**NN**` token,
+ *  the slug, and the `.md` path (which may be on the same line or on
+ *  a soft-break line beneath). The path is the last `.md` token in the
+ *  paragraph. The renderer colours a digits-only strong run white-bold;
+ *  extractJumps reads `**NN**` from source directly — no chip, no
+ *  private-use token. Duplicate tokens: last wins. Pure. */
 export function extractJumps(source: string): Map<number, string> {
   const out = new Map<number, string>();
   for (const para of source.split(/\n{2,}/)) {
-    const chip = para.match(/%%okuda-chip:(\d{1,2})%%/);
-    if (!chip) continue;
+    const tok = para.match(/\*\*(\d{1,2})\*\*/);
+    if (!tok) continue;
     const paths = [...para.matchAll(/\S+\.md/g)].map((m) => m[0]!);
     const path = paths[paths.length - 1];
-    if (path) out.set(Number(chip[1]!), path);
+    if (path) out.set(Number(tok[1]!), path);
   }
   return out;
 }

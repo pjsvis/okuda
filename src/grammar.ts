@@ -26,8 +26,11 @@ export const PARSER_OPTIONS = {
   noIndentedCodeBlocks: true,
 } as const;
 
-/** Inline HTML spans — stripped silently (grammar: Raw HTML → No). */
-export const RE_INLINE_HTML = /<\/?[A-Za-z][^<>\n]*>/g;
+/** Inline HTML spans — stripped silently (grammar: Raw HTML → No).
+ *  Also matches HTML comments `<!-- … -->` so compositors can hide
+ *  jump-resolver wiring (paths) from the rendered output while
+ *  `extractJumps` reads it from source. */
+export const RE_INLINE_HTML = /<!--[\s\S]*?-->|<\/?[A-Za-z][^<>\n]*>/g;
 
 /**
  * ── String-tag protocol ─────────────────────────────────────────────
@@ -79,12 +82,3 @@ export function mermaidToken(id: string): string {
   return `%%okuda-mmd-${id}%%`;
 }
 export const RE_MERMAID_TOKEN = /%%okuda-mmd-([a-z0-9]+)%%/;
-
-/** Number-chip token — survives markdown parsing as inline text; the
- *  renderer paints it as a solid block (the menu's action indicator).
- *  Emitted by index compositors; `extractJumps` reads the number from
- *  the source token directly. (brief: index-and-jump.) */
-export function chipToken(n: number | string): string {
-  return `%%okuda-chip:${n}%%`;
-}
-export const RE_CHIP_TOKEN = /%%okuda-chip:(\d{1,2})%%/g;

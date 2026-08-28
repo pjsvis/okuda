@@ -393,15 +393,15 @@ describe("tui — digitOf (single-byte digit → char, else null)", () => {
   });
 });
 
-describe("tui — extractJumps (scan source for chip-token + path.md lines)", () => {
-  test("lifts chip-token number + path across a soft break (path on its own line)", () => {
+describe("tui — extractJumps (scan source for **NN** + path.md)", () => {
+  test("lifts **NN** + path across a soft break (path on its own line)", () => {
     const src = [
       "# Menu",
       "",
-      "%%okuda-chip:01%% *Foo*",
+      "**01** *Foo*",
       "briefs/foo.md",
       "",
-      "%%okuda-chip:02%% *Bar*",
+      "**02** *Bar*",
       "decisions/bar.md",
     ].join("\n");
     const j = extractJumps(src);
@@ -409,29 +409,29 @@ describe("tui — extractJumps (scan source for chip-token + path.md lines)", ()
     expect(j.get(1)).toBe("briefs/foo.md");
     expect(j.get(2)).toBe("decisions/bar.md");
   });
-  test("same-line chip + path still works (the compact form)", () => {
-    expect(extractJumps("%%okuda-chip:01%% *Foo* — briefs/foo.md").get(1)).toBe("briefs/foo.md");
+  test("same-line **NN** + path still works (the compact form)", () => {
+    expect(extractJumps("**01** *Foo* — briefs/foo.md").get(1)).toBe("briefs/foo.md");
   });
-  test("one-digit chip numbers: %%okuda-chip:5%% → token 5", () => {
-    expect(extractJumps("%%okuda-chip:5%% X — x.md").get(5)).toBe("x.md");
+  test("one-digit numbers: **5** → token 5", () => {
+    expect(extractJumps("**5** X — x.md").get(5)).toBe("x.md");
   });
-  test("zero-padded: %%okuda-chip:05%% → token 5", () => {
-    expect(extractJumps("%%okuda-chip:05%% X — x.md").get(5)).toBe("x.md");
+  test("zero-padded: **05** → token 5", () => {
+    expect(extractJumps("**05** X — x.md").get(5)).toBe("x.md");
   });
   test("duplicate tokens: last wins (compositor error surfaces)", () => {
-    const j = extractJumps("%%okuda-chip:01%% A — a.md\n%%okuda-chip:01%% B — b.md");
+    const j = extractJumps("**01** A — a.md\n**01** B — b.md");
     expect(j.get(1)).toBe("b.md");
     expect(j.size).toBe(1);
   });
-  test("a line without a chip token is not a jump line", () => {
+  test("a line without a bold number is not a jump line", () => {
     expect(extractJumps("- [01] a title — no path").size).toBe(0);
     expect(extractJumps("See [01] in the notes below.").size).toBe(0);
   });
-  test("a chip token without a trailing .md path is not a jump line", () => {
-    expect(extractJumps("%%okuda-chip:01%% a title, no path").size).toBe(0);
+  test("a **NN** without a trailing .md path is not a jump line", () => {
+    expect(extractJumps("**01** a title, no path").size).toBe(0);
   });
   test("paths with spaces: only the last space-free .md token is captured", () => {
-    const j = extractJumps("%%okuda-chip:01%% X\ndecisions/old name.md");
+    const j = extractJumps("**01** X\ndecisions/old name.md");
     expect(j.get(1)).toBe("name.md");
   });
   test("empty source → empty map", () => {
@@ -462,10 +462,9 @@ describe("tui — advanceNumBuffer (the two-digit jump state machine)", () => {
     expect(advanceNumBuffer(null, null)).toEqual({ buffer: null, token: null });
   });
   test("the resolved token round-trips through extractJumps", () => {
-    // End-to-end contract: typing '0'+'5' yields token 5, and a chip-token
-    // paragraph lifts to token 5 → path. The two pure halves agree on the
-    // numbering convention.
-    const jumps = extractJumps("%%okuda-chip:05%% *Title*\ndocs/target.md");
+    // End-to-end contract: typing '0'+'5' yields token 5, and a **05**
+    // paragraph lifts to token 5 → path. The two pure halves agree.
+    const jumps = extractJumps("**05** *Title*\ndocs/target.md");
     const step = advanceNumBuffer(advanceNumBuffer(null, "0").buffer, "5");
     expect(step.token).not.toBeNull();
     expect(jumps.get(step.token!)).toBe("docs/target.md");

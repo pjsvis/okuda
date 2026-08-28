@@ -409,6 +409,15 @@ describe("render — rejections (no crash, no raw markup)", () => {
     expect(out).not.toContain("</b>");
   });
 
+  test("HTML comments stripped — the jump-resolver wiring channel", async () => {
+    // Compositors hide paths in `<!-- … -->`; the renderer strips them
+    // (invisible to the reader) while extractJumps reads them from source.
+    const out = await render("**01** *Title* <!-- briefs/foo.md -->");
+    expect(out).not.toContain("briefs/foo.md");
+    expect(out).not.toContain("<!--");
+    expect(out).toContain("Title");
+  });
+
   test("footnote renders as literal text", async () => {
     const out = await render("Text[^1]\n\n[^1]: the note");
     expect(out).toContain("[^1]");
@@ -499,23 +508,28 @@ describe("render — property invariants", () => {
 // ── near/far: .md path tokens recede to muted; chip tokens are solid blocks ──
 // (the gloaming — near = bold slug, far = muted path/chrome).
 
-describe("render — near/far: .md paths muted, chip tokens solid", () => {
+describe("render — near/far: .md paths muted, white jump numbers", () => {
   test("a .md path in a menu item recedes to muted (far)", async () => {
-    const out = await render("%%okuda-chip:01%% *Title*\ndecisions/foo.md");
+    const out = await render("**01** *Title*\ndecisions/foo.md");
     // muted #585858 → 88;88;88 (dracula). The path reads like the status
     // bar's folder/file text — provenance, not content.
     expect(out).toContain("\x1b[38;2;88;88;88mdecisions/foo.md\x1b[0m");
   });
 
-  test("a chip token renders as a solid bg block (the action indicator)", async () => {
-    const out = await render("%%okuda-chip:01%% *Title*\ndocs/foo.md");
-    // bg = fg = badge-bg (#ff79c6 → 255;121;198 on dracula): a solid block.
-    expect(out).toContain("\x1b[48;2;255;121;198m\x1b[38;2;255;121;198m01\x1b[0m");
+  test("a digits-only **NN** renders white bold (the action indicator)", async () => {
+    const out = await render("**01** *Title*\ndocs/foo.md");
+    // bold attribute (1), no colour → white bold. The number is the
+    // content; bold is the affordance. No chip, no block.
+    expect(out).toContain("\x1b[1m01\x1b[0m");
   });
 
-  test("the chip has no bracket decoration — the block IS the indicator", async () => {
-    const out = await render("%%okuda-chip:01%% *Title*\ndocs/foo.md");
+  test("the number has no bracket or block decoration — just bold digits", async () => {
+    const out = await render("**01** *Title*\ndocs/foo.md");
     expect(out).not.toContain("[01]");
+    // the number itself has no background — the closing rule's chips do,
+    // but the jump number is bold-only (no \x1b[48; immediately before 01)
+    expect(out).toContain("\x1b[1m01\x1b[0m");
+    expect(out).not.toMatch(/\x1b\[48;[^m]*m\x1b\[1m01/);
   });
 
   test("greedy: a .md mention in ordinary prose also mutes (the far register)", async () => {
@@ -524,30 +538,21 @@ describe("render — near/far: .md paths muted, chip tokens solid", () => {
   });
 
   test("the slug is the near-but-lesser thing — emphasis (yellow, italic)", async () => {
-    const out = await render("%%okuda-chip:01%% *The Slug*\ndocs/foo.md");
+    const out = await render("**01** *The Slug*\ndocs/foo.md");
     // emphasis #f1fa8c → 241;250;140 ; italic (3) on dracula.
     expect(out).toContain("\x1b[38;2;241;250;140;3mThe Slug\x1b[0m");
   });
 
-  test("the slug is NOT bold (the chip is the bold anchor)", async () => {
-    const out = await render("%%okuda-chip:01%% *The Slug*\ndocs/foo.md");
-    // The slug must not carry the bold attribute (1) — the chip is the
-    // bold thing; the slug is the coloured-but-lesser thing.
-    expect(out).not.toContain("\x1b[38;2;241;250;140;1mThe Slug");
+  test("a non-digit strong run keeps the amber strong colour (not white)", async () => {
+    const out = await render("**not-a-number**");
+    // strong #ffb86c → 255;184;108 ; bold (1). The digits-only rule is
+    // scoped to numbers; prose strong stays amber.
+    expect(out).toContain("\x1b[38;2;255;184;108;1mnot-a-number\x1b[0m");
   });
 
-  test("no dash separates slug and path — the line break is the separator", async () => {
-    const out = await render("%%okuda-chip:01%% *Title*\ndocs/foo.md");
-    expect(out).not.toContain(" — ");
-    expect(out).not.toContain("\—");
-  });
-
-  test("extractJumps still lifts the path from the chip-token source", async () => {
-    // The colouring is render-plane; extractJumps reads source text
-    // (pre-render), so jump resolution is immune to the heuristic.
+  test("extractJumps still lifts the path from the **NN** source", async () => {
     const { extractJumps } = await import("../src/tui");
-    const src = "%%okuda-chip:02%% *Another*\nbriefs/bar.md";
-    const j = extractJumps(src);
+    const j = extractJumps("**02** *Another*\nbriefs/bar.md");
     expect(j.get(2)).toBe("briefs/bar.md");
   });
 });

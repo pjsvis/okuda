@@ -22,7 +22,6 @@ import {
   RE_INLINE_HTML,
   RE_MERMAID_TOKEN,
   RE_PB_TAG,
-  RE_CHIP_TOKEN,
   TAG_ITEM,
   TAG_NESTED_CLOSE,
   TAG_PROBE_CLOSE,
@@ -543,10 +542,6 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
 
     text(children: string) {
       let out = stripHtml(children);
-      // Number-chip token → solid block (the menu's action indicator).
-      // Private-use token, the mermaid precedent; markdown has no
-      // "solid coloured block" semantic. (brief: index-and-jump.)
-      out = out.replace(RE_CHIP_TOKEN, (_m, n: string) => styler.numberChip(n));
       // Bare .md-path tokens in prose recede to the muted (far) register
       // — near/far: paths are provenance, not content. They read like
       // the status bar's folder/file text. (brief: index-and-jump.)
@@ -565,6 +560,13 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
     },
 
     strong(children: string) {
+      // A digits-only strong run is a menu's jump token — white bold,
+      // not the amber strong colour. The number is the content; bold is
+      // the affordance. No chip, no token, no private-use marker: the
+      // compositor emits plain `**01**`, extractJumps reads it from source,
+      // the renderer colours it. (brief: index-and-jump — the chip that
+      // retired.)
+      if (/^\d{1,3}$/.test(children)) return styler.bold(children);
       return styler.roleBold("strong", children);
     },
     emphasis(children: string) {
