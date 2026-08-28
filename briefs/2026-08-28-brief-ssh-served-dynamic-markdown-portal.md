@@ -1,58 +1,51 @@
-**Brief: `2026-08-28-brief-ssh-served-dynamic-markdown-portal.md**`
+# Brief: SSH-served portal — the ADR-013 Option-2 gate probe
 
-**Intent**
-Provide a standalone, authenticated SSH portal that streams static repository documents and auto-refreshing operational dashboards rendered directly in Okuda's LCARS/Gloam terminal interface.
+**Created:** 2026-08-28 (rewritten from the first draft: re-cast as the gate
+probe; the embedded-daemon approach re-adjudicated against ADR-013)
+**Status:** parked — gate not yet fired
 
-**Scope & Core Requirements**
+## What
 
-* **SSH Daemon & Transport:**
-* Embed a lightweight SSH daemon (e.g., via Bun / `ssh2`) listening on a dedicated port.
+Nothing, yet. This brief names the consumer that would reopen the SSH serving
+shape's Option 2 (an embedded `ssh2` daemon with per-reader identity — e.g.
+GitHub-key auth for colleagues) and records what must be true before any of it
+builds.
 
+## Why
 
-* Support anonymous public access or key-based authorization validated against GitHub user public keys.
-* Direct incoming connections into an interactive PTY session running Okuda's browser loop (`src/tui.ts`).
+ADR-013 adopted Option 1 (OpenSSH ForceCommand) and explicitly deferred Option
+2 behind gates: *"one doc per destination is painful," or "per-reader identity
+/ connect-time logging is needed."* The first draft of this brief re-proposed
+Option 2 plus a fixed 3-second polling engine without naming that decision —
+the palimpsest protocol exists to stop exactly that. The 3-second cadence it
+cited exists nowhere in `src/`, and ADR-013 FO'd frame clocks outright: the
+metric is *latency from meaningful change to screen*, zero when nothing
+changed.
 
+## The gate (falsifiable)
 
+Option 2 is earned when a named consumer is **observed, not projected**: a
+real colleague, a real key, connect-time identity in a real log — or
+Match-block ergonomics genuinely breaking on a real corpus. Until then,
+nothing builds.
 
+## What changes when the gate fires
 
-* **Dynamic Document Polling Engine:**
-* Implement an auto-refresh loop for flagged dynamic dashboard documents.
-* **Cadence Invariant:** Polling rate is strictly fixed at **3 seconds** (0.33 Hz). Sub-second intervals are explicitly out of scope via the Foxtrot Oscar principle.
+- A new ADR supersedes ADR-013's deferral through the front door — no quiet
+  rebuild of Option 2.
+- Transport: embedded `ssh2` daemon, PTY → gloam browser loop; window-change
+  rides the landed SIGWINCH reflow path; no shell, no writes (non-goals
+  survive from the first draft).
+- Refresh: content-gated `fs.watch`, not polling. Dynamic dashboards are
+  producers writing pre-aggregated markdown; the watch path (brief
+  2026-08-26, td-450944) does the rest.
+- Navigation: numeric jump + callsigns per the index-and-jump and
+  silo-mnemonics briefs.
 
+## Acceptance criteria
 
-* Re-renders must use alternate screen buffer cursor-homing (`\x1b[H`) to ensure zero screen flicker during refresh cycles.
+- Parked: none active. The gate firing *is* the acceptance criterion.
 
+## Out of scope
 
-* Maintain active scroll-line anchors across ticks using bounded anchor fallback logic (`decisions/010-bounded-anchor-proportional-fallback.md`).
-
-
-
-
-* **Layout & Terminal Lifecycle:**
-* Bind SSH `window-change` events directly to Okuda's width and wrapping engine (`src/width.ts`, `src/wrap.ts`) to reflow on client resize without ANSI leakage.
-
-
-* Consume keyboard events for navigation, manual refresh triggers, document switching, and palette cycling (`src/palette.ts`).
-
-
-
-
-
-**Non-Goals**
-
-* No shell access, command evaluation, or remote execution on the host.
-* No high-frequency streaming, sub-second polling, or event-log streaming (`tail -f` modes); producers must pre-aggregate telemetry before writing.
-* No write access or remote file modification.
-
-**Acceptance Criteria**
-
-* Connecting via `ssh -p <port> <host>` opens an interactive Okuda viewer.
-
-
-* Dynamic status documents automatically refresh state every 3 seconds without viewport tearing, scroll reset, or noticeable flicker.
-
-
-* SIGWINCH / terminal window resizes immediately trigger clean layout recomputation.
-
-
-* Pressing `q` or `Ctrl+C` cleanly closes the SSH channel and tears down the session.
+- Everything, while parked.

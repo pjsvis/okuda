@@ -1,8 +1,16 @@
 # brief: Inline Ask-the-Doc and Local SSH Transport
 
+> **Parked (2026-08-28):** premature — needs more thought and a *unique*
+> keystroke (`?` is already the hints toggle), plus a compositing answer: the
+> environment writes answer documents and okuda renders them (the filesystem
+> is the message bus); an LLM client does not enter `src/`. The SSH-transport
+> half is dead per ADR-013 (Option 1 landed; Option 2 parked behind the
+> portal gate-probe brief). The modal-frame + scroll-anchor-preservation
+> ideas below are the salvageable kernel for whenever this un parks.
+
 **Created:** 2026-08-28
 **TD:** td-okuda-ai-ssh
-**Status:** pending
+**Status:** parked
 
 ## What
 Adds an in-TUI modal triggered by `?` to execute semantic queries and on-the-fly document summarization against the active document AST, and introduces a local SSH transport daemon to serve Okuda as a zero-dependency local service interface.
