@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-08-29 | ADR-ROLE-LAYOUT-022 | Accepted | Right-anchored role layout for patterned surfaces | 022-right-anchored-role-layout.md |
 | 2026-08-28 | ADR-RETIRE-OKW-018 | Accepted | Retire the "OKW" term | 018-retire-the-okw-term.md |
 | 2026-08-28 | ADR-OKF-V02-019 | Accepted | Adopt OKF v0.2 conformance for the document tree | 019-okf-v02-conformance.md |
 | 2026-08-28 | ADR-ZERO-NOTIFICATION-020 | Accepted | Zero-notification stillness — identity lives on the status line | 020-zero-notification-stillness.md |
