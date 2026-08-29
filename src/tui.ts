@@ -19,6 +19,8 @@ import { detectColorMode, makeStyler, type Styler } from "./ansi";
 import { loadPalette, type Palette } from "./palette";
 import { renderDocument } from "./render";
 import { padStartDisplay, terminalCols, terminalRows } from "./width";
+import { closeSync, openSync, readSync } from "node:fs";
+import { dlopen } from "bun:ffi";
 
 export interface TuiOptions {
   file: string;
@@ -401,6 +403,80 @@ const EXIT_ALT = "\x1b[?1049l";
 const HIDE_CURSOR = "\x1b[?25l";
 const SHOW_CURSOR = "\x1b[?25h";
 
+/** The libc fcntl symbol (variadic; declared 3-arg for F_SETFL, the F_GETFL
+ *  call passes a dummy arg the variadic CC ignores). Cached once per
+ *  process — the launcher's default loop calls runTui per round.
+ *  O_NONBLOCK = 0x80 (darwin) / 0x800 (linux); F_GETFL=3, F_SETFL=4
+ *  (stable across both). Why ffi: Bun 1.4.0 exposes no fcntl binding,
+ *  and `bun:ffi` bundles into `--compile` (a worker from `new URL(...)`
+ *  does not, which ruled out the thread-reader variant). */
+const _fcntl = (() => {
+  try {
+    const lib = dlopen(
+      process.platform === "darwin" ? "libSystem.dylib" : "libc.so.6",
+      { fcntl: { args: ["i32", "i32", "i32"], returns: "i32" } },
+    );
+    return lib.symbols.fcntl;
+  } catch {
+    return null; // non-POSIX or libc unavailable — caller falls back.
+  }
+})();
+const _O_NONBLOCK = process.platform === "darwin" ? 0x80 : 0x800;
+const _F_GETFL = 3;
+const _F_SETFL = 4;
+
+/** Start an active key reader: open /dev/tty fresh, set it O_NONBLOCK
+ *  via ffi fcntl, then a ~60Hz tick does readSync on that fd directly.
+ *  Returns a stop() that clears the tick and closes the fd. Bypasses both
+ *  fzf's poisoned fd 0 (opened under `execute`) AND Bun's passive
+ *  process.stdin reader (the gate-1 freeze, td-7bce5e — when the host
+ *  drains okuda's paint write the event loop goes idle and Bun STOPS
+ *  servicing the passive `data` listener). Opening /dev/tty fresh — not
+ *  fd 0 — also leaves the default loop's next fzf undisturbed: fzf's
+ *  fcntl flags on fd 0 are never touched. When ffi/libc or /dev/tty is
+ *  unavailable, falls back to the passive process.stdin.on("data")
+ *  listener — the non-fzf path still works there; the fzf path is the
+ *  only one that freezes, and ffi is available wherever fzf runs. */
+function startKeyReader(onKey: (data: Buffer) => void): () => void {
+  // See the docstring above for the /dev/tty active-poll rationale. Two
+  // fallbacks to the passive listener: no ffi/libc, or no /dev/tty.
+  if (!_fcntl) {
+    process.stdin.resume();
+    process.stdin.on("data", onKey);
+    return () => { process.stdin.removeListener("data", onKey); };
+  }
+  const f = _fcntl;
+  let ttyFd: number | null = null;
+  try {
+    ttyFd = openSync("/dev/tty", "r+");
+    f(ttyFd, _F_SETFL, f(ttyFd, _F_GETFL, 0) | _O_NONBLOCK);
+  } catch {
+    // No /dev/tty (no controlling terminal) — fall back to passive.
+    process.stdin.resume();
+    process.stdin.on("data", onKey);
+    return () => { process.stdin.removeListener("data", onKey); };
+  }
+  const buf = Buffer.alloc(64);
+  const tick = (): void => {
+    if (ttyFd === null) return;
+    for (;;) {
+      let n: number;
+      try { n = readSync(ttyFd, buf, 0, 64); }
+      catch { return; } // EAGAIN — no bytes this tick
+      if (n <= 0) return;
+      onKey(Buffer.from(buf.subarray(0, n)));
+    }
+  };
+  const id = setInterval(tick, 16);
+  return () => {
+    clearInterval(id);
+    if (ttyFd !== null) {
+      f(ttyFd, _F_SETFL, f(ttyFd, _F_GETFL, 0) & ~_O_NONBLOCK);
+      try { closeSync(ttyFd); } catch { /* gone */ }
+    }
+  };
+}
+
 /**
  * Run the TUI. Caller gates: only invoke when stdout+stdin are TTYs and
  * colour mode is not "none" (brief: NO_COLOR/TERM=dumb fall back to stream).
@@ -608,7 +684,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   const cleanup = (): void => {
     if (cleaned) return;
     cleaned = true;
-    process.stdin.removeListener("data", onKey);
+    stopInput();
     process.stdin.setRawMode?.(false);
     process.stdin.pause?.();
     process.stdout.write(SHOW_CURSOR + EXIT_ALT);
@@ -618,11 +694,25 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     resolveDone();
   };
 
-  // Enter (raw mode + listener only — the alt-screen switch happened
+  // Enter (raw mode + reader only — the alt-screen switch happened
   // before the first read so no FUT frames the launch).
+  //
+  // Input comes from an ACTIVE read tick on /dev/tty, not the passive
+  // process.stdin.on("data"): under fzf `execute`, fzf suspends around
+  // okuda having left fd 0 in a state its line editor used, and once the
+  // host drains okuda's paint write the event loop goes idle and Bun
+  // STOPS servicing the passive `data` listener — keystrokes never
+  // arrive (the gate-1 freeze, td-7bce5e: 9 isolated replications all
+  // received keys; okuda's real path did not). The fix: open /dev/tty
+  // fresh, set O_NONBLOCK via ffi fcntl, a ~60Hz tick does readSync on
+  // that fd — a syscall the OS services regardless of the event loop's
+  // idle state. /dev/tty (not fd 0) leaves the default loop's next fzf
+  // undisturbed. The tick captures every keystroke, so nothing leaks to
+  // fzf's query on resume (the spillover symptom, gone as a consequence).
+  // Raw mode is termios (device-wide) set on fd 0 here; the tick only
+  // reads. (brief: fzf-owns-the-loop.)
   process.stdin.setRawMode?.(true);
-  process.stdin.resume();
-  process.stdin.on("data", onKey);
+  const stopInput = startKeyReader(onKey);
 
   // Resize: re-render at the new width. Preserve the reading position by
   // anchoring on the non-blank line nearest the viewport middle (the eye
