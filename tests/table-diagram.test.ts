@@ -145,6 +145,83 @@ describe("render — tables (uniform presentation policy)", () => {
 
 const MERMAID_SRC = "flowchart LR\n  A[Input v2.0] --> B[Render]\n";
 
+describe("render — menu tables (ADR-022 right-anchored role fit, td-b81597)", () => {
+  const row = (slug: string, cs: string, n: string, f: string) =>
+    `| *${slug}* | ${cs} | **${n}** <!-- %%okuda-rhs:${n}%% ${f} --> |`;
+  const menu =
+    `| Document | Callsign | # |\n|---|---|---|\n` +
+    row("A very long title that goes on and on far past the budget", "BRF-ELISION-PRIMITIVE", "11", "briefs/x.md") + "\n" +
+    row("Short", "ADR-ROLE-LAYOUT-022", "12", "decisions/y.md");
+
+  test("number holds the far right edge at every width; callsign never wraps", async () => {
+    for (const w of [80, 60, 46, 40]) {
+      const out = await renderDocument(menu, { width: w });
+      for (const l of out.split("\n")) {
+        const s = stripANSI(l);
+        if (/^\s+(A very|Short)/.test(s)) {
+          // the row is one line filling the content width (ctx.width =
+          // w-4, + the 2-char finalize margin = w-2 on the terminal):
+          // number at the right edge of the content boundary
+          expect(displayWidth(s)).toBe(w - 2);
+          expect(s.trimEnd().endsWith("11") || s.trimEnd().endsWith("12")).toBe(true);
+        }
+      }
+      // the mid-token wrap that starved the callsign is gone: no line
+      // breaks inside a callsign
+      const flat = stripANSI(out).replace(/\s+/g, " ");
+      expect(flat).toContain("BRF-ELISION-PRIMITIVE");
+      expect(flat).toContain("ADR-ROLE-LAYOUT-022");
+    }
+  });
+
+  test("the ladder: slug truncates with …, then suppresses; floor stays", async () => {
+    // truncate rung: the long slug ends … at the budget
+    const mid = await renderDocument(menu, { width: 46 });
+    const slugLine = stripANSI(mid).split("\n").find((l) => l.includes("A very"))!;
+    expect(slugLine.trimEnd().match(/…\s{2,}/)).toBeTruthy(); // … then gap to callsign
+    // suppress rung: no slug at all, callsign + number right-anchored
+    const tight = await renderDocument(menu, { width: 34 });
+    for (const l of stripANSI(tight).split("\n")) {
+      expect(l).not.toContain("A very");
+      expect(l).not.toContain("Short");
+      if (/BRF-ELISION/.test(l)) {
+        expect(l.trimEnd().endsWith("11")).toBe(true); // floor intact
+      }
+    }
+    // widening reverses: the full slug returns at a wide width
+    const wide = await renderDocument(menu, { width: 140 });
+    expect(stripANSI(wide)).toContain("far past the budget");
+  });
+
+  test("degenerate: callsign elides, the number keeps its home", async () => {
+    const out = await renderDocument(menu, { width: 14 });
+    for (const l of stripANSI(out).split("\n")) {
+      if (/BRF-|ADR-/.test(l)) {
+        expect(displayWidth(l)).toBeLessThanOrEqual(14);
+        expect(l).toMatch(/…\s+1[12]$/); // elided callsign, number at edge
+      }
+    }
+  });
+
+  test("unwired tables stay generic: shrink-wrap + wrap, no role fit", async () => {
+    const plain =
+      `| Document | Callsign | # |\n|---|---|---|\n` +
+      row("A very long title that goes on and on far past the budget", "BRF-ELISION-PRIMITIVE", "11", "briefs/x.md")
+        .replace(/ <!-- [^>]* -->/, ""); // wiring stripped → generic
+    const out = await renderDocument(plain, { width: 40 });
+    // generic path: proportional shrink + in-cell wrap (multi-line rows),
+    // the callsign may wrap — ADR-022's scope gate leaves prose tables to wrap
+    expect(stripANSI(out)).not.toMatch(/…\s{2,}BRF/);
+  });
+
+  test("wiring never leaks: the comment is invisible in output", async () => {
+    const out = await renderDocument(menu, { width: 80 });
+    expect(out).not.toContain("%%okuda-rhs");
+    expect(out).not.toContain("<!--");
+    expect(out).not.toContain("\u0000"); // no tag residue
+  });
+});
+
 describe("render — mermaid pipe + colour classification", () => {
   test("mermaid fence replaced by classified ASCII art", async () => {
     const out = await renderDocument("```mermaid\n" + MERMAID_SRC + "```\n", {

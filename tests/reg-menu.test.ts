@@ -36,11 +36,14 @@ describe("reg-menu — composeMenu (registry → wired table)", () => {
     expect(jumps.get(12)).toBe("decisions/old.md");
   });
 
-  test("long slugs cap at 50 chars with an ellipsis (a menu row is for scanning)", () => {
+  test("long slugs emit in full — the renderer truncates to the live budget (ADR-022; cap retired)", () => {
     const long = [{ file: "x.md", date: "2026-08-29", status: "open", summary: "x".repeat(215), callsign: "BRF-X" }];
     const doc = composeMenu("briefs", long);
     const row = doc.split("\n").find((l) => l.startsWith("| *"))!;
-    expect(row).toContain("*" + "x".repeat(49) + "\u2026*"); // 49 xs + ellipsis = 50
-    expect(row).not.toContain("x".repeat(50));
+    // the compositor no longer guesses width it doesn't have: the full
+    // 215-char slug is in the row; the renderer's role fit truncates it
+    // at render time against the live terminal width
+    expect(row).toContain("*" + "x".repeat(215) + "*");
+    expect(row).not.toContain("\u2026");
   });
 });

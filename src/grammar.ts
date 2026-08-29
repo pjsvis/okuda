@@ -45,6 +45,17 @@ export const RE_INLINE_HTML = /<!--[\s\S]*?-->|<\/?[A-Za-z][^<>\n]*>/g;
 /** List item placeholder — the `list` handler assigns markers. */
 export const TAG_ITEM = "\u0000I\u0000";
 
+/** RHS wire tag — a table cell's jump wiring (`<!-- %%okuda-rhs:NN%%
+ *  path -->`) survives as this tag instead of being stripped as inline
+ *  HTML: the `text` handler emits it, the `td` handler consumes it (the
+ *  cell is marked wired), and any residual is swept by `stripTags`.
+ *  Wired cells are the menu-pattern declaration — the renderer's cue
+ *  that the table is a patterned surface (ADR-022 role fit), not a
+ *  generic table. (td-b81597; same convention the paragraph path and
+ *  `extractJumps` already key on.) */
+export const TAG_RHS_WIRE = "\u0000W\u0000";
+export const RE_RHS_WIRE = /^<!--\s*%%okuda-rhs:\d{1,2}%%[^>]*-->$/;
+
 /** Raw block tags protect never-wrapped content during re-wraps. */
 export function tagRawOpen(kind: string): string {
   return `\u0000RAW:${kind}\u0000`;

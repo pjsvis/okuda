@@ -23,10 +23,12 @@ import {
   RE_MERMAID_TOKEN,
   RE_PB_TAG,
   RE_RHS_TOKEN,
+  RE_RHS_WIRE,
   TAG_ITEM,
   TAG_NESTED_CLOSE,
   TAG_PROBE_CLOSE,
   TAG_RAW_CLOSE,
+  TAG_RHS_WIRE,
   mermaidToken,
   stripTags,
   tagNestedOpen,
@@ -223,6 +225,7 @@ function colorFg(hex: string, text: string): string {
 interface Cell {
   text: string; // may contain inline ANSI
   align?: "left" | "center" | "right";
+  wired?: boolean; // carries jump wiring — the menu-pattern mark (td-b81597)
 }
 interface TableState {
   headerRows: Cell[][];
@@ -566,6 +569,10 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
     },
 
     text(children: string) {
+      // A table cell's jump wiring (whole-comment RHS form) survives as
+      // the wire tag — the td handler consumes it as the menu-pattern
+      // mark; residuals are swept by stripTags at finalize. (td-b81597.)
+      if (RE_RHS_WIRE.test(children)) return TAG_RHS_WIRE;
       let out = stripHtml(children);
       // Bare .md-path tokens in prose recede to the muted (far) register
       // — near/far: paths are provenance, not content. They read like
@@ -672,7 +679,14 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
     td(children: string, meta: { align?: "left" | "center" | "right" }) {
       const t = ensureTable(ctx);
       t.rowIsHeader = false;
-      t.row.push({ text: children, align: meta?.align });
+      // Consume the wire tag: the cell is marked wired (menu pattern),
+      // the tag never flows further. (td-b81597.)
+      const wired = children.includes(TAG_RHS_WIRE);
+      t.row.push({
+        text: wired ? children.split(TAG_RHS_WIRE).join("").trim() : children,
+        align: meta?.align,
+        wired,
+      });
       return "";
     },
     tr(_children: string) {
@@ -902,6 +916,15 @@ function renderTable(t: TableState, ctx: Ctx): string {
     ...rows.map((r) => r.length),
   );
 
+  // Patterned surface? A 3-column table whose last column carries jump
+  // wiring is the menu pattern (slug → callsign → number, ADR-022): the
+  // renderer owns the closed vocabulary — right-anchored roles, priority
+  // suppression. Any other shape, wired or not, is a generic table.
+  // (td-b81597 — the table consumer of the elision primitive, reframed.)
+  if (cols === 3 && rows.some((r) => r[2]?.wired)) {
+    return renderMenuTable(t, ctx);
+  }
+
   // Natural column widths from cell display width.
   const colWidth = new Array<number>(cols).fill(0);
   const measure = (cell: Cell | undefined, i: number): void => {
@@ -982,6 +1005,94 @@ function renderTable(t: TableState, ctx: Ctx): string {
   const trimmed = out.map((block) =>
     block.split("\n").map((l) => l.replace(/[ ]+$/, "")).join("\n"),
   );
+  if (header.length > 0) {
+    return trimmed.slice(0, 2).join("\n") + "\n\n" +
+      trimmed.slice(2).join("\n\n") + "\n\n";
+  }
+  return trimmed.join("\n\n") + "\n\n";
+}
+
+/** Right-anchored role layout for patterned surfaces (ADR-022, td-b81597):
+ *  the menu pattern as a closed vocabulary — number (floor) at the far
+ *  right edge, callsign its stable home left of it, slug filling leftward.
+ *  Suppression, not wrap: the slug truncates with `…` (the transition
+ *  rung), then suppresses entirely when the budget can't hold a scan
+ *  unit; the callsign+number floor never reflows — freed space is empty
+ *  left. The strong-stop and the stable home are the same thing: the
+ *  number is always at the right edge; widening reverses the ladder
+ *  (suppressed → truncated → full slug). The compositor emits full
+ *  content; the renderer truncates to the live budget (retires
+ *  reg-menu's 50-char slug cap — a compositor guessing width it
+ *  doesn't have). */
+function renderMenuTable(t: TableState, ctx: Ctx): string {
+  const { styler, width } = ctx;
+  const header = t.headerRows[0] ?? [];
+  const rows = t.bodyRows;
+
+  const GUTTER = 3; // matches the generic body gutter
+  const csW = Math.max(
+    1,
+    ...rows.map((r) => displayWidth(r[1]?.text ?? "")),
+    displayWidth(header[1]?.text ?? ""),
+  );
+  const numW = Math.max(
+    1,
+    ...rows.map((r) => displayWidth(r[2]?.text ?? "")),
+    displayWidth(header[2]?.text ?? ""),
+  );
+  const rightW = csW + GUTTER + numW;
+  const slugBudget = width - rightW - GUTTER;
+  const floorFits = rightW + GUTTER <= width;
+
+  const out: string[] = [];
+  // The degenerate branch mirrors the body's: the floor itself overruns,
+  // so the header elides the callsign slot and drops the pipes — the
+  // columns are the scan signal, and they still align with the body.
+  const csSlot = Math.max(1, width - numW - GUTTER);
+  if (header.length > 0) {
+    if (floorFits) {
+      const sep = ` ${styler.tablePipe()} `;
+      const h0 = styler.roleBold("table-header", header[0]?.text ?? "");
+      const h1 = styler.roleBold("table-header", header[1]?.text ?? "");
+      const h2 = styler.roleBold("table-header", header[2]?.text ?? "");
+      const slugPart = slugBudget >= 4
+        ? padDisplay(elideToWidth(h0, slugBudget), width - rightW - GUTTER)
+        : " ".repeat(width - rightW - GUTTER);
+      out.push(slugPart + sep + padDisplay(h1, csW) + sep + padStartDisplay(h2, numW));
+    } else {
+      const h1 = styler.roleBold("table-header", header[1]?.text ?? "");
+      const h2 = styler.roleBold("table-header", header[2]?.text ?? "");
+      out.push(
+        padDisplay(elideToWidth(h1, csSlot), csSlot) +
+          " ".repeat(GUTTER) + padStartDisplay(h2, numW),
+      );
+    }
+    out.push(styler.rule(width));
+  }
+  for (const r of rows) {
+    const num = r[2]?.text ?? "";
+    const cs = r[1]?.text ?? "";
+    let line: string;
+    if (!floorFits) {
+      // Degenerate: the floor itself overruns — elide the callsign, the
+      // number keeps its home (width floor 10 means numW always fits).
+      line = padDisplay(elideToWidth(cs, csSlot), csSlot) +
+        " ".repeat(GUTTER) + padStartDisplay(num, numW);
+    } else {
+      const rb = padDisplay(cs, csW) + " ".repeat(GUTTER) +
+        padStartDisplay(num, numW);
+      const slug = styler.roleBold("table-key", r[0]?.text ?? "");
+      const left = slugBudget >= 4
+        ? padDisplay(elideToWidth(slug, slugBudget), width - rightW)
+        : " ".repeat(width - rightW); // suppressed — freed space is empty left
+      line = left + rb;
+    }
+    out.push(line);
+  }
+  if (header.length > 0 || rows.length > 0) out.push(styler.rule(width));
+  // Trailing pad spaces are ours, not content — trim per line (loose rows
+  // keep the blank line between; the header rule belongs to the header).
+  const trimmed = out.map((l) => l.replace(/[ ]+$/, ""));
   if (header.length > 0) {
     return trimmed.slice(0, 2).join("\n") + "\n\n" +
       trimmed.slice(2).join("\n\n") + "\n\n";

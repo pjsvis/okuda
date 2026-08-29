@@ -53,20 +53,18 @@ export function statusGlyph(status: string): string {
 
 /** Compose the wired menu table from registry entries: newest first
  *  (date desc, file tiebreak), jump tokens assigned in scan order.
- *  Slugs cap at 50 chars (a menu row is for scanning, not reading — the
- *  full title lives at the destination; an uncapped 200-char title blows
- *  out the table and starves the callsign column). Pure — the caller
- *  performs the IO. */
+ *  Slugs emit in full — no compositor-level cap: the renderer truncates
+ *  to the live budget by priority (ADR-022 role fit, td-b81597 — the
+ *  old 50-char cap was a fixed ceiling blind to the terminal, a layer
+ *  violation: wasted space at 200 cols, starved at 60). Pure — the
+ *  caller performs the IO. */
 export function composeMenu(tier: string, entries: Entry[]): string {
-  const cap = 50;
-  const slug = (s: string): string =>
-    s.length > cap ? s.slice(0, cap - 1) + "\u2026" : s;
   const sorted = [...entries].sort((a, b) =>
     b.date.localeCompare(a.date) || a.file.localeCompare(b.file));
   const lines = [`# Menu — ${tier}`, ""];
   lines.push("| Document | Callsign | # |", "|---|---|---|");
   sorted.forEach((e, i) => {
-    lines.push(tableRow(slug(e.summary), statusGlyph(e.status), e.callsign ?? "", jumpToken(i), `${tier}/${e.file}`));
+    lines.push(tableRow(e.summary, statusGlyph(e.status), e.callsign ?? "", jumpToken(i), `${tier}/${e.file}`));
   });
   lines.push("");
   return lines.join("\n");
