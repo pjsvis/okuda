@@ -377,13 +377,20 @@ export function padCenterDisplay(s: string, cols: number): string {
   return " ".repeat(left) + s + " ".repeat(cols - w - left);
 }
 
-/** Truncate ANSI-coloured text to `cols` display columns, ANSI-aware:
- *  escapes are 0-width and preserved through the cut. If the text fits,
- *  returns it unchanged. If it overflows, emits the text up to the cut
- *  plus a `marker` (default `…`) — closing any open SGR with `reset`
- *  first. Never exceeds `cols` (the marker is included in the budget).
- *  Pure. (The one-line menu/list pattern — brief: index-and-jump.) */
-export function truncateDisplay(
+/** Elide ANSI-coloured text to `cols` display columns — the elision
+ *  primitive (ADR-014's doctrine, td-b81597): truncate, never wrap; when
+ *  the line overflowed, the last column becomes `…`, the horizontal-
+ *  continuation glyph. ANSI-aware: escapes are 0-width and preserved
+ *  through the cut. Grapheme-aware: whole graphemes at their measured
+ *  width (a wide CJK/emoji cluster is never split and never overruns —
+ *  a straddling cluster is dropped, the marker takes its place). If the
+ *  text fits, returns it unchanged. If it overflows, emits the text up
+ *  to the cut plus a `marker` (default `…`) — closing any open SGR with
+ *  `reset` first. Never exceeds `cols` (the marker is included in the
+ *  budget). Pure. (One primitive, two consumers: code fences + the menu
+ *  role fit — brief: elision-primitive; the one-line menu/list pattern
+ *  from index-and-jump rides the same function.) */
+export function elideToWidth(
   s: string,
   cols: number,
   marker = "…",
@@ -404,15 +411,10 @@ export function truncateDisplay(
       if (/\x1b\[[0-9;]*m/.test(run.raw)) openSgr = !/\x1b\[0*m/.test(run.raw);
       continue;
     }
-    // visible run — take chars until the budget is spent.
-    let taken = "";
-    for (const ch of run.raw) {
-      if (vis >= budget) break;
-      taken += ch;
-      vis += 1;
-    }
-    out += taken;
-    if (vis >= budget) break;
+    // visible grapheme — take it only if it fits whole in the budget.
+    if (vis + run.width > budget) break;
+    out += run.raw;
+    vis += run.width;
   }
   // Close any open SGR before the marker (style hygiene at the cut).
   return out + (openSgr ? reset : "") + marker;

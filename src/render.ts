@@ -40,7 +40,7 @@ import {
   padDisplay,
   padStartDisplay,
 } from "./width";
-import { stripANSI, truncateDisplay } from "./width";
+import { stripANSI, elideToWidth } from "./width";
 import { wrapANSI } from "./wrap";
 
 /** Left indent for list blocks, inside the content margin (Glow list level_indent). */
@@ -557,7 +557,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         // finalize) minus the number + its leading space.
         const numW = num.length + 1; // ' NN'
         const avail = width - 2 - numW;
-        const body = truncateDisplay(rendered, avail);
+        const body = elideToWidth(rendered, avail);
         const line = padDisplay(body, avail) + styler.bold(num);
         return line + "\n\n";
       }
