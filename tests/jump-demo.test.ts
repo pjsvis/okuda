@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { slugify, stateGlyph, jumpToken } from "../scripts/jump-demo";
+import { slugify, stateGlyph, jumpToken, tableRow } from "../scripts/jump-demo";
 
 describe("jump-demo — slugify (the slug is a title, never a stem)", () => {
   test("strips the `Brief:` classification prefix", () => {
@@ -76,5 +76,26 @@ describe("jump-demo — jumpToken (numbers from 11, not 01 — ADR-021)", () => 
       const n = Number(jumpToken(i));
       if (i < 89) expect(n).toBeGreaterThanOrEqual(11);
     }
+  });
+});
+
+describe("tableRow — the three-column form (td-bdfce0)", () => {
+  test("content → address → action; wiring hides in the row's comment", () => {
+    const r = tableRow("Ephemeral index generation", "", "BRF-INDEX-JUMP", "14", "briefs/x.md");
+    expect(r).toBe("| *Ephemeral index generation* | BRF-INDEX-JUMP | **14** <!-- %%okuda-rhs:14%% briefs/x.md --> |");
+  });
+  test("the glyph nests as a trailing mark on the slug — no glyph column", () => {
+    const r = tableRow("Viewport padding", "\u2717", "BRF-VIEWPORT-PADDING", "11", "briefs/v.md");
+    expect(r).toBe("| *Viewport padding* \u2717 | BRF-VIEWPORT-PADDING | **11** <!-- %%okuda-rhs:11%% briefs/v.md --> |");
+  });
+  test("absent callsign renders an empty cell — honest, not derived", () => {
+    const r = tableRow("A slug", "", "", "12", "briefs/y.md");
+    expect(r).toContain("| *A slug* |  | **12**");
+  });
+  test("the row's wiring resolves through extractJumps (line-scan)", async () => {
+    const { extractJumps } = await import("../src/tui");
+    const row = tableRow("A slug", "", "BRF-A", "15", "briefs/a.md");
+    const jumps = extractJumps(`| Document | Callsign | # |\n|---|---|---|\n${row}\n`);
+    expect(jumps.get(15)).toBe("briefs/a.md");
   });
 });

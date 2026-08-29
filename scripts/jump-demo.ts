@@ -1,20 +1,19 @@
 #!/usr/bin/env bun
 /**
- * jump-demo.ts — the menu compositor (index-and-jump, td-9d9981).
+ * jump-demo.ts — the menu compositor (index-and-jump, td-9d9981; the
+ * three-column table form, td-bdfce0).
  *
- * The line, under the near/far pattern (the gloaming):
- *   chip (solid block, the action indicator — type it to jump) →
- *   slug (emphasis, near-but-lesser, the content) →
- *   path (muted, far — on its own line beneath, no dash: the line
- *   break is the separator). State glyphs wear only on the deviations —
- *   the default (open) carries no glyph, since a column of ☐ is
- *   decoration, not signal (style-guide). The chip (action) outranks the
- *   glyph (state) for the eye's first stop on the default rows; a
- *   rejected/parked/accepted row earns its glyph because the state is the
- *   story. The `Brief:` / `Decision:` classification prefix is stripped,
- *   and a registry stem heading (`decision: 011-…`) is normalised to the
- *   descriptive title — the number sequence belongs to the jump token
- *   (RHS), not the slug. The path's folder already says the class.
+ * The menu is a table — slug (content, emphasis) → callsign (address,
+ * the registry's durable handle) → number (action, white-bold — type it
+ * to jump). The number is a column near the slug, not a distant RHS
+ * anchor: the eye scans words, notes the handle, acts on the number
+ * sitting right there. The wiring (token + path) hides in each row's
+ * HTML comment — the renderer strips it; extractJumps reads it from
+ * source. State glyphs nest as a trailing mark on the slug — only
+ * deviations wear theirs (style-guide); the classification prefix is
+ * stripped and registry stem headings normalised (honesty brief). The
+ * one-line form (`slug %%okuda-rhs:NN%%`) remains the pattern for menus
+ * without an address column — the renderer's paragraph handler owns it.
  *
  * Ephemeral — never registered, never a brief. The environment
  * composing (filesystem as the message bus), not okuda (ADR-020).
@@ -77,12 +76,36 @@ export function jumpToken(index: number): string {
   return String(index + 11);
 }
 
+/** Compose one table row of the menu: slug (content) → callsign
+ *  (address) → number (action). The glyph nests as a trailing mark on
+ *  the slug — state is a property of content, not a channel. The wiring
+ *  (token + path) hides in the row's HTML comment: the renderer strips
+ *  it, extractJumps reads it from source. Pure. (td-bdfce0 — the
+ *  three-column form; the distant-RHS number was a list-shape failure
+ *  the table fixes: the number is a column near the slug, a structure.) */
+export function tableRow(slug: string, glyph: string, callsign: string, n: string, file: string): string {
+  const mark = glyph ? ` ${glyph}` : ""; // deviation earns its mark; default bare
+  const cs = callsign || ""; // pre-migration doc — empty cell, honest
+  return `| *${slug}*${mark} | ${cs} | **${n}** <!-- %%okuda-rhs:${n}%% ${file} --> |`;
+}
+
 if (import.meta.main) {
   const recent = readdirSync(join(ROOT, "briefs"))
     .filter((f) => /^2026-08-28.*\.md$/.test(f))
     .map((f) => `briefs/${f}`);
   const rejected = "briefs/2026-08-25-brief-viewport-padding.md";
   const files = [...recent, rejected].sort();
+
+  // Callsign column: the registry is the fast index (frontmatter truth).
+  // A doc without one renders an empty cell — honest, not derived.
+  const csIndex = new Map<string, string>();
+  for (const line of readFileSync(join(ROOT, "briefs", "INDEX.jsonl"), "utf8").split("\n")) {
+    if (!line.trim()) continue;
+    try {
+      const e = JSON.parse(line) as { file?: string; callsign?: string };
+      if (e.file && e.callsign) csIndex.set(`briefs/${e.file}`, e.callsign);
+    } catch { /* malformed — skip */ }
+  }
 
   const rows = files.map((f) => {
     const content = readFileSync(join(ROOT, f), "utf8");
@@ -91,18 +114,15 @@ if (import.meta.main) {
   rows.sort((a, b) => a.file.localeCompare(b.file));
 
   const lines = ["# Menu — recent briefs", ""];
+  // Three columns: content → address → action (slug → callsign → number).
+  // The number is a column near the slug — the eye scans words, notes the
+  // durable handle, acts on the number sitting right there. Widening
+  // restores the slug; the number never left.
+  lines.push("| Document | Callsign | # |", "|---|---|---|");
   rows.forEach((r, i) => {
-    const n = jumpToken(i);
-    const slug = slugify(r.title);
-    const glyph = stateGlyph(r.content);
-    const lead = glyph ? `${glyph} ` : "";  // deviation earns its mark; default bare
-    // [glyph?] slug (emphasis) → RHS number (the action). Visual order
-    // follows action order: consider the slug, then execute the number.
-    // The path is wiring in an HTML comment the renderer strips but
-    // extractJumps reads. One line — truncate to fit, never wrap.
-    lines.push(`${lead}*${slug}* %%okuda-rhs:${n}%% <!-- ${r.file} -->`);
-    lines.push(""); // blank line between items → bulletless, breathing
+    lines.push(tableRow(slugify(r.title), stateGlyph(r.content), csIndex.get(r.file) ?? "", jumpToken(i), r.file));
   });
+  lines.push("");
   lines.push("---", "", "**Key** — type the number to jump · state glyphs (deviations marked):", "");
   lines.push("☐ open · ⋮ parked · ✗ rejected · ✓ accepted (as an ADR)");
   lines.push("");

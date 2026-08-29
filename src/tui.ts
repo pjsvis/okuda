@@ -336,18 +336,18 @@ export function advanceNumBuffer(
   return { buffer: next, token: null };
 }
 
-/** Scan markdown source for `%%okuda-rhs:NN%%` jump tokens paired with
- *  a `.md` path, returning a token→path map. The compositor emits each
- *  menu item as a paragraph: the slug, a trailing `%%okuda-rhs:NN%%`
- *  (the action, RHS), and a `.md` path in an HTML comment (wiring the
- *  renderer strips but extractJumps reads from source). Duplicate tokens:
- *  last wins. Pure. */
+/** Scan markdown source for jump wiring — a `%%okuda-rhs:NN%%` token
+ *  paired with a `.md` path on the same line — returning a token→path
+ *  map. Line-scoped (the compositor's contract: the wiring shares the
+ *  line with its item, hidden in a table row's HTML comment or trailing
+ *  a one-line paragraph — the renderer strips the comment, this reads
+ *  the source). Duplicate tokens: last wins. Pure. */
 export function extractJumps(source: string): Map<number, string> {
   const out = new Map<number, string>();
-  for (const para of source.split(/\n{2,}/)) {
-    const tok = para.match(/%%okuda-rhs:(\d{1,2})%%/);
+  for (const line of source.split("\n")) {
+    const tok = line.match(/%%okuda-rhs:(\d{1,2})%%/);
     if (!tok) continue;
-    const paths = [...para.matchAll(/\S+\.md/g)].map((m) => m[0]!);
+    const paths = [...line.matchAll(/\S+\.md/g)].map((m) => m[0]!);
     const path = paths[paths.length - 1];
     if (path) out.set(Number(tok[1]!), path);
   }

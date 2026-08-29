@@ -93,11 +93,21 @@ One line per item — number → slug:
 
 No state glyph on the line — the number (action) outranks the glyph (state) for the eye's first stop. The glyph vocabulary is held in reserve for tables and status pages where state *is* the story.
 
+**The table form** — when the menu carries an address column (callsigns), the items become a three-column table (td-bdfce0):
+
+| Document | Callsign | # |
+|---|---|---|
+| *Zero-notification stillness* | ADR-ZERO-NOTIFICATION-020 | **17** |
+
+- **Column order: content → address → action** — slug → callsign → number. The eye scans words, notes the durable handle, acts on the number sitting right there: the number is a column near the slug, not a distant RHS anchor the eye must travel to. The trade is explicit — the list's boldest-thing-at-the-far-edge strong-stop is lost, column coherence is gained; the eye learns the number's home.
+- **The glyph nests as a trailing mark on the slug** — state is a property of content, not a channel; no glyph column. Only deviations wear theirs, as ever.
+- **Wiring hides in the row's HTML comment** — `**17** <!-- %%okuda-rhs:17%% decisions/foo.md -->` — the visible number is plain strong (white-bold via the digits-only rule); the token + path are wiring the renderer strips and `extractJumps` reads per line.
+
 Then a **status key at the bottom** — the legend, kept in reserve:
 
 ☐ open · ⋮ parked · ✗ rejected · ✓ accepted
 
-The menu is bulletless, coloured, scannable, and self-documenting. The chip is the action (bold); the slug is the content (near, lesser); the path is the provenance (far). An agent that emits this is a cool sophisticate; an agent that emits a flat numbered list is a wall of white with numbers on it.
+The menu is bulletless, coloured, scannable, and self-documenting. In the list form the number is the action (bold) at the RHS; in the table form it is a column beside its content. The path is always wiring, never content. An agent that emits this is a cool sophisticate; an agent that emits a flat numbered list is a wall of white with numbers on it.
 
 ---
 
