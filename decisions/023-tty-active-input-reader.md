@@ -6,7 +6,10 @@ callsign: ADR-TTY-ACTIVE-INPUT-023
 # Decision: /dev/tty active-poll reader for the TUI (bypass Bun's broken passive stdin)
 
 **Date:** 2026-08-29
-**Status:** Accepted
+**Status:** Aborted (2026-08-30) — the fix landed and verified, but its
+**cost exceeded its benefit. Reverted; passive stdin restored. The
+**findings below stand as knowledge. See
+**`debriefs/2026-08-30-debrief-fzf-owns-the-loop-aborted.md`.
 
 ## Context
 
@@ -61,6 +64,8 @@ unchanged — only the input source swaps.
 
 ## Consequences
 
+**Original consequences (pre-revert, retained as record):**
+
 **What became easier:**
 - The fzf-owns-the-loop spike works: input unfreezes, cursor is preserved
   on resume, and the spillover symptom (leaked keystrokes filtering fzf's
@@ -81,6 +86,19 @@ unchanged — only the input source swaps.
   subprocess of a tool that manipulates the tty (fzf `execute`, and
   likely others). The passive listener remains the fallback for the
   in-process / normal-terminal path.
+
+## Revert (2026-08-30)
+
+The fix was reverted: `runTui` restores the passive
+`process.stdin.on("data")` listener and the `bun:ffi` / `/dev/tty`
+active-poll reader is removed. Reason: the reader ran unconditionally in
+*every* `okuda file --tui` session, paying a `dlopen` of libc and a
+perpetual 60Hz poll for a feature gated behind `GLOAM_SPIKE_FZF_OWNS=1`
+that nobody used by default — cost and benefit on opposite paths. The
+fzf-owns-the-loop spike was reverted in the same pass. The findings above
+remain valid; the decision is *aborted*, not *wrong*. A clean minimal repro
+for the Bun passive-stdin freeze is the precondition for any future revisit
+— record it here, not as a vague intention.
 
 ## Related
 - Brief: `briefs/2026-08-29-brief-fzf-owns-the-loop.md`

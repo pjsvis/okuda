@@ -9,3 +9,4 @@
 {"file":"2026-08-29-debrief-index-and-jump.md","date":"2026-08-29","status":"done","summary":"Debrief: index-and-jump — menus as documents, and the demo that kept them honest","meta":{},"callsign":"DBF-INDEX-JUMP"}
 {"file":"2026-08-29-debrief-okf-callsign-migration.md","date":"2026-08-29","status":"done","summary":"Debrief: the OKF migration and callsign layer — one movement, four slices","meta":{},"callsign":"DBF-OKF-CALLSIGN"}
 {"file":"2026-08-30-debrief-elision-primitive.md","date":"2026-08-30","status":"done","summary":"Debrief: elision primitive — one primitive, two consumers, and an ADR that got superseded mid-build","meta":{},"callsign":"DBF-ELISION-PRIMITIVE"}
+{"file":"2026-08-30-debrief-fzf-owns-the-loop-aborted.md","date":"2026-08-30","status":"done","summary":"Debrief: the fzf-owns-the-loop away mission (aborted)","meta":{},"callsign":"DBR-FZF-OWNS-LOOP-ABORT"}
