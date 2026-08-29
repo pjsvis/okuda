@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-01 | BRF-MERMAID-SOURCE-OMITTED | open | Omit the mermaid source from the render | 2026-09-01-brief-mermaid-source-omitted.md |
 | 2026-08-29 | BRF-MENU-TEMPLATES | open | Menu templates (deferred — fires on the second menu kind) | 2026-08-29-brief-menu-templates-deferred.md |
 | 2026-08-29 | BRF-OKF-CALLSIGN | done | OKF conformance migration and the callsign layer | 2026-08-29-brief-okf-callsign-migration.md |
 | 2026-08-28 | BRF-AI-DOC | open | Inline Ask-the-Doc and Local SSH Transport | 2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md |

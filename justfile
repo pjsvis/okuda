@@ -115,6 +115,12 @@ resize-okuda file:
 view file:
     @./okuda {{file}} --tui
 
+# Build, render, view
+[group('build')]
+run file:
+    @just build >/dev/null
+    @./okuda {{file}} --tui
+
 [group('build')]
 view-glow file:
     @./okuda {{file}} --tui --palette dracula
