@@ -15,7 +15,7 @@
 
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, join } from "node:path";
-import { detectRoot } from "./root";
+import { detectRoot, makeCallsignResolver } from "./root";
 import { runTui } from "./tui";
 import { terminalCols, terminalRows } from "./width";
 
@@ -121,6 +121,11 @@ export async function runLauncher(): Promise<void> {
   // undefined → today's footer, no silo badge. Resolved once per session:
   // the root does not move while gloam is running.
   const root = detectRoot();
+  // Callsign layer (td-bdfce0): rooted gloam resolves per-file callsigns
+  // from the registries for the footer's identity run. The root is static
+  // for the session, so the index loads once — the resolver closure hands
+  // the TUI strings, never registry knowledge (ADR-020).
+  const callsignFor = root ? makeCallsignResolver() : undefined;
   let query = "";
   try {
     for (;;) {
@@ -134,6 +139,7 @@ export async function runLauncher(): Promise<void> {
         width: terminalCols(80),
         rows: terminalRows(24),
         silo: root?.badge,
+        callsignFor,
       });
     }
   } finally {

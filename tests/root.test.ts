@@ -2,7 +2,14 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
-import { detectRoot, presentRegistries } from "../src/root";
+import {
+  callsignForFile,
+  detectRoot,
+  loadCallsigns,
+  makeCallsignResolver,
+  presentRegistries,
+  resolveByCallsign,
+} from "../src/root";
 
 /** mkdtemp helper: returns a fresh empty dir and a cleanup thunk. */
 function scratch(): { dir: string; cleanup: () => void } {
@@ -102,5 +109,59 @@ describe("root — detectRoot (rooted/unrooted gloam signature)", () => {
     expect(here).toContain("decisions/INDEX.jsonl");
     expect(here).toContain("debriefs/INDEX.jsonl");
     expect(here).toContain("playbooks/REGISTRY.jsonl");
+  });
+});
+
+describe("root — callsigns (resolution, not derivation)", () => {
+  /** A scratch silo with one registry: two records, one malformed line,
+   *  one record without a callsign (pre-migration shape). */
+  function scratchSilo(): { dir: string; cleanup: () => void } {
+    const dir = mkdtempSync(join(tmpdir(), "callsign-test-"));
+    mkdirSync(join(dir, "briefs"));
+    writeFileSync(
+      join(dir, "briefs", "INDEX.jsonl"),
+      [
+        JSON.stringify({ file: "a.md", date: "2026-08-29", status: "open", summary: "A", callsign: "BRF-ALPHA" }),
+        "{not json",
+        JSON.stringify({ file: "b.md", date: "2026-08-29", status: "open", summary: "B", callsign: "BRF-BETA" }),
+        JSON.stringify({ file: "c.md", date: "2026-08-29", status: "open", summary: "C" }),
+      ].join("\n") + "\n",
+    );
+    return { dir, cleanup: () => rmSync(dir, { recursive: true, force: true }) };
+  }
+
+  test("loadCallsigns parses records, skips malformed + callsign-less", () => {
+    const { dir, cleanup } = scratchSilo();
+    try {
+      const recs = loadCallsigns(dir);
+      expect(recs.map((r) => r.callsign).sort()).toEqual(["BRF-ALPHA", "BRF-BETA"]);
+      expect(recs[0]!.path).toBe(join(dir, "briefs", "a.md"));
+    } finally { cleanup(); }
+  });
+
+  test("resolveByCallsign: known → path; unknown → null", () => {
+    const { dir, cleanup } = scratchSilo();
+    try {
+      expect(resolveByCallsign("BRF-ALPHA", dir)).toBe(join(dir, "briefs", "a.md"));
+      expect(resolveByCallsign("BRF-NOPE", dir)).toBeNull();
+    } finally { cleanup(); }
+  });
+
+  test("file lookup matches on tier/file segments, however the path arrived", () => {
+    const { dir, cleanup } = scratchSilo();
+    try {
+      expect(callsignForFile(join(dir, "briefs", "a.md"), dir)).toBe("BRF-ALPHA");
+      expect(callsignForFile("briefs/a.md", dir)).toBe("BRF-ALPHA");
+      expect(callsignForFile("briefs/c.md", dir)).toBeNull(); // no callsign
+    } finally { cleanup(); }
+  });
+
+  test("makeCallsignResolver: index loads once, resolves per paint", () => {
+    const { dir, cleanup } = scratchSilo();
+    try {
+      const r = makeCallsignResolver(dir);
+      expect(r("briefs/b.md")).toBe("BRF-BETA");
+      expect(r("nowhere/x.md")).toBeNull();
+    } finally { cleanup(); }
   });
 });

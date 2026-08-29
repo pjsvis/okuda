@@ -107,3 +107,65 @@ export function presentRegistries(cwd: string = process.cwd()): string[] {
   }
   return out;
 }
+
+// ── Callsigns (td-bdfce0: resolution, not derivation) ─────────────────
+
+/** One registry record: a durable callsign and the path it resolves to. */
+export interface CallsignRecord {
+  callsign: string;
+  path: string;
+}
+
+/** Parse the tier registries at cwd into callsign records. The registry
+ *  is the fast index; frontmatter is the truth it mirrors — so resolution
+ *  survives renames (keyed on the record, never the filename stem).
+ *  Malformed lines are skipped, not fatal. Pure-ish (reads fs). */
+export function loadCallsigns(cwd: string = process.cwd()): CallsignRecord[] {
+  const out: CallsignRecord[] = [];
+  for (const [dir, index] of TIER_REGISTRIES) {
+    let raw: string;
+    try {
+      raw = readFileSync(join(cwd, dir, index), "utf8");
+    } catch {
+      continue; // absent tier — not an error
+    }
+    for (const line of raw.split("\n")) {
+      if (!line.trim()) continue;
+      try {
+        const e = JSON.parse(line) as { file?: string; callsign?: string };
+        if (e.file && e.callsign) out.push({ callsign: e.callsign, path: join(cwd, dir, e.file) });
+      } catch {
+        /* malformed — skip */
+      }
+    }
+  }
+  return out;
+}
+
+/** The two trailing path segments — the identity a footer shows and a
+ *  registry records (tier/file), however the caller got the path. Pure. */
+function tierFileKey(p: string): string {
+  const parts = p.split("/").filter(Boolean);
+  return parts.length <= 1 ? p : parts.slice(-2).join("/");
+}
+
+/** Resolve a callsign to its path. Returns null when unknown — the caller
+ *  decides what an unknown code means. Pure-ish (reads fs). */
+export function resolveByCallsign(callsign: string, cwd: string = process.cwd()): string | null {
+  return loadCallsigns(cwd).find((r) => r.callsign === callsign)?.path ?? null;
+}
+
+/** Resolve a document's callsign from its path. Pure-ish (reads fs). */
+export function callsignForFile(file: string, cwd: string = process.cwd()): string | null {
+  const key = tierFileKey(file);
+  return loadCallsigns(cwd).find((r) => tierFileKey(r.path) === key)?.callsign ?? null;
+}
+
+/** A per-file callsign resolver with the registry index loaded once —
+ *  the shape a long-lived surface (the TUI footer, per paint) wants.
+ *  Unknown files resolve to null; the caller renders an absent slot.
+ *  Pure-ish (reads fs once at construction). */
+export function makeCallsignResolver(cwd: string = process.cwd()): (file: string) => string | null {
+  const index = new Map(loadCallsigns(cwd).map((r) => [tierFileKey(r.path), r.callsign] as const));
+  return (file: string) => index.get(tierFileKey(file)) ?? null;
+}

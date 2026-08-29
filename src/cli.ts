@@ -16,7 +16,9 @@ import { loadPalette } from "./palette";
 import { renderDocument } from "./render";
 import { runTui } from "./tui";
 import { runLauncher, invokedAsGloam } from "./launcher";
+import { detectRoot, makeCallsignResolver, resolveByCallsign } from "./root";
 import { terminalCols, terminalRows } from "./width";
+import { existsSync } from "node:fs";
 
 interface Args {
   file: string | null;
@@ -58,6 +60,10 @@ function parseArgs(argv: string[]): Args {
 /** Known preset names, for error messages. */
 const KNOWN_PRESETS = ["okuda", "dracula"];
 
+/** Callsign shape: tier prefix + significant tokens, uppercase (the
+ *  registry's vocabulary — BRF-INDEX-JUMP, ADR-BOUND-010, PLY-REGISTRY). */
+const CALLSIGN_SHAPE = /^[A-Z]{3}(-[A-Z0-9]+)+$/;
+
 async function readSource(file: string | null): Promise<string> {
   if (file) {
     const f = Bun.file(file);
@@ -80,6 +86,26 @@ async function main(): Promise<void> {
   // unaffected; two names, two entry contracts, one binary.
   if (invokedAsGloam() && !args.file && process.stdin.isTTY) {
     await runLauncher();
+    return;
+  }
+  // `gloam <callsign>` (silo-mnemonics): a callsign-shaped argument that
+  // names no file resolves through the rooted registry — the human code
+  // for low-bandwidth channels. Unknown code or unrooted cwd → honest
+  // error; anything else falls through to the reader's own diagnostics.
+  if (invokedAsGloam() && args.file && !existsSync(args.file) && CALLSIGN_SHAPE.test(args.file) && process.stdin.isTTY) {
+    const root = detectRoot();
+    const path = root ? resolveByCallsign(args.file) : null;
+    if (!path) {
+      process.stderr.write(`gloam: unknown callsign: ${args.file}${root ? "" : " (cwd is not a rooted silo)"}\n`);
+      process.exit(1);
+    }
+    await runTui({
+      file: path,
+      width: terminalCols(80),
+      rows: terminalRows(24),
+      silo: root?.badge,
+      callsignFor: makeCallsignResolver(),
+    });
     return;
   }
   const color = args.noColor

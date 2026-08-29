@@ -29,6 +29,10 @@ export interface TuiOptions {
    *  footer, no silo badge. The renderer paints the string; it learns
    *  nothing about trees or registries. */
   silo?: string;
+  /** Per-file callsign resolver (the rooted launcher passes one; the TUI
+   *  knows nothing of registries — ADR-020). Called per paint with the
+   *  current file, so the identity run follows jumps. */
+  callsignFor?: (file: string) => string | null;
 }
 
 /** Decoded keystroke action. `null` = unhandled (no-op). */
@@ -351,15 +355,18 @@ export function extractJumps(source: string): Map<number, string> {
 }
 
 /**
- * Compose the footer: badge + silo? + folder/filename left (identity leads —
- * the glance position), `? help` right (affordance trails). Always
- * compact — verbose hints live on the last row (see hintsLine).
+ * Compose the footer: badge + silo? + callsign? + folder/filename left
+ * (identity leads — the glance position), `? help` right (affordance
+ * trails). Always compact — verbose hints live on the last row (see
+ * hintsLine).
  *
- * The identity run is `silo · callsign · filename` (ADR-020); the silo is
- * the head, muted (provenance, not alarm), passed in by the launcher when
- * rooted. The callsign slot is reserved for td-bdfce0 — absent today, the
- * run reads `silo · filename`. The binary badge (label) leads the run and
- * is unchanged in every mode (brief: silo-mnemonics — okuda <file> unchanged).
+ * The identity run is `silo · callsign · filename` (ADR-020): silo and
+ * callsign both muted (provenance, not alarm), passed in by the launcher
+ * when rooted — the renderer paints the strings it is given and knows
+ * nothing of registries. Absent segments collapse; the run reads
+ * `silo · filename`, or just the filename unrooted. The binary badge
+ * (label) leads the run, unchanged in every mode (brief:
+ * silo-mnemonics — okuda <file> unchanged).
  */
 export function footerLine(
   width: number,
@@ -368,21 +375,23 @@ export function footerLine(
   muted: (s: string) => string,
   badge: (s: string) => string,
   silo?: string,
+  callsign?: string,
 ): string {
   const name = displayPath(file);
   const rightText = compactLeft();
-  // silo run: muted silo + ` · ` prefiguring the callsign slot. Empty when
-  // unrooted — the run collapses to today's badge + filename. The width
-  // math uses plain lengths (ANSI is zero-width), parity with `label.length`
-  // and `name.length` above — never the ANSI-wrapped `siloRun.length`.
-  const siloRun = silo ? muted(silo) + " \u00b7 " : "";
-  const siloWidth = silo ? silo.length + 3 : 0; // silo + " · "
-  // Left: badge (label + 2 padding) + space + silo run + folder/file.
-  const leftWidth = label.length + 2 + 1 + siloWidth + name.length;
+  // identity run: muted silo + callsign, dot-joined, each trailing ` · `.
+  // Empty when unrooted — collapses to today's badge + filename. The
+  // width math uses plain lengths (ANSI is zero-width), parity with
+  // `label.length` and `name.length` — never the ANSI-wrapped run.
+  const identity = [silo, callsign].filter((s): s is string => s !== undefined);
+  const run = identity.length > 0 ? identity.map(muted).join(" \u00b7 ") + " \u00b7 " : "";
+  const runWidth = identity.reduce((w, s) => w + s.length, 0) + identity.length * 3;
+  // Left: badge (label + 2 padding) + space + identity run + folder/file.
+  const leftWidth = label.length + 2 + 1 + runWidth + name.length;
   // Reserve the last column: Apple's rounded window corner clips the
   // bottom-right cell — the footer never writes it.
   const gap = Math.max(1, width - leftWidth - rightText.length - 1);
-  return badge(label) + " " + siloRun + muted(name) + " ".repeat(gap) + muted(rightText) + " ";
+  return badge(label) + " " + run + muted(name) + " ".repeat(gap) + muted(rightText) + " ";
 }
 
 // ── I/O loop ──────────────────────────────────────────────────────────
@@ -474,12 +483,12 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     if (showHints) {
       // Badge row up one; hints own the last row, right-justified, corner pad.
       process.stdout.write(`\x1b[${rows - 1};1H`);
-      process.stdout.write(footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo));
+      process.stdout.write(footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined));
       process.stdout.write(`\x1b[${rows};1H`);
       process.stdout.write(hintsLine(cols, muted));
     } else {
       process.stdout.write(`\x1b[${rows};1H`);
-      process.stdout.write(footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo));
+      process.stdout.write(footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined));
     }
   };
 

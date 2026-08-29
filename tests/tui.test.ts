@@ -146,6 +146,17 @@ describe("tui — footerLine (identity left, affordance right)", () => {
     const f = footerLine(72, "Gloam", FILE, muted, badge, "okuda");
     expect(f.startsWith(badge("Gloam") + " " + muted("okuda") + " \u00b7 " + muted("docs/audit.md"))).toBe(true);
   });
+  test("callsign slot: identity run reads silo · callsign · filename (ADR-020)", () => {
+    const f = footerLine(96, "Gloam", FILE, muted, badge, "okuda", "BRF-INDEX-JUMP");
+    expect(f.startsWith(
+      badge("Gloam") + " " + muted("okuda") + " \u00b7 " + muted("BRF-INDEX-JUMP") + " \u00b7 " + muted("docs/audit.md"),
+    )).toBe(true);
+    expect(displayWidth(stripANSI(f))).toBe(96); // width parity, corner pad kept
+  });
+  test("callsign without silo: the run composes what it is given", () => {
+    const f = footerLine(96, "Gloam", FILE, muted, badge, undefined, "ADR-BOUND-010");
+    expect(f.startsWith(badge("Gloam") + " " + muted("ADR-BOUND-010") + " \u00b7 " + muted("docs/audit.md"))).toBe(true);
+  });
   test("rooted NO_COLOR: silo run is plain text, no escapes added", () => {
     const none = makeStyler(DRACULA_PALETTE, "none");
     const f = footerLine(72, "Gloam", FILE,
