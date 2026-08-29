@@ -13,6 +13,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-29 | BRF-FZF-OWNS-LOOP | open | fzf owns the loop (cursor-preserve experiment) | 2026-08-29-brief-fzf-owns-the-loop.md |
 | 2026-08-29 | BRF-MENU-TEMPLATES | open | Menu templates (deferred — fires on the second menu kind) | 2026-08-29-brief-menu-templates-deferred.md |
 | 2026-08-29 | BRF-OKF-CALLSIGN | done | OKF conformance migration and the callsign layer | 2026-08-29-brief-okf-callsign-migration.md |
+| 2026-08-29 | BRF-PAGED-OKUDAGRAM | open | Paged okudagram view — block-aware paging (candidate invariant) | 2026-08-29-brief-paged-okudagram.md |
 | 2026-08-28 | BRF-AI-DOC | open | Inline Ask-the-Doc and Local SSH Transport | 2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md |
 | 2026-08-28 | BRF-ELISION-PRIMITIVE | done | Elision primitive — close ADR-014, fix the code-fence soft-wrap lie | 2026-08-28-brief-elision-primitive.md |
 | 2026-08-28 | BRF-INDEX-JUMP | done | Ephemeral Index Generation and Numeric Jump Navigation | 2026-08-28-brief-index-and-jump.md |

@@ -29,4 +29,5 @@
 {"file":"2026-08-29-brief-fzf-owns-the-loop.md","date":"2026-08-29","status":"open","summary":"fzf owns the loop (cursor-preserve experiment)","meta":{},"callsign":"BRF-FZF-OWNS-LOOP"}
 {"file":"2026-08-29-brief-menu-templates-deferred.md","date":"2026-08-29","status":"open","summary":"Menu templates (deferred — fires on the second menu kind)","meta":{},"callsign":"BRF-MENU-TEMPLATES"}
 {"file":"2026-08-29-brief-okf-callsign-migration.md","date":"2026-08-29","status":"done","summary":"OKF conformance migration and the callsign layer","meta":{},"callsign":"BRF-OKF-CALLSIGN"}
+{"file":"2026-08-29-brief-paged-okudagram.md","date":"2026-08-29","status":"open","summary":"Paged okudagram view — block-aware paging (candidate invariant)","meta":{},"callsign":"BRF-PAGED-OKUDAGRAM"}
 {"file":"2026-09-01-brief-mermaid-source-omitted.md","date":"2026-09-01","status":"open","summary":"Omit the mermaid source from the render","meta":{},"callsign":"BRF-MERMAID-SOURCE-OMITTED"}
