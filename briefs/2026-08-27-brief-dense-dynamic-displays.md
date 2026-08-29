@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-DENSE-DYNAMIC
+---
+
 # brief: Dense terminal visual primitives for dynamic telemetry
 
 **Created:** 2026-08-26

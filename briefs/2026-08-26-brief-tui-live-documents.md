@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-TUI-LIVE
+---
+
 # Brief: TUI live documents — fs.watch → anchored re-render
 
 **Date:** 2026-08-26

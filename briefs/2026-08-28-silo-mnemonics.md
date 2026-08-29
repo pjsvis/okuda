@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-SILO-MNEMONICS
+---
+
 # Brief: Rooted Gloam — silo badge and document callsigns
 
 **Created:** 2026-08-28 (rewritten from the first draft: badge placement,

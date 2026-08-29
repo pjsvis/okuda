@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-OKF-V02-019
+---
+
 # Decision: Adopt OKF v0.2 conformance for the document tree
 
 **Date:** 2026-08-28

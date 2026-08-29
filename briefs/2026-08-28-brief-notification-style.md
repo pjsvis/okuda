@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-NOTIFICATION-STYLE
+---
+
 # decision: 011-zero-notification-stillness-and-decoupled-inbox-watchers
 
 > **Superseded in role (2026-08-28):** the accepted decision is now

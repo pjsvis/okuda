@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-STRUCTURAL-PROBE-012
+---
+
 # Decision: List nesting depth comes from a structural probe render, not counters or re-wrapping
 
 **Date:** 2026-08-27

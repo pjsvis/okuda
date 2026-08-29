@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-SSH-SERVED-2
+---
+
 # Brief: SSH-served portal — the ADR-013 Option-2 gate probe
 
 **Created:** 2026-08-28 (rewritten from the first draft: re-cast as the gate

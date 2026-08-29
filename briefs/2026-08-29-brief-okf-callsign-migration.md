@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-OKF-CALLSIGN
+---
+
 # Brief: OKF conformance migration and the callsign layer
 
 **Created:** 2026-08-29

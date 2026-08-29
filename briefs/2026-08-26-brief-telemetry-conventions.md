@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-TELEMETRY-CONVENTIONS
+---
+
 # Brief: Telemetry Conventions — Markdown as Message Bus
 
 **Date:** 2026-08-26

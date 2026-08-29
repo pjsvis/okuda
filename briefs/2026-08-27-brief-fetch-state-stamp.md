@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-FETCH-STATE
+---
+
 # Brief: Fetch-state stamp — `checked <time>` + changed/same/failed
 
 **Date:** 2026-08-27

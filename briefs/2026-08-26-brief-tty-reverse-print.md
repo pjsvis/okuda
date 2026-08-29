@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-TTY-REVERSE
+---
+
 # Brief: TTY Reverse-Print — Land at the Top
 
 **Date:** 2026-08-26

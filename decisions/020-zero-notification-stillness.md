@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-ZERO-NOTIFICATION-020
+---
+
 # Decision: Zero-notification stillness — identity lives on the status line
 
 **Date:** 2026-08-28

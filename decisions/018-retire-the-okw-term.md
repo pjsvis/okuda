@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-RETIRE-OKW-018
+---
+
 # Decision: Retire the "OKW" term
 
 **Date:** 2026-08-28

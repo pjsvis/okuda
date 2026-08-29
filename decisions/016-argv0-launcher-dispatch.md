@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-ARGV0-LAUNCHER-016
+---
+
 # Decision: argv[0] dispatch — `gloam` is the launcher entry point
 
 **Date:** 2026-08-27

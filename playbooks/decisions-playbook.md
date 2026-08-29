@@ -1,3 +1,8 @@
+---
+type: Playbook
+callsign: PLY-DECISIONS
+---
+
 # Decisions Playbook
 
 ## Purpose

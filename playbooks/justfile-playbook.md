@@ -1,3 +1,8 @@
+---
+type: Playbook
+callsign: PLY-JUSTFILE
+---
+
 # Justfile Playbook
 
 ## What the Justfile Is

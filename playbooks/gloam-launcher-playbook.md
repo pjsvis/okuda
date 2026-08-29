@@ -1,3 +1,8 @@
+---
+type: Playbook
+callsign: PLY-GLOAM-LAUNCHER
+---
+
 # Gloam Launcher Playbook
 
 How to pick and read markdown documents without typing filenames — and get

@@ -1,4 +1,6 @@
 ---
+type: Debrief
+callsign: DBF-GENERALISATION
 date: 2026-08-20
 tags: [knowledge-system, playbooks]
 agent: pi (claude)

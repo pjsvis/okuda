@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-OKLCH-TUNING
+---
+
 # brief: OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling
 
 **Created:** 2026-08-28

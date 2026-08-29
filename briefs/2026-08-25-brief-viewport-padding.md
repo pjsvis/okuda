@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-VIEWPORT-PADDING
+---
+
 # Brief: Viewport padding — upper and lower render margins
 
 **Date:** 2026-08-25

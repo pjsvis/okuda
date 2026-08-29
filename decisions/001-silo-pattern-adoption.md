@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-SILO-PATTERN-001
+---
+
 # Decision: Adopt the silo pattern from blog-posts for okuda
 
 **Date:** 2026-08-20

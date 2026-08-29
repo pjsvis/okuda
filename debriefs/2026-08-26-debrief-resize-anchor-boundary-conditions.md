@@ -1,4 +1,6 @@
 ---
+type: Debrief
+callsign: DBF-RESIZE-ANCHOR
 date: 2026-08-26
 tags: [tui, resize, anchor, boundary-conditions, reflow, dogfood, proportional-fallback, muppet-exclusion]
 agent: pi (ses_cd5d7b)

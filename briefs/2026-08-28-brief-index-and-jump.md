@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-INDEX-JUMP
+---
+
 # brief: Ephemeral Index Generation and Numeric Jump Navigation
 
 **Created:** 2026-08-28

@@ -1,4 +1,6 @@
 ---
+type: Debrief
+callsign: DBF-JUSTFILE-FACADE
 date: 2026-08-22
 tags: [justfile, facade, repo-infancy, knowledge-system]
 agent: pi (glm-5.2, ses_7b140e→ses_aea82c)

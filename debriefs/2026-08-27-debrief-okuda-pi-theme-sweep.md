@@ -1,3 +1,8 @@
+---
+type: Debrief
+callsign: DBF-OKUDA-PI
+---
+
 # Debrief: The okuda pi theme — first dogfood sweep
 
 **Date:** 2026-08-27

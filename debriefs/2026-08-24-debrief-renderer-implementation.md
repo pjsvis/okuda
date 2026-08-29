@@ -1,4 +1,6 @@
 ---
+type: Debrief
+callsign: DBF-RENDERER-IMPLEMENTATION
 date: 2026-08-24
 tags: [renderer, bun-markdown, ansi, wrap, mermaid, tables, lists, dogfood, knowledge-system]
 agent: pi (glm-5.2, ses_7b140e)

@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-JUMP-DEMO
+---
+
 # Brief: jump-demo honesty — slug derivation + state-glyph signal
 
 **Created:** 2026-08-28

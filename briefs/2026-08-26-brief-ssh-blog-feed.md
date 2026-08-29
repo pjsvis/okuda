@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-SSH-BLOG
+---
+
 # Brief: SSH Blog Feed — the Gopher-Serve v1
 
 **Date:** 2026-08-26

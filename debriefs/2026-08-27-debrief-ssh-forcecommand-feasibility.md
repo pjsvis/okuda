@@ -1,4 +1,6 @@
 ---
+type: Debrief
+callsign: DBF-SSH-FORCECOMMAND
 date: 2026-08-27
 tags: [ssh, forcecommand, transport, deploy, cadence, fps-reframe, muppet-exclusion, dogfood]
 agent: pi (ses_15ce67)

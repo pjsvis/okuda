@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-LAUNCHER-FUT
+---
+
 # Brief: Launcher FUT — session-scoped alt-screen
 
 **Date:** 2026-08-28

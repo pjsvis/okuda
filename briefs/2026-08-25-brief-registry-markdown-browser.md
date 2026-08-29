@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-REGISTRY-MARKDOWN
+---
+
 # Brief: Registry-aware markdown browser — the silo dashboard
 
 **Date:** 2026-08-25

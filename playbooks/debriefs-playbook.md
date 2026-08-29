@@ -1,3 +1,8 @@
+---
+type: Playbook
+callsign: PLY-DEBRIEFS
+---
+
 # Debriefs Playbook
 
 ## Purpose

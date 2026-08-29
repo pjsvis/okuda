@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-DOCUMENT-LINKS
+---
+
 # Brief: Document Links — Gopher Hypertext in the Reader
 
 **Date:** 2026-08-26

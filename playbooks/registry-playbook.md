@@ -1,3 +1,8 @@
+---
+type: Playbook
+callsign: PLY-REGISTRY
+---
+
 # Registry Playbook — Document Index System
 
 ## Principle

@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-TABLE-ELISION-014
+---
+
 # Decision: Table elision over in-cell shrink-wrap
 
 **Date:** 2026-08-27

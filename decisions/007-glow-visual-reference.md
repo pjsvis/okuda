@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-GLOW-VISUAL-007
+---
+
 # Decision: Glow is the visual reference; diverge only for an okuda thing
 
 **Date:** 2026-08-24

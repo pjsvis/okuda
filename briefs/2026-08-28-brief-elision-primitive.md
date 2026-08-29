@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-ELISION-PRIMITIVE
+---
+
 # Brief: Elision primitive — close ADR-014, fix the code-fence soft-wrap lie
 
 **Date:** 2026-08-28

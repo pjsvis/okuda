@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-ARTPACK-AESTHETICS
+---
+
 # brief: Plundered artpack aesthetics & high-SNR dark terminal rendering
 
 **Created:** 2026-08-26

@@ -1,3 +1,8 @@
+---
+type: Playbook
+callsign: PLY-CHROME
+---
+
 # Chrome Playbook
 
 ## What this is

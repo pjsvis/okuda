@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-DIAGRAM-BORDERS-008
+---
+
 # Decision: Diagram borders are blueline, not recessive
 
 **Date:** 2026-08-25

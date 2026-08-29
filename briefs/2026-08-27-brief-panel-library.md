@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-PANEL-LIBRARY
+---
+
 # Brief: The Panel Library — Chunk-Addressable Okudagrams
 
 **Date:** 2026-08-27

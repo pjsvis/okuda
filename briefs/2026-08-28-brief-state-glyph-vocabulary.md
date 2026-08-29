@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-STATE-GLYPH-2
+---
+
 # Brief: State-glyph vocabulary — colour + bold, the closed lexicon
 
 **Date:** 2026-08-28

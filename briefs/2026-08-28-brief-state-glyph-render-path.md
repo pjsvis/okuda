@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-STATE-GLYPH
+---
+
 # Brief: State-glyph render path — the showcase environment + first cut
 
 **Date:** 2026-08-28

@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-ALERT-PALETTE-015
+---
+
 # Decision: An `alert` palette role for the fetch-state stamp's `failed` channel
 
 **Date:** 2026-08-27

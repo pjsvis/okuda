@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-HERDR-DASHBOARD
+---
+
 # Brief: Herdr Dashboard — the Build's Exhaust, Composed
 
 **Date:** 2026-08-26

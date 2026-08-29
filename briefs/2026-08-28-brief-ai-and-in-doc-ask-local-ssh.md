@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-AI-DOC
+---
+
 # brief: Inline Ask-the-Doc and Local SSH Transport
 
 > **Parked (2026-08-28):** premature — needs more thought and a *unique*

@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-SSH-SERVING-013
+---
+
 # Decision: SSH serving shape — OpenSSH ForceCommand (Option 1)
 
 **Date:** 2026-08-27

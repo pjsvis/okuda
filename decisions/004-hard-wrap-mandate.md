@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-HARD-WRAP-004
+---
+
 # Decision: Hard-wrap always — Okuda never delegates wrapping to the terminal
 
 **Date:** 2026-08-22

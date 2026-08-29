@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-DOCUMENT-SEARCH
+---
+
 # Brief: In-Document Search and Outlining — Fast Navigation in Gloam
 
 **Date:** 2026-08-26

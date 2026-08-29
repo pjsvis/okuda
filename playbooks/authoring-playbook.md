@@ -1,3 +1,8 @@
+---
+type: Playbook
+callsign: PLY-AUTHORING
+---
+
 # Authoring Playbook
 
 ## What this is

@@ -1,3 +1,8 @@
+---
+type: Playbook
+callsign: PLY-BRIEFS
+---
+
 # Briefs Playbook
 
 ## What a Brief Is

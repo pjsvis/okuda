@@ -1,4 +1,6 @@
 ---
+type: Debrief
+callsign: DBF-INDEX-JUMP
 date: 2026-08-29
 tags: [index-and-jump, tui, navigation, backstack, adr-020, adr-021, jump-demo, dogfood, honesty]
 agent: pi (ses_9e4b52)

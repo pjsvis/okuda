@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-PALETTE-LIGHTNESS
+---
+
 # Brief: Palette Lightness Knob — Global Brightness, Hue Preserved (parked)
 
 **Date:** 2026-08-26

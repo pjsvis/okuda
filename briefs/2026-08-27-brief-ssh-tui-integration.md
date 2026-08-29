@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-SSH-TUI
+---
+
 # brief: Modern terminal escape protocol integration for SSH TUI delivery
 
 **Created:** 2026-08-26

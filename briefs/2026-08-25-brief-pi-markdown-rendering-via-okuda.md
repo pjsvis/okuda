@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-PI-MARKDOWN
+---
+
 # Brief: Pi markdown rendering via okuda (PARKED — Pi's issue)
 
 **Date:** 2026-08-25

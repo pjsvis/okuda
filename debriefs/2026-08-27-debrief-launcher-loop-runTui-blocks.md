@@ -1,4 +1,6 @@
 ---
+type: Debrief
+callsign: DBF-LAUNCHER-LOOP
 date: 2026-08-27
 tags: [launcher, gloam, runTui, control-flow, debugging, harness-confound, drift, adr-016]
 agent: pi (ses_b0d27c)

@@ -1,3 +1,8 @@
+---
+type: Playbook
+callsign: PLY-DOC
+---
+
 # Playbook for Playbooks
 
 ## Purpose

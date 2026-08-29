@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-BOUNDED-ANCHOR-010
+---
+
 # Decision: Bounded anchor search + proportional fallback for resize scroll-preservation
 
 **Date:** 2026-08-26

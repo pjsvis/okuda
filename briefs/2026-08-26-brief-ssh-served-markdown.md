@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-SSH-SERVED
+---
+
 # Brief: SSH-served markdown — option 1 (OpenSSH ForceCommand)
 
 **Date:** 2026-08-26

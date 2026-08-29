@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-SESSION-HANDOFFS-017
+---
+
 # Decision: Session handoffs are not briefs
 
 **Date:** 2026-08-27
