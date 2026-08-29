@@ -79,15 +79,15 @@ Orientation is a semantic choice. A cycle reads across; a pipeline reads down. S
 
 The pattern for the menu, the index, the status page — the docs an agent composes on demand and that have no depth to hide behind. The look *is* the legibility.
 
-**01** *Ephemeral index generation*
+**11** *Ephemeral index generation*
 
-**02** *Rooted gloam, silo badge and callsigns*
+**12** *Rooted gloam, silo badge and callsigns*
 
-**03** *Zero-notification stillness*
+**13** *Zero-notification stillness*
 
 One line per item — number → slug:
 
-- **Number, white bold.** The action indicator — you type it to jump. Plain `**01**`; the renderer colours a digits-only strong run white-bold (the chip experiment retired: a solid block swallowed the digits three times, and tricky is the last thing a navigation primitive needs). It is the boldest thing on the line — the action outranks everything else.
+- **Number, white bold.** The action indicator — you type it to jump. Plain `**11**` — tokens number from 11, not 01 (ADR-021: the 0 key sits at the opposite end of the row; the offset removes the stretch and reserves `01`–`09` as a free namespace); the renderer colours a digits-only strong run white-bold (the chip experiment retired: a solid block swallowed the digits three times, and tricky is the last thing a navigation primitive needs). It is the boldest thing on the line — the action outranks everything else.
 - **Slug, emphasis — near but lesser.** The descriptive title, the content. Coloured but not bold: the number is the bold anchor; the slug is the coloured-but-lesser thing, so the eye lands on the action first and reads the content second. Strip the classification prefix (`Brief:`, `Decision:`) — the slug is the name, not its category. Date-first, greppable, registry-indexed.
 - **Path — hidden wiring, not content.** The path lives in an HTML comment (`<!-- briefs/foo.md -->`) the renderer strips but `extractJumps` reads from source. It is not provenance for the reader; it is wiring for the jump resolver. Provenance arrives at the destination's footer, not in the menu — when you land, the status line shows where you are.
 
