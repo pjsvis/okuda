@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, afterEach, describe, expect, test } from "bun:test";
 import {
   displayWidth,
   elideToWidth,
@@ -124,11 +124,34 @@ describe("elideToWidth — the elision primitive (ADR-014 doctrine, td-b81597)",
 describe("terminalCols — fzf preview width (FZF_PREVIEW_COLUMNS)", () => {
   const ENV_KEY = "FZF_PREVIEW_COLUMNS";
 
+  // The fallback tests assume the non-TTY (fzf-preview) condition:
+  // terminalSize() returns null, so the fallback is the only path.
+  // That holds under CI/piped stdout but NOT when `just ship` runs in a
+  // real terminal — there stdout.isTTY is true and the ambient width
+  // leaks through, making terminalCols(80) return the real cols, not 80.
+  // Force non-TTY so the fallback path is isolated from the host terminal.
+  let savedIsTTY: boolean | undefined;
+  let savedColumns: number | undefined;
+  let savedRows: number | undefined;
+  beforeEach(() => {
+    savedIsTTY = (process.stdout as any).isTTY;
+    savedColumns = (process.stdout as any).columns;
+    savedRows = (process.stdout as any).rows;
+    Object.defineProperty(process.stdout, "isTTY", { value: false, configurable: true });
+    Object.defineProperty(process.stdout, "columns", { value: 0, configurable: true });
+    Object.defineProperty(process.stdout, "rows", { value: 0, configurable: true });
+  });
+  afterEach(() => {
+    Object.defineProperty(process.stdout, "isTTY", { value: savedIsTTY, configurable: true });
+    Object.defineProperty(process.stdout, "columns", { value: savedColumns, configurable: true });
+    Object.defineProperty(process.stdout, "rows", { value: savedRows, configurable: true });
+  });
+
   test("preview env overrides the fallback when stdout is a pipe", () => {
     process.env[ENV_KEY] = "42";
     try {
-      // In the test runner stdout is not a TTY, so terminalSize() is null —
-      // exactly the fzf-preview condition. The env value must win.
+      // stdout forced non-TTY (above), so terminalSize() is null — exactly
+      // the fzf-preview condition. The env value must win.
       expect(terminalCols(80)).toBe(42);
     } finally {
       delete process.env[ENV_KEY];

@@ -57,6 +57,11 @@ orient:
 check:
     @bun scripts/reg-sync.ts --all && bash scripts/facade-lint.sh
 
+# Tests gate build
+[group('quality gate')]
+ship:
+    @bun test && just check && just build && echo "\n  ✓ shipped → ~/.local/bin/{okuda,gloam} (one binary, two symlinks; auto-fresh)\n"
+
 # ── Build ────────────────────────────────────────────────────
 
 [group('build')]
