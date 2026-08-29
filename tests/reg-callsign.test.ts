@@ -5,6 +5,7 @@ import {
   docCallsign,
   ensureFrontmatter,
   fmValue,
+  renderIndexDoc,
   splitFrontmatter,
 } from "../scripts/reg-sync";
 
@@ -96,5 +97,23 @@ describe("avoidingCollisions", () => {
   test("collision → -2, then -3 (first-come keeps the clean form)", () => {
     const taken = new Set(["BRF-X", "BRF-X-2"]);
     expect(avoidingCollisions("BRF-X", taken)).toBe("BRF-X-3");
+  });
+});
+
+describe("renderIndexDoc", () => {
+  test("shape: generated frontmatter, newest-first rows, deterministic bytes", () => {
+    const entries = [
+      { file: "a.md", date: "2026-08-28", status: "open", summary: "Older", callsign: "BRF-OLD" },
+      { file: "b.md", date: "2026-08-29", status: "done", summary: "Newer | with pipe" },
+    ];
+    const doc = renderIndexDoc("briefs", entries);
+    expect(doc.startsWith("---\ntype: Index\ngenerated: true\n---\n")).toBe(true);
+    expect(doc).toContain("# briefs — silo index");
+    expect(doc).toContain("| Date | Callsign | Status | Document | File |");
+    // newest first; absent callsign renders empty; pipes escaped
+    const rows = doc.split("\n").filter((l) => l.startsWith("| 2026"));
+    expect(rows[0]).toContain("|  | done | Newer \\| with pipe | b.md |");
+    expect(rows[1]).toContain("| BRF-OLD | open | Older | a.md |");
+    expect(renderIndexDoc("briefs", entries)).toBe(doc); // deterministic
   });
 });

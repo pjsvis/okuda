@@ -31,10 +31,10 @@ interface RegistryDef {
 }
 
 const REGISTRIES: Record<string, RegistryDef> = {
-  briefs: { dir: "briefs", index: "INDEX.jsonl", defaultStatus: "open", fmType: "Brief", csPrefix: "BRF" },
-  debriefs: { dir: "debriefs", index: "INDEX.jsonl", defaultStatus: "done", fmType: "Debrief", csPrefix: "DBF" },
-  decisions: { dir: "decisions", index: "INDEX.jsonl", defaultStatus: "Proposed", exclude: ["TEMPLATE.md"], fmType: "ADR", csPrefix: "ADR" },
-  playbooks: { dir: "playbooks", index: "REGISTRY.jsonl", defaultStatus: "canonical", fmType: "Playbook", csPrefix: "PLY" },
+  briefs: { dir: "briefs", index: "INDEX.jsonl", defaultStatus: "open", exclude: ["index.md"], fmType: "Brief", csPrefix: "BRF" },
+  debriefs: { dir: "debriefs", index: "INDEX.jsonl", defaultStatus: "done", exclude: ["index.md"], fmType: "Debrief", csPrefix: "DBF" },
+  decisions: { dir: "decisions", index: "INDEX.jsonl", defaultStatus: "Proposed", exclude: ["TEMPLATE.md", "index.md"], fmType: "ADR", csPrefix: "ADR" },
+  playbooks: { dir: "playbooks", index: "REGISTRY.jsonl", defaultStatus: "canonical", exclude: ["index.md"], fmType: "Playbook", csPrefix: "PLY" },
 };
 
 interface Entry {
@@ -296,7 +296,7 @@ function deriveEntry(dir: string, file: string, def: RegistryDef, registry: stri
   return entry;
 }
 
-function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { missing: number; stale: number; csDrift: number } {
+function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { missing: number; stale: number; csDrift: number; indexDoc: number } {
   const def = REGISTRIES[name]!;
   const dir = join(ROOT, def.dir);
   const indexPath = join(dir, def.index);
@@ -331,9 +331,9 @@ function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { miss
     console.log(`  ${name}: ${csDrift} callsign(s) ${fix ? "lifted" : "drifting"} (frontmatter → registry)`);
   }
 
+  const kept = entries.filter((e) => !staleFiles.has(e.file));
   if (fix) {
     if (missing.length || stale.length || csDrift > 0) {
-      const kept = entries.filter((e) => !staleFiles.has(e.file));
       kept.sort((a, b) => a.file.localeCompare(b.file));
       writeFileSync(indexPath, kept.map((e) => JSON.stringify(e)).join("\n") + "\n");
       console.log(`  ${name}: index rewritten (${kept.length} entries)`);
@@ -346,7 +346,56 @@ function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { miss
     console.log(`  ${name}: OK (0 missing, 0 stale)`);
   }
 
-  return { missing: missing.length, stale: stale.length, csDrift };
+  const indexDoc = syncIndexDoc(name, def, kept, fix);
+  return { missing: missing.length, stale: stale.length, csDrift, indexDoc };
+}
+
+// ── Tier index.md export (ADR-019: generated, never hand-edited) ───────
+
+/** Render a tier's `index.md` from its registry entries — the OKF-visible
+ *  export. Deterministic: same entries, same bytes. Bare `.md` path tokens
+ *  render as doc-refs in okuda; external OKF consumers get a table they
+ *  can parse. Pure. */
+export function renderIndexDoc(tier: string, entries: Entry[]): string {
+  const rows = [...entries]
+    .sort((a, b) => b.date.localeCompare(a.date) || a.file.localeCompare(b.file))
+    .map((e) => `| ${e.date} | ${e.callsign ?? ""} | ${e.status} | ${e.summary.replace(/\|/g, "\\|")} | ${e.file} |`);
+  return [
+    "---",
+    "type: Index",
+    "generated: true",
+    "---",
+    "",
+    `# ${tier} — silo index`,
+    "",
+    "Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.",
+    "",
+    "| Date | Callsign | Status | Document | File |",
+    "|---|---|---|---|---|",
+    ...rows,
+    "",
+  ].join("\n");
+}
+
+/** Sync the generated tier index.md against its registry. Returns drift
+ *  count (0 = current). */
+function syncIndexDoc(name: string, def: RegistryDef, entries: Entry[], fix: boolean): number {
+  const path = join(ROOT, def.dir, "index.md");
+  const want = renderIndexDoc(name, entries);
+  let have: string | null = null;
+  try {
+    have = readFileSync(path, "utf8");
+  } catch {
+    // absent — drift unless fix writes it
+  }
+  if (have === want) return 0;
+  if (fix) {
+    writeFileSync(path, want);
+    console.log(`  ${name}: index.md ${have === null ? "generated" : "regenerated"} (${entries.length} rows)`);
+  } else {
+    console.log(`  ${name}: index.md ${have === null ? "MISSING" : "STALE"}`);
+  }
+  return 1;
 }
 
 // ── Main ────────────────────────────────────────────────────────────────
@@ -361,8 +410,8 @@ if (import.meta.main) {
   const { perRegistry, fmDrift } = migrateCorpus(fix);
   let drift = fmDrift;
   for (const n of names) {
-    const { missing, stale, csDrift } = syncOne(n, fix, perRegistry.get(n) ?? new Map());
-    drift += missing + stale + csDrift;
+    const { missing, stale, csDrift, indexDoc } = syncOne(n, fix, perRegistry.get(n) ?? new Map());
+    drift += missing + stale + csDrift + indexDoc;
   }
   if (drift > 0) {
     console.log(`${drift} drift item(s) ${fix ? "repaired" : "found"} — run reg-list to review`);
