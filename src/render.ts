@@ -726,13 +726,17 @@ function diagramBlock(art: string, ctx: Ctx): string {
     if (ctx.color === "none") return l; // byte-identical to the binary's output
     return classifyDiagramLine(l, ctx.palette, ctx.color) + "\x1b[0m";
   });
-  // Indicator: render the *fact* of the source, not the source. Muted
-  // pointer; the `⋮` keeps its state-parked colour for vocabulary parity
-  // (it survives NO_COLOR as plain content — roleBold is a no-op then).
+  // Indicator: a renderer statement, not a pointer. The source is not
+  // rendered (tautological in a single-render seam); the line names what
+  // the renderer did — elided it — not where the source hides. The `⋮`
+  // keeps its state-parked colour for vocabulary parity ("elided into a
+  // further question"); it survives NO_COLOR as plain content (roleBold is
+  // a no-op then). The explicit verb is for readers without the glyph
+  // lexicon — the glyph is for the initiated, the text is for everyone.
   const glyph = ctx.styler.roleBold("state-parked", "⋮");
-  const pointer = ctx.styler.role("muted", " mermaid source — in the document");
+  const stmt = ctx.styler.role("muted", " mermaid source elided");
   const indOpen = tagRawOpen("diagramsrc");
-  return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n${indOpen}${glyph}${pointer}${TAG_RAW_CLOSE}\n\n`;
+  return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n${indOpen}${glyph}${stmt}${TAG_RAW_CLOSE}\n\n`;
 }
 
 /** Blockquote: single-level pipe prefix, muted, re-wrapped at width-2. */

@@ -237,7 +237,7 @@ describe("render — mermaid pipe + colour classification", () => {
     // (brief: mermaid-source-omitted.)
     expect(out).not.toContain("flowchart LR");
     expect(out).not.toContain("-->");
-    expect(out).toContain("mermaid source — in the document");
+    expect(out).toContain("mermaid source elided");
     // node label survived in the art
     expect(out).toContain("Input v2.0");
   });
@@ -311,7 +311,7 @@ describe("render — mermaid pipe + colour classification", () => {
     expect(out).toContain("Tail");
     expect(out).not.toContain("okuda-mmd");
     expect(out).not.toContain("flowchart"); // binary missing → no art, source dropped
-    expect(out).not.toContain("mermaid source — in the document"); // no indicator without art
+    expect(out).not.toContain("mermaid source elided"); // no indicator without art
   });
 
   test("palette override of diagram-arrow takes effect", async () => {

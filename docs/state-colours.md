@@ -44,7 +44,7 @@ Key: ☐ to do · ✓ done · ✗ rejected · ⋮ parked. ◆ in the notes colum
 The glyphs lead, carrying state the bullet cannot. One glyph, one job, one channel:
 
 - ✓ **Wrap engine.** Grapheme segmentation verified on CJK, emoji, combining marks.
-- ✓ **Mermaid intercept.** Art on show; source omitted, a `⋮` indicator names where it lives.
+- ✓ **Mermaid intercept.** Art on show; source omitted, a `⋮` renderer statement names what was elided.
 - ☐ **Lexer EAW audit.** Token widths against the EAW table — not yet checked.
 - ⋮ **OSC 8.** Parked under Pass C; reopen on terminal evidence.
 - ✗ **Autolink pass.** Rejected — URL detection is the terminal's job.

@@ -88,7 +88,7 @@ flowchart TD
 
 That is the viewer's own path, top to bottom: markdown in, coloured ASCII out. A diagram is not a one-off ornament — it earns column space wherever the prose would otherwise be describing a shape.
 
-And beneath each diagram, one muted indicator line: `⋮ mermaid source — in the document`. The source is not rendered — it is tautological in a single-render seam (the art and the source come from one binary run; they cannot disagree, and `mermaid-to-md --verify` is the drift check, reading the `.md`, not the render). The indicator renders the *fact* of the source — where it lives — not the source itself. Art in the foreground, the pointer honest underneath.
+And beneath each diagram, one muted indicator line: `⋮ mermaid source elided`. The source is not rendered — it is tautological in a single-render seam (the art and the source come from one binary run; they cannot disagree, and `mermaid-to-md --verify` is the drift check, reading the `.md`, not the render). The indicator is a renderer statement — it names what the renderer did (elided the source), not where the source hides. Art in the foreground, the statement honest underneath.
 
 ---
 
@@ -182,7 +182,7 @@ one line:
 | Subsystem | State | Note |
 | --- | --- | --- |
 | Wrap engine | ✓ | grapheme-true; CJK and emoji widths verified |
-| Mermaid intercept | ✓ | art on show; source omitted, a `⋮` indicator names where it lives |
+| Mermaid intercept | ✓ | art on show; source omitted, a `⋮` renderer statement names what was elided |
 | Autolink pass | ✗ | rejected — URL detection is the terminal's job |
 | OSC 8 hyperlinks | ⋮ | parked under Pass C; reopen on terminal evidence |
 | Lexer EAW audit | ☐ | next: token widths against the width table |

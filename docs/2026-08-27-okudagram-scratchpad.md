@@ -34,8 +34,8 @@ they either earn a brief or get foxtrot-oscar'd. The Edinburgh lexicon
   not ask to be read; it waits to be needed. Art foreground, structure
   receding, source quiet underneath. *(Retired 2026-09-01: the echo is
   gone — a viewer who needed the source on a narrow pane got elided
-  fragments, not the source. A `⋮` pointer now names where the source
-  lives, keeping availability honest without pretending to show it.
+  fragments, not the source. A `⋮` renderer statement now names what
+  was elided, keeping availability honest without pretending to show it.
   brief: mermaid-source-omitted.)*
 - **One glyph, one job.** A mark that duplicates an existing structure
   is noise; a mark that distinguishes what structure cannot is perception
