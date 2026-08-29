@@ -1,0 +1,9 @@
+| Workflow Dimension | Traditional Analog Office | The Accidental Typist (Modern SaaS / GUI) | The Captain & Telemetry Pattern |
+| --- | --- | --- | --- |
+| **Primary Interaction Mode** | Dictation and verbal intent to dedicated operators. | Clicking widgets, managing dropdowns, form-filling, navigating tabs. | Emitting concise text briefs; pulling stateless, invariant readouts. |
+| **Telemetry & Status Delivery** | Ledger reports, typed summaries brought on demand. | Push notifications, unread badges, email alerts, modal popups. | Pull-only, ephemeral status Okudagrams invoked via mnemonic commands. |
+| **Cognitive Load Source** | High-level synthesis and business decision-making. | Mechanical navigation, tool maintenance, context-switching fatigue. | Pure problem analysis, structural evaluation, and strategic direction. |
+| **Visual Ingestion Overhead** | Low (standard physical memos, predictable layout). | High (shifting UI layouts, visual noise, interactive widgets everywhere). | Minimal (pre-attentive parsing, fixed color/density grammar, invariant frame). |
+| **Handling Deep Investigation** | Pulling physical files from the cabinet or calling a specialist. | Digging through buried menus, fragmented SaaS tabs, and unlinked dashboards. | Following lightweight embedded URLs in separate windows, then snapping back. |
+| **Task & Execution Layer** | Back-office typing pool, ledger clerks, switchboard operators. | The user acts as their own operator, clerk, and scheduler. | Jimmy / Orchestration layer wrangling autonomous agent fleets in background. |
+| **Hands-On Intervention** | Rarely required; executive detached from tool details. | Constant; forced into the weeds for routine administrative trivia. | Strategic away missions: voluntary root access to code/metal only for novel problems. |

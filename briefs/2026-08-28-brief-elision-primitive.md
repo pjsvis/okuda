@@ -6,7 +6,13 @@ callsign: BRF-ELISION-PRIMITIVE
 # Brief: Elision primitive — close ADR-014, fix the code-fence soft-wrap lie
 
 **Date:** 2026-08-28
-**Status:** Open (dogfood-fired; retires a deferred note and an unimplemented ADR)
+**Status:** Done (2026-08-30 — primitive, fences, menu role fit, ADR-014 closed; debrief `debriefs/2026-08-30-debrief-elision-primitive.md`)
+
+**Reframe:** ADR-022 (2026-08-29) reframed the table consumer before
+implementation: the table consumer became right-anchored role fit (ADR-022),
+not edge elision for generic tables. Generic prose tables wrap by ADR-022's
+scope gate; the 50-char compositor cap retired. The primitive and the
+fence consumer shipped as specified. ADR-014 → Superseded (palimpsest).
 **Branch:** feat/gloam-launcher
 **Context:** dogfood finding on `feat/gloam-launcher`. Long lines inside
 code fences wrap instead of being chopped at the content boundary, and

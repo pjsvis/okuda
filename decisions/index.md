@@ -16,7 +16,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-28 | ADR-JUMP-TOKEN-021 | Accepted | Jump tokens number from 11, not 01 — the ergonomic offset | 021-jump-token-numbering-offset.md |
 | 2026-08-27 | ADR-STRUCTURAL-PROBE-012 | Accepted | Depth is top-down info in a post-order protocol — a PB-tag probe render maps containment to depth so renderList budgets the +4/level composition shift; counters can't work, re-wrapping doubles failure surface | 012-structural-probe-for-list-depth.md |
 | 2026-08-27 | ADR-SSH-SERVING-013 | Accepted | SSH serving shape — OpenSSH ForceCommand (Option 1) | 013-ssh-serving-forcecommand.md |
-| 2026-08-27 | ADR-TABLE-ELISION-014 | Accepted | Table elision over in-cell shrink-wrap | 014-table-elision-over-shrink-wrap.md |
+| 2026-08-27 | ADR-TABLE-ELISION-014 | Superseded | Table elision over in-cell shrink-wrap (superseded by ADR-022's role fit for patterned surfaces; generic tables wrap by the 022 scope gate) | 014-table-elision-over-shrink-wrap.md |
 | 2026-08-27 | ADR-ALERT-PALETTE-015 | Accepted | An `alert` palette role for the fetch-state stamp's `failed` channel | 015-alert-palette-role.md |
 | 2026-08-27 | ADR-ARGV0-LAUNCHER-016 | Accepted | argv[0] dispatch — `gloam` is the launcher entry point | 016-argv0-launcher-dispatch.md |
 | 2026-08-27 | ADR-SESSION-HANDOFFS-017 | Accepted | Session handoffs are not briefs | 017-session-handoffs-are-not-briefs.md |

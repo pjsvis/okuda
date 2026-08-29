@@ -43,7 +43,7 @@ A glyph only earns its place where there is real variance. A column where every 
 
 ## Tables: the structured glance
 
-Tables earn their place when the eye needs to compare across rows. The key column is bold amber (the bold lead, tabulated); the header is cyan; alignment is honoured per-column. A table that would overflow elides to the edge with `…` rather than shrink-wrapping — the table keeps its columns, the reader widens.
+Tables earn their place when the eye needs to compare across rows. The key column is bold amber (the bold lead, tabulated); the header is cyan; alignment is honoured per-column. Overflow splits by surface kind (ADR-022): jump-wired menus lay out right-anchored by role — number at the far edge, callsign its stable home, slug truncates with `…` then suppresses; prose tables wrap in-cell and the operator widens.
 
 | Pattern | Channel | When |
 | --- | :--- | :--- |

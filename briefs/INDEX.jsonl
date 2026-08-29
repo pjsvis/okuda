@@ -16,7 +16,7 @@
 {"file":"2026-08-27-brief-panel-library.md","date":"2026-08-27","status":"open","summary":"The Panel Library — Chunk-Addressable Okudagrams","meta":{"scope":"render","feature":"chunk-addressing"},"callsign":"BRF-PANEL-LIBRARY"}
 {"file":"2026-08-27-brief-ssh-tui-integration.md","date":"2026-08-26","status":"open","summary":"Modern terminal escape protocol integration for SSH TUI delivery","meta":{},"callsign":"BRF-SSH-TUI"}
 {"file":"2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md","date":"2026-08-28","status":"open","summary":"Inline Ask-the-Doc and Local SSH Transport","meta":{},"callsign":"BRF-AI-DOC"}
-{"file":"2026-08-28-brief-elision-primitive.md","date":"2026-08-28","status":"open","summary":"Elision primitive — close ADR-014, fix the code-fence soft-wrap lie","meta":{},"callsign":"BRF-ELISION-PRIMITIVE"}
+{"file":"2026-08-28-brief-elision-primitive.md","date":"2026-08-28","status":"done","summary":"Elision primitive — close ADR-014, fix the code-fence soft-wrap lie","meta":{},"callsign":"BRF-ELISION-PRIMITIVE"}
 {"file":"2026-08-28-brief-index-and-jump.md","date":"2026-08-28","status":"done","summary":"Ephemeral Index Generation and Numeric Jump Navigation","meta":{},"callsign":"BRF-INDEX-JUMP"}
 {"file":"2026-08-28-brief-jump-demo-honesty.md","date":"2026-08-28","status":"open","summary":"jump-demo honesty — slug derivation + state-glyph signal","meta":{},"callsign":"BRF-JUMP-DEMO"}
 {"file":"2026-08-28-brief-launcher-fut.md","date":"2026-08-28","status":"open","summary":"Launcher FUT — session-scoped alt-screen","meta":{},"callsign":"BRF-LAUNCHER-FUT"}

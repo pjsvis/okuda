@@ -6,7 +6,7 @@ callsign: ADR-TABLE-ELISION-014
 # Decision: Table elision over in-cell shrink-wrap
 
 **Date:** 2026-08-27
-**Status:** Accepted
+**Status:** Superseded (by ADR-022 — 2026-08-29; closure landed 2026-08-30, td-b81597)
 
 ## Context
 
@@ -64,3 +64,26 @@ visible once the panel-library work made "the matrix fits the activity"
 a first-class principle. The showcase paragraph that taught shrink-wrap
 is updated in the same change to teach elision, citing this ADR — no
 orphaned instruction left active.
+
+## Supersession record (2026-08-30, td-b81597)
+
+ADR-022 (right-anchored role layout, 2026-08-29) reframed this decision
+before it was ever implemented. What shipped:
+
+- **The doctrine survives — for patterned surfaces, by another
+  mechanism.** Menu tables never shrink-wrap: ADR-022's role fit
+  (number at the far right edge, callsign its stable home, slug
+  truncate→suppress) keeps the columns and the scan — this ADR's goal,
+  achieved by priority suppression rather than edge elision.
+- **The generic-table half is reversed by ADR-022's scope gate.**
+  Prose tables (ADR alternatives matrices, "why rejected" columns) wrap
+  in-cell and the operator widens — "a truncated reason loses the point,
+  a wrapped one keeps it." The proportional shrink-wrap this ADR
+  reversed remains the generic path's fit, deliberately.
+- **The fence half of the no-reflow doctrine landed as `elideToWidth`**
+  (code fences elide at the content width, `…` at the cut — ADR-004's
+  fence exception closed the same day).
+
+The showcase and style-guide teachings that cited this ADR for generic
+table elision are corrected in the same change. An ADR the code
+contradicted was entropy; the map and the territory now agree.

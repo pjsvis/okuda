@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-08-30 | DBF-ELISION-PRIMITIVE | done | Debrief: elision primitive — one primitive, two consumers, and an ADR that got superseded mid-build | 2026-08-30-debrief-elision-primitive.md |
 | 2026-08-29 | DBF-INDEX-JUMP | done | Debrief: index-and-jump — menus as documents, and the demo that kept them honest | 2026-08-29-debrief-index-and-jump.md |
 | 2026-08-29 | DBF-OKF-CALLSIGN | done | Debrief: the OKF migration and callsign layer — one movement, four slices | 2026-08-29-debrief-okf-callsign-migration.md |
 | 2026-08-27 | DBF-LAUNCHER-LOOP | done | Debrief: the launcher loop — runTui blocks, and the three bugs that were one | 2026-08-27-debrief-launcher-loop-runTui-blocks.md |

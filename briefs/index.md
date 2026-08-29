@@ -12,7 +12,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-29 | BRF-MENU-TEMPLATES | open | Menu templates (deferred — fires on the second menu kind) | 2026-08-29-brief-menu-templates-deferred.md |
 | 2026-08-29 | BRF-OKF-CALLSIGN | done | OKF conformance migration and the callsign layer | 2026-08-29-brief-okf-callsign-migration.md |
 | 2026-08-28 | BRF-AI-DOC | open | Inline Ask-the-Doc and Local SSH Transport | 2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md |
-| 2026-08-28 | BRF-ELISION-PRIMITIVE | open | Elision primitive — close ADR-014, fix the code-fence soft-wrap lie | 2026-08-28-brief-elision-primitive.md |
+| 2026-08-28 | BRF-ELISION-PRIMITIVE | done | Elision primitive — close ADR-014, fix the code-fence soft-wrap lie | 2026-08-28-brief-elision-primitive.md |
 | 2026-08-28 | BRF-INDEX-JUMP | done | Ephemeral Index Generation and Numeric Jump Navigation | 2026-08-28-brief-index-and-jump.md |
 | 2026-08-28 | BRF-JUMP-DEMO | open | jump-demo honesty — slug derivation + state-glyph signal | 2026-08-28-brief-jump-demo-honesty.md |
 | 2026-08-28 | BRF-LAUNCHER-FUT | open | Launcher FUT — session-scoped alt-screen | 2026-08-28-brief-launcher-fut.md |

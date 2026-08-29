@@ -149,9 +149,9 @@ Task lists are rejected — the checkbox markup stays literal text:
 | Header | bold cyan, rule beneath | structure |
 | Key column | bold amber | identity |
 | Data cell | high-contrast text | payload |
-| Wide table | elides to terminal width, `…` marker, invites widening | truth |
+| Wide table | menus role-fit (suppress by priority, `…`); prose tables wrap in-cell | truth |
 
-Alignment is honoured per-column: right, left, centre. A table that would overflow the terminal elides to the edge with `…` rather than shrink-wrapping — the table keeps its columns, the reader widens or pages. (Reverses the prior in-cell shrink-wrap; see `decisions/014-table-elision-over-shrink-wrap.md`.)
+Alignment is honoured per-column: right, left, centre. Overflow splits by surface kind (ADR-022's scope gate): a **menu** (jump-wired, three columns) lays out right-anchored by role — the number holds the far right edge, the callsign its stable home, the slug truncates with `…` then suppresses as the terminal narrows; widening reverses the ladder. A **prose table** wraps in-cell — a truncated reason loses the point, a wrapped one keeps it; the operator widens. (`decisions/022-right-anchored-role-layout.md`, superseding `decisions/014-table-elision-over-shrink-wrap.md` for the generic case.)
 
 ---
 
