@@ -84,9 +84,10 @@ export function jumpToken(index: number): string {
  *  three-column form; the distant-RHS number was a list-shape failure
  *  the table fixes: the number is a column near the slug, a structure.) */
 export function tableRow(slug: string, glyph: string, callsign: string, n: string, file: string): string {
+  const cell = slug.replace(/\|/g, "\\|"); // a pipe in the title would break the cell
   const mark = glyph ? ` ${glyph}` : ""; // deviation earns its mark; default bare
   const cs = callsign || ""; // pre-migration doc — empty cell, honest
-  return `| *${slug}*${mark} | ${cs} | **${n}** <!-- %%okuda-rhs:${n}%% ${file} --> |`;
+  return `| *${cell}*${mark} | ${cs} | **${n}** <!-- %%okuda-rhs:${n}%% ${file} --> |`;
 }
 
 if (import.meta.main) {

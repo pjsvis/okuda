@@ -25,6 +25,12 @@ jump-demo:
     @bun scripts/jump-demo.ts > /tmp/okuda-jump-demo.md
     @./okuda /tmp/okuda-jump-demo.md --tui
 
+# Menu
+[group('navigation')]
+menu tier:
+    @bun scripts/reg-menu.ts {{tier}} > /tmp/okuda-menu-{{tier}}.md
+    @./okuda /tmp/okuda-menu-{{tier}}.md --tui
+
 # Rationale
 [group('navigation')]
 info:
