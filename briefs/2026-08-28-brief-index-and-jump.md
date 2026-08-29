@@ -1,8 +1,8 @@
 # brief: Ephemeral Index Generation and Numeric Jump Navigation
 
 **Created:** 2026-08-28
-**TD:** td-okuda-index-jump
-**Status:** pending
+**TD:** td-9d9981 (mechanics) · td-a87bfd (demo honesty)
+**Status:** Done (shipped 2026-08-28; debrief `debriefs/2026-08-29-debrief-index-and-jump.md`. UX remainder — the three-column slug→callsign→number table — deferred to td-bdfce0, sequenced with the callsign migration)
 
 ## What
 Generates ephemeral, numbered Markdown index documents for search and navigation results, enabling instant document switching via two-digit direct numeric entry and backstack traversal.

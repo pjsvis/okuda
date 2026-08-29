@@ -1,28 +1,28 @@
-{"file":"2026-08-25-brief-pi-markdown-rendering-via-okuda.md","date":"2026-08-25","status":"parked","summary":"Pi markdown rendering via okuda (Pi's issue)","meta":{}}
-{"file":"2026-08-25-brief-registry-markdown-browser.md","date":"2026-08-25","status":"open","summary":"Registry-aware markdown browser — the silo dashboard","meta":{}}
-{"file":"2026-08-25-brief-viewport-padding.md","date":"2026-08-25","status":"rejected","summary":"Viewport padding — upper and lower render margins (rejected same day: blank only signals at a boundary; viewport pad fights the content-anchor)","meta":{}}
-{"file":"2026-08-26-brief-document-links.md","date":"2026-08-26","status":"open","summary":"Document Links — Gopher Hypertext in the Reader","meta":{}}
-{"file":"2026-08-26-brief-herdr-dashboard.md","date":"2026-08-26","status":"open","summary":"Herdr Dashboard — the Build's Exhaust, Composed","meta":{}}
-{"file":"2026-08-26-brief-in-document-search-and-outlining.md","date":"2026-08-26","status":"open","summary":"In-Document Search and Outlining — Fast Navigation in Gloam","meta":{"scope":"gloam","feature":"search+outlining"}}
-{"file":"2026-08-26-brief-palette-lightness-knob.md","date":"2026-08-26","status":"parked","summary":"Palette Lightness Knob — Global Brightness, Hue Preserved","meta":{}}
-{"file":"2026-08-26-brief-ssh-blog-feed.md","date":"2026-08-26","status":"open","summary":"SSH Blog Feed — the Gopher-Serve v1","meta":{}}
-{"file":"2026-08-26-brief-ssh-served-markdown.md","date":"2026-08-26","status":"open","summary":"SSH-served markdown — option 1 (OpenSSH ForceCommand)","meta":{}}
-{"file":"2026-08-26-brief-telemetry-conventions.md","date":"2026-08-26","status":"open","summary":"Telemetry Conventions — Markdown as Message Bus","meta":{}}
-{"file":"2026-08-26-brief-tty-reverse-print.md","date":"2026-08-26","status":"open","summary":"TTY Reverse-Print — Land at the Top","meta":{}}
-{"file":"2026-08-26-brief-tui-live-documents.md","date":"2026-08-26","status":"open","summary":"TUI live documents — fs.watch → anchored re-render","meta":{}}
-{"file":"2026-08-27-brief-artpack-aesthetics.md","date":"2026-08-26","status":"open","summary":"Plundered artpack aesthetics & high-SNR dark terminal rendering","meta":{}}
-{"file":"2026-08-27-brief-dense-dynamic-displays.md","date":"2026-08-26","status":"open","summary":"Dense terminal visual primitives for dynamic telemetry","meta":{}}
-{"file":"2026-08-27-brief-fetch-state-stamp.md","date":"2026-08-27","status":"open","summary":"Fetch-state stamp: checked-time + changed/same/failed in footer; fixes the empty-doc-on-fetch-failure lie; LCARS colouring with a new alert palette role; obeys the first temporal directive (fetch-time, not doc-time)","meta":{"depends_on":"2026-08-26-brief-tui-live-documents.md (watch + content gate)","sibling":"2026-08-23-brief-gloam-tui-footer.md","gated_on":"fs.watch in TUI + alert palette-role ADR","td":"td-a27b86","perceptual_property":"permitting, not demanding — the temporal analogue of the loose layout (pull-model attention)"}}
-{"file":"2026-08-27-brief-panel-library.md","date":"2026-08-27","status":"open","summary":"The Panel Library — Chunk-Addressable Okudagrams","meta":{"scope":"render","feature":"chunk-addressing"}}
-{"file":"2026-08-27-brief-ssh-tui-integration.md","date":"2026-08-26","status":"open","summary":"Modern terminal escape protocol integration for SSH TUI delivery","meta":{}}
-{"file":"2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md","date":"2026-08-28","status":"open","summary":"Inline Ask-the-Doc and Local SSH Transport","meta":{}}
-{"file":"2026-08-28-brief-elision-primitive.md","date":"2026-08-28","status":"open","summary":"Elision primitive — close ADR-014, fix the code-fence soft-wrap lie","meta":{}}
-{"file":"2026-08-28-brief-index-and-jump.md","date":"2026-08-28","status":"open","summary":"Ephemeral Index Generation and Numeric Jump Navigation","meta":{}}
-{"file":"2026-08-28-brief-jump-demo-honesty.md","date":"2026-08-28","status":"open","summary":"jump-demo honesty — slug derivation + state-glyph signal","meta":{}}
-{"file":"2026-08-28-brief-launcher-fut.md","date":"2026-08-28","status":"open","summary":"Launcher FUT — session-scoped alt-screen","meta":{}}
-{"file":"2026-08-28-brief-notification-style.md","date":"2026-08-28","status":"open","summary":"011-zero-notification-stillness-and-decoupled-inbox-watchers","meta":{}}
-{"file":"2026-08-28-brief-oklch-tuning.md","date":"2026-08-28","status":"open","summary":"OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling","meta":{}}
-{"file":"2026-08-28-brief-ssh-served-dynamic-markdown-portal.md","date":"2026-08-28","status":"open","summary":"2026-08-28-brief-ssh-served-dynamic-markdown-portal","meta":{}}
-{"file":"2026-08-28-brief-state-glyph-render-path.md","date":"2026-08-28","status":"open","summary":"State-glyph render path — the showcase environment + first cut","meta":{}}
-{"file":"2026-08-28-brief-state-glyph-vocabulary.md","date":"2026-08-28","status":"open","summary":"State-glyph vocabulary — colour + bold, the closed lexicon","meta":{}}
-{"file":"2026-08-28-silo-mnemonics.md","date":"2026-08-28","status":"open","summary":"Rooted Gloam — silo badge and document callsigns","meta":{}}
+{"file": "2026-08-25-brief-pi-markdown-rendering-via-okuda.md", "date": "2026-08-25", "status": "parked", "summary": "Pi markdown rendering via okuda (Pi's issue)", "meta": {}}
+{"file": "2026-08-25-brief-registry-markdown-browser.md", "date": "2026-08-25", "status": "open", "summary": "Registry-aware markdown browser — the silo dashboard", "meta": {}}
+{"file": "2026-08-25-brief-viewport-padding.md", "date": "2026-08-25", "status": "rejected", "summary": "Viewport padding — upper and lower render margins (rejected same day: blank only signals at a boundary; viewport pad fights the content-anchor)", "meta": {}}
+{"file": "2026-08-26-brief-document-links.md", "date": "2026-08-26", "status": "open", "summary": "Document Links — Gopher Hypertext in the Reader", "meta": {}}
+{"file": "2026-08-26-brief-herdr-dashboard.md", "date": "2026-08-26", "status": "open", "summary": "Herdr Dashboard — the Build's Exhaust, Composed", "meta": {}}
+{"file": "2026-08-26-brief-in-document-search-and-outlining.md", "date": "2026-08-26", "status": "open", "summary": "In-Document Search and Outlining — Fast Navigation in Gloam", "meta": {"scope": "gloam", "feature": "search+outlining"}}
+{"file": "2026-08-26-brief-palette-lightness-knob.md", "date": "2026-08-26", "status": "parked", "summary": "Palette Lightness Knob — Global Brightness, Hue Preserved", "meta": {}}
+{"file": "2026-08-26-brief-ssh-blog-feed.md", "date": "2026-08-26", "status": "open", "summary": "SSH Blog Feed — the Gopher-Serve v1", "meta": {}}
+{"file": "2026-08-26-brief-ssh-served-markdown.md", "date": "2026-08-26", "status": "open", "summary": "SSH-served markdown — option 1 (OpenSSH ForceCommand)", "meta": {}}
+{"file": "2026-08-26-brief-telemetry-conventions.md", "date": "2026-08-26", "status": "open", "summary": "Telemetry Conventions — Markdown as Message Bus", "meta": {}}
+{"file": "2026-08-26-brief-tty-reverse-print.md", "date": "2026-08-26", "status": "open", "summary": "TTY Reverse-Print — Land at the Top", "meta": {}}
+{"file": "2026-08-26-brief-tui-live-documents.md", "date": "2026-08-26", "status": "open", "summary": "TUI live documents — fs.watch → anchored re-render", "meta": {}}
+{"file": "2026-08-27-brief-artpack-aesthetics.md", "date": "2026-08-26", "status": "open", "summary": "Plundered artpack aesthetics & high-SNR dark terminal rendering", "meta": {}}
+{"file": "2026-08-27-brief-dense-dynamic-displays.md", "date": "2026-08-26", "status": "open", "summary": "Dense terminal visual primitives for dynamic telemetry", "meta": {}}
+{"file": "2026-08-27-brief-fetch-state-stamp.md", "date": "2026-08-27", "status": "open", "summary": "Fetch-state stamp: checked-time + changed/same/failed in footer; fixes the empty-doc-on-fetch-failure lie; LCARS colouring with a new alert palette role; obeys the first temporal directive (fetch-time, not doc-time)", "meta": {"depends_on": "2026-08-26-brief-tui-live-documents.md (watch + content gate)", "sibling": "2026-08-23-brief-gloam-tui-footer.md", "gated_on": "fs.watch in TUI + alert palette-role ADR", "td": "td-a27b86", "perceptual_property": "permitting, not demanding — the temporal analogue of the loose layout (pull-model attention)"}}
+{"file": "2026-08-27-brief-panel-library.md", "date": "2026-08-27", "status": "open", "summary": "The Panel Library — Chunk-Addressable Okudagrams", "meta": {"scope": "render", "feature": "chunk-addressing"}}
+{"file": "2026-08-27-brief-ssh-tui-integration.md", "date": "2026-08-26", "status": "open", "summary": "Modern terminal escape protocol integration for SSH TUI delivery", "meta": {}}
+{"file": "2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md", "date": "2026-08-28", "status": "open", "summary": "Inline Ask-the-Doc and Local SSH Transport", "meta": {}}
+{"file": "2026-08-28-brief-elision-primitive.md", "date": "2026-08-28", "status": "open", "summary": "Elision primitive — close ADR-014, fix the code-fence soft-wrap lie", "meta": {}}
+{"file": "2026-08-28-brief-index-and-jump.md", "date": "2026-08-28", "status": "done", "summary": "Ephemeral Index Generation and Numeric Jump Navigation", "meta": {}}
+{"file": "2026-08-28-brief-jump-demo-honesty.md", "date": "2026-08-28", "status": "open", "summary": "jump-demo honesty — slug derivation + state-glyph signal", "meta": {}}
+{"file": "2026-08-28-brief-launcher-fut.md", "date": "2026-08-28", "status": "open", "summary": "Launcher FUT — session-scoped alt-screen", "meta": {}}
+{"file": "2026-08-28-brief-notification-style.md", "date": "2026-08-28", "status": "open", "summary": "011-zero-notification-stillness-and-decoupled-inbox-watchers", "meta": {}}
+{"file": "2026-08-28-brief-oklch-tuning.md", "date": "2026-08-28", "status": "open", "summary": "OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling", "meta": {}}
+{"file": "2026-08-28-brief-ssh-served-dynamic-markdown-portal.md", "date": "2026-08-28", "status": "open", "summary": "2026-08-28-brief-ssh-served-dynamic-markdown-portal", "meta": {}}
+{"file": "2026-08-28-brief-state-glyph-render-path.md", "date": "2026-08-28", "status": "open", "summary": "State-glyph render path — the showcase environment + first cut", "meta": {}}
+{"file": "2026-08-28-brief-state-glyph-vocabulary.md", "date": "2026-08-28", "status": "open", "summary": "State-glyph vocabulary — colour + bold, the closed lexicon", "meta": {}}
+{"file": "2026-08-28-silo-mnemonics.md", "date": "2026-08-28", "status": "open", "summary": "Rooted Gloam — silo badge and document callsigns", "meta": {}}
