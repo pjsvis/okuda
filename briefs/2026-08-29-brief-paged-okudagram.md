@@ -78,6 +78,56 @@ no ice-dancing-on-concrete (an oversized block won't page-jump
 mid-read). The mismatch is resolved at the measurement, not the
 preference.
 
+## The state space (resolving a conflation)
+
+A musing on this brief surfaced a conflation worth separating
+before any more cases are added: **"static" and "frozen" are not
+the same thing.** They are two orthogonal axes we had been sliding
+together:
+
+- **Navigation mode** (how input moves the view): *paged* (jumps to
+  a block boundary) vs *slippy* (scrolls within).
+- **Input coupling** (whether input moves the view at all): *live*
+  (input moves it) vs *frozen* (input ignored — *tied-to-the-mast*).
+
+A fitting block in paged mode is "static" — but that is *physics*
+(nothing to scroll, it holds by measurement), not *freeze* (input
+decoupled by user choice). Calling both "frozen" collapses "can't
+move because it fits" into "won't move because the user disabled
+input." A state diagram separates them, because state diagrams
+exist to distinguish states from the transitions between them:
+
+```mermaid
+stateDiagram-v2
+  [*] --> MEASURE
+  MEASURE --> PAGED: fits
+  MEASURE --> SLIPPY: overflows or code-heavy
+  PAGED --> MEASURE: page → next
+  SLIPPY --> FROZEN: freeze
+  FROZEN --> SLIPPY: unfreeze
+  SLIPPY --> MEASURE: boundary → next
+```
+
+Four states, two axes. `PAGED` is paged+live (a fitting block; input
+pages to the next block — it holds by physics, there is nothing to
+freeze). `SLIPPY` is slippy+live (an oversized or code-heavy block;
+input scrolls within it). `FROZEN` is slippy+frozen — a *sub-state*
+of SLIPPY, reached when the user wants to study an oversized unit
+without it scrolling under a dodgy swipe or gravity mouse (the
+`tied-to-the-mast` panel property). `PAGED-FROZEN` is degenerate and
+not drawn: a block that fits has nothing to freeze. **Freeze is a
+SLIPPY affordance, not a PAGED property** — the conflation, drawn
+out, dissolves.
+
+**The open question the diagram surfaces** (not in the original
+brief): when SLIPPY reaches a block boundary, does it page-jump to
+the next block (re-enter MEASURE) or continue scrolling into it? The
+synthesis says "paged at the boundary" — so the transition
+`SLIPPY → MEASURE` is named — but whether the *user* triggers it
+(explicit page input at the boundary) or the *viewer* triggers it
+(auto-page on overflow) is an exploration output. The diagram makes
+the question visible; it does not answer it.
+
 ## The constraint space — what we don't yet know
 
 This is the section that earns the brief its "aspiration" status.
@@ -111,24 +161,55 @@ exploration outputs to defend, not inputs to assume.*
 
 ### 2. The seam
 
-The renderer currently returns a flat line array; the TUI scrolls a
-window. Block-aware paging needs the TUI to know *where the block
-boundaries are in that array*. Two honest options:
+The renderer returns a flat line array; the TUI scrolls a window.
+Block-aware paging needs the TUI to know *where the block boundaries
+are in that array*. A musing on this brief — "it's just one matrix
+fitting into another, we should be able to figure that out from the
+numbers" — collapsed the seam to a ladder, and found the rung the
+exploration was looking for.
 
-```mermaid
-flowchart TD
-  R["renderer returns"] --> O1["option 1: TUI scans for header badges"]
-  R --> O2["option 2: renderer returns block index too"]
-  O1 -- "fragile; couples TUI to render styling" --> X1[(reject)]
-  O2 -- "extends the existing seam" --> X2[(prefer)]
-  O2 --> N["same shape as the eye-proxy anchor: TUI already consumes renderer-derived structure"]
+**Rung 1 — viewport paging (pure numbers).** Jump by screen-height.
+No structure needed. But this drops the synthesis (the block decides)
+and reverts to arbitrary page boundaries — that's `less`/`man`
+paging, lands mid-block → ice-dancing-on-concrete for landing
+intent. *Too simple.*
+
+**Rung 2 — block paging (scan the rendered output).** The renderer
+preserves header markers as *content* by the NO_COLOR-parity
+invariant ("strip escapes → `## Heading` as before"); the TUI already
+scans the line array (the eye-proxy anchor reads blank/non-blank).
+Finding block boundaries is a regex on existing output, not a new
+return value. **The collision:** the same parity property that makes
+real headers cheap to scan makes code-fence `##` indistinguishable.
+Verified in this repo: `docs/ssh-and-gemini.md:49-51` has a code
+fence demonstrating markdown headers —
+
+```
+# Heading 1
+## Heading 2
+### Heading 3
 ```
 
-Lean: option 2. The renderer already has a heading handler; emitting
-header line-indices alongside the lines extends an existing seam
-rather than inventing a tag channel. The eye-proxy anchor is
-precedent for the TUI consuming renderer-derived structure. But the
-exact return shape is an exploration output, not an input.
+— and a scan of rendered output cannot tell that `## Heading 2` from
+a real H2. The parity invariant is double-edged: it gives scanability
+*and* the collision in the same stroke.
+
+**Rung 3 — structured index (renderer returns block boundaries).**
+The escape if the collision is unacceptable. The renderer emits header
+line-indices alongside the lines; the TUI consumes renderer-derived
+structure (eye-proxy anchor precedent). Costs a second channel for
+what a scan gets for free in the common case.
+
+**Lean:** default to rung 2 (scan), accept the collision as a known
+small lie, keep rung 3 in reserve. The collision's failure mode (a
+false page boundary inside a code-fence-heavy section) degrades
+toward the fallback (constraint 4) — the same direction rung 1 lives.
+A third escape exists — scan the *pre-finalize* stream where code
+blocks are still wrapped in `\u0000RAW:code\u0000` tags and skip
+inside them — but the TUI currently gets post-finalize output (tags
+stripped), so that refactor approaches rung 3's cost anyway. *The
+first mapped edge case of the exploration: code-fence `##`-collision,
+resolved by the constraint-4 fallback, not by rung 3.*
 
 ### 3. Sequencing against the fzf epic
 
@@ -141,13 +222,36 @@ TUI entry shape this brief would build on.
 ### 4. The fallback to slippy
 
 What happens when the unit definition refuses to resolve cleanly —
-a document with no headers, a block five viewports tall, a degenerate
-case the synthesis doesn't cover? The honest answer may be "slippy is
-the fallback, paged is the refinement," which makes paged an
-*additive* layer over the existing seam rather than a replacement.
-That would be the cheapest outcome and the least risky. The
-exploration should look for evidence that the additive shape is
-sufficient before assuming a replacement is needed.
+a document with no headers, a block five viewports tall, a code-fence
+heavy section whose `##` collides (constraint 2)? The honest answer
+may be "slippy is the fallback, paged is the refinement," which makes
+paged an *additive* layer over the existing seam rather than a
+replacement. That would be the cheapest outcome and the least risky.
+
+**The second mapped edge case** (surfaced by re-examining the use
+cases): a code-fence-heavy unit — the `ssh-and-gemini.md` shape,
+where the document's own structure is partly code demonstrating
+markup. The reframe that resolved it: code blocks are second-class
+(we render coloured text, truncate left, could truncate below); a
+code-heavy unit is oversized-by-content, and the synthesis handles
+it *by the same rule* — an oversized unit scrolls (SLIPPY), not by a
+new exception. "Revert to slippy + hit freeze" is the fallback the
+brief already named, triggered by content-type density, not just
+physical overflow. *The collision case is the degenerate case the
+fallback was for.*
+
+**Freeze as a surfaced affordance.** The reframe introduced freeze
+(tied-to-the-mast) as a per-unit affordance in SLIPPY — "study this
+oversized unit without it scrolling under me." This is a *new use
+case* the exploration surfaced, not a pre-existing one: the state
+diagram (above) places it as a SLIPPY sub-state (FROZEN), not a PAGED
+property. Worth its own line in the exploration rather than smuggled
+in as "room to maneuver." Whether freeze belongs in the first cut or
+is a later refinement is an exploration output.
+
+The exploration should look for evidence that the additive shape
+(slippy as fallback, paged as refinement, freeze as SLIPPY sub-state)
+is sufficient before assuming a replacement is needed.
 
 ## What this brief is not
 
