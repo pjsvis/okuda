@@ -10,6 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-08-29 | DBF-INDEX-JUMP | done | Debrief: index-and-jump — menus as documents, and the demo that kept them honest | 2026-08-29-debrief-index-and-jump.md |
+| 2026-08-29 | DBF-OKF-CALLSIGN | done | Debrief: the OKF migration and callsign layer — one movement, four slices | 2026-08-29-debrief-okf-callsign-migration.md |
 | 2026-08-27 | DBF-LAUNCHER-LOOP | done | Debrief: the launcher loop — runTui blocks, and the three bugs that were one | 2026-08-27-debrief-launcher-loop-runTui-blocks.md |
 | 2026-08-27 | DBF-OKUDA-PI | done | Debrief: first dogfood sweep of the okuda pi theme — states fired, untestables, promoted to default | 2026-08-27-debrief-okuda-pi-theme-sweep.md |
 | 2026-08-27 | DBF-SSH-FORCECOMMAND | done | Debrief: SSH ForceCommand feasibility — the transport, and the "fps" reframe | 2026-08-27-debrief-ssh-forcecommand-feasibility.md |

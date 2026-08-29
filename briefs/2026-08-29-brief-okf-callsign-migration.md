@@ -7,9 +7,7 @@ callsign: BRF-OKF-CALLSIGN
 
 **Created:** 2026-08-29
 **TD:** td-bdfce0
-**Status:** Open (implementation brief for the task ADR-019 and
-`2026-08-28-silo-mnemonics.md` scoped; lands the table slice deferred by
-`2026-08-28-brief-index-and-jump.md`'s close-out)
+**Status:** Done (shipped 2026-08-29, td-bdfce0; debrief `debriefs/2026-08-29-debrief-okf-callsign-migration.md`. Follow-up: reg-menu compositor, td-012c5d)
 
 ## What
 
