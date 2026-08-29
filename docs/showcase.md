@@ -88,10 +88,7 @@ flowchart TD
 
 That is the viewer's own path, top to bottom: markdown in, coloured ASCII out. A diagram is not a one-off ornament — it earns column space wherever the prose would otherwise be describing a shape.
 
-And beneath each diagram, the muted source: the invitation. Here is your
-art; here is the source if you want to give it a go yourself. Nothing is
-hidden — just presented at the volume each layer has earned: art in the
-foreground, structure receding, source waiting quietly underneath.
+And beneath each diagram, one muted indicator line: `⋮ mermaid source — in the document`. The source is not rendered — it is tautological in a single-render seam (the art and the source come from one binary run; they cannot disagree, and `mermaid-to-md --verify` is the drift check, reading the `.md`, not the render). The indicator renders the *fact* of the source — where it lives — not the source itself. Art in the foreground, the pointer honest underneath.
 
 ---
 
@@ -185,7 +182,7 @@ one line:
 | Subsystem | State | Note |
 | --- | --- | --- |
 | Wrap engine | ✓ | grapheme-true; CJK and emoji widths verified |
-| Mermaid intercept | ✓ | art plus muted source, both on show |
+| Mermaid intercept | ✓ | art on show; source omitted, a `⋮` indicator names where it lives |
 | Autolink pass | ✗ | rejected — URL detection is the terminal's job |
 | OSC 8 hyperlinks | ⋮ | parked under Pass C; reopen on terminal evidence |
 | Lexer EAW audit | ☐ | next: token widths against the width table |

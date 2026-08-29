@@ -232,10 +232,13 @@ describe("render — mermaid pipe + colour classification", () => {
     expect(out).toContain("\x1b[38;2;88;88;88m"); // border
     expect(out).toContain("\x1b[38;2;0;175;95m"); // arrow
     expect(out).toContain("\x1b[38;2;215;215;215m"); // text
-    // the mermaid source appears as the muted checksum block beneath the art
-    expect(out).toContain("flowchart LR");
-    expect(out).toContain("-->");
-    // node label survived
+    // the mermaid source is omitted from the render (tautological in a
+    // single-render seam); an indicator names where it lives instead.
+    // (brief: mermaid-source-omitted.)
+    expect(out).not.toContain("flowchart LR");
+    expect(out).not.toContain("-->");
+    expect(out).toContain("mermaid source — in the document");
+    // node label survived in the art
     expect(out).toContain("Input v2.0");
   });
 
@@ -307,7 +310,8 @@ describe("render — mermaid pipe + colour classification", () => {
     expect(out).toContain("Doc");
     expect(out).toContain("Tail");
     expect(out).not.toContain("okuda-mmd");
-    expect(out).not.toContain("flowchart"); // binary missing → no checksum, source dropped
+    expect(out).not.toContain("flowchart"); // binary missing → no art, source dropped
+    expect(out).not.toContain("mermaid source — in the document"); // no indicator without art
   });
 
   test("palette override of diagram-arrow takes effect", async () => {

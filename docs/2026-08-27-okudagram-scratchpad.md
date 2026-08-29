@@ -32,7 +32,11 @@ they either earn a brief or get foxtrot-oscar'd. The Edinburgh lexicon
   binder. We aim a tad higher.
 - **Availability without insistence.** The muted source echo: it does
   not ask to be read; it waits to be needed. Art foreground, structure
-  receding, source quiet underneath.
+  receding, source quiet underneath. *(Retired 2026-09-01: the echo is
+  gone — a viewer who needed the source on a narrow pane got elided
+  fragments, not the source. A `⋮` pointer now names where the source
+  lives, keeping availability honest without pretending to show it.
+  brief: mermaid-source-omitted.)*
 - **One glyph, one job.** A mark that duplicates an existing structure
   is noise; a mark that distinguishes what structure cannot is perception
   for free. The exception: status glyphs beside a bullet carry state the

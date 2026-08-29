@@ -149,12 +149,6 @@ export function extractDiagramArt(binaryOutput: string): string {
   return m[1]!.replace(/^\n+/, "").replace(/\n+$/, "");
 }
 
-/** Extract the mermaid source checksum (the ```mmd fence the binary emits). */
-export function extractDiagramChecksum(binaryOutput: string): string | null {
-  const m = binaryOutput.match(/```mmd\n([\s\S]*?)\n?```/);
-  if (!m) return null;
-  return m[1]!.replace(/^\n+/, "").replace(/\n+$/, "");
-}
 
 // ── Diagram colour classification (brief: diagram-colour-classification)
 //
@@ -251,7 +245,7 @@ interface Ctx {
   color: ColorMode;
   palette: Palette;
   table: TableState | null;
-  mermaid: Map<string, { art: string; checksum: string | null }>;
+  mermaid: Map<string, { art: string }>;
   /** When set, `list` handlers record structure instead of rendering
    *  (the probe pass — see probeListDepths). */
   listProbe?: (children: string) => string;
@@ -475,7 +469,7 @@ async function interceptMermaid(
     fences.map(async (code) => {
       const out = await spawnMermaid(code, opts);
       if (out === "") return null;
-      return { art: extractDiagramArt(out), checksum: extractDiagramChecksum(out) };
+      return { art: extractDiagramArt(out) };
     }),
   );
   for (const [i, entry] of arts.entries()) {
@@ -537,7 +531,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       const m = children.trim().match(RE_MERMAID_TOKEN);
       if (m) {
         const entry = ctx.mermaid.get(m[1]!);
-        if (entry !== undefined) return diagramBlock(entry.art, entry.checksum, ctx);
+        if (entry !== undefined) return diagramBlock(entry.art, ctx);
         return ""; // pipe failed → drop the placeholder silently
       }
       // One-line list item: `slug %%okuda-rhs:NN%%` — the RHS number is
@@ -719,27 +713,26 @@ function stripHtml(s: string): string {
   return s.replace(RE_INLINE_HTML, "");
 }
 
-/** Mermaid ASCII block: classified, coloured, never wrapped. The
- *  checksum (original mermaid source) follows as a muted code block. */
-function diagramBlock(art: string, checksum: string | null, ctx: Ctx): string {
+/** Mermaid ASCII block: classified, coloured, never wrapped. Beneath
+ *  the art, one muted indicator line names the source's home — the
+ *  source itself is not rendered (it is tautological in a single-render
+ *  seam; `mermaid-to-md --verify` is the drift check, and it reads the
+ *  .md, not the render). The `⋮` glyph borrows the state-parked lexicon
+ *  ("elided into a further question"). (brief: mermaid-source-omitted.) */
+function diagramBlock(art: string, ctx: Ctx): string {
   const open = tagRawOpen("diagram");
   const lines = art.split("\n").map((l) => {
     if (l === "") return "";
     if (ctx.color === "none") return l; // byte-identical to the binary's output
     return classifyDiagramLine(l, ctx.palette, ctx.color) + "\x1b[0m";
   });
-  let out = `${open}${lines.join("\n")}${TAG_RAW_CLOSE}`;
-  // Checksum: the mermaid source, muted, beneath the diagram. Fence
-  // content — elided to the content width like any code line (the
-  // source can run long; the same no-soft-wrap invariant holds).
-  if (checksum) {
-    const csOpen = tagRawOpen("checksum");
-    const csLines = checksum.split("\n").map((l) =>
-      l === "" ? "" : ctx.styler.role("muted", "  " + elideToWidth(l, ctx.width)),
-    );
-    out += `\n${csOpen}${csLines.join("\n")}${TAG_RAW_CLOSE}`;
-  }
-  return out + "\n\n";
+  // Indicator: render the *fact* of the source, not the source. Muted
+  // pointer; the `⋮` keeps its state-parked colour for vocabulary parity
+  // (it survives NO_COLOR as plain content — roleBold is a no-op then).
+  const glyph = ctx.styler.roleBold("state-parked", "⋮");
+  const pointer = ctx.styler.role("muted", " mermaid source — in the document");
+  const indOpen = tagRawOpen("diagramsrc");
+  return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n${indOpen}${glyph}${pointer}${TAG_RAW_CLOSE}\n\n`;
 }
 
 /** Blockquote: single-level pipe prefix, muted, re-wrapped at width-2. */
