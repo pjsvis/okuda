@@ -361,13 +361,31 @@ describe("render — blockquote", () => {
 });
 
 describe("render — code fences", () => {
-  test("2-space indent, code colours, never wrapped", async () => {
+  test("2-space indent, code colours, elided at the content width (td-b81597)", async () => {
     const long = "x".repeat(70);
     const out = await render("```ts\nconst line = \"" + long + "\"\n```", 40);
-    const codeLine = lines(out).find((l) => l.includes(long));
+    const codeLine = lines(out).find((l) => l.includes("const line"));
     expect(codeLine).toBeDefined();
     expect(stripANSI(codeLine!)).toStartWith("  ");
-    expect(displayWidth(codeLine!)).toBeGreaterThan(40); // overflows by design
+    // ADR-004's invariant restored for fences: the emitted line is never
+    // wider than the terminal (margin 2+2 + ctx.width = 40), so the
+    // terminal never soft-wraps it. The overflow ends with the `…`
+    // elision marker — the fence exception ("overflow ugly by design")
+    // closed by eliding, not wrapping.
+    expect(displayWidth(codeLine!)).toBe(40);
+    expect(stripANSI(codeLine!).endsWith("…")).toBe(true);
+  });
+
+  test("elision is grapheme-aware: a wide cluster never splits", async () => {
+    // 16 CJK graphemes = 32 cols > budget 36 at width 40: the last
+    // cluster that would straddle drops whole, … takes its place — the
+    // elided line never exceeds the budget and never shows half a char.
+    const out = await render("```\n\u4e2d\u6587\u5bbd\u5b57\u7b26\u6d4b\u8bd5\u884c\u5f88\u957f\u5f88\u957f\u5f88\u957f\u5f88\u957f\u518d\u52a0\u51e0\u4e2a\u5b57\n```", 40);
+    const codeLine = lines(out).find((l) => l.includes("\u4e2d"));
+    expect(codeLine).toBeDefined();
+    expect(displayWidth(codeLine!)).toBeLessThanOrEqual(40);
+    expect(stripANSI(codeLine!).endsWith("…")).toBe(true);
+    expect(stripANSI(codeLine!)).not.toMatch(/[\u4e2d-\u9fff]$/); // … not a char
   });
 
   test("interior blank lines preserved", async () => {

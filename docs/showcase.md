@@ -52,10 +52,12 @@ should hand off to the browser.
 
 ---
 
-## Code: fences are verbatim
+## Code: fences are verbatim — and elided, never wrapped
 
 ```typescript
-// Fenced code is never wrapped — long lines overflow, on purpose. // Wrapping code mangles it. The reader scrolls; the bytes stay honest. function render(source: string): string { return source .split("\n") .map((line) => line.trimEnd()) .join("\n"); }
+// Fenced code is never wrapped — long lines elide at the content
+// boundary with … at the cut (td-b81597). Wrapping code mangles it;// letting the terminal soft-wrap it lies about the line count. The
+// reader widens; the bytes stay honest. function render(source: string): string { return source .split("\n") .map((line) => line.trimEnd()) .join("\n"); }
 ```
 
 ---
@@ -228,9 +230,9 @@ Inline `<em>HTML</em>` is stripped silently; the tags vanish, the text remains. 
 
 ---
 
-## Width: wrap and bypass
+## Width: wrap, bypass, elide
 
-Body text wraps at the terminal column count. Raw blocks — code fences, mermaid ASCII — bypass wrapping entirely, because wrapping a diagram or a diff destroys its meaning. Resize the terminal and re-render; the prose reflows, the art holds.
+Body text wraps at the terminal column count. Mermaid ASCII bypasses wrapping entirely, because wrapping a diagram destroys its meaning. Code fences never wrap either — a line that would exceed the content width is elided with `…` at the cut (td-b81597): one line stays one line, and widening restores the bytes. Resize the terminal and re-render; the prose reflows, the art holds, the code tells the truth about where it was cut.
 
 ---
 

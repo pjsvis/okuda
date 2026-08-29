@@ -629,12 +629,19 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
     },
 
     code(children: string) {
-      // Fenced code (mermaid never reaches here — pre-pass). Never wrapped.
+      // Fenced code (mermaid never reaches here — pre-pass). Never
+      // wrapped — elided (td-b81597, closing ADR-004's fence exception:
+      // "overflow ugly by design" was the lesser evil when wrapping was
+      // the only alternative; elision is crueler and more useful). Each
+      // line is hard-truncated to the content width with `…` at the cut
+      // — the terminal never soft-wraps what okuda emits (a wrapped code
+      // line is one line pretending to be two). Budget: handler margin 2
+      // + finalize margin 2 + ctx.width = exactly the terminal width.
       const body = children.replace(/\n$/, "");
       const open = tagRawOpen("code");
       const lines = body
         .split("\n")
-        .map((l) => (l === "" ? "" : styler.codeLine("  " + l)));
+        .map((l) => (l === "" ? "" : styler.codeLine("  " + elideToWidth(l, width))));
       return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n\n`;
     },
 
@@ -708,11 +715,13 @@ function diagramBlock(art: string, checksum: string | null, ctx: Ctx): string {
     return classifyDiagramLine(l, ctx.palette, ctx.color) + "\x1b[0m";
   });
   let out = `${open}${lines.join("\n")}${TAG_RAW_CLOSE}`;
-  // Checksum: the mermaid source, muted, beneath the diagram.
+  // Checksum: the mermaid source, muted, beneath the diagram. Fence
+  // content — elided to the content width like any code line (the
+  // source can run long; the same no-soft-wrap invariant holds).
   if (checksum) {
     const csOpen = tagRawOpen("checksum");
     const csLines = checksum.split("\n").map((l) =>
-      l === "" ? "" : ctx.styler.role("muted", "  " + l),
+      l === "" ? "" : ctx.styler.role("muted", "  " + elideToWidth(l, ctx.width)),
     );
     out += `\n${csOpen}${csLines.join("\n")}${TAG_RAW_CLOSE}`;
   }
