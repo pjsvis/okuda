@@ -26,6 +26,15 @@ const PROMPT = "gloam ❯ ";
 /** The verb-grammar binds, exported for a contract test to pin against. */
 export const GLOAM_FZF_BINDS = FZF_BINDS;
 
+/** Spike bind (BRF-FZF-OWNS-LOOP, gate 1): fzf owns the loop. Enter runs the
+ *  reader as a subprocess via fzf's `execute` action — fzf suspends, okuda
+ *  reads the file in its own alt-screen TUI, on quit fzf resumes the SAME
+ *  process, so cursor + query + highlight survive for free. `--tui` is
+ *  required: bare `okuda <file>` is the streaming renderer (no alt-screen,
+ *  no key loop), not the reader experience the loop promises. */
+const FZF_EXECUTE_BIND = "enter:execute(okuda {} --tui)";
+export const GLOAM_SPIKE_FZF_OWNS_BIND = `${FZF_BINDS},${FZF_EXECUTE_BIND}`;
+
 /** fzf must be on PATH; fd is preferred but has an in-process fallback. */
 function which(cmd: string): string | null {
   for (const dir of (process.env.PATH ?? "").split(":")) {
@@ -107,6 +116,43 @@ export async function pickFile(
   return { query: q, file };
 }
 
+/** Gate-1 spike (BRF-FZF-OWNS-LOOP): fzf owns the loop. ONE fzf spawn
+ *  with an `enter:execute(okuda {} --tui)` bind — fzf suspends around the
+ *  reader subprocess and resumes the same process, so cursor + query +
+ *  highlight are preserved for free, and the `--print-query` / `--query`
+ *  reseed ceremony retires. This is a PARALLEL path to the spawn-per-round
+ *  loop: gated by `GLOAM_SPIKE_FZF_OWNS=1`, it does not replace
+ *  `runLauncher`'s default. No callsign/silo threading here (gate 2's
+ *  job); the reader re-derives nothing — `okuda <file> --tui` is the
+ *  plain one-document contract. Spike = answer the gate-1 question,
+ *  nothing more. */
+async function runLauncherSpike(): Promise<void> {
+  const files = listMarkdownFiles();
+  const input = files.join("\n") + "\n";
+  const args = [
+    "fzf",
+    "--layout=reverse",
+    "--no-mouse",
+    "--exact",
+    "--tiebreak=index",
+    `--bind=${GLOAM_SPIKE_FZF_OWNS_BIND}`,
+    `--prompt=${PROMPT}`,
+    `--header=${HEADER}`,
+  ];
+  const proc = Bun.spawn(args, {
+    stdin: "pipe",
+    stdout: "inherit",
+    stderr: "inherit",
+    env: { ...process.env, FZF_DEFAULT_OPTS: "" },
+  });
+  proc.stdin.write(input);
+  await proc.stdin.end();
+  // fzf exits when the user Escs / Ctrl-Cs out of the picker. The reader
+  // rounds happen INSIDE fzf's `execute` — they never surface to this
+  // process as a spawn. Exit code is fzf's: 0 normal, 130 Esc/Ctrl-C.
+  await proc.exited;
+}
+
 /** The browse → read → browse loop. Caller gates: invoked as `gloam`,
  *  no file arg, stdin is a TTY. fzf absence is a clean error, never a
  *  stack trace (brief: graceful absence). */
@@ -114,6 +160,17 @@ export async function runLauncher(): Promise<void> {
   if (!which("fzf")) {
     process.stderr.write("gloam: fzf not found — see DEPENDENCIES.md\n");
     process.exit(1);
+  }
+  // Spike gate (BRF-FZF-OWNS-LOOP, td-99667d): opt-in parallel path. The
+  // default spawn-per-round loop is unchanged; set the env to test gate 1.
+  if (process.env.GLOAM_SPIKE_FZF_OWNS) {
+    process.stdout.write("\x1b[?1007h"); // alt-scroll on, same policy
+    try {
+      await runLauncherSpike();
+    } finally {
+      process.stdout.write("\x1b[?1007l");
+    }
+    return;
   }
   process.stdout.write("\x1b[?1007h"); // alt-scroll on, one policy both surfaces
   // Rooted gloam carries a silo badge the renderer paints at the head of

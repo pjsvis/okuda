@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   GLOAM_FZF_BINDS,
+  GLOAM_SPIKE_FZF_OWNS_BIND,
   invokedAsGloam,
   listMarkdownFiles,
 } from "../src/launcher";
@@ -28,6 +29,32 @@ describe("launcher — verb-grammar binds (ADR-016, contract pin)", () => {
 
   test("esc:cancel is present (clear/done — fzf's modern default, located right)", () => {
     expect(GLOAM_FZF_BINDS).toContain("esc:cancel");
+  });
+});
+
+describe("launcher — spike bind (BRF-FZF-OWNS-LOOP, gate 1)", () => {
+  // The spike is a parallel, opt-in path (GLOAM_SPIKE_FZF_OWNS=1). Its bind
+  // extends the verb-grammar set with an `enter:execute` action so fzf owns
+  // the loop. This pins the shape so a key-grammar drift is caught here, not
+  // in a manual test. (Not gate 1 itself — gate 1 is a manual flash test.)
+  test("spike bind retains the three parity binds", () => {
+    expect(GLOAM_SPIKE_FZF_OWNS_BIND).toContain("ctrl-d:page-down");
+    expect(GLOAM_SPIKE_FZF_OWNS_BIND).toContain("ctrl-u:page-up");
+    expect(GLOAM_SPIKE_FZF_OWNS_BIND).toContain("esc:cancel");
+  });
+
+  test("spike bind adds enter:execute invoking okuda with --tui", () => {
+    // --tui is load-bearing: bare `okuda <file>` is the streaming renderer,
+    // not the alt-screen reader. The execute action runs the reader as a
+    // subprocess; fzf suspends and resumes the same process.
+    expect(GLOAM_SPIKE_FZF_OWNS_BIND).toContain("enter:execute(okuda {} --tui)");
+  });
+
+  test("spike bind does NOT carry the reseed ceremony", () => {
+    // Under fzf-owns-the-loop, fzf keeps its own query; --print-query and
+    // --query reseeding retire. The bind string is the wrong place for those
+    // (they're flags), but the execute path's whole point is no reseed.
+    expect(GLOAM_SPIKE_FZF_OWNS_BIND).not.toContain("print-query");
   });
 });
 
