@@ -21,3 +21,4 @@
 {"file":"021-jump-token-numbering-offset.md","date":"2026-08-28","status":"Accepted","summary":"Jump tokens number from 11, not 01 — the ergonomic offset","meta":{},"callsign":"ADR-JUMP-TOKEN-021"}
 {"file":"022-right-anchored-role-layout.md","date":"2026-08-29","status":"Accepted","summary":"Right-anchored role layout for patterned surfaces","meta":{},"callsign":"ADR-ROLE-LAYOUT-022"}
 {"file":"023-tty-active-input-reader.md","date":"2026-08-29","status":"Accepted","summary":"/dev/tty active-poll reader for the TUI (bypass Bun's broken passive stdin)","meta":{},"callsign":"ADR-TTY-ACTIVE-INPUT-023"}
+{"file":"024-callsigns-are-data.md","date":"2026-08-30","status":"Accepted","summary":"Callsigns are data, not machinery","meta":{},"callsign":"ADR-CALLSIGN-DATA-024"}

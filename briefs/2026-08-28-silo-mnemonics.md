@@ -8,7 +8,20 @@ callsign: BRF-SILO-MNEMONICS
 **Created:** 2026-08-28 (rewritten from the first draft: badge placement,
 callsign ownership, and the rooted/unrooted axis revised after review)
 **TD:** td-okuda-silo-mnemonics
-**Status:** open
+**Status:** open (amended 2026-08-30 — machinery deferred, ADR-024)
+
+> **Amendment (2026-08-30, ADR-024).** `BRF-CONTENT-SHORTLIST` changed the
+> calculus two days after this brief was written: callsigns live in
+> frontmatter, so content search *is* resolution — `gloam -g <callsign>`
+> finds the document through the ordinary content shortlist, no dedicated
+> path. The *Why* stands (two codes, one referent; out-of-band handles).
+> The machinery is deferred: the dedicated `gloam <callsign>` resolver, the
+> reg-sync bootstrap automation, and the index callsign column all wait
+> until the pain is loud. Callsigns remain assigned frontmatter data —
+> cheap, consistent, already in the corpus. Short and unique are
+> constraints (lintable); cool is a quality (earned by the referent,
+> never generated). Coolness is not generated; it accrues to referents
+> that earn it.
 
 ## What
 
@@ -56,12 +69,17 @@ data, displayed beside jump tokens in index views and resolvable as
   (`ADR`/`BRF`/`DBF`/`PLY`) + first ≤2 significant slug tokens + sequence for
   ADRs; collision → numeric suffix. Assigned at `reg-sync` time; renames never
   re-derive. The bounded context (one silo) keeps the namespace containable;
-  cross-silo references qualify with the silo badge.
+  cross-silo references qualify with the silo badge. *(Amended 2026-08-30:
+  the automation is deferred — ADR-024; hand-assignment at creation is fine
+  at corpus scale, and uniqueness is self-enforcing via `gloam -g` surfacing
+  collisions.)*
 - **Index views:** jump tokens (`01`–`99`) are owned by
   `briefs/2026-08-28-brief-index-and-jump.md`; this brief adds the callsign
   column — `01: ADR-BOUND-010 — the full descriptive title`. Jump tokens are
   ephemeral (die with the index document, never jotted); callsigns are durable.
-- **Resolution:** `gloam <callsign>` maps through the registry to a path.
+- **Resolution:** *(Amended 2026-08-30, ADR-024)* `gloam -g <callsign>` —
+  the content shortlist, not a dedicated registry lookup. A callsign not
+  written in frontmatter does not exist.
 
 ## Acceptance criteria
 
