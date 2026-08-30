@@ -147,3 +147,41 @@ If someone hands you dodgy data, hallucinated scope, or counterfeit code, you do
 
 > **If you can't put my intent into a plain-text document and place it in a flat silo, what use is your so-called "Information Technology"?**
 > *(And by the way: if you can't figure it out, escalate to someone who bloody well can. We are dealing with a bounded context here and we have requirements—so get on with it.)*
+
+---
+
+### Addendum: The Recursion of the Loop
+
+The actuation tide in §5 has a quieter half the diagram doesn't show:
+the operator never sees the actuation *as it happens*. You state intent,
+you wait, you read what came back. The feedback is delayed by exactly one
+full revolution of the loop — one disk write, one render, one glance.
+
+That's what the `⋮` indicator line *is*, structurally. Not a pointer to
+a hidden source — a report from the engine: *I actuated; here is what I
+did; I elided the source because it was tautological.* The diagram title
+lands there too: the author stated "this diagram is called The TFS
+Inversion"; the engine actuated; the title came back at the indicator
+line. Intent in, result out, every render.
+
+The recursion is what makes *predictably adequate* precise. You can't
+see the actuation directly — only the artifact it left. So you state
+intent, wait, and judge the result against the intent. If the gap is
+zero, the engine is adequate. If the gap is consistent, it's
+predictable. You don't get enhancement; you get a floor that holds
+across the loop. The loop is short enough — intent → disk → render → eye
+— that you can close it, judge it, and state the next intent against an
+honest result. A CSS committee can't close its loop: the actuation is
+six spec versions and a vendor war away from the intent. okuda's loop
+is one file write.
+
+The recursion holds at every scale the stack runs on: the operator
+states intent to the engine; the author states intent to the diagram;
+the brief states intent to the implementation; the protocol states
+intent to the agent. Same four beats, every time:
+
+> **You state, you wait, you read, you re-state.**
+
+No committee convenes between the state and the re-state. The loop
+turns once per turn, and that is the moat: the thing we don't have to
+debate is the thing we don't have to maintain.
