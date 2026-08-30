@@ -8,20 +8,21 @@ callsign: BRF-SILO-MNEMONICS
 **Created:** 2026-08-28 (rewritten from the first draft: badge placement,
 callsign ownership, and the rooted/unrooted axis revised after review)
 **TD:** td-okuda-silo-mnemonics
-**Status:** open (amended 2026-08-30 — machinery deferred, ADR-024)
+**Status:** open (amended 2026-08-30 — see Amendment below, ADR-024)
 
 > **Amendment (2026-08-30, ADR-024).** `BRF-CONTENT-SHORTLIST` changed the
 > calculus two days after this brief was written: callsigns live in
 > frontmatter, so content search *is* resolution — `gloam -g <callsign>`
-> finds the document through the ordinary content shortlist, no dedicated
-> path. The *Why* stands (two codes, one referent; out-of-band handles).
-> The machinery is deferred: the dedicated `gloam <callsign>` resolver, the
-> reg-sync bootstrap automation, and the index callsign column all wait
-> until the pain is loud. Callsigns remain assigned frontmatter data —
-> cheap, consistent, already in the corpus. Short and unique are
-> constraints (lintable); cool is a quality (earned by the referent,
-> never generated). Coolness is not generated; it accrues to referents
-> that earn it.
+> finds the document through the ordinary content shortlist. The *Why*
+> stands (two codes, one referent; out-of-band handles). Of the machinery,
+> the `gloam <callsign>` registry dispatch and footer identity slot
+> **already shipped** (d39a414, td-bdfce0 — a fact the first draft of
+> ADR-024 missed and corrected at self-review); what remains deferred is
+> the reg-sync bootstrap automation and the index callsign column, until
+> the pain is loud. Callsigns remain assigned frontmatter data — cheap,
+> consistent, already in the corpus. Short and unique are constraints
+> (lintable); cool is a quality (earned by the referent, never generated).
+> Coolness is not generated; it accrues to referents that earn it.
 
 ## What
 
