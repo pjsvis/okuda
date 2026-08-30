@@ -245,7 +245,7 @@ interface Ctx {
   color: ColorMode;
   palette: Palette;
   table: TableState | null;
-  mermaid: Map<string, { art: string }>;
+  mermaid: Map<string, { art: string; title?: string | null }>;
   /** When set, `list` handlers record structure instead of rendering
    *  (the probe pass — see probeListDepths). */
   listProbe?: (children: string) => string;
@@ -455,21 +455,35 @@ async function interceptMermaid(
   opts: RenderOptions,
   ctx: Ctx,
 ): Promise<string> {
-  const fences: string[] = [];
+  const fences: { code: string; title: string | null }[] = [];
   const src = source.replace(
     /(^|\n)```mermaid\n([\s\S]*?)\n?```/g,
     (_m, lead: string, code: string) => {
-      fences.push(code);
+      // Extract a leading `title: <caption>` line (mermaid-native) before
+      // piping — the binary doesn't parse the directive and would dump it
+      // as a literal box. okuda renders the title at the diagram's
+      // indicator line (diagramBlock), where the `⋮ mermaid source elided`
+      // statement sat. Only a title at the very first line is honoured —
+      // mid-fence `title:` is mermaid syntax we don't own.
+      let title: string | null = null;
+      const firstNl = code.indexOf("\n");
+      const firstLine = firstNl === -1 ? code : code.slice(0, firstNl);
+      const tm = firstLine.match(/^title:\s*(.+?)\s*$/);
+      if (tm) {
+        title = tm[1]!;
+        code = firstNl === -1 ? "" : code.slice(firstNl + 1);
+      }
+      fences.push({ code, title });
       return `${lead}${mermaidToken(String(fences.length - 1))}`;
     },
   );
   if (fences.length === 0) return src;
 
   const arts = await Promise.all(
-    fences.map(async (code) => {
-      const out = await spawnMermaid(code, opts);
+    fences.map(async (f) => {
+      const out = await spawnMermaid(f.code, opts);
       if (out === "") return null;
-      return { art: extractDiagramArt(out) };
+      return { art: extractDiagramArt(out), title: f.title };
     }),
   );
   for (const [i, entry] of arts.entries()) {
@@ -531,7 +545,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       const m = children.trim().match(RE_MERMAID_TOKEN);
       if (m) {
         const entry = ctx.mermaid.get(m[1]!);
-        if (entry !== undefined) return diagramBlock(entry.art, ctx);
+        if (entry !== undefined) return diagramBlock(entry.art, ctx, entry.title);
         return ""; // pipe failed → drop the placeholder silently
       }
       // One-line list item: `slug %%okuda-rhs:NN%%` — the RHS number is
@@ -719,22 +733,24 @@ function stripHtml(s: string): string {
  *  seam; `mermaid-to-md --verify` is the drift check, and it reads the
  *  .md, not the render). The `⋮` glyph borrows the state-parked lexicon
  *  ("elided into a further question"). (brief: mermaid-source-omitted.) */
-function diagramBlock(art: string, ctx: Ctx): string {
+function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   const open = tagRawOpen("diagram");
   const lines = art.split("\n").map((l) => {
     if (l === "") return "";
     if (ctx.color === "none") return l; // byte-identical to the binary's output
     return classifyDiagramLine(l, ctx.palette, ctx.color) + "\x1b[0m";
   });
-  // Indicator: a renderer statement, not a pointer. The source is not
-  // rendered (tautological in a single-render seam); the line names what
-  // the renderer did — elided it — not where the source hides. The `⋮`
-  // keeps its state-parked colour for vocabulary parity ("elided into a
-  // further question"); it survives NO_COLOR as plain content (roleBold is
-  // a no-op then). The explicit verb is for readers without the glyph
-  // lexicon — the glyph is for the initiated, the text is for everyone.
+  // Indicator line: the diagram's caption. A leading `title: <caption>`
+  // in the mermaid fence (extracted pre-pipe by interceptMermaid) lands
+  // here — the `⋮` leads (state-parked colour, vocabulary parity), the
+  // caption follows in the muted register. Untitled diagrams fall back to
+  // the renderer statement (`mermaid source elided`) — the source is
+  // tautological in a single-render seam and is not echoed. The glyph
+  // survives NO_COLOR as plain content (roleBold is a no-op then).
   const glyph = ctx.styler.roleBold("state-parked", "⋮");
-  const stmt = ctx.styler.role("muted", " mermaid source elided");
+  const stmt = title
+    ? ctx.styler.role("muted", " " + title)
+    : ctx.styler.role("muted", " mermaid source elided");
   const indOpen = tagRawOpen("diagramsrc");
   return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n${indOpen}${glyph}${stmt}${TAG_RAW_CLOSE}\n\n`;
 }
