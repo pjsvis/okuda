@@ -20,7 +20,7 @@ To build systems that survive reality, we discard the theater and enforce a stri
 
 Standard software tries to "gracefully degrade" around bad input, turning sludge into visual soup. Our engine rejects it at the gate:
 
-* **Visual Matrix:** `CSN: too narrow` or `CSN: too complex` (Computer Says NO).
+* **Visual Matrix:** `CSN: too wide` or `CSN: too complex` (Computer Says NO).
 * **Auditory Stream:** `"... I could continue ..."` followed by an icy 800ms of dead air, giving you time to hit the exit ramp before we lodge a copyright strike on behalf of the José Saramago estate.
 
 ```mermaid
