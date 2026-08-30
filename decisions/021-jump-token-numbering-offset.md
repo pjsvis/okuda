@@ -63,6 +63,27 @@ unclaimed by the default numbering.
   any 1–2 digit token, so legacy `01` tokens and new `11` tokens both
   resolve. No migration of existing rendered docs.
 
+## Corollary: spaced tokens for short menus (2026-08-30)
+
+For a *short* menu (≤ ~9 items), compositors emit **spaced double-taps**
+— `11, 22, 33, 44, …` — not the sequential `11, 12, 13`. Two reasons:
+
+- **Ergonomics.** A spaced token is two presses of one key; the easiest
+  possible double-strike, lazier even than the `11`–`19` neighbourhood
+  the base decision optimised for. The short case gets the short-list
+  treatment.
+- **No precedence.** Sequential numbering reads as *ranking* — item 1
+  more important than item 2 — even when the compositor only sorted by
+  date. Spaced tokens read as *labels*, not ordinals. The token states
+  identity, not rank; the only ordering that remains is top-to-bottom,
+  which is structural, not semantic.
+
+The cut-off is self-limiting: the spaced form serves ≤ ~9 items
+(`11`…`99` at double-stride); beyond that, fall back to sequential
+(`11`+ runs to 89). A compositor emitting `11, 22, …, 99, 110` is
+broken — switch to sequential at ~10 items. Documented in
+`playbooks/authoring-playbook.md` ("The jump-token menu pattern").
+
 ## Related
 
 - Brief: `briefs/2026-08-28-brief-index-and-jump.md` (revised by this ADR)

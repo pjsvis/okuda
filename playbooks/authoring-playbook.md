@@ -174,6 +174,37 @@ house already knows it.
 
 ---
 
+## The jump-token menu pattern
+
+When a document is a menu of jump targets (the vector table pattern,
+`%%okuda-rhs:NN%%` wiring read by `extractJumps`), the two-digit tokens
+follow a spacing rule keyed to list length:
+
+- **Few items (≤ ~9): spaced double-taps** — `11, 22, 33, 44, …`. Each
+  token is two presses of one key; the easiest possible double-strike.
+- **More items (~10+): sequential from 11** — `11, 12, 13, …` (ADR-021).
+  The spaced form would exhaust at 9 items (`99`); sequential serves the
+  longer list and still avoids the 0-key stretch.
+
+**No precedence is implied other than top-to-bottom structural order.**
+Sequential numbering (`11, 12, 13`) reads as *ranking* — item 1 more
+important than item 2 — even when the compositor only sorted by date.
+Spaced tokens (`11, 22, 33`) break that reading: they read as labels,
+not ordinals. The token states identity, not rank; the ordering that
+remains is the list's own order, which is structural. (The Babylon
+principle: state the fact, infer the action.)
+
+**The cut-off is self-limiting.** The spaced form serves ≤ ~9 items
+(`11`…`99` at double-stride); beyond that, fall back to sequential
+(`11`+ runs to 89). A compositor that emits `11, 22, …, 99, 110` is
+broken — switch to sequential at ~10 items. The resolver
+(`extractJumps`, `RE_RHS_TOKEN`) reads any 1–2 digit token, so both
+forms resolve without migration.
+
+Tokens are ephemeral — they die with the index document, never jotted
+(ADR-021). They are keyboard affordances, not counts; the spacing rule
+makes that visible at a glance.
+
 ## Heuristics, emerging
 
 Add here as they surface from dogfooding. Each entry: the pattern, why it earns its place, the perceptual property it serves.
@@ -186,3 +217,4 @@ Add here as they surface from dogfooding. Each entry: the pattern, why it earns 
 - **Short paragraphs.** Wrap-early prose reads as discrete blocks; long paragraphs read as a wall. The renderer hard-wraps at width, but short source paragraphs add an extra beat. (Dogfood to confirm.)
 - **Mermaid diagrams must fit the medium.** The binary renders ASCII art into a character grid; a wide `flowchart LR` with long labels overflows and degrades to a "too wide" notice plus source. Prefer `flowchart TD`, short node labels, short edge labels — the diagram earns its place only as art, not as a fenced slab of source. (Found persisting the okuda-stack riff doc: the LR version degraded; the TD version rendered.)
 - **Reflow prose, never fences.** When reflowing soft returns in a doc (joining single `\n` to spaces so prose wraps to width), **skip fenced code blocks** — ``` ... ``` and mermaid fences are verbatim, load-bearing input. The renderer already treats fences as verbatim (`src/wrap.ts`, commit 24c50ff), but a *manual* doc-edit that reflows the whole file sweeps the fence into the reflow and collapses multi-line source onto one line. The signature failure: a mermaid `flowchart` with each edge on its own line becomes one space-joined line, `mermaid-to-md` can't parse it, and the ASCII diagram degrades to a boxed echo of the source. Found in `docs/showcase.md`: commit 24c50ff's "reflowed soft returns in showcase.md" collapsed the six-line mermaid fence; the diagram silently disappeared and was only noticed when someone ran `just showcase` weeks later. **The fence is not prose. Reflow stops at ``` .**
+- **Jump-token spacing.** Few-item menus use spaced double-taps (`11, 22, 33`) — easiest to type and no precedence implied beyond top-to-bottom order. Longer menus fall back to sequential from 11 (`11, 12, 13`, ADR-021). The token is a label, not an ordinal.
