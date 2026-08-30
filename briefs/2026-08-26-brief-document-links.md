@@ -22,9 +22,16 @@ reader can follow it without leaving the session.
    document (or in the hints row when toggled), print a numbered menu:
    `1. The Gloam Footer Story   2. Palette Census` — muted, link-text
    colour for titles.
-2. **Digits follow.** `1`–`9` are unbound in `decodeKey` today (checked:
-   the keymap is q/j/k/g/G/r/space/b/Ctrl-D/U/?, arrows, PgUp/PgDn —
-   digits are free). `2` opens the second link's target document.
+2. **Digits follow — unified double-digit keyspace (amended 2026-08-30).**
+   Jump tokens and link numbers share one space: **11–99**, assigned in
+   visible order, starting at 11 per ADR-021's offset. No single-digit
+   case exists — a lone digit always buffers (the spaced double-tap
+   behavior, 62213eb), so there is no `1`-vs-`11` disambiguation policy to
+   write. The keybuffer as shipped is already this behavior; the link
+   numberer just fills the same map. Documents with >89 links: the tail is
+   unfollowable, the hints line says so — an honest limit, an authoring
+   problem, not a paging feature. (Supersedes the original 1–9 spec,
+   written before the double-tap jump work landed.)
    Resolution is relative to the current document's directory; the served
    root bounds it (a link outside the root is rendered but not
    followable — it is web-bound, and OSC 8 still carries it for terminals
@@ -58,16 +65,15 @@ them). Two link species, two affordances, no conflict.
 - **Served-root bounding** is a *viewer* concern (the feed config pins
   the root); the reader takes a `resolveLink` hook or a root option —
   decide in implementation, keep the sandbox story unchanged.
-- **Keymap discipline:** digits 1–9 and `u` join the hints line
-  (`1-9 follow · u back` when a document has links; absent otherwise —
-  chrome appears only when it acts).
+- **Keymap discipline:** the hints line reads `11-99 go · u back` when a
+  document has links; absent otherwise — chrome appears only when it acts.
 
 ## Out of scope
 
 - Link *authoring* conventions for blog-posts (the palette revisit and
   link-style pass is the separate parked work — scrappy editing gets its
   own pass when the feed exists to serve the posts).
-- Numbered links > 9 (a menu with 10+ links is an authoring problem, not
+- Numbered links beyond the keyspace (>89) — an authoring problem, not
   a reader problem — cap at 9, log the cap in the menu row).
 - Web links via digits (OSC 8 already owns those; terminals hand them to
   browsers — including on iPad clients that support it).
