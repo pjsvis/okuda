@@ -9,7 +9,9 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-01 | BRF-FLOW-WRAP | open | Flow wrap — internal break opportunities so paths flow as text | 2026-09-01-brief-flow-wrap.md |
 | 2026-09-01 | BRF-MERMAID-SOURCE-OMITTED | open | Omit the mermaid source from the render | 2026-09-01-brief-mermaid-source-omitted.md |
+| 2026-08-30 | BRF-CONTENT-SHORTLIST | open | content shortlist — rg as the discovery source | 2026-08-30-brief-content-shortlist.md |
 | 2026-08-30 | BRF-REFRESH-OFF-DISK | open | refresh off disk — the resize race + the R placebo | 2026-08-30-brief-refresh-off-disk.md |
 | 2026-08-30 | BRF-IPAD-MINI | open | 2026-08-30-ipad-mini-demo | 2026-08-30-ipad-mini-demo.md |
 | 2026-08-29 | BRF-AUDIO-STYLE | open | Audio-First Style Guide and Linting Heuristics | 2026-08-29-audio-style-guide.md |
@@ -18,8 +20,8 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-29 | BRF-OKF-CALLSIGN | done | OKF conformance migration and the callsign layer | 2026-08-29-brief-okf-callsign-migration.md |
 | 2026-08-29 | BRF-PAGED-OKUDAGRAM | open | Paged okudagram view — block-aware paging (candidate invariant) | 2026-08-29-brief-paged-okudagram.md |
 | 2026-08-29 | BRF-RESTICTED-GRAMMAR | open | Okuda Markdown AST to W3C SSML Mapping Investigation | 2026-08-29-brief-resticted-grammar-speech.md |
+| 2026-08-29 | BRF-TERMINAL-SPEECH | open | Terminal Speech Pipeline Easter Egg | 2026-08-29-brief-terminal-speech.md |
 | 2026-08-29 | BRF-MERMAID-HARD | open | Mermaid Rendering Hard Boundary State Machine (CSN Diagnostics) | 2026-08-29-mermaid-hard-boundary-CSN.md |
-| 2026-08-29 | BRF-TERMINAL-SPEECH | open | Terminal Speech Pipeline Easter Egg | 2028-08-29-brief-terminal-speech.md |
 | 2026-08-28 | BRF-AI-DOC | open | Inline Ask-the-Doc and Local SSH Transport | 2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md |
 | 2026-08-28 | BRF-ELISION-PRIMITIVE | done | Elision primitive — close ADR-014, fix the code-fence soft-wrap lie | 2026-08-28-brief-elision-primitive.md |
 | 2026-08-28 | BRF-INDEX-JUMP | done | Ephemeral Index Generation and Numeric Jump Navigation | 2026-08-28-brief-index-and-jump.md |

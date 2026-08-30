@@ -98,6 +98,16 @@ Two small, separable fixes in `src/tui.ts`:
 - `just check` + `just ship` green; existing tui tests pass; a new test
   pins the debounce/serialise property (a synthetic SIGWINCH burst
   produces ≤1 rerender at the settled width).
+- **Mobile SSH re-test (dogfood, 2026-08-30):** re-test resize on
+  Echo-over-SSH (iPhone, then iPad) after landing. The dogfood found
+  that keystrokes act but resize does nothing and the soft-keyboard
+  dismiss leaves a void — both are consistent with `SIGWINCH` not
+  arriving over the SSH channel, *or* arriving and the rerender being
+  stale/torn. The brief's fixes resolve the second; only after landing
+  can we distinguish. If resize *still* does not fire on mobile post-fix,
+  document it as an Echo/pty-SIGWINCH limitation (windowing — the
+  host's concern, not okuda's), not an okuda bug. iPad with a hardware
+  keyboard isolates the resize-only path (no soft-keyboard void).
 
 ## Sequencing
 
