@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-FRONT-MATTER-009
+---
+
 # Decision: Front matter elided, setext headings neutralised
 
 **Date:** 2026-08-25

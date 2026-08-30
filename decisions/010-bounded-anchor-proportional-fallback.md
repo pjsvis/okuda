@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-BOUNDED-ANCHOR-010
+---
+
 # Decision: Bounded anchor search + proportional fallback for resize scroll-preservation
 
 **Date:** 2026-08-26
@@ -73,6 +78,35 @@ No orphans, no stubs, no conditional code paths. The old signature is
 gone (the test file updated in the same commit). No palimpsest risk;
 this ADR is the record the playbook asks for when "no ADR exists for the
 superseded approach."
+
+## Dogfood confirmation (2026-08-27, post-acceptance)
+
+The SSH-served/ForceCommand dogfood (`just ssh-test`, ADR-013) exercised
+the anchor across the full width range in two terminal emulators:
+
+- **Narrow edge.** Confirmed at <20 columns: the proportional floor
+  holds — the anchor line gets wild (the eye-line text-match misses
+  because every line splits across many physical lines), but the fall
+  *never* jumps to the top of the document. The bounded + proportional
+  contract is the contract; the wildness is the proportional floor
+  doing its job at the edge of its competence, not a bug to chase.
+  Source-position tagging through the render plane remains parked
+  behind a second consumer — the gate from this ADR's alternatives
+  table stands; the extreme dogfood did not produce that consumer.
+- **Font zoom stability.** Cmd-Plus/Minus font resize in both Ghostty
+  and Alacritty keeps both UIs stable and readable — the TUI re-renders
+  through `SIGWINCH` and the anchor re-pins without breaking. A slight
+  layout shift is observed because the two emulators' font-zoom ratios
+  differ (the same `columns` count maps to different glyph widths), so
+  the wrap target moves by a few characters between them. The shift is
+  honest reflow, not a defect: each terminal reports its own winsize and
+  okuda fills it, which is the differentiator against Glow's fixed 80.
+
+The narrow-width confirmation is the extreme the original resize work
+did not test; the bounded + proportional approach survived it without
+modification. Logging the confirmation so a future session that sees
+the narrow-width wildness reaches for the ADR before reaching for the
+source-tagging fix.
 
 ## Related
 

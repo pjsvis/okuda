@@ -1,3 +1,8 @@
+---
+type: Playbook
+callsign: PLY-AUTHORING
+---
+
 # Authoring Playbook
 
 ## What this is
@@ -27,6 +32,13 @@ The house-style signature. A loose list where each item opens with a **bold lead
 1. **Count.** The eye sees how many items there are before reading any. This is the table-scan equivalent — the reader knows the scope of the list before committing.
 2. **Keys.** The bold leads render in a high-contrast hue (amber under Okuda, orange under default). The reader scans the keys alone, as if reading a table's first column. Each key is a promise of what the item covers.
 3. **Detail on demand.** The reader drops into the items that interest them and reads the trailing prose. The uninteresting items are skipped, not skimmed.
+
+**Dogfood confirmation (2026-08-26).** Reading the okuda-net post, the
+operator found themselves reading *critically* — the structure invited
+challenge rather than asking to be believed. A slab demands sequential
+faith; a scannable document gives criticism somewhere to stand. The
+pattern is therefore epistemically load-bearing, not decorative: errors
+are findable only in documents that afford the search.
 
 **The trade is explicit.** You give up column alignment (the eye can't vertical-scan a column of values), you gain vertical rhythm and wrap freedom. The author chose breathing room over alignment, and the bold lead preserves the scan path that alignment would have given. The trade is not a loss; it's a redirection of the scan from horizontal (column) to vertical (item).
 
@@ -87,6 +99,112 @@ not for long quoted passages. If the quote is more than ~3 lines of argument,
 it belongs in the body prose. The pipe is for the aphorism, the maxim, the
 definition — the thing you'd underline.
 
+## The muted source echo
+
+A mermaid fence renders as two layers: the ASCII art (borders recede,
+arrows lead, text foregrounds), then the mermaid source beneath it, muted.
+The art is the offer; the source is the invitation.
+
+**Why it earns its place — availability without insistence.** The muted
+source does not ask to be read; it waits to be needed. A reader who wants
+the diagram takes the diagram; a reader who wants to *change* the diagram
+takes the source — copy it, edit it, give it a go yourself. Nothing is
+hidden. And because the echo is the renderer's own receipt (the binary's
+`mmd` fence — what it understood, not what you hoped), art and source can
+be compared on sight: a diagram that disagrees with its source is caught
+in one glance. Restraint is the register: the coolness of the feature is
+expressed by the completeness of the presentation, not the volume.
+
+**Authoring rule.** Never strip the source from a document because "the
+diagram already shows it" — the source is the reader's on-ramp. The
+corollary: if the art needs to shout to be understood, the structure it
+draws is weak.
+
+---
+
+## The status-led list
+
+A loose list whose items open with a status glyph, then the bold lead,
+then prose: ☐ to do, ✓ done, ✗ rejected, ⋮ elided — parked pending a
+question, elided into it rather than vanished.
+
+**Why it earns its place.** The GFM checkbox is binary — `[ ]` or `[x]` —
+and okuda renders it literally anyway (the grammar is closed; the
+markup stays text). Real documents accumulate a third and fourth state
+that binary cannot hold: *rejected* (considered, refused) and *parked*
+(neither planned nor done nor rejected — waiting on a question). The
+operator knows the state from the parked brief; the glyph gives the
+document the same honesty.
+
+**Authoring rules.**
+
+- **Declare the legend.** One line, first use, in the document. House readers skip it; strangers cannot — a private dialect must be taught once.
+- **Keep the set small.** Four states. A fifth and the eye stops scanning and starts decoding.
+- **Document state only.** If the item has an owner, a date, or a handoff, it belongs in the tracker, not the document. Glyphs travel with the prose; the tracker tracks.
+- **Width honesty.** ☐ U+2610, ✓ U+2713, ✗ U+2717, ⋮ U+22EE — one cell each, none emoji-presentation-default. Any new glyph joins the audit doc's working set before it is relied on.
+
+---
+
+## The decision matrix
+
+When a document's payload is "things to decide", the shape is known
+before the captain asks: a table.
+
+| Decision | State | The reasoning |
+| --- | --- | --- |
+| Wrap engine | ✓ | grapheme-true; verified on CJK and emoji |
+| OSC 8 | ⋮ | parked; reopen on terminal evidence |
+
+Key: ☐ open · ✓ decided · ✗ rejected · ⋮ parked.
+
+**Why it earns its place.** Decidability is a scan, not a read. The table
+puts state in its own column, so the eye counts the ☐ before reading a
+word — the open decisions are found in one fixation, which is the whole
+point of a decision list. A prose list buries state inside sentences;
+the reader re-derives it per item. The matrix also forces the third
+column — the reasoning — to justify itself in one cell, which is exactly
+as much as a decision log needs.
+
+**Authoring rule — the canon, not improvisation.** Reach for this shape
+by default when decisions are the payload: column one the decision
+(renders in the key channel), column two the state glyph, column three
+the constraint or reason, key line beneath. "On screen, now" is the
+test: the best format arrives without being specified, because the
+house already knows it.
+
+---
+
+## The jump-token menu pattern
+
+When a document is a menu of jump targets (the vector table pattern,
+`%%okuda-rhs:NN%%` wiring read by `extractJumps`), the two-digit tokens
+follow a spacing rule keyed to list length:
+
+- **Few items (≤ ~9): spaced double-taps** — `11, 22, 33, 44, …`. Each
+  token is two presses of one key; the easiest possible double-strike.
+- **More items (~10+): sequential from 11** — `11, 12, 13, …` (ADR-021).
+  The spaced form would exhaust at 9 items (`99`); sequential serves the
+  longer list and still avoids the 0-key stretch.
+
+**No precedence is implied other than top-to-bottom structural order.**
+Sequential numbering (`11, 12, 13`) reads as *ranking* — item 1 more
+important than item 2 — even when the compositor only sorted by date.
+Spaced tokens (`11, 22, 33`) break that reading: they read as labels,
+not ordinals. The token states identity, not rank; the ordering that
+remains is the list's own order, which is structural. (The Babylon
+principle: state the fact, infer the action.)
+
+**The cut-off is self-limiting.** The spaced form serves ≤ ~9 items
+(`11`…`99` at double-stride); beyond that, fall back to sequential
+(`11`+ runs to 89). A compositor that emits `11, 22, …, 99, 110` is
+broken — switch to sequential at ~10 items. The resolver
+(`extractJumps`, `RE_RHS_TOKEN`) reads any 1–2 digit token, so both
+forms resolve without migration.
+
+Tokens are ephemeral — they die with the index document, never jotted
+(ADR-021). They are keyboard affordances, not counts; the spacing rule
+makes that visible at a glance.
+
 ## Heuristics, emerging
 
 Add here as they surface from dogfooding. Each entry: the pattern, why it earns its place, the perceptual property it serves.
@@ -97,3 +215,6 @@ Add here as they surface from dogfooding. Each entry: the pattern, why it earns 
 - **Front matter elided.** Provenance is not content. Calming.
 - **Vertical-pipe blockquote.** Pull-aside signal — worth remembering, not in the flow. Leading (sets the block apart).
 - **Short paragraphs.** Wrap-early prose reads as discrete blocks; long paragraphs read as a wall. The renderer hard-wraps at width, but short source paragraphs add an extra beat. (Dogfood to confirm.)
+- **Mermaid diagrams must fit the medium.** The binary renders ASCII art into a character grid; a wide `flowchart LR` with long labels overflows and degrades to a "too wide" notice plus source. Prefer `flowchart TD`, short node labels, short edge labels — the diagram earns its place only as art, not as a fenced slab of source. (Found persisting the okuda-stack riff doc: the LR version degraded; the TD version rendered.)
+- **Reflow prose, never fences.** When reflowing soft returns in a doc (joining single `\n` to spaces so prose wraps to width), **skip fenced code blocks** — ``` ... ``` and mermaid fences are verbatim, load-bearing input. The renderer already treats fences as verbatim (`src/wrap.ts`, commit 24c50ff), but a *manual* doc-edit that reflows the whole file sweeps the fence into the reflow and collapses multi-line source onto one line. The signature failure: a mermaid `flowchart` with each edge on its own line becomes one space-joined line, `mermaid-to-md` can't parse it, and the ASCII diagram degrades to a boxed echo of the source. Found in `docs/showcase.md`: commit 24c50ff's "reflowed soft returns in showcase.md" collapsed the six-line mermaid fence; the diagram silently disappeared and was only noticed when someone ran `just showcase` weeks later. **The fence is not prose. Reflow stops at ``` .**
+- **Jump-token spacing.** Few-item menus use spaced double-taps (`11, 22, 33`) — easiest to type and no precedence implied beyond top-to-bottom order. Longer menus fall back to sequential from 11 (`11, 12, 13`, ADR-021). The token is a label, not an ordinal.

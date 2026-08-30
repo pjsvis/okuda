@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { detectColorMode, makeStyler } from "../src/ansi";
 import { DRACULA_PALETTE, loadPalette } from "../src/palette";
+import okudaPreset from "../src/palettes/okuda.json";
 
 function tempFile(name: string): string {
   return join(mkdtempSync(join(tmpdir(), "okuda-pal-")), name);
@@ -94,12 +95,19 @@ describe("styler — byte-exact SGR sequences", () => {
     expect(s.badge("Gloam")).toBe("\x1b[48;2;255;121;198m\x1b[38;2;248;248;242m Gloam \x1b[0m");
   });
 
+  test("bold: the white-bold affordance (digits-only strong runs)", () => {
+    const s = makeStyler(DRACULA_PALETTE, "truecolor");
+    // bold attribute only, no colour → white bold. The menu's jump number.
+    expect(s.bold("01")).toBe("\x1b[1m01\x1b[0m");
+  });
+
   test("none mode: identity, no escapes anywhere; codespan strips backticks (parity); link shows URL", () => {
     const s = makeStyler(DRACULA_PALETTE, "none");
     expect(s.roleBold("heading", "T")).toBe("T");
     expect(s.codespan("c")).toBe("c");
     expect(s.link("text", "url")).toBe("text url"); // parity: URL shown in both modes
     expect(s.badge("G")).toBe(" G "); // padding kept, no colour
+    expect(s.bold("01")).toBe("01"); // plain digits, no colour
     expect(s.rule(4)).toBe("────");
   });
 });
@@ -119,6 +127,96 @@ describe("palette — dracula contract + override loader", () => {
     expect(DRACULA_PALETTE["diagram-border"]).toBe("#585858");
     expect(DRACULA_PALETTE["diagram-arrow"]).toBe("#00af5f");
     expect(DRACULA_PALETTE["diagram-text"]).toBe("#d7d7d7");
+  });
+
+  test("alert role: red in both presets — the failed channel (ADR-015)", () => {
+    expect(DRACULA_PALETTE.alert).toBe("#ff5555");
+    expect((okudaPreset as Record<string, string>).alert).toBe("#ff5555");
+  });
+
+  test("alert is non-confusable: distinct from every other role in each preset", () => {
+    // The whole point of ADR-015: failed must not collide with changed (amber),
+    // same (muted), or the badge. Check against every other role.
+    for (const [role, hex] of Object.entries(DRACULA_PALETTE)) {
+      if (role === "alert" || role === "state-failed") continue;
+      expect(hex).not.toBe(DRACULA_PALETTE.alert);
+    }
+    const okuda = okudaPreset as Record<string, string>;
+    for (const [role, hex] of Object.entries(okuda)) {
+      if (role === "alert" || role === "state-failed") continue;
+      expect(hex).not.toBe(okuda.alert);
+    }
+  });
+
+  // ── State-glyph vocabulary (brief: state-glyph-vocabulary, 2026-08-28) ──
+  // Four state roles: ✓ green (ok), ☐ yellow (todo), ⋮ orange (parked),
+  // ✗ red (failed). Traffic-lamp-universality: preset-independent, like
+  // alert. state-failed === alert (same hex, two names — the convergence
+  // ADR-015 set the precedent for). ◆ is NOT a state role (priority, not
+  // lifecycle — colouring it would collapse two axes).
+
+  test("state roles present in both presets with the traffic-lamp hexes", () => {
+    const okuda = okudaPreset as Record<string, string>;
+    for (const p of [DRACULA_PALETTE, okuda]) {
+      expect(p["state-ok"]).toBe("#5fd35f");      // green
+      expect(p["state-todo"]).toBe("#ffe066");    // yellow
+      expect(p["state-parked"]).toBe("#ff9933");  // orange
+      expect(p["state-failed"]).toBe("#ff5555");  // red
+    }
+  });
+
+  test("state-failed converges with alert (ADR-015 precedent: same hex, two names)", () => {
+    expect(DRACULA_PALETTE["state-failed"]).toBe(DRACULA_PALETTE.alert);
+    const okuda = okudaPreset as Record<string, string>;
+    expect(okuda["state-failed"]).toBe(okuda.alert);
+  });
+
+  test("state colours are preset-independent — traffic-lamp-universality", () => {
+    // Document channels diverge by preset identity; state channels converge
+    // (a green check reads as a green check on every bridge — the principle
+    // ADR-015 set for alert, extended here to the full lamp).
+    const okuda = okudaPreset as Record<string, string>;
+    for (const role of ["state-ok", "state-todo", "state-parked", "state-failed"]) {
+      expect(DRACULA_PALETTE[role as keyof typeof DRACULA_PALETTE]).toBe(okuda[role]);
+    }
+  });
+
+  test("state roles are mutually non-confusable within each preset", () => {
+    // The four states must be four distinct hues — no two states share a
+    // colour, or the scan collapses two states into one.
+    for (const p of [DRACULA_PALETTE, okudaPreset as Record<string, string>]) {
+      const hexes = [p["state-ok"], p["state-todo"], p["state-parked"], p["state-failed"]];
+      expect(new Set(hexes).size).toBe(4);
+    }
+  });
+
+  test("state colours do not collide with the document channels they'd corrupt", () => {
+    // The ADR-006 justification test, enforced: each state colour must
+    // differ from the document channel it would corrupt if reused.
+    // state-ok ≠ link (navigational), state-todo ≠ emphasis (aside),
+    // state-parked ≠ strong (bold-emphasis), state-failed = alert (by intent).
+    for (const p of [DRACULA_PALETTE, okudaPreset as Record<string, string>]) {
+      expect(p["state-ok"]).not.toBe(p.link);
+      expect(p["state-ok"]).not.toBe(p["code-text"]); // Dracula code is green
+      expect(p["state-todo"]).not.toBe(p.emphasis);
+      expect(p["state-todo"]).not.toBe(p["table-key"]);
+      expect(p["state-parked"]).not.toBe(p.strong);
+      expect(p["state-parked"]).not.toBe(p["badge-bg"]);
+      // state-failed === alert is the one allowed collision (by design).
+    }
+  });
+
+  test("roleBold on a state role emits colour + bold in truecolor; plain in none", () => {
+    const tc = makeStyler(DRACULA_PALETTE, "truecolor");
+    // green + bold: \x1b[38;2;95;211;95;1m✓\x1b[0m  (#5fd35f)
+    expect(tc.roleBold("state-ok", "✓")).toBe("\x1b[38;2;95;211;95;1m✓\x1b[0m");
+    // red + bold: \x1b[38;2;255;85;85;1m✗\x1b[0m
+    expect(tc.roleBold("state-failed", "✗")).toBe("\x1b[38;2;255;85;85;1m✗\x1b[0m");
+    // NO_COLOR parity: the glyph survives by shape alone (bold is dropped too —
+    // none-mode returns text unchanged, the ADR-015 invariant).
+    const none = makeStyler(DRACULA_PALETTE, "none");
+    expect(none.roleBold("state-ok", "✓")).toBe("✓");
+    expect(none.roleBold("state-failed", "✗")).toBe("✗");
   });
 
   test("override file replaces known roles, ignores junk", () => {

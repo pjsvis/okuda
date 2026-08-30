@@ -1,3 +1,8 @@
+---
+type: Playbook
+callsign: PLY-CHROME
+---
+
 # Chrome Playbook
 
 ## What this is
@@ -145,3 +150,56 @@ property it serves.
   of truth; the viewer is a view. Copy from the file, not the view.
   Scope discipline — okuda doesn't accrete host competence. Calming
   (one less key to learn) + scope integrity.
+
+## Terminal-gifted capabilities — the restraint ledger
+
+The reader deliberately advertises for **none** of the terminal's input
+facilities: no mouse reporting (DECSET 1000/1002/1006 never emitted), no
+bracketed-paste handling, no focus reporting. Every capability below is
+therefore owned and implemented by the *terminal*, not by okuda — free
+features, zero code, zero maintenance, present on every terminal that
+speaks the standard escape protocols.
+
+- **Text selection + copy.** With no app owning the mouse, native drag
+  selection works everywhere (Alacritty ⌘C, iPad SSH long-drag). An app
+  that enables mouse reporting forfeits this — drags route to the app.
+- **OSC 8 hyperlinks.** `wrap.ts` embeds `\x1b]8;;URL\x1b\\` around link
+  text; any OSC-8 terminal (Alacritty, most modern clients) renders
+  tappable/clickable links. SSH is a byte pipe — the sequences cross it
+  intact, so the feature rides to the iPad for free if the client speaks it.
+- **Alt-scroll arrows (DECSET 1007).** When the terminal translates wheel
+  to ↑/↓ for alt-screen apps, the reader's keymap (CSI + SS3 arrows)
+  receives them — mouse-wheel scroll without owning the mouse.
+- **Scrollback, resize, bracketed paste.** The alternate screen handles
+  geometry; the terminal handles the rest.
+
+**The trade this ledger records:** owning the mouse (wheel/swipe scroll
+inside the reader) would cost native selection and add terminal-state
+management — the parked `reader-mouse-wheel` brief exists, and this
+ledger is the argument for keeping it parked. Pick terminals that gift
+capabilities; write less code. The doctrine's story:
+`docs/2026-08-26-the-porch-without-the-zapper.md`.
+
+- **Hue-per-role census (2026-08-26).** Blue was two hexes over four
+  roles (heading + table-header shared `#99ccff`; link-url +
+  diagram-border shared `#5e8bbf`) — tables and URLs masqueraded as
+  headings. The settled map: **blue = document structure** (headings,
+  diagram blueline per ADR-008), **warm gold/amber/sand = voice and
+  data** (emphasis/table-key `#e0b45c`, strong `#cc8800`, table-header
+  `#c8b878` — quieter than key: headers repeat, keys carry), **sea
+  green = links** (`link-url` `#4d9e7a`, reviving the palette's legacy
+  link role — and the web's own link affordance). URLs are the quietest
+  chromatic role (27% luminance): plumbing, readable when sought.
+
+  **Census addendum (same day): luminance is not perceptual weight.**
+  Strong at 50 luminance "overshadowed" a 57 heading — because census
+  luminance × typographic weight is perceived brightness, and bold gold
+  outshouts pale blue at equal numbers. Rule: a role that carries its
+  own typographic weight (bold) gets *less* colour — but never *below
+  its plain-text peers*: weight may discount colour, not demote the role
+  beneath non-bold neighbours (contradictory signals — bold weight says
+  'prominent', buried colour says 'recede' — read as unsettlement, the
+  page's texture lies). Dogfood bracket: 50 (#ffaa00) overshadowed the
+  heading; 30 (#cc8800) sank beneath khaki table chrome; 41.6
+  (#dfa21a) settles — heading 57 > emphasis/key 49 > table-header 48 >
+  link-text 45 > strong 42×bold-weight > URL 27 > muted 9.

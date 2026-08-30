@@ -49,7 +49,7 @@ Run `okuda docs/tables.md --tui` (or `just tables`). The real test is at **two t
 
 ## 5. Wide — 5 cols, long cell content (forces width-shrink)
 
-**Should see:** the table fits the terminal width (never overflows). The widest columns shrink to a proportional budget; long cells wrap in-cell. This is where loose rows meet overcrowding — does the whitespace help you scan, or does the wrapped table just get taller?
+**Should see:** the table fits the terminal width (never overflows). The widest columns shrink to a proportional budget; long cells wrap in-cell. This is where loose rows meet overcrowding — does the whitespace help you scan, or does the wrapped table just get taller? (Generic tables only — a jump-wired menu table role-fits instead: number far right, callsign stable, slug truncates then suppresses. ADR-022; `just jump-demo` shows that path.)
 
 | Name | Kind | Width | Colour | Notes |
 | --- | --- | --- | --- | --- |

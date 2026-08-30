@@ -1,3 +1,8 @@
+---
+type: Playbook
+callsign: PLY-TD
+---
+
 # TD Playbook
 
 > How to work on this project using `td` for task management. Verified against td v0.61.0 — when the binary and docs disagree, the binary wins. Re-verify on version bump.

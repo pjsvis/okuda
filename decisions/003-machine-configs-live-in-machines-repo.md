@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-MACHINE-CONFIGS-003
+---
+
 # Decision: Machine configuration lives in a dedicated machines repository
 
 **Date:** 2026-08-22

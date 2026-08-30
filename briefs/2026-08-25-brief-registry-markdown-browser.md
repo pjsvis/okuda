@@ -1,4 +1,9 @@
-# Brief: OKW markdown browser — the registry-aware dashboard
+---
+type: Brief
+callsign: BRF-REGISTRY-MARKDOWN
+---
+
+# Brief: Registry-aware markdown browser — the silo dashboard
 
 **Date:** 2026-08-25
 **Status:** Open (the next moat move; not started)
@@ -14,25 +19,31 @@ them as navigable lists grouped by the silo's own conventions (status,
 date, tier). Select an entry → render the document.
 
 The key: okuda renders the workflow's own index format. It knows about
-briefs, decisions, debriefs, playbooks because it knows OKW.
+briefs, decisions, debriefs, playbooks because it knows the knowledge
+system (AGENTS.md's table).
 
-## OKW — the named standard
+## The named standard — superseded by ADR-018
 
-**OKW = Okuda Knowledge Workflow.** The silo's knowledge system
+> Originally this section coined "OKW — Okuda Knowledge Workflow" as a
+> named standard. Retired 2026-08-28: one letter from Google's Open
+> Knowledge Format (OKF), a real standard for this exact shape of thing.
+> See ADR-018 (retirement) and ADR-019 (OKF adoption). The contract below
+> survives under its plain name.
+
+**The knowledge system is the standard.** The silo's knowledge system
 (AGENTS.md's table: briefs / decisions / debriefs / playbooks, each with
-an `INDEX.jsonl` registry) is not an ad-hoc structure — it's a named,
-referenceable standard. Referring to "OKW" takes care of the standards
-problem by naming the thing.
-
-Any silo that follows OKW conventions (four tiers, JSONL registries,
-date-first filenames) is navigable by an OKW-aware browser. The browser
-doesn't hardcode this silo's layout; it reads OKW registries. The
-standard is the contract; the browser is its UI.
+an `INDEX.jsonl` registry) is not an ad-hoc structure — it's a
+referenceable convention. Any silo that follows it (four tiers, JSONL
+registries, date-first filenames, OKF frontmatter per ADR-019) is
+navigable by a registry-aware browser. The browser doesn't hardcode
+this silo's layout; it reads the registries. The convention is the
+contract; the browser is its UI.
 
 This is the category-defining move. glow's browser is generic and knows
-nothing. okuda's browser knows OKW. That's the unclonable surface — the
-moat question ("can you name your secrets?") answers itself: the secret
-is OKW, and the browser is its user interface.
+nothing. okuda's browser knows the workflow. That's the unclonable
+surface — the moat question ("can you name your secrets?") answers
+itself: the secret is the workflow, and the browser is its user
+interface.
 
 ## Why it's the moat
 
@@ -79,12 +90,12 @@ operator actually wants to see.
 A generic file browser is a trap — it's glow-parity at the interaction
 layer with no moat. If you build "list .md files, enter to render,"
 you've spent a week reaching glow's baseline. The *only* reason to build
-the browser is the directory specificity / OKW awareness. Build that
+the browser is the directory specificity / registry awareness. Build that
 first, or don't build.
 
 ## What we provide (the one-line answer)
 
 **Readability.** Of documents (okuda today), of silo state (the browser),
 of workflow navigation (the dashboard, later). The house style + the
-renderer + the OKW registry standard = readability at every layer. If
+renderer + the registry conventions = readability at every layer. If
 the workflow is part of it, cool — but readability is the through-line.

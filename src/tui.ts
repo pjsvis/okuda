@@ -18,12 +18,21 @@
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
 import { loadPalette, type Palette } from "./palette";
 import { renderDocument } from "./render";
+import { padStartDisplay, terminalCols, terminalRows } from "./width";
 
 export interface TuiOptions {
   file: string;
   width: number;
   rows: number;
   palette?: Palette;
+  /** Silo badge (brief: silo-mnemonics). Undefined when unrooted → today's
+   *  footer, no silo badge. The renderer paints the string; it learns
+   *  nothing about trees or registries. */
+  silo?: string;
+  /** Per-file callsign resolver (the rooted launcher passes one; the TUI
+   *  knows nothing of registries — ADR-020). Called per paint with the
+   *  current file, so the identity run follows jumps. */
+  callsignFor?: (file: string) => string | null;
 }
 
 /** Decoded keystroke action. `null` = unhandled (no-op). */
@@ -32,7 +41,7 @@ export type KeyAction =
   | "page-down" | "page-up"
   | "half-down" | "half-up"
   | "top" | "bottom" | "reload"
-  | "help"
+  | "help" | "back"
   | null;
 
 const ESC = 0x1b;
@@ -59,7 +68,12 @@ export function decodeKey(buf: Uint8Array): KeyAction {
     case 0x67: return "top";            // g
     case 0x47: return "bottom";         // G
     case 0x72: return "reload";         // r
+    case 0x20: return "page-down";      // space — less/man convention
+    case 0x62: return "page-up";        // b — less/man back convention
     case 0x3f: return "help";           // ? — toggle verbose hints
+    case 0x75: return "back";           // u — pop the backstack
+    case 0x7f: return "back";           // DEL (Backspace on most terminals)
+    case 0x08: return "back";           // BS  (Backspace on some terminals)
   }
   // Escape sequences: ESC [ <final> or ESC [ <n> ~.
   if (b0 === ESC && buf.length >= 3 && buf[1] === 0x5b) {
@@ -68,6 +82,17 @@ export function decodeKey(buf: Uint8Array): KeyAction {
       case 0x42: return "down";          // ESC [ B — ↓
       case 0x35: return "page-up";      // ESC [ 5 ~ — PgUp
       case 0x36: return "page-down";     // ESC [ 6 ~ — PgDn
+    }
+  }
+  // SS3 arrows: ESC O <final>. Sent when DECCKM (application cursor
+  // mode) is on — commonly left set by the shell's line editor. The same
+  // keys as CSI arrows; alt-scroll wheels emit this form too.
+  if (b0 === ESC && buf.length >= 3 && buf[1] === 0x4f) {
+    switch (buf[2]) {
+      case 0x41: return "up";            // ESC O A — ↑
+      case 0x42: return "down";          // ESC O B — ↓
+      case 0x35: return buf[3] === 0x7e ? "page-up" : null;    // ESC O 5 ~
+      case 0x36: return buf[3] === 0x7e ? "page-down" : null;  // ESC O 6 ~
     }
   }
   // Lone Esc (length 1) — treat as quit; common pager convention.
@@ -162,9 +187,81 @@ export function viewport(
   return { visible: lines.slice(s, s + height), maxScroll, scroll: s };
 }
 
-const HINTS = "q quit · j/k scroll · g/G top/bottom · Ctrl-D/U half · r reload";
+const HINTS = "q quit · j/k · ␣/b page · g/G ends · ^D/^U · r reload · NN jump · u back";
 
 /** Display path: folder/basename (Glow convention). Pure. */
+/** ADR-010 re-anchor as a pure function: given the pre- and post-re-render
+ *  lines and the old scroll, return the scroll that pins the old anchor
+ *  (non-blank line nearest the viewport middle — the eye proxy) back to
+ *  its screen row; bounded text-match first, proportional fallback when
+ *  the match misses, index-preservation when there is no anchor.
+ *  Shared by reload (r) and resize (SIGWINCH); fs.watch joins them later
+ *  (brief: tui-live-documents). Pure. */
+export function reanchoredScroll(
+  oldLines: string[],
+  newLines: string[],
+  oldScroll: number,
+  height: number,
+): number {
+  const oldMax = viewport(oldLines, 0, height).maxScroll;
+  const anchor = anchorFor(oldLines, oldScroll, height);
+  const { maxScroll } = viewport(newLines, 0, height);
+  if (anchor !== null) {
+    const idx = findAnchor(newLines, anchor.text, oldScroll, height);
+    if (idx >= 0) return Math.min(Math.max(0, idx - anchor.offset), maxScroll);
+    return proportionalScroll(oldScroll, oldMax, maxScroll);
+  }
+  return Math.min(oldScroll, maxScroll);
+}
+
+/** Fetch outcome: the read path never coerces failure to empty success
+ *  (brief: fetch-state-stamp). A vanished source reported as `""` rendered
+ *  blank and the gate read `changed`; now failure is a distinct state the
+ *  gate retains the last-known-good against. */
+export type Fetch =
+  | { ok: true; text: string }
+  | { ok: false; reason: string };
+
+/** The three-way value the content gate produces and the footer stamp will
+ *  consume. `changed`/`same` fall out of the rendered-output comparison
+ *  (the mechanised "neither" — mtime is not meaning); `failed` is the
+ *  branch the coercing read path used to hide. One enum, three values,
+ *  no overlap. */
+export type FetchState = "changed" | "same" | "failed";
+
+/** Content gate: two renders are the same iff every line matches. `mtime
+ *  is not meaning` — a rewrite with identical content produces zero visual
+ *  events. Pure, exported for gate tests. */
+export function renderEqual(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
+}
+
+/** The gate decision, pure: given the previous rendered lines and the
+ *  outcome of a fresh fetch (with its rendered form when ok), return the
+ *  new fetch-state, the lines to display, and whether to repaint.
+ *  - failed:  retain the last-known-good (`prev`, or `[]` on the very first
+ *    load), mark `failed`, no repaint — honest-stale-with-label, not blank.
+ *  - same:    the content gate held, mark `same`, no repaint.
+ *  - changed: content moved, mark `changed`, repaint (the caller re-anchors
+ *    and paints).
+ *  `prev === null` is the initial-load sentinel: a successful first fetch
+ *  has no prior to compare against, so it reads as `changed`. */
+export function gateFetch(
+  prev: string[] | null,
+  fetch: Fetch,
+  next: string[],
+): { state: FetchState; lines: string[]; repaint: boolean } {
+  if (!fetch.ok) {
+    return { state: "failed", lines: prev ?? [], repaint: false };
+  }
+  if (prev !== null && renderEqual(prev, next)) {
+    return { state: "same", lines: prev, repaint: false };
+  }
+  return { state: "changed", lines: next, repaint: true };
+}
+
 export function displayPath(file: string): string {
   const parts = file.split("/").filter(Boolean);
   if (parts.length <= 1) return file;
@@ -176,27 +273,125 @@ function compactLeft(): string {
   return "? help";
 }
 
-/**
- * Compose the footer: badge + folder/filename left (identity leads —
- * the glance position), help-or-hints right (affordances trail). Pure.
+/** Viewport height: total rows minus the footer, minus the hints row
+ *  when verbose hints are toggled on — the hints own the last row,
+ *  beneath the badge row (identity above, transient affordances below).
+ *  Pure. */
+export function contentHeight(rows: number, showHints: boolean): number {
+  return rows - 1 - (showHints ? 1 : 0);
+}
+
+/** The verbose hints line, right-justified on the last row with the
+ *  corner column reserved. If it can't fit, it wraps — a legible
+ *  'you are too narrow' rather than silent truncation. Pure. */
+export function hintsLine(width: number, muted: (s: string) => string): string {
+  return muted(padStartDisplay(HINTS, width - 1)) + " ";
+}
+
+/** Decode a single-byte digit ('0'–'9') to its character, else null.
+ *  Multi-byte sequences (escape codes, arrows) are never digits — only
+ *  a lone 0x30–0x39 qualifies. The two-digit jump buffer collects these
+ *  before falling to `decodeKey`; any non-digit cancels the buffer.
+ *  Pure. */
+export function digitOf(buf: Uint8Array): string | null {
+  if (buf.length !== 1) return null;
+  const b = buf[0]!;
+  return b >= 0x30 && b <= 0x39 ? String.fromCharCode(b) : null;
+}
+
+/** A jump target lifted from a markdown inline-link token `[NN](path)`.
  *
- * showHints=false (default): `? help` right — the toggle affordance.
- * showHints=true (toggled via `?`): the verbose HINTS line right.
+ *  The index document is an ordinary markdown file; its `[NN](path)`
+ *  links carry the target path in-band — the filesystem is the message
+ *  bus. ADR-020 holds: no `src/` file reads ambient directories to mutate
+ *  the frame; the TUI scans the source text it already holds. The
+ *  renderer paints the link per glow parity (rose text + visible URL);
+ *  callsign-column polish belongs to the silo-mnemonics brief, not here. */
+export interface JumpEntry {
+  token: number;
+  path: string;
+}
+
+/** The result of advancing the two-digit numeric buffer one keystroke.
+ *  `buffer` is the new pending state (null = empty); `token` is the
+ *  resolved two-digit number when the buffer completed, else null.
+ *  Pure. */
+export interface NumBufferStep {
+  buffer: string | null;
+  token: number | null;
+}
+
+/** Advance the numeric jump buffer: a digit accumulates; at two digits
+ *  the token resolves and the buffer resets to empty. A null digit (any
+ *  non-digit key — motion, escape, letters) cancels a pending buffer so
+ *  a stray keystroke never ambushes a half-typed token. Pure — the
+ *  caller performs the IO (jumpTo/back) the resolved token implies. */
+export function advanceNumBuffer(
+  prev: string | null,
+  digit: string | null,
+): NumBufferStep {
+  if (digit === null) return { buffer: null, token: null };
+  const next = (prev ?? "") + digit;
+  if (next.length >= 2) return { buffer: null, token: Number(next) };
+  return { buffer: next, token: null };
+}
+
+/** Scan markdown source for jump wiring — a `%%okuda-rhs:NN%%` token
+ *  paired with a `.md` path on the same line — returning a token→path
+ *  map. Line-scoped (the compositor's contract: the wiring shares the
+ *  line with its item, hidden in a table row's HTML comment or trailing
+ *  a one-line paragraph — the renderer strips the comment, this reads
+ *  the source). Duplicate tokens: last wins. Pure. */
+export function extractJumps(source: string): Map<number, string> {
+  const out = new Map<number, string>();
+  for (const line of source.split("\n")) {
+    const tok = line.match(/%%okuda-rhs:(\d{1,2})%%/);
+    if (!tok) continue;
+    const paths = [...line.matchAll(/\S+\.md/g)].map((m) => m[0]!);
+    const path = paths[paths.length - 1];
+    if (path) out.set(Number(tok[1]!), path);
+  }
+  return out;
+}
+
+/**
+ * Compose the footer: badge + silo? + callsign? + folder/filename left
+ * (identity leads — the glance position), `? help` right (affordance
+ * trails). Always compact — verbose hints live on the last row (see
+ * hintsLine).
+ *
+ * The identity run is `silo · callsign · filename` (ADR-020): silo and
+ * callsign both muted (provenance, not alarm), passed in by the launcher
+ * when rooted — the renderer paints the strings it is given and knows
+ * nothing of registries. Absent segments collapse; the run reads
+ * `silo · filename`, or just the filename unrooted. The binary badge
+ * (label) leads the run, unchanged in every mode (brief:
+ * silo-mnemonics — okuda <file> unchanged).
  */
 export function footerLine(
   width: number,
   label: string,
   file: string,
-  showHints: boolean,
   muted: (s: string) => string,
   badge: (s: string) => string,
+  silo?: string,
+  callsign?: string,
 ): string {
   const name = displayPath(file);
-  const rightText = showHints ? HINTS : compactLeft();
-  // Left: badge (label + 2 padding) + space + folder/file.
-  const leftWidth = label.length + 2 + 1 + name.length;
-  const gap = Math.max(1, width - leftWidth - rightText.length);
-  return badge(label) + " " + muted(name) + " ".repeat(gap) + muted(rightText);
+  const rightText = compactLeft();
+  // identity run: muted silo + callsign, dot-joined, each trailing ` · `.
+  // Empty when unrooted — collapses to today's badge + filename. The
+  // width math uses plain lengths (ANSI is zero-width), parity with
+  // `label.length` and `name.length` — never the ANSI-wrapped run.
+  const identity = [silo, callsign].filter((s): s is string => s !== undefined);
+  const run = identity.length > 0 ? identity.map(muted).join(" \u00b7 ") + " \u00b7 " : "";
+  const runWidth = identity.reduce((w, s) => w + s.length, 0) + identity.length * 3;
+  // Left: badge (label + 2 padding) + space + identity run + folder/file.
+  const leftWidth = label.length + 2 + 1 + runWidth + name.length;
+  // Reserve the last column: Apple's rounded window corner clips the
+  // bottom-right cell — the footer never writes it.
+  const gap = Math.max(1, width - leftWidth - rightText.length - 1);
+  return badge(label) + " " + run + muted(name) + " ".repeat(gap) + muted(rightText) + " ";
 }
 
 // ── I/O loop ──────────────────────────────────────────────────────────
@@ -217,9 +412,22 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   const muted = (s: string) => styler.role("muted", s);
   const badge = (s: string) => styler.badge(s);
 
-  const readSource = async (): Promise<string> => {
-    const f = Bun.file(opts.file);
-    return await f.exists() ? await f.text() : "";
+  /** Read the source as a discriminated union — never coerce failure to
+   *  empty success. `f.exists()` false and any thrown IO (file unlinked
+   *  mid-session, permission revoked, mount vanished) both surface as
+   *  `{ok:false}`; the gate retains the last-known-good against it.
+   *  (brief: fetch-state-stamp — the empty-doc-on-fetch-failure lie.) */
+  // `currentFile` is the live document — jumps and back-nav swap it;
+  // reload/resize read it. `opts.file` only seeds the initial value.
+  let currentFile = opts.file;
+  const readSource = async (file: string = currentFile): Promise<Fetch> => {
+    const f = Bun.file(file);
+    try {
+      if (!(await f.exists())) return { ok: false, reason: "missing" };
+      return { ok: true, text: await f.text() };
+    } catch (err) {
+      return { ok: false, reason: String(err) };
+    }
   };
 
   const renderLines = async (source: string, width: number): Promise<string[]> => {
@@ -227,18 +435,44 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     return out.split("\n");
   };
 
-  let lines: string[] = await renderLines(await readSource(), opts.width);
+  // Enter the alt-screen *before* the first read+render: the file fetch and
+  // the markdown render are async, and doing them in the primary screen
+  // flashes the user's shell scrollback for a frame (the FUT — flash of
+  // unstyled terminal). A blank alt-screen during the read reads as
+  // "loading," not "glitch"; content of the transitional frame beats its
+  // duration (brief: launcher-fut — the ordering half of the fix).
+  process.stdout.write(ENTER_ALT + HIDE_CURSOR);
+
+  // Initial fetch through the gate: prev=null is the initial-load sentinel,
+  // so a successful first read is `changed` (content arrived) and a failed
+  // first read is `failed` with empty lines (no last-known-good to retain).
+  const initialFetch = await readSource();
+  const initialRender = initialFetch.ok
+    ? await renderLines(initialFetch.text, opts.width)
+    : [];
+  const init = gateFetch(null, initialFetch, initialRender);
+  let lines: string[] = init.lines;
+  let fetchState: FetchState = init.state; // footer stamp reads this (brief: fetch-state-stamp)
   let scroll = 0;
   let showHints = false; // `?` toggles: compact % footer ↔ verbose hints
+  // Index-and-jump state (brief 2026-08-28). The jump table is extracted
+  // from the live source whenever it changes; the backstack records
+  // {file, scroll} for `u`/Backspace traversal; numBuffer collects the
+  // two-digit token before a jump resolves.
+  let jumps = extractJumps(initialFetch.ok ? initialFetch.text : "");
+  let backstack: { file: string; scroll: number }[] = [];
+  let numBuffer: string | null = null;
 
   const dims = () => ({
-    rows: process.stdout.rows || opts.rows || 24,
-    cols: process.stdout.columns || opts.width || 80,
+    // terminalCols/Rows handle the Bun --compile columns=0 bug (tput fallback);
+    // opts.width/rows are the caller's fallbacks for the non-TTY case.
+    rows: terminalRows(opts.rows || 24),
+    cols: terminalCols(opts.width || 80),
   });
 
   const paint = (): void => {
     const { rows, cols } = dims();
-    const height = rows - 1; // reserve the last row for the footer
+    const height = contentHeight(rows, showHints); // footer + optional hints row
     let view = viewport(lines, scroll, height);
     if (scroll > view.maxScroll) {
       scroll = view.maxScroll;
@@ -246,28 +480,105 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     }
     process.stdout.write("\x1b[2J\x1b[H"); // clear + home
     process.stdout.write(view.visible.join("\n"));
-    // Footer at the last row: help toggle left, badge + folder/file right.
-    process.stdout.write(`\x1b[${rows};1H`);
-    process.stdout.write(footerLine(cols, "Gloam", opts.file, showHints, muted, badge));
+    if (showHints) {
+      // Badge row up one; hints own the last row, right-justified, corner pad.
+      process.stdout.write(`\x1b[${rows - 1};1H`);
+      process.stdout.write(footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined));
+      process.stdout.write(`\x1b[${rows};1H`);
+      process.stdout.write(hintsLine(cols, muted));
+    } else {
+      process.stdout.write(`\x1b[${rows};1H`);
+      process.stdout.write(footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined));
+    }
   };
 
-  const reload = async (): Promise<void> => {
-    lines = await renderLines(await readSource(), dims().cols);
-    scroll = 0;
+  /** Re-render from source through the content gate, re-anchored (ADR-010
+   *  semantics) — the one repaint path: resize, manual reload, and (brief:
+   *  tui-live-documents) fs.watch all pin the line under the eye to its
+   *  screen row. The gate is the mechanised "neither": identical content
+   *  → `same`, no repaint; a failed fetch → `failed`, retain the
+   *  last-known-good, no repaint; only a real change repaints. */
+  const rerenderAnchored = async (): Promise<void> => {
+    const { rows, cols } = dims();
+    const height = contentHeight(rows, showHints);
+    const fetch = await readSource();
+    const next = fetch.ok ? await renderLines(fetch.text, cols) : [];
+    const decision = gateFetch(lines, fetch, next);
+    fetchState = decision.state;
+    if (!decision.repaint) return; // gate held, or source lost — keep the screen
+    const oldLines = lines;
+    lines = decision.lines;
+    if (fetch.ok) jumps = extractJumps(fetch.text); // re-extract on change
+    scroll = reanchoredScroll(oldLines, lines, scroll, height);
     paint();
   };
 
+  const reload = (): void => { void rerenderAnchored(); };
+
+  /** Present a freshly fetched doc: set lines, re-extract the jump table,
+   *  set scroll, repaint. Used by jump and back (forced loads — the gate's
+   *  same/changed comparison is meaningless across different files, so
+   *  prev=null semantics apply: the new doc always reads `changed`). The
+   *  caller has already verified fetch.ok and pushed the backstack. */
+  const present = (fetch: Fetch, next: string[], nextScroll: number): void => {
+    lines = next;
+    jumps = fetch.ok ? extractJumps(fetch.text) : jumps;
+    fetchState = fetch.ok ? "changed" : "failed";
+    scroll = nextScroll;
+    paint();
+  };
+
+  /** Jump to the document behind a two-digit token. Pushes the current
+   *  view onto the backstack, loads the target at scroll 0. A missing
+   *  token or a vanished target is a silent no-op (acceptance: "numeric
+   *  input is ignored if the requested index does not exist"). */
+  const jumpTo = async (token: number): Promise<void> => {
+    const path = jumps.get(token);
+    if (!path) return;
+    const fetch = await readSource(path);
+    if (!fetch.ok) return; // target gone — stay put, no backstack push
+    backstack.push({ file: currentFile, scroll });
+    currentFile = path;
+    const next = await renderLines(fetch.text, dims().cols);
+    present(fetch, next, 0);
+  };
+
+  /** Pop the backstack: return to the previous document with its scroll
+   *  intact. Empty stack → no-op. A vanished target is dropped (the file
+   *  is gone; the user stays on the current doc). */
+  const back = async (): Promise<void> => {
+    const prev = backstack.pop();
+    if (!prev) return;
+    const fetch = await readSource(prev.file);
+    if (!fetch.ok) return; // target gone — stay; entry dropped
+    currentFile = prev.file;
+    const next = await renderLines(fetch.text, dims().cols);
+    present(fetch, next, prev.scroll);
+  };
+
   const onKey = (data: Buffer): void => {
-    const action = decodeKey(new Uint8Array(data));
+    const bytes = new Uint8Array(data);
+    // Numeric jump buffer: two digits → token lookup. Any non-digit
+    // (motion, escape sequence, letters) cancels a pending buffer.
+    const digit = digitOf(bytes);
+    const step = advanceNumBuffer(numBuffer, digit);
+    numBuffer = step.buffer;
+    if (step.token !== null) {
+      void jumpTo(step.token);
+      return;
+    }
+    if (digit !== null) return; // first digit only — buffer pending
+    const action = decodeKey(bytes);
     if (action === null) return;
     if (action === "quit") return cleanup();
+    if (action === "back") { void back(); return; }
     if (action === "help") {
       showHints = !showHints;
       paint();
       return;
     }
     const { rows } = dims();
-    const height = rows - 1;
+    const height = contentHeight(rows, showHints);
     const { maxScroll } = viewport(lines, 0, height);
     const half = Math.max(1, Math.floor(height / 2));
     switch (action) {
@@ -285,7 +596,15 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     paint();
   };
 
+  // runTui blocks until the reader session ends. The `done` promise is
+  // resolved by cleanup — `q`/Esc/Ctrl-C (in raw mode, all decoded to
+  // `quit`) restore the terminal and *return* to the caller, so the
+  // launcher's browse → read → browse loop resumes the picker rather
+  // than dying (the bug that dropped the reader straight to the shell).
+  // External SIGINT/SIGTERM (kill from another process) still hard-exit.
   let cleaned = false;
+  let resolveDone: () => void = () => {};
+  const done = new Promise<void>((resolve) => { resolveDone = resolve; });
   const cleanup = (): void => {
     if (cleaned) return;
     cleaned = true;
@@ -293,11 +612,14 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     process.stdin.setRawMode?.(false);
     process.stdin.pause?.();
     process.stdout.write(SHOW_CURSOR + EXIT_ALT);
-    process.exit(0);
+    process.removeListener("SIGWINCH", onWinch);
+    process.removeListener("SIGINT", onSignal);
+    process.removeListener("SIGTERM", onSignal);
+    resolveDone();
   };
 
-  // Enter.
-  process.stdout.write(ENTER_ALT + HIDE_CURSOR);
+  // Enter (raw mode + listener only — the alt-screen switch happened
+  // before the first read so no FUT frames the launch).
   process.stdin.setRawMode?.(true);
   process.stdin.resume();
   process.stdin.on("data", onKey);
@@ -311,32 +633,19 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   // never jumps to the top. Vertical resize doesn't reflow, so the null
   // path keeps index-preservation, honest there. (brief:
   // resize-content-anchor)
-  const onWinch = (): void => { void (async () => {
-    const height = dims().rows - 1;
-    const oldMax = viewport(lines, 0, height).maxScroll;
-    const anchor = anchorFor(lines, scroll, height);
-    lines = await renderLines(await readSource(), dims().cols);
-    const { maxScroll } = viewport(lines, 0, height);
-    if (anchor !== null) {
-      const idx = findAnchor(lines, anchor.text, scroll, height);
-      if (idx >= 0) {
-        scroll = Math.min(Math.max(0, idx - anchor.offset), maxScroll);
-      } else {
-        scroll = proportionalScroll(scroll, oldMax, maxScroll);
-      }
-    } else {
-      scroll = Math.min(scroll, maxScroll);
-    }
-    paint();
-  })(); };
+  const onWinch = (): void => { void rerenderAnchored(); };
   process.on("SIGWINCH", onWinch);
 
-  // Clean exit on signal.
-  const onSignal = (): void => cleanup();
+  // Clean exit on signal: restore the terminal, then hard-exit. A signal
+  // from outside is a hard interrupt, not a return-to-picker; in raw mode
+  // Ctrl-C is byte 0x03 (decoded `quit`), so this path is for `kill -INT`
+  // only — cleanup runs first so the terminal is never left in alt-screen.
+  const onSignal = (): void => { cleanup(); process.exit(130); };
   process.on("SIGINT", onSignal);
   process.on("SIGTERM", onSignal);
 
   paint();
+  await done;
 }
 
 export { HINTS };

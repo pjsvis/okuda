@@ -4,7 +4,7 @@
  * Usage: okuda <file.md> [--watch] [--tui] [--no-color] [--palette <name>]
  *        cat doc.md | okuda
  *
- *  - Terminal width: process.stdout.columns, fallback 80.
+ *  - Terminal width: terminalCols() (handles Bun's columns=0 bug; fallback 80).
  *  - --watch: fs.watch + SIGWINCH re-render, debounced, screen cleared.
  *  - --no-color: same as NO_COLOR (plain text, identical line breaks).
  *  - --palette <name>: named preset (e.g. 'dracula' for glow parity).
@@ -15,6 +15,10 @@ import { detectColorMode } from "./ansi";
 import { loadPalette } from "./palette";
 import { renderDocument } from "./render";
 import { runTui } from "./tui";
+import { runLauncher, invokedAsGloam } from "./launcher";
+import { detectRoot, makeCallsignResolver, resolveByCallsign } from "./root";
+import { terminalCols, terminalRows } from "./width";
+import { existsSync } from "node:fs";
 
 interface Args {
   file: string | null;
@@ -56,6 +60,10 @@ function parseArgs(argv: string[]): Args {
 /** Known preset names, for error messages. */
 const KNOWN_PRESETS = ["okuda", "dracula"];
 
+/** Callsign shape: tier prefix + significant tokens, uppercase (the
+ *  registry's vocabulary — BRF-INDEX-JUMP, ADR-BOUND-010, PLY-REGISTRY). */
+const CALLSIGN_SHAPE = /^[A-Z]{3}(-[A-Z0-9]+)+$/;
+
 async function readSource(file: string | null): Promise<string> {
   if (file) {
     const f = Bun.file(file);
@@ -73,6 +81,33 @@ async function readSource(file: string | null): Promise<string> {
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
+  // Gloam launcher (ADR-016): invoked as `gloam` with no file arg and a TTY
+  // stdin → run the browse → read → browse picker loop. `okuda <file>` is
+  // unaffected; two names, two entry contracts, one binary.
+  if (invokedAsGloam() && !args.file && process.stdin.isTTY) {
+    await runLauncher();
+    return;
+  }
+  // `gloam <callsign>` (silo-mnemonics): a callsign-shaped argument that
+  // names no file resolves through the rooted registry — the human code
+  // for low-bandwidth channels. Unknown code or unrooted cwd → honest
+  // error; anything else falls through to the reader's own diagnostics.
+  if (invokedAsGloam() && args.file && !existsSync(args.file) && CALLSIGN_SHAPE.test(args.file) && process.stdin.isTTY) {
+    const root = detectRoot();
+    const path = root ? resolveByCallsign(args.file) : null;
+    if (!path) {
+      process.stderr.write(`gloam: unknown callsign: ${args.file}${root ? "" : " (cwd is not a rooted silo)"}\n`);
+      process.exit(1);
+    }
+    await runTui({
+      file: path,
+      width: terminalCols(80),
+      rows: terminalRows(24),
+      silo: root?.badge,
+      callsignFor: makeCallsignResolver(),
+    });
+    return;
+  }
   const color = args.noColor
     ? "none"
     : detectColorMode(process.env as NodeJS.ProcessEnv);
@@ -84,7 +119,7 @@ async function main(): Promise<void> {
 
   const draw = async (): Promise<void> => {
     const source = await readSource(args.file);
-    const width = process.stdout.columns || 80;
+    const width = terminalCols(80);
     const out = await renderDocument(source, { width, palette, color });
     if (args.watch) {
       process.stdout.write("\x1b[2J\x1b[3J\x1b[H"); // clear + home
@@ -104,8 +139,8 @@ async function main(): Promise<void> {
   ) {
     await runTui({
       file: args.file,
-      width: process.stdout.columns || 80,
-      rows: process.stdout.rows || 24,
+      width: terminalCols(80),
+      rows: terminalRows(24),
       palette,
     });
     return;

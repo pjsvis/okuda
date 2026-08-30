@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-RENDER-ENGINE-005
+---
+
 # Decision: Render engine uses string protocols over Bun.markdown's string-in/string-out callbacks
 
 **Date:** 2026-08-24

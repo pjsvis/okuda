@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-DEFAULT-PALETTE-011
+---
+
 # Decision: The default palette is the okuda preset — identity over parity
 
 **Date:** 2026-08-25

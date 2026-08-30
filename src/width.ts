@@ -261,6 +261,65 @@ export function displayWidth(s: string): number {
 }
 
 /**
+ * Terminal size detection — robust against the Bun `--compile` bug where
+ * `process.stdout.columns`/`rows` report **0** (not undefined) even when
+ * `isTTY` is true. `0 || fallback` catches undefined but NOT 0, so a naive
+ * `columns || 80` regresses to 80 on the affected terminals (observed in
+ * Alacritty; Ghostty reports the real winsize). Confirmed by a published
+ * polyfill (critique@0.1.140, patch-terminal-dimensions.ts) and Bun issue
+ * #23224. The fix: treat 0 as falsy and fall back to `tput cols`/`tput lines`
+ * (terminfo reads the winsize directly via ioctl, bypassing Bun's broken
+ * path). `tput` is present on every POSIX system with a terminfo db.
+ *
+ * Returns `{ cols, rows }` or `null` if no measurement is possible
+ * (non-TTY, no tput, etc.). Callers apply their own fallback.
+ */
+export function terminalSize(): { cols: number; rows: number } | null {
+  const out = process.stdout;
+  // The real path: Bun's winsize worked. `> 0` excludes the 0-from-compile bug.
+  if (typeof out.columns === "number" && out.columns > 0 && typeof out.rows === "number" && out.rows > 0) {
+    return { cols: out.columns, rows: out.rows };
+  }
+  // The 0/undefined path: ask terminfo directly. Only meaningful on a TTY;
+  // tput on a non-TTY returns the db default (often 80) which is no worse
+  // than our fallback, but we gate on isTTY to avoid a misleading measurement.
+  if (!out.isTTY) return null;
+  try {
+    const { execSync } = require("node:child_process");
+    const cols = parseInt(execSync("tput cols", { encoding: "utf-8", stdio: ["inherit", "pipe", "pipe"] }).trim(), 10);
+    const rows = parseInt(execSync("tput lines", { encoding: "utf-8", stdio: ["inherit", "pipe", "pipe"] }).trim(), 10);
+    if (cols > 0 && rows > 0) return { cols, rows };
+  } catch {
+    // tput missing or failed — caller falls back.
+  }
+  return null;
+}
+
+/** Convenience: terminal columns with a fallback (default 80). The single
+ *  width source for both the streaming path and the TUI.
+ *
+ *  fzf previews: the preview command runs with stdout as a pipe, so
+ *  `terminalSize()` returns null and callers would wrap to the 80 fallback
+ *  while the preview pane is visibly wider/narrower — okuda behaving like
+ *  Glow, the thing this project exists to abolish. fzf exports the pane's
+ *  real width to its preview processes as FZF_PREVIEW_COLUMNS; when set,
+ *  it is authoritative (its presence *means* "you are in a preview pane"),
+ *  so it takes precedence over both the TTY read and the fallback. */
+export function terminalCols(fallback = 80): number {
+  const preview = process.env.FZF_PREVIEW_COLUMNS;
+  if (preview !== undefined) {
+    const n = parseInt(preview, 10);
+    if (Number.isFinite(n) && n > 0) return n;
+  }
+  return terminalSize()?.cols ?? fallback;
+}
+
+/** Convenience: terminal rows with a fallback (default 24). */
+export function terminalRows(fallback = 24): number {
+  return terminalSize()?.rows ?? fallback;
+}
+
+/**
  * Tokenize a string into zero-width escapes and measured graphemes.
  * The wrap engine consumes this stream to track style state and column
  * positions in one pass.
@@ -316,4 +375,47 @@ export function padCenterDisplay(s: string, cols: number): string {
   if (w >= cols) return s;
   const left = Math.floor((cols - w) / 2);
   return " ".repeat(left) + s + " ".repeat(cols - w - left);
+}
+
+/** Elide ANSI-coloured text to `cols` display columns — the elision
+ *  primitive (ADR-014's doctrine, td-b81597): truncate, never wrap; when
+ *  the line overflowed, the last column becomes `…`, the horizontal-
+ *  continuation glyph. ANSI-aware: escapes are 0-width and preserved
+ *  through the cut. Grapheme-aware: whole graphemes at their measured
+ *  width (a wide CJK/emoji cluster is never split and never overruns —
+ *  a straddling cluster is dropped, the marker takes its place). If the
+ *  text fits, returns it unchanged. If it overflows, emits the text up
+ *  to the cut plus a `marker` (default `…`) — closing any open SGR with
+ *  `reset` first. Never exceeds `cols` (the marker is included in the
+ *  budget). Pure. (One primitive, two consumers: code fences + the menu
+ *  role fit — brief: elision-primitive; the one-line menu/list pattern
+ *  from index-and-jump rides the same function.) */
+export function elideToWidth(
+  s: string,
+  cols: number,
+  marker = "…",
+  reset = "\x1b[0m",
+): string {
+  const w = displayWidth(s);
+  if (w <= cols) return s;
+  const markerW = displayWidth(marker);
+  const budget = cols - markerW;
+  if (budget <= 0) return marker.slice(0, cols);
+  // Walk runs, accumulating visible width; cut at the budget.
+  let out = "";
+  let vis = 0;
+  let openSgr = false;
+  for (const run of scanRuns(s)) {
+    if (run.kind === "escape") {
+      out += run.raw;
+      if (/\x1b\[[0-9;]*m/.test(run.raw)) openSgr = !/\x1b\[0*m/.test(run.raw);
+      continue;
+    }
+    // visible grapheme — take it only if it fits whole in the budget.
+    if (vis + run.width > budget) break;
+    out += run.raw;
+    vis += run.width;
+  }
+  // Close any open SGR before the marker (style hygiene at the cut).
+  return out + (openSgr ? reset : "") + marker;
 }

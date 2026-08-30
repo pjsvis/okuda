@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-GLOW-DARK-006
+---
+
 # Decision: Glow (glamour) dark palette as the default
 
 **Date:** 2026-08-24

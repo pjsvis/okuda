@@ -37,6 +37,38 @@ describe("render — headings", () => {
   });
 });
 
+// ── Block terminator (the okudagram's bottom; candidate B of the
+// 2026-08-27 four-way probe). Rule to the title's column, chip in the
+// header chip's cell — renderer-emitted, never authored.
+describe("render — block terminator", () => {
+  test("present on a non-empty document, two chips bookend the rail", async () => {
+    const out = await render("# Title\n\nBody");
+    const last = lines(out).map(stripANSI).filter((l) => l !== "").at(-1)!;
+    // LHS chip mirrors the H1 badge column; RHS chip mirrors the heading chip.
+    expect(last).toMatch(/^ {2}█ ─+ █$/);
+    // Same total width as the heading line — the chips land at the same columns.
+    const heading = lines(out).map(stripANSI).find((l) => l.includes("Title"))!;
+    expect(displayWidth(last)).toBe(displayWidth(heading));
+    // LHS chip at the badge column (first content col), RHS chip at the last.
+    expect(last[2]).toBe("█");
+    expect(last[last.length - 1]).toBe("█");
+  });
+
+  test("absent on an empty document", async () => {
+    const out = await render("");
+    expect(out).not.toContain("─");
+    expect(out).not.toContain("█");
+  });
+
+  test("none-mode parity: plain rail, plain chips, same columns", async () => {
+    const out = await render("Body", W, "none");
+    const last = lines(out).map(stripANSI).filter((l) => l !== "").at(-1)!;
+    // chip + space + rail(W-4-4) + space + chip = content width (W-4)
+    expect(last).toBe("  " + "█ " + "─".repeat(W - 4 - 4) + " █");
+    expect(out).not.toContain("\x1b[");
+  });
+});
+
 // ── RHS chip (brief: right-edge LCARS tab). A heading-bg space at the
 //    last content column of every header line — the visible right bound,
 //    bookend to the left badge. The chip IS the rhs margin for headers.
@@ -165,7 +197,11 @@ describe("render — grammar pre-passes (front matter, setext)", () => {
     expect(none).toContain("para");
     expect(none).toContain("---");
     expect(none).toContain("===");
-    expect(none).not.toContain("──"); // no hr manufactured inside the fence
+    // No hr manufactured inside the fence: the only `──` run is the block
+    // terminator, and it is the document's last line.
+    const hrLines = lines(none).map(stripANSI).filter((l) => l.includes("──"));
+    expect(hrLines).toHaveLength(1);
+    expect(hrLines[0]).toMatch(/─+ █$/);
   });
 
   test("standalone thematic break (blank line above) still renders as hr", async () => {
@@ -260,6 +296,49 @@ describe("render — lists (loose, markers, continuation)", () => {
     expect(out2).not.toContain("\u0000");
   });
 
+  // ADR-004 invariant: okuda owns every \n — no emitted line exceeds the
+  // terminal width. Composition shifts nested blocks +4 per level AFTER
+  // wrapping (item continuation + LIST_INDENT); the wrap must budget it.
+  test("nested list lines respect terminal width (ADR-004)", async () => {
+    // 7-char words tile the (pre-fix) avail budget so wrapped lines hit
+    // the width limit exactly — shorter words can leave slack and miss.
+    const src = "- " + "outerr ".repeat(16) + "\n  - " + "innerr ".repeat(16);
+    const out = await render(src, 40);
+    for (const l of lines(out)) {
+      expect(displayWidth(l)).toBeLessThanOrEqual(40);
+    }
+  });
+
+  test("flattened third-level lines respect terminal width (ADR-004)", async () => {
+    const src =
+      "- " + "alpha ".repeat(14) +
+      "\n  - " + "beta ".repeat(14) +
+      "\n    - " + "gamma ".repeat(14);
+    const out = await render(src, 40);
+    for (const l of lines(out)) {
+      expect(displayWidth(l)).toBeLessThanOrEqual(40);
+    }
+  });
+
+  // ADR-006 NO_COLOR parity for nested lists: the depth budget is
+  // structural and color-independent, so plain output is the coloured
+  // output minus escapes with identical line breaks — including the
+  // wrapped nested lines where the ADR-004 violation used to live.
+  // The existing parity test uses a top-level list only; this pins the
+  // nested case so a future palette/depth change can't silently diverge.
+  test("nested list plain output is coloured output minus escapes (NO_COLOR parity)", async () => {
+    const src =
+      "- " + "outerr ".repeat(16) +
+      "\n  - " + "innerr ".repeat(16) +
+      "\n    - " + "flattened ".repeat(14);
+    const colored = await render(src, 40, "truecolor");
+    const plain = await render(src, 40, "none");
+    expect(plain).not.toContain("\x1b");
+    const cLines = colored.split("\n").map((l) => stripANSI(l).replace(/ +$/, ""));
+    const pLines = plain.split("\n").map((l) => l.replace(/ +$/, ""));
+    expect(cLines).toEqual(pLines);
+  });
+
   test("task list checkbox markup stays literal", async () => {
     const out = await render("- [ ] todo\n- [x] done");
     expect(out).toContain("[ ] todo");
@@ -282,19 +361,39 @@ describe("render — blockquote", () => {
 });
 
 describe("render — code fences", () => {
-  test("2-space indent, code colours, never wrapped", async () => {
+  test("2-space indent, code colours, elided at the content width (td-b81597)", async () => {
     const long = "x".repeat(70);
     const out = await render("```ts\nconst line = \"" + long + "\"\n```", 40);
-    const codeLine = lines(out).find((l) => l.includes(long));
+    const codeLine = lines(out).find((l) => l.includes("const line"));
     expect(codeLine).toBeDefined();
     expect(stripANSI(codeLine!)).toStartWith("  ");
-    expect(displayWidth(codeLine!)).toBeGreaterThan(40); // overflows by design
+    // ADR-004's invariant restored for fences: the emitted line is never
+    // wider than the terminal (margin 2+2 + ctx.width = 40), so the
+    // terminal never soft-wraps it. The overflow ends with the `…`
+    // elision marker — the fence exception ("overflow ugly by design")
+    // closed by eliding, not wrapping.
+    expect(displayWidth(codeLine!)).toBe(40);
+    expect(stripANSI(codeLine!).endsWith("…")).toBe(true);
+  });
+
+  test("elision is grapheme-aware: a wide cluster never splits", async () => {
+    // 16 CJK graphemes = 32 cols > budget 36 at width 40: the last
+    // cluster that would straddle drops whole, … takes its place — the
+    // elided line never exceeds the budget and never shows half a char.
+    const out = await render("```\n\u4e2d\u6587\u5bbd\u5b57\u7b26\u6d4b\u8bd5\u884c\u5f88\u957f\u5f88\u957f\u5f88\u957f\u5f88\u957f\u518d\u52a0\u51e0\u4e2a\u5b57\n```", 40);
+    const codeLine = lines(out).find((l) => l.includes("\u4e2d"));
+    expect(codeLine).toBeDefined();
+    expect(displayWidth(codeLine!)).toBeLessThanOrEqual(40);
+    expect(stripANSI(codeLine!).endsWith("…")).toBe(true);
+    expect(stripANSI(codeLine!)).not.toMatch(/[\u4e2d-\u9fff]$/); // … not a char
   });
 
   test("interior blank lines preserved", async () => {
     const out = await render("```\na\n\nb\n```");
     const stripped = lines(out).map((l) => stripANSI(l));
-    expect(stripped).toEqual(["", "    a", "", "    b", ""]);
+    expect(stripped.slice(0, 5)).toEqual(["", "    a", "", "    b", ""]);
+    // The block terminator follows: two chips bookend a muted rail.
+    expect(stripped.filter((l) => l !== "").at(-1)).toMatch(/^ {2}█ ─+ █$/);
   });
 
   test("indented code block rejected as plain text (no crash, no markup)", async () => {
@@ -326,6 +425,15 @@ describe("render — rejections (no crash, no raw markup)", () => {
     expect(out).toContain("before bold after");
     expect(out).not.toContain("<b>");
     expect(out).not.toContain("</b>");
+  });
+
+  test("HTML comments stripped — the jump-resolver wiring channel", async () => {
+    // Compositors hide paths in `<!-- … -->`; the renderer strips them
+    // (invisible to the reader) while extractJumps reads them from source.
+    const out = await render("**01** *Title* <!-- briefs/foo.md -->");
+    expect(out).not.toContain("briefs/foo.md");
+    expect(out).not.toContain("<!--");
+    expect(out).toContain("Title");
   });
 
   test("footnote renders as literal text", async () => {
@@ -412,5 +520,112 @@ describe("render — property invariants", () => {
     const doc = "- a\n  - b\n\n> q\n\n| h | k |\n|--|--|\n| 1 | 2 |\n";
     const out = await render(doc);
     expect(out).not.toContain("\u0000");
+  });
+});
+
+// ── near/far + RHS action: the one-line list pattern ──
+// (brief: index-and-jump). Slug left (consider), number RHS (execute),
+// path hidden in a comment. Truncate to fit, never wrap.
+
+describe("render — near/far + RHS number, the one-line list pattern", () => {
+  test("a .md path in an HTML comment is stripped (hidden wiring)", async () => {
+    const out = await render("*Title* %%okuda-rhs:01%% <!-- decisions/foo.md -->");
+    expect(out).not.toContain("decisions/foo.md");
+    expect(out).not.toContain("<!--");
+  });
+
+  test("the RHS number renders white bold at the end of the line", async () => {
+    const out = await render("*Title* %%okuda-rhs:01%% <!-- docs/foo.md -->");
+    // bold attribute (1), no colour → white bold. The number is the
+    // content; bold is the affordance.
+    expect(out).toContain("\x1b[1m01\x1b[0m");
+  });
+
+  test("the slug renders as emphasis (yellow, italic) on the left", async () => {
+    const out = await render("*The Slug* %%okuda-rhs:01%% <!-- docs/foo.md -->");
+    // emphasis #f1fa8c → 241;250;140 ; italic (3) on dracula.
+    expect(out).toContain("\x1b[38;2;241;250;140;3mThe Slug\x1b[0m");
+  });
+
+  test("the slug and number are on one line (no wrap)", async () => {
+    const out = await render("*Short* %%okuda-rhs:01%% <!-- docs/foo.md -->");
+    // The item is one line of body text (plus the header/footer rails).
+    const bodyLines = out.split("\n").filter((l) => l.trim() && !l.includes("─") && !l.includes("█"));
+    expect(bodyLines.length).toBe(1);
+  });
+
+  test("a long slug truncates with … and the number stays at the RHS", async () => {
+    const out = await render(
+      "*A very long slug that will not fit in a narrow terminal* %%okuda-rhs:05%% <!-- docs/x.md -->",
+      40,
+    );
+    const plain = out.replace(/\x1b\[[0-9;]*m/g, "");
+    expect(plain).toContain("…");
+    expect(plain).toContain("05");
+    // One body line (not wrapped): the body lines, excluding rails.
+    const bodyLines = plain.split("\n").filter((l) => l.trim() && !l.includes("─") && !l.includes("█"));
+    expect(bodyLines.length).toBe(1);
+    // The full uncut text is not present (truncated).
+    expect(plain).not.toContain("narrow terminal");
+  });
+
+  test("greedy: a .md mention in ordinary prose still mutes (the far register)", async () => {
+    const out = await render("See the notes in docs/essay.md for more.");
+    expect(out).toContain("\x1b[38;2;88;88;88mdocs/essay.md\x1b[0m");
+  });
+
+  test("a non-digit strong run keeps the amber strong colour (not white)", async () => {
+    const out = await render("**not-a-number**");
+    // strong #ffb86c → 255;184;108 ; bold (1). The digits-only rule is
+    // scoped to numbers; prose strong stays amber.
+    expect(out).toContain("\x1b[38;2;255;184;108;1mnot-a-number\x1b[0m");
+  });
+
+  test("extractJumps still lifts the path from the RHS-token source", async () => {
+    const { extractJumps } = await import("../src/tui");
+    const j = extractJumps("*Another* %%okuda-rhs:02%% <!-- briefs/bar.md -->");
+    expect(j.get(2)).toBe("briefs/bar.md");
+  });
+});
+
+// ── prose state glyphs: the closed lexicon colours standalone glyphs ──
+// (the leap — prose glyphs were plain before; now consistent everywhere).
+
+describe("render — state glyphs colour in prose (the lexicon leap)", () => {
+  test("a leading ☐ in a prose run colours state-todo yellow bold", async () => {
+    const out = await render("☐ open — title");
+    // state-todo #ffe066 → 255;224;102 ; bold (1)
+    expect(out).toContain("\x1b[38;2;255;224;102;1m☐\x1b[0m");
+  });
+  test("✓ colours state-ok green bold", async () => {
+    const out = await render("✓ done — landed");
+    expect(out).toContain("\x1b[38;2;95;211;95;1m✓\x1b[0m");
+  });
+  test("✗ colours state-failed red bold", async () => {
+    const out = await render("✗ rejected — out of scope");
+    expect(out).toContain("\x1b[38;2;255;85;85;1m✗\x1b[0m");
+  });
+  test("⋮ colours state-parked orange bold", async () => {
+    const out = await render("⋮ parked — gate not fired");
+    expect(out).toContain("\x1b[38;2;255;153;51;1m⋮\x1b[0m");
+  });
+  test("every standalone glyph in a legend line colours, not just the first", async () => {
+    // The status key at the bottom of a menu: all four glyphs colour.
+    const out = await render("☐ open · ⋮ parked · ✗ rejected · ✓ accepted");
+    expect(out).toContain("\x1b[38;2;255;224;102;1m☐\x1b[0m");
+    expect(out).toContain("\x1b[38;2;255;153;51;1m⋮\x1b[0m");
+    expect(out).toContain("\x1b[38;2;255;85;85;1m✗\x1b[0m");
+    expect(out).toContain("\x1b[38;2;95;211;95;1m✓\x1b[0m");
+  });
+  test("a glyph embedded in a word is NOT coloured (standalone only)", async () => {
+    // The lookahead requires the glyph to be followed by space/end, so
+    // an embedded use (no surrounding spaces) stays plain. Conservative.
+    const out = await render("foo✓bar");
+    expect(out).not.toContain("\x1b[38;2;95;211;95;1m✓");
+  });
+  test("a non-state glyph in prose stays plain (◆ is priority, not state)", async () => {
+    const out = await render("◆ priority — not a state glyph");
+    expect(out).not.toContain("\x1b[38;2;95;211;95;1m◆");
+    expect(out).not.toContain("\x1b[38;2;255;224;102;1m◆");
   });
 });

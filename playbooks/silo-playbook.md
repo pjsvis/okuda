@@ -1,3 +1,8 @@
+---
+type: Playbook
+callsign: PLY-SILO
+---
+
 # Silo Playbook
 
 A **silo** is a self-contained project directory with named compartments,

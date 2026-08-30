@@ -26,8 +26,11 @@ export const PARSER_OPTIONS = {
   noIndentedCodeBlocks: true,
 } as const;
 
-/** Inline HTML spans — stripped silently (grammar: Raw HTML → No). */
-export const RE_INLINE_HTML = /<\/?[A-Za-z][^<>\n]*>/g;
+/** Inline HTML spans — stripped silently (grammar: Raw HTML → No).
+ *  Also matches HTML comments `<!-- … -->` so compositors can hide
+ *  jump-resolver wiring (paths) from the rendered output while
+ *  `extractJumps` reads it from source. */
+export const RE_INLINE_HTML = /<!--[\s\S]*?-->|<\/?[A-Za-z][^<>\n]*>/g;
 
 /**
  * ── String-tag protocol ─────────────────────────────────────────────
@@ -42,6 +45,17 @@ export const RE_INLINE_HTML = /<\/?[A-Za-z][^<>\n]*>/g;
 /** List item placeholder — the `list` handler assigns markers. */
 export const TAG_ITEM = "\u0000I\u0000";
 
+/** RHS wire tag — a table cell's jump wiring (`<!-- %%okuda-rhs:NN%%
+ *  path -->`) survives as this tag instead of being stripped as inline
+ *  HTML: the `text` handler emits it, the `td` handler consumes it (the
+ *  cell is marked wired), and any residual is swept by `stripTags`.
+ *  Wired cells are the menu-pattern declaration — the renderer's cue
+ *  that the table is a patterned surface (ADR-022 role fit), not a
+ *  generic table. (td-b81597; same convention the paragraph path and
+ *  `extractJumps` already key on.) */
+export const TAG_RHS_WIRE = "\u0000W\u0000";
+export const RE_RHS_WIRE = /^<!--\s*%%okuda-rhs:\d{1,2}%%[^>]*-->$/;
+
 /** Raw block tags protect never-wrapped content during re-wraps. */
 export function tagRawOpen(kind: string): string {
   return `\u0000RAW:${kind}\u0000`;
@@ -54,6 +68,21 @@ export function tagNestedOpen(depth: number): string {
 }
 export const TAG_NESTED_CLOSE = "\u0000/NL\u0000";
 
+/**
+ * Structural probe tags — list call identity for the width probe pass.
+ * Bun.markdown is post-order: a nested list renders before its parent
+ * fires, so ancestry can't reach it in one pass. The probe renders once
+ * with list handlers swapped for these tags; a parent's children then
+ * name its descendants, and the containment chain yields each list's
+ * true depth (see render.ts probeListDepths). Probe tags never reach
+ * the final document — probe output is discarded.
+ */
+export function tagProbeOpen(id: number): string {
+  return `\u0000PB:${id}\u0000`;
+}
+export const TAG_PROBE_CLOSE = "\u0000/PB\u0000";
+export const RE_PB_TAG = /\u0000PB:(\d+)\u0000/;
+
 /** Strip every protocol tag from a rendered document. */
 export function stripTags(s: string): string {
   return s.replace(/\u0000[^\u0000]*\u0000/g, "");
@@ -64,3 +93,10 @@ export function mermaidToken(id: string): string {
   return `%%okuda-mmd-${id}%%`;
 }
 export const RE_MERMAID_TOKEN = /%%okuda-mmd-([a-z0-9]+)%%/;
+
+/** RHS number token — a trailing `%%okuda-rhs:NN%%` in a paragraph marks
+ *  a one-line list item: the slug renders left, truncated to fit, the
+ *  number renders bold at the RHS (the action follows the content). The
+ *  compositor emits it; the paragraph handler renders the line;
+ *  `extractJumps` reads the number from source. (brief: index-and-jump.) */
+export const RE_RHS_TOKEN = /%%okuda-rhs:(\d{1,2})%%/;

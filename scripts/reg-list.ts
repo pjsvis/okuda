@@ -25,6 +25,7 @@ interface Entry {
   date: string;
   status: string;
   summary: string;
+  callsign?: string;
   meta?: Record<string, unknown>;
 }
 
@@ -62,9 +63,11 @@ for (const name of names) {
   }
   const wFile = Math.max(...entries.map((e) => e.file.length), 4);
   const wStatus = Math.max(...entries.map((e) => e.status.length), 6);
+  const wCs = Math.max(...entries.map((e) => e.callsign?.length ?? 0), 3);
   for (const e of entries) {
     const src = e.meta?.source ? ` [${e.meta.source}]` : "";
-    console.log(`  ${e.date}  ${e.status.padEnd(wStatus)}  ${e.file.padEnd(wFile)}  ${e.summary}${src}`);
+    const cs = (e.callsign ?? "").padEnd(wCs);
+    console.log(`  ${e.date}  ${e.status.padEnd(wStatus)}  ${e.file.padEnd(wFile)}  ${cs} ${e.summary}${src}`);
   }
 }
 console.log(`\n${total} document(s) across ${names.length} registr${names.length === 1 ? "y" : "ies"}`);

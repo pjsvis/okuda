@@ -21,12 +21,18 @@ import {
   PARSER_OPTIONS,
   RE_INLINE_HTML,
   RE_MERMAID_TOKEN,
+  RE_PB_TAG,
+  RE_RHS_TOKEN,
+  RE_RHS_WIRE,
   TAG_ITEM,
   TAG_NESTED_CLOSE,
+  TAG_PROBE_CLOSE,
   TAG_RAW_CLOSE,
+  TAG_RHS_WIRE,
   mermaidToken,
   stripTags,
   tagNestedOpen,
+  tagProbeOpen,
   tagRawOpen,
 } from "./grammar";
 import { loadPalette, type Palette } from "./palette";
@@ -36,10 +42,64 @@ import {
   padDisplay,
   padStartDisplay,
 } from "./width";
+import { stripANSI, elideToWidth } from "./width";
 import { wrapANSI } from "./wrap";
 
 /** Left indent for list blocks, inside the content margin (Glow list level_indent). */
 const LIST_INDENT = 2;
+
+/** The closed state-glyph vocabulary — lexicon-applied, not author-editable.
+ *  The renderer colours a ✓ green because ✓ is in this set, not because
+ *  an author can tag arbitrary text green. Extends ADR-015's alert
+ *  discipline to the full traffic lamp. ◆ is NOT here — priority, not
+ *  state; colouring it would collapse two axes. (brief:
+ *  state-glyph-render-path.) */
+const STATE_GLYPH_ROLE: Record<string, keyof Palette> = {
+  "\u2713": "state-ok",      // ✓ done/shipped — green
+  "\u2610": "state-todo",    // ☐ todo/pending — yellow
+  "\u22ee": "state-parked",  // ⋮ parked/elided — orange
+  "\u2717": "state-failed",  // ✗ rejected/failed — red (= alert)
+};
+
+/** If `text` begins with a state glyph (the closed set), colour + bold
+ *  that leading glyph via its lexicon role; leave the rest unchanged.
+ *  Detects the glyph after any leading ANSI escapes (inline-styled
+ *  cells may carry SGR before the visible char). Pure; no-op in none
+ *  mode (roleBold returns the glyph plain — NO_COLOR parity). */
+function styleStateGlyph(text: string, styler: ReturnType<typeof makeStyler>): string {
+  if (text === "") return text;
+  // Find the first visible char by skipping leading ANSI SGR sequences.
+  const stripped = stripANSI(text);
+  const first = [...stripped][0];
+  if (first === undefined) return text;
+  const role = STATE_GLYPH_ROLE[first];
+  if (!role) return text;
+  // Locate the glyph in the original (with ANSI) by matching the
+  // stripped prefix length, then splice the styled glyph in.
+  const prefixLen = stripped.length - [...stripped].slice(1).join("").length;
+  // Walk the original text, counting visible chars until we hit the glyph.
+  let visStart = -1;
+  let visible = 0;
+  const re = /\x1b\[[0-9;]*m/g;
+  let m: RegExpExecArray | null;
+  let i = 0;
+  for (;;) {
+    re.lastIndex = i;
+    m = re.exec(text);
+    const ansiStart = m ? m.index : text.length;
+    if (visible === 0) { visStart = ansiStart; break; }
+    // count chars between i and ansiStart
+    if (ansiStart > i) {
+      const chunk = text.slice(i, ansiStart);
+      visible += [...chunk].length;
+    }
+    i = m ? m.index + m[0].length : text.length;
+    if (!m) break;
+  }
+  if (visStart < 0) visStart = 0;
+  const glyph = first;
+  return text.slice(0, visStart) + styler.roleBold(role, glyph) + text.slice(visStart + prefixLen);
+}
 
 export interface RenderOptions {
   width: number;
@@ -89,12 +149,6 @@ export function extractDiagramArt(binaryOutput: string): string {
   return m[1]!.replace(/^\n+/, "").replace(/\n+$/, "");
 }
 
-/** Extract the mermaid source checksum (the ```mmd fence the binary emits). */
-export function extractDiagramChecksum(binaryOutput: string): string | null {
-  const m = binaryOutput.match(/```mmd\n([\s\S]*?)\n?```/);
-  if (!m) return null;
-  return m[1]!.replace(/^\n+/, "").replace(/\n+$/, "");
-}
 
 // ── Diagram colour classification (brief: diagram-colour-classification)
 //
@@ -165,6 +219,7 @@ function colorFg(hex: string, text: string): string {
 interface Cell {
   text: string; // may contain inline ANSI
   align?: "left" | "center" | "right";
+  wired?: boolean; // carries jump wiring — the menu-pattern mark (td-b81597)
 }
 interface TableState {
   headerRows: Cell[][];
@@ -190,7 +245,14 @@ interface Ctx {
   color: ColorMode;
   palette: Palette;
   table: TableState | null;
-  mermaid: Map<string, { art: string; checksum: string | null }>;
+  mermaid: Map<string, { art: string; title?: string | null }>;
+  /** When set, `list` handlers record structure instead of rendering
+   *  (the probe pass — see probeListDepths). */
+  listProbe?: (children: string) => string;
+  /** Per-list nesting depth from the probe pass, consumed in call order. */
+  listDepths?: number[];
+  /** Call-order cursor into listDepths (the render pass). */
+  listSeq: number;
 }
 
 /** Render a closed-grammar markdown document to ANSI lines. */
@@ -213,6 +275,7 @@ export async function renderDocument(
     palette,
     table: null,
     mermaid: new Map(),
+    listSeq: 0,
   };
 
   // Pre-pass 1: elide YAML front matter (document-start `---\n…\n---`).
@@ -230,11 +293,86 @@ export async function renderDocument(
   // Pre-pass 3: intercept mermaid fences → pipe to binary → placeholder tokens.
   const source3 = await interceptMermaid(source2, opts, ctx);
 
+  // Pre-pass 4 (structural probe): each list's nesting depth. Post-order
+  // callbacks mean a nested list renders before its parent fires — depth
+  // (top-down) can't reach it in one pass. The probe renders once with
+  // list handlers swapped for identity tags; parents' children name their
+  // descendants, giving the containment chain. The render pass then draws
+  // depths from it in identical call order (same source, same parser —
+  // deterministic sequence).
+  ctx.listDepths = probeListDepths(source3, ctx);
+  ctx.listSeq = 0;
+
   const rendered = Bun.markdown.render(source3, handlers(ctx), {
     ...PARSER_OPTIONS,
-  });
+  }).replace(/\n+$/, "\n\n"); // terminator wants exactly one blank line above
 
-  return finalize(rendered);
+  // Block terminator — the okudagram's bottom (candidate B of the
+  // 2026-08-27 four-way probe). Two chips bookend a muted rule: the
+  // LHS chip mirrors the H1 badge's column (subdued — muted, not
+  // heading-coloured, so it orients without declaring depth; the badge
+  // encodes level, the terminator encodes *exit*), the RHS chip mirrors
+  // the heading chip's cell. The eye, trained by the H1 badge on the
+  // left, lands on the muted LHS chip on scroll and reads "closed" —
+  // no false promise of more to read. Completes the diagonal (heading
+  // blue top+LHS, muted RHS+footer) and closes the frame a bare rule
+  // cannot — a separator that doubles as a terminator terminates
+  // nothing. Emitted by the renderer, never authored: every document
+  // ends, so termination is a property of rendering (the TUI's closer
+  // is the Gloam footer, its own frame — the terminator belongs to the
+  // streaming canvas). none-mode parity via the styler: plain `─` rail,
+  // plain `█` chips.
+  let out = rendered;
+  if (stripTags(rendered).trim() !== "") {
+    const rail = ctx.width - 4; // chip + space + rail + space + chip = width
+    out = rendered + styler.headingChip() + " " + styler.rule(rail) + " " + styler.headingChip() + "\n";
+  }
+  return finalize(out);
+}
+
+/**
+ * Render once with probe list handlers to map each list call to its
+ * nesting depth. Each probe call wraps its (already-rendered) children
+ * in a PB tag; a parent's children therefore name every descendant list.
+ * The nearest LATER call containing tag i is i's immediate parent
+ * (post-order: ancestors fire after descendants; the minimum index beats
+ * every grandparent). Depth = ancestor-chain length. Probe output is
+ * discarded — only the depth map survives.
+ */
+function probeListDepths(source: string, ctx: Ctx): number[] {
+  const RE_PB_ALL = new RegExp(RE_PB_TAG.source, "g");
+  const contained: number[][] = [];
+  ctx.listProbe = (children: string): string => {
+    const id = contained.length;
+    contained.push([...children.matchAll(RE_PB_ALL)].map((m) => Number(m[1])));
+    return tagProbeOpen(id) + children + TAG_PROBE_CLOSE;
+  };
+  try {
+    Bun.markdown.render(source, handlers(ctx), { ...PARSER_OPTIONS });
+  } finally {
+    ctx.listProbe = undefined;
+    // The probe runs every handler, not just `list` — table handlers can
+    // mutate ctx.table. A well-formed table self-resets (the `table`
+    // handler sets ctx.table = null), but a malformed unclosed table would
+    // leave stale state for the render pass to inherit via ensureTable.
+    // Reset here so probe state never leaks into the render pass.
+    ctx.table = null;
+  }
+
+  const parentOf = new Array<number>(contained.length).fill(-1);
+  for (let j = 0; j < contained.length; j++) {
+    for (const id of contained[j]!) {
+      if (parentOf[id] === -1) parentOf[id] = j; // first (nearest) wins
+    }
+  }
+  const depths = new Array<number>(contained.length).fill(-1);
+  const depthOf = (i: number): number => {
+    if (depths[i] !== -1) return depths[i]!;
+    const p = parentOf[i]!;
+    return (depths[i] = p === -1 ? 0 : depthOf(p) + 1);
+  };
+  for (let i = 0; i < contained.length; i++) depthOf(i);
+  return depths;
 }
 
 /**
@@ -317,21 +455,35 @@ async function interceptMermaid(
   opts: RenderOptions,
   ctx: Ctx,
 ): Promise<string> {
-  const fences: string[] = [];
+  const fences: { code: string; title: string | null }[] = [];
   const src = source.replace(
     /(^|\n)```mermaid\n([\s\S]*?)\n?```/g,
     (_m, lead: string, code: string) => {
-      fences.push(code);
+      // Extract a leading `title: <caption>` line (mermaid-native) before
+      // piping — the binary doesn't parse the directive and would dump it
+      // as a literal box. okuda renders the title at the diagram's
+      // indicator line (diagramBlock), where the `⋮ mermaid source elided`
+      // statement sat. Only a title at the very first line is honoured —
+      // mid-fence `title:` is mermaid syntax we don't own.
+      let title: string | null = null;
+      const firstNl = code.indexOf("\n");
+      const firstLine = firstNl === -1 ? code : code.slice(0, firstNl);
+      const tm = firstLine.match(/^title:\s*(.+?)\s*$/);
+      if (tm) {
+        title = tm[1]!;
+        code = firstNl === -1 ? "" : code.slice(firstNl + 1);
+      }
+      fences.push({ code, title });
       return `${lead}${mermaidToken(String(fences.length - 1))}`;
     },
   );
   if (fences.length === 0) return src;
 
   const arts = await Promise.all(
-    fences.map(async (code) => {
-      const out = await spawnMermaid(code, opts);
+    fences.map(async (f) => {
+      const out = await spawnMermaid(f.code, opts);
       if (out === "") return null;
-      return { art: extractDiagramArt(out), checksum: extractDiagramChecksum(out) };
+      return { art: extractDiagramArt(out), title: f.title };
     }),
   );
   for (const [i, entry] of arts.entries()) {
@@ -393,18 +545,68 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       const m = children.trim().match(RE_MERMAID_TOKEN);
       if (m) {
         const entry = ctx.mermaid.get(m[1]!);
-        if (entry !== undefined) return diagramBlock(entry.art, entry.checksum, ctx);
+        if (entry !== undefined) return diagramBlock(entry.art, ctx, entry.title);
         return ""; // pipe failed → drop the placeholder silently
+      }
+      // One-line list item: `slug %%okuda-rhs:NN%%` — the RHS number is
+      // the action, the slug is the content. Render the slug left (truncated
+      // to fit, one line, `…` on overflow), the number bold at the RHS.
+      // Visual order follows action order: consider, then execute.
+      // (brief: index-and-jump — the pattern that repeats for any list
+      //  where the item is one line and the action is RHS.)
+      const rhs = children.match(RE_RHS_TOKEN);
+      if (rhs) {
+        const num = rhs[1]!;
+        // The slug is the paragraph minus the RHS token and any HTML
+        // comment (the path wiring). Strip both, then render the
+        // remaining inline content through wrapBlock and take the first
+        // line — one line, truncated to fit, the number at the RHS.
+        const slugSrc = children.replace(RE_RHS_TOKEN, "").replace(RE_INLINE_HTML, "");
+        const slugLines = wrapBlock(stripHtml(slugSrc));
+        const rendered = slugLines[0] ?? "";
+        // column budget: full width minus the 2-char margins (applied by
+        // finalize) minus the number + its leading space.
+        const numW = num.length + 1; // ' NN'
+        const avail = width - 2 - numW;
+        const body = elideToWidth(rendered, avail);
+        const line = padDisplay(body, avail) + styler.bold(num);
+        return line + "\n\n";
       }
       const lines = wrapBlock(stripHtml(children));
       return lines.join("\n") + "\n\n";
     },
 
     text(children: string) {
-      return stripHtml(children);
+      // A table cell's jump wiring (whole-comment RHS form) survives as
+      // the wire tag — the td handler consumes it as the menu-pattern
+      // mark; residuals are swept by stripTags at finalize. (td-b81597.)
+      if (RE_RHS_WIRE.test(children)) return TAG_RHS_WIRE;
+      let out = stripHtml(children);
+      // Bare .md-path tokens in prose recede to the muted (far) register
+      // — near/far: paths are provenance, not content. They read like
+      // the status bar's folder/file text. (brief: index-and-jump.)
+      out = out.replace(/\b([\w][\w/.-]*\.md)\b/g, (m) =>
+        styler.role("muted", m));
+      // A standalone state glyph colours in prose — the vocabulary's
+      // "colour + bold" intent applies wherever the glyph appears as a
+      // glyph (standalone, not embedded). The lexicon is consistent
+      // everywhere. (brief: state-glyph-vocab.)
+      out = out.replace(
+        /(^|\s)([\u2713\u2610\u22ee\u2717])(?=\s|$)/g,
+        (_whole, pre: string, g: string) =>
+          pre + styler.roleBold(STATE_GLYPH_ROLE[g]!, g),
+      );
+      return out;
     },
 
     strong(children: string) {
+      // A digits-only strong run is a menu's jump token — white bold,
+      // not the amber strong colour. The number is the content; bold is
+      // the affordance. No chip, no token, no private-use marker: the
+      // compositor emits plain `**01**`, extractJumps reads it from source,
+      // the renderer colours it. (brief: index-and-jump — the chip that
+      // retired.)
+      if (/^\d{1,3}$/.test(children)) return styler.bold(children);
       return styler.roleBold("strong", children);
     },
     emphasis(children: string) {
@@ -442,12 +644,19 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
     },
 
     code(children: string) {
-      // Fenced code (mermaid never reaches here — pre-pass). Never wrapped.
+      // Fenced code (mermaid never reaches here — pre-pass). Never
+      // wrapped — elided (td-b81597, closing ADR-004's fence exception:
+      // "overflow ugly by design" was the lesser evil when wrapping was
+      // the only alternative; elision is crueler and more useful). Each
+      // line is hard-truncated to the content width with `…` at the cut
+      // — the terminal never soft-wraps what okuda emits (a wrapped code
+      // line is one line pretending to be two). Budget: handler margin 2
+      // + finalize margin 2 + ctx.width = exactly the terminal width.
       const body = children.replace(/\n$/, "");
       const open = tagRawOpen("code");
       const lines = body
         .split("\n")
-        .map((l) => (l === "" ? "" : styler.codeLine("  " + l)));
+        .map((l) => (l === "" ? "" : styler.codeLine("  " + elideToWidth(l, width))));
       return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n\n`;
     },
 
@@ -462,6 +671,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
     },
 
     list(children: string, meta: { ordered: boolean; start?: number }) {
+      if (ctx.listProbe) return ctx.listProbe(children);
       return renderList(children, meta, ctx);
     },
 
@@ -477,7 +687,14 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
     td(children: string, meta: { align?: "left" | "center" | "right" }) {
       const t = ensureTable(ctx);
       t.rowIsHeader = false;
-      t.row.push({ text: children, align: meta?.align });
+      // Consume the wire tag: the cell is marked wired (menu pattern),
+      // the tag never flows further. (td-b81597.)
+      const wired = children.includes(TAG_RHS_WIRE);
+      t.row.push({
+        text: wired ? children.split(TAG_RHS_WIRE).join("").trim() : children,
+        align: meta?.align,
+        wired,
+      });
       return "";
     },
     tr(_children: string) {
@@ -510,25 +727,32 @@ function stripHtml(s: string): string {
   return s.replace(RE_INLINE_HTML, "");
 }
 
-/** Mermaid ASCII block: classified, coloured, never wrapped. The
- *  checksum (original mermaid source) follows as a muted code block. */
-function diagramBlock(art: string, checksum: string | null, ctx: Ctx): string {
+/** Mermaid ASCII block: classified, coloured, never wrapped. Beneath
+ *  the art, one muted indicator line names the source's home — the
+ *  source itself is not rendered (it is tautological in a single-render
+ *  seam; `mermaid-to-md --verify` is the drift check, and it reads the
+ *  .md, not the render). The `⋮` glyph borrows the state-parked lexicon
+ *  ("elided into a further question"). (brief: mermaid-source-omitted.) */
+function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   const open = tagRawOpen("diagram");
   const lines = art.split("\n").map((l) => {
     if (l === "") return "";
     if (ctx.color === "none") return l; // byte-identical to the binary's output
     return classifyDiagramLine(l, ctx.palette, ctx.color) + "\x1b[0m";
   });
-  let out = `${open}${lines.join("\n")}${TAG_RAW_CLOSE}`;
-  // Checksum: the mermaid source, muted, beneath the diagram.
-  if (checksum) {
-    const csOpen = tagRawOpen("checksum");
-    const csLines = checksum.split("\n").map((l) =>
-      l === "" ? "" : ctx.styler.role("muted", "  " + l),
-    );
-    out += `\n${csOpen}${csLines.join("\n")}${TAG_RAW_CLOSE}`;
-  }
-  return out + "\n\n";
+  // Indicator line: the diagram's caption. A leading `title: <caption>`
+  // in the mermaid fence (extracted pre-pipe by interceptMermaid) lands
+  // here — the `⋮` leads (state-parked colour, vocabulary parity), the
+  // caption follows in the muted register. Untitled diagrams fall back to
+  // the renderer statement (`mermaid source elided`) — the source is
+  // tautological in a single-render seam and is not echoed. The glyph
+  // survives NO_COLOR as plain content (roleBold is a no-op then).
+  const glyph = ctx.styler.roleBold("state-parked", "⋮");
+  const stmt = title
+    ? ctx.styler.role("muted", " " + title)
+    : ctx.styler.role("muted", " mermaid source elided");
+  const indOpen = tagRawOpen("diagramsrc");
+  return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n${indOpen}${glyph}${stmt}${TAG_RAW_CLOSE}\n\n`;
 }
 
 /** Blockquote: single-level pipe prefix, muted, re-wrapped at width-2. */
@@ -593,6 +817,9 @@ function renderList(
   ctx: Ctx,
 ): string {
   const { width } = ctx;
+  // Nesting depth from the probe pass (0 = top-level), drawn in the
+  // same call order the probe recorded it.
+  const depth = ctx.listDepths?.[ctx.listSeq++] ?? 0;
   const embedded = [...children.matchAll(/\u0000NL:(\d)\u0000/g)].map((m) =>
     Number(m[1]),
   );
@@ -607,7 +834,12 @@ function renderList(
     const marker = meta.ordered ? `${(meta.start ?? 1) + i}.` : "•";
     const markerPrefix = `${marker} `;
     const textCol = displayWidth(markerPrefix);
-    const avail = Math.max(4, width - textCol - LIST_INDENT);
+    // Composition shifts a nested block +4 per level AFTER wrapping
+    // (item continuation +2 and the parent's LIST_INDENT +2 — or the
+    // flatten equivalent at the depth cap). Budget it here, at wrap
+    // time, so every emitted line lands inside the terminal (ADR-004:
+    // okuda owns every \n; nested overflow was the violation).
+    const avail = Math.max(4, width - 4 * depth - textCol - LIST_INDENT);
     const contIndent = " ".repeat(textCol);
 
     const parts = splitNested(item);
@@ -627,7 +859,12 @@ function renderList(
       const wrapped = wrapANSI(text, { width: avail });
       for (const line of wrapped) {
         if (firstLine) {
-          lines.push(markerPrefix + line);
+          // State-glyph lead: colour + bold the leading state glyph on
+          // the first line of a list item (brief: state-glyph-render-path).
+          // The glyph is content the author chose; the colour honours
+          // the lexicon. `◆` is NOT a state role — it stays on the
+          // heading/strong channel (priority, not lifecycle).
+          lines.push(markerPrefix + styleStateGlyph(line, ctx.styler));
           firstLine = false;
         } else {
           lines.push(contIndent + line);
@@ -692,6 +929,15 @@ function renderTable(t: TableState, ctx: Ctx): string {
     ...rows.map((r) => r.length),
   );
 
+  // Patterned surface? A 3-column table whose last column carries jump
+  // wiring is the menu pattern (slug → callsign → number, ADR-022): the
+  // renderer owns the closed vocabulary — right-anchored roles, priority
+  // suppression. Any other shape, wired or not, is a generic table.
+  // (td-b81597 — the table consumer of the elision primitive, reframed.)
+  if (cols === 3 && rows.some((r) => r[2]?.wired)) {
+    return renderMenuTable(t, ctx);
+  }
+
   // Natural column widths from cell display width.
   const colWidth = new Array<number>(cols).fill(0);
   const measure = (cell: Cell | undefined, i: number): void => {
@@ -746,9 +992,16 @@ function renderTable(t: TableState, ctx: Ctx): string {
   for (const r of rows) {
     const cells: string[][] = [];
     for (let i = 0; i < cols; i++) {
+      const raw = r[i]?.text ?? "";
+      // State-glyph column: colour + bold a leading state glyph via the
+      // lexicon role. Applied to non-key columns (i>0); the key column
+      // already gets table-key styling. The first column's glyph, if any,
+      // rides in table-key bold — a separate axis, not state. (brief:
+      // state-glyph-render-path.)
+      const styled = i === 0 ? raw : styleStateGlyph(raw, styler);
       const cell: Cell = i === 0
         ? { text: styler.roleBold("table-key", r[0]?.text ?? ""), align: r[0]?.align }
-        : r[i] ?? { text: "" };
+        : { text: styled, align: r[i]?.align };
       cells.push(padCell(cell, i, colWidth));
     }
     out.push(zipRow(cells, colWidth, bodySep));
@@ -765,6 +1018,94 @@ function renderTable(t: TableState, ctx: Ctx): string {
   const trimmed = out.map((block) =>
     block.split("\n").map((l) => l.replace(/[ ]+$/, "")).join("\n"),
   );
+  if (header.length > 0) {
+    return trimmed.slice(0, 2).join("\n") + "\n\n" +
+      trimmed.slice(2).join("\n\n") + "\n\n";
+  }
+  return trimmed.join("\n\n") + "\n\n";
+}
+
+/** Right-anchored role layout for patterned surfaces (ADR-022, td-b81597):
+ *  the menu pattern as a closed vocabulary — number (floor) at the far
+ *  right edge, callsign its stable home left of it, slug filling leftward.
+ *  Suppression, not wrap: the slug truncates with `…` (the transition
+ *  rung), then suppresses entirely when the budget can't hold a scan
+ *  unit; the callsign+number floor never reflows — freed space is empty
+ *  left. The strong-stop and the stable home are the same thing: the
+ *  number is always at the right edge; widening reverses the ladder
+ *  (suppressed → truncated → full slug). The compositor emits full
+ *  content; the renderer truncates to the live budget (retires
+ *  reg-menu's 50-char slug cap — a compositor guessing width it
+ *  doesn't have). */
+function renderMenuTable(t: TableState, ctx: Ctx): string {
+  const { styler, width } = ctx;
+  const header = t.headerRows[0] ?? [];
+  const rows = t.bodyRows;
+
+  const GUTTER = 3; // matches the generic body gutter
+  const csW = Math.max(
+    1,
+    ...rows.map((r) => displayWidth(r[1]?.text ?? "")),
+    displayWidth(header[1]?.text ?? ""),
+  );
+  const numW = Math.max(
+    1,
+    ...rows.map((r) => displayWidth(r[2]?.text ?? "")),
+    displayWidth(header[2]?.text ?? ""),
+  );
+  const rightW = csW + GUTTER + numW;
+  const slugBudget = width - rightW - GUTTER;
+  const floorFits = rightW + GUTTER <= width;
+
+  const out: string[] = [];
+  // The degenerate branch mirrors the body's: the floor itself overruns,
+  // so the header elides the callsign slot and drops the pipes — the
+  // columns are the scan signal, and they still align with the body.
+  const csSlot = Math.max(1, width - numW - GUTTER);
+  if (header.length > 0) {
+    if (floorFits) {
+      const sep = ` ${styler.tablePipe()} `;
+      const h0 = styler.roleBold("table-header", header[0]?.text ?? "");
+      const h1 = styler.roleBold("table-header", header[1]?.text ?? "");
+      const h2 = styler.roleBold("table-header", header[2]?.text ?? "");
+      const slugPart = slugBudget >= 4
+        ? padDisplay(elideToWidth(h0, slugBudget), width - rightW - GUTTER)
+        : " ".repeat(width - rightW - GUTTER);
+      out.push(slugPart + sep + padDisplay(h1, csW) + sep + padStartDisplay(h2, numW));
+    } else {
+      const h1 = styler.roleBold("table-header", header[1]?.text ?? "");
+      const h2 = styler.roleBold("table-header", header[2]?.text ?? "");
+      out.push(
+        padDisplay(elideToWidth(h1, csSlot), csSlot) +
+          " ".repeat(GUTTER) + padStartDisplay(h2, numW),
+      );
+    }
+    out.push(styler.rule(width));
+  }
+  for (const r of rows) {
+    const num = r[2]?.text ?? "";
+    const cs = r[1]?.text ?? "";
+    let line: string;
+    if (!floorFits) {
+      // Degenerate: the floor itself overruns — elide the callsign, the
+      // number keeps its home (width floor 10 means numW always fits).
+      line = padDisplay(elideToWidth(cs, csSlot), csSlot) +
+        " ".repeat(GUTTER) + padStartDisplay(num, numW);
+    } else {
+      const rb = padDisplay(cs, csW) + " ".repeat(GUTTER) +
+        padStartDisplay(num, numW);
+      const slug = styler.roleBold("table-key", r[0]?.text ?? "");
+      const left = slugBudget >= 4
+        ? padDisplay(elideToWidth(slug, slugBudget), width - rightW)
+        : " ".repeat(width - rightW); // suppressed — freed space is empty left
+      line = left + rb;
+    }
+    out.push(line);
+  }
+  if (header.length > 0 || rows.length > 0) out.push(styler.rule(width));
+  // Trailing pad spaces are ours, not content — trim per line (loose rows
+  // keep the blank line between; the header rule belongs to the header).
+  const trimmed = out.map((l) => l.replace(/[ ]+$/, ""));
   if (header.length > 0) {
     return trimmed.slice(0, 2).join("\n") + "\n\n" +
       trimmed.slice(2).join("\n\n") + "\n\n";

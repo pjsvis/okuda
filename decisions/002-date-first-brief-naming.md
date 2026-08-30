@@ -1,3 +1,8 @@
+---
+type: ADR
+callsign: ADR-DATE-FIRST-002
+---
+
 # Decision: Brief filenames are date-first
 
 **Date:** 2026-08-20

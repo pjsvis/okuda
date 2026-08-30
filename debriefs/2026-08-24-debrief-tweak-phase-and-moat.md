@@ -1,4 +1,6 @@
 ---
+type: Debrief
+callsign: DBF-TWEAK-PHASE
 date: 2026-08-24
 tags: [tables, wrap, soft-returns, dogfood, moat, glow-convergence, foxtrot-oscar]
 agent: pi (ses_a5ee71)

@@ -30,7 +30,25 @@ export type Role =
   | "muted"
   | "diagram-border"
   | "diagram-arrow"
-  | "diagram-text";
+  | "diagram-text"
+  | "alert" // chrome-only: the fetch-state stamp's `failed` channel (ADR-015)
+  // State-glyph vocabulary (brief: state-glyph-vocabulary, 2026-08-28):
+  // closed lexicon applied by the renderer to the glyphs themselves —
+  // not an author colourbrush. Converges across presets (traffic-lamp-
+  // universality, extending ADR-015's alert precedent). state-failed
+  // === alert by intent (same hex, two names).
+  | "state-ok"
+  | "state-todo"
+  | "state-parked"
+  | "state-failed"
+  // Document reference — a bare .md path token in prose (e.g. an index
+  // line's trailing `decisions/foo.md`). Distinct from links (URLs only,
+  // per the render policy), distinct from code, and held separate so a
+  // future mnemonic/callsign role can co-exist without collision.
+  // Experimental (brief: index-and-jump): a greedy heuristic — colours
+  // any .md mention in prose, not just index lines. The leap; learn the
+  // reach by seeing it over-reach.
+  | "doc-ref";
 
 export type Palette = Record<Role, string>;
 
@@ -86,6 +104,18 @@ export const DRACULA_PALETTE: Palette = {
   "diagram-border": "#585858",
   "diagram-arrow": "#00af5f",
   "diagram-text": "#d7d7d7",
+  alert: "#ff5555", // Dracula red — the fetch-state `failed` channel (ADR-015)
+  // State-glyph vocabulary — traffic-lamp colours, preset-independent
+  // (alarm/success-universality extends ADR-015). state-failed === alert.
+  // Distinct from document channels: the justification table in the brief
+  // names why each existing channel fails, so the hexes must not reuse them —
+  // green ≠ code-text (#50fa7b), yellow ≠ emphasis (#f1fa8c), orange ≠ strong
+  // (#ffb86c). state-failed === alert is the one allowed collision.
+  "state-ok": "#5fd35f",
+  "state-todo": "#ffe066",
+  "state-parked": "#ff9933",
+  "state-failed": "#ff5555",
+  "doc-ref": "#e8c44a",
 };
 
 /** Named presets — the identity layers. The default is the okuda

@@ -17,6 +17,14 @@ A terminal markdown viewer built on `Bun.markdown`, rendering mermaid fences via
 
 okuda renders what this workflow generates: headers, loose lists, loose tables, code fences, mermaid→ASCII, inline styles, word wrap. Full CommonMark compliance, interactive TUIs, and HTML pipelines are explicitly out of scope (`docs/2026-08-20-origin-doc.md`).
 
+**Three concerns, three owners** — the operating principle for any scope question:
+
+1. **Compositing** (where the text comes from) belongs to the environment. okuda never composites; the filesystem is the message bus, and any tool that writes markdown to a file is already a compositor, without an API.
+2. **Windowing** (where the text appears) belongs to the host (Herdr). okuda carries no window manager; opening a tab is the host's job, not the viewer's.
+3. **Rendering** (markdown in, coloured bytes out, fast) is okuda's whole job.
+
+The test for any "should we build X": *does X touch the byte stream or the screen?* If it touches the byte stream's origin (compositing) or the pane layout (windowing), it belongs outside okuda. If it touches the screen before the byte stream, it's rendering and it's ours. One line, one gate, no exceptions — *we don't care where the text comes from.*
+
 ## External Dependency
 
 `mermaid-to-md` (Rust CLI, `~/.local/bin/`) — reads mermaid source on stdin, writes ASCII diagram to stdout. okuda never parses mermaid itself.
@@ -29,5 +37,6 @@ okuda renders what this workflow generates: headers, loose lists, loose tables, 
 | Playbooks | `playbooks/` | How do we do X? |
 | Decisions | `decisions/` | Why did we choose X over Y? |
 | Debriefs | `debriefs/` | What happened and why? |
+| Session handoffs | `td handoff` (ephemeral) or `docs/` (persistent) | Where was I? — never `briefs/` (ADR-017) |
 
 External dependencies: `DEPENDENCIES.md`

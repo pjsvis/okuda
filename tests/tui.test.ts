@@ -1,17 +1,27 @@
 import { describe, expect, test } from "bun:test";
 import {
   decodeKey,
+  digitOf,
+  extractJumps,
+  advanceNumBuffer,
   footerLine,
   viewport,
-  HINTS,
+  contentHeight,
+  hintsLine,
   displayPath,
   stripForAnchor,
   anchorFor,
   findAnchor,
   proportionalScroll,
+  reanchoredScroll,
+  gateFetch,
+  renderEqual,
+  type Fetch,
+  type FetchState,
 } from "../src/tui";
 import { makeStyler } from "../src/ansi";
 import { DRACULA_PALETTE } from "../src/palette";
+import { displayWidth, stripANSI } from "../src/width";
 
 function buf(...bytes: number[]): Uint8Array {
   return new Uint8Array(bytes);
@@ -59,8 +69,24 @@ describe("tui — decodeKey (escape sequences)", () => {
     expect(decodeKey(buf(0x1b, 0x5b, 0x35, 0x7e))).toBe("page-up");
     expect(decodeKey(buf(0x1b, 0x5b, 0x36, 0x7e))).toBe("page-down");
   });
+  test("space → page-down, b → page-up (less/man convention)", () => {
+    expect(decodeKey(buf(0x20))).toBe("page-down");
+    expect(decodeKey(buf(0x62))).toBe("page-up");
+  });
   test("unknown escape sequence → null", () => {
     expect(decodeKey(buf(0x1b, 0x5b, 0x43))).toBeNull(); // ESC [ C — right, unbound
+  });
+  // ESC O A/B = ↑/↓ under DECCKM (application cursor mode) — the form the
+  // shell's line editor leaves active, and what alt-scroll wheels emit.
+  test("SS3 arrows (DECCKM on) → up/down", () => {
+    expect(decodeKey(buf(0x1b, 0x4f, 0x41))).toBe("up");
+    expect(decodeKey(buf(0x1b, 0x4f, 0x42))).toBe("down");
+  });
+  test("SS3 page keys → page-up/page-down; malformed → null", () => {
+    expect(decodeKey(buf(0x1b, 0x4f, 0x35, 0x7e))).toBe("page-up");
+    expect(decodeKey(buf(0x1b, 0x4f, 0x36, 0x7e))).toBe("page-down");
+    expect(decodeKey(buf(0x1b, 0x4f, 0x35))).toBeNull(); // ESC O 5 (no tilde)
+    expect(decodeKey(buf(0x1b, 0x4f, 0x43))).toBeNull(); // ESC O C — right, unbound
   });
 });
 
@@ -95,26 +121,73 @@ describe("tui — footerLine (identity left, affordance right)", () => {
   const FILE = "/Users/x/Dev/okuda/docs/audit.md";
 
   test("compact: badge + folder/file left; ? help right", () => {
-    const f = footerLine(72, "Gloam", FILE, false, muted, badge);
+    const f = footerLine(72, "Gloam", FILE, muted, badge);
     expect(f.startsWith(badge("Gloam") + " " + muted("docs/audit.md"))).toBe(true);
-    expect(f.endsWith(muted("? help"))).toBe(true);
+    expect(f.endsWith(muted("? help") + " ")).toBe(true);
   });
-  test("toggled: verbose HINTS replace the compact right", () => {
-    const f = footerLine(72, "Gloam", FILE, true, muted, badge);
-    expect(f.startsWith(badge("Gloam") + " " + muted("docs/audit.md"))).toBe(true);
-    expect(f.endsWith(muted(HINTS))).toBe(true);
+  test("RHS corner pad: the last column is blank, never ink", () => {
+    const f = footerLine(72, "Gloam", FILE, muted, badge);
+    expect(displayWidth(stripANSI(f))).toBe(72); // exactly fills the row…
+    expect(stripANSI(f).endsWith(" ")).toBe(true); // …but the last column is the pad
   });
   test("narrow width: at least one space gap, no throw", () => {
-    const f = footerLine(10, "Gloam", FILE, false, muted, badge);
+    const f = footerLine(10, "Gloam", FILE, muted, badge);
     expect(f).toContain("Gloam");
   });
   test("NO_COLOR: plain text, no escapes; padding kept (shape parity)", () => {
     const none = makeStyler(DRACULA_PALETTE, "none");
-    const f = footerLine(72, "Gloam", FILE, false,
+    const f = footerLine(72, "Gloam", FILE,
       (s) => none.role("muted", s), (s) => none.badge(s));
     expect(f).not.toContain("\x1b");
     expect(f.startsWith(" Gloam  docs/audit.md")).toBe(true);
-    expect(f.endsWith("? help")).toBe(true);
+    expect(f.endsWith("? help ")).toBe(true);
+  });
+  test("rooted: silo badge leads the identity run, muted (provenance)", () => {
+    const f = footerLine(72, "Gloam", FILE, muted, badge, "okuda");
+    expect(f.startsWith(badge("Gloam") + " " + muted("okuda") + " \u00b7 " + muted("docs/audit.md"))).toBe(true);
+  });
+  test("callsign slot: identity run reads silo · callsign · filename (ADR-020)", () => {
+    const f = footerLine(96, "Gloam", FILE, muted, badge, "okuda", "BRF-INDEX-JUMP");
+    expect(f.startsWith(
+      badge("Gloam") + " " + muted("okuda") + " \u00b7 " + muted("BRF-INDEX-JUMP") + " \u00b7 " + muted("docs/audit.md"),
+    )).toBe(true);
+    expect(displayWidth(stripANSI(f))).toBe(96); // width parity, corner pad kept
+  });
+  test("callsign without silo: the run composes what it is given", () => {
+    const f = footerLine(96, "Gloam", FILE, muted, badge, undefined, "ADR-BOUND-010");
+    expect(f.startsWith(badge("Gloam") + " " + muted("ADR-BOUND-010") + " \u00b7 " + muted("docs/audit.md"))).toBe(true);
+  });
+  test("rooted NO_COLOR: silo run is plain text, no escapes added", () => {
+    const none = makeStyler(DRACULA_PALETTE, "none");
+    const f = footerLine(72, "Gloam", FILE,
+      (s) => none.role("muted", s), (s) => none.badge(s), "okuda");
+    expect(f.startsWith(" Gloam  okuda \u00b7 docs/audit.md")).toBe(true);
+  });
+  test("rooted: RHS corner pad still fills the row exactly", () => {
+    const f = footerLine(72, "Gloam", FILE, muted, badge, "okuda");
+    expect(displayWidth(stripANSI(f))).toBe(72);
+    expect(stripANSI(f).endsWith(" ")).toBe(true);
+  });
+  test("unrooted (no silo): byte-for-byte today's footer", () => {
+    const withSilo = footerLine(72, "Gloam", FILE, muted, badge, undefined);
+    const without = footerLine(72, "Gloam", FILE, muted, badge);
+    expect(withSilo).toBe(without);
+  });
+  test("contentHeight: hints row reserved when toggled", () => {
+    expect(contentHeight(24, false)).toBe(23); // footer only
+    expect(contentHeight(24, true)).toBe(22);  // badge row + hints row
+  });
+  test("hintsLine: right-justified on the last row, corner column blank", () => {
+    const plain = (s: string) => s;
+    const h = hintsLine(80, plain);
+    expect(h.endsWith(" ")).toBe(true); // corner pad
+    expect(h.startsWith(" ")).toBe(true); // right-justified
+    expect(h.trimStart().startsWith("q quit")).toBe(true);
+    expect(displayWidth(h)).toBe(80); // fills the row exactly
+  });
+  test("hintsLine: too narrow → no left pad, text starts at col 1 (legible)", () => {
+    const plain = (s: string) => s;
+    expect(hintsLine(60, plain).startsWith("q")).toBe(true);
   });
 });
 
@@ -206,5 +279,219 @@ describe("tui — proportionalScroll (the robust floor)", () => {
   });
   test("bottom of doc stays bottom", () => {
     expect(proportionalScroll(100, 100, 200)).toBe(200);
+  });
+});
+
+describe("tui — reanchoredScroll (the one repaint path: reload / resize / watch)", () => {
+  // height 6: mid row is scroll+3. 20 content lines, scrolled to 10:
+  // viewport rows 10..15, anchor = lines[13] ("  line-13"), offset 3.
+  const doc = Array.from({ length: 20 }, (_, i) => `  line-${i}`);
+
+  test("reload on unchanged content keeps the scroll (regression: was reset to 0)", () => {
+    expect(reanchoredScroll(doc, doc, 10, 6)).toBe(10);
+  });
+
+  test("content inserted above the viewport advances the scroll with it", () => {
+    // Three lines prepended: the anchor text moves from 13 to 16.
+    const grown = Array.from({ length: 3 }, (_, i) => `  new-${i}`).concat(doc);
+    expect(reanchoredScroll(doc, grown, 10, 6)).toBe(13);
+  });
+
+  test("content removed above the viewport pulls the scroll back", () => {
+    const shrunk = doc.slice(3); // anchor "line-13" now at index 10
+    expect(reanchoredScroll(doc, shrunk, 10, 6)).toBe(7);
+  });
+
+  test("anchor gone (big edit) → proportional fallback, never top", () => {
+    const rewritten = Array.from({ length: 40 }, (_, i) => `  x-${i}`);
+    const s = reanchoredScroll(doc, rewritten, 10, 6);
+    expect(s).toBeGreaterThan(0); // not the old top-jump
+    expect(s).toBe(Math.round((10 / 14) * 34)); // old fraction of new max
+  });
+
+  test("scroll clamps to the new max when the doc shrinks hard", () => {
+    const tiny = ["  only", "  lines"];
+    expect(reanchoredScroll(doc, tiny, 10, 6)).toBe(0); // maxScroll 0
+  });
+});
+
+describe("tui — renderEqual (the content gate primitive)", () => {
+  test("identical renders are equal", () => {
+    expect(renderEqual(["a", "b"], ["a", "b"])).toBe(true);
+  });
+  test("length differs → not equal", () => {
+    expect(renderEqual(["a"], ["a", "b"])).toBe(false);
+  });
+  test("any line differs → not equal", () => {
+    expect(renderEqual(["a", "b"], ["a", "x"])).toBe(false);
+  });
+  test("both empty → equal (the cron-rewrite-with-identical-content case)", () => {
+    expect(renderEqual([], [])).toBe(true);
+  });
+});
+
+describe("tui — gateFetch (changed / same / failed, retain-on-failure)", () => {
+  const ok = (text: string): Fetch => ({ ok: true, text });
+  const fail = (reason = "missing"): Fetch => ({ ok: false, reason });
+  const render = (text: string): string[] => text.split("\n");
+  const prev = render("alpha\nbeta\ngamma");
+
+  test("failed fetch retains the last-known-good and marks failed, no repaint", () => {
+    const d = gateFetch(prev, fail("mount gone"), []);
+    expect(d.state).toBe("failed");
+    expect(d.lines).toBe(prev); // last-known-good retained, not blanked
+    expect(d.repaint).toBe(false);
+  });
+
+  test("failed fetch with no prior (initial load) → empty lines, failed, no repaint", () => {
+    const d = gateFetch(null, fail(), []);
+    expect(d.state).toBe("failed");
+    expect(d.lines).toEqual([]); // nothing to retain
+    expect(d.repaint).toBe(false);
+  });
+
+  test("same content → same, no repaint (the mechanised ‘neither’)", () => {
+    const same = render("alpha\nbeta\ngamma");
+    const d = gateFetch(prev, ok("alpha\nbeta\ngamma"), same);
+    expect(d.state).toBe("same");
+    expect(d.repaint).toBe(false);
+    expect(d.lines).toBe(prev);
+  });
+
+  test("identical-bytes rewrite (mtime moved, content didn’t) → same, no repaint", () => {
+    // mtime is not meaning: a cron rewrite with identical content is a no-op.
+    const d = gateFetch(prev, ok("alpha\nbeta\ngamma"), [...prev]);
+    expect(d.state).toBe("same");
+    expect(d.repaint).toBe(false);
+  });
+
+  test("changed content → changed, repaint, new lines", () => {
+    const next = render("alpha\nBETA\ngamma");
+    const d = gateFetch(prev, ok("alpha\nBETA\ngamma"), next);
+    expect(d.state).toBe("changed");
+    expect(d.repaint).toBe(true);
+    expect(d.lines).toBe(next);
+  });
+
+  test("initial-load sentinel (prev null) + success → changed (content arrived)", () => {
+    const next = render("hello");
+    const d = gateFetch(null, ok("hello"), next);
+    expect(d.state).toBe("changed");
+    expect(d.lines).toBe(next);
+    expect(d.repaint).toBe(true);
+  });
+
+  test("the three states are mutually exclusive (no overlap)", () => {
+    const states: FetchState[] = [
+      gateFetch(prev, fail(), []).state,
+      gateFetch(prev, ok("alpha\nbeta\ngamma"), render("alpha\nbeta\ngamma")).state,
+      gateFetch(prev, ok("alpha\nBETA\ngamma"), render("alpha\nBETA\ngamma")).state,
+    ];
+    expect(new Set(states).size).toBe(3);
+  });
+});
+
+// ── Index-and-jump (brief 2026-08-28) ───────────────────────────────
+
+describe("tui — decodeKey (back-nav: u / Backspace)", () => {
+  test("u → back", () => {
+    expect(decodeKey(buf(0x75))).toBe("back");
+  });
+  test("DEL (0x7f) → back (Backspace on most terminals)", () => {
+    expect(decodeKey(buf(0x7f))).toBe("back");
+  });
+  test("BS (0x08) → back (Backspace on some terminals)", () => {
+    expect(decodeKey(buf(0x08))).toBe("back");
+  });
+});
+
+describe("tui — digitOf (single-byte digit → char, else null)", () => {
+  test("digits 0–9 → their character", () => {
+    expect(digitOf(buf(0x30))).toBe("0");
+    expect(digitOf(buf(0x35))).toBe("5");
+    expect(digitOf(buf(0x39))).toBe("9");
+  });
+  test("letters → null (the buffer only collects digits)", () => {
+    expect(digitOf(buf(0x6a))).toBeNull(); // j
+    expect(digitOf(buf(0x75))).toBeNull(); // u — not a digit, clears buffer
+  });
+  test("multi-byte escape sequence → null (arrows, page keys)", () => {
+    expect(digitOf(buf(0x1b, 0x5b, 0x41))).toBeNull(); // ↑
+    expect(digitOf(buf(0x1b, 0x5b, 0x35, 0x7e))).toBeNull(); // PgUp
+  });
+  test("empty buffer → null", () => {
+    expect(digitOf(buf())).toBeNull();
+  });
+});
+
+describe("tui — extractJumps (scan source for %%okuda-rhs:NN%% + path.md)", () => {
+  test("lifts the RHS number + the path from a comment in the paragraph", () => {
+    const src = [
+      "# Menu",
+      "",
+      "*Foo* %%okuda-rhs:01%% <!-- briefs/foo.md -->",
+      "",
+      "*Bar* %%okuda-rhs:02%% <!-- decisions/bar.md -->",
+    ].join("\n");
+    const j = extractJumps(src);
+    expect(j.size).toBe(2);
+    expect(j.get(1)).toBe("briefs/foo.md");
+    expect(j.get(2)).toBe("decisions/bar.md");
+  });
+  test("one-digit numbers: %%okuda-rhs:5%% → token 5", () => {
+    expect(extractJumps("*X* %%okuda-rhs:5%% <!-- x.md -->").get(5)).toBe("x.md");
+  });
+  test("zero-padded: %%okuda-rhs:05%% → token 5", () => {
+    expect(extractJumps("*X* %%okuda-rhs:05%% <!-- x.md -->").get(5)).toBe("x.md");
+  });
+  test("duplicate tokens: last wins (compositor error surfaces)", () => {
+    const j = extractJumps("*A* %%okuda-rhs:01%% <!-- a.md -->\n\n*B* %%okuda-rhs:01%% <!-- b.md -->");
+    expect(j.get(1)).toBe("b.md");
+    expect(j.size).toBe(1);
+  });
+  test("a paragraph without an RHS token is not a jump line", () => {
+    expect(extractJumps("- [01] a title — no path").size).toBe(0);
+    expect(extractJumps("**01** a title, no rhs token").size).toBe(0);
+  });
+  test("an RHS token without a .md path is not a jump line", () => {
+    expect(extractJumps("*X* %%okuda-rhs:01%% a title, no path").size).toBe(0);
+  });
+  test("empty source → empty map", () => {
+    expect(extractJumps("").size).toBe(0);
+  });
+});
+
+describe("tui — advanceNumBuffer (the two-digit jump state machine)", () => {
+  test("first digit → buffer holds it, no token yet", () => {
+    expect(advanceNumBuffer(null, "0")).toEqual({ buffer: "0", token: null });
+    expect(advanceNumBuffer(null, "5")).toEqual({ buffer: "5", token: null });
+  });
+  test("second digit → token resolves, buffer resets to empty", () => {
+    expect(advanceNumBuffer("0", "5")).toEqual({ buffer: null, token: 5 });
+    expect(advanceNumBuffer("1", "0")).toEqual({ buffer: null, token: 10 });
+    expect(advanceNumBuffer("9", "9")).toEqual({ buffer: null, token: 99 });
+  });
+  test("zero-pads: '0' then '1' → token 1 (not 10)", () => {
+    // The compositor zero-pads; [05] is token 5. Two-digit entry '0'+'5'
+    // must resolve to 5, matching extractJumps(…).get(5).
+    expect(advanceNumBuffer("0", "5").token).toBe(5);
+  });
+  test("non-digit after one digit → buffer cancelled, no token", () => {
+    // A stray j or u must not ambush a half-typed token.
+    expect(advanceNumBuffer("0", null)).toEqual({ buffer: null, token: null });
+  });
+  test("non-digit on empty buffer → still empty, no token", () => {
+    expect(advanceNumBuffer(null, null)).toEqual({ buffer: null, token: null });
+  });
+  test("the resolved token round-trips through extractJumps", () => {
+    // End-to-end contract: typing '0'+'5' yields token 5, and an RHS
+    // paragraph lifts to token 5 → path. The two pure halves agree.
+    const jumps = extractJumps("*Title* %%okuda-rhs:05%% <!-- docs/target.md -->");
+    const step = advanceNumBuffer(advanceNumBuffer(null, "0").buffer, "5");
+    expect(step.token).not.toBeNull();
+    expect(jumps.get(step.token!)).toBe("docs/target.md");
+  });
+  test("typing '0'+'0' → token 0 (matches [00] if the compositor emits it)", () => {
+    expect(advanceNumBuffer("0", "0").token).toBe(0);
   });
 });
