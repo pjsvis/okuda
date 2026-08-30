@@ -29,6 +29,32 @@ Implement a binary validation state machine in Okuda's Mermaid ASCII renderer th
 - Interactive pan/zoom controls or viewport sliders inside the terminal matrix[cite: 1].
 - Parsing or rendering diagrams outside the restricted Mermaid subset grammar[cite: 1].
 
+## Space allocation — the asymmetry is forced by gate order
+
+The two CSN states allocate vertical space differently, and the
+asymmetry is not a choice — it falls out of *when* each gate fires:
+
+- **`CSN: too wide` — post-layout, reserve space.** The binary has
+  already computed the ASCII art; the bounding box ($width \times
+  height$) is known. The diagram just doesn't fit the viewport width.
+  Reserve the vertical space it *would* occupy. The blank footprint is a
+  statement: *if we could render it, it would be this tall.* The reader
+  sees the diagram's shadow — its dimensions are real, only its glyphs
+  are withheld. Same honesty as table elision (ADR-014): the table keeps
+  its width, the elision marks the overflow.
+- **`CSN: too complex` — pre-layout, no space.** The complexity gate fires
+  *before* the binary runs (acceptance: "without attempting ASCII layout
+  calculation"). We have node/edge counts but no bounding box — we never
+  measured the dimensions, so we allocate none. Just the diagnostic line.
+  Reserving space here would be inventing a dimension we never computed —
+  a lie.
+
+One line: **width-elided reserves space (the box is known);
+complexity-elided reserves none (the box is uncomputed).** A future
+"let's reserve a default box for complex diagrams too" is a regression
+  to guard against — it fabricates a measurement the gate deliberately
+  skipped.
+
 ## Preconditions
 
 - [ ] Okuda Mermaid parser emits a deterministic layout bounding box ($width \times height$) and node/edge count prior to matrix drawing[cite: 1].
@@ -45,8 +71,8 @@ Implement a binary validation state machine in Okuda's Mermaid ASCII renderer th
 
 ## Acceptance Criteria
 
-* A Mermaid diagram whose rendered ASCII width exceeds current terminal columns renders `CSN: too wide` with zero line-wrapping or matrix corruption[cite: 1].
-* A Mermaid diagram exceeding the node/complexity threshold renders `CSN: too complex` without attempting ASCII layout calculation[cite: 1].
+* A Mermaid diagram whose rendered ASCII width exceeds current terminal columns renders `CSN: too wide` with zero line-wrapping or matrix corruption[cite: 1]. The vertical space the diagram *would* occupy is reserved (the footprint is the statement; the dimensions are known, only the glyphs are withheld)[cite: 1].
+* A Mermaid diagram exceeding the node/complexity threshold renders `CSN: too complex` without attempting ASCII layout calculation[cite: 1]. No vertical space is reserved — the bounding box was never computed, so none is allocated; only the diagnostic line is emitted[cite: 1].
 * Resizing the terminal to exceed the minimum required width immediately clears `CSN: too wide` and renders the valid ASCII diagram on the next draw tick[cite: 1].
 * Documents containing `CSN:` blocks continue to render all preceding and subsequent Markdown text sections normally[cite: 1].
 
