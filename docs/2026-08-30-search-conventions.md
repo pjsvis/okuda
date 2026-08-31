@@ -102,6 +102,33 @@ owner is declared.
    BRF-CONTENT-SHORTLIST — agents should reuse the same sources, not
    re-invent ranking.
 
+## Document states (the docs/ lifecycle)
+
+`docs/` is unregistered — no callsigns, no register (ADR-025's boundary).
+But documents there have lifecycles, especially foreign-origin drafts
+(other models, other sessions, other silos). The state lives in the
+opening blockquote, the only register an unregistered folder should
+ carry:
+
+```
+Logged <date>. Status: fresh | reconciled | aligned | discussion | superseded.
+Origin: <source, if foreign>.
+```
+
+- **fresh** — landed as-received, not yet checked against the ledger
+- **reconciled** — scraped against the contracts; provenance note records
+  what was scraped, kept, routed (ADR-027 clause 3)
+- **aligned** — the ledger stops arguing with it; a normal citizen
+- **discussion** — a riff or options paper; no decision claimed
+- **superseded** — a newer document owns the content; link forward
+
+The status change *is* the note: edit the blockquote when the state
+changes (the VRL doc walked fresh → reconciled → aligned on its first
+day). No frontmatter, no lift machinery — a register for docs/ fires
+only on a **named consumer** (an agent pipeline filtering by status, a
+feed hiding `fresh` drafts); until then the blockquote is the register,
+and the migration, when it comes, is one mechanical pass.
+
 ## Status
 
 Draft. The test of a conventions page is whether the fingers converge on
