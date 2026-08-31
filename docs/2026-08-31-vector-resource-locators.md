@@ -24,7 +24,7 @@ This document formalizes two interface affordances designed for sovereign knowle
 
 ### The Two Affordances
 
-#### 1. The Dynamic Entry Sigil (`&now`) and the VRL `[11 : 99]`
+#### 1. The Address-Of Sigil (`&`) and the VRL `[11 : 99]`
 * **The `&` Mnemonic:** In C/Rust systems programming, `&` is the address-of operator. In the flat, date-stamped document silo (`YYYY-MM-DD-slug.md`), files prefixed with `&` (`&alpha.md`, `&briefs.md`, `&next.md`) act as live
 pointers and dynamic trajectory tables rather than static receipts. The
 fleet is real: orientation, the state table, the decision table — and the
