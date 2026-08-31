@@ -10,6 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-08-31 | ADR-WIRE-FORMAT-026 | Accepted | The wire format — one grammar, two forms, paint decoupled | 026-wire-format.md |
+| 2026-08-31 | ADR-TEMPERAMENT-DISCIPLINE-027 | Accepted | Temperament is downstream of discipline | 027-temperament-is-downstream-of-discipline.md |
 | 2026-08-30 | ADR-CALLSIGN-DATA-024 | Accepted | Callsigns are data, not machinery | 024-callsigns-are-data.md |
 | 2026-08-30 | ADR-MNEMONIC-MODEL-025 | Accepted | The mnemonic namespace model | 025-mnemonic-namespace-model.md |
 | 2026-08-29 | ADR-ROLE-LAYOUT-022 | Accepted | Right-anchored role layout for patterned surfaces | 022-right-anchored-role-layout.md |

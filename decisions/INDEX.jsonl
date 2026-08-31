@@ -24,3 +24,4 @@
 {"file":"024-callsigns-are-data.md","date":"2026-08-30","status":"Accepted","summary":"Callsigns are data, not machinery","meta":{},"callsign":"ADR-CALLSIGN-DATA-024"}
 {"file":"025-mnemonic-namespace-model.md","date":"2026-08-30","status":"Accepted","summary":"The mnemonic namespace model","meta":{},"callsign":"ADR-MNEMONIC-MODEL-025"}
 {"file":"026-wire-format.md","date":"2026-08-31","status":"Accepted","summary":"The wire format — one grammar, two forms, paint decoupled","meta":{},"callsign":"ADR-WIRE-FORMAT-026"}
+{"file":"027-temperament-is-downstream-of-discipline.md","date":"2026-08-31","status":"Accepted","summary":"Temperament is downstream of discipline","meta":{},"callsign":"ADR-TEMPERAMENT-DISCIPLINE-027"}
