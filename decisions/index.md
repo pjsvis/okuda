@@ -10,6 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-08-30 | ADR-CALLSIGN-DATA-024 | Accepted | Callsigns are data, not machinery | 024-callsigns-are-data.md |
+| 2026-08-30 | ADR-MNEMONIC-MODEL-025 | Accepted | The mnemonic namespace model | 025-mnemonic-namespace-model.md |
 | 2026-08-29 | ADR-ROLE-LAYOUT-022 | Accepted | Right-anchored role layout for patterned surfaces | 022-right-anchored-role-layout.md |
 | 2026-08-29 | ADR-TTY-ACTIVE-INPUT-023 | Accepted | /dev/tty active-poll reader for the TUI (bypass Bun's broken passive stdin) | 023-tty-active-input-reader.md |
 | 2026-08-28 | ADR-RETIRE-OKW-018 | Accepted | Retire the "OKW" term | 018-retire-the-okw-term.md |
