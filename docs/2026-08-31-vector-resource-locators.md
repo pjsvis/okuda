@@ -62,13 +62,18 @@ sigil is the convention that names them, not a proposal.
 
 ---
 
-### Field Memory: "Roger You Roger" and the Caspian Static
+### Field Memory: "Roger Your Roger" and the Caspian Static
 
-On a Motorola VHF/UHF handset connecting a base station in Turkmenbashi to offshore drilling platforms in the Caspian Sea, conversational niceties are dead weight.
+On a Motorola VHF/UHF handset connecting a base station in Cheleken to offshore drilling platforms in the Caspian Sea, conversational niceties are dead weight.
 
 When squelch tail bites into syllables and tropospheric ducting turns background hash into a constant roar, you do not say: *"Yes, I understand what you just mentioned, please go ahead."*
 
-You say: **`"Roger you Roger."`**
+You say: **`"Roger your Roger."`**
+
+* **Origin:** attributed to Fleet Air Arm radio procedure by hearsay;
+  unverified. Claimed by the operator, 2026-08-31 — hearsay is recorded
+  as hearsay, and the claim is on file (the NASA attribution rule:
+  lessons learned are attributed, even one's own folklore).
 
 * **The Double-Token Invariant:** The first *Roger* acknowledges receipt of the transmission; the second *Roger* confirms that the content is understood and operationally locked.
 * **Cadence as Error Correction:** In high-noise environments, repetition of hard, distinct phonetic syllables acts as forward error correction.
@@ -131,7 +136,7 @@ We leave behind the infinite canvas, the 400MB runtime bundles, and the conversa
 
 We take the clay tablet, the Roman daybook, the Caspian radio habit, and the aircraft carrier docket—and we project them cleanly onto glass.
 
-Intent declared. Vector locked. *Roger you Roger.*
+Intent declared. Vector locked. *Roger your Roger.*
 
 ---
 
