@@ -110,6 +110,19 @@ conventions page: the bridge is operator-observed and awaits
 codification by the keymap owner — if it breaks during a demo, that's
 the bug-hunt finding, not the demo failing.)
 
+### Trick 8½ — Clear the desk (two panes, two levels)
+
+The reset state is free: an *empty query* already renders the `&`-family
+at the top of the picker — byte order puts `&` (0x26) before everything,
+so the desk you want is what the picker shows when you've forgiven it.
+The full two-pane flow, all shipped: tmux split, two gloams, one silo —
+read a string on the anchor pane (tied-to-the-mast), type it into the
+probe pane (slippy), pick from the suspects, `u` back, `Esc-Esc` to
+clear the desk. Recursion in cycles, never in depth: two levels, reset
+any time. The only unbuilt part is a `Ctrl-L` bind to make the reset a
+gesture instead of a composition — one line in `FZF_BINDS`, a decision
+for the keymap owner under the stillness ledger.
+
 ### Trick 9 — The two link species
 
 From a rendered document in the TTY, follow a web link (OSC 8 hands it
@@ -142,7 +155,8 @@ doubles as the harness, and a broken trick is the harness working.
 ## Related
 
 - `docs/2026-08-30-search-conventions.md` — the two-keymap rules and the
-  ladder (Tricks 7–8 execute it)
+  ladder (Tricks 7–8 execute it); the two-pane cross-reference is its
+  multi-client case
 - `docs/2026-08-30-gloam-seams.md` — the seams and the moat (Trick 5 is
   Option A; Trick 10 is the deployment story)
 - `docs/2026-08-31-okuda-precedents.md` — where the bracket cadence and

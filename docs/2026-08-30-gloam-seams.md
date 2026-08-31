@@ -102,6 +102,13 @@ Who composes these seams, observed and proposed:
 
 - **The human at a terminal** — the TUI loop; the primary client, unchanged
   by everything above.
+- **Two panes, one silo** — two gloam instances side by side (tmux
+  split), cross-referencing: read a string on the anchor pane, type it
+  into the probe pane, pick from the suspects. The panes share the
+  corpus through the filesystem; the operator is the compositor between
+  them. The first multi-client story, and it ships today — pane *roles*
+  (anchor = tied-to-the-mast, probe = slippy) belong to the host (Herdr,
+  Panel Library brief); the workflow costs nothing now.
 - **Agents** — pi sessions and the like, reading the silo by pipe: register
   queries, path resolution, document renders. Informally active today
   (several documents in this silo were written by an agent composing these
@@ -169,6 +176,11 @@ meeting.
 - **No native integrations.** Foreign systems are *addressed* (URLs,
   mailto, deep links — see Foreign composition), never embedded; their
   rendering and their state are their concern.
+- **No deep navigation stacks.** The loop recurs in cycles, never in
+  depth: picker → reader → picker, two levels, and the desk-clearing
+  gesture (Esc-Esc, or a future `Ctrl-L` bind) resets to the `&`-family
+  root — which is what an *empty query* already renders, guaranteed by
+  byte order.
 - **Rendering never leaves okuda.** Headless gloam emits *paths* and
   *markdown* — the byte stream's origin is compositing, legitimately;
   coloured bytes on a screen remain okuda's whole job.
