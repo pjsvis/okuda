@@ -129,6 +129,59 @@ only on a **named consumer** (an agent pipeline filtering by status, a
 feed hiding `fresh` drafts); until then the blockquote is the register,
 and the migration, when it comes, is one mechanical pass.
 
+## The two keymaps — one pair of hands
+
+Two components share the keyboard: the **reader** (okuda) and the **picker**
+(fzf). Same keys, different meanings — the mode is always visible: the
+picker announces itself with the `gloam ❯ ` prompt; the reader is the
+framed document. Verified against `src/tui.ts` (`decodeKey`) and
+`src/launcher.ts` (`FZF_BINDS`); fzf's built-in emacs bindings remain
+available (`FZF_DEFAULT_OPTS` is emptied, not replaced).
+
+**Reader — motion and exit**
+
+| Key | Action |
+|---|---|
+| `j` / `k` | line down / up |
+| `space` / `b` | page down / up (less/man convention) |
+| `Ctrl-D` / `Ctrl-U` | half-page down / up |
+| `g` / `G` | top / bottom |
+| arrows, PgUp/PgDn | same motions, for everyone else |
+| `r` | reload off disk |
+| `?` | toggle verbose hints |
+| `11`–`99` | jump to the wired row (two-digit buffer; any non-digit cancels) |
+| `u` / Backspace | back — pop the backstack |
+| `q` / `Q` / Ctrl-C / Ctrl-Z | quit to the picker |
+
+**Picker — filter and act**
+
+| Key | Action |
+|---|---|
+| type | filters (fuzzy; `--exact`; see the grammar table above) |
+| `Enter` | read the selection — into the reader |
+| `Ctrl-W` | clear one word of the query |
+| `Esc` | clear query — and on an empty query, done |
+| `Ctrl-D` / `Ctrl-U` | page down / up — **mirrored from the reader** |
+| `Ctrl-C` | abort the loop entirely |
+
+**The seam rules**
+
+1. **Mirrored where semantics match.** `Ctrl-D`/`Ctrl-U` page in both
+   components — the one deliberate reuse, bound into fzf for exactly this
+   reason. Paging should never surprise between modes.
+2. **Dual-duty keys change meaning with the mode.** `Esc` cancels a
+   half-typed token in the reader but clears-or-exits in the picker;
+   digits are a jump buffer in the reader but filter *text* in the picker
+   (typing `11` finds files containing 11); `q` quits the reader but
+   filters for the letter q in the picker. The prompt tells you which
+   world the hands are in.
+3. **The bridge.** The operator's flow out of the reader into an empty
+   picker prompt: exit the reader, `Esc` to clear the reseeded query —
+   two keystrokes to a blank `gloam ❯ `, ready for a new word. Note for
+   the keymap owner: the reader's lone `Esc` is a buffer-cancel no-op in
+   `decodeKey` as coded, so codify whichever bridge is intended — the
+   observed flow or an explicit `Esc`-quits — before it drifts.
+
 ## Status
 
 Draft. The test of a conventions page is whether the fingers converge on
