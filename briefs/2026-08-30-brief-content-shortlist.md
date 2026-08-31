@@ -25,7 +25,8 @@ rg emits the shortlist of "files that mention X"; fzf picks one from
 the usual suspects; okuda reads the selection. Three tools, one pipe
 each, file-grain throughout. The reader's one-document contract
 (`okuda <file>`) is unchanged — no line-anchor, no compositor, no
-structured rows.
+structured rows. (Amended 2026-08-30: the shortlist **merges registry
+field hits first** — see §Ranked sources.)
 
 ## What
 
@@ -40,8 +41,9 @@ structured rows.
    Under this brief both modes source from rg:
    - `gloam` (no arg) → `rg --files --type md | fzf` (filename picker,
      rg-sourced; direct replacement for `fd -e md | fzf`).
-   - `gloam -g <query>` → `rg -l <query> --type md | fzf` (content
-     shortlist).
+   - `gloam -g <query>` → ranked merge (see §Ranked sources, item 3):
+     registry field hits first, then `rg -l <query> --type md` (content
+     shortlist), deduped by path.
 
    `walkMarkdown` (the `readdirSync` in-process fallback) **retires**:
    it only ever worked on a local filesystem, and its `name.startsWith(".")`
@@ -50,7 +52,22 @@ structured rows.
    uniformly; the include/exclude-archive question becomes a single
    `.gitignore` decision, not a per-source-codepath accident.
 
-3. **The launcher loop is unchanged in shape.** `runLauncher`'s
+3. **Ranked sources — the shortlist merges channels (amended 2026-08-30,
+   ADR-025).** The operator doesn't always know whether what they
+   remember is a callsign, a filename fragment, or a topic — the router
+   between channels is the pipe, not the human. The `-g` shortlist
+   sources, in precision order, deduped by path:
+   1. **Registry field hits** — `rg -i '"callsign":.*<query>' */INDEX.jsonl`
+      (field-anchored: owner-only, per ADR-025's header-only rule; ranks
+      first because the registry is the only truthful owner index).
+   2. **Body hits** — `rg -l <query> --type md` (the original content
+      shortlist; sanctioned noise, ranked last).
+   Filename search (no arg) is unchanged. Exact resolution stays out of
+   scope: `gloam <callsign>` (shaped arg, registry dispatch, d39a414)
+   remains the only path that guarantees exactly-one — the merged
+   shortlist is for *not knowing*, and honestly returns a shortlist.
+
+4. **The launcher loop is unchanged in shape.** `runLauncher`'s
    browse → read → browse loop, the query reseed (`--print-query` +
    `--query`), the alt-scroll policy, the callsign/silo threading —
    all identical. The only change is *what feeds `pickFile`'s stdin*:
@@ -126,10 +143,14 @@ structured rows.
 - `gloam` (no arg) launches the filename picker, now rg-sourced; the
   browse → read → browse loop, query reseed, and cursor behavior are
   indistinguishable from today (regression-free).
-- `gloam -g diagram` launches fzf seeded with `rg -l diagram --type md`
-  output; selecting a file reads it; Esc returns to the launcher; the
-  query is reseeded for the next round (same loop semantics as the
-  filename path).
+- `gloam -g diagram` launches fzf seeded with the ranked merge (§Ranked
+  sources): registry field hits for `diagram` first, then `rg -l diagram
+  --type md` output, deduped by path; selecting a file reads it; Esc
+  returns to the launcher; the query is reseeded for the next round
+  (same loop semantics as the filename path).
+- A pure-registry query (e.g. `gloam -g SHORTLIST`) ranks the owning
+  document first and any prose mentions later — a test pins the field-
+  anchored source and the dedupe.
 - `gloam -g mermaid border` narrows to files mentioning both terms
   (rg default AND across the pattern; or two-word pattern — the
   implementer picks the honest rg invocation, no custom AND logic).
@@ -189,6 +210,9 @@ check for external/test callers first.
 - `src/launcher.ts` — `listMarkdownFiles` (retires `walkMarkdown`),
   `pickFile` (source-agnostic, unchanged), `runLauncher` (gains `-g`
   dispatch), `invokedAsGloam`
+- ADR: `decisions/025-mnemonic-namespace-model.md` — header-only
+  placement is why the registry field is the only truthful owner index,
+  and therefore why it can safely rank first
 - `docs/2026-08-30-the-butt-dial-question.md` — where the
   discoverability gap was named (this brief is the gap's first
   graduate)
