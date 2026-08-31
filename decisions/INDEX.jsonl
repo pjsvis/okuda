@@ -23,3 +23,4 @@
 {"file":"023-tty-active-input-reader.md","date":"2026-08-29","status":"Accepted","summary":"/dev/tty active-poll reader for the TUI (bypass Bun's broken passive stdin)","meta":{},"callsign":"ADR-TTY-ACTIVE-INPUT-023"}
 {"file":"024-callsigns-are-data.md","date":"2026-08-30","status":"Accepted","summary":"Callsigns are data, not machinery","meta":{},"callsign":"ADR-CALLSIGN-DATA-024"}
 {"file":"025-mnemonic-namespace-model.md","date":"2026-08-30","status":"Accepted","summary":"The mnemonic namespace model","meta":{},"callsign":"ADR-MNEMONIC-MODEL-025"}
+{"file":"026-wire-format.md","date":"2026-08-31","status":"Accepted","summary":"The wire format — one grammar, two forms, paint decoupled","meta":{},"callsign":"ADR-WIRE-FORMAT-026"}
