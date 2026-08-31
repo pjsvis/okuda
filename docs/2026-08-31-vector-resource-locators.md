@@ -2,7 +2,9 @@
 
 > *"The past is a foreign country; they do things differently there. But they had to get the signal through the static just like us."*
 
-> **Provenance and reconciliation (2026-08-31).** Drafted in a Gemini
+> **Provenance and reconciliation (2026-08-31).** Status: **aligned**
+> (landed *fresh*; reconciled same day against the silo's contracts).
+> Drafted in a Gemini
 > conversation with a different context, then reconciled against the silo's
 > contracts. Scraped: the wire syntax (the canonical grammar is
 > `%%okuda-rhs:NN%%` — two source forms, per ADR-WIRE-FORMAT-026; the
