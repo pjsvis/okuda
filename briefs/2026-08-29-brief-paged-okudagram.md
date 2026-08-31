@@ -5,9 +5,23 @@ callsign: BRF-PAGED-OKUDAGRAM
 
 # Brief: Paged okudagram view — block-aware paging (candidate invariant)
 
-**Date:** 2026-08-29
+**Date:** 2026-08-29 (amended 2026-08-30 — stepping clause folded in, see
+below)
 **Status:** Aspiration — constraint-space exploration, not a plan
 **Branch:** feat/gloam-launcher (parked; no code yet)
+
+> **Amendment (2026-08-30, stepping clause).** A navigation riff —
+> paragraph-to-paragraph stepping, "stepwise as an okudagram: the target
+> heading plus whatever else fits" — folded in here after review against
+> the corpus's recorded constraints. The riff was fuzzy; the corpus was
+> not: the section-snap semantics are shaped by BRF-VIEWPORT-PADDING's
+> rejection (continuation, never padding), the keybindings by ADR-021's
+> timing protocol and the stillness ledger (single keys, no gesture
+> dialect), and touch by td-dc0126's unproven layer. Provenance recorded
+> in the amendment section; the fuzz was sharpened, not replaced —
+> "navigate the structure, not the lines; compose each step" is the
+> riff's phrase and this brief's best sentence on the subject.
+
 **Context:** a dogfood musing on the scroll seam. The current TUI is
 slippy: a flat line array, a continuous viewport sliced through it,
 an "eye proxy" anchor pinning the nearest non-blank line to the
@@ -127,6 +141,54 @@ synthesis says "paged at the boundary" — so the transition
 (explicit page input at the boundary) or the *viewer* triggers it
 (auto-page on overflow) is an exploration output. The diagram makes
 the question visible; it does not answer it.
+
+## The stepping clause (folded in 2026-08-30)
+
+The riff contributes the *explicit input channel* for the state machine
+this brief already drew. Nothing above changes; two additions:
+
+**Block-granular motion keys.** Single keys, forward/back, stepping to
+the next/previous block boundary — candidates `{` / `}` (the less and
+Emacs paragraph-motion lineage; the muscle memory already exists in the
+audience). Headings are blocks: block-stepping lands on them naturally,
+so no separate heading-jump axis is added. The keys are the human
+trigger for the transitions the state machine already names
+(`PAGED → MEASURE: page → next`); they add no states. Line motion
+(j/k, Ctrl-D/U, space/b) is untouched — slippy flow keeps its own
+vocabulary, stepping adds its own.
+
+**Section-snap composition.** A step re-*composes* the viewport: target
+heading at the top, the section's content flowing down to fill the
+screen, and if the section is short, **the next section's content
+continues** — the view is always full of content and always anchored at
+structure. Never padded: BRF-VIEWPORT-PADDING's rejection is binding
+precedent ("blank only signals at a boundary; viewport pad fights the
+content-anchor"). The distinction the riff drew, kept as the clause's
+soul: *scrolling is translation; stepping is composition per step.*
+Nearly free — the renderer re-renders constantly (live documents,
+resize anchoring); re-composing per step is the same machinery with a
+different anchor.
+
+**Rejected in review: double-tap.** A timing gesture collides with the
+two-digit jump buffer's timing protocol (ADR-021's spaced double-taps
+exist to disambiguate buffered digits); it duplicates existing keys
+(Ctrl-D/U) with fuzzier semantics; and a second tap-dialect is a fresh
+negotiation the stillness ledger (ADR-020) prices in. Single keys only.
+
+**Deferred: touch.** Tap-as-touch rides SGR mouse reporting (td-dc0126,
+wheel→scroll) over a transport the mobile dogfood found fragile
+(resize flaky, soft-keyboard voids). Keyboard first; the mouse brief
+owns taps when it lands.
+
+**Dependency, stated honestly:** the stepping keys presuppose the unit
+definition (constraint 1) — "next block" is undefined until the unit is
+defined. The stepping clause inherits whatever the exploration settles;
+it adds no unit question of its own.
+
+**Sequencing update:** constraint 3's gate (fzf epic ship-or-abort)
+has **resolved — aborted** (`152eb62`, revert; debrief on file). The
+scroll seam is clear. The unpark conditions reduce to one: the unit
+definition needs a defender.
 
 ## The constraint space — what we don't yet know
 
@@ -321,7 +383,15 @@ the honest output is "keep slippy, here's why," recorded here.
   `preserveScrollFraction` (the eye-proxy anchor this would extend)
 - `src/render.ts` — the heading handler (option 2's index source)
 - `briefs/2026-08-29-brief-fzf-owns-the-loop.md` — `BRF-FZF-OWNS-LOOP`
-  (shares the TUI seam; gate 3 of sequencing)
+  (shares the TUI seam; **aborted 2026-08-30 — the seam is clear**)
+- `decisions/021-jump-token-numbering-offset.md` + the spaced double-tap
+  corollary — the timing protocol the rejected double-tap clause would
+  have collided with
+- `briefs/2026-08-25-brief-viewport-padding.md` — `BRF-VIEWPORT-PADDING`,
+  rejected: binding precedent for continuation-never-padding
+- td-dc0126 — SGR mouse reporting (the touch deferral's owner)
+- `decisions/020-zero-notification-stillness.md` — the vocabulary ledger
+  the new keys are argued against
 - `decisions/004-hard-wrap-mandate.md` — the precedent invariant:
   "okuda owns every `\n`" (a paged layer would inherit this)
 - The constitution (`system.md`) — invariants join here if they hold
