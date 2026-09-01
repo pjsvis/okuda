@@ -48,6 +48,20 @@ import { wrapANSI } from "./wrap";
 /** Left indent for list blocks, inside the content margin (Glow list level_indent). */
 const LIST_INDENT = 2;
 
+/** Inline vector paint — strip the token and any comment-wrapped path
+ *  from a rendered child string, returning the remaining slug and the
+ *  token number for bracket painting. Tolerant of the inline parser's
+ *  mangling: the token may arrive with one or two percents per side
+ *  (`%%okuda-rhs:NN%%` in source, often `%okuda-rhs:NN%` in the stream).
+ *  The jump map is built from the *source* (extractJumps); this only
+ *  paints. Returns null when the child carries no vector. Pure. */
+function stripVector(children: string): { slug: string; num: string } | null {
+  const m = children.match(/%{1,2}okuda-rhs:(\d{1,2})%{1,2}/);
+  if (!m) return null;
+  const slug = children.replace(/%{1,2}okuda-rhs:(\d{1,2})%{1,2}/, "").replace(RE_INLINE_HTML, "").trim();
+  return { slug, num: m[1]! };
+}
+
 /** The closed state-glyph vocabulary — lexicon-applied, not author-editable.
  *  The renderer colours a ✓ green because ✓ is in this set, not because
  *  an author can tag arbitrary text green. Extends ADR-015's alert
@@ -548,29 +562,19 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         if (entry !== undefined) return diagramBlock(entry.art, ctx, entry.title);
         return ""; // pipe failed → drop the placeholder silently
       }
-      // One-line list item: `slug %%okuda-rhs:NN%%` — the RHS number is
-      // the action, the slug is the content. Render the slug left (truncated
-      // to fit, one line, `…` on overflow), the number bold at the RHS.
-      // Visual order follows action order: consider, then execute.
-      // (brief: index-and-jump — the pattern that repeats for any list
-      //  where the item is one line and the action is RHS.)
-      const rhs = children.match(RE_RHS_TOKEN);
-      if (rhs) {
-        const num = rhs[1]!;
-        // The slug is the paragraph minus the RHS token and any HTML
-        // comment (the path wiring). Strip both, then render the
-        // remaining inline content through wrapBlock and take the first
-        // line — one line, truncated to fit, the number at the RHS.
-        const slugSrc = children.replace(RE_RHS_TOKEN, "").replace(RE_INLINE_HTML, "");
-        const slugLines = wrapBlock(stripHtml(slugSrc));
-        const rendered = slugLines[0] ?? "";
-        // column budget: full width minus the 2-char margins (applied by
-        // finalize) minus the number + its leading space.
-        const numW = num.length + 1; // ' NN'
-        const avail = width - 2 - numW;
-        const body = elideToWidth(rendered, avail);
-        const line = padDisplay(body, avail) + styler.bold(num);
-        return line + "\n\n";
+      // Inline vector paint: strip the token, paint a bracketed badge in
+      // the accent role, right after the slug. No layout assumptions —
+      // the badge travels with the text (ADR-026 paint direction: the
+      // BBS/lynx bracket cadence, adopted). The RHS right-aligned form
+      // was retired: it required width math per handler and leaked raw
+      // tokens from handlers without it (the listItem bug).
+      const v = stripVector(children);
+      if (v) {
+        const badge = `[${v.num}]`;
+        const slugLines = wrapBlock(stripHtml(v.slug));
+        const avail = Math.max(width - 2 - badge.length - 1, 8);
+        const body = elideToWidth(slugLines.join(" "), avail);
+        return body + " " + styler.roleBold("strong", badge) + "\n\n";
       }
       const lines = wrapBlock(stripHtml(children));
       return lines.join("\n") + "\n\n";
@@ -667,6 +671,10 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
     // List items emit a placeholder; the `list` handler assigns markers
     // (bun 1.3.8 passes no listItem metadata — decisions/005).
     listItem(children: string) {
+      // Inline vector paint for list items too — the same badge, no
+      // layout math; the token used to leak raw from this handler.
+      const v = stripVector(children);
+      if (v) return TAG_ITEM + v.slug + " " + styler.roleBold("strong", `[${v.num}]`);
       return TAG_ITEM + children;
     },
 
