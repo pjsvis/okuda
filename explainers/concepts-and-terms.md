@@ -70,6 +70,16 @@ Together they are the reason the same debate never happens twice, and
 the reason a newcomer — human or AI — can reach full speed in one
 session. Internally: **the ledger is the moat.**
 
+Exercise the vocabulary — these are the real compartments, open one:
+
+| Open | # |
+|---|---|
+| **Briefs** — what will we build? | **11** <!-- %%okuda-rhs:11%% briefs/index.md --> |
+| **Decisions** — why did we choose this? | **12** <!-- %%okuda-rhs:12%% decisions/index.md --> |
+| **Debriefs** — what happened when we built it? | **13** <!-- %%okuda-rhs:13%% debriefs/index.md --> |
+| **The orientation vector** — the silo's home screen | **14** <!-- %%okuda-rhs:14%% &alpha.md --> |
+| **The decision table** — what is next, ranked | **15** <!-- %%okuda-rhs:15%% &next.md --> |
+
 ## The diagram tool
 
 Write a **mermaid** fence; okuda draws it as ASCII art in the terminal.

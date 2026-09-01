@@ -7,18 +7,20 @@
 >
 > Unregistered by design — no callsigns (ADR-025's boundary). A register
 > fires when this folder grows a named consumer or crosses ~8 documents.
+>
+> **Exercise out of the gate:** the tables below are jump-wired. Type the
+> two digits to go; type `u` to come back. Reading the explanation and
+> using the thing are the same gesture here — that is the point.
 
 ## The reading path
 
-1. **[The terminal](the-terminal.md)** — why this silo lives in a
-   terminal, and what okuda does with the glass.
-2. **[Concepts and terms](concepts-and-terms.md)** — the vocabulary:
-   silo, gloam, okudagram, callsigns, the & family, the ledger. Start
-   here whenever a word is unfamiliar.
-3. **[The diagram tool](the-diagram-tool.md)** — how mermaid fences
-   become ASCII art, and how big a diagram may be.
-4. **[SSH](ssh.md)** — the silo on any device: the gopher model, what
-   works today, what is coming.
+| Destination | # |
+|---|---|
+| **The terminal** — why this silo lives in the glass | **11** <!-- %%okuda-rhs:11%% explainers/the-terminal.md --> |
+| **Concepts and terms** — the vocabulary, defined before it is used | **12** <!-- %%okuda-rhs:12%% explainers/concepts-and-terms.md --> |
+| **The diagram tool** — mermaid fences become ASCII art | **13** <!-- %%okuda-rhs:13%% explainers/the-diagram-tool.md --> |
+| **SSH** — the silo on any device | **14** <!-- %%okuda-rhs:14%% explainers/ssh.md --> |
+| **&next** — the decision table (you are ready for this one) | **15** <!-- %%okuda-rhs:15%% &next.md --> |
 
 New explainers join the path. The rule is the house rule: explain the
 concept before using the word, and lead with why the reader should
