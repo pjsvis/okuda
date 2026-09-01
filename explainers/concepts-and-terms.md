@@ -39,6 +39,15 @@ same document, even after the file is renamed. The rule that makes them
 trustworthy: a callsign appears in exactly one place, the front matter
 of the document it names.
 
+One grammar note: callsigns are **written tier-first, spoken tier-
+last**. On paper, `BRF-DOCUMENT-LINKS` — the category leads, because
+the address is hierarchical (which register, which roll) and because
+the prefix groups and greps the roll. Out loud, "the document-links
+brief" — or in full slacker register: *"document links, dude, like in
+a brief an' that."* The meaning leads, the tier trails, and it still
+resolves — the mumble is a tier declaration. Both are correct; they
+are different channels.
+
 ## Jump tokens
 
 **Jump tokens** are the two-digit numbers you see beside rows in index
