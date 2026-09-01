@@ -83,23 +83,40 @@ Exercise the vocabulary — these are the real compartments, open one:
 ## The roll
 
 Classic document management divides files into *controlled* and
-*uncontrolled*. That vocabulary does not fit here, because git controls
-every document — the history is universal. The real variable is
-**membership**: has the document joined the body of the kirk?
+*uncontrolled* — and the terms are paper-era, deliberately not used
+here. The context (ISO 9001:2015, clause 7.5): a **controlled document**
+is one put through the full lifecycle — approval before issue, version
+control, obsolete versions pulled from circulation so that *only the
+current approved version sits at the point of use*; an **uncontrolled
+copy** is a printout marked "for reference only" that no one updates,
+and treating one as authoritative is a formal nonconformance. The whole
+apparatus exists because paper drifts: printed copies go stale, shared
+drives desync, and someone eventually works from the wrong revision.
 
-A document **on the roll** is registered: it carries a callsign, its
-name is lifted into a register, and it comes under the session's
-discipline — frontmatter hygiene, status flips at debrief time, the
-callsign lint, the reg-sync drift walk. In exchange it holds the
-privileges of membership: a durable address, field-anchored findability,
-a line in the index.
+That is the apparatus git makes unnecessary. Every document in this silo
+is controlled by an unfuckwithable audit mechanism called git: the
+current approved version is whatever `main` says, obsolete versions are
+preserved rather than destroyed, the revision history is the audit
+trail, and there are no printouts to go stale. Clause 7.5 is the paper-
+era ancestor of the commit; we run its intent, not its bureaucracy.
 
-A document **off the roll** — everything in `docs/`, `explainers/`, the
-`&` vectors — is governed but not enrolled: git-controlled, lint-checked,
-merged through the same quality gate, read and linked like any other —
-but no callsign, no roll-call, no drift audit. Free documents. The
-freedom is deliberate: they keep their author's voice and layout, and
-they cost the session nothing to maintain.
+So the variable here is not *control* — it is **membership**: has the
+document joined the body of the kirk? A document **registry-controlled**
+is on the roll: it carries a callsign, its name is lifted into a
+register, and it comes under the session's discipline — frontmatter
+hygiene, status flips at debrief time, the callsign lint, the reg-sync
+drift walk. In exchange it holds the privileges of membership: a durable
+address, field-anchored findability, a line in the index. The registry
+is a *second* control layer that git does not provide — consistency
+checksums, identifiers, drift repair — which is why it is optional,
+and why joining it means something.
+
+A document **not registry-controlled** — everything in `docs/`,
+`explainers/`, the `&` vectors — is governed but not enrolled: git-
+controlled, lint-checked, merged through the same quality gate, read and
+linked like any other — but no callsign, no roll-call, no drift audit.
+Free documents. The freedom is deliberate: they keep their author's
+voice and layout, and they cost the session nothing to maintain.
 
 The mnemonic is the badge of membership. No callsign, no roll — and no
 obligations either. Both states are honourable; they are just different.
