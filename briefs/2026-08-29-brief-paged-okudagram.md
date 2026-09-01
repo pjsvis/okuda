@@ -190,6 +190,46 @@ has **resolved — aborted** (`152eb62`, revert; debrief on file). The
 scroll seam is clear. The unpark conditions reduce to one: the unit
 definition needs a defender.
 
+## The frame-numbering clause (folded 2026-08-31)
+
+The second fold-in from the navigation riff, and the reason the unit
+question doubled in value: **the frame is the numbering scope.** Two
+build strategies now exist for the vector contract — *numbers to files,
+that's it* — and only the list-construction time differs:
+
+1. **Pre-render** (shipped): the jump list is built from the source
+   before the render (`extractJumps`); stable for the whole document.
+2. **Per-frame** (this clause): the list is built when a frame is
+   composed — whatever fits on the screen is numbered 11, 12, 13… in
+   visible order. Page forward; the next frame numbers from 11 again.
+
+The resolution contract is identical: keypress → number → file.
+
+**Ergonomics for free.** The vector list is a byproduct of composition
+— the frame already knows its visible blocks; numbering them costs
+nothing. And the vectors *are* the paging controls: "what do I press to
+see more?" — the numbers on screen, typically 11, 12, 13. Pressing the
+visible vectors *is* seeing more; no separate next-page key is needed.
+
+**Motor invariance.** Every frame numbers from 11 — the fingers never
+re-map, the press is always the same two keys' distance away. The
+Ceefax/BBS property (per-page coordinates), and the reason the
+precedents lineage keeps resurfacing.
+
+**Scope.** The ceiling is 89 slots (11–99) *per frame*, not per
+document — a composed frame that overflows the keyspace is a unit-
+definition failure, not a numbering failure. A lot of scope for one
+screen.
+
+**Ephemerality holds.** Per-frame numbers cannot be jotted (they die
+with the frame); the durable tier stays callsigns. The boundary —
+jump tokens for now, callsigns for later — is applied to time.
+
+**Dependency, doubled.** The frame is the paging scope *and* the
+numbering scope — the same boundary drawn twice. The unit definition
+(constraint 1) now gates two clauses; the unpark case is stronger than
+this morning's.
+
 ## The constraint space — what we don't yet know
 
 This is the section that earns the brief its "aspiration" status.
