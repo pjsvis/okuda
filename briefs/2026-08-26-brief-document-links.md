@@ -70,19 +70,19 @@ reader can follow it without leaving the session.
 
 ```mermaid
 flowchart TD
-    C["path-shaped string"] --> F{"inside a code fence?"}
-    F -- "yes" --> SKIP["plain text — no badge"]
-    F -- "no" --> W{"explicit wire on the line?"}
-    W -- "yes" --> WIRE["explicit wins — wired first"]
-    W -- "no" --> G1{"prefix in the ls set?"}
-    G1 -- "no" --> SKIP
-    G1 -- "yes" --> G2{"ends .md?"}
-    G2 -- "no" --> SKIP
-    G2 -- "yes" --> G3{"file exists?"}
-    G3 -- "no" --> SKIP
-    G3 -- "yes" --> G4{"keyspace space?"}
-    G4 -- "no" --> CAP["forgotten — cap stated in hints"]
-    G4 -- "yes" --> B["badge — number assigned"]
+    C[string] --> F{in a code fence}
+    F -- yes --> SKIP[plain text]
+    F -- no --> W{explicit wire}
+    W -- yes --> WIRED[wired first]
+    W -- no --> G1{prefix in ls set}
+    G1 -- no --> SKIP
+    G1 -- yes --> G2{ends md}
+    G2 -- no --> SKIP
+    G2 -- yes --> G3{file exists}
+    G3 -- no --> SKIP
+    G3 -- yes --> G4{keyspace space}
+    G4 -- no --> CAP[forgotten]
+    G4 -- yes --> B[badge]
 ```
 
 4. **Navigation stack.** Following a link pushes; a bound key (proposal:
