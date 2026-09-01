@@ -118,3 +118,27 @@ proving ground (`docs/2026-08-30-voice-actuator-testing.md`).
 *Provenance:* the dunt is operator lore — the radio/TV heuristic is
 real and widespread, the Fleet Air Arm grade of attribution (claimed,
 not cited). The design use is ours.
+
+### The dunt as a carrier — spacing, not force (added 2026-08-31)
+
+The operator's extension, and it changes the primitive's class: force
+(slaps to thumps) was a one-bit urgency flag; **spacing is a full
+channel**. Sharp or protracted dunts — the quality measured by the
+gaps between them, not the impacts. A dunt detector plus an interval
+decoder is Morse code: the oldest attention-gated, sender-and-receiver-
+only protocol on record, purpose-built for low-bandwidth covert
+channels.
+
+Two encodings fit the grammar: **ITU Morse digits** (unambiguous, five
+symbols per digit) and **tap-count** (digit N = N dunts, gap, next
+digit — the POW code, three times faster). Either way the actuation
+chain gains a first-class acoustic register: `[DUNT-stream] → decode →
+[Coordinate] → [Actuation]` — silent, hands-busy-compatible, and the
+terminal never knows.
+
+The acoustic register stack is now three deep, one decoder: voice
+(conversational), radiotelephony (command cadence), rhythm (covert) —
+each gated by the dunt that says listen. **Status: routed proposal** —
+the decoder is ~30 lines and the M4 mic is the hardware, but it waits
+on a named consumer like everything else in the blue-sky pile. The
+design note is the persistence, not a build ticket.
