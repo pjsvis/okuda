@@ -36,6 +36,12 @@ just prints — composes:
 - **Chrome appears only when it acts.** Hints, footers, and state
   markers show up when they mean something and vanish when they don't.
 
+## Next
+
+| Open | # |
+|---|---|
+| **Concepts and terms** — the vocabulary, defined before it is used | **11** <!-- %%okuda-rhs:11%% explainers/concepts-and-terms.md --> |
+
 ## Why this beats a web page for a knowledge base
 
 Three reasons, in descending order of stubbornness:

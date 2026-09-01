@@ -59,3 +59,11 @@ as the text, and it survives every renderer, everywhere, forever.
 
 That document contains a state machine about halfway down. Find it,
 narrow your terminal slowly, and watch the art hold its shape.
+
+## Going deeper
+
+| Open | # |
+|---|---|
+| **The agent-side playbook** — every limit, from the source | **11** <!-- %%okuda-rhs:11%% playbooks/mermaid-diagrams-playbook.md --> |
+| **The mangle demo** — ten tricks, including this one | **12** <!-- %%okuda-rhs:12%% docs/2026-08-31-mangle-demo.md --> |
+| **A document with a state machine** — see it rendered | **13** <!-- %%okuda-rhs:13%% docs/2026-08-31-actuator-inputs.md --> |
