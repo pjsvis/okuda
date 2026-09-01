@@ -38,6 +38,32 @@ The draft's over-engineering was exactly this conflation: giving settings
 the address grammar. The fix is not trimming the BNF — it is splitting
 the category.
 
+### The control surface (added 2026-08-31)
+
+How the system commands will actually be controlled, decided now so the
+abstractions stay outside: **no config or ini files** — state lives in
+the corpus or in the process, never in a third file. Three layers:
+
+1. **The palette is the default.** The luminance scalar multiplies a
+   fixed palette (td-b4bae8); a permanently dimmer silo is a *chosen
+   palette*, which is durable configuration already sitting in files
+   the operator owns.
+2. **The CLI param is the boot value.** `--brightness` or an env var,
+   set by whatever launches the pane — the **host is the config
+   system**: `herdr tab create --env OKUDA_BRIGHTNESS=1.2`, per pane,
+   two panes at two brightnesses, no settings file anywhere.
+3. **TUI nudge keys are the live scalar.** After boot, `+` / `−`
+   (non-digits: they cancel the jump buffer cleanly; no collision with
+   the 11–99 grammar). Voice phrases in the same idiom: "Glow
+   brighter", never "Glow seven three".
+
+The zoom parallel proves the shape: the host zooms, okuda detects the
+resize and re-renders — no setting, no restart. Brightness is the same
+event in the luminance channel. Sequencing: the scalar (td-b4bae8,
+after state-glyph tuning) → the nudge keys (one keybind decision) →
+the CLI param (one flag) → the voice phrases (one command each). All
+small; none needing config. Foxtrot oscar to the ini.
+
 ## The navigation grammar, formalized (shipped truth)
 
 The state machine below is not a proposal — it is `advanceNumBuffer`
