@@ -64,6 +64,27 @@ reader can follow it without leaving the session.
    resolves to the shipped silent no-op — and if a badge is missing or
    wrong, the four rules read off the line answer why.
 
+   The gates, drawn — and the diagram is the complexity canary: if
+   four gates can't render, the inference is over-complicated and the
+   fallback is the review.
+
+```mermaid
+flowchart TD
+    C["path-shaped string"] --> F{"inside a code fence?"}
+    F -- "yes" --> SKIP["plain text — no badge"]
+    F -- "no" --> W{"explicit wire on the line?"}
+    W -- "yes" --> WIRE["explicit wins — wired first"]
+    W -- "no" --> G1{"prefix in the ls set?"}
+    G1 -- "no" --> SKIP
+    G1 -- "yes" --> G2{"ends .md?"}
+    G2 -- "no" --> SKIP
+    G2 -- "yes" --> G3{"file exists?"}
+    G3 -- "no" --> SKIP
+    G3 -- "yes" --> G4{"keyspace space?"}
+    G4 -- "no" --> CAP["forgotten — cap stated in hints"]
+    G4 -- "yes" --> B["badge — number assigned"]
+```
+
 4. **Navigation stack.** Following a link pushes; a bound key (proposal:
    `u`, unbound today) pops back to the previous document at the previous
    scroll — the anchor machinery (`reanchoredScroll`) already preserves
