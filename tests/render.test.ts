@@ -534,11 +534,11 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
     expect(out).not.toContain("<!--");
   });
 
-  test("the RHS number renders white bold at the end of the line", async () => {
+  test("the vector renders as an accent bracket after the slug", async () => {
     const out = await render("*Title* %%okuda-rhs:01%% <!-- docs/foo.md -->");
-    // bold attribute (1), no colour → white bold. The number is the
-    // content; bold is the affordance.
-    expect(out).toContain("\x1b[1m01\x1b[0m");
+    // ADR-026 paint direction: the bracket badge in the accent role
+    // (strong #ffb86c), bold. Tolerant of the inline parser's % mangling.
+    expect(out).toContain("\x1b[38;2;255;184;108;1m[01]\x1b[0m");
   });
 
   test("the slug renders as emphasis (yellow, italic) on the left", async () => {
@@ -554,14 +554,14 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
     expect(bodyLines.length).toBe(1);
   });
 
-  test("a long slug truncates with … and the number stays at the RHS", async () => {
+  test("a long slug truncates with … and the badge still paints", async () => {
     const out = await render(
       "*A very long slug that will not fit in a narrow terminal* %%okuda-rhs:05%% <!-- docs/x.md -->",
       40,
     );
     const plain = out.replace(/\x1b\[[0-9;]*m/g, "");
     expect(plain).toContain("…");
-    expect(plain).toContain("05");
+    expect(plain).toContain("[05]");
     // One body line (not wrapped): the body lines, excluding rails.
     const bodyLines = plain.split("\n").filter((l) => l.trim() && !l.includes("─") && !l.includes("█"));
     expect(bodyLines.length).toBe(1);
