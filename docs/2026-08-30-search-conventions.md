@@ -102,6 +102,25 @@ owner is declared.
    BRF-CONTENT-SHORTLIST — agents should reuse the same sources, not
    re-invent ranking.
 
+## The three breadcrumbs — ambient state, hot-potato held
+
+The loop holds exactly three pieces of session state, each answering
+one of the reader's lost moments. Learn to pick them up:
+
+| Breadcrumb | Question it answers | Holding time |
+|---|---|---|
+| The reseeded query | *why was I reading this?* | survives one loop; cleared on demand |
+| The backstack | *how did I get here?* | dies with the process; `u` walks it |
+| The document itself | *is this still true?* | `r` reloads off disk — silence means nothing changed |
+
+A browser history answers *where you went*; the reseeded query answers
+**what you were looking for** — intent, not trajectory. And the
+holding times are deliberate: state that lives too long becomes drift
+(a settings store, a stale cache, a second ledger), so each breadcrumb
+is held exactly as long as its question can still be asked, then
+dropped. Hot potato, by design. When in doubt: `Esc` shows the query,
+`u` walks the path, `r` checks the world.
+
 ## Document states (the docs/ lifecycle)
 
 `docs/` is unregistered — no callsigns, no register (ADR-025's boundary).
