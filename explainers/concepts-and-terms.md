@@ -80,6 +80,30 @@ Exercise the vocabulary — these are the real compartments, open one:
 | **The orientation vector** — the silo's home screen | **14** <!-- %%okuda-rhs:14%% &alpha.md --> |
 | **The decision table** — what is next, ranked | **15** <!-- %%okuda-rhs:15%% &next.md --> |
 
+## The roll
+
+Classic document management divides files into *controlled* and
+*uncontrolled*. That vocabulary does not fit here, because git controls
+every document — the history is universal. The real variable is
+**membership**: has the document joined the body of the kirk?
+
+A document **on the roll** is registered: it carries a callsign, its
+name is lifted into a register, and it comes under the session's
+discipline — frontmatter hygiene, status flips at debrief time, the
+callsign lint, the reg-sync drift walk. In exchange it holds the
+privileges of membership: a durable address, field-anchored findability,
+a line in the index.
+
+A document **off the roll** — everything in `docs/`, `explainers/`, the
+`&` vectors — is governed but not enrolled: git-controlled, lint-checked,
+merged through the same quality gate, read and linked like any other —
+but no callsign, no roll-call, no drift audit. Free documents. The
+freedom is deliberate: they keep their author's voice and layout, and
+they cost the session nothing to maintain.
+
+The mnemonic is the badge of membership. No callsign, no roll — and no
+obligations either. Both states are honourable; they are just different.
+
 ## The diagram tool
 
 Write a **mermaid** fence; okuda draws it as ASCII art in the terminal.
