@@ -36,12 +36,40 @@ reader can follow it without leaving the session.
    root bounds it (a link outside the root is rendered but not
    followable — it is web-bound, and OSC 8 still carries it for terminals
    that want to hand it to a browser).
-3. **Navigation stack.** Following a link pushes; a bound key (proposal:
+3. **Inferred vectors — optimistic, prefix-derived, debuggable by
+   inspection (added 2026-08-31).** Explicit links are not the only
+   paths in the corpus: documents reference each other with *bare
+   path-shaped strings* (`decisions/025-mnemonic-namespace-model.md`,
+   `briefs/index.md`) with no link syntax at all. At render time these
+   get optimistic vectors, under four deterministic rules:
+   (a) the **prefix set is derived from an `ls` of the silo root** —
+   folder names plus root documents; the structure is the config, no
+   declarations, self-maintaining; (b) a candidate is a token-bounded
+   string starting with a known prefix and ending `.md`, **existence-
+   verified** before painting (optimism with a bouncer); (c) **explicit
+   wins** — `%%okuda-rhs%%` wires claim their numbers first, inference
+   numbers only unwired references, markdown links outrank bare paths;
+   (d) **keyspace cap**: visible order to 99, the rest forgotten, the
+   hints row states the cap. Code fences are skipped (paths quoted as
+   text must not badge — the same fence-collision class as the mermaid
+   scan, one solution serving both). The affordance stays the menu
+   (item 1); inline bracket badges are a later paint refinement under
+   ADR-026's direction.
+
+   **Debuggable by inspection** is the requirement that makes optimism
+   safe: the inference is deterministic and explainable from the text
+   alone — a badge implies (prefix in the `ls` set) ∧ (ends `.md`) ∧
+   (file exists) ∧ (keyspace space); no badge implies the same four
+   negations. No hidden state, no learning, no model. A wrong guess
+   resolves to the shipped silent no-op — and if a badge is missing or
+   wrong, the four rules read off the line answer why.
+
+4. **Navigation stack.** Following a link pushes; a bound key (proposal:
    `u`, unbound today) pops back to the previous document at the previous
    scroll — the anchor machinery (`reanchoredScroll`) already preserves
    position across re-render; reuse it across documents. `u` from the
    first document is a no-op.
-4. **The loop joins in.** In the launcher/feed loop, quitting the reader
+5. **The loop joins in.** In the launcher/feed loop, quitting the reader
    (`q`) returns to the picker, as today; `u` walks back through followed
    links *inside* the reader session. Two layers, two back keys, no
    confusion: `q` exits the document, `u` unwinds within it.
@@ -74,12 +102,15 @@ them). Two link species, two affordances, no conflict.
   link-style pass is the separate parked work — scrappy editing gets its
   own pass when the feed exists to serve the posts).
 - Numbered links beyond the keyspace (>89) — an authoring problem, not
-  a reader problem — cap at 9, log the cap in the menu row).
+  a reader problem — the cap is stated in the hints row.
 - Web links via digits (OSC 8 already owns those; terminals hand them to
   browsers — including on iPad clients that support it).
 
 ## Verification
 
+- Unit: inference rules (prefix set from ls, fence skip, existence
+  gate, explicit-first precedence, keyspace cap — each rule tested
+  against a line that should badge and a line that shouldn't);
 - Unit: link collection (relative vs absolute vs web); digit decode;
   `u` stack push/pop; anchor preservation across document switches.
 - Sandbox: follow a link between two posts over the feed; `u` returns to
