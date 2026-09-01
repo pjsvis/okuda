@@ -25,3 +25,8 @@
 New explainers join the path. The rule is the house rule: explain the
 concept before using the word, and lead with why the reader should
 care.
+
+There is no separate help system, and none is wanted: these explainers
+surface in search results *alongside* the documents they explain, in
+the same corpus, through the same gate. Adjacency is the delivery
+mechanism — help that lives somewhere else stops being true.
