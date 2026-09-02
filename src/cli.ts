@@ -185,4 +185,13 @@ async function main(): Promise<void> {
   }
 }
 
-await main();
+// Entry guard: cli.ts is now importable (tests import versionLine
+// from it) — importing a module must not execute the CLI. Found the
+// hard way (2026-09-02): without the guard, `bun test` ran main() on
+// import; with stdin a TTY (any interactive `just ship`), readSource
+// printed usage and exit(1)'d the whole suite. The harness's piped
+// stdin had been masking it — tests green in one environment are not
+// tests green.
+if (import.meta.main) {
+  await main();
+}
