@@ -81,10 +81,12 @@ export type Palette = Record<Role, string>;
  * Table roles keep okuda's semantic layer (brief: table policy), tuned
  * to the Glow palette: header = heading blue, key = Glow H1 pale yellow.
  *
- * code-background: empty string ("") here = no background emitted
- * (glow parity, Pass B). The okuda preset (the default) or a user
- * override sets a real hex to emit a code panel (the Okuda affordance — a
- * content-sized coloured block behind fenced code, LCARS-style).
+ * code-background: empty string ("") = no background emitted (glow
+ * parity, Pass B). The okuda preset set a real hex from 2026-08-25
+ * (LCARS panel) and retired it 2026-09-02: a second background behind
+ * the terminal's perfectly adequate one is ugly and superfluous. A
+ * user override may still set a hex; colour tuning (td-8ece4e) checks
+ * the remaining bg options once before the idea is pronounced dead.
  */
 export const DRACULA_PALETTE: Palette = {
   heading: "#bd93f9",

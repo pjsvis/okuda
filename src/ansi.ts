@@ -133,9 +133,13 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     bold: (text) => wrap("\x1b[1m", text),
     strike: (text) => wrap("\x1b[9m", text),
     // Pass B (2026-08-24): code background dropped for glow parity (the
-    // bg read as a blurry box). The `okuda` preset re-activates it
+    // bg read as a blurry box). The `okuda` preset re-activated it
     // (2026-08-25): a content-sized coloured panel behind fenced code —
     // the LCARS affordance, a deliberate divergence from glow.
+    // Retired again 2026-09-02: the panel read as a second background
+    // behind a perfectly adequate one (the terminal's own). The role
+    // stays — colour tuning may yet earn a subtler bg; an empty string
+    // emits nothing. The rule is the user's: one background, no more.
     // Empty code-background = no bg (default); hex = bg emitted.
     codeLine: (line) => {
       const cdbg = palette["code-background"];
