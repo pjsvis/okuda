@@ -103,6 +103,61 @@ the source silo:
 4. Nothing is invented. The moment a scene requires breaking a rule
    above, write the scene about the broken rule — that scene is better.
 
+## The degradation ladder — the Keith Richards Principle
+
+Comms resilience as a hero's journey: the channel will be degraded by
+calamities in escalating order, and at every stage the silo keeps
+performing. The invariant that makes the ladder a ladder and not a
+collapse: **degradation strips presentation, never content.** The
+payload is plain markdown; the glass is negotiable. The principle is
+named for the man who outlived every plane, every decade, and one
+Fijian coconut tree: still performing, still the same set.
+
+**1. The ordinary world — wifi.** Full okudagram: colour, diagrams,
+role-fit tables, instant. Nothing to overcome.
+
+**2. The wifi dies.** SSH over cellular. Bandwidth shrinks; the
+okudagram is kilobytes, so nothing changes. The glass is smaller and
+farther away; the composition holds.
+
+**3. Congestion.** The window throttles to a trickle. The okudagram
+strips to plain text — NO_COLOR parity, the composition degrades to
+monospace, the content arrives intact. Less glow, same truth.
+
+**4. The network is gone.** No infrastructure at all: the silo runs
+locally — airplane mode, the iPad demo thesis. The channel is now
+sneakernet: carry the files. Paper enters the ladder (`okuda docs/x.md
+| lp`), and the debrief can be read by candlelight.
+
+**5. The device dies.** The binary is one file, the corpus is flat
+markdown, and the printer speaks plain text: the ledger survives on
+paper — braille embossed, large-print, ink. The Vindolanda tablets are
+the precedent: docket on a flat surface, legible two millennia later.
+
+**6. The paper is gone.** Fire, flood, confiscation — but the ledger
+was *pushed*: origin has it, wherever origin is. And if origin is gone
+too, the callsigns and the grammar are in the operator's head — the
+format is simple enough to re-derive from memory. The debriefs say
+what was known.
+
+**7. The abyss — the last channel is one bit.** Rhythm: dunt-stream,
+Morse, tap-code. Five dunts is five. The slowest, simplest, unkillable
+channel — the one that needs nothing but a surface, a knuckle, and
+patience. The whole corpus can pass through one bit and a clock.
+
+**8. The return.** The channel recovers, and everything degraded
+*recovers with it* — colour, diagrams, composition, the full glass —
+because nothing was lost: the degradation stripped presentation only,
+and presentation re-renders from content. The ledger is the same
+ledger. The hero returns to the ordinary world, which never stopped
+being readable.
+
+**The principle, stated:** every calamity removes a channel; no
+calamity removes the content. The ladder is also the accessibility
+ladder run backwards — screen, TTS, braille, paper — because disaster
+and disability are the same shape: fewer channels, same content, and
+the design was built for both.
+
 ## Where the real thing lives
 
 The silo this brief came from: `pjsvis/okuda` — a terminal markdown
