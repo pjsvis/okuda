@@ -168,6 +168,17 @@ Each documented refusal is a wall segment with a warrant. The request
 will come back — requests do — and the answer is now a citation, not a
 meeting.
 
+**Stage 4, when a named consumer arrives: harness-assisted API
+hoisting.** For sufferers of REST syndrome who cannot reach the
+filesystem API unaided: a thin adapter that hoists the register API to
+their wire protocol — HTTP, their schema, their verbs. An assistive
+device, not a feature: it is named for what it does, it accommodates
+rather than cures (the cure is `jq`, and graduation happens when the
+sufferer learns it), it is gated on a named consumer, and it hoists
+*from* the registers — the source of truth never moves. The silo
+accommodates input variation (dunts, switches, Morse) and output
+variation alike; the full stack of human variation, served.
+
 ## Anti-goals
 
 - **No daemons.** Service delivery rides OpenSSH (ForceCommand) or plain
