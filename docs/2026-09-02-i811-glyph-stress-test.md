@@ -255,6 +255,63 @@ above has a better true story than any fictional one. The Ea-nāṣir tablet is
 a complaint about copper; Linear B is how you prove a lost language was
 Greek; Sequoyah wrote Cherokee into existence from nothing.
 
+## Probe 8 — the four vernaculars
+
+A follow-up dogfood ruling (2026-09-02): Probe 6's gag generalizes. Real,
+verifiable corpus text exists for all four of Probe 7's Unicode-native
+scripts — spice present where the corpus has it, noted absent where it does
+not, and no invention required anywhere. One line each, deadpan teaser,
+translation withheld where there is anything to withhold:
+
+* **Cherokee** (U+13A0) — ᏣᎳᎩ ᏧᎴᎯᏌᏅᎯ — the masthead of the Cherokee
+  Phoenix, the first Native American newspaper, New Echota, 21 February
+  1828, printed partly in the syllabary Sequoyah built from nothing. The
+  first thing ever set in the type was a translation of the Lord's Prayer;
+  by the third issue the correspondence columns were arguing about property
+  and elections. Georgia confiscated the press; the editor, Elias Boudinot,
+  was killed in 1839 over the Treaty of New Echota. The script outlived the
+  nation's printing.
+* **Ogham** (U+1680) — CIIC 200, Coolmagort, Co. Kerry — ᚋᚐᚊᚔ ᚈᚈᚐᚂ ᚃᚑᚏᚌᚑᚄ
+  ᚋᚒᚉᚑᚔ ᚈᚑᚔᚉᚐᚉ — a three-generation genealogy, carved bottom-left upward
+  along a stone edge: Ttal, son of Vorgos, of the kin of Toica. The surviving
+  corpus is some four hundred lines and every one is a gravestone or a claim
+  of ownership. No poems, no prayers, no complaints — the oldest continuous
+  prose in any Goidelic language is a burial register. If the Sumerian corpus
+  is the ancient world's tabloid, ogham is its phone book, and the phone
+  book has no plot. Verified spice-free; the verdict is the finding.
+* **Egyptian hieroglyphs** (U+13000) — Papyrus Turin 55001 (Museo Egizio
+  Cat. 2031), Deir el-Medina, Ramesside — in the edition's transliteration
+  (Brawanski & Fischer-Elfert 2012, text 3):
+  `nfr n.k kꜣt.ı͗ my m-sꜣ.ı͗ ẖr tꜣy.k mrwt ı͗ ḥnn.k` —
+  a woman assesses the merits of one of her parts, issues an instruction
+  about approaching from behind, and makes an appreciative remark about
+  his. Champollion — the man who decoded the script — called this papyrus
+  "an image of monstrous obscenity"; the Museo Egizio displayed the
+  animal-cartoon section and kept the other section in its magazines from
+  1965 until 2003. The brown-paper-bag anecdote has a rival.
+* **Linear B** (U+10000) — PY Ta 641 — 𐀴𐀪𐀡𐀆 — ti-ri-po-de, two tripods,
+  followed on the clay by a drawn tripod: the tablet that proved Ventris
+  right. Blegen read the syllables against the picture of the pot and wrote
+  "all this seems too good to be true. Is coincidence excluded?" The corpus
+  is receipts again — but the spice is already there, literally: the Knossos
+  Mc series counts perfumed oil by the dozen litres with coriander and
+  sesame on the manifest, and Hand 2, scribe of the Tripod Tablet, worked in
+  the perfumed-oil wing. A Bronze Age inventory that smells.
+
+Fixture honesty, per this document's own rule:
+
+* **Cherokee** renders wherever the terminal font carries U+13A0; no
+  conversion needed.
+* **Ogham** Unicode renders horizontally; the original is carved vertically
+  on a stone edge, read bottom-left upward. What appears on screen is a
+  transliteration of the carving, not the carving.
+* **Egyptian** — the Turin captions are **hieratic**, not hieroglyphic, so
+  the quotable form is transliteration, exactly the Probe 6 precedent.
+  Glyph-true Unicode is honest for the single-sign classics (𓂀 𓋹 𓄤) and
+  approximate for running text — no ligatures, sign order flattened.
+* **Linear B** — syllabograms and vessel ideograms are both in Plane 1;
+  renders as-is, no fixture-construction step.
+
 ## What this would prove, and what it costs
 
 The paste claimed "verified across UTF-8 terminal pipeline, zero dependencies
@@ -279,5 +336,5 @@ width/BiDi fixes fall out. Small to start (one doc, render it, observe),
 then scoping follows the evidence. Fixture work first: the transliteration
 lines of Probe 6 are quotable now; glyph-true cuneiform needs a sign-form
 converter (aBZL/Cuneify) built or borrowed before the renderer is accused.
-The probe corpus: Probes 1–7, rendered over SSH on a fresh machine — the
+The probe corpus: Probes 1–8, rendered over SSH on a fresh machine — the
 tofu-free constraint of Probe 7 is part of the acceptance.
