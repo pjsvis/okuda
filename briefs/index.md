@@ -11,6 +11,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 |---|---|---|---|---|
 | 2026-09-01 | BRF-FLOW-WRAP | open | Flow wrap — internal break opportunities so paths flow as text | 2026-09-01-brief-flow-wrap.md |
 | 2026-09-01 | BRF-MERMAID-SOURCE-OMITTED | open | Omit the mermaid source from the render | 2026-09-01-brief-mermaid-source-omitted.md |
+| 2026-08-31 | BRF-CITTY-CLI | open | the CLI contract — adopting citty for the okuda/gloam surface | 2026-08-31-brief-citty-cli.md |
 | 2026-08-30 | BRF-CONTENT-SHORTLIST | open | content shortlist — rg as the discovery source | 2026-08-30-brief-content-shortlist.md |
 | 2026-08-30 | BRF-REFRESH-OFF-DISK | open | refresh off disk — the resize race + the R placebo | 2026-08-30-brief-refresh-off-disk.md |
 | 2026-08-30 | BRF-IPAD-MINI | open | 2026-08-30-ipad-mini-demo | 2026-08-30-ipad-mini-demo.md |
