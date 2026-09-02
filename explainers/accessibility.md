@@ -157,6 +157,43 @@ by architecture: **there are no timers to adjust.** Time is the one
 dimension the silo does not gate — and the first law says it never
 will.
 
+## Braille — the display, the embosser, and the chorded keyboard
+
+Braille is not a font — it is a **character encoding**: Unicode block
+U+2800–U+28FF, 256 cells, six dots each (eight in computer braille).
+Everything else is a rendering of that encoding, and there are three:
+
+- **Refreshable braille displays** — the primary reading device, and
+  the one that matters here: a row of 14–80 cells with pins that pop up
+  and down electromechanically, re-rendering *dynamically* as the user
+  navigates. A braille display is literally a narrow terminal with
+  haptic output — 40 cells is a 40-column glass. The translator that
+  feeds them is `liblouis` (used by NVDA, JAWS, Orca, macOS), and
+  modern displays connect over a standard USB HID braille protocol —
+  no vendor driver needed.
+- **Embossers** — the printing process: impact pins embossing paper,
+  double-sided, fed by the same translation. This is the `lp` path,
+  one layer deeper.
+- **Simulated braille fonts** — the visual rendering of cells, used
+  for signage, education, and embossing masters. Sighted readers use
+  these; blind readers use the first two.
+
+**And yes — braille talks back.** Input is a Perkins-style six-key
+keyboard: the six dots as keys, pressed in chords — a 6-bit chording
+keyboard with 64 combinations, enough for the alphabet and control.
+Braille notetakers ship one; iOS does braille *screen* input (draw the
+dots on the glass). Under the one-ingress rule, a Perkins keyboard is
+already inside the silo: it emits keystrokes.
+
+Two silo connections worth savouring. First: **a 40-cell display is
+the ultimate narrow glass** — the elision primitive, the role-fit
+tables, and the one-line action blocks exist precisely for a reader
+whose terminal is 40 cells wide and never wider. Second: **braille and
+the dunt-stream are the same encoding in different dimensions** —
+braille is a 6-bit cell in *space*; dunts with spacing are a cell in
+*time*. The tactile and acoustic registers are isomorphic, and a dunt
+decoder that grouped dunts into cells would be reading braille by ear.
+
 ## Paper — the last resort, and the oldest universal medium
 
 At the very end of the ladder: **the content pipes to paper.**
