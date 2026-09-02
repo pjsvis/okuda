@@ -205,16 +205,49 @@ The scripts that *are* commonly available and still carry flair — Unicode
 native, present in system terminal fonts, each with a story:
 
 * **Cherokee** (U+13A0) — ᏣᎳᎩ — a script with a named inventor, Sequoyah,
-  who could not read any language when he built one.
+  who could not read any language when he built one. Render it: ᎣᏏᏲ —
+  *osiyo*, hello.
 * **Ogham** (U+1680) — ᚑᚌᚐᚋ — the edge-of-the-stone script; angular,
-  terminal-native, reads from the bottom-left upward.
-* **Egyptian hieroglyphs** (U+13000) — 𓂀 — one block above cuneiform
-  (U+12000). The two oldest writing systems on earth are Unicode
-  neighbours: 12000 and 13000, the oldest addresses on the block.
-* **Linear B** (U+10000) — 𐀀 — the very first Supplementary Plane block ever
+  terminal-native, reads from the bottom-left upward. Render the most
+  common word in the surviving corpus: ᚋᚐᚊᚔ — *MAQI*, of the son.
+* **Egyptian hieroglyphs** (U+13000) — one block above cuneiform (U+12000).
+  The two oldest writing systems on earth are Unicode neighbours: 12000 and
+  13000, the oldest addresses on the block. Render the classics: 𓂀 — the
+  Eye of Horus; 𓋹 — *ankh*, life; 𓄤 — *nfr*, beautiful.
+* **Linear B** (U+10000) — the very first Supplementary Plane block ever
   encoded; a syllabary for Greek that sat undeciphered for 3,000 years until
   Ventris cracked it, and turned out to be — receipts. Palatial accounting.
-  The Bronze Age's NOW.md.
+  The Bronze Age's NOW.md. Render the first five codepoints ever given to
+  Plane 1: 𐀀𐀁𐀂𐀃𐀄 — *a e i o u*, the whole vowel bench of Mycenaean
+  Greek.
+
+### The South American gap
+
+The operator asked for South American glyphs, and the answer is a gap — but
+an instructive one:
+
+* **The Andes had no glyph script to encode.** The hemisphere's great
+  recording system was the *khipu* — knotted cord. Data, yes; glyphs, no.
+  Nothing to render until someone can render knots, and there is no
+  consensus on what the knots say.
+* **The khipu is the anti-okuda medium.** It is compositing without
+  rendering: a message bus made of wool, where the byte stream never meets
+  a screen. The three-concerns split says compositing belongs to the
+  environment — the Inca took that literally and outsourced display to the
+  reader's hands.
+* **One spicy claim, banked at preprint strength** (Hume's Razor applies,
+  0 citations so far): a 2026 computational read of 619 khipu proposes a
+  13-symbol syllabic channel in the knot turn-counts — tribute registers,
+  censuses, judicial dossiers, an astronomical catalog. *Structured forms,
+  none prose.* If true: the Inca had a spreadsheet 500 years before
+  VisiCalc, and never once wrote a poem in it. The empire ran on NOW.md and
+  had no &alpha.
+* **Maya is the near miss — and not Klingon.** It is Mesoamerican, not
+  South American, and it is *not yet* in Unicode, but it has a tentative
+  roadmap slot (U+15500) and live 2026 proposals (Codical Maya, Classic
+  Extended-A). Unlike pIqaD, this one is coming. When the block lands, it
+  joins the corpus — the probe doc's first script with a living spoken
+  descendant.
 
 The pattern is the point: the glyph stress corpus wants scripts that survive
 a fresh SSH session with no font shopping, and every Unicode-native script
