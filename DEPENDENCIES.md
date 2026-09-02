@@ -20,8 +20,9 @@ name and package name differ. The origin doc's `spacex-mermaid` is stale;
 
 ### `mermaid-to-md` platforms (verified 2026-09-02, macOS + Linux)
 
-- **macOS**: wrapper symlinked (`scripts/mermaid-to-md.sh`) + the compiled
-  `mermaid-tui` binary copied to `~/.local/bin/`.
+- **macOS**: wrapper symlinked (the upstream repo's
+  `scripts/mermaid-to-md.sh`) + the compiled `mermaid-tui` binary copied
+  to `~/.local/bin/`.
 - **Linux (Omarchy/Arch)**: verified 2026-09-02 after `cargo build
   --release` from source. **No GitHub release assets exist** — `install.sh`
   and the npm path are unexercised escape hatches; a fresh Linux box builds
