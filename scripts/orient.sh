@@ -33,12 +33,19 @@ if [[ -z "$branch" ]]; then
 fi
 
 upstream="$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true)"
-if [[ -n "$upstream" ]]; then
-  read -r behind ahead <<<"$(git rev-list --left-right --count "$upstream"...HEAD)"
+# Tracking ref: configured upstream if any, else origin/<branch> if the
+# ref exists (push without -u sets no upstream — a pushed branch must not
+# read as unpushed; the report must not cry wolf).
+track="$upstream"
+if [[ -z "$track" ]]; then
+  git rev-parse --verify --quiet "origin/$branch" >/dev/null 2>&1 && track="origin/$branch"
+fi
+if [[ -n "$track" ]]; then
+  read -r behind ahead <<<"$(git rev-list --left-right --count "$track"...HEAD)"
   if (( behind == 0 && ahead == 0 )); then
-    sync=" — in sync with ${upstream#origin/}"
+    sync=" — in sync with ${track#origin/}"
   else
-    sync=" — ahead $ahead, behind $behind vs ${upstream#origin/}"
+    sync=" — ahead $ahead, behind $behind vs ${track#origin/}"
     [[ $behind -gt 0 ]] && sync+="  ← PULL FIRST"
     [[ $ahead  -gt 0 ]] && sync+="  ← UNPUSHED"
   fi
