@@ -37,5 +37,6 @@
 {"file":"2026-08-30-brief-content-shortlist.md","date":"2026-08-30","status":"open","summary":"content shortlist — rg as the discovery source","meta":{},"callsign":"BRF-CONTENT-SHORTLIST"}
 {"file":"2026-08-30-brief-refresh-off-disk.md","date":"2026-08-30","status":"open","summary":"refresh off disk — the resize race + the R placebo","meta":{},"callsign":"BRF-REFRESH-OFF-DISK"}
 {"file":"2026-08-30-ipad-mini-demo.md","date":"2026-08-30","status":"open","summary":"2026-08-30-ipad-mini-demo","meta":{},"callsign":"BRF-IPAD-MINI"}
+{"file":"2026-08-31-brief-citty-cli.md","date":"2026-08-31","status":"open","summary":"the CLI contract — adopting citty for the okuda/gloam surface","meta":{},"callsign":"BRF-CITTY-CLI"}
 {"file":"2026-09-01-brief-flow-wrap.md","date":"2026-09-01","status":"open","summary":"Flow wrap — internal break opportunities so paths flow as text","meta":{},"callsign":"BRF-FLOW-WRAP"}
 {"file":"2026-09-01-brief-mermaid-source-omitted.md","date":"2026-09-01","status":"open","summary":"Omit the mermaid source from the render","meta":{},"callsign":"BRF-MERMAID-SOURCE-OMITTED"}
