@@ -49,11 +49,7 @@ amp:
 # State
 [group('navigation')]
 orient:
-    @echo "branch:  $(git branch --show-current)"
-    @echo "status:  $(git status --short | wc -l | tr -d ' ') changed file(s)"
-    @-git status --short
-    @echo "last:    $(git log -1 --oneline)"
-    @echo "docs:    $(cat briefs/INDEX.jsonl 2>/dev/null | grep -c .) briefs, $(cat decisions/INDEX.jsonl 2>/dev/null | grep -c .) decisions, $(cat debriefs/INDEX.jsonl 2>/dev/null | grep -c .) debriefs, $(cat playbooks/REGISTRY.jsonl 2>/dev/null | grep -c .) playbooks"
+    @bash scripts/orient.sh
 
 # ── Quality gate ─────────────────────────────────────────────
 
