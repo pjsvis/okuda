@@ -268,6 +268,16 @@ export function displayPath(file: string): string {
   return parts.slice(-2).join("/");
 }
 
+/** Synchronized-output bracket (DECSET 2026, BRF-SYNC-OUTPUT). The
+ * terminal defers compositing until the closer, so a frame split
+ * across TCP packets (SSH) lands as one frame instead of a visible
+ * blank-to-content tear. Unknown-mode-safe: terminals without 2026
+ * ignore the pair. One seam, both paint paths go through syncWrap. */
+export const SYNC_BEGIN = "\x1b[?2026h";
+export const SYNC_END = "\x1b[?2026l";
+export const syncWrap = (frame: string): string =>
+  SYNC_BEGIN + frame + SYNC_END;
+
 /** Compact LHS: the help affordance only. Pure. */
 function compactLeft(): string {
   return "? help";
@@ -478,18 +488,23 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       scroll = view.maxScroll;
       view = viewport(lines, scroll, height);
     }
-    process.stdout.write("\x1b[2J\x1b[H"); // clear + home
-    process.stdout.write(view.visible.join("\n"));
+    // One frame, one write (BRF-SYNC-OUTPUT): assembled whole, emitted
+    // whole, bracketed so the terminal composites it atomically. The
+    // clear strategy is unchanged in this brief — the bracket masks the
+    // blank gap on the wire; removing it is option 1, deferred.
+    let frame = "\x1b[2J\x1b[H"; // clear + home
+    frame += view.visible.join("\n");
     if (showHints) {
       // Badge row up one; hints own the last row, right-justified, corner pad.
-      process.stdout.write(`\x1b[${rows - 1};1H`);
-      process.stdout.write(footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined));
-      process.stdout.write(`\x1b[${rows};1H`);
-      process.stdout.write(hintsLine(cols, muted));
+      frame += `\x1b[${rows - 1};1H`;
+      frame += footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined);
+      frame += `\x1b[${rows};1H`;
+      frame += hintsLine(cols, muted);
     } else {
-      process.stdout.write(`\x1b[${rows};1H`);
-      process.stdout.write(footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined));
+      frame += `\x1b[${rows};1H`;
+      frame += footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined);
     }
+    process.stdout.write(syncWrap(frame));
   };
 
   /** Re-render from source through the content gate, re-anchored (ADR-010

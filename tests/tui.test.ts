@@ -10,6 +10,9 @@ import {
   hintsLine,
   displayPath,
   stripForAnchor,
+  SYNC_BEGIN,
+  SYNC_END,
+  syncWrap,
   anchorFor,
   findAnchor,
   proportionalScroll,
@@ -26,6 +29,37 @@ import { displayWidth, stripANSI } from "../src/width";
 function buf(...bytes: number[]): Uint8Array {
   return new Uint8Array(bytes);
 }
+
+describe("tui — synchronized output bracket (BRF-SYNC-OUTPUT)", () => {
+  test("the bracket is the DECSET 2026 set/reset pair", () => {
+    // The mode is the contract; changing it is a protocol change, not a
+    // tweak. 2026 = synchronized output; terminals without it ignore
+    // unrecognised private modes, so the pair is safe to emit anywhere.
+    expect(SYNC_BEGIN).toBe("\x1b[?2026h");
+    expect(SYNC_END).toBe("\x1b[?2026l");
+  });
+
+  test("syncWrap: opener first, closer last, frame untouched between", () => {
+    const frame = "\x1b[2J\x1b[Hbody\x1b[24;1Hfooter";
+    const wrapped = syncWrap(frame);
+    expect(wrapped.startsWith(SYNC_BEGIN)).toBe(true);
+    expect(wrapped.endsWith(SYNC_END)).toBe(true);
+    // the frame is byte-identical between the brackets — the bracket is
+    // additive, no content byte changes (BRF-SYNC-OUTPUT acceptance)
+    expect(wrapped.slice(SYNC_BEGIN.length, -SYNC_END.length)).toBe(frame);
+  });
+
+  test("syncWrap adds exactly one opener and one closer, injects nothing", () => {
+    // A frame containing its own 2026 sequences would be a caller
+    // contract violation (the renderer never emits them); syncWrap
+    // cannot un-emit what the caller put in. What it does guarantee:
+    // one opener at the front, one closer at the end, nothing else.
+    const frame = "x\x1b[2J\x1b[Hy";
+    const wrapped = syncWrap(frame);
+    expect(wrapped.split(SYNC_BEGIN).length - 1).toBe(1);
+    expect(wrapped.split(SYNC_END).length - 1).toBe(1);
+  });
+});
 
 describe("tui — decodeKey (single-byte controls)", () => {
   test("quit: q, Q, Ctrl-C (0x03), Ctrl-Z (0x1a), lone Esc", () => {
