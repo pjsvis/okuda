@@ -21,6 +21,7 @@
 | **The diagram tool** — mermaid fences become ASCII art | **13** <!-- %%okuda-rhs:13%% explainers/the-diagram-tool.md --> |
 | **SSH** — the silo on any device | **14** <!-- %%okuda-rhs:14%% explainers/ssh.md --> |
 | **&next** — the decision table (you are ready for this one) | **15** <!-- %%okuda-rhs:15%% &next.md --> |
+| **Accessibility** — the hit list, and what the design already gives | **16** <!-- %%okuda-rhs:16%% explainers/accessibility.md --> |
 
 New explainers join the path. The rule is the house rule: explain the
 concept before using the word, and lead with why the reader should
