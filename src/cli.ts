@@ -28,6 +28,12 @@ interface Args {
   palette: string | null;
 }
 
+/** Build stamp: --define BUILD_SHA="<sha>" at compile time (justfile
+ * build). The typeof guard keeps unstamped runs (bun run src/cli.ts,
+ * old binaries) safe — they report (dev), and `just fresh` fails loud on
+ * them rather than trusting them. */
+declare const BUILD_SHA: string | undefined;
+
 function parseArgs(argv: string[]): Args {
   const args: Args = { file: null, watch: false, noColor: false, tui: false, palette: null };
   for (let i = 0; i < argv.length; i++) {
@@ -45,7 +51,8 @@ function parseArgs(argv: string[]): Args {
       process.stdout.write("usage: okuda <file.md> [--watch] [--tui] [--no-color] [--palette <name>]\n");
       process.exit(0);
     } else if (a === "--version") {
-      process.stdout.write("okuda 0.1.0\n");
+      const sha = typeof BUILD_SHA !== "undefined" ? BUILD_SHA : undefined;
+      process.stdout.write(`okuda 0.1.0${sha ? ` (${sha})` : " (dev)"}\n`);
       process.exit(0);
     } else if (!args.file) {
       args.file = a;

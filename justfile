@@ -65,7 +65,12 @@ check:
 # Tests gate build
 [group('quality gate')]
 ship:
-    @bun test && just check && just build && echo "\n  ✓ shipped → ~/.local/bin/{okuda,gloam} (one binary, two symlinks; auto-fresh)\n"
+    @bun test && just check && just build && just install && just fresh
+
+# Freshness check
+[group('quality gate')]
+fresh:
+    @bash scripts/fresh.sh
 
 # ── Build ────────────────────────────────────────────────────
 
@@ -73,10 +78,10 @@ ship:
 dev file:
     @bun run src/cli.ts {{file}}
 
-# Compile
+# Compile (stamped)
 [group('build')]
 build:
-    @bun build --compile src/cli.ts --outfile okuda
+    @bun build --compile --define "BUILD_SHA=\"$(git rev-parse --short=7 HEAD)\"" src/cli.ts --outfile okuda
 
 # Install
 [group('build')]
