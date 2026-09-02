@@ -391,8 +391,9 @@ anything to withhold — and in one case the poem withholds its own.
   p. 106.)
 * **Myanmar — negative control** (U+1000) — *expected: broken* —
   ကုသိုလ်လည်းရ ဝမ်းလည်းဝ —
-  a proverb from the collections: merit is mentioned twice, satisfaction
-  once. No edition-grade citation is claimed and none is needed — the
+  a proverb from the collections: merit once, satisfaction once, and
+  the particle meaning "also" twice — the doubling is the argument. No
+  edition-grade citation is claimed and none is needed — the
   line's job is to be real text in a script whose stacking behaviour no
   monospace font on the test machine covers at all. If it renders as
   anything other than tofu, that is a finding about the terminal, not a
@@ -402,9 +403,11 @@ Fixture honesty, per this document's own rule — and this time the honesty
 extends to the fonts, measured rather than assumed:
 
 * **No monospace font on this machine claims coverage of any of these
-  blocks** — fc-list across the full font set: nothing for U+0915, U+0E01,
-  U+0B95, U+AC00, or U+1000; Menlo, the terminal's own monospace, carries
-  none of them. Every glyph-true line above renders only where the
+  blocks** — fc-list across the monospace font set: nothing for U+0915,
+  U+0E01, U+0B95, U+AC00, or U+1000; Menlo, the terminal's own monospace,
+  carries none of them. The full font set does cover all five blocks —
+  only in proportional faces (.SF Devanagari, Thonburi, .SF Tamil,
+  Apple SD Gothic Neo, Myanmar MN). Every glyph-true line above renders only where the
   terminal does proportional font fallback (iTerm2 will; Terminal.app
   will not — tofu). Probe 7's tofu-free acceptance is therefore
   conditional for these vectors, and the condition is the stress: what is
