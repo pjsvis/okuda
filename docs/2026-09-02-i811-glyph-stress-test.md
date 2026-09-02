@@ -261,24 +261,32 @@ A follow-up dogfood ruling (2026-09-02): Probe 6's gag generalizes. Real,
 verifiable corpus text exists for all four of Probe 7's Unicode-native
 scripts — spice present where the corpus has it, noted absent where it does
 not, and no invention required anywhere. One line each, deadpan teaser,
-translation withheld where there is anything to withhold:
+translation withheld where there is anything to withhold. First-draft
+caveat: three claims below failed independent review and were corrected
+against the editions — the fixture must be verified before the renderer is
+accused, and this fixture was not exempt:
 
 * **Cherokee** (U+13A0) — ᏣᎳᎩ ᏧᎴᎯᏌᏅᎯ — the masthead of the Cherokee
   Phoenix, the first Native American newspaper, New Echota, 21 February
   1828, printed partly in the syllabary Sequoyah built from nothing. The
-  first thing ever set in the type was a translation of the Lord's Prayer;
-  by the third issue the correspondence columns were arguing about property
-  and elections. Georgia confiscated the press; the editor, Elias Boudinot,
-  was killed in 1839 over the Treaty of New Echota. The script outlived the
+  first thing ever set in the type was Genesis 1:1–5, proof-printed in
+  Boston in December 1827 before the press left for Georgia (Missionary
+  Herald); the Lord's Prayer followed in issue one's Poetry column, and by
+  the second issue the correspondence columns were arguing about land and
+  offices. Georgia confiscated the press; the editor, Elias Boudinot, was
+  killed in 1839 over the Treaty of New Echota. The script outlived the
   nation's printing.
-* **Ogham** (U+1680) — CIIC 200, Coolmagort, Co. Kerry — ᚋᚐᚊᚔ ᚈᚈᚐᚂ ᚃᚑᚏᚌᚑᚄ
-  ᚋᚒᚉᚑᚔ ᚈᚑᚔᚉᚐᚉ — a three-generation genealogy, carved bottom-left upward
-  along a stone edge: Ttal, son of Vorgos, of the kin of Toica. The surviving
-  corpus is some four hundred lines and every one is a gravestone or a claim
-  of ownership. No poems, no prayers, no complaints — the oldest continuous
-  prose in any Goidelic language is a burial register. If the Sumerian corpus
-  is the ancient world's tabloid, ogham is its phone book, and the phone
-  book has no plot. Verified spice-free; the verdict is the finding.
+* **Ogham** (U+1680) — CIIC 200, Coolmagort, Co. Kerry — ᚋᚐᚊᚔ ᚈᚈᚐᚂ ᚋᚐᚊᚔ
+  ᚃᚑᚏᚌᚑᚄ ᚋᚐᚊᚔ ᚋᚒᚉᚑᚔ ᚈᚑᚔᚉᚐᚉ — MAQI-TTAL MAQI VORGOS MAQI MUCOI TOICAC,
+  the edition reading (Macalister CIIC; Gippert TITUS) — a three-generation
+  genealogy, carved bottom-left upward along a stone edge: Ttal, son of
+  Vorgos, of the kin of Toica. The surviving corpus is roughly four hundred
+  orthodox inscriptions (McManus counts 382), and every one is a gravestone
+  or a claim of ownership. No poems, no prayers, no complaints — the oldest
+  continuous prose in any Goidelic language is a burial register. If the
+  Sumerian corpus is the ancient world's tabloid, ogham is its phone book,
+  and the phone book has no plot. Verified spice-free; the verdict is the
+  finding.
 * **Egyptian hieroglyphs** (U+13000) — Papyrus Turin 55001 (Museo Egizio
   Cat. 2031), Deir el-Medina, Ramesside — in the edition's transliteration
   (Brawanski & Fischer-Elfert 2012, text 3):
@@ -294,9 +302,11 @@ translation withheld where there is anything to withhold:
   right. Blegen read the syllables against the picture of the pot and wrote
   "all this seems too good to be true. Is coincidence excluded?" The corpus
   is receipts again — but the spice is already there, literally: the Knossos
-  Mc series counts perfumed oil by the dozen litres with coriander and
-  sesame on the manifest, and Hand 2, scribe of the Tripod Tablet, worked in
-  the perfumed-oil wing. A Bronze Age inventory that smells.
+  Ga series counts perfumed oil with coriander on the manifest
+  (ko-ri-a2-da-na), PY Un 267 records a man handing aromatic substances to
+  an unguent-boiler, the Mycenae Ge series tallies sesame, and Hand 2,
+  scribe of the Tripod Tablet, worked in the perfumed-oil wing. A Bronze Age
+  inventory that smells.
 
 Fixture honesty, per this document's own rule:
 
