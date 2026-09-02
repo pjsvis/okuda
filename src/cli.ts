@@ -34,6 +34,17 @@ interface Args {
  * them rather than trusting them. */
 declare const BUILD_SHA: string | undefined;
 
+/** Version: single source of truth — package.json, imported so the
+ * binary and the manifest cannot drift apart. The old hardcoded
+ * `0.1.0` in this file was a second source wearing a matching value;
+ * matching until the day it isn't is not a property, it's a latency. */
+import pkg from "../package.json";
+
+/** The --version line: manifest version + compile stamp. Pure. */
+export function versionLine(sha?: string): string {
+  return `okuda ${pkg.version}${sha ? ` (${sha})` : " (dev)"}`;
+}
+
 function parseArgs(argv: string[]): Args {
   const args: Args = { file: null, watch: false, noColor: false, tui: false, palette: null };
   for (let i = 0; i < argv.length; i++) {
@@ -52,7 +63,7 @@ function parseArgs(argv: string[]): Args {
       process.exit(0);
     } else if (a === "--version") {
       const sha = typeof BUILD_SHA !== "undefined" ? BUILD_SHA : undefined;
-      process.stdout.write(`okuda 0.1.0${sha ? ` (${sha})` : " (dev)"}\n`);
+      process.stdout.write(versionLine(sha) + "\n");
       process.exit(0);
     } else if (!args.file) {
       args.file = a;
@@ -174,4 +185,13 @@ async function main(): Promise<void> {
   }
 }
 
-await main();
+// Entry guard: cli.ts is now importable (tests import versionLine
+// from it) — importing a module must not execute the CLI. Found the
+// hard way (2026-09-02): without the guard, `bun test` ran main() on
+// import; with stdin a TTY (any interactive `just ship`), readSource
+// printed usage and exit(1)'d the whole suite. The harness's piped
+// stdin had been masking it — tests green in one environment are not
+// tests green.
+if (import.meta.main) {
+  await main();
+}
