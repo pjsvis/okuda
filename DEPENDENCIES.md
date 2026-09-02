@@ -32,8 +32,10 @@ name and package name differ. The origin doc's `spacex-mermaid` is stale;
   symlink; it finds the binary via its PATH fallback — so the binary must
   be *copied*, not linked, or installed somewhere on PATH.)
 - The symptom of a missing binary on a fresh machine is four opaque
-  failures in `tests/table-diagram.test.ts`; a precondition test there now
-  names the dependency before the diagram tests run.
+  failures in `tests/table-diagram.test.ts`; the precondition test there
+  smokes the pipe (spawns the wrapper, demands art) and names the
+  dependency before the diagram tests run — wrapper-resolvable-but-broken
+  is caught too, not just wrapper-absent.
 
 ### `mermaid-to-md` known limits (verified 2026-08-28)
 

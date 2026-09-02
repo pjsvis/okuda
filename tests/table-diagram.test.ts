@@ -230,14 +230,39 @@ describe("render — mermaid precondition (dependency named, not inferred)", () 
   // (2026-09-02) spent a round trip on exactly that. This test names the
   // dependency before the diagram tests run: one failure, one missing
   // tool, one fix. DEPENDENCIES.md is the source of truth for the fix.
-  test("mermaid-to-md resolvable (precondition for the diagram tests)", () => {
+  //
+  // Round two (2026-09-02, Omarchy field report): the wrapper resolved
+  // (symlink in place) but mermaid-tui — the binary the wrapper delegates
+  // to — was never installed, so the wrapper existed and failed. An
+  // existence check passes while the pipe is broken; the precondition
+  // therefore SMOKES the pipe: it spawns the resolved wrapper with a
+  // minimal diagram and demands non-empty output. Stat is not smoke.
+  const resolveMermaid = (): string | null => {
     // Same resolution order as src/render.ts: ~/.local/bin first, then PATH.
     const candidates = [
       `${process.env.HOME ?? ""}/.local/bin/mermaid-to-md`,
       ...(process.env.PATH ?? "").split(":").map((d) => `${d}/mermaid-to-md`),
     ];
-    const resolvable = candidates.some((p) => p && existsSync(p));
-    expect(resolvable).toBe(true);
+    return candidates.find((p) => p && existsSync(p)) ?? null;
+  };
+
+  test("mermaid-to-md pipe smokes end-to-end (precondition for the diagram tests)", async () => {
+    const wrapper = resolveMermaid();
+    // Unresolved wrapper: name the dependency outright (round-one symptom).
+    expect(wrapper).not.toBeNull();
+    if (!wrapper) return;
+    // Resolved but broken: spawn it and demand art. Catches wrapper-present-
+    // binary-missing — the wrapper's own "mermaid-tui not found" exit — and
+    // any other pipe failure, before the diagram tests fail opaquely
+    // (round-two symptom).
+    const proc = Bun.spawn([wrapper], { stdin: "pipe", stdout: "pipe" });
+    proc.stdin.write("flowchart LR\n  A[Smoke] --> B[Pipe]\n");
+    proc.stdin.end();
+    const out = await new Response(proc.stdout).text();
+    const code = await proc.exited;
+    expect(code).toBe(0);
+    expect(out.trim().length).toBeGreaterThan(0);
+    expect(out).not.toContain("not found");
   });
 });
 
