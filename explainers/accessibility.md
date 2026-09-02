@@ -122,6 +122,68 @@ possible because the deficit is the same in everyone: nobody can
 tolerate shite. The design does not ask for patience. It removes the
 shite.
 
+## Time — the first law of temporal accessibility
+
+**Time belongs to the reader. The system never spends it, and never
+takes it back.**
+
+- **Acquisition has no deadline.** The repo waits: clone today, pull
+  next month, catch up next year — the ledger preserves everything, the
+  states vocabulary holds documents *fresh* until a human reconciles
+  them at their own pace, and no update expires while unread.
+- **Inspection has no timeout.** No idle disconnect, no forced page
+  turn, no animation to chase, no "are you still there?". The anchor
+  holds the reading position *indefinitely* — tied-to-the-mast is a
+  time-independent affordance. The reseeded query waits as long as the
+  reader does. The backstack dies only when the process does — the one
+  designed expiry, on the reader's terms.
+- **As few keystrokes as required.** The two-digit grammar puts every
+  action two presses away, and the density profile keeps the common
+  case shortest. No timed sequences, no hold-and-wait, no
+  press-before-the-bar-runs-out.
+
+The honest exception: the two-digit jump buffer has timing — the
+spaced double-tap protocol (ADR-021). One timed affordance in the whole
+system, designed to be forgiving (visible buffer, cancelled by any
+non-digit, no penalty), because two digits must resolve. It is the
+exception that proves the law: the timing exists *for* the reader's
+fingers, not against their patience.
+
+Contrast with the pattern this law refuses: the session timeout, the
+expiring link, the auto-advancing carousel — each one a system spending
+the user's time without permission. WCAG's timing guidelines (2.2.1,
+2.2.6) ask systems to make timers adjustable; this silo satisfies them
+by architecture: **there are no timers to adjust.** Time is the one
+dimension the silo does not gate — and the first law says it never
+will.
+
+## Paper — the last resort, and the oldest universal medium
+
+At the very end of the ladder: **the content pipes to paper.**
+
+```bash
+okuda docs/x.md | lp
+```
+
+Pipe mode's output strips to plain text (the NO_COLOR parity), and
+plain text is what every printer has spoken since the beginning. Paper
+is the terminal that never changes: no power, no device, no dependency
+— the original universal medium, older than the screen by four
+thousand years. It is also an accessibility channel in its own right:
+**braille embossers accept plain text**; large print is a font size
+away; and paper never scrolls away, never times out, and never needs
+charging — the final honouring of the first law, in ink.
+
+The one degradation, honestly: colour is lost, and ASCII diagrams
+become fixed-width characters — the art survives, the glow doesn't.
+The composition was never the point; the content was. Paper proves it:
+strip the glass entirely and the silo still delivers.
+
+The ladder, complete: screen → TTS → braille → paper. Each layer
+simpler than the last, each one still the whole corpus. Accessibility
+is not a mode the system enters — it is the property that the *last*
+resort is as complete as the first.
+
 ## The remote dunt — accessibility over the channel
 
 The dunt generalises from a knock to a **message**. One gloam instance
