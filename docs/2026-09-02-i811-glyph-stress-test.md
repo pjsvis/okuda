@@ -130,6 +130,98 @@ affordance, or a per-mode bg (fences vs tables vs diagrams), before we say
 Foxtrot Oscar to backgrounds entirely. If no option beats the terminal's
 own background, none survives.
 
+## Probe 6 — the spicy tablets
+
+A dogfood ruling from the operator: the Ea-nāṣir receipt is retired from
+headline duty — the internet has had two hundred years of meme-time with it
+and it is now the oldest hackneyed joke in the oldest medium. The corpus,
+though, is genuinely, verifiably spicy, and the gag is structural: the stories
+below are rendered exactly as they come down to us, and the translations are
+withheld. You would have to know Sumerian to tell what happens. The scholars
+who published these knew exactly what they were sitting on — the author of
+the standard study of this corpus reports carrying it around in a
+brown-paper bag.
+
+One line each, renderable transliteration where the editions give it, deadpan
+teaser otherwise:
+
+* **Šu-Suen A 20** (ETCSL 2.4.4.1) —
+  `kaš-a-ni-gen7 gal4-la-ni ze2-ba-am3` —
+  a comparison is drawn between two things she has. The tavern-keeper is
+  involved. Sweetness is mentioned.
+* **Inanna-Dumuzi P, col. ii 24–27** (ETCSL 4.08.16) —
+  `ma-a gal4-la-gu10 du6 du8-du8-a a ma-a-ra / ki-sikil-gen a-ba-a
+  ur11-ru-a-bi / gal4-la-gu10 ki duru5 a ma-ra` —
+  irrigation is discussed at length, and someone asks a question about
+  who exactly is going to do the ploughing.
+* **Šu-Suen B 9, 11** (ETCSL 2.4.4.2) —
+  `mu-ti-in ag2 ze2-ze2-ba du5-mu-u8-AK / e2 ki-nu2-a lal3 hab2
+  du11-ga-ba` —
+  the speaker requests to perform certain unnamed sweet things, and
+  describes a bedroom that has been made, somehow, moist.
+* **Inanna-Dumuzi B1 35–56** (ETCSL 4.08.28) — a shepherd shows his sister a
+  nature documentary, scene by scene, and explains what the animals are
+  doing. The sister is slow to grasp the allegory.
+* **Inanna and Šu-kale-tuda** (ETCSL 1.3.3) — a gardener, a sleeping goddess,
+  a poplar tree; then the wells of the land fill with blood, three
+  nationwide manhunts, and a sentence no storyteller since has bettered:
+  you will die, but your name will live in songs.
+* **Enlil and Ninlil** (ETCSL 1.2.1) — what the chief god did in the boat, the
+  exile it earned him, the three disguises he wore to get back, and the
+  four children who resulted.
+* **Inanna and Enki** (ETCSL 1.3.1) — of the hundred-odd arts of civilization
+  Enki hands over while drunk, exactly one needs no translation even in
+  transliteration: the kissing of the phallus. Civilization, it turns out,
+  has always had this on the list.
+
+Fixture honesty, per this document's own rule (the fixture is verified before
+the renderer is accused): the lines above are **transliteration** — sign
+names in Latin, renders everywhere, and the honest quotable form of the
+editions. Glyph-true cuneiform for these stories requires sign-form
+conversion from the editions' transliterations (aBZL sign table, or
+Cuneify) — a fixture-construction step for the brief, not a renderer
+complaint.
+
+## Probe 7 — constructed scripts, and the Klingon verdict
+
+The operator asked for Klingon. The answer is no, and the reason is a better
+story than the script would have been:
+
+* **Klingon (pIqaD) is not in Unicode and likely never will be.** The Unicode
+  Consortium rejected it in 1997 for lack of usage, again in 2016 despite
+  evidence (a comic book, a Monopoly set, a legal brief — yes, really), and
+  declined to reconsider in 2021. The blocker is Paramount's IP. It lives
+  only in the Private Use Area (U+F8D0–U+F8FF, ConScript registry) behind
+  fan fonts, and Noto refuses PUA outright.
+* **What that means for okuda:** over a bare SSH session — the dogfood
+  environment — PUA renders as tofu. A pIqaD line would probe the font
+  installation, not the renderer. That is a false failure signal, the thing
+  this document exists to prevent.
+* **The tofu probe, optional negative control:** one deliberately PUA line,
+  labelled *expected: empty boxes*. The only failure mode is a crash. Good
+  experimental design has a negative control; this would be ours.
+
+The scripts that *are* commonly available and still carry flair — Unicode
+native, present in system terminal fonts, each with a story:
+
+* **Cherokee** (U+13A0) — ᏣᎳᎩ — a script with a named inventor, Sequoyah,
+  who could not read any language when he built one.
+* **Ogham** (U+1680) — ᚑᚌᚐᚋ — the edge-of-the-stone script; angular,
+  terminal-native, reads from the bottom-left upward.
+* **Egyptian hieroglyphs** (U+13000) — 𓂀 — one block above cuneiform
+  (U+12000). The two oldest writing systems on earth are Unicode
+  neighbours: 12000 and 13000, the oldest addresses on the block.
+* **Linear B** (U+10000) — 𐀀 — the very first Supplementary Plane block ever
+  encoded; a syllabary for Greek that sat undeciphered for 3,000 years until
+  Ventris cracked it, and turned out to be — receipts. Palatial accounting.
+  The Bronze Age's NOW.md.
+
+The pattern is the point: the glyph stress corpus wants scripts that survive
+a fresh SSH session with no font shopping, and every Unicode-native script
+above has a better true story than any fictional one. The Ea-nāṣir tablet is
+a complaint about copper; Linear B is how you prove a lost language was
+Greek; Sequoyah wrote Cherokee into existence from nothing.
+
 ## What this would prove, and what it costs
 
 The paste claimed "verified across UTF-8 terminal pipeline, zero dependencies
@@ -151,4 +243,8 @@ single-width. The open questions, in ascending order of pain:
 
 Candidate brief material: **BRF-GLYPH-STRESS** — probe doc + whatever
 width/BiDi fixes fall out. Small to start (one doc, render it, observe),
-then scoping follows the evidence.
+then scoping follows the evidence. Fixture work first: the transliteration
+lines of Probe 6 are quotable now; glyph-true cuneiform needs a sign-form
+converter (aBZL/Cuneify) built or borrowed before the renderer is accused.
+The probe corpus: Probes 1–7, rendered over SSH on a fresh machine — the
+tofu-free constraint of Probe 7 is part of the acceptance.
