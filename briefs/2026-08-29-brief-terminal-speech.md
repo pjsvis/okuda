@@ -142,3 +142,40 @@ each gated by the dunt that says listen. **Status: routed proposal** —
 the decoder is ~30 lines and the M4 mic is the hardware, but it waits
 on a named consumer like everything else in the blue-sky pile. The
 design note is the persistence, not a build ticket.
+
+### Modes and state — `--mci` and `--mce` (added 2026-08-31)
+
+Two params, following the control-surface ruling (CLI params as boot
+values; the flag convention of the `-g` gate — an explicit mode, no
+heuristics):
+
+- **Ingress:** `gloam --mci` — the instance accepts Morse input. The
+  dunt detector or a keyed interface feeds the interval decoder;
+  decoded characters enter the input buffer per the two-keymap.
+- **Egress:** `cat doc.md | gloam --mce` — the document prints in
+  Morse. Dots, dashes, and SPACE.
+
+The alphabet is as stated: `.` and `-` and SPACE — and the SPACE is
+the third symbol that does the disambiguation work, the silence that
+separates what would otherwise merge. In the egress template, silence
+was already elision; in the ingress channel, silence is already the
+letter boundary. The channel's silence and the template's silence are
+the same silence.
+
+**Conventions:** the *timing* standard exists and is adopted — ITU
+timing: dot = 1 unit, dash = 3 units, intra-character gap = 1,
+inter-character gap = 3, word gap = 7. The *control* standard does
+not: no accepted convention exists for Morse-code control of a software
+system. The nearest real precedent is Gboard's Morse input mode (2018,
+built with assistive-tech developer Tania Finlayson) — Morse as an
+accessibility *text-entry* method, which is exactly this use case, and
+the reason the named-consumer gate on this build is likely to clear.
+Control prosigns, where needed, follow radio convention as proposals:
+`AR` = end of command, `SOS` = abort. Everything else is ours to
+declare — one paragraph in the build brief, when a named consumer
+arrives.
+
+**Terms, conditions, and the harness.** Terms and conditions may apply,
+and your warranty may not support banging your device with rocks or
+against hard surfaces. An age- and ability-appropriate morse-code
+harness is recommended for extended use of this ingress mode.
