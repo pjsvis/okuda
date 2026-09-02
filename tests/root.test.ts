@@ -10,6 +10,7 @@ import {
   presentRegistries,
   resolveByCallsign,
 } from "../src/root";
+import { versionLine } from "../src/cli";
 
 /** mkdtemp helper: returns a fresh empty dir and a cleanup thunk. */
 function scratch(): { dir: string; cleanup: () => void } {
@@ -163,5 +164,16 @@ describe("root — callsigns (resolution, not derivation)", () => {
       expect(r("briefs/b.md")).toBe("BRF-BETA");
       expect(r("nowhere/x.md")).toBeNull();
     } finally { cleanup(); }
+  });
+});
+describe("cli — versionLine (single source of truth, v0.1.0 trifecta)", () => {
+  test("reported version is the manifest's version, not a twin string", () => {
+    // The old bug class: `0.1.0` hardcoded in cli.ts beside the same
+    // value in package.json — two sources that match until they don't.
+    // The invariant: the line is derived FROM the manifest at import
+    // time, so drift is structurally impossible, not vigilantly avoided.
+    const pkg = require("../package.json") as { version: string };
+    expect(versionLine("abc1234")).toBe(`okuda ${pkg.version} (abc1234)`);
+    expect(versionLine()).toBe(`okuda ${pkg.version} (dev)`);
   });
 });
