@@ -99,6 +99,29 @@ The honest bound: terminal *layout* remains left-anchored everywhere —
 a limit of the medium, shared by every terminal application, not a
 choice of this one. Content renders; the frame is what it is.
 
+## Losing your place is a barrier too
+
+The one perceptual deficit this silo takes seriously is **a low
+tolerance for shite**. Prevalence: universal. Onset: the first time a
+window was resized and your paragraph vanished. Prognosis without
+treatment: the reader re-scans the whole page to find where they were —
+the most expensive act in reading, and the one that fatigues low-vision
+and magnification users first, screen reader users worst of all, and
+everyone else silently.
+
+The accommodation on record — the only one known to work by *removing
+the cause* rather than advising patience: **the anchor**. Resize, zoom,
+reload, return from a followed link, and the eye-proxy re-matches the
+line nearest where you were and re-anchors the composition to it
+(`reanchoredScroll`; see `docs/2026-08-31-the-same-okudagram.md`). You
+get back the same okudagram, at the same place in the meaning, whatever
+shape the container is now.
+
+Accommodating everyone's tolerance deficit simultaneously is only
+possible because the deficit is the same in everyone: nobody can
+tolerate shite. The design does not ask for patience. It removes the
+shite.
+
 ## The remote dunt — accessibility over the channel
 
 The dunt generalises from a knock to a **message**. One gloam instance
