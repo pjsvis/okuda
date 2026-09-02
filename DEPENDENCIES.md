@@ -10,13 +10,29 @@ an assumption.
 | `just` | 1.53.0 | Task runner | 2026-08-20 |
 | `git` | 2.54.0 | Version control | 2026-08-20 |
 | `td` | 0.61.0 | Task management | 2026-08-27 |
-| `mermaid-to-md` | 0.1.0* | Mermaid → ASCII | 2026-08-20 |
+| `mermaid-to-md` | 0.1.0* | Mermaid → ASCII | 2026-09-02 |
 | `fzf` | 0.73.1 | Fuzzy picker — runtime dep of no-arg `gloam` mode | 2026-08-27 |
 | `fd` | 10.4.2 | File finder — preferred by `gloam` (in-process walk if absent) | 2026-08-27 |
 
 \* Self-reports as `mermaid-tui 0.1.0`, lives at `~/.local/bin/` — binary
 name and package name differ. The origin doc's `spacex-mermaid` is stale;
 `mermaid-to-md` is the real dependency.
+
+### `mermaid-to-md` platforms (verified 2026-09-02, macOS + Linux)
+
+- **macOS**: wrapper symlinked (`scripts/mermaid-to-md.sh`) + the compiled
+  `mermaid-tui` binary copied to `~/.local/bin/`.
+- **Linux (Omarchy/Arch)**: verified 2026-09-02 after `cargo build
+  --release` from source. **No GitHub release assets exist** — `install.sh`
+  and the npm path are unexercised escape hatches; a fresh Linux box builds
+  from source: clone `pjsvis/mermaid-to-md`, `cargo build --release`,
+  `cp target/release/mermaid-tui ~/.local/bin/`, symlink the wrapper.
+  (The wrapper's repo-relative binary resolution does not survive the
+  symlink; it finds the binary via its PATH fallback — so the binary must
+  be *copied*, not linked, or installed somewhere on PATH.)
+- The symptom of a missing binary on a fresh machine is four opaque
+  failures in `tests/table-diagram.test.ts`; a precondition test there now
+  names the dependency before the diagram tests run.
 
 ### `mermaid-to-md` known limits (verified 2026-08-28)
 

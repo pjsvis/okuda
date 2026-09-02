@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { renderDocument } from "../src/render";
 import { DRACULA_PALETTE } from "../src/palette";
 import { displayWidth, stripANSI } from "../src/width";
+import { existsSync } from "node:fs";
 
 const W = 64;
 
@@ -219,6 +220,24 @@ describe("render — menu tables (ADR-022 right-anchored role fit, td-b81597)", 
     expect(out).not.toContain("%%okuda-rhs");
     expect(out).not.toContain("<!--");
     expect(out).not.toContain("\u0000"); // no tag residue
+  });
+});
+
+describe("render — mermaid precondition (dependency named, not inferred)", () => {
+  // The diagram tests below pipe through the real mermaid-to-md binary.
+  // When it is missing they fail opaquely — empty art, colour assertions
+  // fail, four tests die with no culprit named. The Omarchy bring-up
+  // (2026-09-02) spent a round trip on exactly that. This test names the
+  // dependency before the diagram tests run: one failure, one missing
+  // tool, one fix. DEPENDENCIES.md is the source of truth for the fix.
+  test("mermaid-to-md resolvable (precondition for the diagram tests)", () => {
+    // Same resolution order as src/render.ts: ~/.local/bin first, then PATH.
+    const candidates = [
+      `${process.env.HOME ?? ""}/.local/bin/mermaid-to-md`,
+      ...(process.env.PATH ?? "").split(":").map((d) => `${d}/mermaid-to-md`),
+    ];
+    const resolvable = candidates.some((p) => p && existsSync(p));
+    expect(resolvable).toBe(true);
   });
 });
 
