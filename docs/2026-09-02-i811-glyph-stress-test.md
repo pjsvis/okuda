@@ -255,6 +255,183 @@ above has a better true story than any fictional one. The Ea-nāṣir tablet is
 a complaint about copper; Linear B is how you prove a lost language was
 Greek; Sequoyah wrote Cherokee into existence from nothing.
 
+## Probe 8 — the four vernaculars
+
+A follow-up dogfood ruling (2026-09-02): Probe 6's gag generalizes. Real,
+verifiable corpus text exists for all four of Probe 7's Unicode-native
+scripts — spice present where the corpus has it, noted absent where it does
+not, and no invention required anywhere. One line each, deadpan teaser,
+translation withheld where there is anything to withhold. First-draft
+caveat: three claims below failed independent review and were corrected
+against the editions — the fixture must be verified before the renderer is
+accused, and this fixture was not exempt:
+
+* **Cherokee** (U+13A0) — ᏣᎳᎩ ᏧᎴᎯᏌᏅᎯ — the masthead of the Cherokee
+  Phoenix, the first Native American newspaper, New Echota, 21 February
+  1828, printed partly in the syllabary Sequoyah built from nothing. The
+  first thing ever set in the type was Genesis 1:1–5, proof-printed in
+  Boston in December 1827 before the press left for Georgia (Missionary
+  Herald); the Lord's Prayer followed in issue one's Poetry column, and by
+  the second issue the correspondence columns were arguing about land and
+  offices. Georgia confiscated the press; the editor, Elias Boudinot, was
+  killed in 1839 over the Treaty of New Echota. The script outlived the
+  nation's printing.
+* **Ogham** (U+1680) — CIIC 200, Coolmagort, Co. Kerry — ᚋᚐᚊᚔ ᚈᚈᚐᚂ ᚋᚐᚊᚔ
+  ᚃᚑᚏᚌᚑᚄ ᚋᚐᚊᚔ ᚋᚒᚉᚑᚔ ᚈᚑᚔᚉᚐᚉ — MAQI-TTAL MAQI VORGOS MAQI MUCOI TOICAC,
+  the edition reading (Macalister CIIC; Gippert TITUS) — a three-generation
+  genealogy, carved bottom-left upward along a stone edge: Ttal, son of
+  Vorgos, of the kin of Toica. The surviving corpus is roughly four hundred
+  orthodox inscriptions (McManus counts 382), and every one is a gravestone
+  or a claim of ownership. No poems, no prayers, no complaints — the oldest
+  continuous prose in any Goidelic language is a burial register. If the
+  Sumerian corpus is the ancient world's tabloid, ogham is its phone book,
+  and the phone book has no plot. Verified spice-free; the verdict is the
+  finding.
+* **Egyptian hieroglyphs** (U+13000) — Papyrus Turin 55001 (Museo Egizio
+  Cat. 2031), Deir el-Medina, Ramesside — in the edition's transliteration
+  (Brawanski & Fischer-Elfert 2012, text 3):
+  `nfr n.k kꜣt.ı͗ my m-sꜣ.ı͗ ẖr tꜣy.k mrwt ı͗ ḥnn.k` —
+  a woman assesses the merits of one of her parts, issues an instruction
+  about approaching from behind, and makes an appreciative remark about
+  his. Champollion — the man who decoded the script — called this papyrus
+  "an image of monstrous obscenity"; the Museo Egizio displayed the
+  animal-cartoon section and kept the other section in its magazines from
+  1965 until 2003. The brown-paper-bag anecdote has a rival.
+* **Linear B** (U+10000) — PY Ta 641 — 𐀴𐀪𐀡𐀆 — ti-ri-po-de, two tripods,
+  followed on the clay by a drawn tripod: the tablet that proved Ventris
+  right. Blegen read the syllables against the picture of the pot and wrote
+  "all this seems too good to be true. Is coincidence excluded?" The corpus
+  is receipts again — but the spice is already there, literally: the Knossos
+  Ga series counts perfumed oil with coriander on the manifest
+  (ko-ri-a2-da-na), PY Un 267 records a man handing aromatic substances to
+  an unguent-boiler, the Mycenae Ge series tallies sesame, and Hand 2,
+  scribe of the Tripod Tablet, worked in the perfumed-oil wing. A Bronze Age
+  inventory that smells.
+
+Fixture honesty, per this document's own rule:
+
+* **Cherokee** renders wherever the terminal font carries U+13A0; no
+  conversion needed.
+* **Ogham** Unicode renders horizontally; the original is carved vertically
+  on a stone edge, read bottom-left upward. What appears on screen is a
+  transliteration of the carving, not the carving.
+* **Egyptian** — the Turin captions are **hieratic**, not hieroglyphic, so
+  the quotable form is transliteration, exactly the Probe 6 precedent.
+  Glyph-true Unicode is honest for the single-sign classics (𓂀 𓋹 𓄤) and
+  approximate for running text — no ligatures, sign order flattened.
+* **Linear B** — syllabograms and vessel ideograms are both in Plane 1;
+  renders as-is, no fixture-construction step.
+
+## Probe 9 — the shaping scripts
+
+The dogfood ruling extends once more: Probe 8's gag holds for the scripts
+that do the real shaping work — stacked conjuncts, combining marks above
+and below the base, precomposed syllables, and one script that writes no
+inter-word spaces at all. The selection criterion is script stress, not
+language: each line below earns its place by making the width function do
+something Latin never asks of it. One line each, glyph-true where the
+editions give it, deadpan teaser, translation withheld where there is
+anything to withhold — and in one case the poem withholds its own.
+
+* **Devanagari** (U+0900) — Jayadeva, *Gītagovinda* 2.15 —
+  श्लथकुसुमाकुलकुन्तलया नखलिखितघनस्तनभारम्
+  `ślatha-kusumākula-kuntalayā nakha-likhita-ghana-stana-bhāram` —
+  hair is described as loosened and strewn with fallen flowers; nails are
+  mentioned as having left a record; a weight is then assessed for a part
+  of her the sentence never names directly. The poem these lines come from
+  is sung as temple music to this day; the twelfth-century singers knew
+  exactly what they were setting. The IAST line is the render-everywhere
+  form, the Probe 6 precedent; the Devanagari carries the conjunct stacks
+  (श्ल, स्त) that Latin never grows.
+* **Thai** (U+0E00) — *Lilit Phra Lo*, verse 30, Ayutthaya —
+  เสียงฦๅเสียงเล่าอ้าง อันใด พี่เอย เสียงย่อมยอยศใคร ทั่วหล้า
+  สองเขือพี่หลับใหล ลืมตื่น ฤๅพี่ สองพี่คิดเองอ้า อย่าได้ถามเผือฯ —
+  a question about which rumour has gone abroad; two sleepers are
+  mentioned as slow to wake; further questions are then declined. This is
+  the stanza the Ayutthaya schoolbook *Chindamani* set as its model of
+  correct verse form, quoted there with the obsolete letter ฦๅ (U+0E27)
+  that no modern Thai keyboard emits — the standard text prints เสียงลือ.
+  The poem is a love-tragedy its own era's critics called morally
+  corrupting and the Literature Club of 1916 declared the finest lilit
+  ever written; the two verdicts agree. No inter-word spaces — the wrap
+  payload: everything the word-wrapper knows about Latin breaks here.
+* **Korean** (U+AC00) — Hwang Jini (황진이), kisaeng of Gaeseong, sijo —
+  청산리 벽계수야 수이 감을 자랑 마라
+  일도창해하면 돌아오기 어려우니
+  명월이 만공산하니 쉬어간들 어떠리 —
+  a man is addressed by his pen-name, "green stream of the blue
+  mountains"; the stream is told not to boast of flowing away, because
+  what reaches the sea does not come back; the moon is observed to be
+  full over the empty mountains, and an invitation follows. The addressee
+  was a scholar of ascetic inclinations; what he was invited to rest from
+  is not stated. (청구영언, the 1728 *Cheongguyeongeon* anthology.)
+* **Tamil** (U+0B80) — *Kuruntokai* 40, Sembulappeyāneṉār, Sangam akam —
+  யாயும் ஞாயும் யார் ஆகியரோ? எந்தையும் நுந்தையும் எம் முறைக் கேளிர்?
+  யானும் நீயும் எவ் வழி அறிதும்? செம் புலப் பெயல் நீர் போல
+  அன்புடை நெஞ்சம் தாம் கலந்தனவே —
+  two people ask what they are to each other, whose parents belong to
+  whom, and by what way two strangers came to be one; the answer is a
+  single simile involving red earth and rain. It is the most-translated
+  poem in the classical Tamil corpus, and the translations are withheld
+  here anyway — the poet's own name is taken from the poem's image, which
+  is the closest the corpus comes to a signature on the confession.
+* **Greek — [12] upgraded** (U+0370) — Marcus Argentarius, *Palatine
+  Anthology* 5.128 —
+  στέρνα περὶ στέρνοις, μαστῷ δ᾽ ἔπι μαστὸν ἐρείσας,
+  χείλεά τε γλυκεροῖς χείλεσι συμπιέσας Ἀντιγόνης,
+  καὶ χρῶτα λαβὼν πρὸς χρῶτα, τὰ λοιπὰ σιγῶ,
+  μάρτυς ἐφ᾽ οἷς λύχνος ἐπεγράφετο. —
+  the [12] vector grows up: epistemology retired, an epigrammatist who
+  banked under a Roman name but wrote in Greek takes the slot. Three
+  arrangements are specified, each in matching pairs; a lamp is entered
+  as the sole registered witness; and the third line is this document's
+  own rule, arriving four words early: τὰ λοιπὰ σιγῶ — the rest, I am
+  silent. A poem that withholds its own translation from the inside.
+  (Paton edition; Codex Palatinus 23, the anthology's namesake codex,
+  p. 106.)
+* **Myanmar — negative control** (U+1000) — *expected: broken* —
+  ကုသိုလ်လည်းရ ဝမ်းလည်းဝ —
+  a proverb from the collections: merit once, satisfaction once, and
+  the particle meaning "also" twice — the doubling is the argument. No
+  edition-grade citation is claimed and none is needed — the
+  line's job is to be real text in a script whose stacking behaviour no
+  monospace font on the test machine covers at all. If it renders as
+  anything other than tofu, that is a finding about the terminal, not a
+  complaint about the renderer.
+
+Fixture honesty, per this document's own rule — and this time the honesty
+extends to the fonts, measured rather than assumed:
+
+* **No monospace font on this machine claims coverage of any of these
+  blocks** — fc-list across the monospace font set: nothing for U+0915,
+  U+0E01, U+0B95, U+AC00, or U+1000; Menlo, the terminal's own monospace,
+  carries none of them. The full font set does cover all five blocks —
+  only in proportional faces (.SF Devanagari, Thonburi, .SF Tamil,
+  Apple SD Gothic Neo, Myanmar MN). Every glyph-true line above renders only where the
+  terminal does proportional font fallback (iTerm2 will; Terminal.app
+  will not — tofu). Probe 7's tofu-free acceptance is therefore
+  conditional for these vectors, and the condition is the stress: what is
+  being measured is font-fallback behaviour and width disagreement, which
+  is exactly the failure class this probe exists to document.
+* **Devanagari** — the Devanagari line is a mechanical rendering of the
+  edition's IAST (GRETIL e-text, checked against the Stoler-Miller
+  edition); the conjunct stacks are the glyph-true claim, the IAST is the
+  render-everywhere claim, and both are given so either can be tested.
+* **Thai** — the stanza with the obsolete ฦๅ is the *Chindamani*
+  quotation; the Wachirayan Library text (1926 edition, digitized on the
+  National Library of Thailand's D-Library) prints เสียงลือ. Both
+  spellings are attested; the obsolete letter is quoted deliberately, as
+  the rare-glyph payload.
+* **Korean** — precomposed syllables only; no jamo sequences. The
+  rendering stress is width and fallback, not composition.
+* **Tamil** — text as given in the GRETIL / Project Madurai e-text;
+  vowel signs above and below the base are the combining-mark stress.
+* **Greek** — polytonic, renders everywhere; Paton edition text verified
+  against the Palatine codex page (Heidelberg diglit). The upgrade of
+  [12] is a content change, not a rendering one.
+* **Myanmar** — real text, no edition claim, expected tofu. A control
+  that passes by failing.
+
 ## What this would prove, and what it costs
 
 The paste claimed "verified across UTF-8 terminal pipeline, zero dependencies
@@ -273,11 +450,19 @@ single-width. The open questions, in ascending order of pain:
    first failure of this test was in the paste, not the renderer. That is
    the finding worth keeping: the fixture must be verified before the
    renderer is accused.
+5. **Combining marks** — does the width function count Devanagari matras,
+   Tamil vowel signs, and Thai above/below marks as zero-width, or does
+   it count codepoints and wrap early? A grapheme-cluster-naive counter
+   over-counts every Probe 9 line.
+6. **Dictionary-less wrap** — Thai (and Khmer, if ever added) write no
+   inter-word spaces. The Latin word-wrapper has no break candidates;
+   what happens to a long unbreakable run — overflow, hard break, or a
+   grapheme-aware fallback? Nothing in the current renderer answers this,
+   which is the point of the payload.
 
 Candidate brief material: **BRF-GLYPH-STRESS** — probe doc + whatever
 width/BiDi fixes fall out. Small to start (one doc, render it, observe),
 then scoping follows the evidence. Fixture work first: the transliteration
 lines of Probe 6 are quotable now; glyph-true cuneiform needs a sign-form
 converter (aBZL/Cuneify) built or borrowed before the renderer is accused.
-The probe corpus: Probes 1–7, rendered over SSH on a fresh machine — the
-tofu-free constraint of Probe 7 is part of the acceptance.
+The probe corpus: Probes 1–9, rendered over SSH on a fresh machine — the tofu-free constraint of Probe 7 holds for Probes 1–8 and is knowingly conditional for Probe 9, where font fallback is the thing under test.
