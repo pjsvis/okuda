@@ -117,6 +117,19 @@ document agree.
 └────────────┴────────────┴────────────────────────┴─────────────┴────────────┘
 ```
 
+## Probe 5 — the background question
+
+Dogfood finding (2026-09-02, over SSH): every fenced probe on this page
+painted a dark panel — the `okuda` preset's `code-background: #1a1530`,
+the LCARS affordance — and against the terminal's own background it read
+as a second background behind a perfectly adequate one. Ugly and
+superfluous; the preset now emits none. But that is a *verdict*, not a
+law — the colour tuning session (td-8ece4e, then td-b4bae8) should check
+the background options once, properly: a dimmer register, a border-only
+affordance, or a per-mode bg (fences vs tables vs diagrams), before we say
+Foxtrot Oscar to backgrounds entirely. If no option beats the terminal's
+own background, none survives.
+
 ## What this would prove, and what it costs
 
 The paste claimed "verified across UTF-8 terminal pipeline, zero dependencies
