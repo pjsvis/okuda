@@ -36,6 +36,15 @@ already integrated, by construction.
 
 ### Vision
 
+Terminology first, because it matters to the readers of this page: the
+accepted terms are **blind and low-vision readers** (identity-first,
+the blind community's own preference), **vision impairment** in medical
+and statistical registers, and — most useful in engineering —
+*functional* names: **screen reader users, magnification users,
+braille readers, keyboard-only users**. Name the technology or the
+need, not the deficit; and note the social model underneath: the
+glass was the barrier, and the design removes it.
+
 - **Brightness is a knob, not a compromise.** The palette scales its
   lightness on demand (keys, CLI, per-pane) — low vision, glare,
   fatigue, and dark rooms are all the same dial.
