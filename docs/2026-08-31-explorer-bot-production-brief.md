@@ -158,6 +158,53 @@ ladder run backwards — screen, TTS, braille, paper — because disaster
 and disability are the same shape: fewer channels, same content, and
 the design was built for both.
 
+## The relay — the message changes form, never content
+
+The escalation, played as a chain: the bot's message hops through
+receivers and senders, each relay re-encoding into whatever mode the
+current constraint allows — and every hop ends with a roger. This is
+store-and-forward relaying, the pattern real deep-space missions use
+(the Mars rovers reach Earth by way of orbiters: stored, forwarded,
+acknowledged).
+
+The postman game — the telephone-chain party game where the message
+degrades into comedy — fails for one reason: **nobody writes it
+down.** Each hop is lossy speech-to-memory-to-speech. The silo chain
+cannot play that game, because at every hop the message is *deposited*
+into the relay's own registers before re-encoding: written, verified,
+rogered, then forwarded in the next mode. Each relay re-derives from
+its own written record, never from memory. Degradation is impossible
+when every postman keeps a copy.
+
+The beats:
+
+1. **The bot → station A, wifi.** The okudagram arrives; station A
+   reconciles it into its ledger. *"Roger your Roger."*
+2. **Station A → station B, radiotelephony.** A's wifi dies; the
+   message is spoken in command cadence — vector numbers, pause, key
+   facts. B copies by ear into its own ledger, reads it back. *Roger.*
+3. **Station B → relay C, dunt-Morse.** The radio dies; B taps the
+   hull — rhythm, spaced, the decoder at C clicking along. C writes,
+   confirms, *rogers*.
+4. **Relay C → ground, paper.** C's device dies; the message prints,
+   and is *carried* — sneakernet, the oldest relay. The ground station
+   scans it, reconciles it into `main`, *rogers*.
+5. **The return.** The ground sends the acknowledgment *back up the
+   chain* — each relay passing the roger in its own mode, until the
+   bot, watching its last pane, receives the two words its grammar
+   was built for: *"Roger your Roger."*
+
+The dramatic engine: the audience watches the message change *form*
+five times — colour, voice, rhythm, paper, ledger — while the tension
+is whether it survives the hops. The payoff: it was never at risk,
+because every postman kept a copy, and the last hop's roger is the
+first hop's message, byte-faithful, coming home.
+
+**The principle:** the mode is negotiable at every hop; the content is
+not. A chain of relays that write things down cannot lose a message —
+and a chain where every hop ends in a roger is not a telephone game.
+It is a ledger, distributed.
+
 ## Where the real thing lives
 
 The silo this brief came from: `pjsvis/okuda` — a terminal markdown

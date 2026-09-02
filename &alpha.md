@@ -25,6 +25,7 @@ That is the whole vocabulary — number keys to go, `u` to return.
 | **Debriefs** — what happened and why? | **33** <!-- %%okuda-rhs:33%% debriefs/index.md --> |
 | **Playbooks** — how do we do X? | **44** <!-- %%okuda-rhs:44%% playbooks/index.md --> |
 | **Live state** — `NOW.md` (where was I?) | **55** <!-- %%okuda-rhs:55%% NOW.md --> |
+| **Explainers** — the quiet introduction | **66** <!-- %%okuda-rhs:66%% explainers/README.md --> |
 
 A jump table is just a markdown file with `%%okuda-rhs:NN%%` wiring.
 This is the default vector file; any other such file, once loaded,

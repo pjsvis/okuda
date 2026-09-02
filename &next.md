@@ -1,15 +1,18 @@
 # &next — the decision table
 
-Not the state table (`&briefs` has all 41; this one argues). Each entry
+Not the state table (`&briefs` has all 42; this one argues). Each entry
 is an **action block**: one line, one action — *name, verdict, cost* —
 with the jump number as its address. Type the digits; `u` comes back.
-Built 2026-08-31, after ADR-025/026 and the day's amendments.
+Built 2026-08-31, after ADR-025/026 and the day's amendments; amended
+2026-09-02 (bracket paint landed per the ledger-day debrief; CITTY in).
 
 ## Recommended — start these next
 
 - **Duplicate-callsign lint** (td-040450) — ADR-025's exactly-one contract is prose until this ships; the resolver is still silent-first-wins. Freshest debt, smallest fix · **S** %%okuda-rhs:11%% <!-- decisions/025-mnemonic-namespace-model.md -->
 - **BRF-CONTENT-SHORTLIST — ranked merge** — the discovery gap is the oldest standing complaint; ranked sources amended and specced; unblocks agents and humans alike. The spout · **M** %%okuda-rhs:12%% <!-- briefs/2026-08-30-brief-content-shortlist.md -->
-- **Bracket paint** (ADR-026 paint direction) — small render change, `[11]` in OKLCH accent; makes the wire layer visible and dogfoods the cadence argument · **S** %%okuda-rhs:13%% <!-- decisions/026-wire-format.md -->
+- **BRF-CITTY-CLI — the CLI contract adopts citty** — decision made, three
+  gates named; the stateless stance is the moat; lands a stable `gloam` arg
+  surface · **M** %%okuda-rhs:13%% <!-- briefs/2026-08-31-brief-citty-cli.md -->
 
 ## Ready — when the pain flares
 

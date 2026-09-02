@@ -1,12 +1,13 @@
 # &briefs — the state table
 
 Every brief, grouped by *assessed* state (not registry status), each row
-jump-wired. Two digits, `11`–`51`; `u` goes back. Debrief paths shown where
-a debrief exists — 5 of 12 debriefs have no brief counterpart (infra and
+jump-wired. Two digits, `11`–`52`; `u` goes back. Debrief paths shown where
+a debrief exists — 7 of 13 debriefs have no brief counterpart (infra and
 theme work that never briefed; listed at the bottom).
 
-Built 2026-08-30. Editorial surface — regenerable by reg-menu when grouping
-stops earning its keep.
+Built 2026-08-30; amended 2026-09-02 (BRF-CITTY-CLI row, debrief count).
+Editorial surface — regenerable by reg-menu when grouping stops earning its
+keep; `just amp` checks the drift.
 
 ## Landed — debrief on file
 
@@ -33,6 +34,7 @@ stops earning its keep.
 | **19** | BRF-REFRESH-OFF-DISK | · ready | resize race + R placebo; td-2df019 | — <!-- %%okuda-rhs:19%% briefs/2026-08-30-brief-refresh-off-disk.md --> |
 | **20** | BRF-SILO-MNEMONICS | · ready | amended: data not machinery; small remainder | — <!-- %%okuda-rhs:20%% briefs/2026-08-28-silo-mnemonics.md --> |
 | **21** | BRF-FLOW-WRAP | · ready | break opportunities so paths flow | — <!-- %%okuda-rhs:21%% briefs/2026-09-01-brief-flow-wrap.md --> |
+| **52** | BRF-CITTY-CLI | · ready | citty parses; stateless stance; three gates | — <!-- %%okuda-rhs:52%% briefs/2026-08-31-brief-citty-cli.md --> |
 
 ## In flight — partially landed, has commits
 
@@ -87,5 +89,5 @@ stops earning its keep.
 ## Debriefs without briefs
 
 `playbook-generalisation` · `justfile-facade` · `renderer-implementation` ·
-`tweak-phase-and-moat` · `launcher-loop-runTui-blocks` · `okuda-pi-theme-sweep`
-— infra, methodology, and theme work; never briefed, correctly.
+`tweak-phase-and-moat` · `launcher-loop-runTui-blocks` · `okuda-pi-theme-sweep` ·
+`the-ledger-day` — infra, methodology, and theme work; never briefed, correctly.

@@ -41,6 +41,11 @@ info:
     @echo "Origin and design: docs/2026-08-20-origin-doc.md"
     @echo "Dependencies:       DEPENDENCIES.md"
 
+# AMPER drift
+[group('navigation')]
+amp:
+    @bun scripts/amp-check.ts
+
 # State
 [group('navigation')]
 orient:
