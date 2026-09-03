@@ -780,13 +780,24 @@ function quoteBlock(children: string, ctx: Ctx): string {
       }
       continue;
     }
-    // The pipe is the blockquote cue; inline emphasis renders as the
-    // author wrote it. Blanket-italicising the line collided with
-    // inline emphasis spans (their RESET killed the outer italic,
-    // spilling normal text mid-line). The pipe is sufficient.
+    // An aside is italic — that is the invariant. The pipe is the
+    // blockquote cue; the italic is the aside's identity. Inline
+    // emphasis inside an aside composes: bold renders bold-italic
+    // (visible), italic renders italic (same as the aside — redundant,
+    // but correct). The catch: inline spans emit full RESET (styler
+    // reset) that kills the outer italic. The fix: wrap the line in
+    // italic and re-open italic after every reset in the content. We
+    // own the render; the styler gives mode-aware reset (empty in
+    // NO_COLOR) so parity holds.
+    const reset = styler.reset();
+    const italicOpen = styler.roleItalic("emphasis", "").replace(/\x1b\[0m$/, "");
     const lines = wrapANSI(seg.text, { width: width - 2 });
     for (const line of lines) {
-      out.push(line === "" ? "" : styler.quotePipe() + " " + line);
+      if (line === "") { out.push(""); continue; }
+      // Re-open italic after every reset so inline spans compose instead
+      // of spilling; close with a single reset at the end.
+      const reItalicised = reset ? line.replace(/\x1b\[0m/g, `${reset}${italicOpen}`) : line;
+      out.push(styler.quotePipe() + " " + italicOpen + reItalicised + reset);
     }
   }
   return out.join("\n") + "\n\n";
