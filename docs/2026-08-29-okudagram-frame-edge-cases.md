@@ -1,15 +1,15 @@
 ---
-title: Paged-okudagram edge cases — dogfood
-callsign: DOC-PAGED-EDGE-CASES
-brief: briefs/2026-08-29-brief-paged-okudagram.md (BRF-PAGED-OKUDAGRAM)
+title: Okudagram-frame edge cases — dogfood
+callsign: DOC-FRAME-EDGE-CASES
+brief: briefs/2026-08-29-brief-okudagram-frame.md (BRF-PAGED-OKUDAGRAM)
 ---
 
-# Paged-okudagram edge cases
+# Okudagram-frame edge cases
 
 **Date:** 2026-08-29
-**Purpose:** dogfood every edge case the paged-okudagram exploration
+**Purpose:** dogfood every edge case the okudagram-frame rule
 has named. Render this document in okuda and walk it. The results are
-valid evidence regardless of whether paging ships — every case is a
+valid evidence regardless of whether the frame rule ships — every case is a
 real document shape okuda already has to handle; the paged layer, if
 it comes, must preserve the current renderer's behaviour on each.
 
@@ -313,6 +313,19 @@ document shapes.
 
 - *(empty — to be filled by walking the document in okuda)*
 
+**Sizing and zoom (no separate case):** terminal zoom (Cmd±) changes
+the character-cell size, which changes rows and columns available,
+which is the *same signal* the frame rule already handles — a resize.
+There is no zoom case; there is only resize, and zoom is one of its
+causes. The frame recomputes for the new glass and re-anchors on the
+same header. Readability concerns that follow from it — too small to
+read, too dim, too big — belong to the host (terminal emulator, the
+*window* surface) or to palette (a render setting, not a frame
+concern). okuda renders bytes; the host decides the cell size. The
+three-concerns principle assigns sizing and zoom to windowing, which
+okuda refuses to fold. The rule inherits the refusal: it never sizes,
+never zooms, never adjusts brightness; it fills.
+
 **Pre-walk finding (authoring-time):** EC7's nested fence — a
 markdown fragment demonstrating a code fence *inside* a code fence —
 broke the outer fence on first render. CommonMark: a fenced code
@@ -325,7 +338,7 @@ note one day.
 
 ## Related
 
-- `briefs/2026-08-29-brief-paged-okudagram.md` — `BRF-PAGED-OKUDAGRAM`,
+- `briefs/2026-08-29-brief-okudagram-frame.md` — `BRF-PAGED-OKUDAGRAM`,
   the aspirational brief this document dogfoods
 - `docs/2026-08-27-okudagram-scratchpad.md` — the lexicon
   (*hopscotch-on-ice*, *ice-dancing-on-concrete*, *tied-to-the-mast*,
