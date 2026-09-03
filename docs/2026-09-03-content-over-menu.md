@@ -134,6 +134,31 @@ That is the lineage: ZOG's menu, Apollo's restart, okuda's frame.
 Content over menu; the dunt as the interface; the anchor as the thing
 that survives the dunt.
 
+## Do not underestimate the dunt
+
+The feeling is older than software. It is the feeling of television or
+radio in the days when you thought you had a signal — context, music,
+a show — and then you had something else, and yet nothing had changed,
+apart from the ambient geomagnetic field (but then who cares about that
+when you are in the middle of the Archers, and that scene on the roof,
+and the tragic denouement, and Nigel, ohh Nigel). So in desperation you
+applied the only communications-theory heuristic you had: you
+introduced a perturbation to the system and observed its behaviour. And
+if it did not return to the required performance specifications, you
+introduced a significant perturbation. A dunt, then a bigger dunt.
+
+The dunt may seem a simple thing. But over centuries dunts have been
+deployed in high-risk situations and proved resilient and anti-fragile.
+The rating on the carrier; the crew in the lunar module; the listener
+by the wireless; the reader at the terminal. Each perturbs, observes,
+and the signal returns or it does not, and if it does not, you perturb
+harder. The dunt is the oldest interface: *change something, see what
+happens, keep what works.* okuda's contribution is to make the dunt
+deterministic — the function is pure, so the perturbation always
+returns the signal, and the anchor is structural, so the signal is
+always the one you were reading. The dunt always works. Do not
+underestimate it.
+
 ## Related
 
 - `briefs/2026-08-29-brief-okudagram-frame.md` — `BRF-PAGED-OKUDAGRAM`,
