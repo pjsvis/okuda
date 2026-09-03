@@ -349,7 +349,23 @@ describe("render — lists (loose, markers, continuation)", () => {
 describe("render — blockquote", () => {
   test("muted pipe + indent, single level", async () => {
     const out = await render("> quoted line");
-    expect(out).toContain("\x1b[38;2;118;118;118m│\x1b[0m \x1b[38;2;241;250;140;3mquoted line\x1b[0m");
+    // The pipe is the blockquote cue; content renders as-authored
+    // (no blanket italic — that collided with inline emphasis spans).
+    expect(out).toContain("\x1b[38;2;118;118;118m│\x1b[0m quoted line");
+  });
+
+  test("inline emphasis inside a blockquote renders correctly", async () => {
+    const out = await render("> **bold** and *italic* and plain");
+    // Bold and italic spans must survive the blockquote container —
+    // no RESET spill killing surrounding emphasis, no double-italic.
+    // The strong span uses roleBold (colour + ;1m); italic uses ;3m.
+    expect(out).toContain(";1m"); // bold survives
+    expect(out).toContain(";3m"); // italic survives
+    // The plain tail after the inline spans must still be in the quote
+    // (pipe prefix present on the line, content not lost).
+    const line = lines(out).find((l) => l.includes("plain"));
+    expect(line).toBeDefined();
+    expect(stripANSI(line!)).toContain("plain");
   });
 
   test("quote content re-wraps inside the pipe column", async () => {
