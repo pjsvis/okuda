@@ -45,7 +45,7 @@ keep; `just amp` checks the drift.
 | **24** | BRF-STATE-GLYPH | ◆ partial | render path + showcase environment | — <!-- %%okuda-rhs:24%% briefs/2026-08-28-brief-state-glyph-render-path.md --> |
 | **25** | BRF-STATE-GLYPH-2 | ◆ partial | vocabulary — closed lexicon | — <!-- %%okuda-rhs:25%% briefs/2026-08-28-brief-state-glyph-vocabulary.md --> |
 | **26** | BRF-OKLCH-TUNING | ◆ partial | td-b4bae8 ready-to-start | — <!-- %%okuda-rhs:26%% briefs/2026-08-28-brief-oklch-tuning.md --> |
-| **27** | BRF-PAGED-OKUDAGRAM | · open | block-aware paging, candidate invariant | — <!-- %%okuda-rhs:27%% briefs/2026-08-29-brief-paged-okudagram.md --> |
+| **27** | BRF-PAGED-OKUDAGRAM | · open | the okudagram frame — a portioning rule | — <!-- %%okuda-rhs:27%% briefs/2026-08-29-brief-okudagram-frame.md --> |
 | **28** | BRF-TTY-REVERSE | · open | land at the top | — <!-- %%okuda-rhs:28%% briefs/2026-08-26-brief-tty-reverse-print.md --> |
 
 ## SSH family — feasibility debriefed, build pending

@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-03 | DBF-FRAMING-THING | done | Debrief: The framing thing — knocked into a cocked hat | 2026-09-03-debrief-the-framing-thing.md |
 | 2026-09-02 | DBR-SSH-BRINGUP | done | Debrief: the SSH bring-up — glyph probes to a tear-free frame | 2026-09-02-debrief-ssh-bringup.md |
 | 2026-09-01 | DBF-LEDGER-DAY-2026-08-31 | done | Debrief: the ledger day — 2026-08-30/31 | 2026-08-31-debrief-the-ledger-day.md |
 | 2026-08-30 | DBF-ELISION-PRIMITIVE | done | Debrief: elision primitive — one primitive, two consumers, and an ADR that got superseded mid-build | 2026-08-30-debrief-elision-primitive.md |

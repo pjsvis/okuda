@@ -30,7 +30,7 @@
 {"file":"2026-08-29-brief-fzf-owns-the-loop.md","date":"2026-08-29","status":"open","summary":"fzf owns the loop (cursor-preserve experiment)","meta":{},"callsign":"BRF-FZF-OWNS-LOOP"}
 {"file":"2026-08-29-brief-menu-templates-deferred.md","date":"2026-08-29","status":"open","summary":"Menu templates (deferred — fires on the second menu kind)","meta":{},"callsign":"BRF-MENU-TEMPLATES"}
 {"file":"2026-08-29-brief-okf-callsign-migration.md","date":"2026-08-29","status":"done","summary":"OKF conformance migration and the callsign layer","meta":{},"callsign":"BRF-OKF-CALLSIGN"}
-{"file":"2026-08-29-brief-paged-okudagram.md","date":"2026-08-29","status":"open","summary":"Paged okudagram view — block-aware paging (candidate invariant)","meta":{},"callsign":"BRF-PAGED-OKUDAGRAM"}
+{"file":"2026-08-29-brief-okudagram-frame.md","date":"2026-08-29","status":"open","summary":"The okudagram frame — a portioning rule","meta":{},"callsign":"BRF-PAGED-OKUDAGRAM"}
 {"file":"2026-08-29-brief-resticted-grammar-speech.md","date":"2026-08-29","status":"open","summary":"Okuda Markdown AST to W3C SSML Mapping Investigation","meta":{},"callsign":"BRF-RESTICTED-GRAMMAR"}
 {"file":"2026-08-29-brief-terminal-speech.md","date":"2026-08-29","status":"open","summary":"Terminal Speech Pipeline Easter Egg","meta":{},"callsign":"BRF-TERMINAL-SPEECH"}
 {"file":"2026-08-29-mermaid-hard-boundary-CSN.md","date":"2026-08-29","status":"open","summary":"Mermaid Rendering Hard Boundary State Machine (CSN Diagnostics)","meta":{},"callsign":"BRF-MERMAID-HARD"}
@@ -41,3 +41,6 @@
 {"file":"2026-09-01-brief-flow-wrap.md","date":"2026-09-01","status":"open","summary":"Flow wrap — internal break opportunities so paths flow as text","meta":{},"callsign":"BRF-FLOW-WRAP"}
 {"file":"2026-09-01-brief-mermaid-source-omitted.md","date":"2026-09-01","status":"open","summary":"Omit the mermaid source from the render","meta":{},"callsign":"BRF-MERMAID-SOURCE-OMITTED"}
 {"file":"2026-09-02-brief-synchronized-output.md","date":"2026-09-02","status":"open","summary":"Synchronized output — deliver each paint as one frame","meta":{},"callsign":"BRF-SYNC-OUTPUT"}
+{"file":"2026-09-03-brief-ctrl-clone.md","date":"2026-09-03","status":"open","summary":"Ctrl-NN — clone the terminal on the dereferenced document","meta":{},"callsign":"BRF-CTRL-CLONE"}
+{"file":"2026-09-03-brief-edit-dispatch.md","date":"2026-09-03","status":"open","summary":"Edit dispatch — `$EDITOR` in a separate terminal, file is the contract","meta":{},"callsign":"BRF-EDIT-DISPATCH"}
+{"file":"2026-09-03-brief-voice-padd.md","date":"2026-09-03","status":"open","summary":"Voice-controlled silo — the PADD over Tailscale","meta":{},"callsign":"BRF-VOICE-PADD"}

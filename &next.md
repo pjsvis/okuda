@@ -21,7 +21,7 @@ Built 2026-08-31, after ADR-025/026 and the day's amendments; amended
 
 ## Exploration — read-and-think, no code
 
-- **BRF-PAGED-OKUDAGRAM — unit definition** — unpark condition halved (fzf epic aborted, seam clear); needs one defender for "header → next header" against the real corpus · **S** %%okuda-rhs:16%% <!-- briefs/2026-08-29-brief-paged-okudagram.md -->
+- **BRF-PAGED-OKUDAGRAM — the okudagram frame** — rule fully specified: a frame is a header + content to the next header; fills the terminal, human sizes, no assumptions; pending walk validation against EC1–EC9 · **S** %%okuda-rhs:16%% <!-- briefs/2026-08-29-brief-okudagram-frame.md -->
 
 ## Hygiene — small, owed
 

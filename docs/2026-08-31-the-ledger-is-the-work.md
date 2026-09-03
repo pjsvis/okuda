@@ -142,4 +142,4 @@ concession section — the marketing version of this document is credible
   walk, fresh → aligned)
 - Doc: `docs/2026-08-30-naming-like-nasa.md` (the attribution rule this
   document follows: lessons learned are attributed, with hashes)
-- Brief: `briefs/2026-08-29-brief-paged-okudagram.md` (the caught gate)
+- Brief: `briefs/2026-08-29-brief-okudagram-frame.md` (the caught gate)

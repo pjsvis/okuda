@@ -28,6 +28,27 @@ they either earn a brief or get foxtrot-oscar'd. The Edinburgh lexicon
 - **Book-binding.** The renderer owns the binding (header, closer,
   margins); the author owns the pages. Per-author binding goes scrappy;
   renderer-owned binding is uniform across every document, forever.
+  The two fixed points — the start-anchor (frame-0, the existence
+  condition) and the terminator (the last frame's natural close) — are
+  the binding's structural anchors. They do not move while the document
+  exists; they are source-derived, recomputed, never stored. The anchor
+  says *you are here*; the terminator says *you have arrived*; the
+  document is the territory between them.
+- **Step, scroll, vector.** Three motions, three scopes, three acts.
+  A *vector* is cross-document — dereference a reference, leave this
+  document for that one (transcendent). A *step* is within-document —
+  progress along structure, land on the next header, recompose the
+  frame (immanent). A *scroll* is within-frame — translate through
+  lines, see every line, cross frame boundaries without recomposing
+  (continuous). **Paging is a category error, not a concept** — it was
+  a fourth thing that did not exist, a screen-sized leap to an
+  arbitrary position, which is neither a reference nor a structural
+  progression. The space a step traverses is the document itself,
+  portioned into a 1D sequence of frames bounded by the two fixed
+  points; you move *along* the sequence — ordinal, next/previous. Not
+  a grid, not a deck, not a graph. A strand with a head and a tail.
+  (Founding lexicon entry for the okudagram-frame rule,
+  `BRF-PAGED-OKUDAGRAM`; the callsign stays to remind us paging didn't.)
 - **Soup spilled by an avant-garde artist.** What `ls` looks like. No
   binder. We aim a tad higher.
 - **Availability without insistence.** The muted source echo: it does
