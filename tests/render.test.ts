@@ -349,9 +349,9 @@ describe("render — lists (loose, markers, continuation)", () => {
 describe("render — blockquote", () => {
   test("muted pipe + indent, single level", async () => {
     const out = await render("> quoted line");
-    // The pipe is the blockquote cue; content renders as-authored
-    // (no blanket italic — that collided with inline emphasis spans).
-    expect(out).toContain("\x1b[38;2;118;118;118m│\x1b[0m quoted line");
+    // An aside is italic — the invariant. The pipe is the blockquote
+    // cue; the italic is the aside's identity.
+    expect(out).toContain("\x1b[38;2;118;118;118m│\x1b[0m \x1b[38;2;241;250;140;3mquoted line\x1b[0m");
   });
 
   test("inline emphasis inside a blockquote renders correctly", async () => {
