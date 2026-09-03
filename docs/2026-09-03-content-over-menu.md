@@ -159,6 +159,21 @@ returns the signal, and the anchor is structural, so the signal is
 always the one you were reading. The dunt always works. Do not
 underestimate it.
 
+## The tagline
+
+**A stateless traversal of state space.** Albeit more interesting if
+it were a particularly spicy state space.
+
+The stateless is the pure function and the anchor — no state about the
+frame it's showing you, just the inputs recomputed. The traversal is
+step, scroll, vector. The state space is the document's structure,
+portioned into frames, bounded by two fixed points, dereferencable to
+other state spaces and back. `less` does a stateless traversal of a
+boring state space (lines); okuda does a stateless traversal of a
+spicy one (structured, anchored, dereferencable, re-anchored across
+perturbations). The spiciness is the moat. It could be better, but
+only if it exists to be better.
+
 ## Related
 
 - `briefs/2026-08-29-brief-okudagram-frame.md` — `BRF-PAGED-OKUDAGRAM`,
