@@ -119,26 +119,20 @@ it. The menu was the path, not the destination.
 ## The dunt
 
 Apollo 1201/1202: the computer overloaded, the alarm fired, the
-software prioritised and restarted, the landing stayed alive. The
-resolution was not a menu — it was a content the crew already knew,
-surfaced at the moment it was needed, and a procedure: gie it a dunt,
-and if that doesn't work, gie it another. The dunt was the interface.
+software prioritised, restarted, kept the landing alive. The dunt was
+the interface.
 
-The frame rule inherits the dunt. Zoom: the frame recomputes, the
-anchor re-finds, the content stays. Resize: same. Re-render: same.
-Back-navigate: same. Each is a dunt — a restart that preserves the
-thing that matters (the reader's position) and recomputes everything
-else. The pure function `okudagram = f(source, width, palette)` is the
-dunt made deterministic: gie it the inputs, it gives you the frame
-back. If the inputs changed, you get the new frame for the new inputs,
+The frame rule inherits it. Zoom, resize, re-render, back-navigate —
+each is a dunt: a restart that preserves the thing that matters (the
+reader's position) and recomputes everything else. The pure function
+`okudagram = f(source, width, palette)` is the dunt made
+deterministic — gie it the inputs, it gives you the frame back,
 anchored at the same place. The dunt always works because the function
 is pure and the anchor is structural.
 
 That is the lineage: ZOG's menu, Apollo's restart, okuda's frame.
 Content over menu; the dunt as the interface; the anchor as the thing
-that survives the dunt. Gie it a dunt, and if that doesn't work, gie
-it another. It will work, because the function is pure and the anchor
-is structural, and because the menu never consumed the screen.
+that survives the dunt.
 
 ## Related
 
