@@ -68,6 +68,11 @@ ship:
 search-smoke:
     @bash scripts/search-smoke.sh
 
+# Search replay — picker instance, standalone
+[group('quality gate')]
+search-replay:
+    @bash scripts/search-replay.sh
+
 # Freshness check
 [group('quality gate')]
 fresh:
