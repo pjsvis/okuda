@@ -8,6 +8,7 @@ import {
   listMarkdownFiles,
   rankedShortlistEntries,
   registryHits,
+  selfEntriesCmd,
 } from "../src/launcher";
 import { existsSync } from "node:fs";
 import { basename } from "node:path";
@@ -278,6 +279,44 @@ describe("launcher — conformance smoke: the search the operator runs", () => {
     });
     expect(proc.exitCode).toBe(1);
     expect(proc.stderr.toString()).toContain("-g is a gloam mode flag"); // -g gate, not "unexpected argument"
+  });
+
+  test("entry path: --entries prints the ranked stream headless (ADR-030)", () => {
+    // The live picker's reload target — and the seam where dev (bun run
+    // src/cli.ts) and compiled (the binary) invocations must behave
+    // identically. If this diverges, the operator's picker goes stale
+    // while every stdin-fed test stays green.
+    const proc = Bun.spawnSync(["bun", "run", "src/cli.ts", "--entries", "load", "bearing"], {
+      stdout: "pipe",
+      stderr: "pipe",
+      env: { ...process.env, FZF_DEFAULT_OPTS: "" },
+    });
+    expect(proc.exitCode).toBe(0);
+    const out = proc.stdout.toString();
+    expect(out).toContain("load-bearing"); // evidence rows
+    expect(out).toContain("DEPENDENCIES.md");
+  });
+
+  test("entry path: --entries with no query lists the whole corpus", () => {
+    const proc = Bun.spawnSync(["bun", "run", "src/cli.ts", "--entries"], {
+      stdout: "pipe",
+      stderr: "pipe",
+      env: { ...process.env, FZF_DEFAULT_OPTS: "" },
+    });
+    expect(proc.exitCode).toBe(0);
+    expect(proc.stdout.toString().split("\n").filter(Boolean).length).toBeGreaterThan(100);
+  });
+
+  test("selfEntriesCmd resolves the seam: dev re-execs bun, compiled re-execs itself", () => {
+    const cmd = selfEntriesCmd();
+    if (process.execPath.endsWith("/bun")) {
+      // The script-path half of this seam is proven end to end by the
+      // --entries spawn tests above (bun run src/cli.ts as the child);
+      // under `bun test` argv[1] is the runner's, not the CLI's.
+      expect(cmd).toMatch(/^bun run "/);
+    } else {
+      expect(cmd).toBe(`"${process.execPath}"`);
+    }
   });
 
   test("bodyPattern: multi-word queries tolerate hyphenation and spacing", () => {

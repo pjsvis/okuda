@@ -15,7 +15,7 @@ import { detectColorMode } from "./ansi";
 import { loadPalette } from "./palette";
 import { renderDocument } from "./render";
 import { runTui } from "./tui";
-import { runLauncher, invokedAsGloam } from "./launcher";
+import { runLauncher, invokedAsGloam, rankedShortlistEntries } from "./launcher";
 import { detectRoot, makeCallsignResolver, resolveByCallsign } from "./root";
 import { terminalCols, terminalRows } from "./width";
 import { existsSync } from "node:fs";
@@ -27,6 +27,8 @@ interface Args {
   tui: boolean;
   palette: string | null;
   grep: string | null;
+  entries: string | null;
+  extra: string[];
 }
 
 /** Build stamp: --define BUILD_SHA="<sha>" at compile time (justfile
@@ -47,7 +49,7 @@ export function versionLine(sha?: string): string {
 }
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { file: null, watch: false, noColor: false, tui: false, palette: null, grep: null };
+  const args: Args = { file: null, watch: false, noColor: false, tui: false, palette: null, grep: null, entries: null, extra: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
     if (a === "--watch" || a === "-w") args.watch = true;
@@ -65,23 +67,27 @@ function parseArgs(argv: string[]): Args {
         process.stderr.write("gloam: -g requires a query (e.g. gloam -g diagram)\n");
         process.exit(1);
       }
+    } else if (a === "--entries") {
+      // Headless entry-stream printer (ADR-030): the live picker's
+      // reload target. Consumes the remaining args as the query.
+      args.entries = argv.slice(i + 1).join(" ");
+      break;
     } else if (a === "--help" || a === "-h") {
       process.stdout.write("usage: okuda <file.md> [--watch] [--tui] [--no-color] [--palette <name>]\n");
-      process.stdout.write("       gloam [-g <query>]  (browse → read → browse; -g seeds the ranked content shortlist)\n");
+      process.stdout.write("       gloam [<query words>] [-g <query>] [--entries <query>]  (live search → read → loop)\n");
       process.exit(0);
     } else if (a === "--version") {
       const sha = typeof BUILD_SHA !== "undefined" ? BUILD_SHA : undefined;
       process.stdout.write(versionLine(sha) + "\n");
       process.exit(0);
-    } else if (!args.file && args.grep === null) {
-      args.file = a;
     } else if (args.grep !== null) {
       // Positionals after -g join the query: `just gloam -g load bearing`
       // is the phrase "load bearing", not "load" with a stray "bearing".
       args.grep += " " + a;
+    } else if (!args.file) {
+      args.file = a;
     } else {
-      process.stderr.write(`okuda: unexpected argument: ${a}\n`);
-      process.exit(1);
+      args.extra.push(a);
     }
   }
   return args;
@@ -111,27 +117,44 @@ async function readSource(file: string | null): Promise<string> {
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
-  // Gloam launcher (ADR-016): invoked as `gloam` with no file arg and a TTY
-  // stdin → run the browse → read → browse picker loop. `okuda <file>` is
-  // unaffected; two names, two entry contracts, one binary.
-  // `gloam -g <query>` (BRF-CONTENT-SHORTLIST): the ranked content
-  // shortlist — registry field hits, body hits, filename remainder —
-  // seeded into the same browse → read → browse loop. An explicit flag,
-  // never a heuristic: bare-arg stays "the file called X". Gates before
-  // the no-arg launcher (which would otherwise swallow the invocation,
-  // -g sets no file arg).
-  if (args.grep !== null) {
-    if (!invokedAsGloam() || !process.stdin.isTTY) {
-      process.stderr.write("gloam: -g is a gloam mode flag and needs a TTY (invoke as gloam -g <query>)\n");
-      process.exit(1);
+  // Headless entry-stream printer (ADR-030): the live picker's reload
+  // target and the debugging surface. Works under both binary names, no
+  // TTY required — fzf spawns it per keystroke.
+  if (args.entries !== null) {
+    process.stdout.write(rankedShortlistEntries(args.entries).join("\n") + "\n");
+    return;
+  }
+  if (args.grep !== null && (!invokedAsGloam() || !process.stdin.isTTY)) {
+    process.stderr.write("gloam: -g is a gloam mode flag and needs a TTY (invoke as gloam -g <query>)\n");
+    process.exit(1);
+  }
+  if (!invokedAsGloam() && args.extra.length > 0) {
+    process.stderr.write(`okuda: unexpected argument: ${args.extra[0]}\n`);
+    process.exit(1);
+  }
+  if (invokedAsGloam() && process.stdin.isTTY) {
+    // `-g <query>`: seed alias (ADR-030 §4) — same as a bare-arg query.
+    if (args.grep !== null) {
+      await runLauncher({ query: args.grep });
+      return;
     }
-    await runLauncher({ grep: args.grep });
-    return;
+    // Bare args resolve deterministically (ADR-030 §3): existing file →
+    // the shared reader below; callsign shape → registry dispatch below;
+    // anything else (and no args at all) → the live search, seeded with
+    // the joined positionals or empty.
+    const isQuery = args.file !== null && !existsSync(args.file);
+    if (isQuery && !CALLSIGN_SHAPE.test(args.file!)) {
+      await runLauncher({ query: [args.file, ...args.extra].join(" ") });
+      return;
+    }
+    if (!args.file) {
+      await runLauncher({ query: "" });
+      return;
+    }
+    // Existing file / callsign: fall through to the callsign gate and
+    // the shared reader below — both contracts unchanged.
   }
-  if (invokedAsGloam() && !args.file && process.stdin.isTTY) {
-    await runLauncher();
-    return;
-  }
+  // `gloam <callsign>` (silo-mnemonics): a callsign-shaped argument that
   // `gloam <callsign>` (silo-mnemonics): a callsign-shaped argument that
   // names no file resolves through the rooted registry — the human code
   // for low-bandwidth channels. Unknown code or unrooted cwd → honest

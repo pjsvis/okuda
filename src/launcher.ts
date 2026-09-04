@@ -56,11 +56,30 @@ function clipSnippet(s: string): string {
 }
 
 const FZF_BINDS = "ctrl-d:page-down,ctrl-u:page-up,esc:cancel";
-const HEADER = "enter: read · ctrl-w: clear word · esc: clear/done · -g <query>: content search";
+const HEADER = "type: search everything · enter: read · ctrl-w: clear word · esc: clear/done";
 const PROMPT = "gloam ❯ ";
 
 /** The verb-grammar binds, exported for a contract test to pin against. */
 export const GLOAM_FZF_BINDS = FZF_BINDS;
+
+/** The live-search bind (ADR-030): every keystroke recomputes the entry
+ *  stream via this same binary's `--entries` printer. Exported for the
+ *  contract test; the <self> placeholder is substituted at spawn time. */
+export const LIVE_RELOAD_BIND_TEMPLATE = "change:reload(<self> --entries {q})";
+
+/** The command fzf's `change:reload` runs to recompute the entry stream
+ *  for the current query — this same binary, `--entries {q}`. Dev runs
+ *  (`bun run src/cli.ts`) re-exec through bun; the compiled binary
+ *  re-execs itself. The seam is pinned by the entry-path tests because
+ *  it is exactly where a smoke-vs-operator divergence hid before. */
+export function selfEntriesCmd(): string {
+  const exe = process.execPath;
+  if (exe.endsWith("/bun")) {
+    const script = process.argv[1] ?? "";
+    return `bun run "${script}"`;
+  }
+  return `"${exe}"`;
+}
 
 /** The environment we hand fzf: inherited, minus every `FZF_*` variable.
  *  We own the picker instance — its binds, its layout, its behavior are
@@ -253,11 +272,13 @@ export function rankedShortlistEntries(query: string, cwd: string = process.cwd(
 }
 
 /** One picker round. Pipes `files` into fzf, returns the selection + the
- *  reseedable query; `null` on Esc/abort (exit the loop). */
+ *  reseedable query; `null` on Esc/abort (exit the loop). `live` adds
+ *  the change:reload bind (ADR-030) — every keystroke recomputes the
+ *  entry stream via this binary's `--entries` printer. */
 export async function pickFile(
   files: string[],
   query: string,
-  prompt: string = PROMPT,
+  live: boolean,
 ): Promise<{ query: string; file: string } | null> {
   const input = files.join("\n") + "\n";
   const args = [
@@ -268,11 +289,12 @@ export async function pickFile(
     "--tiebreak=index",
     "--delimiter=\t", // entries are `path\tsnippet`; match the whole line
     `--bind=${FZF_BINDS}`,
-    `--prompt=${prompt}`,
+    `--prompt=${PROMPT}`,
     `--query=${query}`,
     "--print-query",
     `--header=${HEADER}`,
   ];
+  if (live) args.push(`--bind=change:reload(${selfEntriesCmd()} --entries {q})`);
   const proc = Bun.spawn(args, {
     stdin: "pipe",
     stdout: "pipe",
@@ -294,13 +316,12 @@ export async function pickFile(
 }
 
 /** The browse → read → browse loop. Caller gates: invoked as `gloam`,
- *  no file arg (or `-g <query>`), stdin is a TTY. fzf and rg absence are
- *  clean errors, never a stack trace (brief: graceful absence; rg is a
- *  hard dep alongside fzf — BRF-CONTENT-SHORTLIST source unification).
- *  `opts.grep` seeds the loop with the ranked content shortlist instead
- *  of the plain file list; loop shape, query reseed, and cursor behavior
- *  are identical in both modes. */
-export async function runLauncher(opts: { grep?: string } = {}): Promise<void> {
+ *  TTY stdin (see ADR-030 for the arg dispatch). fzf and rg absence are
+ *  clean errors, never a stack trace. `opts.query` seeds the search —
+ *  plain `gloam` starts empty. Every mode is live (ADR-030): the picker
+ *  recomputes the entry stream per keystroke via change:reload, and the
+ *  loop recomputes the seed rows per round for the reseeded query. */
+export async function runLauncher(opts: { query?: string } = {}): Promise<void> {
   if (!which("rg")) {
     process.stderr.write("gloam: rg not found — see DEPENDENCIES.md\n");
     process.exit(1);
@@ -320,16 +341,16 @@ export async function runLauncher(opts: { grep?: string } = {}): Promise<void> {
   // for the session, so the index loads once — the resolver closure hands
   // the TUI strings, never registry knowledge (ADR-020).
   const callsignFor = root ? makeCallsignResolver() : undefined;
-  // The content query seeds the picker: entries carry `path\tsnippet`,
-  // so the seeded query matches filenames AND body evidence in one AND.
-  // Recomputed once per invocation (the query is the refinement;
-  // re-running `gloam -g <more specific>` is the Unix remedy — the
-  // brief declines interactive change:reload).
-  let query = opts.grep ?? "";
+  // Live search (ADR-030): the seed rows are the ranked merge for the
+  // current query; while the picker is open, change:reload recomputes
+  // them per keystroke via this binary's --entries printer. Per round,
+  // the rows are recomputed for the reseeded query — read a document,
+  // Esc back, and the picker already matches what you last searched.
+  let query = opts.query ?? "";
   try {
     for (;;) {
-      const files = opts.grep !== undefined ? rankedShortlistEntries(opts.grep) : listMarkdownFiles();
-      const pick = await pickFile(files, query, opts.grep !== undefined ? "gloam -g ❯ " : PROMPT);
+      const files = rankedShortlistEntries(query);
+      const pick = await pickFile(files, query, true);
       if (pick === null) break; // Esc / Ctrl-C in the picker
       query = pick.query; // reseed next round
       if (!pick.file) break; // empty selection (Enter on empty list)

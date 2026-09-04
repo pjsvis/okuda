@@ -27,3 +27,4 @@
 {"file":"027-temperament-is-downstream-of-discipline.md","date":"2026-08-31","status":"Accepted","summary":"Temperament is downstream of discipline","meta":{},"callsign":"ADR-TEMPERAMENT-DISCIPLINE-027"}
 {"file":"028-wire-budget.md","date":"2026-09-02","status":"Accepted","summary":"The wire is the budget","meta":{},"callsign":"ADR-WIRE-BUDGET-028"}
 {"file":"029-renderer-reader-glass.md","date":"2026-09-03","status":"Accepted","summary":"Disambiguate the renderer, the reader, and the glass","meta":{},"callsign":"ADR-RENDERER-READER-029"}
+{"file":"030-live-search-picker.md","date":"2026-09-04","status":"Accepted","summary":"The picker is a live search","meta":{},"callsign":"ADR-LIVE-SEARCH-030"}

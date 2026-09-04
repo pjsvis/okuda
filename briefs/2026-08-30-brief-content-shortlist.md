@@ -119,11 +119,14 @@ scorer. See §Ranked sources.)
 - **No previews.** No `--preview 'rg -n {1}'`, no bat, no matched-line
   display. fzf matches on the filenames of the rg-filtered set; that's
   enough for a shortlist. Previews are the `etc` that foxtrot-oscarred.
-- **No `change:reload`.** No interactive content-narrowing where the
-  file list reloads on every keystroke. The query is the refinement;
-  re-running `gloam -g <more specific>` is the Unix remedy. Cheap at
-  silo scale; the entire machinery that would make it interactive is
-  what this brief declines to build.
+- **No `change:reload`.** ~~No interactive content-narrowing where the
+  file list reloads on every keystroke.~~ **REVERSED 2026-09-04 by
+  operator evidence — see ADR-030** (`decisions/030-live-search-picker.md`):
+  three consecutive dogfood failures were mode-boundary failures, and
+  the operator's goal — "fire up gloam, search, find, view an arbitrary
+  document" — is the live search. Plain `gloam` recomputes the merge per
+  keystroke via `--entries {q}`; `-g` survives as a seed alias. This
+  amendment records the palimpsest; the ADR is the decision.
 - **No compositor.** No structured rows, no `tableRow`-shaped output,
   no jump-wiring. The content shortlist is a plain `rg -l` pipe, not a
   jump table. (The jump-table compositor is the natural file-grain

@@ -28,25 +28,15 @@ Work cycle: **brief → branch → implement → check → review → debrief**
 
 ## Searching
 
-Two modes, one picker:
-
-- **`gloam` (no params) — filenames only.** The file list as normal: every
-  markdown file, one per line; what you type matches **paths**. Fast when
-  you remember the name.
-- **`gloam -g <query>` — content + filenames, prioritised.** One query
-  searches both: fzf matches the whole row (path **and** matching-line
-  evidence). Rows arrive in channel order — registry callsign hits first,
-  body matches second, all remaining filenames last — so `--tiebreak=index`
-  makes the feed order the ranking. The prompt reads `gloam -g ❯` so the
-  mode is always visible. Unquoted multi-word queries work
-  (`just gloam -g load bearing`); multi-word search is phrase-tolerant
-  ("load bearing" finds "load-bearing").
-- **Evidence, not documents:** each row is `path` + the first matching
-  line. Widening the terminal reveals more of the line — fzf truncates at
-  the glass edge, so the resize is the expansion.
-- **Refinement semantics (honest):** the evidence is computed once for the
-  `-g` seed; typing inside the picker narrows *within* that seed's rows.
-  A new corpus-wide search = Esc, re-run with a new `-g`.
+One mode, live (ADR-030): **`gloam` is the search.** Type to search
+filenames and content simultaneously — every keystroke recomputes the
+ranked rows (registry callsign hits first, body matches with the
+matching line as evidence, filename matches). Enter reads; Esc returns
+with your query. Bare arguments resolve in order: existing file → read
+it; callsign shape → registry dispatch; anything else → search query
+(`just gloam load bearing`, unquoted is fine). `gloam -g <query>`
+survives as a seed alias. `okuda --entries "<query>"` prints the raw
+entry stream (the reload target; handy for debugging).
 
 ## Troubleshooting
 
