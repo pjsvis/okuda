@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-03 | ADR-RENDERER-READER-029 | Accepted | Disambiguate the renderer, the reader, and the glass | 029-renderer-reader-glass.md |
 | 2026-09-02 | ADR-WIRE-BUDGET-028 | Accepted | The wire is the budget | 028-wire-budget.md |
 | 2026-08-31 | ADR-WIRE-FORMAT-026 | Accepted | The wire format — one grammar, two forms, paint decoupled | 026-wire-format.md |
 | 2026-08-31 | ADR-TEMPERAMENT-DISCIPLINE-027 | Accepted | Temperament is downstream of discipline | 027-temperament-is-downstream-of-discipline.md |
