@@ -206,6 +206,23 @@ describe("launcher — conformance smoke: the search the operator runs", () => {
     // channel) — the contract is that it surfaces in the shortlist.
     expect(matches).toContain("docs/2026-08-20-origin-doc.md");
   });
+
+  test("entry path: `-g` parses at the CLI gate, never falls through to the reader", async () => {
+    // The 2026-09-04 operator trap: the smoke drove the pipe directly and
+    // stayed green while the operator's entry path (`just gloam -g q`)
+    // silently dropped the flag — old recipe, no passthrough — and typed
+    // the query into the filename-only picker. Zero results, smoke green.
+    // This pin drives the *entry*: with -g parsed (non-TTY here), the
+    // -g gate must fire its own error, proving the flag was consumed as
+    // a mode flag and not passed to the reader or swallowed.
+    const proc = Bun.spawnSync(["bun", "run", "src/cli.ts", "-g", "1.4.0"], {
+      stdout: "pipe",
+      stderr: "pipe",
+      env: { ...process.env, FZF_DEFAULT_OPTS: "" },
+    });
+    expect(proc.exitCode).toBe(1);
+    expect(proc.stderr.toString()).toContain("-g is a gloam mode flag");
+  });
 });
 
 describe("launcher — fzf spawn wiring (non-interactive smoke)", () => {
