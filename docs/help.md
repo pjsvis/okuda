@@ -28,7 +28,7 @@ Work cycle: **brief → branch → implement → check → review → debrief**
 ## Searching
 
 - `gloam` — browse → read → browse picker over all markdown (filename search)
-- `gloam -g <query>` — ranked content search: registry callsign hits first, then body matches (`path + matching-line` evidence per entry), then filename matches. One query searches both; results prioritised by channel.
+- `gloam -g <query>` (or `just gloam -g <query>`) — ranked content search: registry callsign hits first, then body matches (`path + matching-line` evidence per entry), then filename matches. One query searches both; results prioritised by channel.
 
 ## Standing rules
 
