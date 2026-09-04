@@ -584,13 +584,11 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
       40,
     );
     const plain = out.replace(/\x1b\[[0-9;]*m/g, "");
-    expect(plain).toContain("…");
     expect(plain).toContain("§05");
-    // One body line (not wrapped): the body lines, excluding rails.
-    const bodyLines = plain.split("\n").filter((l) => l.trim() && !l.includes("─") && !l.includes("█"));
-    expect(bodyLines.length).toBe(1);
-    // The full uncut text is not present (truncated).
-    expect(plain).not.toContain("narrow terminal");
+    // ADR-031: references are prose — the badge wraps with the text
+    // (the elide-to-one-line behavior was the legacy menu-row pattern).
+    expect(plain.split("\n").some((l) => l.trimEnd().endsWith("§05"))).toBe(true);
+    expect(plain).toContain("narrow terminal");
   });
 
   test("greedy: a .md mention in ordinary prose still mutes (the far register)", async () => {

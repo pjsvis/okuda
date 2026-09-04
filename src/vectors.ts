@@ -34,73 +34,66 @@ export const CALLSIGN_SHAPE = /^[A-Z]{3}(-[A-Z0-9]+)+$/;
 const RE_MD_LINK = /\[[^\]\n]*\]\((\S+?\.md)\)/g;
 const RE_CALLSIGN = /[A-Z]{3}(?:-[A-Z0-9]+)+/g;
 
-/** The destination set: every reference-shaped target in the document,
- *  in reading order (a Set preserves insertion order), unique by
- *  construction, capped at MAX_REFS. Optimistic: nothing is validated
- *  here — a destination is whatever looks like a reference. The
- *  frontmatter is not scanned: a document's own callsign is identity,
- *  not a reference. Legacy `okuda-rhs` token numbers are not honored
- *  (their surrounding paths and callsigns are ordinary references like
- *  any other). Pure. */
-export function discoverDestinations(source: string): Set<string> {
-  const fm = source.match(/^---\n[\s\S]*?\n---/);
-  const bodyStart = fm ? fm[0]!.length : 0;
-  const hits: Array<{ pos: number; target: string }> = [];
-  for (const m of source.matchAll(RE_MD_LINK)) {
-    if (m.index! >= bodyStart) hits.push({ pos: m.index!, target: m[1]! });
-  }
-  for (const m of source.matchAll(RE_CALLSIGN)) {
-    if (m.index! >= bodyStart) hits.push({ pos: m.index!, target: m[0]! });
-  }
-  hits.sort((a, b) => a.pos - b.pos);
-  // The Set is the contract: unique by destination, insertion order is
-  // reading order, enumeration is the assignment.
-  const dests = new Set<string>();
-  for (const h of hits) {
-    if (dests.size >= MAX_REFS) break;
-    dests.add(h.target);
-  }
-  return dests;
+/** Reference occurrences: every reference-shaped span in the document,
+ *  in reading order, **with repeats** — the vector↔filename relationship
+ *  is one-to-many (two mentions of the same ADR are two vectors, both
+ *  translating to the same filename; each mention is its own actuation
+ *  point). Capped at MAX_REFS. Optimistic: nothing validated. The
+ *  frontmatter is not scanned (a document's own callsign is identity,
+ *  not a reference). Legacy `okuda-rhs` numbers are not honored. Pure. */
+export interface RefOccurrence {
+  pos: number;
+  end: number;
+  target: string;
 }
 
-/** The jump map: enumerate the destination set, assign the vectors —
- *  `§11` upward, insertion order, capped defensively at MAX_REFS even
- *  if a caller bypasses discovery. Pure; rebuilt on every render —
- *  re-derivation replaces invalidation. */
-export function buildJumpMap(dests: Iterable<string>): Map<number, string> {
+export function scanReferences(source: string): RefOccurrence[] {
+  const fm = source.match(/^---\n[\s\S]*?\n---/);
+  const bodyStart = fm ? fm[0]!.length : 0;
+  const hits: RefOccurrence[] = [];
+  for (const m of source.matchAll(RE_MD_LINK)) {
+    if (m.index! >= bodyStart) hits.push({ pos: m.index!, end: m.index! + m[0]!.length, target: m[1]! });
+  }
+  for (const m of source.matchAll(RE_CALLSIGN)) {
+    if (m.index! >= bodyStart) hits.push({ pos: m.index!, end: m.index! + m[0]!.length, target: m[0]! });
+  }
+  hits.sort((a, b) => a.pos - b.pos);
+  return hits.slice(0, MAX_REFS);
+}
+
+/** The jump map — the in-memory translation table: vector number →
+ *  filename. One-to-many by design: repeated references to the same
+ *  document each hold their own vector pointing at the same filename.
+ *  Rebuilt on every render — re-derivation replaces invalidation. */
+export function buildJumpMap(refs: RefOccurrence[]): Map<number, string> {
   const map = new Map<number, string>();
   let n = VECTOR_MIN;
-  for (const target of dests) {
-    if (n > VECTOR_MAX) break;
-    map.set(n++, target);
+  for (const ref of refs) {
+    if (n > VECTOR_MAX) break; // the cap is the map's invariant, not discovery's
+    map.set(n++, ref.target);
   }
   return map;
 }
 
 /** Convenience: derive the map straight from a main document's source. */
 export function jumpMapFor(source: string): Map<number, string> {
-  return buildJumpMap(discoverDestinations(source));
+  return buildJumpMap(scanReferences(source));
 }
 
-/** Inject one paint marker after each reference occurrence. The marker
- *  (`%okuda-vector:NN%`) is consumed by the renderer's inline paint —
- *  the painted `[NN]` is illustrative text, and the source string this
- *  function returns is used for rendering only, never persisted. Pure. */
+/** Inject one paint marker after each reference occurrence — the i-th
+ *  occurrence carries vector `VECTOR_MIN + i`, per the map. The marker
+ *  (`%okuda-vector:NN%`) is consumed by the renderer's inline paint;
+ *  the painted `§NN` is illustrative text, and the returned string is
+ *  used for rendering only, never persisted. Replaces from the end so
+ *  positions stay valid. Pure. */
 export function annotateSource(source: string, map: Map<number, string>): string {
-  const byTarget = new Map<string, number>();
-  for (const [num, target] of map) byTarget.set(target, num);
+  const occ = scanReferences(source);
   let out = source;
-  for (const [target, num] of byTarget) {
-    const badge = ` %okuda-vector:${num}%`;
-    // Escape regex syntax in the target — paths and callsigns are
-    // literal strings, not patterns.
-    const esc = target.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    // Links: badge after the closing paren. Callsigns: badge after the
-    // token. Each occurrence carries the same number (the map dedupes).
-    const reLink = new RegExp(`(\\[[^\\]\\n]*\\]\\(${esc}\\))`, "g");
-    const reToken = new RegExp(`(?<![A-Z0-9-])${esc}(?![A-Z0-9-])`, "g");
-    if (reLink.test(out)) out = out.replace(reLink, `$1${badge}`);
-    else out = out.replace(reToken, `$&${badge}`);
+  for (let i = occ.length - 1; i >= 0; i--) {
+    const num = VECTOR_MIN + i;
+    if (!map.has(num)) continue; // the paint is a projection of the map
+    const o = occ[i]!;
+    out = out.slice(0, o.end) + ` %okuda-vector:${num}%` + out.slice(o.end);
   }
   return out;
 }

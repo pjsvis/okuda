@@ -4,49 +4,45 @@ import {
   VECTOR_MAX,
   CLONE_TOKEN,
   MAX_REFS,
-  discoverDestinations,
+  scanReferences,
   buildJumpMap,
   jumpMapFor,
   annotateSource,
 } from "../src/vectors";
 
-describe("vectors — discovery (optimistic, reading order, unique)", () => {
+describe("vectors — discovery (occurrences, reading order, one-to-many)", () => {
   test("callsign-shaped tokens are references", () => {
-    const refs = discoverDestinations("see ADR-030 and ADR-028 for the wire.");
-    expect([...refs]).toEqual(["ADR-030", "ADR-028"]);
+    const refs = scanReferences("see ADR-030 and ADR-028 for the wire.").map((r) => r.target);
+    expect(refs).toEqual(["ADR-030", "ADR-028"]);
   });
 
   test("markdown links to .md paths are references (target is the path)", () => {
-    const refs = discoverDestinations("read [the brief](briefs/2026-09-04-brief-porch-matrix.md) first.");
-    expect([...refs]).toEqual(["briefs/2026-09-04-brief-porch-matrix.md"]);
+    const refs = scanReferences("read [the brief](briefs/2026-09-04-brief-porch-matrix.md) first.").map((r) => r.target);
+    expect(refs).toEqual(["briefs/2026-09-04-brief-porch-matrix.md"]);
   });
 
   test("reading order across both shapes", () => {
-    const refs = discoverDestinations(
+    const refs = scanReferences(
       "first [a doc](docs/x.md), then ADR-030, then [another](docs/y.md).",
-    );
-    expect([...refs]).toEqual(["docs/x.md", "ADR-030", "docs/y.md"]);
+    ).map((r) => r.target);
+    expect(refs).toEqual(["docs/x.md", "ADR-030", "docs/y.md"]);
   });
 
-  test("a Set of destinations — unique by target, insertion order", () => {
-    const refs = discoverDestinations("ADR-030 early, ADR-028, ADR-030 again.");
-    expect([...refs]).toEqual(["ADR-030", "ADR-028"]);
-  });
-
-  test("the frontmatter is not scanned — a document's own callsign is not a reference", () => {
-    const src = "---\ntype: Brief\ncallsign: BRF-WORKING-COPY\n---\n\nRides on ADR-030 and the wire.";
-    const refs = discoverDestinations(src);
-    expect([...refs]).toEqual(["ADR-030"]); // own callsign skipped
+  test("one-to-many: repeated references keep one vector each, same filename", () => {
+    // The footnote model: each mention is its own actuation point; the
+    // map translates several vectors to one filename.
+    const refs = scanReferences("ADR-030 early, ADR-028, ADR-030 again.").map((r) => r.target);
+    expect(refs).toEqual(["ADR-030", "ADR-028", "ADR-030"]);
   });
 
   test("zero-padded and single-digit bracketed numbers are never vectors", () => {
-    const refs = discoverDestinations("steps [07] and [3] and even [14] — but 14 has no callsign shape.");
-    expect(refs.size).toBe(0); // [14] is user text, not a reference
+    const refs = scanReferences("steps [07] and [3] and even [14] — but 14 has no callsign shape.");
+    expect(refs.length).toBe(0); // [14] is user text, not a reference
   });
 
   test("false-positive shapes are optimistic references (the actuator decides)", () => {
     // SSH-2 has callsign shape; discovery paints it; actuation fails honestly.
-    expect([...discoverDestinations("the SSH-2 protocol")]).toEqual(["SSH-2"]);
+    expect(scanReferences("the SSH-2 protocol").map((r) => r.target)).toEqual(["SSH-2"]);
   });
 
   test("legacy okuda-rhs wiring is not honored — and is not a reference", () => {
@@ -54,28 +50,35 @@ describe("vectors — discovery (optimistic, reading order, unique)", () => {
     // paths in prose are provenance (the near/far register), not
     // references. The authored number is not honored. The row is inert.
     const src = "| *slug* | CS | **14** <!-- %%okuda-rhs:14%% briefs/x.md --> |";
-    expect(discoverDestinations(src).size).toBe(0);
+    expect(scanReferences(src).length).toBe(0);
+  });
+
+  test("the frontmatter is not scanned — a document's own callsign is not a reference", () => {
+    const src = "---\ntype: Brief\ncallsign: BRF-WORKING-COPY\n---\n\nRides on ADR-030 and the wire.";
+    const refs = scanReferences(src).map((r) => r.target);
+    expect(refs).toEqual(["ADR-030"]); // own callsign skipped
   });
 
   test("cap: discovery stops at MAX_REFS", () => {
     const src = Array.from({ length: 120 }, (_, i) => `ADR-${1000 + i}`).join(" ");
-    const refs = discoverDestinations(src);
-    expect(refs.size).toBe(MAX_REFS);
+    const refs = scanReferences(src);
+    expect(refs.length).toBe(MAX_REFS);
     expect(MAX_REFS).toBe(VECTOR_MAX - VECTOR_MIN + 1);
   });
 });
 
-describe("vectors — the jump map", () => {
-  test("numbers run from 11, in discovery order", () => {
-    const map = jumpMapFor("AAA-2 and ADR-002 and [x](docs/z.md).".replace("AAA-2", "ADR-002"));
-    expect(map.get(11)).toBe("ADR-002"); // duplicated in prose, deduped in the map
-    expect(map.get(12)).toBe("docs/z.md");
+describe("vectors — the jump map (the translation table)", () => {
+  test("numbers run from 11, in reading order — one-to-many values", () => {
+    const map = jumpMapFor("ADR-002 early, ADR-002 again, [x](docs/z.md).");
+    expect(map.get(11)).toBe("ADR-002");
+    expect(map.get(12)).toBe("ADR-002"); // same filename, its own vector
+    expect(map.get(13)).toBe("docs/z.md");
     expect(map.has(10)).toBe(false);
-    expect(map.has(13)).toBe(false);
+    expect(map.has(14)).toBe(false);
   });
 
   test("buildJumpMap caps at MAX_REFS", () => {
-    const refs = Array.from({ length: 120 }, (_, i) => `ADR-${i}`);
+    const refs = Array.from({ length: 120 }, (_, i) => ({ pos: i, end: i + 1, target: `ADR-${i}` }));
     const map = buildJumpMap(refs);
     expect(map.size).toBe(MAX_REFS);
     expect(map.has(VECTOR_MAX + 1)).toBe(false);
@@ -88,32 +91,33 @@ describe("vectors — the jump map", () => {
 });
 
 describe("vectors — annotation (illustrative paint markers)", () => {
-  test("injects the marker after each reference occurrence", () => {
-    const map = buildJumpMap(["ADR-030"]);
+  test("injects the marker after each reference occurrence, per the map", () => {
+    const map = jumpMapFor("the live search is ADR-030, amended.");
     const out = annotateSource("the live search is ADR-030, amended.", map);
     expect(out).toBe("the live search is ADR-030 %okuda-vector:11%, amended.");
   });
 
-  test("every occurrence carries the same number", () => {
-    const map = buildJumpMap(["ADR-030"]);
-    const out = annotateSource("ADR-030 once, ADR-030 twice.", map);
-    expect(out.match(/%okuda-vector:11%/g)!.length).toBe(2);
+  test("repeated references get their own vectors (one-to-many)", () => {
+    const src = "ADR-030 once, ADR-030 twice.";
+    const map = jumpMapFor(src);
+    const out = annotateSource(src, map);
+    expect(out).toContain("%okuda-vector:11%");
+    expect(out).toContain("%okuda-vector:12%");
   });
 
   test("links: badge after the closing paren", () => {
-    const map = buildJumpMap(["docs/x.md"]);
+    const map = jumpMapFor("see [the doc](docs/x.md) here.");
     const out = annotateSource("see [the doc](docs/x.md) here.", map);
     expect(out).toBe("see [the doc](docs/x.md) %okuda-vector:11% here.");
   });
 
   test("targets with regex metacharacters are literal", () => {
-    const map = buildJumpMap(["docs/x(1).md"]);
-    const out = annotateSource("read docs/x(1).md now.", map);
+    const map = jumpMapFor("see [x](docs/x(1).md) here.");
+    const out = annotateSource("see [x](docs/x(1).md) here.", map);
     expect(out).toContain("%okuda-vector:11%");
   });
 
   test("no references → source unchanged", () => {
-    const map = buildJumpMap([]);
-    expect(annotateSource("plain text.", map)).toBe("plain text.");
+    expect(annotateSource("plain text.", jumpMapFor("plain text."))).toBe("plain text.");
   });
 });
