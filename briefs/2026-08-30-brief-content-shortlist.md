@@ -108,6 +108,14 @@ scorer. See §Ranked sources.)
   like a normal person. Line-level navigation inside a rendered doc is
   a reader feature (see the in-document-search non-goal below), never
   a launcher contract — `okuda <file>` stays a file-only contract.
+  *(Amended 2026-09-04, conformance: the picker's `-g` entries carry
+  `path\tsnippet` — the first matching line as fzf-searchable evidence —
+  because a ranker whose evidence is invisible to the matcher is not a
+  search: typing a content query into a filename-matching picker
+  returns zero. The snippet lives and dies in the picker; selection
+  parses back to a path and the reader's file-only contract above is
+  unchanged. No jump table, no line addressing — the line is evidence,
+  not an address.)*
 - **No previews.** No `--preview 'rg -n {1}'`, no bat, no matched-line
   display. fzf matches on the filenames of the rg-filtered set; that's
   enough for a shortlist. Previews are the `etc` that foxtrot-oscarred.
@@ -191,6 +199,15 @@ scorer. See §Ranked sources.)
 - `just check` + `just ship` green; existing launcher tests pass; a
   new test pins the `-g` entry point (spawns rg, seeds fzf, returns a
   selection) and the rg-absence gate.
+- **Conformance smoke (added 2026-09-04, after the first implementation
+  shipped without it):** the suite drives fzf non-interactively
+  (`--filter --exact --tiebreak=index --delimiter=\t`) over the real
+  merge with the real query, end to end: `1.4.0` must surface
+  `DEPENDENCIES.md` (the operator's scenario: locate the bun version);
+  a filename query must surface its file through the same pipe. The
+  failure mode this guards is structural: entries must carry the match
+  evidence, or the ranking is latent and the search is broken while
+  every unit test stays green.
 
 ## Open questions
 

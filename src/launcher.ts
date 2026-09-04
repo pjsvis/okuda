@@ -23,6 +23,14 @@ import { detectRoot, makeCallsignResolver, TIER_REGISTRIES } from "./root";
 import { runTui } from "./tui";
 import { terminalCols, terminalRows } from "./width";
 
+/** The entry separator: `path\tsnippet`. fzf matches the whole line
+ *  (path + snippet) so one query searches filenames AND content; the
+ *  selection is parsed back to the path before the reader sees it.
+ *  The reader's file-only contract is untouched — the snippet is
+ *  picker-side evidence, never handed past pickFile (2026-09-04
+ *  conformance amendment to BRF-CONTENT-SHORTLIST). */
+const SEP = "\t";
+
 const FZF_BINDS = "ctrl-d:page-down,ctrl-u:page-up,esc:cancel";
 const HEADER = "enter: read · ctrl-w: clear word · esc: clear/done";
 const PROMPT = "gloam ❯ ";
@@ -69,27 +77,45 @@ export function listMarkdownFiles(cwd: string = process.cwd()): string[] {
 
 /** Registry field hits (channel 1, owner-only per ADR-025): rg the tier
  *  INDEX.jsonl files with a callsign-anchored pattern, parse each match
- *  as JSON, emit the owning document's path. The rg match is the
- *  prefilter; the JSON parse is the anchor — a line whose *summary*
- *  happens to match is discarded because only `callsign` was anchored.
- *  Unrooted cwd → no registries → empty channel (honest: no owner
- *  index, no channel-1 ranking). Pure-ish (reads fs). */
-export function registryHits(query: string, cwd: string = process.cwd()): string[] {
-  const hits: string[] = [];
+ *  as JSON, return the owning rows (path + callsign + summary). The rg
+ *  match is the prefilter; the JSON parse is the anchor — a line whose
+ *  *summary* happens to match is discarded because only `callsign` was
+ *  anchored. Unrooted cwd → no registries → empty channel (honest: no
+ *  owner index, no channel-1 ranking). Pure-ish (reads fs). */
+export interface RegistryRow {
+  path: string;
+  callsign: string;
+  summary: string;
+}
+
+export function registryRows(query: string, cwd: string = process.cwd()): RegistryRow[] {
+  const rows: RegistryRow[] = [];
   const pattern = `"callsign":"[^"]*${escapeRegex(query)}`;
   for (const [dir, file] of TIER_REGISTRIES) {
     const reg = join(dir, file);
     if (!existsSync(join(cwd, reg))) continue;
     for (const line of rgLines(["-i", "--no-filename", pattern, reg], cwd)) {
       try {
-        const row = JSON.parse(line) as { file?: string };
-        if (row.file) hits.push(join(dir, row.file));
+        const row = JSON.parse(line) as { file?: string; callsign?: string; summary?: string };
+        if (row.file) {
+          rows.push({
+            path: join(dir, row.file),
+            callsign: row.callsign ?? "",
+            summary: row.summary ?? "",
+          });
+        }
       } catch {
         // A registry line that isn't JSON isn't ours — skip, don't crash.
       }
     }
   }
-  return hits;
+  return rows;
+}
+
+/** Registry field hits as paths (the channel-1 view; the entries builder
+ *  consumes registryRows for the snippet). */
+export function registryHits(query: string, cwd: string = process.cwd()): string[] {
+  return registryRows(query, cwd).map((r) => r.path);
 }
 
 /** Dedupe ranked channels by path, preserving first occurrence (feed
@@ -109,16 +135,60 @@ export function dedupeByPath(channels: string[][]): string[] {
   return out;
 }
 
-/** The `-g` shortlist (BRF-CONTENT-SHORTLIST, ranked sources): registry
- *  field hits first, then body hits (`rg -l -F`), then the filename
- *  remainder — deduped by path. Prioritisation is feed order; fzf's
- *  `--tiebreak=index` (already pinned) makes ties rank by input
- *  position. The pipe is the ranker; there is no scorer. Pure-ish. */
-export function rankedShortlist(query: string, cwd: string = process.cwd()): string[] {
-  const registry = registryHits(query, cwd);
-  const body = rgLines(["-l", "-F", query, "--type", "md"], cwd);
-  const all = listMarkdownFiles(cwd);
-  return dedupeByPath([registry, body, all]);
+/** Same dedupe for whole entries (`path\tsnippet`) — dedupe key is the
+ *  path before the separator. Pure. */
+function dedupeEntries(entries: string[][]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const channel of entries) {
+    for (const e of channel) {
+      const path = e.split(SEP)[0]!;
+      if (!seen.has(path)) {
+        seen.add(path);
+        out.push(e);
+      }
+    }
+  }
+  return out;
+}
+
+/** The `-g` shortlist as picker entries (BRF-CONTENT-SHORTLIST, ranked
+ *  sources; 2026-09-04 conformance amendment). Each entry is
+ *  `path\tsnippet` so fzf matches content and filename in one query:
+ *  - registry channel: snippet = `CALLSIGN — summary` (owner evidence)
+ *  - body channel: snippet = the first matching line (`rg -n -F -m 1`)
+ *  - filename remainder: path only (fzf matches it by name)
+ *  Prioritisation is feed order; fzf's `--tiebreak=index` (already
+ *  pinned) makes ties rank by input position. The pipe is the ranker.
+ *  Pure-ish. */
+export function rankedShortlistEntries(query: string, cwd: string = process.cwd()): string[] {
+  // Channel 1 — registry field hits, callsign-anchored (ADR-025).
+  const registry = registryRows(query, cwd).map((r) => {
+    const snippet = r.summary ? `${r.callsign} — ${r.summary}` : r.callsign;
+    return `${r.path}${SEP}${snippet}`;
+  });
+  // Channel 2 — body hits with the matching line as evidence.
+  const body: string[] = [];
+  const seenBody = new Set<string>();
+  for (const line of rgLines(["-n", "-F", "-m", "1", "--no-heading", query, "--type", "md"], cwd)) {
+    // rg -n output is `path:line:text`; paths in this silo contain no
+    // colons, so split on the first two.
+    const i = line.indexOf(":");
+    const j = i === -1 ? -1 : line.indexOf(":", i + 1);
+    if (i === -1 || j === -1) continue;
+    const path = line.slice(0, i);
+    const text = line.slice(j + 1).trim();
+    if (!seenBody.has(path)) {
+      seenBody.add(path);
+      body.push(`${path}${SEP}${text}`);
+    }
+  }
+  // Channel 3 — filename remainder, no snippet (fzf matches the path).
+  const bodyPaths = new Set(body.map((e) => e.split(SEP)[0]));
+  const remainder = listMarkdownFiles(cwd)
+    .filter((f) => !bodyPaths.has(f) && !registry.some((e) => e.startsWith(f + SEP)))
+    .map((f) => `${f}${SEP}`);
+  return dedupeEntries([registry, body, remainder]);
 }
 
 /** One picker round. Pipes `files` into fzf, returns the selection + the
@@ -134,6 +204,7 @@ export async function pickFile(
     "--no-mouse",
     "--exact",
     "--tiebreak=index",
+    "--delimiter=\t", // entries are `path\tsnippet`; match the whole line
     `--bind=${FZF_BINDS}`,
     `--prompt=${PROMPT}`,
     `--query=${query}`,
@@ -153,7 +224,9 @@ export async function pickFile(
   const out = await new Response(proc.stdout).text();
   const lines = out.split("\n");
   const q = lines[0] ?? "";
-  const file = lines.slice(1).join("\n").replace(/\n+$/, "");
+  // Selection is `path\tsnippet` in -g mode, bare path in filename mode
+  // — either way the path is everything before the first tab.
+  const file = lines.slice(1).join("\n").replace(/\n+$/, "").split(SEP)[0]!;
   return { query: q, file };
 }
 
@@ -184,15 +257,15 @@ export async function runLauncher(opts: { grep?: string } = {}): Promise<void> {
   // for the session, so the index loads once — the resolver closure hands
   // the TUI strings, never registry knowledge (ADR-020).
   const callsignFor = root ? makeCallsignResolver() : undefined;
-  let query = "";
+  // The content query seeds the picker: entries carry `path\tsnippet`,
+  // so the seeded query matches filenames AND body evidence in one AND.
+  // Recomputed once per invocation (the query is the refinement;
+  // re-running `gloam -g <more specific>` is the Unix remedy — the
+  // brief declines interactive change:reload).
+  let query = opts.grep ?? "";
   try {
     for (;;) {
-      // The shortlist is computed once per invocation (the query is the
-      // refinement; re-running `gloam -g <more specific>` is the Unix
-      // remedy — the brief declines interactive change:reload). Inside
-      // the loop the picker reseeds within the computed list, same as
-      // the filename path.
-      const files = opts.grep !== undefined ? rankedShortlist(opts.grep) : listMarkdownFiles();
+      const files = opts.grep !== undefined ? rankedShortlistEntries(opts.grep) : listMarkdownFiles();
       const pick = await pickFile(files, query);
       if (pick === null) break; // Esc / Ctrl-C in the picker
       query = pick.query; // reseed next round
