@@ -56,7 +56,11 @@ function clipSnippet(s: string): string {
 }
 
 const FZF_BINDS = "ctrl-d:page-down,ctrl-u:page-up,esc:cancel";
-const HEADER = "type: search everything · enter: read · ctrl-w: clear word · esc: clear/done";
+const HEADER =
+  "type: search everything · enter: read · ctrl-w: clear word · esc: clear/done\n ";
+  // The trailing space-line is the breath after the help text — fzf
+  // renders header rows literally, and an explicitly non-empty line
+  // guarantees the gap on every glass (a bare "\n\n" can collapse).
 const PROMPT = "gloam ❯ ";
 
 /** The verb-grammar binds, exported for a contract test to pin against. */
