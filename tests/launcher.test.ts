@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+  FZF_FIXED_ARGS,
   GLOAM_FZF_BINDS,
   bodyPattern,
   dedupeByPath,
@@ -342,6 +343,13 @@ describe("launcher — fzf spawn wiring (non-interactive smoke)", () => {
   // Can't drive the interactive TUI loop here, but verify the spawn
   // contract: fzf reads the file list from stdin, writes selection to
   // stdout. --filter makes fzf non-interactive (selects matches, exits).
+  test("the fzf spine pins --no-hscroll (the path must never slide)", () => {
+    // hscroll centers the match — which lives in the evidence, mid-line —
+    // and clips the path's beginning ("··.md"). Comprehension fix.
+    expect(FZF_FIXED_ARGS).toContain("--no-hscroll");
+    expect(FZF_FIXED_ARGS).toContain("--delimiter=\t");
+  });
+
   test("fzf on PATH (precondition for the launcher)", () => {
     // The launcher prints a clean error if fzf is missing; this test
     // documents that the dev environment has it.

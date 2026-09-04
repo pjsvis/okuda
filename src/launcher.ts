@@ -271,6 +271,22 @@ export function rankedShortlistEntries(query: string, cwd: string = process.cwd(
   return dedupeEntries([registry, body, remainder]);
 }
 
+/** The fzf argv that never changes: the picker instance's fixed spine.
+ *  Exported for the contract test. --no-hscroll is comprehension, not
+ *  cosmetics: with hscroll, fzf slides the line left to center the
+ *  match — which lives in the evidence, mid-line — and clips the path's
+ *  beginning ("··.md"). The path is the only actionable part; it must
+ *  never move. Right-edge truncation keeps every row readable and gives
+ *  the widening-reveal for free (ADR-030 layout). */
+export const FZF_FIXED_ARGS = [
+  "--layout=reverse",
+  "--no-mouse",
+  "--no-hscroll",
+  "--exact",
+  "--tiebreak=index",
+  "--delimiter=\t", // entries are `path\tsnippet`; match the whole line
+];
+
 /** One picker round. Pipes `files` into fzf, returns the selection + the
  *  reseedable query; `null` on Esc/abort (exit the loop). `live` adds
  *  the change:reload bind (ADR-030) — every keystroke recomputes the
@@ -283,11 +299,7 @@ export async function pickFile(
   const input = files.join("\n") + "\n";
   const args = [
     "fzf",
-    "--layout=reverse",
-    "--no-mouse",
-    "--exact",
-    "--tiebreak=index",
-    "--delimiter=\t", // entries are `path\tsnippet`; match the whole line
+    ...FZF_FIXED_ARGS,
     `--bind=${FZF_BINDS}`,
     `--prompt=${PROMPT}`,
     `--query=${query}`,
