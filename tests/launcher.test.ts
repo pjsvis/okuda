@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   FZF_FIXED_ARGS,
+  FZF_HL_ARG,
   GLOAM_FZF_BINDS,
   bodyPattern,
   dedupeByPath,
@@ -116,8 +117,11 @@ describe("launcher — rankedShortlistEntries (the -g merge, integration)", () =
   test("a pure-registry query ranks the owning document first", () => {
     // SHORTLIST names exactly one owner: the brief itself. Registry
     // channel fires, body mentions rank later, filename remainder last.
+    // (Orientation files float above all channels — ADR-030-era channel
+    // 0 — so the owning doc is the first row *with a directory*.)
     const entries = rankedShortlistEntries("BRF-CONTENT-SHORTLIST", process.cwd());
-    expect(pathOf(entries[0]!)).toBe("briefs/2026-08-30-brief-content-shortlist.md");
+    const firstTiered = entries.find((e) => pathOf(e).includes("/"));
+    expect(pathOf(firstTiered!)).toBe("briefs/2026-08-30-brief-content-shortlist.md");
     expect(entries.length).toBeGreaterThan(1); // the remainder followed
   });
 
@@ -131,6 +135,31 @@ describe("launcher — rankedShortlistEntries (the -g merge, integration)", () =
     const entries = rankedShortlistEntries("diagram", process.cwd());
     const paths = entries.map(pathOf);
     expect(new Set(paths).size).toBe(paths.length);
+  });
+
+  test("orientation: silo-root files float to the top of every list", () => {
+    // The &files (and the other root markdown) are the operator's
+    // anchors; they rank before any evidence row, for any query.
+    for (const q of ["diagram", "load bearing", ""]) {
+      const entries = rankedShortlistEntries(q, process.cwd());
+      const firstNonRoot = entries.findIndex((e) => pathOf(e).includes("/"));
+      for (let i = 0; i < firstNonRoot; i++) {
+        expect(pathOf(entries[i]!)).not.toMatch(/\//); // root files only
+      }
+      expect(firstNonRoot).toBeGreaterThanOrEqual(8); // the whole root set
+    }
+  });
+
+  test("orientation files carry their evidence when they match", () => {
+    // A root file that matches in the body moves UP with its evidence —
+    // it must not sink to the body channel nor lose the snippet to dedupe.
+    const entries = rankedShortlistEntries("ripgrep", process.cwd());
+    const dep = entries.find((e) => pathOf(e) === "DEPENDENCIES.md");
+    expect(dep).toBeDefined();
+    if (dep) {
+      expect(dep.split("\t")[1]).toBeDefined(); // evidence attached
+      expect(entries.indexOf(dep!)).toBeLessThan(8); // inside channel 0
+    }
   });
 
   test("body-channel entries carry the matching line as snippet evidence", () => {
@@ -348,6 +377,13 @@ describe("launcher — fzf spawn wiring (non-interactive smoke)", () => {
     // and clips the path's beginning ("··.md"). Comprehension fix.
     expect(FZF_FIXED_ARGS).toContain("--no-hscroll");
     expect(FZF_FIXED_ARGS).toContain("--delimiter=\t");
+  });
+
+  test("match highlight: okuda's own amber, bold+underline (the Cmd+F courtesy)", () => {
+    expect(FZF_HL_ARG).toContain("#dfa21a"); // the reader's `strong`
+    expect(FZF_HL_ARG).toContain("bold:underline");
+    expect(FZF_HL_ARG).toContain("hl:");
+    expect(FZF_HL_ARG).toContain("selected-hl:"); // highlight survives on the cursor line
   });
 
   test("fzf on PATH (precondition for the launcher)", () => {

@@ -227,8 +227,10 @@ function dedupeEntries(entries: string[][]): string[] {
 }
 
 /** The `-g` shortlist as picker entries (BRF-CONTENT-SHORTLIST, ranked
- *  sources; 2026-09-04 conformance amendment). Each entry is
+ *  sources; 2026-09-04 conformance amendment; ADR-030). Each entry is
  *  `path\tsnippet` so fzf matches content and filename in one query:
+ *  - orientation channel: silo-root markdown (the &files) float first,
+ *    carrying their evidence when they have any
  *  - registry channel: snippet = `CALLSIGN — summary` (owner evidence)
  *  - body channel: snippet = the first matching line (`rg -n -F -m 1`)
  *  - filename remainder: path only (fzf matches it by name)
@@ -264,11 +266,25 @@ export function rankedShortlistEntries(query: string, cwd: string = process.cwd(
     }
   }
   // Channel 3 — filename remainder, no snippet (fzf matches the path).
-  const bodyPaths = new Set(body.map((e) => e.split(SEP)[0]));
-  const remainder = listMarkdownFiles(cwd)
-    .filter((f) => !bodyPaths.has(f) && !registry.some((e) => e.startsWith(f + SEP)))
+  const all = listMarkdownFiles(cwd);
+  const evidenceOf = new Map<string, string>();
+  for (const e of [...registry, ...body]) {
+    const p = e.split(SEP)[0]!;
+    if (!evidenceOf.has(p)) evidenceOf.set(p, e);
+  }
+  // Channel 0 — orientation files: silo-root markdown (the operator's
+  // anchors — &alpha, &briefs, &next — live here). They float to the top
+  // of every list, carrying their evidence when they have any; a root
+  // file matched in the body moves up rather than sinking to channel 2.
+  const rootFiles = all.filter((f) => !f.includes("/"));
+  const orientation = rootFiles.map((f) => evidenceOf.get(f) ?? `${f}${SEP}`);
+  const oriented = new Set(rootFiles);
+  const registryRest = registry.filter((e) => !oriented.has(e.split(SEP)[0]!));
+  const bodyRest = body.filter((e) => !oriented.has(e.split(SEP)[0]!));
+  const remainder = all
+    .filter((f) => !oriented.has(f) && !evidenceOf.has(f))
     .map((f) => `${f}${SEP}`);
-  return dedupeEntries([registry, body, remainder]);
+  return dedupeEntries([orientation, registryRest, bodyRest, remainder]);
 }
 
 /** The fzf argv that never changes: the picker instance's fixed spine.
@@ -287,6 +303,15 @@ export const FZF_FIXED_ARGS = [
   "--delimiter=\t", // entries are `path\tsnippet`; match the whole line
 ];
 
+/** Match highlighting: the query's matched substrings render in the
+ *  okuda palette's strong amber (#dfa21a — the reader's own `strong`,
+ *  LCARS identity), bold + underlined, so the visual link between what
+ *  you typed and why the row matched is legible at a glance — the same
+ *  courtesy the host's Cmd+F extends to rendered text. Skipped under
+ *  NO_COLOR: fzf falls back to its bw scheme and we don't fight it. */
+export const FZF_HL_ARG =
+  "--color=hl:#dfa21a:bold:underline,hl+:#dfa21a:bold:underline,selected-hl:#dfa21a:bold:underline";
+
 /** One picker round. Pipes `files` into fzf, returns the selection + the
  *  reseedable query; `null` on Esc/abort (exit the loop). `live` adds
  *  the change:reload bind (ADR-030) — every keystroke recomputes the
@@ -300,6 +325,7 @@ export async function pickFile(
   const args = [
     "fzf",
     ...FZF_FIXED_ARGS,
+    ...(process.env.NO_COLOR ? [] : [FZF_HL_ARG]),
     `--bind=${FZF_BINDS}`,
     `--prompt=${PROMPT}`,
     `--query=${query}`,
