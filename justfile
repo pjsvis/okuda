@@ -68,7 +68,7 @@ ship:
 search-smoke:
     @bash scripts/search-smoke.sh
 
-# Search replay — picker instance, standalone
+# Picker instance replay
 [group('quality gate')]
 search-replay:
     @bash scripts/search-replay.sh
