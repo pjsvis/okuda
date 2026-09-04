@@ -37,14 +37,20 @@ const RE_CALLSIGN = /[A-Z]{3}(?:-[A-Z0-9]+)+/g;
 /** Discover the reference targets of a main document, in reading order,
  *  unique by target, capped at MAX_REFS. Optimistic: nothing is
  *  validated here — a target is whatever looks like a reference.
+ *  The frontmatter block is not scanned: the document's own callsign is
+ *  an identity, not a reference — self-vectors waste the address space.
  *  Legacy `okuda-rhs` token numbers are not honored (their surrounding
  *  paths and callsigns are ordinary references like any other). Pure. */
 export function discoverReferences(source: string): string[] {
+  const fm = source.match(/^---\n[\s\S]*?\n---/);
+  const bodyStart = fm ? fm[0]!.length : 0;
   const hits: Array<{ pos: number; target: string }> = [];
   for (const m of source.matchAll(RE_MD_LINK)) {
+    if (m.index! < bodyStart) continue;
     hits.push({ pos: m.index!, target: m[1]! });
   }
   for (const m of source.matchAll(RE_CALLSIGN)) {
+    if (m.index! < bodyStart) continue;
     hits.push({ pos: m.index!, target: m[0]! });
   }
   hits.sort((a, b) => a.pos - b.pos);

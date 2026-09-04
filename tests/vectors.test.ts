@@ -33,6 +33,12 @@ describe("vectors — discovery (optimistic, reading order, unique)", () => {
     expect(refs).toEqual(["ADR-030", "ADR-028"]);
   });
 
+  test("the frontmatter is not scanned — a document's own callsign is not a reference", () => {
+    const src = "---\ntype: Brief\ncallsign: BRF-WORKING-COPY\n---\n\nRides on ADR-030 and the wire.";
+    const refs = discoverReferences(src);
+    expect(refs).toEqual(["ADR-030"]); // own callsign skipped
+  });
+
   test("zero-padded and single-digit bracketed numbers are never vectors", () => {
     const refs = discoverReferences("steps [07] and [3] and even [14] — but 14 has no callsign shape.");
     expect(refs).toEqual([]); // [14] is user text, not a reference
