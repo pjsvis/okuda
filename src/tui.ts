@@ -16,6 +16,7 @@
  */
 
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
+import { annotateSource, jumpMapFor, CLONE_TOKEN } from "./vectors";
 import { loadPalette, type Palette } from "./palette";
 import { renderDocument } from "./render";
 import { padStartDisplay, terminalCols, terminalRows } from "./width";
@@ -33,6 +34,11 @@ export interface TuiOptions {
    *  knows nothing of registries — ADR-020). Called per paint with the
    *  current file, so the identity run follows jumps. */
   callsignFor?: (file: string) => string | null;
+  /** Vector actuation resolver (ADR-031): vector target → document path.
+   *  File-existence first, callsign dispatch where rooted; null = no
+   *  document (the actuator flashes honestly). Same ADR-020 boundary —
+   *  a closure, never registry knowledge. */
+  resolveTarget?: (target: string) => string | null;
 }
 
 /** Decoded keystroke action. `null` = unhandled (no-op). */
@@ -187,7 +193,7 @@ export function viewport(
   return { visible: lines.slice(s, s + height), maxScroll, scroll: s };
 }
 
-const HINTS = "q quit · j/k · ␣/b page · g/G ends · ^D/^U · r reload · NN jump · u back";
+const HINTS = "q quit · j/k · ␣/b · g/G · ^D/^U · r reload · NN deref · 99 clone · u unwind";
 
 /** Display path: folder/basename (Glow convention). Pure. */
 /** ADR-010 re-anchor as a pure function: given the pre- and post-re-render
@@ -453,25 +459,72 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   // duration (brief: launcher-fut — the ordering half of the fix).
   process.stdout.write(ENTER_ALT + HIDE_CURSOR);
 
+  // Main-document state (ADR-031) — declared before the first render,
+  // which annotates from the map. The jump map belongs to the MAIN
+  // document and is derived from its source (vectors.ts) — rebuilt on
+  // main reload, never on dereference. The backstack is depth one
+  // (main → one dereference → u unwinds); the painted `[NN]` badges are
+  // a projection of the map — the main render annotates, dereferenced
+  // renders are clean.
+  const mainFile = opts.file;
+  const deriveMain = (text: string): Map<number, string> => jumpMapFor(text);
+  let mainText = "";
+  let mainJumps: Map<number, string> = new Map();
+  let backstack: { file: string; scroll: number }[] = [];
+  let numBuffer: string | null = null;
+
   // Initial fetch through the gate: prev=null is the initial-load sentinel,
   // so a successful first read is `changed` (content arrived) and a failed
   // first read is `failed` with empty lines (no last-known-good to retain).
   const initialFetch = await readSource();
   const initialRender = initialFetch.ok
-    ? await renderLines(initialFetch.text, opts.width)
+    ? await renderLines(annotateSource(initialFetch.text, mainJumps), opts.width)
     : [];
   const init = gateFetch(null, initialFetch, initialRender);
   let lines: string[] = init.lines;
   let fetchState: FetchState = init.state; // footer stamp reads this (brief: fetch-state-stamp)
   let scroll = 0;
   let showHints = false; // `?` toggles: compact % footer ↔ verbose hints
-  // Index-and-jump state (brief 2026-08-28). The jump table is extracted
-  // from the live source whenever it changes; the backstack records
-  // {file, scroll} for `u`/Backspace traversal; numBuffer collects the
-  // two-digit token before a jump resolves.
-  let jumps = extractJumps(initialFetch.ok ? initialFetch.text : "");
-  let backstack: { file: string; scroll: number }[] = [];
-  let numBuffer: string | null = null;
+  if (initialFetch.ok) {
+    mainText = initialFetch.text;
+    mainJumps = deriveMain(mainText);
+  }
+
+  /** Footer flash (ADR-031): the actuator's honest failure surface and
+   *  the clone verb's receipt. Drawn on the hints row for a breath, then
+   *  cleared — never a crash, never a silent nothing. */
+  let flashMsg: string | null = null;
+  let flashTimer: ReturnType<typeof setTimeout> | null = null;
+  const flash = (msg: string, role: "alert" | "state-ok" = "alert"): void => {
+    flashMsg = msg;
+    if (flashTimer) clearTimeout(flashTimer);
+    flashTimer = setTimeout(() => {
+      flashMsg = null;
+      flashTimer = null;
+      paint();
+    }, 2500);
+    paint();
+  };
+
+  /** The clone verb (`99`, ADR-031): promote the currently rendered
+   *  document to main of a NEW instance, via the host. tmux is the
+   *  contract (the porch matrix's landing surface); OKUDA_CLONE_CMD is
+   *  the escape hatch ($1 = the document); no host → honest flash. The
+   *  clone re-derives its own map — nothing transfers, nothing mutates. */
+  const clone = (): void => {
+    const doc = currentFile;
+    if (process.env.TMUX) {
+      const r = Bun.spawnSync(["tmux", "new-window", "-c", process.cwd(), "gloam", doc]);
+      if (r.exitCode === 0) flash(`[99] — cloned: ${doc}`, "state-ok");
+      else flash(`[99] — clone failed (tmux new-window exit ${r.exitCode})`);
+    } else if (process.env.OKUDA_CLONE_CMD) {
+      const r = Bun.spawnSync(["sh", "-c", process.env.OKUDA_CLONE_CMD, "okuda-clone", doc]);
+      if (r.exitCode === 0) flash(`[99] — cloned: ${doc}`, "state-ok");
+      else flash(`[99] — clone failed (OKUDA_CLONE_CMD exit ${r.exitCode})`);
+    } else {
+      flash("[99] — no clone host: run inside tmux or set OKUDA_CLONE_CMD");
+    }
+  };
 
   const dims = () => ({
     // terminalCols/Rows handle the Bun --compile columns=0 bug (tput fallback);
@@ -494,15 +547,16 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // blank gap on the wire; removing it is option 1, deferred.
     let frame = "\x1b[2J\x1b[H"; // clear + home
     frame += view.visible.join("\n");
-    if (showHints) {
-      // Badge row up one; hints own the last row, right-justified, corner pad.
-      frame += `\x1b[${rows - 1};1H`;
-      frame += footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined);
+    const footer = footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined);
+    frame += `\x1b[${rows - 1};1H`;
+    frame += footer;
+    if (flashMsg) {
+      // The flash owns the last row while visible — warnings outrank hints.
+      frame += `\x1b[${rows};1H`;
+      frame += styler.roleBold("alert", ` ${flashMsg} `.padEnd(cols).slice(0, cols));
+    } else if (showHints) {
       frame += `\x1b[${rows};1H`;
       frame += hintsLine(cols, muted);
-    } else {
-      frame += `\x1b[${rows};1H`;
-      frame += footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined);
     }
     process.stdout.write(syncWrap(frame));
   };
@@ -517,13 +571,20 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     const { rows, cols } = dims();
     const height = contentHeight(rows, showHints);
     const fetch = await readSource();
-    const next = fetch.ok ? await renderLines(fetch.text, cols) : [];
+    const atMain = backstack.length === 0;
+    if (fetch.ok && atMain) {
+      mainText = fetch.text;
+      mainJumps = deriveMain(mainText); // the map re-derives; no invalidation
+    }
+    // The main render annotates (ADR-031); dereferenced renders are clean.
+    const next = fetch.ok
+      ? await renderLines(atMain ? annotateSource(fetch.text, mainJumps) : fetch.text, cols)
+      : [];
     const decision = gateFetch(lines, fetch, next);
     fetchState = decision.state;
     if (!decision.repaint) return; // gate held, or source lost — keep the screen
     const oldLines = lines;
     lines = decision.lines;
-    if (fetch.ok) jumps = extractJumps(fetch.text); // re-extract on change
     scroll = reanchoredScroll(oldLines, lines, scroll, height);
     paint();
   };
@@ -537,37 +598,50 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  caller has already verified fetch.ok and pushed the backstack. */
   const present = (fetch: Fetch, next: string[], nextScroll: number): void => {
     lines = next;
-    jumps = fetch.ok ? extractJumps(fetch.text) : jumps;
     fetchState = fetch.ok ? "changed" : "failed";
     scroll = nextScroll;
     paint();
   };
 
-  /** Jump to the document behind a two-digit token. Pushes the current
-   *  view onto the backstack, loads the target at scroll 0. A missing
-   *  token or a vanished target is a silent no-op (acceptance: "numeric
-   *  input is ignored if the requested index does not exist"). */
+  /** Actuate a vector: dereference the map's target and render it CLEAN
+   *  (its references are not shown — the tour cannot proceed from here).
+   *  Depth one: only the main document actuates. Optimistic paint means
+   *  the target may not exist — the failure is a footer flash, and the
+   *  wording belongs to the vector: "[14] — no document to render". */
   const jumpTo = async (token: number): Promise<void> => {
-    const path = jumps.get(token);
-    if (!path) return;
+    if (backstack.length > 0) return; // dereferenced render is clean — nothing to actuate
+    const target = mainJumps.get(token);
+    if (!target) return; // no such vector — silent, per the old contract
+    const path = opts.resolveTarget ? opts.resolveTarget(target) : target;
+    if (!path) {
+      flash(`[${token}] — no document to render`);
+      return;
+    }
     const fetch = await readSource(path);
-    if (!fetch.ok) return; // target gone — stay put, no backstack push
+    if (!fetch.ok) {
+      flash(`[${token}] — no document to render`);
+      return; // optimistic paint, honest failure — stay put, no stack push
+    }
     backstack.push({ file: currentFile, scroll });
     currentFile = path;
     const next = await renderLines(fetch.text, dims().cols);
     present(fetch, next, 0);
   };
 
-  /** Pop the backstack: return to the previous document with its scroll
-   *  intact. Empty stack → no-op. A vanished target is dropped (the file
-   *  is gone; the user stays on the current doc). */
+  /** Unwind (`u`): pop the dereference and re-render the MAIN document —
+   *  annotated again, at its stored scroll. The map re-derives from the
+   *  main source (which may have changed under us; derivation replaces
+   *  invalidation). A vanished main is the one state we cannot rebuild —
+   *  stay put. */
   const back = async (): Promise<void> => {
     const prev = backstack.pop();
     if (!prev) return;
     const fetch = await readSource(prev.file);
-    if (!fetch.ok) return; // target gone — stay; entry dropped
+    if (!fetch.ok) return; // main gone — stay; entry dropped
+    mainText = fetch.text;
+    mainJumps = deriveMain(mainText);
     currentFile = prev.file;
-    const next = await renderLines(fetch.text, dims().cols);
+    const next = await renderLines(annotateSource(fetch.text, mainJumps), dims().cols);
     present(fetch, next, prev.scroll);
   };
 
@@ -579,7 +653,11 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     const step = advanceNumBuffer(numBuffer, digit);
     numBuffer = step.buffer;
     if (step.token !== null) {
-      void jumpTo(step.token);
+      if (step.token === CLONE_TOKEN) {
+        clone();
+      } else {
+        void jumpTo(step.token);
+      }
       return;
     }
     if (digit !== null) return; // first digit only — buffer pending

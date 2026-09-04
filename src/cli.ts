@@ -17,6 +17,7 @@ import { renderDocument } from "./render";
 import { runTui } from "./tui";
 import { runLauncher, invokedAsGloam, rankedShortlistEntries } from "./launcher";
 import { detectRoot, makeCallsignResolver, resolveByCallsign } from "./root";
+import { CALLSIGN_SHAPE } from "./vectors";
 import { terminalCols, terminalRows } from "./width";
 import { existsSync } from "node:fs";
 
@@ -96,10 +97,6 @@ function parseArgs(argv: string[]): Args {
 /** Known preset names, for error messages. */
 const KNOWN_PRESETS = ["okuda", "dracula"];
 
-/** Callsign shape: tier prefix + significant tokens, uppercase (the
- *  registry's vocabulary — BRF-INDEX-JUMP, ADR-BOUND-010, PLY-REGISTRY). */
-const CALLSIGN_SHAPE = /^[A-Z]{3}(-[A-Z0-9]+)+$/;
-
 async function readSource(file: string | null): Promise<string> {
   if (file) {
     const f = Bun.file(file);
@@ -132,6 +129,15 @@ async function main(): Promise<void> {
     process.stderr.write(`okuda: unexpected argument: ${args.extra[0]}\n`);
     process.exit(1);
   }
+  // The vector actuator's resolver (ADR-031): target → document path.
+  // File existence first (works unrooted), callsign dispatch where the
+  // cwd is a rooted silo. Built once per run; handed to every runTui.
+  const root = detectRoot();
+  const resolveTarget = (target: string): string | null => {
+    if (existsSync(target)) return target;
+    if (root) return resolveByCallsign(target);
+    return null;
+  };
   if (invokedAsGloam() && process.stdin.isTTY) {
     // `-g <query>`: seed alias (ADR-030 §4) — same as a bare-arg query.
     if (args.grep !== null) {
@@ -155,12 +161,10 @@ async function main(): Promise<void> {
     // the shared reader below — both contracts unchanged.
   }
   // `gloam <callsign>` (silo-mnemonics): a callsign-shaped argument that
-  // `gloam <callsign>` (silo-mnemonics): a callsign-shaped argument that
   // names no file resolves through the rooted registry — the human code
   // for low-bandwidth channels. Unknown code or unrooted cwd → honest
   // error; anything else falls through to the reader's own diagnostics.
   if (invokedAsGloam() && args.file && !existsSync(args.file) && CALLSIGN_SHAPE.test(args.file) && process.stdin.isTTY) {
-    const root = detectRoot();
     const path = root ? resolveByCallsign(args.file) : null;
     if (!path) {
       process.stderr.write(`gloam: unknown callsign: ${args.file}${root ? "" : " (cwd is not a rooted silo)"}\n`);
@@ -172,6 +176,7 @@ async function main(): Promise<void> {
       rows: terminalRows(24),
       silo: root?.badge,
       callsignFor: makeCallsignResolver(),
+      resolveTarget,
     });
     return;
   }
@@ -209,6 +214,7 @@ async function main(): Promise<void> {
       width: terminalCols(80),
       rows: terminalRows(24),
       palette,
+      resolveTarget,
     });
     return;
   }

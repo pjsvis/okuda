@@ -19,7 +19,7 @@
 
 import { existsSync } from "node:fs";
 import { basename, join } from "node:path";
-import { detectRoot, makeCallsignResolver, TIER_REGISTRIES } from "./root";
+import { detectRoot, makeCallsignResolver, resolveByCallsign, TIER_REGISTRIES } from "./root";
 import { runTui } from "./tui";
 import { terminalCols, terminalRows } from "./width";
 
@@ -402,6 +402,10 @@ export async function runLauncher(opts: { query?: string } = {}): Promise<void> 
         rows: terminalRows(24),
         silo: root?.badge,
         callsignFor,
+        resolveTarget: (target: string): string | null => {
+          if (existsSync(target)) return target;
+          return root ? resolveByCallsign(target) : null;
+        },
       });
     }
   } finally {
