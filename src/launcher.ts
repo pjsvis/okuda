@@ -92,10 +92,24 @@ function rgLines(args: string[], cwd?: string): string[] {
   return text ? text.split("\n").filter(Boolean) : [];
 }
 
-/** Escape a query for embedding in an rg regex (registry channel only;
- *  the body channel uses -F and needs no escaping). Pure. */
+/** Escape a query for embedding in an rg regex (registry channel and
+ *  the phrase-tolerant body pattern). Pure. */
 function escapeRegex(q: string): string {
   return q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** The body-channel rg pattern for a query. Single word → literal
+ *  (`-F`, case-sensitive). Multi-word → phrase-tolerant regex: words
+ *  joined by a bounded gap (`.{0,3}`, case-insensitive) so "load
+ *  bearing" finds "load-bearing" — prose is written with hyphens and
+ *  table pipes between the words, and a literal multi-word string
+ *  matches none of it (found 2026-09-04: the operator's "load bearing"
+ *  returned zero against a corpus full of "load-bearing"). Each word is
+ *  regex-escaped; the bounded join is the only magic. Pure. */
+export function bodyPattern(query: string): { kind: "fixed" | "regex"; pattern: string } {
+  const words = query.trim().split(/\s+/).filter(Boolean);
+  if (words.length <= 1) return { kind: "fixed", pattern: words[0] ?? "" };
+  return { kind: "regex", pattern: words.map(escapeRegex).join(".{0,3}") };
 }
 
 /** List markdown files: `rg --files --type md` (respects .gitignore
@@ -199,12 +213,18 @@ export function rankedShortlistEntries(query: string, cwd: string = process.cwd(
     const snippet = clipSnippet(r.summary ? `${r.callsign} — ${r.summary}` : r.callsign);
     return `${r.path}${SEP}${snippet}`;
   });
-  // Channel 2 — body hits with the matching line as evidence.
+  // Channel 2 — body hits with the matching line as evidence. The
+  // pattern is phrase-tolerant (see bodyPattern): literal for one word,
+  // bounded-gap join for multi-word, so prose hyphenation can't hide a
+  // document. rg output is `path:line:text`; paths in this silo contain
+  // no colons, so split on the first two.
   const body: string[] = [];
   const seenBody = new Set<string>();
-  for (const line of rgLines(["-n", "-F", "-m", "1", "--no-heading", query, "--type", "md"], cwd)) {
-    // rg -n output is `path:line:text`; paths in this silo contain no
-    // colons, so split on the first two.
+  const { kind, pattern } = bodyPattern(query);
+  const bodyArgs = kind === "fixed"
+    ? ["-n", "-F", "-m", "1", "--no-heading", pattern, "--type", "md"]
+    : ["-n", "-i", "-m", "1", "--no-heading", pattern, "--type", "md"];
+  for (const line of rgLines(bodyArgs, cwd)) {
     const i = line.indexOf(":");
     const j = i === -1 ? -1 : line.indexOf(":", i + 1);
     if (i === -1 || j === -1) continue;
@@ -228,6 +248,7 @@ export function rankedShortlistEntries(query: string, cwd: string = process.cwd(
 export async function pickFile(
   files: string[],
   query: string,
+  prompt: string = PROMPT,
 ): Promise<{ query: string; file: string } | null> {
   const input = files.join("\n") + "\n";
   const args = [
@@ -238,7 +259,7 @@ export async function pickFile(
     "--tiebreak=index",
     "--delimiter=\t", // entries are `path\tsnippet`; match the whole line
     `--bind=${FZF_BINDS}`,
-    `--prompt=${PROMPT}`,
+    `--prompt=${prompt}`,
     `--query=${query}`,
     "--print-query",
     `--header=${HEADER}`,
@@ -298,7 +319,7 @@ export async function runLauncher(opts: { grep?: string } = {}): Promise<void> {
   try {
     for (;;) {
       const files = opts.grep !== undefined ? rankedShortlistEntries(opts.grep) : listMarkdownFiles();
-      const pick = await pickFile(files, query);
+      const pick = await pickFile(files, query, opts.grep !== undefined ? "gloam -g ❯ " : PROMPT);
       if (pick === null) break; // Esc / Ctrl-C in the picker
       query = pick.query; // reseed next round
       if (!pick.file) break; // empty selection (Enter on empty list)

@@ -73,8 +73,12 @@ function parseArgs(argv: string[]): Args {
       const sha = typeof BUILD_SHA !== "undefined" ? BUILD_SHA : undefined;
       process.stdout.write(versionLine(sha) + "\n");
       process.exit(0);
-    } else if (!args.file) {
+    } else if (!args.file && args.grep === null) {
       args.file = a;
+    } else if (args.grep !== null) {
+      // Positionals after -g join the query: `just gloam -g load bearing`
+      // is the phrase "load bearing", not "load" with a stray "bearing".
+      args.grep += " " + a;
     } else {
       process.stderr.write(`okuda: unexpected argument: ${a}\n`);
       process.exit(1);

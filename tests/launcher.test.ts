@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   GLOAM_FZF_BINDS,
+  bodyPattern,
   dedupeByPath,
   fzfEnv,
   invokedAsGloam,
@@ -222,6 +223,33 @@ describe("launcher — conformance smoke: the search the operator runs", () => {
     });
     expect(proc.exitCode).toBe(1);
     expect(proc.stderr.toString()).toContain("-g is a gloam mode flag");
+  });
+
+  test("entry path: unquoted multi-word positionals join the -g query", async () => {
+    // `just gloam -g load bearing` must mean the phrase "load bearing" —
+    // not "load" with "bearing" silently dropped or turned into a file.
+    const proc = Bun.spawnSync(["bun", "run", "src/cli.ts", "-g", "load", "bearing"], {
+      stdout: "pipe",
+      stderr: "pipe",
+      env: { ...process.env, FZF_DEFAULT_OPTS: "" },
+    });
+    expect(proc.exitCode).toBe(1);
+    expect(proc.stderr.toString()).toContain("-g is a gloam mode flag"); // -g gate, not "unexpected argument"
+  });
+
+  test("bodyPattern: multi-word queries tolerate hyphenation and spacing", () => {
+    const p = bodyPattern("load bearing");
+    expect(p.kind).toBe("regex");
+    expect(p.pattern).toBe("load.{0,3}bearing");
+    const single = bodyPattern("1.4.0");
+    expect(single).toEqual({ kind: "fixed", pattern: "1.4.0" });
+  });
+
+  test("'load bearing' surfaces DEPENDENCIES.md (hyphenated in the corpus)", () => {
+    const entries = rankedShortlistEntries("load bearing", process.cwd());
+    const dep = entries.find((e) => e.startsWith("DEPENDENCIES.md\t"));
+    expect(dep).toBeDefined();
+    expect(dep).toContain("load-bearing"); // evidence: the hyphenated row
   });
 });
 
