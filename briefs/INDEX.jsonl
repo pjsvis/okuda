@@ -41,3 +41,4 @@
 {"file":"2026-09-01-brief-flow-wrap.md","date":"2026-09-01","status":"open","summary":"Flow wrap — internal break opportunities so paths flow as text","meta":{},"callsign":"BRF-FLOW-WRAP"}
 {"file":"2026-09-01-brief-mermaid-source-omitted.md","date":"2026-09-01","status":"open","summary":"Omit the mermaid source from the render","meta":{},"callsign":"BRF-MERMAID-SOURCE-OMITTED"}
 {"file":"2026-09-02-brief-synchronized-output.md","date":"2026-09-02","status":"open","summary":"Synchronized output — deliver each paint as one frame","meta":{},"callsign":"BRF-SYNC-OUTPUT"}
+{"file":"2026-09-04-brief-porch-matrix.md","date":"2026-09-04","status":"open","summary":"The porch matrix — click a URL, land in a terminal, read the silo","meta":{},"callsign":"BRF-PORCH-MATRIX"}

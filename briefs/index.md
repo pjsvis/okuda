@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-04 | BRF-PORCH-MATRIX | open | The porch matrix — click a URL, land in a terminal, read the silo | 2026-09-04-brief-porch-matrix.md |
 | 2026-09-02 | BRF-SYNC-OUTPUT | open | Synchronized output — deliver each paint as one frame | 2026-09-02-brief-synchronized-output.md |
 | 2026-09-01 | BRF-FLOW-WRAP | open | Flow wrap — internal break opportunities so paths flow as text | 2026-09-01-brief-flow-wrap.md |
 | 2026-09-01 | BRF-MERMAID-SOURCE-OMITTED | open | Omit the mermaid source from the render | 2026-09-01-brief-mermaid-source-omitted.md |
