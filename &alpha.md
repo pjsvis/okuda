@@ -20,6 +20,7 @@
 - **§NN** — gold vectors after a document's references. The section
   sign means *reference*: actuate to dereference — the target renders
   clean, and its references are not shown. The tour cannot run away.
+  [The silcrow, explained](docs/2026-09-04-the-silcrow.md).
 
 - **u** — unwind: back to the main document, annotated again.
 
