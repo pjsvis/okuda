@@ -151,29 +151,30 @@ describe("launcher — rankedShortlistEntries (the -g merge, integration)", () =
     expect(entries.some((e) => pathOf(e).endsWith("index.md"))).toBe(false);
   });
 
-  test("orientation: silo-root files float to the top of every list", () => {
-    // The &files (and the other root markdown) are the operator's
-    // anchors; they rank before any evidence row, for any query.
+  test("orientation: the &-family floats at the landing, vanishes when searching", () => {
+    // Landing (empty query): the whole root set greets you — orientation
+    // is the job. Searching: the &-family vanishes — pointers, not prey.
+    // Root *content* files (DEPENDENCIES.md…) compete normally.
     const rootCount = listMarkdownFiles(process.cwd()).filter((f) => !f.includes("/")).length;
-    for (const q of ["diagram", "load bearing", ""]) {
+    const landing = rankedShortlistEntries("", process.cwd());
+    const firstNonRoot = landing.findIndex((e) => pathOf(e).includes("/"));
+    expect(firstNonRoot).toBe(rootCount); // the whole root set, floating
+    for (const q of ["diagram", "load bearing", "1.4.0"]) {
       const entries = rankedShortlistEntries(q, process.cwd());
-      const firstNonRoot = entries.findIndex((e) => pathOf(e).includes("/"));
-      for (let i = 0; i < firstNonRoot; i++) {
-        expect(pathOf(entries[i]!)).not.toMatch(/\//); // root files only
-      }
-      expect(firstNonRoot).toBe(rootCount); // the whole root set
+      expect(entries.some((e) => pathOf(e).startsWith("&"))).toBe(false); // pointers suppressed
     }
+    expect(rankedShortlistEntries("1.4.0", process.cwd()).some((e) => pathOf(e) === "DEPENDENCIES.md"))
+      .toBe(true); // root content is still prey
   });
 
   test("orientation files carry their evidence when they match", () => {
-    // A root file that matches in the body moves UP with its evidence —
-    // it must not sink to the body channel nor lose the snippet to dedupe.
+    // A root content file that matches in the body surfaces with its
+    // evidence attached — even while the &-family stays suppressed.
     const entries = rankedShortlistEntries("ripgrep", process.cwd());
     const dep = entries.find((e) => pathOf(e) === "DEPENDENCIES.md");
     expect(dep).toBeDefined();
     if (dep) {
       expect(dep.split("\t")[1]).toBeDefined(); // evidence attached
-      expect(entries.indexOf(dep!)).toBeLessThan(8); // inside channel 0
     }
   });
 

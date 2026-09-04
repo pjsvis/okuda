@@ -270,26 +270,40 @@ export function rankedShortlistEntries(query: string, cwd: string = process.cwd(
       body.push(`${path}${SEP}${clipSnippet(text)}`);
     }
   }
-  // Channel 3 — filename remainder, no snippet (fzf matches the path).
+  // Channel 0 — orientation: at the LANDING (empty query) every silo-root
+  // file floats — the &-family (&alpha, &briefs, &next: the editorial
+  // state documents) plus the root content files. Once there is search
+  // text, the &-family vanishes: they are pointers to the files being
+  // looked for, not the files themselves (2026-09-04). Root *content*
+  // files (DEPENDENCIES.md, system.md…) compete normally — they are
+  // prey too. The landing is the only place the pointers preen.
+  const searching = query.trim().length > 0;
   const all = listMarkdownFiles(cwd);
+  const rootFiles = all.filter((f) => !f.includes("/"));
+  const ampers = new Set(rootFiles.filter((f) => basename(f).startsWith("&")));
   const evidenceOf = new Map<string, string>();
   for (const e of [...registry, ...body]) {
     const p = e.split(SEP)[0]!;
     if (!evidenceOf.has(p)) evidenceOf.set(p, e);
   }
-  // Channel 0 — orientation files: silo-root markdown (the operator's
-  // anchors — &alpha, &briefs, &next — live here). They float to the top
-  // of every list, carrying their evidence when they have any; a root
-  // file matched in the body moves up rather than sinking to channel 2.
-  const rootFiles = all.filter((f) => !f.includes("/"));
-  const orientation = rootFiles.map((f) => evidenceOf.get(f) ?? `${f}${SEP}`);
-  const oriented = new Set(rootFiles);
-  const registryRest = registry.filter((e) => !oriented.has(e.split(SEP)[0]!));
-  const bodyRest = body.filter((e) => !oriented.has(e.split(SEP)[0]!));
+  if (!searching) {
+    const orientation = rootFiles.map((f) => evidenceOf.get(f) ?? `${f}${SEP}`);
+    const oriented = new Set(rootFiles);
+    const registryRest = registry.filter((e) => !oriented.has(e.split(SEP)[0]!));
+    const bodyRest = body.filter((e) => !oriented.has(e.split(SEP)[0]!));
+    const remainder = all
+      .filter((f) => !oriented.has(f) && !evidenceOf.has(f))
+      .map((f) => `${f}${SEP}`);
+    return dedupeEntries([orientation, registryRest, bodyRest, remainder]);
+  }
+  // Searching: the &-family is suppressed everywhere; all else competes.
+  const isAmp = (path: string): boolean => ampers.has(path);
+  const registryRest = registry.filter((e) => !isAmp(e.split(SEP)[0]!));
+  const bodyRest = body.filter((e) => !isAmp(e.split(SEP)[0]!));
   const remainder = all
-    .filter((f) => !oriented.has(f) && !evidenceOf.has(f))
+    .filter((f) => !ampers.has(f) && !evidenceOf.has(f))
     .map((f) => `${f}${SEP}`);
-  return dedupeEntries([orientation, registryRest, bodyRest, remainder]);
+  return dedupeEntries([registryRest, bodyRest, remainder]);
 }
 
 /** The fzf argv that never changes: the picker instance's fixed spine.
