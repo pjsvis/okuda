@@ -150,7 +150,7 @@ export function bodyPattern(query: string): { kind: "fixed" | "regex"; pattern: 
  *  equivalent) so the picker's `--tiebreak=index` keeps a canonical
  *  order. Pure-ish (reads fs). */
 export function listMarkdownFiles(cwd: string = process.cwd()): string[] {
-  return rgLines(["--files", "--type", "md"], cwd).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  return rgLines(["--files", "--type", "md", ...CORPUS_EXCLUSIONS], cwd).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 }
 
 /** Registry field hits (channel 1, owner-only per ADR-025): rg the tier
@@ -255,9 +255,10 @@ export function rankedShortlistEntries(query: string, cwd: string = process.cwd(
   const body: string[] = [];
   const seenBody = new Set<string>();
   const { kind, pattern } = bodyPattern(query);
-  const bodyArgs = kind === "fixed"
-    ? ["-n", "-F", "-m", "1", "--no-heading", pattern, "--type", "md"]
-    : ["-n", "-i", "-m", "1", "--no-heading", pattern, "--type", "md"];
+  const bodyArgs = ["-n", "-m", "1", "--no-heading", ...CORPUS_EXCLUSIONS];
+  if (kind === "fixed") bodyArgs.push("-F", pattern);
+  else bodyArgs.push("-i", pattern);
+  bodyArgs.push("--type", "md");
   for (const line of rgLines(bodyArgs, cwd)) {
     const i = line.indexOf(":");
     const j = i === -1 ? -1 : line.indexOf(":", i + 1);
@@ -306,6 +307,13 @@ export const FZF_FIXED_ARGS = [
   "--tiebreak=index",
   "--delimiter=\t", // entries are `path\tsnippet`; match the whole line
 ];
+
+/** Corpus exclusions: generated registry views are build artifacts, not
+ *  documents — `reg-sync` regenerates every `index.md` from the JSONL
+ *  ("hand-edits are overwritten", by the silo's own constitution). They
+ *  crowd the search results with tables nobody searches for; the picker
+ *  itself is the better index. Applied to every corpus rg call. */
+export const CORPUS_EXCLUSIONS = ["-g", "!**/index.md"];
 
 /** Match highlighting: the query's matched substrings render in the
  *  okuda palette's strong amber (#dfa21a — the reader's own `strong`,

@@ -92,6 +92,14 @@ describe("launcher — listMarkdownFiles (rg-sourced, BRF-CONTENT-SHORTLIST)", (
     const sorted = [...files].sort();
     expect(files).toEqual(sorted);
   });
+
+  test("generated index.md views are not in the corpus (build artifacts)", () => {
+    // reg-sync regenerates every index.md from the JSONL — "hand-edits
+    // are overwritten" by the silo's own constitution. They are not
+    // documents; the picker is the better index.
+    const files = listMarkdownFiles(process.cwd());
+    expect(files.some((f) => f.endsWith("/index.md") || f === "index.md")).toBe(false);
+  });
 });
 
 describe("launcher — dedupeByPath (feed order = priority)", () => {
@@ -137,16 +145,23 @@ describe("launcher — rankedShortlistEntries (the -g merge, integration)", () =
     expect(new Set(paths).size).toBe(paths.length);
   });
 
+  test("generated index.md surfaces in no channel", () => {
+    // Body hits and remainder alike exclude the generated views.
+    const entries = rankedShortlistEntries("silo index generated", process.cwd());
+    expect(entries.some((e) => pathOf(e).endsWith("index.md"))).toBe(false);
+  });
+
   test("orientation: silo-root files float to the top of every list", () => {
     // The &files (and the other root markdown) are the operator's
     // anchors; they rank before any evidence row, for any query.
+    const rootCount = listMarkdownFiles(process.cwd()).filter((f) => !f.includes("/")).length;
     for (const q of ["diagram", "load bearing", ""]) {
       const entries = rankedShortlistEntries(q, process.cwd());
       const firstNonRoot = entries.findIndex((e) => pathOf(e).includes("/"));
       for (let i = 0; i < firstNonRoot; i++) {
         expect(pathOf(entries[i]!)).not.toMatch(/\//); // root files only
       }
-      expect(firstNonRoot).toBeGreaterThanOrEqual(8); // the whole root set
+      expect(firstNonRoot).toBe(rootCount); // the whole root set
     }
   });
 
