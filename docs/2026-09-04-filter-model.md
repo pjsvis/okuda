@@ -17,7 +17,8 @@ appropriate results. This note records the model as it stands after the
 2. **State filter — landing vs searching.** Empty query = the landing:
    the root set floats (the `&`-family plus root content files) —
    orientation is the job. Non-empty query = the search: the `&`-family
-   vanishes (pointers, not prey), everything else competes on evidence.
+   vanishes (the signposts step aside), everything else competes on
+   evidence.
 3. **Generated views are never in the corpus.** Every `index.md` is a
    `reg-sync` artifact — build output, not documents.
 
@@ -89,6 +90,38 @@ answer precisely.
 discovery-level filter). Only worth it if the corpus grows a class of
 results that repeatedly needs hiding — do not build for one annoyance.
 
+## The house vocabulary
+
+The terms for "looking something up", gathered from a thousand years of
+the trade — and the ones this silo uses:
+
+- **Reference / cross-reference (§)** — the pointer itself. Law's
+  `§12`, the back-of-book `see also`. Ours: the silcrow vector.
+- **Dereference** — hypertext and pointer-speak: follow the reference
+  to the thing it names. Ours: actuating a vector. Established.
+- **Consult** — the library verb: to consult a reference work. The
+  polite word for what the reader does to a document.
+- **Resolve** — names to addresses (DNS, linkers). Ours: target string
+  → document path, at the actuator.
+- **Call number** — the library address used to fetch an item from the
+  stacks. Our *callsigns* are call numbers by another spelling.
+- **Concordance** — an index of every word in a text with its
+  locations: full-text search in print form. The live search is the
+  silo's concordance, compiled per keystroke.
+- **Finding aid** — the archivist's term for a guide that describes a
+  collection so it can be navigated. The `&`-family documents are
+  finding aids; they step aside when you consult.
+- **Selective dissemination (SDI)** — 1960s library science for
+  filtered alerts: the profession's word for a *filter*.
+- **Retrieval / recall / precision** — information retrieval's terms
+  for the act and its quality measures.
+- **Jump / go to** — the editor's verbs. Ours: the two-digit actuation.
+- **Browse** — aimless by design; the landing's privilege.
+
+The house verbs: **type, dereference, unwind, promote, consult**. The
+house nouns: **main document, referenced document, signpost, silcrow,
+concordance**.
+
 ## The rule for adding any of these
 
 Ladder discipline (ADR-028's, applied to features): an implied filter
@@ -101,8 +134,9 @@ would be neat.
 
 1. A filter has states; each state owes the reader something different.
    Blending them was the day's worst bug class.
-2. Pointers are not prey: orientation files link to what you want —
-   they are not what you want.
+2. The signposts step aside: orientation documents announce what you
+   want — they are not what you want. When you consult, the signposts
+   make way.
 3. Generated views are build artifacts; search indexes authorship.
 4. The paint is a projection of the map: annotations are illustrative
    text, the source is never mutated, re-derivation replaces

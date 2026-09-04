@@ -164,7 +164,7 @@ describe("launcher — rankedShortlistEntries (the -g merge, integration)", () =
       expect(entries.some((e) => pathOf(e).startsWith("&"))).toBe(false); // pointers suppressed
     }
     expect(rankedShortlistEntries("1.4.0", process.cwd()).some((e) => pathOf(e) === "DEPENDENCIES.md"))
-      .toBe(true); // root content is still prey
+      .toBe(true); // root content documents are consulted like any other
   });
 
   test("orientation files carry their evidence when they match", () => {
