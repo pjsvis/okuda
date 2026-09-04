@@ -1,12 +1,11 @@
 # &next — the decision table
 
-Not the state table (`&briefs` has the full ledger; this one argues).
 Each entry is an **action block**: one line, one action — *name,
-verdict, cost* — with its reference in plain sight. Actuate the amber
-vector to dereference; `u` unwinds; `99` promotes the document to its
-own terminal. Amended 2026-09-04: ADR-030 and ADR-031 landed (the live
-search and the working copy); the hidden wiring retired — references
-are text now.
+verdict, cost* — with its reference in plain sight. 
+
+Actuate the amber vector [##] to render the referenced document:
+- `u` unwinds and returns to main document; 
+- `99` promotes the referenced document to its own terminal. 
 
 ## Landed today — the debt this table was tracking
 

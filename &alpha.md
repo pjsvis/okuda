@@ -17,9 +17,9 @@
 - **Type** — the live search is the dereference path. The document's
   references are plain text; type the callsign and it resolves.
 
-- **[NN]** — amber vectors after a document's references. Actuate to
-  dereference: the target renders clean, and its references are not
-  shown. The tour cannot run away.
+- **[§NN]** — amber vectors after a document's references. The section
+  sign means *reference*: actuate to dereference — the target renders
+  clean, and its references are not shown. The tour cannot run away.
 
 - **u** — unwind: back to the main document, annotated again.
 
