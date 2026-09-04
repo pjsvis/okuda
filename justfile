@@ -93,9 +93,9 @@ install:
 
 # Gloam launcher
 [group('build')]
-gloam:
+gloam *args:
     @just build >/dev/null
-    @bash -c 'exec -a gloam ./okuda'
+    @bash -c 'exec -a gloam ./okuda "$@"' -- {{args}}
     @echo "okuda → ~/.local/bin/okuda  (run `just build` to refresh after edits)"
 
 # Tests

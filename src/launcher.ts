@@ -47,7 +47,7 @@ function clipSnippet(s: string): string {
 }
 
 const FZF_BINDS = "ctrl-d:page-down,ctrl-u:page-up,esc:cancel";
-const HEADER = "enter: read · ctrl-w: clear word · esc: clear/done";
+const HEADER = "enter: read · ctrl-w: clear word · esc: clear/done · -g <query>: content search";
 const PROMPT = "gloam ❯ ";
 
 /** The verb-grammar binds, exported for a contract test to pin against. */
