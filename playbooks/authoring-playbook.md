@@ -174,36 +174,28 @@ house already knows it.
 
 ---
 
-## The jump-token menu pattern
+## References are text (ADR-031)
 
-When a document is a menu of jump targets (the vector table pattern,
-`%%okuda-rhs:NN%%` wiring read by `extractJumps`), the two-digit tokens
-follow a spacing rule keyed to list length:
+The former jump-token menu pattern — authored `%%okuda-rhs:NN%%` wiring,
+assigned numbers, spacing rules — is **retired**. Under ADR-031 the
+reference is the text: a callsign-shaped token or a local `.md` link in
+prose is discovered at render time, and the main document's vectors
+(`§11` … `§98`, gold, in the reserved paint) are derived from it —
+reading order, unique, no authoring.
 
-- **Few items (≤ ~9): spaced double-taps** — `11, 22, 33, 44, …`. Each
-  token is two presses of one key; the easiest possible double-strike.
-- **More items (~10+): sequential from 11** — `11, 12, 13, …` (ADR-021).
-  The spaced form would exhaust at 9 items (`99`); sequential serves the
-  longer list and still avoids the 0-key stretch.
+**Write the reference; the number takes care of itself.** The rules
+that survive:
 
-**No precedence is implied other than top-to-bottom structural order.**
-Sequential numbering (`11, 12, 13`) reads as *ranking* — item 1 more
-important than item 2 — even when the compositor only sorted by date.
-Spaced tokens (`11, 22, 33`) break that reading: they read as labels,
-not ordinals. The token states identity, not rank; the ordering that
-remains is the list's own order, which is structural. (The Babylon
-principle: state the fact, infer the action.)
-
-**The cut-off is self-limiting.** The spaced form serves ≤ ~9 items
-(`11`…`99` at double-stride); beyond that, fall back to sequential
-(`11`+ runs to 89). A compositor that emits `11, 22, …, 99, 110` is
-broken — switch to sequential at ~10 items. The resolver
-(`extractJumps`, `RE_RHS_TOKEN`) reads any 1–2 digit token, so both
-forms resolve without migration.
-
-Tokens are ephemeral — they die with the index document, never jotted
-(ADR-021). They are keyboard affordances, not counts; the spacing rule
-makes that visible at a glance.
+- **References are plain text.** A callsign in prose, a link to a local
+  document. No wiring, no tokens, no HTML comments.
+- **Numbering is structural, not authored.** Reading order, unique by
+  target — the compositor's ordering is the only ordering, and it
+  cannot read as ranking because it is not chosen.
+- **Cap at 88.** Past `§98` the map stops. The remedy is editorial:
+  split the document, or clone and search.
+- **Optimistic.** A reference to a document that does not exist yet
+  renders as a vector and fails honestly on actuation. Intentions are
+  navigable; the flash says so when they are premature.
 
 ## Heuristics, emerging
 

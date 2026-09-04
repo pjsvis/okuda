@@ -18,9 +18,9 @@ This is the **gopher model** of publishing: a server serves documents; a
 dumb, universal client renders them. No app store, no web framework, no
 synchronisation. The connection *is* the app.
 
-| Open | # |
-|---|---|
-| **The feasibility debrief** — the engineering answer, on file | **11** <!-- %%okuda-rhs:11%% debriefs/2026-08-27-debrief-ssh-forcecommand-feasibility.md --> |
+| Open |
+|---|
+| [The feasibility debrief](debriefs/2026-08-27-debrief-ssh-forcecommand-feasibility.md) — the engineering answer, on file  |
 
 ## What works today
 
@@ -70,6 +70,6 @@ cd path/to/okuda
 That is the whole tutorial. The experience is the one you know — on
 whatever screen is in front of you.
 
-| Open | # |
-|---|---|
-| **The decision table** — what the silo is doing next | **12** <!-- %%okuda-rhs:12%% &next.md --> |
+| Open |
+|---|
+| [The decision table](&next.md) — what the silo is doing next  |
