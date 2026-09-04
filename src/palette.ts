@@ -48,7 +48,12 @@ export type Role =
   // Experimental (brief: index-and-jump): a greedy heuristic — colours
   // any .md mention in prose, not just index lines. The leap; learn the
   // reach by seeing it over-reach.
-  | "doc-ref";
+  | "doc-ref"
+  // The vector paint (ADR-031): the numbered jump badges the main
+  // document's render projects from the in-memory jump map. Reserved —
+  // the markdown grammar cannot address this role, so painted numbers
+  // are visibly ours and authored `[NN]` text can never imitate them.
+  | "vector";
 
 export type Palette = Record<Role, string>;
 
@@ -118,6 +123,7 @@ export const DRACULA_PALETTE: Palette = {
   "state-parked": "#ff9933",
   "state-failed": "#ff5555",
   "doc-ref": "#e8c44a",
+  "vector": "#dfa21a", // ADR-031: the reserved vector paint — the reader's own `strong` amber
 };
 
 /** Named presets — the identity layers. The default is the okuda

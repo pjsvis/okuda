@@ -550,11 +550,18 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
     expect(out).not.toContain("<!--");
   });
 
-  test("the vector renders as an accent bracket after the slug", async () => {
+  test("legacy okuda-rhs strips silently — retired, no badge (ADR-031)", async () => {
     const out = await render("*Title* %%okuda-rhs:01%% <!-- docs/foo.md -->");
-    // ADR-026 paint direction: the bracket badge in the accent role
-    // (strong #ffb86c), bold. Tolerant of the inline parser's % mangling.
-    expect(out).toContain("\x1b[38;2;255;184;108;1m[01]\x1b[0m");
+    expect(out).not.toContain("[01]");
+    expect(out).not.toContain("okuda-rhs");
+    expect(out).toContain("Title");
+  });
+
+  test("the vector badge paints in the reserved vector role after the slug", async () => {
+    const out = await render("*Title* %okuda-vector:01% <!-- docs/foo.md -->");
+    // ADR-031: the badge in the reserved vector paint (#dfa21a → 223;162;26),
+    // bold. Tolerant of the inline parser's % mangling.
+    expect(out).toContain("\x1b[38;2;223;162;26;1m[01]\x1b[0m");
   });
 
   test("the slug renders as emphasis (yellow, italic) on the left", async () => {
@@ -564,15 +571,15 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
   });
 
   test("the slug and number are on one line (no wrap)", async () => {
-    const out = await render("*Short* %%okuda-rhs:01%% <!-- docs/foo.md -->");
+    const out = await render("*Short* %okuda-vector:01% <!-- docs/foo.md -->");
     // The item is one line of body text (plus the header/footer rails).
     const bodyLines = out.split("\n").filter((l) => l.trim() && !l.includes("─") && !l.includes("█"));
     expect(bodyLines.length).toBe(1);
   });
 
-  test("a long slug truncates with … and the badge still paints", async () => {
+  test("a long slug truncates with … and the vector badge still paints", async () => {
     const out = await render(
-      "*A very long slug that will not fit in a narrow terminal* %%okuda-rhs:05%% <!-- docs/x.md -->",
+      "*A very long slug that will not fit in a narrow terminal* %okuda-vector:05% <!-- docs/x.md -->",
       40,
     );
     const plain = out.replace(/\x1b\[[0-9;]*m/g, "");

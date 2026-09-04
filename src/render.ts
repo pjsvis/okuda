@@ -51,15 +51,21 @@ const LIST_INDENT = 2;
 /** Inline vector paint — strip the token and any comment-wrapped path
  *  from a rendered child string, returning the remaining slug and the
  *  token number for bracket painting. Tolerant of the inline parser's
- *  mangling: the token may arrive with one or two percents per side
- *  (`%%okuda-rhs:NN%%` in source, often `%okuda-rhs:NN%` in the stream).
- *  The jump map is built from the *source* (extractJumps); this only
- *  paints. Returns null when the child carries no vector. Pure. */
-function stripVector(children: string): { slug: string; num: string } | null {
-  const m = children.match(/%{1,2}okuda-rhs:(\d{1,2})%{1,2}/);
+ *  mangling: the token may arrive with one or two percents per side.
+ *  Two token kinds (ADR-031):
+ *    - `%okuda-vector:NN%` — live: painted as a badge in the reserved
+ *      vector role (the main document's derived jump map made visible).
+ *    - `%okuda-rhs:NN%` — legacy (ADR-022, retired): stripped silently,
+ *      no badge — the authored numbers are not honored.
+ *  The jump map is derived from the *source* (vectors.ts); this only
+ *  paints. Returns null when the child carries neither token. Pure. */
+function stripVector(children: string): { slug: string; num: string; live: boolean } | null {
+  const vec = children.match(/%{1,2}okuda-vector:(\d{1,2})%{1,2}/);
+  const legacy = children.match(/%{1,2}okuda-rhs:(\d{1,2})%{1,2}/);
+  const m = vec ?? legacy;
   if (!m) return null;
-  const slug = children.replace(/%{1,2}okuda-rhs:(\d{1,2})%{1,2}/, "").replace(RE_INLINE_HTML, "").trim();
-  return { slug, num: m[1]! };
+  const slug = children.replace(/%{1,2}okuda-(?:vector|rhs):(\d{1,2})%{1,2}/, "").replace(RE_INLINE_HTML, "").trim();
+  return { slug, num: m[1]!, live: vec !== null };
 }
 
 /** The closed state-glyph vocabulary — lexicon-applied, not author-editable.
@@ -562,19 +568,19 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         if (entry !== undefined) return diagramBlock(entry.art, ctx, entry.title);
         return ""; // pipe failed → drop the placeholder silently
       }
-      // Inline vector paint: strip the token, paint a bracketed badge in
-      // the accent role, right after the slug. No layout assumptions —
-      // the badge travels with the text (ADR-026 paint direction: the
-      // BBS/lynx bracket cadence, adopted). The RHS right-aligned form
-      // was retired: it required width math per handler and leaked raw
-      // tokens from handlers without it (the listItem bug).
+      // Inline vector paint: strip the token; live vectors paint a
+      // bracketed badge in the reserved vector role, right after the
+      // slug — no layout assumptions, the badge travels with the text
+      // (ADR-026 paint direction). Legacy tokens strip silently (ADR-031:
+      // the authored numbers are not honored).
       const v = stripVector(children);
       if (v) {
+        if (!v.live) return wrapBlock(stripHtml(v.slug)).join("\n") + "\n\n";
         const badge = `[${v.num}]`;
         const slugLines = wrapBlock(stripHtml(v.slug));
         const avail = Math.max(width - 2 - badge.length - 1, 8);
         const body = elideToWidth(slugLines.join(" "), avail);
-        return body + " " + styler.roleBold("strong", badge) + "\n\n";
+        return body + " " + styler.roleBold("vector", badge) + "\n\n";
       }
       const lines = wrapBlock(stripHtml(children));
       return lines.join("\n") + "\n\n";
@@ -674,7 +680,10 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // Inline vector paint for list items too — the same badge, no
       // layout math; the token used to leak raw from this handler.
       const v = stripVector(children);
-      if (v) return TAG_ITEM + v.slug + " " + styler.roleBold("strong", `[${v.num}]`);
+      if (v) {
+        if (!v.live) return TAG_ITEM + v.slug;
+        return TAG_ITEM + v.slug + " " + styler.roleBold("vector", `[${v.num}]`);
+      }
       return TAG_ITEM + children;
     },
 
