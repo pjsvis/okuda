@@ -40,9 +40,14 @@ paint is illustrative; the source is never mutated; legacy wiring
 5. **The actuator.** `NN` looks up the map → target string → resolve
    (file exists / callsign through the registry) → render in place,
    clean, pushing the previous render for `u` to unwind. Resolution
-   failure → **footer flash**: `unknown callsign: X` / `no such file:
-   X` — visible, honest, non-fatal. The old `%%okuda-rhs%%` extraction
-   and `[NN](path)`-token wiring retire (tests updated or deleted).
+   failure → **footer flash**: `[14] — no document to render`. The
+   wording belongs to the vector, not the vocabulary: the user actuated
+   a painted vector and there is nothing there — the flash never says
+   "unknown callsign" (that is the shaped-arg dispatch's error, a
+   different surface). Uniform regardless of why the target is absent:
+   the vector was optimistic; the document does not exist; stay put.
+   The old `%%okuda-rhs%%` extraction and `[NN](path)`-token wiring
+   retire (tests updated or deleted).
 6. **The clone verb — `99`.** Host spawn: inside tmux,
    `tmux new-window -t <silo session> 'gloam <current-doc>'`; outside
    tmux, `$OKUDA_CLONE_CMD` if set, else an honest footer message
