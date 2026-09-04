@@ -41,6 +41,3 @@
 {"file":"2026-09-01-brief-flow-wrap.md","date":"2026-09-01","status":"open","summary":"Flow wrap — internal break opportunities so paths flow as text","meta":{},"callsign":"BRF-FLOW-WRAP"}
 {"file":"2026-09-01-brief-mermaid-source-omitted.md","date":"2026-09-01","status":"open","summary":"Omit the mermaid source from the render","meta":{},"callsign":"BRF-MERMAID-SOURCE-OMITTED"}
 {"file":"2026-09-02-brief-synchronized-output.md","date":"2026-09-02","status":"open","summary":"Synchronized output — deliver each paint as one frame","meta":{},"callsign":"BRF-SYNC-OUTPUT"}
-{"file":"2026-09-03-brief-ctrl-clone.md","date":"2026-09-03","status":"open","summary":"Ctrl-NN — clone the terminal on the dereferenced document","meta":{},"callsign":"BRF-CTRL-CLONE"}
-{"file":"2026-09-03-brief-edit-dispatch.md","date":"2026-09-03","status":"open","summary":"Edit dispatch — `$EDITOR` in a separate terminal, file is the contract","meta":{},"callsign":"BRF-EDIT-DISPATCH"}
-{"file":"2026-09-03-brief-voice-padd.md","date":"2026-09-03","status":"open","summary":"Voice-controlled silo — the PADD over Tailscale","meta":{},"callsign":"BRF-VOICE-PADD"}
