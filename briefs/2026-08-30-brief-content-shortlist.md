@@ -6,7 +6,7 @@ callsign: BRF-CONTENT-SHORTLIST
 # Brief: content shortlist — rg as the discovery source
 
 **Date:** 2026-08-30
-**Status:** Open
+**Status:** Open (amended 2026-09-04 — unified ranking, see §Ranked sources)
 **Branch:** feat/gloam-launcher
 **Context:** the discoverability gap named in
 `docs/2026-08-30-the-butt-dial-question.md` and unpacked across the
@@ -26,7 +26,11 @@ the usual suspects; okuda reads the selection. Three tools, one pipe
 each, file-grain throughout. The reader's one-document contract
 (`okuda <file>`) is unchanged — no line-anchor, no compositor, no
 structured rows. (Amended 2026-08-30: the shortlist **merges registry
-field hits first** — see §Ranked sources.)
+field hits first** — see §Ranked sources. Amended 2026-09-04: the
+operator's requirement is one search over **filenames and content
+both, prioritised** — filename matches join the ranked merge as a
+channel, and the prioritisation mechanism is feed order, not a
+scorer. See §Ranked sources.)
 
 ## What
 
@@ -52,20 +56,31 @@ field hits first** — see §Ranked sources.)
    uniformly; the include/exclude-archive question becomes a single
    `.gitignore` decision, not a per-source-codepath accident.
 
-3. **Ranked sources — the shortlist merges channels (amended 2026-08-30,
-   ADR-025).** The operator doesn't always know whether what they
-   remember is a callsign, a filename fragment, or a topic — the router
-   between channels is the pipe, not the human. The `-g` shortlist
-   sources, in precision order, deduped by path:
+3. **Ranked sources — the shortlist merges channels (amended 2026-08-30
+   and 2026-09-04, ADR-025).** The operator doesn't always know whether
+   what they remember is a callsign, a filename fragment, or a topic —
+   the router between channels is the pipe, not the human. The 2026-09-04
+   requirement is explicit: **filenames and content in one search,
+   results prioritised.** The `-g` shortlist sources, in precision
+   order, deduped by path:
    1. **Registry field hits** — `rg -i '"callsign":.*<query>' */INDEX.jsonl`
       (field-anchored: owner-only, per ADR-025's header-only rule; ranks
       first because the registry is the only truthful owner index).
-   2. **Body hits** — `rg -l <query> --type md` (the original content
-      shortlist; sanctioned noise, ranked last).
-   Filename search (no arg) is unchanged. Exact resolution stays out of
-   scope: `gloam <callsign>` (shaped arg, registry dispatch, d39a414)
-   remains the only path that guarantees exactly-one — the merged
-   shortlist is for *not knowing*, and honestly returns a shortlist.
+   2. **Body hits** — `rg -l <query> --type md` (the content shortlist;
+      files whose text mentions the query).
+   3. **Filename remainder** — every other file from `rg --files --type md`.
+      fzf's `--exact` still matches these by name; appending the
+      remainder preserves filename search inside the same picker
+      instead of splitting it into a separate mode.
+   **Prioritisation is feed order, not a scorer.** The merged list is
+   emitted in the order above; `--tiebreak=index` (already pinned) makes
+   fzf rank ties by input position. A document that matches on registry,
+   body, *and* filename appears once, at its highest channel. No custom
+   ranker, no scoring pass, no second sort — the pipe is the ranker.
+   Exact resolution stays out of scope: `gloam <callsign>` (shaped arg,
+   registry dispatch, d39a414) remains the only path that guarantees
+   exactly-one — the merged shortlist is for *not knowing*, and honestly
+   returns a shortlist.
 
 4. **The launcher loop is unchanged in shape.** `runLauncher`'s
    browse → read → browse loop, the query reseed (`--print-query` +
@@ -107,9 +122,12 @@ field hits first** — see §Ranked sources.)
   builder if content-match ever needs to be table-shaped — that's the
   wrinkle in "issue 1 / issue 2 are orthogonal" noted in the riff; it
   stays noted, not acted on.)
-- **Not replacing filename search.** Both modes earn their keep: rg
-  needs a query, so `gloam` (no arg) is still the fast path when you
-  remember the name. Content does not subsume filename here.
+- **Not replacing the no-arg filename picker.** Both entry points earn
+  their keep: `gloam` (no arg) is still the fast path when you remember
+  the name and want zero ceremony. Content does not subsume filename
+  here — though since the 2026-09-04 amendment, `-g` covers filenames
+  too (remainder channel), so the split is about the query gate, not
+  about what is searchable.
 - **Not in-document search (deferred).** No `ctrl+f` / `:grep` inside
   the reader in this brief. In-document search is a *mixed* feature
   across the three-concerns line: match-highlight recolours rendered
@@ -145,9 +163,14 @@ field hits first** — see §Ranked sources.)
   indistinguishable from today (regression-free).
 - `gloam -g diagram` launches fzf seeded with the ranked merge (§Ranked
   sources): registry field hits for `diagram` first, then `rg -l diagram
-  --type md` output, deduped by path; selecting a file reads it; Esc
-  returns to the launcher; the query is reseeded for the next round
-  (same loop semantics as the filename path).
+  --type md` output, then the filename remainder — deduped by path,
+  feed order = priority; selecting a file reads it; Esc returns to the
+  launcher; the query is reseeded for the next round (same loop
+  semantics as the filename path).
+- A pure-filename query (e.g. a fragment that matches only a filename,
+  no body hit) still surfaces the file via the remainder channel — a
+  test pins that filename search survives inside `-g` (the 2026-09-04
+  requirement: filenames and content, one search).
 - A pure-registry query (e.g. `gloam -g SHORTLIST`) ranks the owning
   document first and any prose mentions later — a test pins the field-
   anchored source and the dedupe.
