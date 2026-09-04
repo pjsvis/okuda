@@ -63,6 +63,13 @@ check:
 ship:
     @bun test && just check && just build && just install && just fresh
 
+# Content-search conformance smoke (BRF-CONTENT-SHORTLIST) —
+# `just search-smoke` for the canonical scenario, or pass your own:
+# `just search-smoke minimap docs/2026-09-04-minimap-reversal.md`
+[group('quality gate')]
+search-smoke query="1.4.0" want="DEPENDENCIES.md":
+    @bash scripts/search-smoke.sh {{query}} {{want}}
+
 # Freshness check
 [group('quality gate')]
 fresh:
