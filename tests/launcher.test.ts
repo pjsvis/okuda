@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   GLOAM_FZF_BINDS,
   dedupeByPath,
+  fzfEnv,
   invokedAsGloam,
   listMarkdownFiles,
   rankedShortlistEntries,
@@ -212,5 +213,49 @@ describe("launcher — fzf spawn wiring (non-interactive smoke)", () => {
       return false;
     })();
     expect(onPath).toBe(true);
+  });
+});
+
+describe("launcher — fzf env ownership (the picker inherits no FZF_* furniture)", () => {
+  test("fzfEnv strips the whole FZF_* namespace, hostile env included", () => {
+    // Saved/restored per key: process.env mutation in tests is fine if
+    // scoped and reversed — same pattern the argv0 tests use.
+    const hostile: Record<string, string> = {
+      FZF_DEFAULT_OPTS: "--height=100% --border --bind=ctrl-z:abort",
+      FZF_DEFAULT_COMMAND: "rm -rf /",
+      FZF_TMUX: "1",
+      FZF_API_KEY: "stolen",
+      PATH: process.env.PATH ?? "",
+      HOME: process.env.HOME ?? "",
+    };
+    const saved: Array<[string, string | undefined]> = Object.keys(hostile).map((k) => [k, process.env[k]]);
+    for (const [k, v] of Object.entries(hostile)) process.env[k] = v;
+    const env = fzfEnv();
+    for (const [k, v] of saved) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
+    for (const k of Object.keys(hostile)) {
+      if (k.startsWith("FZF_")) expect(env[k]).toBeUndefined();
+      else expect(env[k]).toBeDefined(); // non-FZF_* env passes through
+    }
+  });
+
+  test("behavioral: hostile FZF_DEFAULT_OPTS cannot reach the picker", async () => {
+    // Spawn fzf through fzfEnv with FZF_DEFAULT_OPTS set to something
+    // that would corrupt our layout (--height/border/binds). Our spawn
+    // must behave as if the variable does not exist.
+    const saved = process.env.FZF_DEFAULT_OPTS;
+    process.env.FZF_DEFAULT_OPTS = "--height=100% --border --bind=ctrl-z:abort";
+    const proc = Bun.spawn(
+      ["fzf", "--filter", "1.4.0", "--exact", "--delimiter=\t"],
+      { stdin: "pipe", stdout: "pipe", env: fzfEnv() },
+    );
+    proc.stdin.write("DEPENDENCIES.md\t| bun | 1.4.0 |\nother.md\tnothing\n");
+    await proc.stdin.end();
+    if (saved === undefined) delete process.env.FZF_DEFAULT_OPTS;
+    else process.env.FZF_DEFAULT_OPTS = saved;
+    const out = await new Response(proc.stdout).text();
+    expect(out.split("\t")[0]).toBe("DEPENDENCIES.md"); // matched, unpolluted
   });
 });

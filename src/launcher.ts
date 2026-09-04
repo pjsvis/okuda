@@ -38,6 +38,23 @@ const PROMPT = "gloam ❯ ";
 /** The verb-grammar binds, exported for a contract test to pin against. */
 export const GLOAM_FZF_BINDS = FZF_BINDS;
 
+/** The environment we hand fzf: inherited, minus every `FZF_*` variable.
+ *  We own the picker instance — its binds, its layout, its behavior are
+ *  ours, passed as explicit args, never negotiated with shell rc files.
+ *  Blanking FZF_DEFAULT_OPTS alone was a one-door fix in a hallway of
+ *  doors: FZF_DEFAULT_OPTS merges binds/themes/geometry our args don't
+ *  override, and other FZF_* vars (DEFAULT_COMMAND, TMUX opts, API_KEY)
+ *  are future holes. Strip the namespace; the guest brings no furniture
+ *  (ADR-016's guest principle, applied to env). Exported for the
+ *  ownership contract test. */
+export function fzfEnv(): Record<string, string> {
+  const env: Record<string, string> = {};
+  for (const [k, v] of Object.entries(process.env)) {
+    if (v !== undefined && !k.startsWith("FZF_")) env[k] = v;
+  }
+  return env;
+}
+
 /** fzf must be on PATH (rg is gated separately — it is the source for
  *  both picker modes). */
 function which(cmd: string): string | null {
@@ -215,7 +232,7 @@ export async function pickFile(
     stdin: "pipe",
     stdout: "pipe",
     stderr: "inherit",
-    env: { ...process.env, FZF_DEFAULT_OPTS: "" },
+    env: fzfEnv(), // owned instance — see fzfEnv, no FZF_* inheritance
   });
   proc.stdin.write(input);
   await proc.stdin.end();
