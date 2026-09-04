@@ -137,6 +137,16 @@ describe("launcher — rankedShortlistEntries (the -g merge, integration)", () =
     expect(dep).toContain("1.4.0"); // the snippet shows the version row
   });
 
+  test("snippets are bounded (ADR-028: entry length is paint volume)", () => {
+    for (const q of ["diagram", "the", "Bun 1.4.0"]) {
+      for (const e of rankedShortlistEntries(q, process.cwd())) {
+        const [path, snippet] = e.split("\t");
+        expect(path!.length).toBeGreaterThan(0);
+        if (snippet) expect(snippet.length).toBeLessThanOrEqual(100);
+      }
+    }
+  });
+
   test("registryHits is field-anchored: a summary-only match is not an owner", () => {
     // "diagram" appears in many summaries; only callsign-bearing rows
     // may produce channel-1 hits, and each hit must live in a tier dir.

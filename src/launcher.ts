@@ -31,6 +31,21 @@ import { terminalCols, terminalRows } from "./width";
  *  conformance amendment to BRF-CONTENT-SHORTLIST). */
 const SEP = "\t";
 
+/** Snippet budget (ADR-028: the wire is the budget). The snippet is
+ *  evidence — enough to recognise why a file matched, never the
+ *  document itself. Capped at source, not at the glass: deterministic
+ *  across terminal widths, and the picker repaints the whole visible
+ *  list per keystroke, so entry length is paint volume. Long entries
+ *  also push the path off-screen when fzf hscrolls to a deep match —
+ *  the path is the only actionable part; the snippet must never
+ *  outrank it. */
+const SNIPPET_MAX = 100;
+
+function clipSnippet(s: string): string {
+  const oneLine = s.replace(/[\t\n]/g, " ").trim();
+  return oneLine.length > SNIPPET_MAX ? oneLine.slice(0, SNIPPET_MAX - 1) + "…" : oneLine;
+}
+
 const FZF_BINDS = "ctrl-d:page-down,ctrl-u:page-up,esc:cancel";
 const HEADER = "enter: read · ctrl-w: clear word · esc: clear/done";
 const PROMPT = "gloam ❯ ";
@@ -181,7 +196,7 @@ function dedupeEntries(entries: string[][]): string[] {
 export function rankedShortlistEntries(query: string, cwd: string = process.cwd()): string[] {
   // Channel 1 — registry field hits, callsign-anchored (ADR-025).
   const registry = registryRows(query, cwd).map((r) => {
-    const snippet = r.summary ? `${r.callsign} — ${r.summary}` : r.callsign;
+    const snippet = clipSnippet(r.summary ? `${r.callsign} — ${r.summary}` : r.callsign);
     return `${r.path}${SEP}${snippet}`;
   });
   // Channel 2 — body hits with the matching line as evidence.
@@ -197,7 +212,7 @@ export function rankedShortlistEntries(query: string, cwd: string = process.cwd(
     const text = line.slice(j + 1).trim();
     if (!seenBody.has(path)) {
       seenBody.add(path);
-      body.push(`${path}${SEP}${text}`);
+      body.push(`${path}${SEP}${clipSnippet(text)}`);
     }
   }
   // Channel 3 — filename remainder, no snippet (fzf matches the path).
