@@ -17,10 +17,18 @@ Work cycle: **brief → branch → implement → check → review → debrief**
 
 ## Operator commands
 
+- `just ship` — the full gate: tests → check → build → install → fresh. Run before push.
+- `just fresh` — is the binary on PATH this checkout's HEAD? (stale-binary gate)
+- `just search-smoke` — proves the gloam `-g` content search end to end, no TTY: freshness → merge → fzf. Custom scenario: `bash scripts/search-smoke.sh <query> <expected-path>`
 - `just check` — registry sync gate; fails (exit 1) on MISSING or STALE entries. Run before every commit.
 - `just reg-sync` — check registries for drift
 - `just reg-sync-fix` — regenerate indexes from filesystem
 - `just reg-briefs` / `reg-decisions` / `reg-debriefs` / `reg-playbooks` — list one registry
+
+## Searching
+
+- `gloam` — browse → read → browse picker over all markdown (filename search)
+- `gloam -g <query>` — ranked content search: registry callsign hits first, then body matches (`path + matching-line` evidence per entry), then filename matches. One query searches both; results prioritised by channel.
 
 ## Standing rules
 
