@@ -15,7 +15,7 @@ set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-QUERY="${1:-1.4.0}"
+QUERY="${*:-1.4.0}"
 DUMP="${TMPDIR:-/tmp}/gloam-entries.txt"
 
 # ── the exact entry stream ────────────────────────────────────────────
@@ -41,7 +41,7 @@ fzf --layout=reverse --no-mouse --exact --tiebreak=index --delimiter="	" \
   < "$DUMP" > /tmp/gloam-selection.txt || true
 
 echo "── selection ──────────────────────────────────────────"
-sel="$(sed 's/\t.*//' /tmp/gloam-selection.txt | head -1)"
+sel="$(sed -E 's/\t.*//; s/[[:space:]]+$//' /tmp/gloam-selection.txt | head -1)"
 if [[ -n "$sel" ]]; then
   echo "picked:  $sel"
 else

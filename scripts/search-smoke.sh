@@ -44,7 +44,7 @@ const proc = Bun.spawn(args, { stdin: "pipe", stdout: "pipe", env: { ...process.
 proc.stdin.write(entries.join("\n") + "\n");
 await proc.stdin.end();
 const out = await new Response(proc.stdout).text();
-const matches = out.split("\n").filter(Boolean).map((l) => l.split("\t")[0]!);
+const matches = out.split("\n").filter(Boolean).map((l) => l.split("\t")[0]!.trimEnd());
 if (!matches.includes(want)) {
   console.error(`smoke: FAIL — fzf "${query}" returned ${matches.length} matches, none is ${want}`);
   console.error("smoke: top matches:", matches.slice(0, 5).join(" | ") || "(none)");

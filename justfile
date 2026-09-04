@@ -70,8 +70,8 @@ search-smoke:
 
 # Picker instance replay
 [group('quality gate')]
-search-replay:
-    @bash scripts/search-replay.sh
+search-replay *args:
+    @bash scripts/search-replay.sh {{args}}
 
 # Freshness check
 [group('quality gate')]

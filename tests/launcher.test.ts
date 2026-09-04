@@ -115,25 +115,25 @@ describe("launcher — rankedShortlistEntries (the -g merge, integration)", () =
     // SHORTLIST names exactly one owner: the brief itself. Registry
     // channel fires, body mentions rank later, filename remainder last.
     const entries = rankedShortlistEntries("BRF-CONTENT-SHORTLIST", process.cwd());
-    expect(entries[0]!.split("\t")[0]).toBe("briefs/2026-08-30-brief-content-shortlist.md");
+    expect(pathOf(entries[0]!)).toBe("briefs/2026-08-30-brief-content-shortlist.md");
     expect(entries.length).toBeGreaterThan(1); // the remainder followed
   });
 
   test("a pure-filename query still surfaces the file (remainder channel)", () => {
     // The 2026-09-04 amendment: filenames and content, one search.
     const entries = rankedShortlistEntries("origin-doc", process.cwd());
-    expect(entries.some((e) => e.split("\t")[0] === "docs/2026-08-20-origin-doc.md")).toBe(true);
+    expect(entries.some((e) => pathOf(e) === "docs/2026-08-20-origin-doc.md")).toBe(true);
   });
 
   test("no duplicates in the merged list", () => {
     const entries = rankedShortlistEntries("diagram", process.cwd());
-    const paths = entries.map((e) => e.split("\t")[0]);
+    const paths = entries.map(pathOf);
     expect(new Set(paths).size).toBe(paths.length);
   });
 
   test("body-channel entries carry the matching line as snippet evidence", () => {
     const entries = rankedShortlistEntries("1.4.0", process.cwd());
-    const dep = entries.find((e) => e.startsWith("DEPENDENCIES.md\t"));
+    const dep = entries.find((e) => pathOf(e) === "DEPENDENCIES.md");
     expect(dep).toBeDefined();
     expect(dep).toContain("1.4.0"); // the snippet shows the version row
   });
@@ -148,6 +148,26 @@ describe("launcher — rankedShortlistEntries (the -g merge, integration)", () =
     }
   });
 
+  test("evidence grammar: single-spaced, no table-pipe padding at the edges", () => {
+    const entries = rankedShortlistEntries("load bearing", process.cwd());
+    for (const e of entries) {
+      const snippet = e.slice(e.indexOf("\t") + 1);
+      if (!snippet) continue;
+      expect(snippet).not.toMatch(/\s{2,}/); // collapsed
+      expect(snippet).not.toMatch(/^\|/); // leading cell padding stripped
+      expect(snippet).not.toMatch(/\|$/); // trailing cell padding stripped
+    }
+  });
+
+  test("evidence rows share one aligned path column; remainder rows untouched", () => {
+    const entries = rankedShortlistEntries("diagram", process.cwd());
+    const evidence = entries.filter((e) => e.slice(e.indexOf("\t") + 1).length > 0);
+    expect(evidence.length).toBeGreaterThan(0);
+    const widths = evidence.map((e) => e.indexOf("\t"));
+    expect(new Set(widths).size).toBe(1); // one shared column edge — the true max
+    expect(widths[0]).toBeGreaterThan(10); // a real column, not zero-width
+  });
+
   test("registryHits is field-anchored: a summary-only match is not an owner", () => {
     // "diagram" appears in many summaries; only callsign-bearing rows
     // may produce channel-1 hits, and each hit must live in a tier dir.
@@ -158,6 +178,11 @@ describe("launcher — rankedShortlistEntries (the -g merge, integration)", () =
   });
 });
 
+// Path extraction mirroring pickFile (alignment padding trimmed).
+function pathOf(line: string): string {
+  return line.split("\t")[0]!.trimEnd();
+}
+
 describe("launcher — conformance smoke: the search the operator runs", () => {
   // The 2026-09-04 miss: the merge was tested, the search was not. This
   // drives fzf non-interactively (--filter) exactly as pickFile drives
@@ -165,6 +190,10 @@ describe("launcher — conformance smoke: the search the operator runs", () => {
   // operator's scenario end to end: type the content query, find the
   // file. If this fails, the picker is broken, whatever the unit tests
   // say about the merge.
+
+  // Path extraction mirrors pickFile: everything before the tab, with
+  // alignment padding trimmed.
+  const pathOf = (line: string) => line.split("\t")[0]!.trimEnd();
 
   async function fzfFilter(query: string, entries: string[]): Promise<string[]> {
     // Async Bun.spawn with stdin:"pipe" — the exact mechanism pickFile
@@ -180,7 +209,7 @@ describe("launcher — conformance smoke: the search the operator runs", () => {
     proc.stdin.write(entries.join("\n") + "\n");
     await proc.stdin.end();
     const out = await new Response(proc.stdout).text();
-    return out.split("\n").filter(Boolean).map((line) => line.split("\t")[0]!);
+    return out.split("\n").filter(Boolean).map(pathOf);
   }
 
   test("query '1.4.0' locates the bun version row in DEPENDENCIES.md", async () => {
@@ -245,11 +274,14 @@ describe("launcher — conformance smoke: the search the operator runs", () => {
     expect(single).toEqual({ kind: "fixed", pattern: "1.4.0" });
   });
 
-  test("'load bearing' surfaces DEPENDENCIES.md (hyphenated in the corpus)", () => {
+  test("'load bearing' surfaces DEPENDENCIES.md (hyphenated in the corpus)", async () => {
     const entries = rankedShortlistEntries("load bearing", process.cwd());
-    const dep = entries.find((e) => e.startsWith("DEPENDENCIES.md\t"));
+    const dep = entries.find((e) => pathOf(e) === "DEPENDENCIES.md");
     expect(dep).toBeDefined();
     expect(dep).toContain("load-bearing"); // evidence: the hyphenated row
+    // And through the real matcher: the phrase query must surface it.
+    const matches = await fzfFilter("load bearing", entries);
+    expect(matches).toContain("DEPENDENCIES.md");
   });
 });
 
