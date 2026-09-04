@@ -18,8 +18,10 @@ import { basename, join } from "node:path";
 
 /** Tier directories and their registry filenames. The pre-OKF fallback
  *  signature: a silo that indexes itself already has these; the OKF
- *  root `index.md` supersedes them once the migration (td-bdfce0) lands. */
-const TIER_REGISTRIES: Array<[dir: string, file: string]> = [
+ *  root `index.md` supersedes them once the migration (td-bdfce0) lands.
+ *  Exported: the launcher's registry channel (BRF-CONTENT-SHORTLIST)
+ *  walks the same tiers — one list, two consumers, no drift. */
+export const TIER_REGISTRIES: Array<[dir: string, file: string]> = [
   ["briefs", "INDEX.jsonl"],
   ["decisions", "INDEX.jsonl"],
   ["debriefs", "INDEX.jsonl"],

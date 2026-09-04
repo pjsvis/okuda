@@ -26,6 +26,7 @@ interface Args {
   noColor: boolean;
   tui: boolean;
   palette: string | null;
+  grep: string | null;
 }
 
 /** Build stamp: --define BUILD_SHA="<sha>" at compile time (justfile
@@ -46,7 +47,7 @@ export function versionLine(sha?: string): string {
 }
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { file: null, watch: false, noColor: false, tui: false, palette: null };
+  const args: Args = { file: null, watch: false, noColor: false, tui: false, palette: null, grep: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
     if (a === "--watch" || a === "-w") args.watch = true;
@@ -58,8 +59,15 @@ function parseArgs(argv: string[]): Args {
         process.stderr.write("okuda: --palette requires a name (e.g. dracula)\n");
         process.exit(1);
       }
+    } else if (a === "--grep" || a === "-g") {
+      args.grep = argv[++i] ?? null;
+      if (!args.grep) {
+        process.stderr.write("gloam: -g requires a query (e.g. gloam -g diagram)\n");
+        process.exit(1);
+      }
     } else if (a === "--help" || a === "-h") {
       process.stdout.write("usage: okuda <file.md> [--watch] [--tui] [--no-color] [--palette <name>]\n");
+      process.stdout.write("       gloam [-g <query>]  (browse → read → browse; -g seeds the ranked content shortlist)\n");
       process.exit(0);
     } else if (a === "--version") {
       const sha = typeof BUILD_SHA !== "undefined" ? BUILD_SHA : undefined;
@@ -102,6 +110,20 @@ async function main(): Promise<void> {
   // Gloam launcher (ADR-016): invoked as `gloam` with no file arg and a TTY
   // stdin → run the browse → read → browse picker loop. `okuda <file>` is
   // unaffected; two names, two entry contracts, one binary.
+  // `gloam -g <query>` (BRF-CONTENT-SHORTLIST): the ranked content
+  // shortlist — registry field hits, body hits, filename remainder —
+  // seeded into the same browse → read → browse loop. An explicit flag,
+  // never a heuristic: bare-arg stays "the file called X". Gates before
+  // the no-arg launcher (which would otherwise swallow the invocation,
+  // -g sets no file arg).
+  if (args.grep !== null) {
+    if (!invokedAsGloam() || !process.stdin.isTTY) {
+      process.stderr.write("gloam: -g is a gloam mode flag and needs a TTY (invoke as gloam -g <query>)\n");
+      process.exit(1);
+    }
+    await runLauncher({ grep: args.grep });
+    return;
+  }
   if (invokedAsGloam() && !args.file && process.stdin.isTTY) {
     await runLauncher();
     return;

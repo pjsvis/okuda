@@ -1,8 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import {
   GLOAM_FZF_BINDS,
+  dedupeByPath,
   invokedAsGloam,
   listMarkdownFiles,
+  rankedShortlist,
+  registryHits,
 } from "../src/launcher";
 import { existsSync } from "node:fs";
 import { basename } from "node:path";
@@ -55,10 +58,21 @@ describe("launcher — invokedAsGloam (argv[0] basename detection)", () => {
   });
 });
 
-describe("launcher — listMarkdownFiles", () => {
+describe("launcher — listMarkdownFiles (rg-sourced, BRF-CONTENT-SHORTLIST)", () => {
+  test("rg on PATH (precondition — rg is the source for both picker modes)", () => {
+    const onPath = (() => {
+      for (const dir of (process.env.PATH ?? "").split(":")) {
+        if (!dir) continue;
+        if (existsSync(`${dir}/rg`)) return true;
+      }
+      return false;
+    })();
+    expect(onPath).toBe(true);
+  });
+
   test("lists .md files in this repo (the silo we index against)", () => {
     const files = listMarkdownFiles(process.cwd());
-    expect(files.length).toBeGreaterThan(20); // 34 briefs alone
+    expect(files.length).toBeGreaterThan(20); // 43 briefs alone
     expect(files.every((f) => f.endsWith(".md"))).toBe(true);
   });
 
@@ -72,6 +86,55 @@ describe("launcher — listMarkdownFiles", () => {
     const files = listMarkdownFiles(process.cwd());
     const sorted = [...files].sort();
     expect(files).toEqual(sorted);
+  });
+});
+
+describe("launcher — dedupeByPath (feed order = priority)", () => {
+  test("first occurrence wins; channel order preserved", () => {
+    expect(dedupeByPath([["a.md", "b.md"], ["b.md", "c.md"], ["c.md", "d.md"]])).toEqual([
+      "a.md",
+      "b.md",
+      "c.md",
+      "d.md",
+    ]);
+  });
+
+  test("a document matching every channel appears once, at its highest channel", () => {
+    expect(dedupeByPath([["hit.md"], ["hit.md"], ["hit.md"]])).toEqual(["hit.md"]);
+  });
+
+  test("empty channels are honest no-ops", () => {
+    expect(dedupeByPath([[], ["a.md"], []])).toEqual(["a.md"]);
+  });
+});
+
+describe("launcher — rankedShortlist (the -g merge, integration)", () => {
+  test("a pure-registry query ranks the owning document first", () => {
+    // SHORTLIST names exactly one owner: the brief itself. Registry
+    // channel fires, body mentions rank later, filename remainder last.
+    const shortlist = rankedShortlist("BRF-CONTENT-SHORTLIST", process.cwd());
+    expect(shortlist[0]).toBe("briefs/2026-08-30-brief-content-shortlist.md");
+    expect(shortlist.length).toBeGreaterThan(1); // the remainder followed
+  });
+
+  test("a pure-filename query still surfaces the file (remainder channel)", () => {
+    // The 2026-09-04 amendment: filenames and content, one search.
+    const shortlist = rankedShortlist("origin-doc", process.cwd());
+    expect(shortlist).toContain("docs/2026-08-20-origin-doc.md");
+  });
+
+  test("no duplicates in the merged list", () => {
+    const shortlist = rankedShortlist("diagram", process.cwd());
+    expect(new Set(shortlist).size).toBe(shortlist.length);
+  });
+
+  test("registryHits is field-anchored: a summary-only match is not an owner", () => {
+    // "diagram" appears in many summaries; only callsign-bearing rows
+    // may produce channel-1 hits, and each hit must live in a tier dir.
+    const hits = registryHits("diagram", process.cwd());
+    for (const h of hits) {
+      expect(h.startsWith("briefs/") || h.startsWith("decisions/") || h.startsWith("debriefs/") || h.startsWith("playbooks/")).toBe(true);
+    }
   });
 });
 

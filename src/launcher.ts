@@ -8,14 +8,18 @@
  * on quit, the picker resumes with the query reseeded. On Esc, exit.
  * (briefs/2026-08-26-brief-gloam-launcher-promotion.md; ADR-016.)
  *
+ * `-g <query>` (BRF-CONTENT-SHORTLIST) seeds the picker with the ranked
+ * shortlist — registry field hits, body hits, filename remainder —
+ * instead of the plain file list. rg is the source for both modes.
+ *
  * fzf on our ship follows our rules; back in unix land it follows its
  * own. The binds are scoped to this invocation (`FZF_DEFAULT_OPTS=`
  * blanks inherited opts); no global mutation, no dotfile edit.
  */
 
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { basename, join } from "node:path";
-import { detectRoot, makeCallsignResolver } from "./root";
+import { detectRoot, makeCallsignResolver, TIER_REGISTRIES } from "./root";
 import { runTui } from "./tui";
 import { terminalCols, terminalRows } from "./width";
 
@@ -26,7 +30,8 @@ const PROMPT = "gloam ❯ ";
 /** The verb-grammar binds, exported for a contract test to pin against. */
 export const GLOAM_FZF_BINDS = FZF_BINDS;
 
-/** fzf must be on PATH; fd is preferred but has an in-process fallback. */
+/** fzf must be on PATH (rg is gated separately — it is the source for
+ *  both picker modes). */
 function which(cmd: string): string | null {
   for (const dir of (process.env.PATH ?? "").split(":")) {
     if (!dir) continue;
@@ -36,39 +41,84 @@ function which(cmd: string): string | null {
   return null;
 }
 
-/** List markdown files: `fd -e md` if available (respects .gitignore),
- *  else an in-process recursive walk (the fallback the brief names).
- *  Sorted ASCII-deterministic (LC_ALL=C equivalent) so the picker's
- *  `--tiebreak=index` keeps a canonical order. Pure-ish (reads fs). */
-export function listMarkdownFiles(cwd: string = process.cwd()): string[] {
-  if (which("fd")) {
-    const out = Bun.spawnSync(["fd", "-e", "md"], { cwd, env: { ...process.env, LC_ALL: "C" } });
-    const text = out.stdout.toString();
-    return text ? text.split("\n").filter(Boolean) : [];
-  }
-  return walkMarkdown(cwd).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+/** One rg invocation → stdout lines. Empty on no-match (rg exit 1) or
+ *  any other nonzero exit — the launcher's channels are best-effort
+ *  shortlists, and a channel that found nothing feeds an empty list,
+ *  not a crash. Pure-ish (spawns rg, reads stdout). */
+function rgLines(args: string[], cwd?: string): string[] {
+  const out = Bun.spawnSync(["rg", ...args], { cwd, env: { ...process.env, LC_ALL: "C" } });
+  if (out.exitCode !== 0) return [];
+  const text = out.stdout.toString();
+  return text ? text.split("\n").filter(Boolean) : [];
 }
 
-function walkMarkdown(dir: string, acc: string[] = []): string[] {
-  let entries: string[];
-  try {
-    entries = readdirSync(dir);
-  } catch {
-    return acc;
-  }
-  for (const name of entries) {
-    if (name === ".git" || name.startsWith(".")) continue;
-    const p = join(dir, name);
-    let st;
-    try {
-      st = statSync(p);
-    } catch {
-      continue;
+/** Escape a query for embedding in an rg regex (registry channel only;
+ *  the body channel uses -F and needs no escaping). Pure. */
+function escapeRegex(q: string): string {
+  return q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** List markdown files: `rg --files --type md` (respects .gitignore
+ *  uniformly — the include/exclude question is a .gitignore decision,
+ *  not a per-codepath accident). Sorted ASCII-deterministic (LC_ALL=C
+ *  equivalent) so the picker's `--tiebreak=index` keeps a canonical
+ *  order. Pure-ish (reads fs). */
+export function listMarkdownFiles(cwd: string = process.cwd()): string[] {
+  return rgLines(["--files", "--type", "md"], cwd).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+}
+
+/** Registry field hits (channel 1, owner-only per ADR-025): rg the tier
+ *  INDEX.jsonl files with a callsign-anchored pattern, parse each match
+ *  as JSON, emit the owning document's path. The rg match is the
+ *  prefilter; the JSON parse is the anchor — a line whose *summary*
+ *  happens to match is discarded because only `callsign` was anchored.
+ *  Unrooted cwd → no registries → empty channel (honest: no owner
+ *  index, no channel-1 ranking). Pure-ish (reads fs). */
+export function registryHits(query: string, cwd: string = process.cwd()): string[] {
+  const hits: string[] = [];
+  const pattern = `"callsign":"[^"]*${escapeRegex(query)}`;
+  for (const [dir, file] of TIER_REGISTRIES) {
+    const reg = join(dir, file);
+    if (!existsSync(join(cwd, reg))) continue;
+    for (const line of rgLines(["-i", "--no-filename", pattern, reg], cwd)) {
+      try {
+        const row = JSON.parse(line) as { file?: string };
+        if (row.file) hits.push(join(dir, row.file));
+      } catch {
+        // A registry line that isn't JSON isn't ours — skip, don't crash.
+      }
     }
-    if (st.isDirectory()) walkMarkdown(p, acc);
-    else if (name.endsWith(".md")) acc.push(p);
   }
-  return acc;
+  return hits;
+}
+
+/** Dedupe ranked channels by path, preserving first occurrence (feed
+ *  order = priority: a document that appears in several channels ranks
+ *  at its highest). Pure; exported for the contract test. */
+export function dedupeByPath(channels: string[][]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const channel of channels) {
+    for (const f of channel) {
+      if (!seen.has(f)) {
+        seen.add(f);
+        out.push(f);
+      }
+    }
+  }
+  return out;
+}
+
+/** The `-g` shortlist (BRF-CONTENT-SHORTLIST, ranked sources): registry
+ *  field hits first, then body hits (`rg -l -F`), then the filename
+ *  remainder — deduped by path. Prioritisation is feed order; fzf's
+ *  `--tiebreak=index` (already pinned) makes ties rank by input
+ *  position. The pipe is the ranker; there is no scorer. Pure-ish. */
+export function rankedShortlist(query: string, cwd: string = process.cwd()): string[] {
+  const registry = registryHits(query, cwd);
+  const body = rgLines(["-l", "-F", query, "--type", "md"], cwd);
+  const all = listMarkdownFiles(cwd);
+  return dedupeByPath([registry, body, all]);
 }
 
 /** One picker round. Pipes `files` into fzf, returns the selection + the
@@ -108,9 +158,17 @@ export async function pickFile(
 }
 
 /** The browse → read → browse loop. Caller gates: invoked as `gloam`,
- *  no file arg, stdin is a TTY. fzf absence is a clean error, never a
- *  stack trace (brief: graceful absence). */
-export async function runLauncher(): Promise<void> {
+ *  no file arg (or `-g <query>`), stdin is a TTY. fzf and rg absence are
+ *  clean errors, never a stack trace (brief: graceful absence; rg is a
+ *  hard dep alongside fzf — BRF-CONTENT-SHORTLIST source unification).
+ *  `opts.grep` seeds the loop with the ranked content shortlist instead
+ *  of the plain file list; loop shape, query reseed, and cursor behavior
+ *  are identical in both modes. */
+export async function runLauncher(opts: { grep?: string } = {}): Promise<void> {
+  if (!which("rg")) {
+    process.stderr.write("gloam: rg not found — see DEPENDENCIES.md\n");
+    process.exit(1);
+  }
   if (!which("fzf")) {
     process.stderr.write("gloam: fzf not found — see DEPENDENCIES.md\n");
     process.exit(1);
@@ -129,7 +187,12 @@ export async function runLauncher(): Promise<void> {
   let query = "";
   try {
     for (;;) {
-      const files = listMarkdownFiles();
+      // The shortlist is computed once per invocation (the query is the
+      // refinement; re-running `gloam -g <more specific>` is the Unix
+      // remedy — the brief declines interactive change:reload). Inside
+      // the loop the picker reseeds within the computed list, same as
+      // the filename path.
+      const files = opts.grep !== undefined ? rankedShortlist(opts.grep) : listMarkdownFiles();
       const pick = await pickFile(files, query);
       if (pick === null) break; // Esc / Ctrl-C in the picker
       query = pick.query; // reseed next round
