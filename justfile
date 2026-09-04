@@ -63,10 +63,10 @@ check:
 ship:
     @bun test && just check && just build && just install && just fresh
 
-# Content-search conformance smoke (BRF-CONTENT-SHORTLIST)
+# Search conformance smoke
 [group('quality gate')]
-search-smoke query="1.4.0" want="DEPENDENCIES.md":
-    @bash scripts/search-smoke.sh {{query}} {{want}}
+search-smoke:
+    @bash scripts/search-smoke.sh
 
 # Freshness check
 [group('quality gate')]
