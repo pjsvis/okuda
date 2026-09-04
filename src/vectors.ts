@@ -34,50 +34,52 @@ export const CALLSIGN_SHAPE = /^[A-Z]{3}(-[A-Z0-9]+)+$/;
 const RE_MD_LINK = /\[[^\]\n]*\]\((\S+?\.md)\)/g;
 const RE_CALLSIGN = /[A-Z]{3}(?:-[A-Z0-9]+)+/g;
 
-/** Discover the reference targets of a main document, in reading order,
- *  unique by target, capped at MAX_REFS. Optimistic: nothing is
- *  validated here — a target is whatever looks like a reference.
- *  The frontmatter block is not scanned: the document's own callsign is
- *  an identity, not a reference — self-vectors waste the address space.
- *  Legacy `okuda-rhs` token numbers are not honored (their surrounding
- *  paths and callsigns are ordinary references like any other). Pure. */
-export function discoverReferences(source: string): string[] {
+/** The destination set: every reference-shaped target in the document,
+ *  in reading order (a Set preserves insertion order), unique by
+ *  construction, capped at MAX_REFS. Optimistic: nothing is validated
+ *  here — a destination is whatever looks like a reference. The
+ *  frontmatter is not scanned: a document's own callsign is identity,
+ *  not a reference. Legacy `okuda-rhs` token numbers are not honored
+ *  (their surrounding paths and callsigns are ordinary references like
+ *  any other). Pure. */
+export function discoverDestinations(source: string): Set<string> {
   const fm = source.match(/^---\n[\s\S]*?\n---/);
   const bodyStart = fm ? fm[0]!.length : 0;
   const hits: Array<{ pos: number; target: string }> = [];
   for (const m of source.matchAll(RE_MD_LINK)) {
-    if (m.index! < bodyStart) continue;
-    hits.push({ pos: m.index!, target: m[1]! });
+    if (m.index! >= bodyStart) hits.push({ pos: m.index!, target: m[1]! });
   }
   for (const m of source.matchAll(RE_CALLSIGN)) {
-    if (m.index! < bodyStart) continue;
-    hits.push({ pos: m.index!, target: m[0]! });
+    if (m.index! >= bodyStart) hits.push({ pos: m.index!, target: m[0]! });
   }
   hits.sort((a, b) => a.pos - b.pos);
-  const out: string[] = [];
-  const seen = new Set<string>();
+  // The Set is the contract: unique by destination, insertion order is
+  // reading order, enumeration is the assignment.
+  const dests = new Set<string>();
   for (const h of hits) {
-    if (seen.has(h.target)) continue;
-    seen.add(h.target);
-    out.push(h.target);
-    if (out.length >= MAX_REFS) break;
+    if (dests.size >= MAX_REFS) break;
+    dests.add(h.target);
   }
-  return out;
+  return dests;
 }
 
-/** The jump map: vector number (11+) → target, in discovery order.
- *  Capped defensively at MAX_REFS — the map enforces the invariant even
+/** The jump map: enumerate the destination set, assign the vectors —
+ *  `§11` upward, insertion order, capped defensively at MAX_REFS even
  *  if a caller bypasses discovery. Pure; rebuilt on every render —
  *  re-derivation replaces invalidation. */
-export function buildJumpMap(refs: string[]): Map<number, string> {
+export function buildJumpMap(dests: Iterable<string>): Map<number, string> {
   const map = new Map<number, string>();
-  refs.slice(0, MAX_REFS).forEach((target, i) => map.set(VECTOR_MIN + i, target));
+  let n = VECTOR_MIN;
+  for (const target of dests) {
+    if (n > VECTOR_MAX) break;
+    map.set(n++, target);
+  }
   return map;
 }
 
 /** Convenience: derive the map straight from a main document's source. */
 export function jumpMapFor(source: string): Map<number, string> {
-  return buildJumpMap(discoverReferences(source));
+  return buildJumpMap(discoverDestinations(source));
 }
 
 /** Inject one paint marker after each reference occurrence. The marker

@@ -592,6 +592,12 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // mark; residuals are swept by stripTags at finalize. (td-b81597.)
       if (RE_RHS_WIRE.test(children)) return TAG_RHS_WIRE;
       let out = stripHtml(children);
+      // Vector markers (ADR-031) — table cells route through here, not
+      // the paragraph handler: live tokens paint as gold silcrows, legacy
+      // tokens strip silently (retired, not honored).
+      out = out.replace(/%{1,2}okuda-vector:(\d{1,2})%{1,2}/g, (_m, n: string) =>
+        " " + styler.roleBold("vector", `§${n}`));
+      out = out.replace(/%{1,2}okuda-(?:vector|rhs):\d{1,2}%{1,2}/g, "");
       // Bare .md-path tokens in prose recede to the muted (far) register
       // — near/far: paths are provenance, not content. They read like
       // the status bar's folder/file text. (brief: index-and-jump.)

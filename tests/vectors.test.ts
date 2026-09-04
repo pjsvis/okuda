@@ -4,7 +4,7 @@ import {
   VECTOR_MAX,
   CLONE_TOKEN,
   MAX_REFS,
-  discoverReferences,
+  discoverDestinations,
   buildJumpMap,
   jumpMapFor,
   annotateSource,
@@ -12,41 +12,41 @@ import {
 
 describe("vectors — discovery (optimistic, reading order, unique)", () => {
   test("callsign-shaped tokens are references", () => {
-    const refs = discoverReferences("see ADR-030 and ADR-028 for the wire.");
-    expect(refs).toEqual(["ADR-030", "ADR-028"]);
+    const refs = discoverDestinations("see ADR-030 and ADR-028 for the wire.");
+    expect([...refs]).toEqual(["ADR-030", "ADR-028"]);
   });
 
   test("markdown links to .md paths are references (target is the path)", () => {
-    const refs = discoverReferences("read [the brief](briefs/2026-09-04-brief-porch-matrix.md) first.");
-    expect(refs).toEqual(["briefs/2026-09-04-brief-porch-matrix.md"]);
+    const refs = discoverDestinations("read [the brief](briefs/2026-09-04-brief-porch-matrix.md) first.");
+    expect([...refs]).toEqual(["briefs/2026-09-04-brief-porch-matrix.md"]);
   });
 
   test("reading order across both shapes", () => {
-    const refs = discoverReferences(
+    const refs = discoverDestinations(
       "first [a doc](docs/x.md), then ADR-030, then [another](docs/y.md).",
     );
-    expect(refs).toEqual(["docs/x.md", "ADR-030", "docs/y.md"]);
+    expect([...refs]).toEqual(["docs/x.md", "ADR-030", "docs/y.md"]);
   });
 
-  test("unique by target — first occurrence wins the number", () => {
-    const refs = discoverReferences("ADR-030 early, ADR-028, ADR-030 again.");
-    expect(refs).toEqual(["ADR-030", "ADR-028"]);
+  test("a Set of destinations — unique by target, insertion order", () => {
+    const refs = discoverDestinations("ADR-030 early, ADR-028, ADR-030 again.");
+    expect([...refs]).toEqual(["ADR-030", "ADR-028"]);
   });
 
   test("the frontmatter is not scanned — a document's own callsign is not a reference", () => {
     const src = "---\ntype: Brief\ncallsign: BRF-WORKING-COPY\n---\n\nRides on ADR-030 and the wire.";
-    const refs = discoverReferences(src);
-    expect(refs).toEqual(["ADR-030"]); // own callsign skipped
+    const refs = discoverDestinations(src);
+    expect([...refs]).toEqual(["ADR-030"]); // own callsign skipped
   });
 
   test("zero-padded and single-digit bracketed numbers are never vectors", () => {
-    const refs = discoverReferences("steps [07] and [3] and even [14] — but 14 has no callsign shape.");
-    expect(refs).toEqual([]); // [14] is user text, not a reference
+    const refs = discoverDestinations("steps [07] and [3] and even [14] — but 14 has no callsign shape.");
+    expect(refs.size).toBe(0); // [14] is user text, not a reference
   });
 
   test("false-positive shapes are optimistic references (the actuator decides)", () => {
     // SSH-2 has callsign shape; discovery paints it; actuation fails honestly.
-    expect(discoverReferences("the SSH-2 protocol")).toEqual(["SSH-2"]);
+    expect([...discoverDestinations("the SSH-2 protocol")]).toEqual(["SSH-2"]);
   });
 
   test("legacy okuda-rhs wiring is not honored — and is not a reference", () => {
@@ -54,13 +54,13 @@ describe("vectors — discovery (optimistic, reading order, unique)", () => {
     // paths in prose are provenance (the near/far register), not
     // references. The authored number is not honored. The row is inert.
     const src = "| *slug* | CS | **14** <!-- %%okuda-rhs:14%% briefs/x.md --> |";
-    expect(discoverReferences(src)).toEqual([]);
+    expect(discoverDestinations(src).size).toBe(0);
   });
 
   test("cap: discovery stops at MAX_REFS", () => {
     const src = Array.from({ length: 120 }, (_, i) => `ADR-${1000 + i}`).join(" ");
-    const refs = discoverReferences(src);
-    expect(refs.length).toBe(MAX_REFS);
+    const refs = discoverDestinations(src);
+    expect(refs.size).toBe(MAX_REFS);
     expect(MAX_REFS).toBe(VECTOR_MAX - VECTOR_MIN + 1);
   });
 });
