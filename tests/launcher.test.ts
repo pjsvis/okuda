@@ -138,13 +138,25 @@ describe("launcher — rankedShortlistEntries (the -g merge, integration)", () =
     expect(dep).toContain("1.4.0"); // the snippet shows the version row
   });
 
-  test("snippets are bounded (ADR-028: entry length is paint volume)", () => {
+  test("snippets are bounded — anti-pathological only (ADR-028)", () => {
     for (const q of ["diagram", "the", "Bun 1.4.0"]) {
       for (const e of rankedShortlistEntries(q, process.cwd())) {
         const [path, snippet] = e.split("\t");
         expect(path!.length).toBeGreaterThan(0);
-        if (snippet) expect(snippet.length).toBeLessThanOrEqual(100);
+        if (snippet) expect(snippet.length).toBeLessThanOrEqual(240);
       }
+    }
+  });
+
+  test("single column: paths at natural width, evidence on the same line", () => {
+    // The 2026-09-04 operator layout: the file list looks like the
+    // filename picker (no padding), evidence follows on the same line,
+    // and fzf's glass-edge truncation is the widening reveal.
+    const entries = rankedShortlistEntries("load bearing", process.cwd());
+    for (const e of entries) {
+      const pathField = e.split("\t")[0]!;
+      expect(pathField).toBe(pathField.trimEnd()); // no alignment padding
+      expect(pathField).not.toMatch(/\s/); // paths are paths
     }
   });
 
@@ -159,13 +171,15 @@ describe("launcher — rankedShortlistEntries (the -g merge, integration)", () =
     }
   });
 
-  test("evidence rows share one aligned path column; remainder rows untouched", () => {
+  test("alignment retired — single natural-width column (2026-09-04)", () => {
+    // The padded-table look lasted one revision: the operator chose the
+    // file-list-as-normal column, evidence on the same line, widening as
+    // the reveal. This test stays as the tombstone and the guard: no
+    // entry may carry alignment padding.
     const entries = rankedShortlistEntries("diagram", process.cwd());
-    const evidence = entries.filter((e) => e.slice(e.indexOf("\t") + 1).length > 0);
-    expect(evidence.length).toBeGreaterThan(0);
-    const widths = evidence.map((e) => e.indexOf("\t"));
-    expect(new Set(widths).size).toBe(1); // one shared column edge — the true max
-    expect(widths[0]).toBeGreaterThan(10); // a real column, not zero-width
+    for (const e of entries) {
+      expect(e.split("\t")[0]).toBe(e.split("\t")[0]!.trimEnd());
+    }
   });
 
   test("registryHits is field-anchored: a summary-only match is not an owner", () => {

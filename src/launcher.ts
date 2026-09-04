@@ -39,38 +39,20 @@ const SEP = "\t";
  *  also push the path off-screen when fzf hscrolls to a deep match —
  *  the path is the only actionable part; the snippet must never
  *  outrank it. */
-const SNIPPET_MAX = 100;
+const SNIPPET_MAX = 240;
 
 /** Evidence grammar: one line, single spaces, no table-cell pipe padding
  *  at the edges (the corpus is full of `| cell | cell |` rows whose
- *  padding is format, not signal). Then capped — the snippet is
- *  evidence, never the document. Pure. */
+ *  padding is format, not signal). The budget is anti-pathological only,
+ *  not the reveal mechanism — fzf truncates entries at the glass edge,
+ *  so widening the screen reveals more of the line for free (operator,
+ *  2026-09-04: "contents on the same line, expands as screen is
+ *  widened"). Pure. */
 function clipSnippet(s: string): string {
   const oneLine = s.replace(/[\t\n]/g, " ").replace(/\s+/g, " ").trim();
   const bare = oneLine.replace(/^[|\s]+/, "").replace(/\s*\|$/, "").trim();
   const t = bare.length > 0 ? bare : oneLine;
   return t.length > SNIPPET_MAX ? t.slice(0, SNIPPET_MAX - 1) + "…" : t;
-}
-
-/** Path-column alignment: evidence rows are a table, not a transcript.
- *  Snippet rows pad their path to the widest evidence path — the true
- *  max, no cap: paths are identity and cannot be truncated down to a
- *  tidy column, so a "capped" width would just split the table in two
- *  (found by the alignment test: rows at 48 and rows at 49–58). Long
- *  paths push evidence right; the snippet budget keeps total length
- *  bounded. Filename-remainder rows are unchanged; the separator stays
- *  the tab; parsing trims. Pure. */
-function alignEntries(entries: string[]): string[] {
-  const evidenceWidths = entries
-    .map((e) => e.indexOf(SEP))
-    .filter((i, idx) => i !== -1 && entries[idx]!.slice(i + 1).length > 0);
-  if (evidenceWidths.length === 0) return entries;
-  const w = Math.max(...evidenceWidths);
-  return entries.map((e) => {
-    const i = e.indexOf(SEP);
-    if (i === -1 || e.slice(i + 1).length === 0) return e;
-    return e.slice(0, i).padEnd(w) + SEP + e.slice(i + 1);
-  });
 }
 
 const FZF_BINDS = "ctrl-d:page-down,ctrl-u:page-up,esc:cancel";
@@ -267,7 +249,7 @@ export function rankedShortlistEntries(query: string, cwd: string = process.cwd(
   const remainder = listMarkdownFiles(cwd)
     .filter((f) => !bodyPaths.has(f) && !registry.some((e) => e.startsWith(f + SEP)))
     .map((f) => `${f}${SEP}`);
-  return alignEntries(dedupeEntries([registry, body, remainder]));
+  return dedupeEntries([registry, body, remainder]);
 }
 
 /** One picker round. Pipes `files` into fzf, returns the selection + the
