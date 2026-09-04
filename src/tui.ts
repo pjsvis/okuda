@@ -515,14 +515,14 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     const doc = currentFile;
     if (process.env.TMUX) {
       const r = Bun.spawnSync(["tmux", "new-window", "-c", process.cwd(), "gloam", doc]);
-      if (r.exitCode === 0) flash(`[99] — cloned: ${doc}`, "state-ok");
-      else flash(`[99] — clone failed (tmux new-window exit ${r.exitCode})`);
+      if (r.exitCode === 0) flash(`cloned: ${doc}`, "state-ok");
+      else flash(`clone failed (tmux new-window exit ${r.exitCode})`);
     } else if (process.env.OKUDA_CLONE_CMD) {
       const r = Bun.spawnSync(["sh", "-c", process.env.OKUDA_CLONE_CMD, "okuda-clone", doc]);
-      if (r.exitCode === 0) flash(`[99] — cloned: ${doc}`, "state-ok");
-      else flash(`[99] — clone failed (OKUDA_CLONE_CMD exit ${r.exitCode})`);
+      if (r.exitCode === 0) flash(`cloned: ${doc}`, "state-ok");
+      else flash(`clone failed (OKUDA_CLONE_CMD exit ${r.exitCode})`);
     } else {
-      flash("[99] — no clone host: run inside tmux or set OKUDA_CLONE_CMD");
+      flash("no clone host: run inside tmux or set OKUDA_CLONE_CMD");
     }
   };
 
@@ -614,12 +614,12 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     if (!target) return; // no such vector — silent, per the old contract
     const path = opts.resolveTarget ? opts.resolveTarget(target) : target;
     if (!path) {
-      flash(`[${token}] — no document to render`);
+      flash(`§${token} — no document to render`);
       return;
     }
     const fetch = await readSource(path);
     if (!fetch.ok) {
-      flash(`[${token}] — no document to render`);
+      flash(`§${token} — no document to render`);
       return; // optimistic paint, honest failure — stay put, no stack push
     }
     backstack.push({ file: currentFile, scroll });

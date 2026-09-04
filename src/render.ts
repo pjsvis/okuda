@@ -576,7 +576,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       const v = stripVector(children);
       if (v) {
         if (!v.live) return wrapBlock(stripHtml(v.slug)).join("\n") + "\n\n";
-        const badge = `[\u00a7${v.num}]`;
+        const badge = `\u00a7${v.num}`;
         const slugLines = wrapBlock(stripHtml(v.slug));
         const avail = Math.max(width - 2 - badge.length - 1, 8);
         const body = elideToWidth(slugLines.join(" "), avail);
@@ -682,7 +682,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       const v = stripVector(children);
       if (v) {
         if (!v.live) return TAG_ITEM + v.slug;
-        return TAG_ITEM + v.slug + " " + styler.roleBold("vector", `[\u00a7${v.num}]`);
+        return TAG_ITEM + v.slug + " " + styler.roleBold("vector", `\u00a7${v.num}`);
       }
       return TAG_ITEM + children;
     },

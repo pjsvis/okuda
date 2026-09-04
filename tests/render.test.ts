@@ -559,9 +559,10 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
 
   test("the vector badge paints in the reserved vector role after the slug", async () => {
     const out = await render("*Title* %okuda-vector:01% <!-- docs/foo.md -->");
-    // ADR-031: the badge in the reserved vector paint (#dfa21a → 223;162;26),
-    // bold. Tolerant of the inline parser's % mangling.
-    expect(out).toContain("\x1b[38;2;223;162;26;1m[§01]\x1b[0m");
+    // ADR-031: the badge in the reserved vector paint (#ffcc66 → 255;204;102),
+    // bold, bracketless — the section sign is the marker and the boundary.
+    // Tolerant of the inline parser's % mangling.
+    expect(out).toContain("\x1b[38;2;255;204;102;1m§01\x1b[0m");
   });
 
   test("the slug renders as emphasis (yellow, italic) on the left", async () => {
@@ -584,7 +585,7 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
     );
     const plain = out.replace(/\x1b\[[0-9;]*m/g, "");
     expect(plain).toContain("…");
-    expect(plain).toContain("[§05]");
+    expect(plain).toContain("§05");
     // One body line (not wrapped): the body lines, excluding rails.
     const bodyLines = plain.split("\n").filter((l) => l.trim() && !l.includes("─") && !l.includes("█"));
     expect(bodyLines.length).toBe(1);

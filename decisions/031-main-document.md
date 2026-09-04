@@ -27,7 +27,7 @@ registry-validated at render time.
 ## The model
 
 - **Main document**: what the instance is rooted on. Rendered with its
-  references annotated as vectors — `[§11]` … `[§98]` painted after each
+  references annotated as vectors — `§11` … `§98` painted after each
   reference, in the reserved vector paint (see below). The section sign
   is the semantics: it means *reference*, it is not a character prose
   uses, and the badge reads as a reference even without colour.
@@ -55,8 +55,10 @@ registry-validated at render time.
   two-digit buffer closes the space; no leading-zero ambiguity.
 - **Overflow stops**: past 98 references, the map simply ends. The
   remedy is editorial — make the document smaller, or clone and search.
-- **Always two digits** in the painted form, behind the section sign:
-  `[§NN]`.
+- **Always two digits** in the painted form, led by the section sign:
+  `§NN` — no brackets. The section sign is the marker and the boundary;
+  brackets were markdown habit, and the gold bold carries the rest
+  (settled by experiment 2026-09-04: brackets dropped, colour kept).
 - **Zero-padded digits in source are never vectors**: `[07]` in a
   document is text, always.
 - **The reserved paint**: vector numbers render in a dedicated palette
