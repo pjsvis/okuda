@@ -77,6 +77,23 @@ document, at the same time, through the same grammar**:
 The collaboration is not metaphorical. It is the same file, the same
 map, two projections.
 
+## The working set
+
+The channel bounds the context to a **restricted document set with
+declared relevance to the current context** — Denning's working set,
+applied to documents. The main document declares its relevance by
+referencing; the vectors make the declaration addressable; the shelf
+bootstraps it (the root is the initial working set); the dive extends
+it only as far as the query and the references reach. Thrashing is
+bounded by the same rules that bound the tour: one dereference deep,
+88 vectors, each level a deliberate keystroke.
+
+This is why declared relevance beats inferred relevance for a curated
+corpus: a link carries intent, which no similarity score recovers; a
+stale link is auditable, which no embedding is; and the agent's context
+window mirrors the human's working set exactly, because both are
+projections of the same derived map.
+
 ## The self-description
 
 This explainer describes the system to others, potentially — and to
