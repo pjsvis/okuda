@@ -151,6 +151,34 @@ The house verbs: **type, dereference, unwind, promote, consult**. The
 house nouns: **main document, referenced document, signpost, silcrow,
 concordance**.
 
+### 5. The sqlite temptation — declined, with reasons (2026-09-04)
+
+The challenge was posed honestly: *compose the silo into a browser-like
+experience with a small local sqlite database — make something you
+already have, out of stuff you already have, to do something it already
+does.* Declined, because the sentence is a self-portrait of the
+redundant abstraction:
+
+- **What the database would buy** — a persisted working set across
+  sessions. The silo's answer already exists in its own idiom: the
+  working set persisted is a **document** (a `&shelf.md`, written when
+  you stand up, read when you sit down) — the trail-is-a-document rule,
+  applied to sessions.
+- **What the database would cost** — the first global state in the
+  system: a cache that can go stale, a schema that can drift, a
+  coherence problem where there used to be a file.
+- **What the browser experience already is** — tabs = tmux windows;
+  history = the window list; bookmarks = the shelf and the silcrows;
+  reload = `r`; the address bar = the concordance; back = unnecessary.
+  The composition exists. Only the chrome is missing, and chrome is
+  where browsers go to die.
+
+If the experiment is ever run, it runs in a scratch branch as a lab —
+it must not merge, because its deliverable is the invariant this system
+is built on refusing: global state. The seniority test is knowing that
+the correct output of the challenge is the refusal, written down. This
+is that.
+
 ## The rule for adding any of these
 
 Ladder discipline (ADR-028's, applied to features): an implied filter
