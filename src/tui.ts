@@ -82,10 +82,13 @@ export function decodeKey(buf: Uint8Array): KeyAction {
     case 0x62: return "page-up";        // b — less/man back convention
     case 0x3f: return "help";           // ? — toggle verbose hints
     case 0x75: return "back";           // u — pop the backstack
-    // Backspace does not unwind (keyboard-controls): the silcrow
-    // vocabulary owns the exits — `u` unwinds, `00` is OFF. A stray
-    // backspace in a dereferenced document must not throw the reader
-    // out of it.
+    // Backspace unwinds — restored 2026-09-05 on ergonomics: it sits
+    // on the RHS beside the less-used keys, the natural rest for the
+    // right hand between reads. It has no job outside the dereferenced
+    // document: at main the backstack is empty and `back` is a no-op —
+    // the depth-one stack makes it safe by construction.
+    case 0x7f: return "back";           // DEL (Backspace on most terminals)
+    case 0x08: return "back";           // BS  (Backspace on some terminals)
   }
   // Escape sequences: ESC [ <final> or ESC [ <n> ~.
   if (b0 === ESC && buf.length >= 3 && buf[1] === 0x5b) {

@@ -17,9 +17,12 @@
 
 - **[00] OFF is live** — double-tap zero exits, and the hints row now
   advertises it first: `00 off`. The mnemonic held: 00 = OFF.
-- **Backspace no longer unwinds** — the silcrow vocabulary owns the
-  exits: `u` unwinds, `00` is OFF. A stray backspace in a dereferenced
-  document stays put (it used to throw the reader out).
+- **Backspace unwinds (restored same day)** — the first retirement was
+  reversed on ergonomics: Backspace sits on the RHS beside the
+  less-used keys, the right hand's natural rest between reads. It has
+  no job outside the dereferenced document — at main the depth-one
+  stack makes it a no-op by construction. `u` and Backspace are
+  synonyms for the same verb: unwind.
 - **ESC cancels the partial vector** — a lone ESC stands down a
   half-typed sequence (ESC-as-unwind remains deferred: the
   split-sequence synthesis risk).

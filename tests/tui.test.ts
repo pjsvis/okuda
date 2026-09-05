@@ -427,15 +427,13 @@ describe("tui — gateFetch (changed / same / failed, retain-on-failure)", () =>
 
 // ── Index-and-jump (brief 2026-08-28) ───────────────────────────────
 
-describe("tui — decodeKey (back-nav: u only)", () => {
+describe("tui — decodeKey (back-nav: u and Backspace are synonyms)", () => {
   test("u → back", () => {
     expect(decodeKey(buf(0x75))).toBe("back");
   });
-  test("Backspace does NOT unwind (keyboard-controls): 00 is OFF, u unwinds", () => {
-    // The silcrow vocabulary owns the exits — a stray backspace in a
-    // dereferenced document must not throw the reader out of it.
-    expect(decodeKey(buf(0x7f))).toBeNull();
-    expect(decodeKey(buf(0x08))).toBeNull();
+  test("DEL/BS → back — RHS ergonomics; no-op at main by the depth-one stack", () => {
+    expect(decodeKey(buf(0x7f))).toBe("back");
+    expect(decodeKey(buf(0x08))).toBe("back");
   });
 });
 
