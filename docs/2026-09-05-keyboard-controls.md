@@ -39,9 +39,10 @@ the state machine.
   default until [01] lands.
 - **[03] frozen mode** — cheap: suppress the fs.watch/rerender path
   (`r` stays manual). For reading while an agent edits.
-- **[01] frame mode** — needs BRF-PAGED-OKUDAGRAM (header + content to
-  the next header, fills the glass). The brief is specced; this doc
-  promotes it from Exploration to build-next.
+- **[01] frame mode — LANDED (v1, 2026-09-05)**: j/k step header to
+  header (k from mid-frame snaps to the current frame's header first),
+  arrows slippy within, ␣/b page within. The brief's EC1–EC9 walk
+  remains the residue.
 - **[10] edit** — the retired edit-dispatch idea returns as a verb:
   `$EDITOR` (or the declared agent channel) on the current document,
   in a separate terminal. File is the contract; no state.
@@ -70,6 +71,7 @@ the state machine.
   picker round. Re-bind: ESC clears the query (back to the shelf)
   instead; only `00` exits the loop. A grammar change in the fzf
   binds — pinned by the contract test.
+- **ESC should cancel outstanding number keys
 - **Mode is per-instance** — no global state (constitution). A new
   instance opens in the default mode; there is deliberately no
   "mode memory" across instances.

@@ -18,6 +18,7 @@
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
 import { annotateSource, jumpMapFor, CLONE_TOKEN } from "./vectors";
 import { cloneArgs } from "./clone";
+import { frameBounds, headingLines, snapFrame } from "./frames";
 import { verbFor } from "./keygrammar";
 import { loadPalette, type Palette } from "./palette";
 import { renderDocument } from "./render";
@@ -525,6 +526,11 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  the fs.watch auto-re-render is suppressed. `r` remains the manual
    *  override, resize still follows the glass. */
   let frozen = false;
+  /** Render mode (keyboard-controls): `slide` = the continuous surface
+   *  (default); `frame` = the okudagram frame — j/k step header to
+   *  header, arrows stay slippy within, ␣/b page within (BRF-
+   *  PAGED-OKUDAGRAM). Mode is per-instance, no memory across clones. */
+  let renderMode: "slide" | "frame" = "slide";
 
   /** Edit a blank document (`09`): a new note in the CURRENT
    *  document's directory, opened in the declared editor inside a
@@ -698,8 +704,18 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       const verb = verbFor(step.token);
       switch (verb) {
         case "exit": return cleanup();
-        case "frame": flash("frame mode — needs BRF-PAGED-OKUDAGRAM"); break;
-        case "slide": frozen = false; flash("sliding mode"); break;
+        case "frame": {
+          renderMode = "frame";
+          const { start } = frameBounds(headingLines(lines), lines.length, scroll);
+          scroll = start;
+          flash("frame mode — j/k steps, arrows slippy within");
+          break;
+        }
+        case "slide":
+          renderMode = "slide";
+          frozen = false;
+          flash("sliding mode");
+          break;
         case "freeze": frozen = true; flash("frozen — the document stays still (r re-renders)"); break;
         case "editNew": editNew(); break;
         case "edit": flash("edit current — the edit brief is not wired yet"); break;
@@ -724,8 +740,16 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     const { maxScroll } = viewport(lines, 0, height);
     const half = Math.max(1, Math.floor(height / 2));
     switch (action) {
-      case "down": scroll += 1; break;
-      case "up": scroll -= 1; break;
+      case "down":
+        if (renderMode === "frame") {
+          scroll = snapFrame(headingLines(lines), lines.length, scroll, 1);
+        } else scroll += 1;
+        break;
+      case "up":
+        if (renderMode === "frame") {
+          scroll = snapFrame(headingLines(lines), lines.length, scroll, -1);
+        } else scroll -= 1;
+        break;
       case "page-down": scroll += height; break;
       case "page-up": scroll -= height; break;
       case "half-down": scroll += half; break;

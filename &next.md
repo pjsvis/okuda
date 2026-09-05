@@ -12,6 +12,12 @@ Actuate the amber vector [##] to render the referenced document:
 - **BRF-CONTENT-SHORTLIST** — the discovery gap, the oldest standing
   complaint: closed. The live search shipped as the default (ADR-030),
   ranked and evidence-carrying; the picker is the index now.
+- **The keyboard grammar** — 00-10 verbs and modes, 11-98 addresses, 99
+  promotion: the two-digit space is a language with a bindings table
+  (src/keygrammar.ts); renumbering is a one-line edit.
+- **Frame mode (BRF-PAGED-OKUDAGRAM, v1)** — `01` actuates: a frame is
+  a header and its content to the next header; j/k step frames, arrows
+  slippy within, ␣/b page. The brief's EC walk remains.
 
 ## Recommended — start these next
 
@@ -30,9 +36,9 @@ Actuate the amber vector [##] to render the referenced document:
 
 ## Exploration — read-and-think, no code
 
-- **BRF-PAGED-OKUDAGRAM — the okudagram frame** — rule fully specified:
-  a frame is a header + content to the next header; pending walk
-  validation against EC1–EC9 · **S**
+- **BRF-PAGED-OKUDAGRAM — the EC walk** — frame mode v1 shipped; the
+  brief's EC1–EC9 edge cases need a validation walk against real
+  documents (tall frames, blank frames, nested headers) · **S**
 
 ## Hygiene — small, owed
 
