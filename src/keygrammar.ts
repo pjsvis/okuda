@@ -2,6 +2,12 @@
  * keygrammar.ts — the two-digit keyboard grammar as data (ADR-031,
  * keyboard-controls 2026-09-05).
  *
+ * This file is a grammar and some actuators. Keep them consistent
+ * throughout time; recover if things go wrong (re-derivation is always
+ * available — nothing here is state). There is no messy state to deal
+ * with: just the system invariants and the inescapable side effects,
+ * which live in the actuators, at the edge, visibly.
+ *
  * The two-digit space has three zones:
  *   00–10  verbs and modes — what the instance DOES
  *   11–98  addresses — what the instance SHOWS (the silcrows)
