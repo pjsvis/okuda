@@ -73,7 +73,7 @@ search-smoke:
 search-replay *args:
     @bash scripts/search-replay.sh {{args}}
 
-# Vector dogfood — assert the contract, then open the glass
+# Vector contract dogfood
 [group('quality gate')]
 dogfood:
     @bun scripts/vector-check.ts
