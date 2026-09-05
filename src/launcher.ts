@@ -55,7 +55,10 @@ function clipSnippet(s: string): string {
   return t.length > SNIPPET_MAX ? t.slice(0, SNIPPET_MAX - 1) + "…" : t;
 }
 
-const FZF_BINDS = "ctrl-d:page-down,ctrl-u:page-up,esc:cancel";
+// esc:clear-query — ESC never exits the picker (keyboard-controls:
+// "ESC stops short of exiting the app"); leaving is Ctrl-C or 00 in the
+// document. The old esc:cancel made a double-ESC exit the game.
+const FZF_BINDS = "ctrl-d:page-down,ctrl-u:page-up,esc:clear-query";
 const HEADER =
   "type: search everything · enter: read · ctrl-w: clear word · esc: clear/done\n ";
   // The trailing space-line is the breath after the help text — fzf

@@ -19,7 +19,15 @@ describe("launcher — verb-grammar binds (ADR-016, contract pin)", () => {
   test("the three parity binds are present and in the agreed order", () => {
     // The picker is a guest of the reader's key set. These binds are the
     // contract; changing them is a key-grammar change, not a tweak.
-    expect(GLOAM_FZF_BINDS).toBe("ctrl-d:page-down,ctrl-u:page-up,esc:cancel");
+    expect(GLOAM_FZF_BINDS).toBe("ctrl-d:page-down,ctrl-u:page-up,esc:clear-query");
+  });
+
+  test("esc NEVER aborts the picker (keyboard-controls: double-ESC must not exit)", () => {
+    // The old esc:cancel made ESC abort the picker round — a double-tap
+    // took the operator out of the game. ESC clears the query; leaving
+    // is Ctrl-C or 00 in the document.
+    expect(GLOAM_FZF_BINDS).toContain("esc:clear-query");
+    expect(GLOAM_FZF_BINDS).not.toContain("esc:cancel");
   });
 
   test("ctrl-u is NOT clear-query (the punch the parity work fixed)", () => {
@@ -34,8 +42,8 @@ describe("launcher — verb-grammar binds (ADR-016, contract pin)", () => {
     expect(GLOAM_FZF_BINDS).toContain("ctrl-d:page-down");
   });
 
-  test("esc:cancel is present (clear/done — fzf's modern default, located right)", () => {
-    expect(GLOAM_FZF_BINDS).toContain("esc:cancel");
+  test("esc:clear-query is present (ESC never exits — keyboard-controls)", () => {
+    expect(GLOAM_FZF_BINDS).toContain("esc:clear-query");
   });
 });
 

@@ -27,7 +27,7 @@ process.stdout.write(rankedShortlistEntries(process.argv[1]!).join("\n") + "\n")
 echo "── the same thing, both sides ─────────────────────────"
 echo "query:   \"$QUERY\""
 echo "entries: $DUMP ($(wc -l < "$DUMP" | tr -d ' ') lines, $(grep -c $'\t' "$DUMP" || true) with evidence)"
-echo "argv:    fzf --layout=reverse --no-mouse --no-hscroll --exact --tiebreak=index --delimiter=<TAB> --color=... \\"
+echo "argv:    fzf --layout=reverse --no-mouse --no-hscroll --exact --tiebreak=index --delimiter=<TAB> \\\n           --bind=...esc:clear-query... --color=... \\"
 echo "           --bind=ctrl-d:page-down,ctrl-u:page-up,esc:cancel \\"
 echo "           --query=\"$QUERY\" --print-query --header=... --prompt=\"gloam -g ❯ \""
 echo "env:     FZF_* stripped (fzfEnv); your shell rc cannot reach this instance"
@@ -35,7 +35,7 @@ echo "────────────────────────�
 
 # ── the instance: identical argv, interactive, list from the dump ─────
 fzf --layout=reverse --no-mouse --no-hscroll --exact --tiebreak=index --delimiter="	" \
-  --bind="ctrl-d:page-down,ctrl-u:page-up,esc:cancel" \
+  --bind="ctrl-d:page-down,ctrl-u:page-up,esc:clear-query" \
   --prompt="gloam -g ❯ " --query="$QUERY" --print-query \
   --header="type: search everything · enter: read · ctrl-w: clear word · esc: clear/done\n " \
   < "$DUMP" > /tmp/gloam-selection.txt || true
