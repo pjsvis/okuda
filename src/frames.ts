@@ -1,6 +1,11 @@
 /**
- * frames.ts — the okudagram frame helpers (BRF-PAGED-OKUDAGRAM, ADR-031
- * frame mode).
+ * frames.ts — the okudaframe helpers (BRF-PAGED-OKUDAGRAM, ADR-031
+ * frame mode, keyboard-controls [01]).
+ *
+ * Naming (the attribution badge): Okuda's name goes on artifacts that
+ * carry the design language — okudagram (the diagrams), okudaframe
+ * (these reading frames), okuda (the palette and the badge). The
+ * suffix names the artifact; the prefix is the attribution.
  *
  * The rule, from the brief: **a frame is a header and its content, from
  * the header to the next header (or EOF).** The frame fills the

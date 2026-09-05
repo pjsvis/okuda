@@ -53,7 +53,7 @@ the state machine.
   default until [01] lands.
 - **[03] frozen mode** — cheap: suppress the fs.watch/rerender path
   (`r` stays manual). For reading while an agent edits.
-- **[01] frame mode — LANDED (v1, 2026-09-05)**: j/k step header to
+- **[01] frame mode — LANDED (v1, 2026-09-05), named the okudaframe**: j/k step header to
   header (k from mid-frame snaps to the current frame's header first),
   arrows slippy within, ␣/b page within. The brief's EC1–EC9 walk
   remains the residue.
