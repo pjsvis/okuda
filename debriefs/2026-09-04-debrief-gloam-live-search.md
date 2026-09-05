@@ -72,6 +72,35 @@ standalone). 343 tests. ADR-030 carries the decision.
 - The picker-as-okuda-overlay endgame (three-concerns negotiation,
   ADR-016's guest line) — named, not scheduled.
 
+## Addendum — the afternoon (the same day, continued)
+
+The morning shipped the search; the afternoon gave it a philosophy and
+a shape:
+
+- **The silcrow** — bracketless `§NN` badges in the reserved vector
+  paint (LCARS gold, distinct from every author-addressable role); the
+  glyph inherited, not invented.
+- **The shelf and the dive** — no text lands on the root shelf; filter
+  text dives the corpus with root files excluded. The &-family floats
+  at the landing and steps aside when you consult.
+- **One-to-many vectors** — every reference occurrence gets its own
+  vector; several vectors may translate to one filename. The map is the
+  translation table; the paint is a projection.
+- **The shared channel** — the agent audits references through the same
+  derivation the human reads through (`--entries`); the audit caught
+  its own decoration on first run.
+- **The vocabulary and the filter model** — the house words pinned
+  (reference, dereference, unwind, promote, consult); the reserve list
+  filed (shelf scale, folder-listing suppression, the agent's tour,
+  state filters); and one challenge declined: the sqlite browser, whose
+  deliverable was the invariant the system refuses.
+
+The arc: **history abolished, context bounded to declared relevance,
+and the whole thing composed out of machinery a millennium old.** The
+session closed with the seniority test passed in writing: the sqlite
+temptation, declined with reasons, filed beside the ideas it almost
+displaced.
+
 ## Numbers
 
 - 15 commits on `feat/content-shortlist-amendment`, ff-merged to `main`.
