@@ -75,8 +75,11 @@ search-replay *args:
 
 # Vector contract dogfood
 [group('quality gate')]
-dogfood:
+smoke-test:
     @bun scripts/vector-check.ts
+    @bun test tests/keygrammar.test.ts tests/frames.test.ts tests/clone.test.ts tests/vectors.test.ts
+
+dogfood: smoke-test
     @./okuda --tui '&alpha.md'
 
 # Freshness check

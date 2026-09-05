@@ -67,12 +67,12 @@ the state machine.
   but nothing is lost under the no-state model — the document is on
   disk and the shelf re-derives. Proposal: no confirmation; 00 twice
   is deliberate enough.
-- **Picker ESC vs `esc:cancel`** — fzf's bind currently exits the
+- **Picker ESC vs `esc:cancel`** - fzf's bind currently exits the
   picker round. Re-bind: ESC clears the query (back to the shelf)
   instead; only `00` exits the loop. A grammar change in the fzf
   binds — pinned by the contract test.
-- **ESC should cancel outstanding number keys
-- **Mode is per-instance** — no global state (constitution). A new
+- **ESC cancels partial vector** - if a user presses a single key they can escape the sequence by pressing ESC  
+- **Mode is per-instance** - no global state (constitution). A new
   instance opens in the default mode; there is deliberately no
   "mode memory" across instances.
 - **The footer must advertise the grammar** — the hints row carries

@@ -695,6 +695,14 @@ export async function runTui(opts: TuiOptions): Promise<void> {
 
   const onKey = (data: Buffer): void => {
     const bytes = new Uint8Array(data);
+    // A lone ESC (keyboard-controls: "ESC cancels partial vector") —
+    // the user's escape from a half-typed sequence. Arrow sequences
+    // arrive as multi-byte reads, so a single-byte ESC is genuinely
+    // alone: cancel the pending buffer and stand down.
+    if (bytes.length === 1 && bytes[0] === ESC) {
+      if (numBuffer !== null) numBuffer = advanceNumBuffer(numBuffer, null).buffer;
+      return;
+    }
     // Numeric jump buffer: two digits → token lookup. Any non-digit
     // (motion, escape sequence, letters) cancels a pending buffer.
     const digit = digitOf(bytes);
