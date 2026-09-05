@@ -47,6 +47,24 @@ remaining open question is scale behaviour: whether the shelf should
 grow compartments as the silo grows (tier rows that expand on
 selection) or stay a strict root. Recorded; not urgent.
 
+### 1b. Folder-listing suppression (mused 2026-09-04, not built)
+
+The index.md exclusion generalizes: a **hand-authored folder listing** —
+a document whose references enumerate one folder's contents
+(`explainers/README.md` is the exhibit) — is navigational furniture,
+like the `&`-family. When searching, suppress it: the reader wants the
+listed documents, not the list.
+
+- **The detector must be coverage, not clustering:** of the documents
+  in folder F, how many does this document reference? High coverage +
+  all targets in F + the document announcing F = a listing. A themed
+  essay linking five related decisions is not a listing; do not sweep
+  it.
+- **Payoff:** the same calm the `&`-family exclusion bought, extended
+  to every authored index.
+- **Status:** one annoyance so far — the ladder rule says wait for the
+  second.
+
 ### 2. Implied tier filters
 
 The callsigns are already a filter vocabulary: typing `ADR-` *is* a
@@ -73,6 +91,26 @@ answer precisely.
 - **Against:** requires evidence rows to carry state — a schema
   decision in the map; and "parked" documents are usually *correctly*
   out of sight.
+
+### 3. The agent's tour — visibility and marking (mused 2026-09-04)
+
+The shared channel means an agent can render documents, not just audit
+them. An agent on a magical mystery tour — dereferencing reference
+after reference, spawning instances — leaves a trail **across the
+screen**, and that is the alert: spatial traversal makes the trail
+glanceable (the window count grows; the tour cannot hide in a stack it
+does not have).
+
+Refinements worth considering when agents actually tour:
+
+- **Mark agent-spawned instances** — a footer/w title marker so the
+  human distinguishes *my tour* from *the agent's tour* at a glance,
+  and can close the agent's trail wholesale.
+- **The audit leaves no trail** — `--entries` is read-only; littering
+  is a choice the agent made, which is why visibility matters.
+- **The trail is a document, not a stack** — an agent that toured
+  writes its trail into a `&next` row or a debrief line; the editorial
+  answer, as ever.
 
 ### 4. Negation
 
