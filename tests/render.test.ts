@@ -125,10 +125,13 @@ describe("render — heading RHS chip (right-edge tab)", () => {
     const src = "# " + "heading word ".repeat(6);
     const tc = await render(src, 26, "truecolor");
     const none = await render(src, 26, "none");
-    expect(none).not.toContain("\x1b");
+    // NO_COLOR strips colour, not attributes — heading text keeps its bold
+    // (SGR 1), but no colour escapes survive. The chip stays a plain `█`.
+    expect(none).not.toContain("\x1b[38;2;");
+    expect(none).not.toContain("\x1b[48;2;");
     expect(none).toContain("█"); // glyph present in plain mode too
-    // Structural parity: strip escapes from truecolor → identical lines.
-    expect(stripANSI(tc).split("\n")).toEqual(none.split("\n"));
+    // Structural parity: strip escapes from both → identical lines.
+    expect(stripANSI(tc).split("\n")).toEqual(stripANSI(none).split("\n"));
   });
 
   test("reflow on resize keeps the chip at the right bound", async () => {
@@ -482,13 +485,16 @@ describe("render — NO_COLOR parity", () => {
     "",
   ].join("\n");
 
-  test("plain output is the colored output minus escapes (identical line breaks)", async () => {
+  test("plain output is the colored output minus colour (attributes retained, identical line breaks)", async () => {
     const colored = await render(doc, 40, "truecolor");
     const plain = await render(doc, 40, "none");
-    expect(plain).not.toContain("\x1b");
-    // identical structure: strip escapes from colored → same lines
+    // NO_COLOR strips colour, not attributes — bold (SGR 1) survives on
+    // headings/strong; no truecolour escapes remain in the plain output.
+    expect(plain).not.toContain("\x1b[38;2;");
+    expect(plain).not.toContain("\x1b[48;2;");
+    // identical structure: strip escapes from both → same lines
     const cLines = colored.split("\n").map((l) => stripANSI(l).replace(/ +$/, ""));
-    const pLines = plain.split("\n").map((l) => l.replace(/ +$/, ""));
+    const pLines = plain.split("\n").map((l) => stripANSI(l).replace(/ +$/, ""));
     expect(cLines).toEqual(pLines);
   });
 
@@ -559,11 +565,11 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
 
   test("the vector badge paints in the reserved vector role after the slug", async () => {
     const out = await render("*Title* %okuda-vector:01% <!-- docs/foo.md -->");
-    // ADR-031: the badge in the reserved vector paint (rose #fb7185 → 251;113;133),
-    // bracketless, colour-only — bold is a shared channel and cannot
-    // disambiguate; the reserved gold does.
+    // ADR-031 + td-c31929: the badge in the reserved vector paint (rose
+    // #fb7185 → 251;113;133) AND bold — the silcrow is a control among
+    // information; controls earn both channels (colour + weight).
     // Tolerant of the inline parser's % mangling.
-    expect(out).toContain("\x1b[38;2;251;113;133m§01\x1b[0m");
+    expect(out).toContain("\x1b[38;2;251;113;133;1m§01\x1b[0m");
   });
 
   test("the slug renders as emphasis (yellow, italic) on the left", async () => {

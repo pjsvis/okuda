@@ -51,7 +51,7 @@ reading becomes the main document of a fresh, stateless instance,
 where its own references gain their silcrows. Depth of traversal is
 opt-in, and each level costs a deliberate keystroke.
 
-## Why gold *and* bold
+## Why rose *and* bold
 
 Colour answers *what is this*; the silcrow answers *what is this*;
 and both together say *go look*. Most painted text in okuda answers only the first —
@@ -73,7 +73,7 @@ corpus may reference documents that do not exist yet.
 
 ## The vocabulary
 
-- **§NN** — a vector; rose, weightless, on the main document only
+- **§NN** — a vector; rose, bold, on the main document only
 - **NN** — actuate: dereference, render clean
 - **u** — unwind: back to the main document
 - **99** — promote: clone into a new instance as main

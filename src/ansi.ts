@@ -97,7 +97,11 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     return {
       mode,
       role: (_n, text) => text,
-      roleBold: (_n, text) => text,
+      // NO_COLOR strips colour, not attributes — the silcrow's redundant
+      // weight channel survives (SGR 1 is not colour). The doc's "weight
+      // remains" claim is true. Closed with a full \x1b[0m reset per the
+      // wrap invariant (no partial \x1b[22m).
+      roleBold: (_n, text) => `\x1b[1m${text}${RESET}`,
       roleItalic: (_n, text) => text,
       roleBoldItalic: (_n, text) => text,
       roleUnderline: (_n, text) => text,

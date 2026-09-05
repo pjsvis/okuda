@@ -101,9 +101,12 @@ describe("styler — byte-exact SGR sequences", () => {
     expect(s.bold("01")).toBe("\x1b[1m01\x1b[0m");
   });
 
-  test("none mode: identity, no escapes anywhere; codespan strips backticks (parity); link shows URL", () => {
+  test("none mode: colour stripped, attributes kept; codespan strips backticks (parity); link shows URL", () => {
     const s = makeStyler(DRACULA_PALETTE, "none");
-    expect(s.roleBold("heading", "T")).toBe("T");
+    // NO_COLOR strips colour, not attributes — roleBold's weight survives
+    // (SGR 1 is not colour); the redundant channel the doc claims remains.
+    expect(s.roleBold("heading", "T")).toBe("\x1b[1mT\x1b[0m");
+    expect(s.role("heading", "T")).toBe("T"); // colour-only role → plain
     expect(s.codespan("c")).toBe("c");
     expect(s.link("text", "url")).toBe("text url"); // parity: URL shown in both modes
     expect(s.badge("G")).toBe(" G "); // padding kept, no colour
@@ -206,17 +209,18 @@ describe("palette — dracula contract + override loader", () => {
     }
   });
 
-  test("roleBold on a state role emits colour + bold in truecolor; plain in none", () => {
+  test("roleBold on a state role emits colour + bold in truecolor; bold survives in none", () => {
     const tc = makeStyler(DRACULA_PALETTE, "truecolor");
     // green + bold: \x1b[38;2;95;211;95;1m✓\x1b[0m  (#5fd35f)
     expect(tc.roleBold("state-ok", "✓")).toBe("\x1b[38;2;95;211;95;1m✓\x1b[0m");
     // red + bold: \x1b[38;2;255;85;85;1m✗\x1b[0m
     expect(tc.roleBold("state-failed", "✗")).toBe("\x1b[38;2;255;85;85;1m✗\x1b[0m");
-    // NO_COLOR parity: the glyph survives by shape alone (bold is dropped too —
-    // none-mode returns text unchanged, the ADR-015 invariant).
+    // NO_COLOR strips colour, not attributes — the glyph survives by shape
+    // AND weight (SGR 1 is not colour). ADR-015's plain-`role` invariant is
+    // separate: the fetch stamp's `✗` rides `role("alert", …)`, not roleBold.
     const none = makeStyler(DRACULA_PALETTE, "none");
-    expect(none.roleBold("state-ok", "✓")).toBe("✓");
-    expect(none.roleBold("state-failed", "✗")).toBe("✗");
+    expect(none.roleBold("state-ok", "✓")).toBe("\x1b[1m✓\x1b[0m");
+    expect(none.roleBold("state-failed", "✗")).toBe("\x1b[1m✗\x1b[0m");
   });
 
   test("override file replaces known roles, ignores junk", () => {

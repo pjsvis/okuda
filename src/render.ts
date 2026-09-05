@@ -84,8 +84,8 @@ const STATE_GLYPH_ROLE: Record<string, keyof Palette> = {
 /** If `text` begins with a state glyph (the closed set), colour + bold
  *  that leading glyph via its lexicon role; leave the rest unchanged.
  *  Detects the glyph after any leading ANSI escapes (inline-styled
- *  cells may carry SGR before the visible char). Pure; no-op in none
- *  mode (roleBold returns the glyph plain — NO_COLOR parity). */
+ *  cells may carry SGR before the visible char). Pure; in none mode the
+ *  colour drops but the weight survives (roleBold emits SGR 1). */
 function styleStateGlyph(text: string, styler: ReturnType<typeof makeStyler>): string {
   if (text === "") return text;
   // Find the first visible char by skipping leading ANSI SGR sequences.
@@ -580,7 +580,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         const slugLines = wrapBlock(stripHtml(v.slug));
         const avail = Math.max(width - 2 - badge.length - 1, 8);
         const body = elideToWidth(slugLines.join(" "), avail);
-        return body + " " + styler.role("vector", badge) + "\n\n";
+        return body + " " + styler.roleBold("vector", badge) + "\n\n";
       }
       const lines = wrapBlock(stripHtml(children));
       return lines.join("\n") + "\n\n";
@@ -593,10 +593,10 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       if (RE_RHS_WIRE.test(children)) return TAG_RHS_WIRE;
       let out = stripHtml(children);
       // Vector markers (ADR-031) — table cells route through here, not
-      // the paragraph handler: live tokens paint as gold silcrows, legacy
+      // the paragraph handler: live tokens paint as rose silcrows, legacy
       // tokens strip silently (retired, not honored).
       out = out.replace(/%{1,2}okuda-vector:(\d{1,2})%{1,2}/g, (_m, n: string) =>
-        " " + styler.role("vector", `§${n}`));
+        " " + styler.roleBold("vector", `§${n}`));
       out = out.replace(/%{1,2}okuda-(?:vector|rhs):\d{1,2}%{1,2}/g, "");
       // Bare .md-path tokens in prose recede to the muted (far) register
       // — near/far: paths are provenance, not content. They read like
@@ -769,7 +769,8 @@ function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   // caption follows in the muted register. Untitled diagrams fall back to
   // the renderer statement (`mermaid source elided`) — the source is
   // tautological in a single-render seam and is not echoed. The glyph
-  // survives NO_COLOR as plain content (roleBold is a no-op then).
+  // keeps its weight under NO_COLOR (roleBold emits SGR 1 — colour drops,
+  // attributes survive); the `⋮` reads as a control among the art.
   const glyph = ctx.styler.roleBold("state-parked", "⋮");
   const stmt = title
     ? ctx.styler.role("muted", " " + title)
