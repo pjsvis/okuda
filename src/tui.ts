@@ -458,7 +458,10 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   // unstyled terminal). A blank alt-screen during the read reads as
   // "loading," not "glitch"; content of the transitional frame beats its
   // duration (brief: launcher-fut — the ordering half of the fix).
-  process.stdout.write(ENTER_ALT + HIDE_CURSOR);
+  // Alt-scroll is the reader's own mode (ADR-031 dogfood: the launcher
+  // used to own it, but direct `okuda --tui` and `just dogfood` enter
+  // without the launcher — the wheel died at every non-launcher door).
+  process.stdout.write(ENTER_ALT + HIDE_CURSOR + "\x1b[?1007h");
 
   // Main-document state (ADR-031) — declared before the first render,
   // which annotates from the map. The jump map belongs to the MAIN
@@ -709,7 +712,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     process.stdin.removeListener("data", onKey);
     process.stdin.setRawMode?.(false);
     process.stdin.pause?.();
-    process.stdout.write(SHOW_CURSOR + EXIT_ALT);
+    process.stdout.write(SHOW_CURSOR + "\x1b[?1007l" + EXIT_ALT);
     process.removeListener("SIGWINCH", onWinch);
     process.removeListener("SIGINT", onSignal);
     process.removeListener("SIGTERM", onSignal);

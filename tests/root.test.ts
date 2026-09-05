@@ -177,3 +177,19 @@ describe("cli — versionLine (single source of truth, v0.1.0 trifecta)", () => 
     expect(versionLine()).toBe(`okuda ${pkg.version} (dev)`);
   });
 });
+
+describe("resolveByCallsign — ordinal shorthand (ADR-031 dogfood)", () => {
+  test("tier + ordinal resolves when exactly one callsign matches", () => {
+    // The prose says ADR-030; the registry knows ADR-LIVE-SEARCH-030.
+    expect(resolveByCallsign("ADR-030")).toBe(join(process.cwd(), "decisions/030-live-search-picker.md"));
+    expect(resolveByCallsign("ADR-031")).toBe(join(process.cwd(), "decisions/031-main-document.md"));
+  });
+
+  test("exact callsigns still resolve first", () => {
+    expect(resolveByCallsign("ADR-MAIN-DOCUMENT-031")).toBe(join(process.cwd(), "decisions/031-main-document.md"));
+  });
+
+  test("absent ordinals refuse", () => {
+    expect(resolveByCallsign("ADR-999")).toBeNull();
+  });
+});

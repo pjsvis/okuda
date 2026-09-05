@@ -408,6 +408,9 @@ export async function runLauncher(opts: { query?: string } = {}): Promise<void> 
   let query = opts.query ?? "";
   try {
     for (;;) {
+      // The reader owns its alt-scroll and releases it on exit — the
+      // picker re-arms per round so the wheel works on the shelf too.
+      process.stdout.write("\x1b[?1007h");
       const files = rankedShortlistEntries(query);
       const pick = await pickFile(files, query, true);
       if (pick === null) break; // Esc / Ctrl-C in the picker
