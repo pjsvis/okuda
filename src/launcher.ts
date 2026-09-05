@@ -23,6 +23,18 @@ import { detectRoot, makeCallsignResolver, resolveByCallsign, TIER_REGISTRIES } 
 import { runTui } from "./tui";
 import { terminalCols, terminalRows } from "./width";
 
+/** Alt-screen enter/exit (BRF-LAUNCHER-FUT, return-edge fix). The reader
+ *  toggles its own alt-screen per document (own mode); on quit it exits to
+ *  primary, which is where the return-edge FUT lived — the rg gap + fzf
+ *  startup flashed the user's shell scrollback. The launcher now re-enters
+ *  and clears the alt-screen at the top of each round, so the gap is a
+ *  blank alt-screen (same content-of-frame philosophy as the reader's
+ *  enter-before-read ordering fix). Local constants — tui.ts stays the
+ *  alt-screen authority for `okuda <file>`; the launcher owns the session
+ *  *transitions*, not the reader's surface. */
+const ENTER_ALT_SCREEN = "\x1b[?1049h";
+const EXIT_ALT_SCREEN = "\x1b[?1049l";
+
 /** The entry separator: `path\tsnippet`. fzf matches the whole line
  *  (path + snippet) so one query searches filenames AND content; the
  *  selection is parsed back to the path before the reader sees it.
@@ -393,6 +405,10 @@ export async function runLauncher(opts: { query?: string } = {}): Promise<void> 
     process.exit(1);
   }
   process.stdout.write("\x1b[?1007h"); // alt-scroll on, one policy both surfaces
+  // Enter + blank the session alt-screen up front so the FIRST round's
+  // rg gap (rankedShortlistEntries) is a blank surface, not shell scrollback
+  // — the launch-edge half of the same fix (BRF-LAUNCHER-FUT).
+  process.stdout.write(ENTER_ALT_SCREEN + "\x1b[2J\x1b[H");
   // Rooted gloam carries a silo badge the renderer paints at the head of
   // the footer identity run (brief: 2026-08-28-silo-mnemonics). Unrooted →
   // undefined → today's footer, no silo badge. Resolved once per session:
@@ -411,9 +427,15 @@ export async function runLauncher(opts: { query?: string } = {}): Promise<void> 
   let query = opts.query ?? "";
   try {
     for (;;) {
-      // The reader owns its alt-scroll and releases it on exit — the
-      // picker re-arms per round so the wheel works on the shelf too.
-      process.stdout.write("\x1b[?1007h");
+      // Return-edge FUT fix (BRF-LAUNCHER-FUT): the reader exited the
+      // alt-screen on quit (?1049l → primary), so without this the rg
+      // gap + fzf startup would flash the primary screen. Re-enter and
+      // clear BEFORE the rg spawns — the gap reads as a blank alt-screen
+      // ("loading"), not shell scrollback. Mirrors the reader's own-mode
+      // enter-before-read ordering fix in tui.ts; fzf's own ?1049h on
+      // spawn is idempotent against this. Alt-scroll re-armed per round
+      // because the reader released it on exit.
+      process.stdout.write(ENTER_ALT_SCREEN + "\x1b[2J\x1b[H" + "\x1b[?1007h");
       const files = rankedShortlistEntries(query);
       const pick = await pickFile(files, query, true);
       if (pick === null) break; // Esc / Ctrl-C in the picker
@@ -432,9 +454,12 @@ export async function runLauncher(opts: { query?: string } = {}): Promise<void> 
       });
     }
   } finally {
-    // alt-scroll off — don't leave the user's terminal in a mode gloam
-    // turned on. The reader's own alt-screen exit is paired in tui.ts.
-    process.stdout.write("\x1b[?1007l");
+    // alt-scroll off, then exit the session alt-screen the launcher armed.
+    // Don't leave the user's terminal in a mode gloam turned on. (The old
+    // comment here — "the reader's own alt-screen exit is paired in tui.ts"
+    // — described the return-edge FUT, now fixed by re-entering + clearing
+    // each round.)
+    process.stdout.write("\x1b[?1007l" + EXIT_ALT_SCREEN);
   }
 }
 
