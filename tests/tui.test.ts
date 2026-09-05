@@ -62,12 +62,15 @@ describe("tui — synchronized output bracket (BRF-SYNC-OUTPUT)", () => {
 });
 
 describe("tui — decodeKey (single-byte controls)", () => {
-  test("quit: q, Q, Ctrl-C (0x03), Ctrl-Z (0x1a), lone Esc", () => {
+  test("quit: q, Q, Ctrl-C (0x03) — Ctrl-Z is unbound, lone Esc is the cancel", () => {
     expect(decodeKey(buf(0x71))).toBe("quit"); // q
     expect(decodeKey(buf(0x51))).toBe("quit"); // Q (Glow's convention)
     expect(decodeKey(buf(0x03))).toBe("quit"); // Ctrl-C
-    expect(decodeKey(buf(0x1a))).toBe("quit"); // Ctrl-Z
-    expect(decodeKey(buf(0x1b))).toBe("quit"); // lone Esc
+    // Ctrl-Z unbound (the flense): raw mode turned it into a surprise
+    // exit — the OFF verb is 00. Lone Esc is the partial-vector cancel,
+    // handled in applyKey before decodeKey.
+    expect(decodeKey(buf(0x1a))).toBeNull();
+    expect(decodeKey(buf(0x1b))).toBeNull();
   });
   test("motion: j down, k up, g top, G bottom", () => {
     expect(decodeKey(buf(0x6a))).toBe("down");

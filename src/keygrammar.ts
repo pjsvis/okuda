@@ -46,3 +46,30 @@ export function verbFor(token: number): Verb | "vector" | null {
   if (token >= 11 && token <= 98) return "vector";
   return null;
 }
+
+/** Split a raw stdin read into key events: the four supported escape
+ *  sequences ride as single multi-byte events, everything else is a
+ *  single-byte event. Burst-safe: a pasted "12" yields two presses,
+ *  not one swallowed byte. Pure. */
+export function splitKeyEvents(bytes: Uint8Array): Uint8Array[] {
+  const events: Uint8Array[] = [];
+  let i = 0;
+  while (i < bytes.length) {
+    if (bytes[i] === 0x1b && bytes[i + 1] === 0x5b) {
+      const c = bytes[i + 2];
+      if (c !== undefined && c >= 0x41 && c <= 0x44) {
+        events.push(bytes.slice(i, i + 3)); // ESC [ A–D
+        i += 3;
+        continue;
+      }
+      if (c !== undefined && (c === 0x35 || c === 0x36) && bytes[i + 3] === 0x7e) {
+        events.push(bytes.slice(i, i + 4)); // ESC [ 5~ / 6~
+        i += 4;
+        continue;
+      }
+    }
+    events.push(bytes.slice(i, i + 1));
+    i += 1;
+  }
+  return events;
+}

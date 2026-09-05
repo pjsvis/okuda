@@ -19,7 +19,7 @@ import { detectColorMode, makeStyler, type Styler } from "./ansi";
 import { annotateSource, jumpMapFor, CLONE_TOKEN } from "./vectors";
 import { cloneArgs } from "./clone";
 import { frameBounds, headingLines, snapFrame } from "./frames";
-import { verbFor } from "./keygrammar";
+import { splitKeyEvents, verbFor, type Verb } from "./keygrammar";
 import { loadPalette, type Palette } from "./palette";
 import { renderDocument } from "./render";
 import { basename, dirname, join } from "node:path";
@@ -67,10 +67,9 @@ export function decodeKey(buf: Uint8Array): KeyAction {
   const b0 = buf[0]!;
   // Single-byte controls.
   switch (b0) {
-    case 0x03: return "quit";            // Ctrl-C
+    case 0x03: return "quit";            // Ctrl-C — the interrupt; OFF is 00
     case 0x04: return "half-down";      // Ctrl-D
     case 0x15: return "half-up";        // Ctrl-U
-    case 0x1a: return "quit";           // Ctrl-Z (raw mode swallows SIGTSTP)
     case 0x71: return "quit";           // q
     case 0x51: return "quit";           // Q (Glow's convention)
     case 0x6a: return "down";           // j
@@ -110,8 +109,9 @@ export function decodeKey(buf: Uint8Array): KeyAction {
       case 0x36: return buf[3] === 0x7e ? "page-down" : null;  // ESC O 6 ~
     }
   }
-  // Lone Esc (length 1) — treat as quit; common pager convention.
-  if (b0 === ESC && buf.length === 1) return "quit";
+  // Lone Esc (length 1) — the partial-vector cancel, applied by
+  // applyKey before decodeKey is reached. Here it is null.
+  if (b0 === ESC && buf.length === 1) return null;
   return null;
 }
 
@@ -612,8 +612,11 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  screen row. The gate is the mechanised "neither": identical content
    *  → `same`, no repaint; a failed fetch → `failed`, retain the
    *  last-known-good, no repaint; only a real change repaints. */
-  const rerenderAnchored = async (): Promise<void> => {
-    if (frozen) return; // frozen mode (keyboard-controls): the document stays still
+  const rerenderAnchored = async (reason: "watch" | "resize" | "reload"): Promise<void> => {
+    // Frozen gates only the WATCHER — the document stays still while an
+    // agent edits; resize follows the glass and `r` is the manual
+    // override (keyboard-controls, 2026-09-05). No flag save/restore.
+    if (frozen && reason === "watch") return;
     const { rows, cols } = dims();
     const height = contentHeight(rows, showHints);
     const fetch = await readSource();
@@ -635,14 +638,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     paint();
   };
 
-  const reload = (): void => {
-    void (async () => {
-      const wasFrozen = frozen;
-      frozen = false;
-      await rerenderAnchored();
-      frozen = wasFrozen;
-    })();
-  };
+  const reload = (): void => { void rerenderAnchored("reload"); };
 
   /** Present a freshly fetched doc: set lines, re-extract the jump table,
    *  set scroll, repaint. Used by jump and back (forced loads — the gate's
@@ -698,43 +694,52 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     present(fetch, next, prev.scroll);
   };
 
-  const onKey = (data: Buffer): void => {
-    const bytes = new Uint8Array(data);
+  /** The verb handler table — the dispatch half of the grammar, beside
+   *  KEYBINDINGS (the binding half). A new verb is one entry here and
+   *  one there; the onKey loop never grows. */
+  const verbHandlers: Partial<Record<Verb, () => void>> = {
+    exit: () => cleanup(),
+    frame: () => {
+      renderMode = "frame";
+      scroll = snapFrame(headingLines(lines), lines.length, scroll, 1);
+      flash("frame mode — j/k steps, arrows slippy within");
+    },
+    slide: () => {
+      renderMode = "slide";
+      frozen = false;
+      flash("sliding mode");
+    },
+    freeze: () => {
+      frozen = true;
+      flash("frozen — the document stays still (r re-renders)");
+    },
+    editNew: () => editNew(),
+    edit: () => flash("edit current — the edit brief is not wired yet"),
+    clone: () => clone(),
+  };
+
+  /** Reduce ONE key event to its effect. The reducer is pure up to the
+   *  verb handlers; onKey feeds it every event in the read. */
+  const applyKey = (bytes: Uint8Array): void => {
     // A lone ESC (keyboard-controls: "ESC cancels partial vector") —
     // the user's escape from a half-typed sequence. Arrow sequences
-    // arrive as multi-byte reads, so a single-byte ESC is genuinely
-    // alone: cancel the pending buffer and stand down.
+    // arrive as multi-byte events (the lexer keeps them whole), so a
+    // single-byte ESC is genuinely alone: stand the buffer down.
     if (bytes.length === 1 && bytes[0] === ESC) {
       if (numBuffer !== null) numBuffer = advanceNumBuffer(numBuffer, null).buffer;
       return;
     }
-    // Numeric jump buffer: two digits → token lookup. Any non-digit
+    // Numeric jump buffer: two digits → token → verb. Any non-digit
     // (motion, escape sequence, letters) cancels a pending buffer.
     const digit = digitOf(bytes);
     const step = advanceNumBuffer(numBuffer, digit);
     numBuffer = step.buffer;
     if (step.token !== null) {
       const verb = verbFor(step.token);
-      switch (verb) {
-        case "exit": return cleanup();
-        case "frame": {
-          renderMode = "frame";
-          const { start } = frameBounds(headingLines(lines), lines.length, scroll);
-          scroll = start;
-          flash("frame mode — j/k steps, arrows slippy within");
-          break;
-        }
-        case "slide":
-          renderMode = "slide";
-          frozen = false;
-          flash("sliding mode");
-          break;
-        case "freeze": frozen = true; flash("frozen — the document stays still (r re-renders)"); break;
-        case "editNew": editNew(); break;
-        case "edit": flash("edit current — the edit brief is not wired yet"); break;
-        case "clone": clone(); break;
-        case "vector": void jumpTo(step.token); break;
-        default: break; // reserved, unassigned — acknowledged, silent
+      if (verb === "vector") {
+        void jumpTo(step.token);
+      } else {
+        verbHandlers[verb]?.();
       }
       return;
     }
@@ -812,7 +817,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   // never jumps to the top. Vertical resize doesn't reflow, so the null
   // path keeps index-preservation, honest there. (brief:
   // resize-content-anchor)
-  const onWinch = (): void => { void rerenderAnchored(); };
+  const onWinch = (): void => { void rerenderAnchored("resize"); };
   process.on("SIGWINCH", onWinch);
 
   // Clean exit on signal: restore the terminal, then hard-exit. A signal
