@@ -59,7 +59,7 @@ registry-validated at render time.
   remedy is editorial — make the document smaller, or clone and search.
 - **Always two digits** in the painted form, led by the section sign:
   `§NN` — no brackets. The section sign is the marker and the boundary;
-  brackets were markdown habit, and the gold bold carries the rest
+  brackets were markdown habit, and the reserved rose carries the rest
   (settled by experiment 2026-09-04: brackets dropped, colour kept).
 - **Zero-padded digits in source are never vectors**: `[07]` in a
   document is text, always.

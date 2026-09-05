@@ -6,7 +6,7 @@
 Every document in the silo is rendered twice: once as it is, and — when
 it is the main document of a Gloam instance — once with its references
 annotated. The annotation is the **silcrow**: `§`, the section sign,
-followed by two digits. Gold, bold, after the reference it points at:
+followed by two digits. Rose, after the reference it points at — the rubricator's ink (`rubric` = *ruber*, red): the medieval navigation marks were red for the same reason we are.
 
 ```text
 ADR-030 §11
@@ -36,7 +36,7 @@ means the same thing on every glass, until the document changes, at
 which point the map re-derives and the numbers follow. Derivation
 replaces invalidation.
 
-The paint is **reserved**: the gold is a palette slot the markdown
+The paint is **reserved**: the rose is a palette slot the markdown
 grammar cannot address, and prose never types `§`. A user who writes
 `[14]` in their document produces text; our numbers are visibly ours.
 (Occam's addendum: don't use too many links.)
@@ -53,8 +53,8 @@ opt-in, and each level costs a deliberate keystroke.
 
 ## Why gold *and* bold
 
-Colour answers *what is this*; weight answers *does this demand
-something of me*. Most painted text in okuda answers only the first —
+Colour answers *what is this*; the silcrow answers *what is this*;
+and both together say *go look*. Most painted text in okuda answers only the first —
 state glyphs inform, muted provenance recedes, emphasis is the
 author's voice. The silcrow is the one element in the frame that
 responds to input: a control among information. Controls earn both
@@ -73,7 +73,7 @@ corpus may reference documents that do not exist yet.
 
 ## The vocabulary
 
-- **§NN** — a vector; gold, bold, on the main document only
+- **§NN** — a vector; rose, weightless, on the main document only
 - **NN** — actuate: dereference, render clean
 - **u** — unwind: back to the main document
 - **99** — promote: clone into a new instance as main

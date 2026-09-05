@@ -17,7 +17,8 @@
 - **Type** — the live search is the dereference path. The document's
   references are plain text; type the callsign and it resolves.
 
-- **§NN** — gold vectors after a document's references. The section
+- **§NN** — rose vectors after a document's references (the
+  rubricator's ink). The section
   sign means *reference*: actuate to dereference — the target renders
   clean, and its references are not shown. The tour cannot run away.
   [The silcrow explainer](docs/2026-09-04-the-silcrow.md).

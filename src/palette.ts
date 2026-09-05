@@ -123,7 +123,7 @@ export const DRACULA_PALETTE: Palette = {
   "state-parked": "#ff9933",
   "state-failed": "#ff5555",
   "doc-ref": "#e8c44a",
-  "vector": "#ffcc66", // ADR-031: the reserved vector paint — LCARS gold; distinct from every author-addressable role in both presets (strong #ffb86c / #dfa21a)
+  "vector": "#fb7185", // ADR-031: the reserved vector paint — ROSE, the rubricator's ink (rubric = ruber, red); rose-end, not crimson (the alarm channel); distinct from link-text #ff79c6 and every author-addressable role
 };
 
 /** Named presets — the identity layers. The default is the okuda
