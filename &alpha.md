@@ -17,8 +17,7 @@
 - **Type** — the live search is the dereference path. The document's
   references are plain text; type the callsign and it resolves.
 
-- **§NN** — rose vectors after a document's references (the
-  rubricator's ink). The section
+- **§NN** — rose vectors after a document's references. The section
   sign means *reference*: actuate to dereference — the target renders
   clean, and its references are not shown. The tour cannot run away.
   [The silcrow explainer](docs/2026-09-04-the-silcrow.md).
@@ -34,19 +33,6 @@
 No menus, no state. The map is derived; the paint is illustrative.
 (ADR-031.)
 
-## the link types — one of each, live
-
-A document references three worlds. This is an example of each; the
-amber silcrows on this very page are painted from them.
-
-- **A callsign** — ADR-030: the registry resolves it; the shape is the
-  address.
-- **A local document** — [the origin doc](docs/2026-08-20-origin-doc.md):
-  the markdown form, for targets that carry no callsign.
-- **The wider web** — [the silo's repository](https://github.com/pjsvis/okuda):
-  a URL is rendered as a link and is never a vector — the web is not
-  the silo.
-
 ## first reads
 
 - ADR-031 — the main document and the working copy
@@ -56,6 +42,43 @@ amber silcrows on this very page are painted from them.
 - [the origin doc](docs/2026-08-20-origin-doc.md)
 - [dependencies](DEPENDENCIES.md)
 - [today, recorded](debriefs/2026-09-04-debrief-gloam-live-search.md)
+
+## the dogfood range — every vector case, live
+
+This section is the test bench (`just dogfood` asserts it headless).
+Each case names what should happen. If a case lies, the renderer is
+lying.
+
+1. **Callsign in prose** — ADR-030: one silcrow after the token.
+2. **Callsign in bold** — **ADR-031**: the vector paints outside the
+   bold, in the reserved rose.
+3. **Callsign in a list item** — the *first reads* list above: every
+   entry carries its silcrow.
+4. **Local document link** — [the constitution](system.md): the badge
+   follows the link's URL.
+5. **One-to-many** — ADR-030 again: a second mention, a second vector,
+   the same destination. (The map translates many vectors to one
+   filename.)
+6. **Garden-path regression** — [the silcrow
+   explainer](docs/2026-09-04-the-silcrow.md): a noun-phrase label; the
+   URL must read as an address, never as a sentence.
+7. **Zero-padded numbers are text** — steps [07] and [3] are never
+   vectors, whatever the brackets promise.
+8. **An external URL is never a vector** — [the silo's
+   repository](https://github.com/pjsvis/okuda) renders as a link;
+   the web is not the silo.
+9. **Legacy wiring is silent** — the token at the end of this line is
+   stripped without a badge: %%okuda-rhs:11%% briefs/x.md — retired,
+   not honored (ADR-022 reversed).
+10. **Callsign in a table cell** — vectors paint in tables too:
+
+| ADR | Rule |
+|---|---|
+| ADR-024 | callsigns are data, not machinery |
+| ADR-020 | the renderer never reads registries — a closure, always |
+
+11. **In bold, mid-sentence** — the working copy of **ADR-031** is the
+    specification for everything on this page.
 
 ## notes
 

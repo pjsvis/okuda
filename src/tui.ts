@@ -477,7 +477,15 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   // Initial fetch through the gate: prev=null is the initial-load sentinel,
   // so a successful first read is `changed` (content arrived) and a failed
   // first read is `failed` with empty lines (no last-known-good to retain).
+  // The map is derived BEFORE the first render — the initial frame is a
+  // main render and must arrive annotated. (Bug, found by dogfood: the
+  // map was derived after the initial render, so the first frame
+  // annotated against an empty map and opened bare.)
   const initialFetch = await readSource();
+  if (initialFetch.ok) {
+    mainText = initialFetch.text;
+    mainJumps = deriveMain(mainText);
+  }
   const initialRender = initialFetch.ok
     ? await renderLines(annotateSource(initialFetch.text, mainJumps), opts.width)
     : [];
@@ -486,10 +494,6 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   let fetchState: FetchState = init.state; // footer stamp reads this (brief: fetch-state-stamp)
   let scroll = 0;
   let showHints = false; // `?` toggles: compact % footer ↔ verbose hints
-  if (initialFetch.ok) {
-    mainText = initialFetch.text;
-    mainJumps = deriveMain(mainText);
-  }
 
   /** Footer flash (ADR-031): the actuator's honest failure surface and
    *  the clone verb's receipt. Drawn on the hints row for a breath, then
