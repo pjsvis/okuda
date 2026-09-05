@@ -13,6 +13,17 @@
 - new gloam instance
 - edit current document
 
+## landed (2026-09-05)
+
+- **[00] OFF is live** — double-tap zero exits, and the hints row now
+  advertises it first: `00 off`. The mnemonic held: 00 = OFF.
+- **Backspace no longer unwinds** — the silcrow vocabulary owns the
+  exits: `u` unwinds, `00` is OFF. A stray backspace in a dereferenced
+  document stays put (it used to throw the reader out).
+- **ESC cancels the partial vector** — a lone ESC stands down a
+  half-typed sequence (ESC-as-unwind remains deferred: the
+  split-sequence synthesis risk).
+
 ---
 
 ## The grammar this gives us (2026-09-04, mapped to ADR-031)

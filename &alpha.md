@@ -5,12 +5,12 @@
 - **okuda** renders restricted-grammar markdown in the terminal, fast.
 
 - **Gloam** is the search: type to find filenames and content at once;
-  every keystroke re-ranks the silo. Enter reads. Rooted in a silo (a
-  git repo) when launched there; over ssh or `okuda://` when the silo
-  is another machine.
+  every keystroke re-ranks the silo. Enter reads the document. 
 
-- **The wire is the budget.** The silo renders in place — nothing is
-  sent back to be rendered by someone else's glass.
+- **Rooted in a silo** a git repo when launched there. 
+
+- **Over `ssh://`** when the silo is another machine.
+
 
 ## how to move
 

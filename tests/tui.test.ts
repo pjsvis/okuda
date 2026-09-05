@@ -216,12 +216,12 @@ describe("tui — footerLine (identity left, affordance right)", () => {
     const h = hintsLine(80, plain);
     expect(h.endsWith(" ")).toBe(true); // corner pad
     expect(h.startsWith(" ")).toBe(true); // right-justified
-    expect(h.trimStart().startsWith("q quit")).toBe(true);
+    expect(h.trimStart().startsWith("00 off")).toBe(true);
     expect(displayWidth(h)).toBe(80); // fills the row exactly
   });
   test("hintsLine: too narrow → no left pad, text starts at col 1 (legible)", () => {
     const plain = (s: string) => s;
-    expect(hintsLine(60, plain).startsWith("q")).toBe(true);
+    expect(hintsLine(60, plain).startsWith("0")).toBe(true);
   });
 });
 
@@ -427,15 +427,15 @@ describe("tui — gateFetch (changed / same / failed, retain-on-failure)", () =>
 
 // ── Index-and-jump (brief 2026-08-28) ───────────────────────────────
 
-describe("tui — decodeKey (back-nav: u / Backspace)", () => {
+describe("tui — decodeKey (back-nav: u only)", () => {
   test("u → back", () => {
     expect(decodeKey(buf(0x75))).toBe("back");
   });
-  test("DEL (0x7f) → back (Backspace on most terminals)", () => {
-    expect(decodeKey(buf(0x7f))).toBe("back");
-  });
-  test("BS (0x08) → back (Backspace on some terminals)", () => {
-    expect(decodeKey(buf(0x08))).toBe("back");
+  test("Backspace does NOT unwind (keyboard-controls): 00 is OFF, u unwinds", () => {
+    // The silcrow vocabulary owns the exits — a stray backspace in a
+    // dereferenced document must not throw the reader out of it.
+    expect(decodeKey(buf(0x7f))).toBeNull();
+    expect(decodeKey(buf(0x08))).toBeNull();
   });
 });
 

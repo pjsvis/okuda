@@ -82,8 +82,10 @@ export function decodeKey(buf: Uint8Array): KeyAction {
     case 0x62: return "page-up";        // b — less/man back convention
     case 0x3f: return "help";           // ? — toggle verbose hints
     case 0x75: return "back";           // u — pop the backstack
-    case 0x7f: return "back";           // DEL (Backspace on most terminals)
-    case 0x08: return "back";           // BS  (Backspace on some terminals)
+    // Backspace does not unwind (keyboard-controls): the silcrow
+    // vocabulary owns the exits — `u` unwinds, `00` is OFF. A stray
+    // backspace in a dereferenced document must not throw the reader
+    // out of it.
   }
   // Escape sequences: ESC [ <final> or ESC [ <n> ~.
   if (b0 === ESC && buf.length >= 3 && buf[1] === 0x5b) {
@@ -197,7 +199,7 @@ export function viewport(
   return { visible: lines.slice(s, s + height), maxScroll, scroll: s };
 }
 
-const HINTS = "q quit · j/k · ␣/b · g/G · ^D/^U · r reload · NN deref · 99 clone · u unwind";
+const HINTS = "00 off · j/k · ␣/b · g/G · r reload · NN deref · 99 clone · u unwind";
 
 /** Display path: folder/basename (Glow convention). Pure. */
 /** ADR-010 re-anchor as a pure function: given the pre- and post-re-render
