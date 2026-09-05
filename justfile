@@ -195,6 +195,16 @@ state-colours-doc:
 state-colours:
     @bun scripts/state-colours.ts
 
+# Palette swatch doc
+[group('build')]
+palette-swatch:
+    @bun scripts/palette-swatch.ts > docs/2026-09-05-palette-swatch.md
+
+# Palette swatch viewer
+[group('build')]
+palette-swatch-doc:
+    @./okuda docs/2026-09-05-palette-swatch.md --tui
+
 # Chip dogfood
 [group('build')]
 chip:
