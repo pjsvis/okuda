@@ -17,7 +17,7 @@ import { renderDocument } from "./render";
 import { runTui } from "./tui";
 import { runLauncher, invokedAsGloam, rankedShortlistEntries } from "./launcher";
 import { detectRoot, makeCallsignResolver, resolveByCallsign } from "./root";
-import { CALLSIGN_SHAPE } from "./vectors";
+import { CALLSIGN_SHAPE, jumpMapFor, annotateSource } from "./vectors";
 import { terminalCols, terminalRows } from "./width";
 import { existsSync } from "node:fs";
 
@@ -192,7 +192,13 @@ async function main(): Promise<void> {
   const draw = async (): Promise<void> => {
     const source = await readSource(args.file);
     const width = terminalCols(80);
-    const out = await renderDocument(source, { width, palette, color });
+    // A streaming render to a TTY is a main document too (ADR-031): it
+    // gets its silcrows. Piped output stays clean — the paint is for
+    // glass, not for downstream tools.
+    const source2 = process.stdout.isTTY
+      ? annotateSource(source, jumpMapFor(source))
+      : source;
+    const out = await renderDocument(source2, { width, palette, color });
     if (args.watch) {
       process.stdout.write("\x1b[2J\x1b[3J\x1b[H"); // clear + home
     }

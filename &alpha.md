@@ -33,10 +33,23 @@
 No menus, no state. The map is derived; the paint is illustrative.
 (ADR-031.)
 
+## the link types — one of each, live
+
+A document references three worlds. This is an example of each; the
+amber silcrows on this very page are painted from them.
+
+- **A callsign** — ADR-030: the registry resolves it; the shape is the
+  address.
+- **A local document** — [the origin doc](docs/2026-08-20-origin-doc.md):
+  the markdown form, for targets that carry no callsign.
+- **The wider web** — [the silo's repository](https://github.com/pjsvis/okuda):
+  a URL is rendered as a link and is never a vector — the web is not
+  the silo.
+
 ## first reads
 
-- ADR-030 — the live search
 - ADR-031 — the main document and the working copy
+- ADR-030 — the live search
 - BRF-PORCH-MATRIX — click a URL, land in a terminal
 - [the constitution](system.md)
 - [the origin doc](docs/2026-08-20-origin-doc.md)
