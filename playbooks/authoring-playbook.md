@@ -174,6 +174,17 @@ house already knows it.
 
 ---
 
+## Link labels are noun phrases
+
+The renderer paints a link as `text url` on one line. A label that ends
+in a verb phrase garden-paths against the URL that follows: *"The
+silcrow, explained docs/2026-09-04-the-silcrow.md"* reads as the
+silcrow doing the explaining — the reversal is accidental and
+unignorable. Label links as **noun phrases**: *"The silcrow
+explainer docs/2026-09-04-the-silcrow.md"* — the URL then reads as the
+address of the thing named, which it is. (Found in `&alpha`,
+2026-09-04, by the irony being too clean to ignore.)
+
 ## References are text (ADR-031)
 
 The former jump-token menu pattern — authored `%%okuda-rhs:NN%%` wiring,
