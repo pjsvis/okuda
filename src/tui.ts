@@ -780,6 +780,12 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     paint();
   };
 
+  /** The reader's entry point: split the read into key events, reduce
+   *  each. (The reducer is `applyKey`; the lexer is `splitKeyEvents`.) */
+  const onKey = (data: Buffer): void => {
+    for (const event of splitKeyEvents(new Uint8Array(data))) applyKey(event);
+  };
+
   // runTui blocks until the reader session ends. The `done` promise is
   // resolved by cleanup — `q`/Esc/Ctrl-C (in raw mode, all decoded to
   // `quit`) restore the terminal and *return* to the caller, so the
