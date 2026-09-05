@@ -18,8 +18,10 @@
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
 import { annotateSource, jumpMapFor, CLONE_TOKEN } from "./vectors";
 import { cloneArgs } from "./clone";
+import { verbFor } from "./keygrammar";
 import { loadPalette, type Palette } from "./palette";
 import { renderDocument } from "./render";
+import { basename, dirname, join } from "node:path";
 import { padStartDisplay, terminalCols, terminalRows } from "./width";
 
 export interface TuiOptions {
@@ -519,6 +521,30 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  contract (the porch matrix's landing surface); OKUDA_CLONE_CMD is
    *  the escape hatch ($1 = the document); no host → honest flash. The
    *  clone re-derives its own map — nothing transfers, nothing mutates. */
+  /** Frozen mode (`03`, keyboard-controls): the document stays still —
+   *  the fs.watch auto-re-render is suppressed. `r` remains the manual
+   *  override, resize still follows the glass. */
+  let frozen = false;
+
+  /** Edit a blank document (`09`): a new note in the CURRENT
+   *  document's directory, opened in the declared editor inside a
+   *  separate terminal (the clone grammar's own spin-up). The file is
+   *  the contract — the silo picks it up by search; nothing mutates. */
+  const editNew = (): void => {
+    const dir = dirname(currentFile);
+    const stamp = new Date().toISOString().replace(/[-:T]/g, "").slice(0, 12);
+    const note = join(dir, `note-${stamp}.md`);
+    const editor = process.env.OKUDA_EDITOR ?? process.env.EDITOR ?? "vi";
+    const integration = process.env.OKUDA_CLONE ?? "edit-terminal";
+    const spec = cloneArgs(integration, note, process.platform, dir, editor);
+    if ("error" in spec) {
+      flash(`edit: ${spec.error}`);
+      return;
+    }
+    Bun.spawn([spec.cmd, ...spec.args], { stdio: "ignore" });
+    flash(`editing: ${basename(note)}`, "state-ok");
+  };
+
   const clone = (): void => {
     const doc = currentFile;
     if (process.env.TMUX) {
@@ -576,6 +602,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  → `same`, no repaint; a failed fetch → `failed`, retain the
    *  last-known-good, no repaint; only a real change repaints. */
   const rerenderAnchored = async (): Promise<void> => {
+    if (frozen) return; // frozen mode (keyboard-controls): the document stays still
     const { rows, cols } = dims();
     const height = contentHeight(rows, showHints);
     const fetch = await readSource();
@@ -597,7 +624,14 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     paint();
   };
 
-  const reload = (): void => { void rerenderAnchored(); };
+  const reload = (): void => {
+    void (async () => {
+      const wasFrozen = frozen;
+      frozen = false;
+      await rerenderAnchored();
+      frozen = wasFrozen;
+    })();
+  };
 
   /** Present a freshly fetched doc: set lines, re-extract the jump table,
    *  set scroll, repaint. Used by jump and back (forced loads — the gate's
@@ -661,10 +695,17 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     const step = advanceNumBuffer(numBuffer, digit);
     numBuffer = step.buffer;
     if (step.token !== null) {
-      if (step.token === CLONE_TOKEN) {
-        clone();
-      } else {
-        void jumpTo(step.token);
+      const verb = verbFor(step.token);
+      switch (verb) {
+        case "exit": return cleanup();
+        case "frame": flash("frame mode — needs BRF-PAGED-OKUDAGRAM"); break;
+        case "slide": frozen = false; flash("sliding mode"); break;
+        case "freeze": frozen = true; flash("frozen — the document stays still (r re-renders)"); break;
+        case "editNew": editNew(); break;
+        case "edit": flash("edit current — the edit brief is not wired yet"); break;
+        case "clone": clone(); break;
+        case "vector": void jumpTo(step.token); break;
+        default: break; // reserved, unassigned — acknowledged, silent
       }
       return;
     }

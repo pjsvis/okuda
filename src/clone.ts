@@ -14,13 +14,15 @@
 
 export type CloneSpec = { cmd: string; args: string[] } | { error: string };
 
-const appleScript = (cwd: string, doc: string): string => {
+const shellQuote = (s: string): string => `"${s.replace(/[\\"]/g, "\\$&")}"`;
+
+const appleScript = (cwd: string, command: string): string => {
   // Two quoting layers: the do-script argument is an AppleScript string
   // whose CONTENT is a shell command — so the shell paths get their own
   // double quotes first, then the whole line is escaped for AppleScript.
   const shellQuote = (s: string): string => `"${s.replace(/[\\"]/g, "\\$&")}"`;
   const appleEscape = (s: string): string => s.replace(/[\\"]/g, "\\$&");
-  const shellLine = `cd ${shellQuote(cwd)} && gloam ${shellQuote(doc)}`;
+  const shellLine = `cd ${shellQuote(cwd)} && ${command}`;
   return `tell application "Terminal" to do script "${appleEscape(shellLine)}"`;
 };
 
@@ -35,7 +37,7 @@ export function cloneArgs(
   switch (integration) {
     case "terminal":
       if (platform === "darwin") {
-        return { cmd: "osascript", args: ["-e", appleScript(cwd, doc)] };
+        return { cmd: "osascript", args: ["-e", appleScript(cwd, `gloam ${shellQuote(doc)}`)] };
       }
       return { error: "the built-in `terminal` integration is macOS-only — declare OKUDA_CLONE=tmux or OKUDA_CLONE=cmd" };
     case "tmux":
@@ -50,6 +52,16 @@ export function cloneArgs(
     }
     case "herdr":
       return { error: "the `herdr` integration is specced, not built — see BRF-PORCH-MATRIX and the filter model" };
+    case "edit-terminal": {
+      // The 09 verb (edit a blank document): the terminal spins up
+      // running the declared editor on the new file. The editor is
+      // OKUDA_EDITOR ?? EDITOR ?? vi; the file is the contract.
+      const editor = process.env.OKUDA_EDITOR ?? process.env.EDITOR ?? "vi";
+      if (platform === "darwin") {
+        return { cmd: "osascript", args: ["-e", appleScript(cwd, doc, editor)] };
+      }
+      return { error: "the built-in `edit-terminal` integration is macOS-only — declare OKUDA_CLONE=tmux and edit inside tmux" };
+    }
     default:
       return { error: `unknown clone integration "${integration}" — known: terminal, tmux, cmd, herdr` };
   }
