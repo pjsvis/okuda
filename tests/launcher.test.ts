@@ -151,38 +151,38 @@ describe("launcher — rankedShortlistEntries (the -g merge, integration)", () =
     expect(entries.some((e) => pathOf(e).endsWith("index.md"))).toBe(false);
   });
 
-  test("orientation: the &-family floats at the landing, vanishes when searching", () => {
-    // Landing (empty query): the whole root set greets you — orientation
-    // is the job. Searching: the &-family vanishes — pointers, not prey.
-    // Root *content* files (DEPENDENCIES.md…) compete normally.
-    const rootCount = listMarkdownFiles(process.cwd()).filter((f) => !f.includes("/")).length;
-    const landing = rankedShortlistEntries("", process.cwd());
-    const firstNonRoot = landing.findIndex((e) => pathOf(e).includes("/"));
-    expect(firstNonRoot).toBe(rootCount); // the whole root set, floating
-    for (const q of ["diagram", "load bearing", "1.4.0"]) {
-      const entries = rankedShortlistEntries(q, process.cwd());
-      expect(entries.some((e) => pathOf(e).startsWith("&"))).toBe(false); // pointers suppressed
-    }
-    expect(rankedShortlistEntries("1.4.0", process.cwd()).some((e) => pathOf(e) === "DEPENDENCIES.md"))
-      .toBe(true); // root content documents are consulted like any other
+  test("orientation: the landing is the shelf — root files, nothing else", () => {
+    // The landing is a shelf, not a dump: the silo's top level, and
+    // nothing else. Folder contents stay behind their labels until the
+    // filter is expressed.
+    const shelf = rankedShortlistEntries("", process.cwd());
+    expect(shelf.every((e) => !pathOf(e).includes("/"))).toBe(true);
+    expect(shelf.length).toBe(listMarkdownFiles(process.cwd()).filter((f) => !f.includes("/")).length);
   });
 
-  test("orientation files carry their evidence when they match", () => {
-    // A root content file that matches in the body surfaces with its
-    // evidence attached — even while the &-family stays suppressed.
-    const entries = rankedShortlistEntries("ripgrep", process.cwd());
-    const dep = entries.find((e) => pathOf(e) === "DEPENDENCIES.md");
-    expect(dep).toBeDefined();
-    if (dep) {
-      expect(dep.split("\t")[1]).toBeDefined(); // evidence attached
+  test("the dive: searching suppresses root files entirely", () => {
+    // Filter text expressed → the shelf steps aside: no root file is a
+    // destination in the dive, in any channel.
+    for (const q of ["diagram", "load bearing", "1.4.0"]) {
+      const entries = rankedShortlistEntries(q, process.cwd());
+      expect(entries.length).toBeGreaterThan(0);
+      expect(entries.every((e) => !pathOf(e).includes("/"))).toBe(false); // corpus rows exist
+      expect(entries.some((e) => !pathOf(e).includes("/"))).toBe(false); // no root files at all
     }
+  });
+
+  test("shelf rows carry first-line previews", () => {
+    const shelf = rankedShortlistEntries("", process.cwd());
+    const dep = shelf.find((e) => e.startsWith("DEPENDENCIES.md\t"));
+    expect(dep).toBeDefined();
+    expect(dep!.split("\t")[1]!.length).toBeGreaterThan(0); // preview attached
   });
 
   test("body-channel entries carry the matching line as snippet evidence", () => {
     const entries = rankedShortlistEntries("1.4.0", process.cwd());
-    const dep = entries.find((e) => pathOf(e) === "DEPENDENCIES.md");
-    expect(dep).toBeDefined();
-    expect(dep).toContain("1.4.0"); // the snippet shows the version row
+    const hit = entries.find((e) => pathOf(e) === "decisions/023-tty-active-input-reader.md");
+    expect(hit).toBeDefined();
+    expect(hit).toContain("1.4.0"); // the snippet shows the version mention
   });
 
   test("snippets are bounded — anti-pathological only (ADR-028)", () => {
@@ -273,20 +273,24 @@ describe("launcher — conformance smoke: the search the operator runs", () => {
     return out.split("\n").filter(Boolean).map(pathOf);
   }
 
-  test("query '1.4.0' locates the bun version row in DEPENDENCIES.md", async () => {
-    const entries = rankedShortlistEntries("1.4.0", process.cwd());
-    const matches = await fzfFilter("1.4.0", entries);
+  test("the shelf surfaces DEPENDENCIES.md; the dive never does (root excluded)", async () => {
+    // The 2026-09-04 shelf decision: root files live on the landing and
+    // are excluded from the dive — the bun version is found by opening
+    // the shelf's DEPENDENCIES.md, not by corpus search.
+    const shelf = rankedShortlistEntries("", process.cwd());
+    expect(shelf.some((e) => e.startsWith("DEPENDENCIES.md\t"))).toBe(true);
+    const dive = rankedShortlistEntries("1.4.0", process.cwd());
+    const matches = await fzfFilter("1.4.0", dive);
     expect(matches.length).toBeGreaterThan(0); // the v1 failure mode: zero matches
-    // Locatable, not pinned-first: within the body channel rg traversal
-    // order decides, and any other file mentioning Bun 1.4.0 may rank
-    // above it. The conformance contract is *findable in the shortlist*.
-    expect(matches).toContain("DEPENDENCIES.md");
+    expect(matches.every((m) => !m.includes("/"))).toBe(false); // the dive is corpus-wide
+    expect(matches).not.toContain("DEPENDENCIES.md"); // root excluded from the dive
   });
 
-  test("query 'bun 1.4.0' (fzf AND) still finds it", async () => {
+  test("query 'bun 1.4.0' (fzf AND) narrows within the dive", async () => {
     const entries = rankedShortlistEntries("bun", process.cwd());
     const matches = await fzfFilter("bun 1.4.0", entries);
-    expect(matches).toContain("DEPENDENCIES.md");
+    expect(matches.length).toBeGreaterThan(0);
+    expect(matches.every((m) => !m.startsWith("&"))).toBe(true); // &-family never in the dive
   });
 
   test("a filename query narrows through the same pipe", async () => {
@@ -340,17 +344,18 @@ describe("launcher — conformance smoke: the search the operator runs", () => {
     expect(proc.exitCode).toBe(0);
     const out = proc.stdout.toString();
     expect(out).toContain("load-bearing"); // evidence rows
-    expect(out).toContain("DEPENDENCIES.md");
+    expect(out).not.toContain("DEPENDENCIES.md"); // root files are shelf, not dive
   });
 
-  test("entry path: --entries with no query lists the whole corpus", () => {
+  test("entry path: --entries with no query lists the shelf", () => {
     const proc = Bun.spawnSync(["bun", "run", "src/cli.ts", "--entries"], {
       stdout: "pipe",
       stderr: "pipe",
       env: { ...process.env, FZF_DEFAULT_OPTS: "" },
     });
     expect(proc.exitCode).toBe(0);
-    expect(proc.stdout.toString().split("\n").filter(Boolean).length).toBeGreaterThan(100);
+    const lines = proc.stdout.toString().split("\n").filter(Boolean);
+    expect(lines.length).toBe(listMarkdownFiles(process.cwd()).filter((f) => !f.includes("/")).length);
   });
 
   test("selfEntriesCmd resolves the seam: dev re-execs bun, compiled re-execs itself", () => {
@@ -373,14 +378,14 @@ describe("launcher — conformance smoke: the search the operator runs", () => {
     expect(single).toEqual({ kind: "fixed", pattern: "1.4.0" });
   });
 
-  test("'load bearing' surfaces DEPENDENCIES.md (hyphenated in the corpus)", async () => {
+  test("'load bearing' surfaces corpus documents (hyphenated in the prose)", async () => {
     const entries = rankedShortlistEntries("load bearing", process.cwd());
-    const dep = entries.find((e) => pathOf(e) === "DEPENDENCIES.md");
-    expect(dep).toBeDefined();
-    expect(dep).toContain("load-bearing"); // evidence: the hyphenated row
+    const hit = entries.find((e) => pathOf(e) === "briefs/2026-08-26-brief-tui-live-documents.md");
+    expect(hit).toBeDefined();
+    expect(hit).toContain("load-bearing"); // evidence: the hyphenated row
     // And through the real matcher: the phrase query must surface it.
     const matches = await fzfFilter("load bearing", entries);
-    expect(matches).toContain("DEPENDENCIES.md");
+    expect(matches).toContain("briefs/2026-08-26-brief-tui-live-documents.md");
   });
 });
 

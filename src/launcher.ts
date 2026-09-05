@@ -270,38 +270,33 @@ export function rankedShortlistEntries(query: string, cwd: string = process.cwd(
       body.push(`${path}${SEP}${clipSnippet(text)}`);
     }
   }
-  // Channel 0 — orientation: at the LANDING (empty query) every silo-root
-  // file floats — the &-family (&alpha, &briefs, &next: the editorial
-  // state documents) plus the root content files. Once there is search
-  // text, the &-family vanishes: they are pointers to the files being
-  // looked for, not the files themselves (2026-09-04). Root *content*
-  // files (DEPENDENCIES.md, system.md…) compete normally — they are
-  // prey too. The landing is the only place the pointers preen.
+  // The shelf and the dive (the filter model's state rule, landed
+  // 2026-09-04). No text → the SHELF: root files only — arrive, see the
+  // silo's top level; the &-family and the root content documents are
+  // the whole floor. Text → the DIVE: corpus search results, root files
+  // excluded entirely — you have expressed intent, the shelf steps
+  // aside, and the documents it announced take the floor. Arrive and
+  // know what you want: type it. Do not know: read the root, which
+  // links everywhere.
   const searching = query.trim().length > 0;
   const all = listMarkdownFiles(cwd);
   const rootFiles = all.filter((f) => !f.includes("/"));
-  const ampers = new Set(rootFiles.filter((f) => basename(f).startsWith("&")));
+  const isRoot = new Set(rootFiles);
   const evidenceOf = new Map<string, string>();
   for (const e of [...registry, ...body]) {
     const p = e.split(SEP)[0]!;
     if (!evidenceOf.has(p)) evidenceOf.set(p, e);
   }
   if (!searching) {
-    const orientation = rootFiles.map((f) => evidenceOf.get(f) ?? `${f}${SEP}`);
-    const oriented = new Set(rootFiles);
-    const registryRest = registry.filter((e) => !oriented.has(e.split(SEP)[0]!));
-    const bodyRest = body.filter((e) => !oriented.has(e.split(SEP)[0]!));
-    const remainder = all
-      .filter((f) => !oriented.has(f) && !evidenceOf.has(f))
-      .map((f) => `${f}${SEP}`);
-    return dedupeEntries([orientation, registryRest, bodyRest, remainder]);
+    // The shelf: every root file, first-line preview as evidence.
+    return dedupeEntries([rootFiles.map((f) => evidenceOf.get(f) ?? `${f}${SEP}`)]);
   }
-  // Searching: the &-family is suppressed everywhere; all else competes.
-  const isAmp = (path: string): boolean => ampers.has(path);
-  const registryRest = registry.filter((e) => !isAmp(e.split(SEP)[0]!));
-  const bodyRest = body.filter((e) => !isAmp(e.split(SEP)[0]!));
+  // The dive: corpus results; root files are not destinations here.
+  const inCorpus = (e: string): boolean => !isRoot.has(e.split(SEP)[0]!);
+  const registryRest = registry.filter(inCorpus);
+  const bodyRest = body.filter(inCorpus);
   const remainder = all
-    .filter((f) => !ampers.has(f) && !evidenceOf.has(f))
+    .filter((f) => !isRoot.has(f) && !evidenceOf.has(f))
     .map((f) => `${f}${SEP}`);
   return dedupeEntries([registryRest, bodyRest, remainder]);
 }

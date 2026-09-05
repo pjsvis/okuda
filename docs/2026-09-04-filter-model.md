@@ -14,11 +14,13 @@ appropriate results. This note records the model as it stands after the
 1. **The text filter** — the query matches the whole row: path and
    evidence line, fzf `--exact` AND across terms. Phrase-tolerant
    (`load bearing` finds `load-bearing`).
-2. **State filter — landing vs searching.** Empty query = the landing:
-   the root set floats (the `&`-family plus root content files) —
-   orientation is the job. Non-empty query = the search: the `&`-family
-   vanishes (the signposts step aside), everything else competes on
-   evidence.
+2. **State filter — the shelf and the dive (landed 2026-09-04, the
+   operator's decision).** No text → **root files only**: the shelf.
+   Filter text → **corpus search results, root files excluded**: the
+   dive. Arrive, and either you know what you are looking for (type it,
+   refine) or you do not (read the root — which links everywhere). The
+   &-family vanishes while searching along with every other root file;
+   the pointers had their floor at the landing.
 3. **Generated views are never in the corpus.** Every `index.md` is a
    `reg-sync` artifact — build output, not documents.
 
@@ -40,21 +42,10 @@ Both were real bugs today.
 
 ### 1. The shelf: no filter text → no folder contents
 
-The tempted idea, stated properly: at the landing, show only the silo's
-top level — the root files. Folder contents appear when the filter is
-expressed. The silo reads as a **shelf, not a dump**: `briefs/` exists
-on the shelf as a named compartment; its 45 files stay behind the
-label until asked for.
-
-- **For:** calm landing (the restful-rendering thesis); the root set is
-  already the natural "table of contents"; scale-proof (a 500-file silo
-  would bury the root set today).
-- **Against:** hides serendipity — the full-corpus dump occasionally
-  surfaces a document you didn't know to search for; and the live
-  search already ranks, so the landing's noise is sorted noise.
-- **Verdict:** try it as a mode before believing it. The cheapest
-  experiment is a keybinding or flag (shelf-mode landing), dogfooded
-  for a week.
+**Graduated 2026-09-04 — landed** (see State filter, above). The
+remaining open question is scale behaviour: whether the shelf should
+grow compartments as the silo grows (tier rows that expand on
+selection) or stay a strict root. Recorded; not urgent.
 
 ### 2. Implied tier filters
 

@@ -28,15 +28,20 @@ Work cycle: **brief → branch → implement → check → review → debrief**
 
 ## Searching
 
-One mode, live (ADR-030): **`gloam` is the search.** Type to search
-filenames and content simultaneously — every keystroke recomputes the
-ranked rows (registry callsign hits first, body matches with the
-matching line as evidence, filename matches). Enter reads; Esc returns
-with your query. Bare arguments resolve in order: existing file → read
-it; callsign shape → registry dispatch; anything else → search query
-(`just gloam load bearing`, unquoted is fine). `gloam -g <query>`
-survives as a seed alias. `okuda --entries "<query>"` prints the raw
-entry stream (the reload target; handy for debugging).
+One mode, live (ADR-030 + the filter model): **`gloam` is the search.**
+
+- **No text → the shelf**: the silo's root documents only — arrive, see
+  the top level. The `&`-family and the root content documents are the
+  whole floor.
+- **Text → the dive**: every keystroke recomputes the ranked corpus
+  results — registry callsign hits, body matches with the matching line
+  as evidence, filename matches. Root files are not destinations in the
+  dive; the shelf steps aside once intent is expressed.
+- Enter reads; Esc returns with your query; bare arguments resolve in
+  order (existing file → read; callsign shape → registry; anything else
+  → query). `gloam -g <query>` survives as a seed alias.
+- `okuda --entries "<query>"` prints the raw entry stream (the reload
+  target; handy for debugging).
 
 ## Troubleshooting
 

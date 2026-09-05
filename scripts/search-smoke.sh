@@ -15,8 +15,8 @@ set -euo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 
-QUERY="${1:-1.4.0}"
-WANT="${2:-DEPENDENCIES.md}"
+QUERY="${1:-load bearing}"
+WANT="${2:-briefs/2026-08-26-brief-tui-live-documents.md}"
 # Custom scenarios: bash scripts/search-smoke.sh <query> <expected-path>
 # (the just recipe is parameterless — facade-lint forbids param defaults).
 

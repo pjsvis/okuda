@@ -98,6 +98,25 @@ dereference; NN addresses only the derived map); documents with >88
 references must be restructured; false-positive references cost one
 honest error on actuation.
 
+## There is no history
+
+The model renders the back-stack unnecessary, and unnecessary abstraction
+is not a simplification opportunity — it is a removal. The inventory:
+
+- *Return to where I was* — the original instance never moved; `u`
+  unwinds the one dereference.
+- *Revisit something I saw* — it is still open (a clone), or re-findable
+  by typing its callsign into the concordance.
+- *Know what I passed through* — the set of open instances, visible in
+  the window list. **The trail is spatial, not temporal.**
+- *Undo* — meaningless without destruction; nothing was destroyed.
+
+History existed because software destroyed. The browser's back-stack was
+an accounting trick for in-place replacement (`docs/2026-09-04-history-is-bunk.md`).
+Non-destructive dereference and promotion abolish the destruction, and
+with it the ledger. The documents form a graph; a history imposes a line
+through it; the walk is the reader's attention, and it owes no ledger.
+
 ## Related
 
 - ADR-022 (menu pattern) — reversed; palimpsest there
