@@ -203,6 +203,13 @@ would be neat.
 6. Optimism at render, honesty at actuation: paint what looks like a
    reference; flash when it isn't. Validation at render time is the
    wrong place to spend the cost.
+7. A pure system fails totally and immediately — and that is good. A
+   stateful system fails partially and silently: it runs, looks fine,
+   and is quietly wrong. Total failure with trivial recovery beats
+   partial failure with forensics. The corollary: when philosophy and
+   ergonomics disagree, check whether the architecture has already
+   resolved the philosophy's concern (the depth-one stack made the
+   Backspace restoration safe before it was argued).
 
 ## Related
 
