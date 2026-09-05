@@ -48,11 +48,16 @@ paint is illustrative; the source is never mutated; legacy wiring
    the vector was optimistic; the document does not exist; stay put.
    The old `%%okuda-rhs%%` extraction and `[NN](path)`-token wiring
    retire (tests updated or deleted).
-6. **The clone verb — `99`.** Host spawn: inside tmux,
-   `tmux new-window -t <silo session> 'gloam <current-doc>'`; outside
-   tmux, `$OKUDA_CLONE_CMD` if set, else an honest footer message
-   ("clone: no host — run inside tmux or set OKUDA_CLONE_CMD"). The
-   clone renders the same file as main → annotated by rule 3.
+6. **The clone verb — `99`.** Spin up another terminal running
+   `gloam <current-doc>`. The integration is DECLARED via
+   `OKUDA_CLONE` — a restricted grammar, closed set: `terminal`
+   (macOS Terminal via osascript; the default), `tmux` (new window in
+   the current session — a guest capability, not a runtime dep),
+   `cmd` (`OKUDA_CLONE_CMD`, $1 = the doc), `herdr` (specced, not
+   built). Default: `terminal`, or `tmux` when already inside tmux.
+   Unknown integrations and missing configuration refuse with the
+   known set named. The clone renders the same file as main →
+   annotated by rule 3.
 7. **The hints.** Footer becomes:
    `q quit · NN deref · 99 clone · u unwind · /search? · r reload` —
    final wording at implementation.

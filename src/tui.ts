@@ -17,6 +17,7 @@
 
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
 import { annotateSource, jumpMapFor, CLONE_TOKEN } from "./vectors";
+import { cloneArgs } from "./clone";
 import { loadPalette, type Palette } from "./palette";
 import { renderDocument } from "./render";
 import { padStartDisplay, terminalCols, terminalRows } from "./width";

@@ -22,6 +22,9 @@ export const VECTOR_MIN = 11;
 export const VECTOR_MAX = 98;
 /** The clone verb (ADR-031): not a vector — reserved in the two-digit space. */
 export const CLONE_TOKEN = 99;
+/** The two-digit space is 00-99; reserved: 00-09 (unreachable padding),
+ *  10 (numeric sanity), 99 (the clone verb). Vectors: 11-98 — 88
+ *  addresses, and silcrow 11 is always the first. */
 /** The two-digit buffer only ever completes on two digits, so painted
  *  forms are always two characters wide. */
 export const MAX_REFS = VECTOR_MAX - VECTOR_MIN + 1;

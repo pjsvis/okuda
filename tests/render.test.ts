@@ -560,9 +560,10 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
   test("the vector badge paints in the reserved vector role after the slug", async () => {
     const out = await render("*Title* %okuda-vector:01% <!-- docs/foo.md -->");
     // ADR-031: the badge in the reserved vector paint (#ffcc66 → 255;204;102),
-    // bold, bracketless — the section sign is the marker and the boundary.
+    // bracketless, colour-only — bold is a shared channel and cannot
+    // disambiguate; the reserved gold does.
     // Tolerant of the inline parser's % mangling.
-    expect(out).toContain("\x1b[38;2;255;204;102;1m§01\x1b[0m");
+    expect(out).toContain("\x1b[38;2;255;204;102m§01\x1b[0m");
   });
 
   test("the slug renders as emphasis (yellow, italic) on the left", async () => {

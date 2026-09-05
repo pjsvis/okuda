@@ -580,7 +580,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         const slugLines = wrapBlock(stripHtml(v.slug));
         const avail = Math.max(width - 2 - badge.length - 1, 8);
         const body = elideToWidth(slugLines.join(" "), avail);
-        return body + " " + styler.roleBold("vector", badge) + "\n\n";
+        return body + " " + styler.role("vector", badge) + "\n\n";
       }
       const lines = wrapBlock(stripHtml(children));
       return lines.join("\n") + "\n\n";
@@ -596,7 +596,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // the paragraph handler: live tokens paint as gold silcrows, legacy
       // tokens strip silently (retired, not honored).
       out = out.replace(/%{1,2}okuda-vector:(\d{1,2})%{1,2}/g, (_m, n: string) =>
-        " " + styler.roleBold("vector", `§${n}`));
+        " " + styler.role("vector", `§${n}`));
       out = out.replace(/%{1,2}okuda-(?:vector|rhs):\d{1,2}%{1,2}/g, "");
       // Bare .md-path tokens in prose recede to the muted (far) register
       // — near/far: paths are provenance, not content. They read like
