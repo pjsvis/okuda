@@ -56,9 +56,9 @@ lying.
    entry carries its silcrow.
 4. **Local document link** — [the constitution](system.md): the badge
    follows the link's URL.
-5. **One-to-many** — ADR-030 again: a second mention, a second vector,
-   the same destination. (The map translates many vectors to one
-   filename.)
+5. **Repeat citation** — ADR-030 again: a second mention, the SAME
+   silcrow (§13). One destination, one number — the citation
+   convention, everywhere.
 6. **Garden-path regression** — [the silcrow
    explainer](docs/2026-09-04-the-silcrow.md): a noun-phrase label; the
    URL must read as an address, never as a sentence.

@@ -33,25 +33,46 @@ const map = jumpMapFor(source);
 const annotated = annotateSource(source, map);
 const out = await renderDocument(annotated, { width: 100, palette, color });
 const plain = out.replace(/\x1b\[[0-9;]*m/g, "");
+// Only PAINTED silcrows count — literal §NN text in prose is the
+// user's, and the reserved paint is what makes ours ours.
+const vectorHex = palette["vector"]!.replace("#", "");
+const vectorRgb = [0, 2, 4].map((i) => parseInt(vectorHex.slice(i, i + 2), 16)).join(";");
+const paintedRe = new RegExp(`\\x1b\\[38;2;${vectorRgb}m§(\\d{2})\\x1b\\[0m`, "g");
 
 let fail = 0;
 const ok = (msg: string): void => console.log(`  ✓ ${msg}`);
 const bad = (msg: string): void => { console.error(`  ✗ ${msg}`); fail++; };
 
-// 1. Every discovered reference is painted, in reading order.
+// 1. Every unique destination carries its silcrow (one destination,
+//    one silcrow — repeats reuse the number).
 const refs = scanReferences(source);
-const painted = [...out.matchAll(/§(\d{2})/g)].map((m) => Number(m[1]!));
-for (let i = 0; i < refs.length; i++) {
+const unique = [...new Set(refs.map((r) => r.target))];
+const painted = [...out.matchAll(paintedRe)].map((m) => Number(m[1]!));
+for (let i = 0; i < unique.length; i++) {
   const num = VECTOR_MIN + i;
-  if (!painted.includes(num)) bad(`§${num} (${refs[i]!.target}) is not painted`);
+  if (!painted.includes(num)) bad(`§${num} (${unique[i]!}) is not painted`);
 }
-if (painted.length >= refs.length && refs.length > 0) ok(`${painted.length} silcrow(s) painted, map size ${map.size}`);
+if (painted.length >= unique.length && unique.length > 0) ok(`${painted.length} silcrow(s) painted, ${unique.length} destinations, map size ${map.size}`);
 
-// 2. Reading order: the painted sequence is 11, 12, … (one-to-many
-//    allows repeated numbers; the ORDER must still ascend).
-const ascending = painted.every((n, i) => i === 0 || n >= painted[i - 1]!);
-if (ascending) ok("painted numbers ascend in reading order");
-else bad(`painted numbers do not ascend: ${painted.join(", ")}`);
+// 2. Every painted number is a valid map entry — no invention.
+const mapKeys = new Set(map.keys());
+if (painted.every((n) => mapKeys.has(n))) ok("every painted number is a mapped vector");
+else bad(`painted numbers outside the map: ${painted.filter((n) => !mapKeys.has(n)).join(", ")}`);
+
+// 2b. The citation convention: repeated destinations reuse exactly
+//     their number, once per mention (repeats never get new numbers).
+const mentionCounts = new Map<string, number>();
+for (const r of refs) mentionCounts.set(r.target, (mentionCounts.get(r.target) ?? 0) + 1);
+const numByTarget = new Map<string, number>();
+for (const [num, target] of map) numByTarget.set(target, num);
+let conventionHolds = true;
+for (const [target, count] of mentionCounts) {
+  const num = numByTarget.get(target);
+  if (num === undefined) continue; // over-cap destination — unpainted
+  const paintCount = painted.filter((n) => n === num).length;
+  if (paintCount !== count) { conventionHolds = false; bad(`citation convention broken: ${target} has ${count} mention(s) but ${paintCount} paint(s) of §${num}`); }
+}
+if (conventionHolds) ok("the citation convention holds — repeats reuse the silcrow");
 
 // 3. No marker leaks into the frame.
 if (/%okuda-(?:vector|rhs):/.test(out)) bad("a paint marker leaked into the frame");

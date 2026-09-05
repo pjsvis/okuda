@@ -65,14 +65,20 @@ export function scanReferences(source: string): RefOccurrence[] {
 }
 
 /** The jump map — the in-memory translation table: vector number →
- *  filename. One-to-many by design: repeated references to the same
- *  document each hold their own vector pointing at the same filename.
- *  Rebuilt on every render — re-derivation replaces invalidation. */
+ *  filename, **one destination, one silcrow**. A destination cited
+ *  repeatedly carries one number, reused at every mention (the citation
+ *  convention: IEEE reprints, legal §-cross-references). First
+ *  occurrence assigns; numbers ascend in reading order; capped at
+ *  MAX_REFS — the cap is the map's invariant. Rebuilt on every render —
+ *  re-derivation replaces invalidation. */
 export function buildJumpMap(refs: RefOccurrence[]): Map<number, string> {
   const map = new Map<number, string>();
   let n = VECTOR_MIN;
+  const seen = new Set<string>();
   for (const ref of refs) {
     if (n > VECTOR_MAX) break; // the cap is the map's invariant, not discovery's
+    if (seen.has(ref.target)) continue; // one destination, one silcrow
+    seen.add(ref.target);
     map.set(n++, ref.target);
   }
   return map;
@@ -90,11 +96,13 @@ export function jumpMapFor(source: string): Map<number, string> {
  *  used for rendering only, never persisted. Replaces from the end so
  *  positions stay valid. Pure. */
 export function annotateSource(source: string, map: Map<number, string>): string {
+  const targetNum = new Map<string, number>();
+  for (const [num, target] of map) targetNum.set(target, num);
   const occ = scanReferences(source);
   let out = source;
   for (let i = occ.length - 1; i >= 0; i--) {
-    const num = VECTOR_MIN + i;
-    if (!map.has(num)) continue; // the paint is a projection of the map
+    const num = targetNum.get(occ[i]!.target);
+    if (num === undefined || !map.has(num)) continue; // the paint is a projection of the map
     const o = occ[i]!;
     out = out.slice(0, o.end) + ` %okuda-vector:${num}%` + out.slice(o.end);
   }

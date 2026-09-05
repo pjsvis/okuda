@@ -68,13 +68,12 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
 });
 
 describe("vectors — the jump map (the translation table)", () => {
-  test("numbers run from 11, in reading order — one-to-many values", () => {
+  test("numbers run from 11, in reading order — one destination, one silcrow", () => {
     const map = jumpMapFor("ADR-002 early, ADR-002 again, [x](docs/z.md).");
     expect(map.get(11)).toBe("ADR-002");
-    expect(map.get(12)).toBe("ADR-002"); // same filename, its own vector
-    expect(map.get(13)).toBe("docs/z.md");
+    expect(map.get(12)).toBe("docs/z.md");
+    expect(map.has(13)).toBe(false); // the repeat reuses §11
     expect(map.has(10)).toBe(false);
-    expect(map.has(14)).toBe(false);
   });
 
   test("buildJumpMap caps at MAX_REFS", () => {
@@ -97,12 +96,11 @@ describe("vectors — annotation (illustrative paint markers)", () => {
     expect(out).toBe("the live search is ADR-030 %okuda-vector:11%, amended.");
   });
 
-  test("repeated references get their own vectors (one-to-many)", () => {
+  test("repeated references reuse the silcrow (the citation convention)", () => {
     const src = "ADR-030 once, ADR-030 twice.";
     const map = jumpMapFor(src);
     const out = annotateSource(src, map);
-    expect(out).toContain("%okuda-vector:11%");
-    expect(out).toContain("%okuda-vector:12%");
+    expect(out.match(/%okuda-vector:11%/g)!.length).toBe(2); // same number, both cites
   });
 
   test("links: badge after the closing paren", () => {

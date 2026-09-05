@@ -43,6 +43,10 @@ registry-validated at render time.
   not a vector; it is the clone verb, available on main and on a
   dereference alike (why hobble main by withholding what referenced
   documents have?).
+- **One destination, one silcrow**: a document cited repeatedly reuses
+  its number at every mention — the citation convention (IEEE reprints,
+  legal §-cross-references). The number identifies the destination; the
+  mentions are where it is cited from.
 - **Optimistic vectors**: references are recognized by shape and
   painted without validating the destination. The **actuator fails
   honestly** — `unknown callsign: X` in the footer — when the target
