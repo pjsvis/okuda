@@ -56,6 +56,35 @@ The architecture is gone. One question survives, gated on a dogfood finding rath
 
 This is the difference the whole thing turns on: we kept the *question* because it's empirical and serves a real user; we rejected the *architecture* because it was speculative and served a rubric. One is anti-entropy; the other is entropy wearing a halo.
 
+### The ingress / egress asymmetry (the Morse shape)
+
+The accessibility work that *does* earn its place is shaped by one rule:
+**input is a stream; output is a performance.** Morse makes it visible.
+
+- **Ingress is a stream.** A single-switch user emits one signal in time;
+the silo's two-digit grammar already accepts keystrokes, so a Morse
+text box (DOT / DASH / SPACE) is not an accessibility mode bolted on —
+it's a keyboard with fewer keys. Under the one-ingress rule, Morse
+input is a translator at the ingress, not a new grammar. The reader's
+pace; the system just listens.
+- **Egress is a performance.** Morse output is *slow* — 40 wpm is fast
+for a human, far slower than reading, slower than TTS, slower than
+braille. Outputting a document in Morse forces the system to spend the
+reader's time at the system's cadence, which collides with the first
+law of temporal accessibility (time belongs to the reader, the system
+never spends it). So Morse egress inherits the speech brief's exact
+shape: per-section, on-demand, interruptible — the `s` key's contract,
+reused. Not "the document in Morse," but "this section in Morse, when
+asked, cut to silence on navigation."
+
+The asymmetry isn't a flaw in the design; it's the difference between
+*ingress* and *egress* the explainer already encodes for speech. Morse
+and speech are the same rung of the ladder viewed through different
+encodings: input is a stream (the reader's pace), output is a
+performance (the system's pace, bounded and skippable, never spent
+without permission). Morse isn't a new feature; it's the silo
+recognising its own shape, one switch at a time.
+
 ---
 
 ## The ladder holds
