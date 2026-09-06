@@ -97,9 +97,37 @@ okuda <file.md> --no-color | tee /dev/tty | say
       degraded dogfood now (full doc), run the coupled-frame dogfood
       when the pager lands.
 
+## Run 1 findings (2026-09-06, degraded preview — pager not landed)
+
+Ran: `okuda docs/2026-08-25-what-it-feels-like.md --no-color | tee /dev/tty | say`
+
+- **Mechanical success, zero new code.** 8454 bytes → simultaneous visual
+  + audio (20MB AIFF, 471s).
+- **`--no-color` does not fully strip ANSI — real gap.** 28 escape
+  sequences survive (the `^[[1m` bold codes); raw markdown has 0. `say`
+  reads them as noise. **The clean audio input is `cat doc.md`, not
+  `okuda --no-color`.** okuda *adds* decoration noise for the ear.
+  Action: either `--no-color` strips bold too, or the audio path skips
+  okuda. Worth a td issue.
+- **Other decoration read as noise:** `#` markers → "hash"; right-margin
+  border glyphs; custom list bullets. All confirmed, as predicted.
+- **Desync larger than estimated.** ~2s visual scan vs 471s audio =
+  ~235× slower for the ear on this doc (longer than a single frame, so
+  the per-frame estimate scales up). The serial ear's triage cost is
+  real and bigger than the 30s guess.
+- **Chunk-size test blocked on the pager.** Heading-subtree ear-triage
+  sizing needs `space` = next frame (panel brief work item 5, not
+  landed). This was the degraded preview; the coupled-frame test waits.
+
+**Verdict:** the dogfood did its job — confirmed the degradation, located
+it (surviving escapes + decoration), showed the clean input is raw
+markdown, measured the desync. Most of it was shite (decoration noise),
+exactly as the "sooner we find out the better" pass predicted. The
+`--no-color` escape-survival is the actionable finding.
+
 ## Work Plan
 
-1. [ ] Run the degraded dogfood now: `okuda <small doc> --no-color |
+1. [x] Run the degraded dogfood now: `okuda <small doc> --no-color |
       tee /dev/tty | say`. Record: what `say` reads as noise, the
       2s-vs-30s desync feel, whether heading-subtree chunks (if paged)
       are ear-triage-sized. This is the "sooner we find out the better"
