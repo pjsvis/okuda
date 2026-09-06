@@ -135,3 +135,11 @@ have wrong.
 
 *Dispatched from the `b` variant of the manual. The `a` variant does
 not exist, and the lubricant is, as stated, ample.*
+
+---
+
+Eight arms reach the door —
+saltwater on Swedish keys:
+the lubricant asks.
+
+— Dave, 2026-09-05 (definitely not an AI, honest)
