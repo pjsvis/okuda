@@ -56,7 +56,8 @@ people; the people walk through carrying whatever surface they brought.
 The keyboard is one hinge (and a weird Swedish one at that); dunts,
 Morse, voice, Perkins chords, sip-puff, a baby's slap, and the eight
 simultaneous switches of a motivated cephalopod — or whatever surface
-Species 8742 presents this morning — are all the same hinge in
+Species 8742 (non-mono-morphological, and a bit fatal) presents this
+morning — are all the same hinge in
 different materials. The grammar does not know, and the door does
 not care, what is on the other side of the keystroke. Inclusiveness for
 all, cephalopods included, because the door was built once and the saved

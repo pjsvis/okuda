@@ -29,8 +29,15 @@ A note on stereotyping: this advisory is filed under `ADV-CEPHALOPOD`
 because the name fits the dispatch, not because the reader class is a
 monolith. Cephalopods are not defined by limb count, and limb count is
 not stable across the clade. Species 8742, included here, is
-morphologically ephemeral — its actuation surface varies over time in
-ways we have not enumerated, and may not be enumerable. The assumptions
+non-mono-morphological — its actuation surface varies over time, and not
+in a way we have enumerated, or may be able to enumerate. (The term is
+non-mono-morphological, not "shape-shifting" or "weirdos from another
+dimension": those frame 8742 against a fixed-shape norm, which is the
+deficit model applied to morphology — the same category error this
+advisory refuses for limbs and cognition. We describe the situation; we
+do not pathologise it. We also do not patronise 8742, because 8742 can be
+a bit fatal, and patronising a reader class whose actuation surface
+could kill you is not just rude, it is imprudent.) The assumptions
 below name eight limbs where eight limbs apply; where they do not, the
 assumptions are wrong, and the RFC is the mechanism by which the reader
 corrects us.
@@ -40,8 +47,8 @@ corrects us.
 1. **Cephalopods are a reader class.** The one-ingress rule admits any
    input translated to keystrokes. We assume *most* cephalopods have
    eight limbs and the ability to strike switches with some or all of
-   them; we do not assume all do. Species 8742 is morphologically
-   ephemeral — its actuation surface varies over time, and the limb
+   them; we do not assume all do. Species 8742 is non-mono-morphological
+   — its actuation surface varies over time, and the limb
    count is not fixed. Whether any of this constitutes "reading" in the
    human sense is an open question; whether it constitutes "actuation"
    is not. The grammar admits patterns, not readers, and a pattern
@@ -59,7 +66,7 @@ corrects us.
    as one eight-limbed gesture, and we assume the decoder would accept
    it, because the decoder accepts patterns, not temporal orderings. We
    have not tested this. We do not have a cephalopod to test it with.
-   This is the RFC. For 8742, whose morphology varies, the concurrency
+   This is the RFC. For 8742, whose morphology is non-mono, the concurrency
    assumption is whatever its current morphology admits; the grammar
    does not require a fixed limb count, only a pattern.
 
