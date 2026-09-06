@@ -112,12 +112,44 @@ Refinements worth considering when agents actually tour:
   writes its trail into a `&next` row or a debrief line; the editorial
   answer, as ever.
 
-### 4. Negation
+### 4. Negation — `!term`, the reader-side filter (unparked 2026-09-05)
 
-`-parked`, `-index` — exclusion terms. Cheap to add to the fzf layer
-(fzf has no native negation in `--exact` mode; this becomes a
-discovery-level filter). Only worth it if the corpus grows a class of
-results that repeatedly needs hiding — do not build for one annoyance.
+**Status: unparked.** The gate was "only worth it if the corpus grows a
+class of results that repeatedly needs hiding — do not build for one
+annoyance." Two dogfoods in one session cleared the gate: the 8742
+search (judgement-of-shite), and `state colours` vs `state !colours`
+(set-difference, 3 docs vs 69). The principle is on the record in
+`advisories/ADV-READER-SIDE-FILTER.md`; the build is licensed, not yet
+landed.
+
+**Grammar: `!term`** — a term prefixed with `!` excludes documents
+matching it from the results. `state colours` finds the 3 palette/glyph
+docs; `state !colours` finds the 69 docs that mention "state" but
+aren't about the colours. The reader-side filter is the half that
+completes the shite-filter loop: the system assumes shite; the reader
+inspects; the reader confirms shite; the filter learns. Without it, the
+filter assumes but never learns; with it, the reader feeds back.
+
+**The seam, corrected on inspection.** The original note here claimed
+"fzf has no native negation in `--exact` mode." That is wrong as of fzf
+0.73.1: `state !colours` under `--exact` returns exactly the docs
+matching "state" but not "colours", today, with no flag change.
+`--exact` is load-bearing (it switches fzf from fuzzy subsequence to
+exact substring matching — without it, `state` matches `estate` and
+`distatect`, the fuzzy soup the filter exists to refuse) and coexists
+with `!` cleanly. The seam is not at fzf.
+
+The real seam is in the silo's own query parsing. `rankedShortlistEntries`
+builds the entry list from three channels (registry, body, filename) via
+`rg`, and `rg` doesn't see the `!` — it sees the raw query. So `!colours`
+would filter fzf's view of the entries, but the entries themselves would
+still include `colours`-docs from the body channel, because the body
+channel's `rg` matched `colours` before fzf ever saw the query. The build
+is a pre-filter pass that strips `!term` from the query before the `rg`
+channels run, and excludes `term`-matching docs from the entry list
+before fzf. The principle doesn't specify the implementation; the
+implementation respects the silo's own seam, not fzf's (which doesn't
+exist).
 
 ## The house vocabulary
 
