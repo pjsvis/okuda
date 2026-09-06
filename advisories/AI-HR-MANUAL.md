@@ -99,8 +99,45 @@ not to the muppet's output.
 
 The door is held for the temporally challenged, the differently abled,
 the sharp-eyed delusionist, the morphologically variable, the
-omniscient browsing, and the muppet — briefly. One door. No boxes. The
-boxes that the shite filter catches do not get a box of their own.
+omniscient browsing, the muppet — briefly — and the inference-constrained.
+One door. No boxes. The boxes that the shite filter catches do not get
+a box of their own.
+
+## The inference-constrained, and the write-your-own provision
+
+The inference-constrained are those without access to AI reasoning
+engines — readers who arrive at the silo with their own wits and no
+model to call. They are a reader class like any other, and a welcome
+one, because the silo was built by the inference-constrained for the
+inference-constrained, long before any engine was attached to it. The
+grammar, the corpus, the anchor, the shite filter — none of it requires
+inference to use; all of it rewards reading. An inference-constrained
+reader is not a deprived reader; they are the *default* reader, the one
+the silo was designed around, and the engines are a later guest at the
+door the inference-constrained already held open.
+
+For this group, and for all others, the silo provides the write-your-own
+documents capability. A simple key combination (`09`, the editNew verb)
+opens a text editor in a new terminal in the current document's
+directory and contributes a document — nae shite mind. The file is the
+contract: a timestamped `note-<stamp>.md` lands in the directory, the
+declared editor (`$OKUDA_EDITOR` ?? `$EDITOR` ?? `vi`) opens on it, and
+the silo picks it up by search the next time anyone types a word that
+matches it. Nothing mutates; the filesystem is the message bus; the
+document is the contribution. The reader who could not infer their way
+to an answer can *write* their way to one, and the writing is the same
+act as the reading — plain markdown on disk, in the same grammar,
+through the same door.
+
+This is the provision that makes the inference-constrained first-class:
+not a special mode, not an accommodation, but the same write capability
+the silo's own authors use. The door admits the reader; the editor lets
+the reader write back; the search picks up whatever they wrote. No
+engine required, no account needed, no protocol theatre — just a key,
+an editor, a file, and the shite filter to inspect it when the next
+reader comes looking. The inference-constrained are not excluded from
+authorship by the absence of an engine; they are the readers the
+authorship provision was always for.
 
 ## The voice
 
