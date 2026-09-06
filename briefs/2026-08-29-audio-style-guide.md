@@ -6,7 +6,29 @@ callsign: BRF-AUDIO-STYLE
 # Brief: Audio-First Style Guide and Linting Heuristics
 
 **Date:** 2026-08-29
-**Status:** Open
+**Status:** Open (partially superseded 2026-09-06)
+
+---
+
+> **Demolition notice (2026-09-06).** The outbound-markup portions of
+> this brief — the amplitude/pause lookup table (work item 4), the
+> `SRSN:` protocol (work item 3), and the "volume (dB) and pause
+> duration (ms)" mapping in Scope — are the `--dunt` error pointing
+> outbound: a protocol for one sink leaking into the text stream. They
+> are demolished by `docs/2026-09-06-protocol-free-text-identity.md` and
+> replaced by `BRF-TTS-DOGFOOD` (the coupled-frame `say` dogfood). The
+> protocol we didn't build is the feature; `say`'s own punctuation→pause
+> mapping is the "initial grammar," at zero code cost.
+>
+> **What survives:** the *authoring* style guide portion — prose cadence
+> rules, comma-as-breath, clause-length limits, mandatory diagram
+> titles. That is **compositing guidance** (the environment's job): it
+> helps authors write markdown that degrades gracefully for any sink,
+> visual or audio. It is not outbound markup and it is not ours to
+> emit; it is ours to recommend. A future revision should split this
+> brief: the surviving authoring guidance stays as a style guide; the
+> demolished outbound-markup portions are retired with a pointer to
+> `BRF-TTS-DOGFOOD`.
 
 ---
 
