@@ -9,4 +9,5 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-05 | ADV-BOUNDED-CONTEXT-COMMON | open | ADV-BOUNDED-CONTEXT-COMMON — Advisory on the bounded context as a common, shared with others | ADV-BOUNDED-CONTEXT-COMMON.md |
 | 2026-09-05 | ADV-CEPHALOPOD-RFC | open | ADV-CEPHALOPOD-RFC — Advisory for cephalopods (request for comments) | ADV-CEPHALOPOD-RFC.md |
