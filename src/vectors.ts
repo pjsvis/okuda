@@ -22,12 +22,19 @@ export const VECTOR_MIN = 11;
 export const VECTOR_MAX = 98;
 /** The clone verb (ADR-031): not a vector — reserved in the two-digit space. */
 export const CLONE_TOKEN = 99;
+/** Repeated-digit actuators (ADR-032): reserved for double-tap verbs
+ *  ([00] exit and [99] clone already set the precedent). The silcrow
+ *  allocator skips these globally — a shape rule, not a range rule:
+ *  repeated digit = actuator, mixed digits = address. The grammar
+ *  reserves them; documents never see the gap (numbers are dynamic). */
+export const RESERVED_VECTORS = new Set([44, 55, 66, 77, 88]);
 /** The two-digit space is 00-99; reserved: 00-09 (unreachable padding),
- *  10 (numeric sanity), 99 (the clone verb). Vectors: 11-98 — 88
- *  addresses, and silcrow 11 is always the first. */
+ *  10 (numeric sanity), 99 (the clone verb), and the repeated-digit
+ *  actuators {44,55,66,77,88} (ADR-032). Vectors: 11-98 minus the 5
+ *  reserved actuators — 83 addresses, and silcrow 11 is always first. */
 /** The two-digit buffer only ever completes on two digits, so painted
  *  forms are always two characters wide. */
-export const MAX_REFS = VECTOR_MAX - VECTOR_MIN + 1;
+export const MAX_REFS = VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size;
 
 /** Callsign shape: tier prefix + significant tokens, uppercase. Moved
  *  here from cli.ts — the dispatch and the discovery scan share one
@@ -79,6 +86,10 @@ export function buildJumpMap(refs: RefOccurrence[]): Map<number, string> {
     if (n > VECTOR_MAX) break; // the cap is the map's invariant, not discovery's
     if (seen.has(ref.target)) continue; // one destination, one silcrow
     seen.add(ref.target);
+    // Skip the reserved repeated-digit actuators (ADR-032): the gap is
+    // invisible because numbers are dynamic, never authored.
+    while (RESERVED_VECTORS.has(n) && n <= VECTOR_MAX) n++;
+    if (n > VECTOR_MAX) break;
     map.set(n++, ref.target);
   }
   return map;

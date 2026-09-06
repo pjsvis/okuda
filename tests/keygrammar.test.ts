@@ -26,6 +26,10 @@ describe("keygrammar — the two-digit language as data", () => {
     for (const t of [4, 5, 6, 7, 8]) expect(verbFor(t)).toBeNull();
   });
 
+  test("repeated-digit actuators are reserved (ADR-032), not vectors", () => {
+    for (const t of [44, 55, 66, 77, 88]) expect(verbFor(t)).toBeNull();
+  });
+
   test("the bindings are a table — renumbering is data, not code", () => {
     // Every binding key is outside the address range: verbs and modes
     // never collide with silcrow addresses, and renumbering is a one-

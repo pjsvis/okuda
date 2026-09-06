@@ -29,3 +29,4 @@
 {"file":"029-renderer-reader-glass.md","date":"2026-09-03","status":"Accepted","summary":"Disambiguate the renderer, the reader, and the glass","meta":{},"callsign":"ADR-RENDERER-READER-029"}
 {"file":"030-live-search-picker.md","date":"2026-09-04","status":"Accepted","summary":"The picker is a live search","meta":{},"callsign":"ADR-LIVE-SEARCH-030"}
 {"file":"031-main-document.md","date":"2026-09-04","status":"Accepted","summary":"The main document — optimistic vectors, 99 promotes, u unwinds","meta":{},"callsign":"ADR-MAIN-DOCUMENT-031"}
+{"file":"032-repeated-digit-actuators.md","date":"2026-09-06","status":"Accepted","summary":"Repeated-digit actuators — [44,55,66,77,88] reserved","meta":{},"callsign":"ADR-REPEATED-DIGIT-ACTUATORS-032"}

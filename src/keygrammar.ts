@@ -20,6 +20,8 @@
  * missing.
  */
 
+import { RESERVED_VECTORS } from "./vectors";
+
 export type Verb =
   | "exit"
   | "frame"
@@ -44,11 +46,13 @@ export const KEYBINDINGS: Record<number, Verb> = {
 /** Reduce a completed two-digit token to its verb. Returns `"vector"`
  *  for the address range, `null` for reserved-unassigned tokens (the
  *  press is acknowledged and does nothing — reserved, not missing).
- *  Pure. */
+ *  The repeated-digit actuators {44,55,66,77,88} (ADR-032) are reserved
+ *  for future double-tap verbs and resolve to null until bound. Pure. */
 export function verbFor(token: number): Verb | "vector" | null {
   if (token === 99) return "clone";
   const verb = KEYBINDINGS[token];
   if (verb) return verb;
+  if (RESERVED_VECTORS.has(token)) return null; // ADR-032 actuator pocket
   if (token >= 11 && token <= 98) return "vector";
   return null;
 }

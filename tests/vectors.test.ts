@@ -63,7 +63,8 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
     const src = Array.from({ length: 120 }, (_, i) => `ADR-${1000 + i}`).join(" ");
     const refs = scanReferences(src);
     expect(refs.length).toBe(MAX_REFS);
-    expect(MAX_REFS).toBe(VECTOR_MAX - VECTOR_MIN + 1);
+    // ADR-032: 5 repeated-digit actuators reserved → 83 addresses, not 88.
+    expect(MAX_REFS).toBe(VECTOR_MAX - VECTOR_MIN + 1 - 5);
   });
 });
 
@@ -81,6 +82,17 @@ describe("vectors — the jump map (the translation table)", () => {
     const map = buildJumpMap(refs);
     expect(map.size).toBe(MAX_REFS);
     expect(map.has(VECTOR_MAX + 1)).toBe(false);
+  });
+
+  test("the allocator skips the reserved actuators (ADR-032)", () => {
+    // 84 distinct refs: fills 11-43, skips 44, fills 45-54, skips 55, …
+    const refs = Array.from({ length: 84 }, (_, i) => ({ pos: i, end: i + 1, target: `ADR-${i}` }));
+    const map = buildJumpMap(refs);
+    expect(map.size).toBe(MAX_REFS); // 83 — one short of 84
+    for (const r of [44, 55, 66, 77, 88]) expect(map.has(r)).toBe(false);
+    expect(map.get(11)).toBe("ADR-0");
+    expect(map.get(43)).toBe("ADR-32"); // last before the 44 gap
+    expect(map.get(45)).toBe("ADR-33"); // first after the 44 gap
   });
 
   test("99 is not derivable — the clone verb is reserved", () => {

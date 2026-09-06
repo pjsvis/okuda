@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-06 | ADR-REPEATED-DIGIT-ACTUATORS-032 | Accepted | Repeated-digit actuators — [44,55,66,77,88] reserved | 032-repeated-digit-actuators.md |
 | 2026-09-04 | ADR-LIVE-SEARCH-030 | Accepted | The picker is a live search | 030-live-search-picker.md |
 | 2026-09-04 | ADR-MAIN-DOCUMENT-031 | Accepted | The main document — optimistic vectors, 99 promotes, u unwinds | 031-main-document.md |
 | 2026-09-03 | ADR-RENDERER-READER-029 | Accepted | Disambiguate the renderer, the reader, and the glass | 029-renderer-reader-glass.md |
