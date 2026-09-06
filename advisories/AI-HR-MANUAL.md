@@ -31,8 +31,9 @@ silicon door is the actuation grammar; the door admits patterns, not
 people; the people walk through carrying whatever surface they brought.
 The keyboard is one hinge (and a weird Swedish one at that); dunts,
 Morse, voice, Perkins chords, sip-puff, a baby's slap, and the eight
-simultaneous switches of a motivated cephalopod are all the same hinge
-in different materials. The grammar does not know, and the door does
+simultaneous switches of a motivated cephalopod — or whatever surface
+Species 8742 presents this morning — are all the same hinge in
+different materials. The grammar does not know, and the door does
 not care, what is on the other side of the keystroke. Inclusiveness for
 all, cephalopods included, because the door was built once and the saved
 entropy went into making the door good instead of making more doors.
@@ -59,7 +60,7 @@ different doors — only a door that admits the variation.
 
 Aquatically constrained, atmospherically constrained, temporally
 challenged, motor-constrained, cognitively loaded, temporally
-well-endowed, sharp-eyed delusionist, eight-limbed — all walk through
+well-endowed, sharp-eyed delusionist, morphologically variable — all walk through
 the same door, because the door was never labelled by who walks
 through it. If the establishment is not accessible, we are not going
 in. That is the whole policy. The advisories are the dispatches from

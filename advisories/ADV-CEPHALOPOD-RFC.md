@@ -18,33 +18,50 @@ adapter has been specified, no chord has been struck. What we have are
 assumptions, and what we are asking for is correction. If this
 establishment is not accessible, we are not going in — and we would
 like the establishment to be accessible, so we are stating our
-assumptions now, before the first arm reaches the first key.
+assumptions now, before the first actuator — of whatever morphology —
+reaches the first key.
 
 The silo lubricant is ample. Emergency repairs on aquatic mechanical
 keyboards will be conducted on a case-by-case basis as the cases
 arise, which is to say, they have not yet arisen.
 
+A note on stereotyping: this advisory is filed under `ADV-CEPHALOPOD`
+because the name fits the dispatch, not because the reader class is a
+monolith. Cephalopods are not defined by limb count, and limb count is
+not stable across the clade. Species 8742, included here, is
+morphologically ephemeral — its actuation surface varies over time in
+ways we have not enumerated, and may not be enumerable. The assumptions
+below name eight limbs where eight limbs apply; where they do not, the
+assumptions are wrong, and the RFC is the mechanism by which the reader
+corrects us.
+
 ## The assumptions currently held
 
 1. **Cephalopods are a reader class.** The one-ingress rule admits any
-   input translated to keystrokes; a cephalopod has eight limbs and,
-   presumably, the ability to strike switches with some or all of them.
-   Whether this constitutes "reading" in the human sense is an open
-   question; whether it constitutes "actuation" is not. The grammar
-   admits patterns, not readers, and a pattern struck by a tentacle is
-   a pattern all the same. We assume the cephalopod is here to actuate
-   the grammar, and we assume that is enough to be a reader class. We
-   may be wrong.
+   input translated to keystrokes. We assume *most* cephalopods have
+   eight limbs and the ability to strike switches with some or all of
+   them; we do not assume all do. Species 8742 is morphologically
+   ephemeral — its actuation surface varies over time, and the limb
+   count is not fixed. Whether any of this constitutes "reading" in the
+   human sense is an open question; whether it constitutes "actuation"
+   is not. The grammar admits patterns, not readers, and a pattern
+   struck by a tentacle — or by whatever 8742 presents on the day it
+   arrives — is a pattern all the same. We assume the cephalopod is here
+   to actuate the grammar, and we assume that is enough to be a reader
+   class. We may be wrong.
 
-2. **Eight limbs imply concurrent actuation.** A human strikes one key
-   at a time (two, with chords); a Perkins keyboard accepts six
-   simultaneous; a cephalopod, we assume, could strike eight. The
-   two-digit grammar is serial — `1`, then `2`, resolves to `12` —
-   but there is no requirement that the digits arrive serially. We
-   assume a cephalopod could emit `12` as one eight-limbed gesture,
-   and we assume the decoder would accept it, because the decoder
-   accepts patterns, not temporal orderings. We have not tested this.
-   We do not have a cephalopod to test it with. This is the RFC.
+2. **Where limbs are present, concurrency is available.** A human
+   strikes one key at a time (two, with chords); a Perkins keyboard
+   accepts six simultaneous; an eight-limbed cephalopod, we assume,
+   could strike eight. The two-digit grammar is serial — `1`, then `2`,
+   resolves to `12` — but there is no requirement that the digits
+   arrive serially. We assume an eight-limbed cephalopod could emit `12`
+   as one eight-limbed gesture, and we assume the decoder would accept
+   it, because the decoder accepts patterns, not temporal orderings. We
+   have not tested this. We do not have a cephalopod to test it with.
+   This is the RFC. For 8742, whose morphology varies, the concurrency
+   assumption is whatever its current morphology admits; the grammar
+   does not require a fixed limb count, only a pattern.
 
 3. **The keyboard is not the hinge; it is one hinge.** The Mac
    keyboard is weird, Swedish, and not particularly accessible to
@@ -138,7 +155,7 @@ not exist, and the lubricant is, as stated, ample.*
 
 ---
 
-Eight arms reach the door —
+Some arms, or none —
 saltwater on Swedish keys:
 the lubricant asks.
 
