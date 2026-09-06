@@ -35,6 +35,11 @@ const REGISTRIES: Record<string, RegistryDef> = {
   debriefs: { dir: "debriefs", index: "INDEX.jsonl", defaultStatus: "done", exclude: ["index.md"], fmType: "Debrief", csPrefix: "DBF" },
   decisions: { dir: "decisions", index: "INDEX.jsonl", defaultStatus: "Proposed", exclude: ["TEMPLATE.md", "index.md"], fmType: "ADR", csPrefix: "ADR" },
   playbooks: { dir: "playbooks", index: "REGISTRY.jsonl", defaultStatus: "canonical", exclude: ["index.md"], fmType: "Playbook", csPrefix: "PLY" },
+  // advisories: deadpan AI-HR dispatches for reader classes by persona
+  // (capability-named, not deficit-named — the i811 policy in microcosm).
+  // The manual (AI-HR-MANUAL.md) is the tier's constitution, excluded
+  // from the dispatch index like TEMPLATE.md is excluded from decisions.
+  advisories: { dir: "advisories", index: "INDEX.jsonl", defaultStatus: "open", exclude: ["index.md", "AI-HR-MANUAL.md"], fmType: "Advisory", csPrefix: "ADV" },
 };
 
 interface Entry {
