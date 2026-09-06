@@ -33,9 +33,34 @@ Two dogfoods, two different shapes (one judgement-of-shite, one set-difference),
 
 ## The honest bound: the code waits, the principle lands
 
-The principle is right and persists now. The *code* — wiring fzf's negation, which `--exact` mode doesn't support natively (see `docs/2026-09-04-filter-model.md` §4) — waits for the build, not the principle. The filter-model doc's own discipline applies: build when the evidence is in, and the evidence is in as of this advisory, but the build is a separate act from the principle. The advisory records the principle and the dogfood; the code is the thing the principle licenses, lands when the implementer picks it up, and respects the seam `--exact` mode draws.
+The principle is right and persists now. The *code* waits for the build,
+not the principle. The filter-model doc's own discipline applies: build
+when the evidence is in, and the evidence is in as of this advisory, but
+the build is a separate act from the principle. The advisory records the
+principle and the dogfood; the code is the thing the principle licenses
+and lands when the implementer picks it up.
 
-The one technical note, for whoever builds it: fzf's `--exact` mode (which the shite filter depends on for AND-across-terms matching) doesn't support `!` negation natively. The build is either dropping `--exact` (which changes the matching semantics the shite filter depends on — rejected) or a pre-filter pass that strips `!term` from the query and post-filters the results (the honest path, preserves `--exact`). The principle doesn't specify the implementation; the implementation respects the seam.
+The technical note, corrected on inspection (the filter-model doc's
+claim that "fzf has no native negation in `--exact` mode" is wrong as of
+fzf 0.73.1): `--exact` mode *does* support `!` negation natively —
+`state !colours` under `--exact` returns exactly the docs matching
+"state" but not "colours", today, with no flag change. `--exact` is
+load-bearing for the shite filter (it switches fzf from fuzzy
+subsequence to exact substring matching — without it, `state` matches
+`estate` and `distatect`, which is the fuzzy soup the filter exists to
+refuse), and it coexists with `!` cleanly. The seam is not at fzf.
+
+The real seam is in the silo's own query parsing. The silo's
+`rankedShortlistEntries` builds the entry list from three channels
+(registry, body, filename) via `rg`, and `rg` doesn't see the `!` —
+it sees the raw query. So `!colours` would filter fzf's view of the
+entries, but the entries themselves would still include `colours`-docs
+from the body channel, because the body channel's `rg` matched
+`colours` before fzf ever saw the query. The build is a pre-filter
+pass that strips `!term` from the query before the `rg` channels run,
+and excludes `term`-matching docs from the entry list before fzf.
+The principle doesn't specify the implementation; the implementation
+respects the silo's own seam, not fzf's (which doesn't exist).
 
 ## The standing invitation
 
