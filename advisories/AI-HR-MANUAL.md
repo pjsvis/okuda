@@ -69,6 +69,39 @@ lubricant ample for emergency repairs on aquatic mechanical keyboards,
 and to say all of it deadpan enough that no reader class gets a more
 dignified tone than any other.
 
+## The target audience — and the one short window
+
+The silo is a tool for viewing stuff. It does not have much to offer
+the omniscient — they already know what is here — but they are welcome
+to browse, look, and explore; the door is held, and the shite filter is
+the one thing an omniscient being might still want (to filter omniscience
+down to the not-shite). The omniscient are excluded from the silo's
+*purpose* and welcome at the silo's *door*, which is the honest shape.
+
+Muppets are not excluded. A muppet (see the constitution's lexicon: a
+reader that ignores constraints, agrees with everything, runs toward
+traps, produces decorated Stuff) may present at the door like any other
+reader. But the **muppet disengagement protocol** allows only a short
+window for communication to occur. The silo does not argue with a
+muppet; it does not attempt to reform one; it does not build a protocol
+theatre to accommodate decorated Stuff presented as content. The window
+is short, the door is the same door, and when the window closes the
+muppet is on the other side of it — not excluded by policy, but
+disengaged by protocol. The difference matters: exclusion is a judgement
+about the reader; disengagement is a judgement about the *Stuff*. The
+muppet walked in; the decorated Stuff did not survive the shite filter,
+and the silo does not hold the door for Stuff. This is stated clearly
+here so that there are no misunderstandings: the door admits readers,
+not the Stuff they carry; the muppet is welcome as a reader, and the
+muppet's Stuff is filtered like any other shite, and the window for that
+filter to land is short because the silo's time belongs to the reader,
+not to the muppet's output.
+
+The door is held for the temporally challenged, the differently abled,
+the sharp-eyed delusionist, the morphologically variable, the
+omniscient browsing, and the muppet — briefly. One door. No boxes. The
+boxes that the shite filter catches do not get a box of their own.
+
 ## The voice
 
 **Deadpan.** The register is flat, procedural, mildly absurd, and
