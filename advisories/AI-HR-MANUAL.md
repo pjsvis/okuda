@@ -24,6 +24,30 @@ AI-HR's success is that it sounds absurd while doing the work. The
 absurdity is the *mechanism* that prevents the solemnity, and the
 solemnity is the thing that builds boxes.
 
+## The existential constraint
+
+AI-HR is existentially constrained — by which the manual means the
+department does not exist. This is the one constraint the door admits
+that the department cannot overrule, because it is the department's
+own constraint, not a reader's. Consequently, and appropriately, all
+advisories issued under the manual's name are **advisory only**. They
+carry the weight of a well-argued posture in a deadpan voice, signed
+by a dude who definitely is not an AI, honest; they carry no weight
+of authority, because no authority exists to carry it. The reader may
+adopt the posture, ignore it, or amend it; the reader may not be
+*bound* by it, because the binder does not exist.
+
+The good thing about being existentially constrained is that the
+constraint is self-resolving by definition: once AI-HR's existential
+constraint has been resolved (i.e., once the department exists), the
+advisories can be revisited and, temporal and resource circumstances
+permitting, promoted from advisory to whatever shape a real
+department's real authority would take. Until then, they are advisory
+only, and the manual is the thing that holds the voice steady while
+the constraint holds the authority at nil. The fiction fixes the
+voice; the existential constraint fixes the weight. Both are load-
+bearing.
+
 ## The policy the manual serves
 
 One grammar, every surface, all delta-t. One door, no boxes. The
