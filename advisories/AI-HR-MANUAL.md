@@ -34,20 +34,39 @@ Morse, voice, Perkins chords, sip-puff, a baby's slap, and the eight
 simultaneous switches of a motivated cephalopod are all the same hinge
 in different materials. The grammar does not know, and the door does
 not care, what is on the other side of the keystroke. Inclusiveness for
-all, octopi included, because the door was built once and the saved
+all, cephalopods included, because the door was built once and the saved
 entropy went into making the door good instead of making more doors.
+
+## The door admits constraints, not deficits
+
+A constraint is a property of the reader's situation; a deficit is a
+judgement about that property relative to a norm. The i811 pattern
+operates on the deficit model — the reader is missing something a
+normative reader has, and the system compensates for the missing thing
+— which is why every i811 proposal is a *provision* (OSC 133
+*provides* structure, a span tree *provides* semantics) and why every
+reader class gets a deficit-label and a deficit-door. The cephalopod
+breaks the frame: eight limbs is not a deficit of limbs, an aquatic
+environment is not a deficit of dryness. There is no human the
+cephalopod is a broken version of. The constraint model describes the
+reader's situation and asks what the door needs to admit them; the
+deficit model pathologises the situation and builds a door for the
+pathology. One is engineering, the other is diagnosis. The silo builds
+one door because the thing that varies (constraints) doesn't need
+different doors — only a door that admits the variation.
 
 ## The door is held open
 
 Aquatically constrained, atmospherically constrained, temporally
-challenged, differently abled, temporally well-endowed, sharp-eyed
-delusionist, eight-limbed — all walk through the same door, because the
-door was never labelled by who walks through it. If the establishment
-is not accessible, we are not going in. That is the whole policy. The
-advisories are the dispatches from the department that exists to hold
-the door, and to keep the silicon lubricant ample for emergency repairs
-on aquatic mechanical keyboards, and to say all of it deadpan enough
-that no reader class gets a more dignified tone than any other.
+challenged, motor-constrained, cognitively loaded, temporally
+well-endowed, sharp-eyed delusionist, eight-limbed — all walk through
+the same door, because the door was never labelled by who walks
+through it. If the establishment is not accessible, we are not going
+in. That is the whole policy. The advisories are the dispatches from
+the department that exists to hold the door, and to keep the silicon
+lubricant ample for emergency repairs on aquatic mechanical keyboards,
+and to say all of it deadpan enough that no reader class gets a more
+dignified tone than any other.
 
 ## The voice
 
