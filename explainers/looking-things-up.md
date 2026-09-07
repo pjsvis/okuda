@@ -30,11 +30,12 @@ None of these is ours. All of them are ours.
 ## The tricks that come free with humans
 
 1. **§ already means "see here."** A millennium of statutes trained
-   every reader before we met them. A gold `§11` needs no legend; the
+   every reader before we met them. A rubricated silcrow like `§11` needs no legend; the
    glyph carries its own instructions.
 2. **Colour is category.** The medieval **rubricators** wrote the text
-   in black, then painted the pilcrows red in a second pass —
-   navigation, in a colour the writer never touched. Readers learned
+   in black, then painted the silcrows red in a second pass:
+   navigation, in a colour the writer never touches. 
+   Readers learned
    *colour means wayfinding* without a lesson. Our gold vector paint is
    the same trick: a reserved slot the grammar cannot address.
 3. **Two digits are motor memory.** The same gesture as a keypad, a

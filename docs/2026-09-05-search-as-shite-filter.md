@@ -12,6 +12,50 @@ Read the filter-model doc as written and it's a *search* — query in, ranked re
 
 This is the filter-model doc's shelf/dive distinction read at its most radical, and it's the right reading. The shelf answers *"is there anything here worth my time?"* — and it's allowed to answer *"maybe not, here's the door."* The root documents are the *case for the silo's own existence*: this is what's here, this is why you'd bother, this is the index of what pushing any button other than Ctrl-C would get you. If they don't make the case, Ctrl-C is the correct response and the shelf has done its job — it filtered the silo *out* of your morning, which is a successful filter, not a failed one. A search engine that returns zero results has failed; a shite filter that returns "nothing worth your time" has *succeeded*. The difference is whether the system claims to serve your query or your attention.
 
+## The author's intent — the folders are there for a reason
+
+Someone put these documents in folders for a reason, and left the
+ top-level documents in the root of the folder for a reason. Why would
+you want to blow up the folders and spatter the contents all over your
+terminal? That is just mad. The shite filter respects the author's
+curation: the root documents are where the author put the case for the
+silo (the shelf), and the folders are where the author put the depth
+(the dive, on demand). A search that flattens the folders into one
+ranked list is a search that *overrides the author's intent* — it
+decides the author's structure doesn't matter and the reader's query
+is the only structure that does. The shite filter says the opposite:
+the author's structure is the default, and the reader's query is the
+opt-in that overrides it, temporarily, for the duration of the dive.
+
+The folders are not a filing cabinet to be emptied onto the desk; they
+are the *structure the author built* so the reader could find the
+depth by following the root documents into it. If you know what you
+want, get it — type the query, the dive finds it. If you don't, look
+in the top-level documents for a clue — the shelf is the case, the
+root docs are the index, the depth is where the author put it. Or
+just spin up a file browser or an IDE and use that, if that's easier
+— the silo is not the only tool, and the shite filter does not claim
+to be the only door. The file browser is the author's structure,
+raw; the shite filter is the author's structure, *curated to the
+reader's intent*.
+
+## The honest bound: shite in, shite out
+
+The shite filter filters out everything you do not need to see. But it
+might also filter out what you want to see if you are not precise
+enough. That is the trade, and it is the *same trade* the return edge
+makes (no recently-viewed list — if you wanted to remember it, you
+would have). The filter is honest about what it does: it assumes
+shite, and the assumption is sometimes wrong. A too-imprecise query
+filters out the wanted along with the unwanted; a too-broad shelf
+filters out nothing and becomes the flat list the folders were built
+to prevent. The filter's job is to be *precise enough to keep the
+wanted and reject the unwanted*, and the precision is the reader's
+job, not the filter's. Shite in, shite out — the filter reflects the
+query; a shite query returns shite; a precise query returns the
+wanted. The filter does not guess; the reader does not get a
+prediction. Both sides are honest, and the honesty is the trade.
+
 ## The three properties of an honest filter
 
 ### 1. Nothing to see here, apart from some documents that tell you what there is to see

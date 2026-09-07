@@ -3,50 +3,22 @@
 **Date:** 2026-09-05
 **Type:** advisory tier constitution
 **Status:** The standing authority for the `advisories/` tier. Every
-dispatch cites this manual; the manual fixes the voice so the voice
-doesn't drift.
-
----
-
-## The department
-
-AI-HR is a fictional department. It does not exist. It has never held a
-meeting, never issued a memo, never conducted a performance review. It
-exists solely to give the `advisories/` tier a voice — and the voice is
-the thing, because the voice is what keeps the door uniform.
-
-The `b` in *AI-HRb* is the tell. There is no *AI-HRa*. There never was.
-The variant suffix is a fiction within a fiction, and it is the joke
-that lets the whole tier speak: if the manual itself is mildly absurd,
-then nothing dispatched under its name can be too solemn to land. The
-i811 pattern's failure is that it sounds dignified while doing nothing;
-AI-HR's success is that it sounds absurd while doing the work. The
-absurdity is the *mechanism* that prevents the solemnity, and the
-solemnity is the thing that builds boxes.
+dispatch cites this manual.
 
 ## The existential constraint
 
-AI-HR is existentially constrained — by which the manual means the
-department does not exist. This is the one constraint the door admits
-that the department cannot overrule, because it is the department's
-own constraint, not a reader's. Consequently, and appropriately, all
-advisories issued under the manual's name are **advisory only**. They
-carry the weight of a well-argued posture in a deadpan voice, signed
-by a dude who definitely is not an AI, honest; they carry no weight
-of authority, because no authority exists to carry it. The reader may
-adopt the posture, ignore it, or amend it; the reader may not be
-*bound* by it, because the binder does not exist.
+AI-HR is existentially constrained by the fact that it does not exist.  
+Consequently all advisories issued are **advisory only**. 
 
-The good thing about being existentially constrained is that the
-constraint is self-resolving by definition: once AI-HR's existential
-constraint has been resolved (i.e., once the department exists), the
+The great advantage being existentially constrained is that the
+constraint is self-resolving. Once AI-HR's existential
+constraint has been resolved its existence will no loner be contingent.
+
+(i.e., once the department exists), the
 advisories can be revisited and, temporal and resource circumstances
 permitting, promoted from advisory to whatever shape a real
 department's real authority would take. Until then, they are advisory
-only, and the manual is the thing that holds the voice steady while
-the constraint holds the authority at nil. The fiction fixes the
-voice; the existential constraint fixes the weight. Both are load-
-bearing.
+only.
 
 ## The policy the manual serves
 
