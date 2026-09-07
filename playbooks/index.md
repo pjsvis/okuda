@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-07 | PLY-BABY-EXTRACTION | canonical | The Baby Extraction Playbook | baby-extraction-playbook.md |
 | 2026-09-01 | PLY-MERMAID-DIAGRAMS | canonical | Mermaid diagrams playbook — authoring for the SpaceXAi renderer | mermaid-diagrams-playbook.md |
 | 2026-08-31 | PLY-HERDR-CAST | canonical | Herdr cast playbook — casting documents to panes, scripting the host | herdr-cast-playbook.md |
 | 2026-08-26 | PLY-GLOAM-LAUNCHER | canonical | Gloam Launcher Playbook | gloam-launcher-playbook.md |

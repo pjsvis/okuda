@@ -9,6 +9,9 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-07 | BRF-DIAGRAM-INGESTION | open | The diagram ingestion pipeline — mermaid-to-md as the show/elide/hide gate | 2026-09-07-brief-diagram-ingestion.md |
+| 2026-09-07 | BRF-OKUDAGRAM-STEP | open | The okudagram step — no gaps in coverage | 2026-09-07-brief-okudagram-step.md |
+| 2026-09-07 | BRF-ONION-SEARCH-GRAMMAR | open | The onion search grammar — staged filtering, path/content separation | 2026-09-07-brief-onion-search-grammar.md |
 | 2026-09-06 | BRF-CONCORDANCE-PREFILTER | open | The concordance pre-filter — `\|`, `!`, and case at the silo's seam | 2026-09-06-brief-concordance-prefilter.md |
 | 2026-09-06 | BRF-TTS-DOGFOOD | open | Coupled-frame TTS dogfood (mac `say`) | 2026-09-06-brief-tts-dogfood.md |
 | 2026-09-05 | BRF-STREAM-IDENTITY-HEADER | open | Stream identity header — name the document for the unknown destination | 2026-09-05-brief-stream-identity-header.md |

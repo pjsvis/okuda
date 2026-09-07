@@ -544,3 +544,107 @@ describe("launcher — the concordance pre-filter (BRF-CONCORDANCE-PREFILTER)", 
     expect(FZF_FIXED_ARGS).toContain("--exact");
   });
 });
+
+// ─── The onion search grammar (BRF-ONION-SEARCH-GRAMMAR) ─────────────
+// Red by design: these assert the contract the onion brief specifies.
+// They fail today because the grammar is not implemented — `@`, `dir/`,
+// and `!path` are treated as literal content, so every query returns
+// the whole corpus (~214 entries) instead of the path-filtered set.
+// Skipped by design — these encode the contract the onion brief
+// specifies, but the grammar is not implemented, so they would fail
+// today and block the ship gate. `describe.skip` keeps the bodies
+// ready: remove `.skip` when the onion grammar lands (BRF-ONION-
+// SEARCH-GRAMMAR, td-d95cf3) and the 7 tests go green in one flip.
+// The counts are the ground truth (verified 2026-09-07 against the
+// filesystem); each test names the number expected, then confirms
+// via the onion search. The decisive shape — name the number,
+// confirm the search.
+describe.skip("launcher — the onion search grammar (BRF-ONION-SEARCH-GRAMMAR, skipped by design)", () => {
+  // Ground truth, verified 2026-09-07 (the contract these tests pin):
+  //   briefs/2026-09-02-*         → 1 file
+  //   briefs/2026-09-*            → 10 files
+  //   briefs/2026-08-*            → 40 files
+  //   briefs/ (all dated)          → 50 files
+  //   decisions/ (undated, numbered) → 0 dated 2026-09-*
+  // The corpus is ~214 .md files total — the baseline failure: every
+  // query below returns ~214 today because path predicates aren't parsed.
+
+  test("@date is a path predicate: briefs/ @2026-09-02 → exactly 1 entry", () => {
+    // The smoke-test query that motivated the brief. One brief is dated
+    // 2026-09-02 (brief-synchronized-output). Today returns 214.
+    const entries = rankedShortlistEntries("briefs/ @2026-09-02", process.cwd());
+    const paths = entries.map((e) => e.split("\t")[0]!);
+    expect(paths.length).toBe(1);
+    expect(paths.every((p) => p.startsWith("briefs/"))).toBe(true);
+    expect(paths.every((p) => p.includes("2026-09-02"))).toBe(true);
+  });
+
+  test("@YYYY-MM is a path predicate: briefs/ @2026-09 → exactly 10 entries", () => {
+    // Month-granularity date predicate. 10 briefs dated 2026-09-*.
+    const entries = rankedShortlistEntries("briefs/ @2026-09", process.cwd());
+    const paths = entries.map((e) => e.split("\t")[0]!);
+    expect(paths.length).toBe(10);
+    expect(paths.every((p) => p.startsWith("briefs/"))).toBe(true);
+    expect(paths.every((p) => p.includes("2026-09"))).toBe(true);
+  });
+
+  test("dir/ is a path predicate: briefs/ → exactly 50 entries", () => {
+    // A bare directory token. 50 briefs (the whole briefs/ tier). A bare
+    // word is content today; the trailing / is the path signal.
+    const entries = rankedShortlistEntries("briefs/", process.cwd());
+    const paths = entries.map((e) => e.split("\t")[0]!);
+    expect(paths.length).toBe(50);
+    expect(paths.every((p) => p.startsWith("briefs/"))).toBe(true);
+  });
+
+  test("@date alone (no dir): @2026-09-02 → entries across every tier", () => {
+    // @date without a directory filters by date across the whole corpus.
+    // 2026-09-02 appears in multiple tiers (briefs/, docs/, etc.) — the
+    // test confirms the count matches the filesystem ground truth, not
+    // 214. Computed dynamically so the test survives tier growth.
+    const expected = listMarkdownFiles(process.cwd())
+      .filter((p) => p.includes("2026-09-02"))
+      .length;
+    const entries = rankedShortlistEntries("@2026-09-02", process.cwd());
+    const paths = entries.map((e) => e.split("\t")[0]!);
+    expect(paths.length).toBe(expected);
+    expect(paths.every((p) => p.includes("2026-09-02"))).toBe(true);
+  });
+
+  test("!path excludes a directory: !briefs/ @2026-09-02 → zero briefs/", () => {
+    // Path negation at Layer 1. Excluding briefs/ from the date query
+    // removes the one brief; the result is every other tier's 2026-09-02
+    // docs, with no briefs/ paths. Today negation matches nothing (the
+    // literal `(briefs/)` glob hits zero files) so briefs/ leaks in.
+    const entries = rankedShortlistEntries("!briefs/ @2026-09-02", process.cwd());
+    const paths = entries.map((e) => e.split("\t")[0]!);
+    expect(paths.every((p) => !p.startsWith("briefs/"))).toBe(true);
+    expect(paths.every((p) => p.includes("2026-09-02"))).toBe(true);
+  });
+
+  test("the regression query: !briefs/ @2026-09 debriefs/ | decisions/ | docs/ → no briefs, all 2026-09", () => {
+    // The smoke-test query rewritten in the onion grammar. Flat OR of
+    // path predicates, no parens, no grouping operator. Every result is
+    // in one of the named dirs, dated 2026-09, and briefs/ is excluded.
+    const q = "!briefs/ @2026-09 debriefs/ | decisions/ | docs/";
+    const entries = rankedShortlistEntries(q, process.cwd());
+    const paths = entries.map((e) => e.split("\t")[0]!);
+    expect(paths.every((p) => !p.startsWith("briefs/"))).toBe(true);
+    expect(paths.every((p) => p.includes("2026-09"))).toBe(true);
+    expect(
+      paths.every((p) =>
+        p.startsWith("debriefs/") ||
+        p.startsWith("decisions/") ||
+        p.startsWith("docs/")),
+    ).toBe(true);
+  });
+
+  test("path predicates compose: decisions/ @2026-09 → zero (decisions aren't date-prefixed)", () => {
+    // The honest-empty case. decisions/ files are numbered (001-…), not
+    // dated, so decisions/ @2026-09 is zero — the path predicate ANDs
+    // and finds no file matching both. Zero, not 214, is the green.
+    const entries = rankedShortlistEntries("decisions/ @2026-09", process.cwd());
+    const paths = entries.map((e) => e.split("\t")[0]!);
+    expect(paths.length).toBe(0);
+  });
+});
