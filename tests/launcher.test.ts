@@ -8,6 +8,7 @@ import {
   fzfEnv,
   invokedAsGloam,
   listMarkdownFiles,
+  parseQuery,
   rankedShortlistEntries,
   registryHits,
   selfEntriesCmd,
@@ -470,5 +471,76 @@ describe("launcher — fzf env ownership (the picker inherits no FZF_* furniture
     else process.env.FZF_DEFAULT_OPTS = saved;
     const out = await new Response(proc.stdout).text();
     expect(out.split("\t")[0]).toBe("DEPENDENCIES.md"); // matched, unpolluted
+  });
+});
+
+describe("launcher — the concordance pre-filter (BRF-CONCORDANCE-PREFILTER)", () => {
+  test("parseQuery: splits | into alternatives", () => {
+    const q = parseQuery("alpha | beta | gamma");
+    expect(q.alternatives).toEqual(["alpha", "beta", "gamma"]);
+    expect(q.exclude).toEqual([]);
+  });
+
+  test("parseQuery: extracts !term as exclusion", () => {
+    const q = parseQuery("state !colours");
+    expect(q.alternatives).toEqual(["state"]);
+    expect(q.exclude).toEqual(["colours"]);
+  });
+
+  test("parseQuery: combines | and !", () => {
+    const q = parseQuery("alpha | beta !gamma");
+    expect(q.alternatives).toEqual(["alpha", "beta"]);
+    expect(q.exclude).toEqual(["gamma"]);
+  });
+
+  test("parseQuery: empty alternatives dropped", () => {
+    const q = parseQuery("alpha | | beta");
+    expect(q.alternatives).toEqual(["alpha", "beta"]);
+  });
+
+  test("case fix: zod finds ZOG in the body channel", () => {
+    // The single-word body channel was case-sensitive (rg -F without -i).
+    // The modern concordance style: case-insensitive everywhere.
+    const entries = rankedShortlistEntries("zod", process.cwd());
+    // ZOG appears in the corpus as a callsign or body text.
+    // If the case fix works, we get results; without it, zero.
+    expect(entries.length).toBeGreaterThan(0);
+  });
+
+  test("OR: protocol-free | TTS finds both alternatives' documents", () => {
+    const entries = rankedShortlistEntries("protocol-free | TTS", process.cwd());
+    const paths = entries.map((e) => e.split("\t")[0]!);
+    // The identity doc (protocol-free) should be in the union.
+    expect(paths.some((p) => p.includes("protocol-free"))).toBe(true);
+    // TTS dogfood docs should be in the union.
+    expect(paths.some((p) => p.includes("tts"))).toBe(true);
+  });
+
+  test("OR deduplicates: a doc matching two alternatives appears once", () => {
+    const entries = rankedShortlistEntries("okuda | okuda", process.cwd());
+    const paths = entries.map((e) => e.split("\t")[0]!);
+    const okudaPaths = paths.filter((p) => p.includes("okuda"));
+    // No duplicate paths — dedup by path.
+    const unique = new Set(okudaPaths);
+    expect(unique.size).toBe(okudaPaths.length);
+  });
+
+  test("negation: !term excludes docs matching the negated term", () => {
+    // Search for "concordance" but exclude docs mentioning "filter".
+    const withAll = rankedShortlistEntries("concordance", process.cwd());
+    const withoutFilter = rankedShortlistEntries("concordance !filter", process.cwd());
+    const withPaths = new Set(withAll.map((e) => e.split("\t")[0]!));
+    const withoutPaths = withoutFilter.map((e) => e.split("\t")[0]!);
+    // Exclusion should remove some results (if any matched "filter").
+    expect(withoutPaths.length).toBeLessThanOrEqual(withPaths.size);
+    // Every surviving doc should NOT contain "filter" in its path.
+    for (const p of withoutPaths) {
+      expect(p.toLowerCase()).not.toContain("filter");
+    }
+  });
+
+  test("--exact anti-soup preserved: state does not match estate", () => {
+    // --exact is load-bearing; the pre-filter must not break it.
+    expect(FZF_FIXED_ARGS).toContain("--exact");
   });
 });

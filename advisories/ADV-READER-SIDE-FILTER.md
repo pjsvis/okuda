@@ -50,6 +50,15 @@ subsequence to exact substring matching — without it, `state` matches
 `estate` and `distatect`, which is the fuzzy soup the filter exists to
 refuse), and it coexists with `!` cleanly. The seam is not at fzf.
 
+**Verified 2026-09-06.** `echo -e "state colours\ncolours only\nstate
+only\nother" | fzf --exact --filter="state !colours"` returns "state
+only" — `!` negation works natively in `--exact`. The advisory's
+correction was right; a later session "re-corrected" it (claiming
+`--exact` disables `!`), which was wrong — the `!` and `|` grammars
+live alongside `--exact`, not inside the mode it disables. The
+advisory stands. See `BRF-CONCORDANCE-PREFILTER` for the full
+verification and the pre-filter implementation.
+
 The real seam is in the silo's own query parsing. The silo's
 `rankedShortlistEntries` builds the entry list from three channels
 (registry, body, filename) via `rg`, and `rg` doesn't see the `!` —

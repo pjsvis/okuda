@@ -151,6 +151,59 @@ before fzf. The principle doesn't specify the implementation; the
 implementation respects the silo's own seam, not fzf's (which doesn't
 exist).
 
+**Status: landed 2026-09-06.** The pre-filter is built
+(`BRF-CONCORDANCE-PREFILTER`). `parseQuery` splits `|` into
+alternatives and extracts `!term` exclusions; the `rg` channels run
+per-alternative; negated docs are excluded from the entry list before
+fzf. fzf's native `--exact` `!` and `|` coexist (verified) for in-fzf
+refinement, but the entry list is already correct.
+
+### 4b. Case contract — the modern concordance style (landed 2026-09-06)
+
+**Status: landed.** The concordance is case-insensitive across all
+channels — the modern concordance style. The scriptorium's concordance
+indexed every word regardless of capitalisation; the word is the word
+whether the scribe wrote it in title case or not. Case-sensitive search
+penalises the reader for not knowing the corpus's casing, and casing is
+an accident of authoring.
+
+**The fix:** `rg -i` on the single-word body channel (the outlier).
+The registry channel was already `-i`; the multi-word body channel was
+already `-i`; the single-word body channel was `rg -F` (case-sensitive).
+One line: `bodyArgs.push("-F", "-i", pattern)`. The concordance is now
+case-consistent across all three channels.
+
+**The uppercase escape hatch — parked.** Smart-case (`-S`) gives the
+reader a force-sensitive escape hatch: lowercase matches any case,
+uppercase forces case-sensitive. The dogfood (`zod` finds `ZOG`)
+cleared the case-insensitivity gate but not the escape-hatch gate.
+Same discipline as `!` (section 4): build when the corpus grows a class
+of queries that need it, not for one annoyance.
+
+### 4c. OR — `|`, the concordance's union (landed 2026-09-06)
+
+**Status: landed.** `a | b | c` returns the union of `a`, `b`, and `c`
+results. The silo's `parseQuery` splits on `|`, runs one `rg`
+invocation per alternative, and unions the entry lists (deduped,
+rank-preserved via feed order). fzf's `--exact` does the final
+substring refinement over the pre-OR'd list.
+
+**The coincidence, explained.** Before the pre-filter, `filter |
+filters` returned "most results" not because `|` was OR (it was a
+literal in `rg`'s regex) but because markdown tables use pipes: the
+body channel's regex `filter.{0,3}\|.{0,3}filters` matched a table row
+where "filter" sits next to a pipe next to "filters". After the
+pre-filter, `filter | filters` ORs correctly — the union of "filter"
+results and "filters" results — and the table-pipe coincidence is
+irrelevant. The OR is real, not accidental.
+
+**fzf issue #412.** `|` as OR was added to fzf in v0.11.0 (2015),
+closed by junegunn. Verified 2026-09-06: fzf `--exact` supports `|`
+natively (`echo -e "alpha\nbeta\ngamma" | fzf --exact --filter="alpha
+| gamma"` returns both). The silo's pre-filter resolves `|` upstream
+so the entry list is correct; fzf's native `|` coexists for in-fzf
+refinement.
+
 ## The house vocabulary
 
 The terms for "looking something up", gathered from a thousand years of

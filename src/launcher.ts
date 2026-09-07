@@ -145,8 +145,47 @@ function escapeRegex(q: string): string {
   return q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+/** The parsed query — the concordance's extended-search grammar at the
+ *  silo's seam (BRF-CONCORDANCE-PREFILTER). `|` splits alternatives
+ *  (OR); `!term` negates (exclude docs matching `term`). The silo
+ *  resolves these upstream of the rg channels; fzf's `--exact` does
+ *  the final substring refinement (and supports `|`/`!` natively,
+ *  verified 2026-09-06 — but the entry list must be correct first).
+ *  Pure. */
+export interface ParsedQuery {
+  alternatives: string[]; // OR alternatives, each a raw query string
+  exclude: string[]; // `!term` → terms to exclude (strip from results)
+}
+
+/** Parse a raw query into the concordance grammar: `|` → OR
+ *  alternatives, `!word` → negation. Whitespace-delimited; `!` prefix
+ *  on a word marks it as an exclude term. Empty alternatives (consecutive
+ *  `|`, leading/trailing) are dropped. Pure. */
+export function parseQuery(query: string): ParsedQuery {
+  const alternatives = query
+    .split("|")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const exclude: string[] = [];
+  const cleaned = alternatives.map((alt) =>
+    alt
+      .split(/\s+/)
+      .filter((w) => {
+        if (w.startsWith("!") && w.length > 1) {
+          exclude.push(w.slice(1));
+          return false;
+        }
+        return Boolean(w);
+      })
+      .join(" ")
+      .trim(),
+  );
+  return { alternatives: cleaned.filter(Boolean), exclude };
+}
+
 /** The body-channel rg pattern for a query. Single word → literal
- *  (`-F`, case-sensitive). Multi-word → phrase-tolerant regex: words
+ *  (`-F`, case-insensitive — the modern concordance style, BRF-
+ *  CONCORDANCE-PREFILTER). Multi-word → phrase-tolerant regex: words
  *  joined by a bounded gap (`.{0,3}`, case-insensitive) so "load
  *  bearing" finds "load-bearing" — prose is written with hyphens and
  *  table pipes between the words, and a literal multi-word string
@@ -255,63 +294,88 @@ function dedupeEntries(entries: string[][]): string[] {
  *  - filename remainder: path only (fzf matches it by name)
  *  Prioritisation is feed order; fzf's `--tiebreak=index` (already
  *  pinned) makes ties rank by input position. The pipe is the ranker.
- *  Pure-ish. */
+ *
+ *  The concordance pre-filter (BRF-CONCORDANCE-PREFILTER): `|` splits
+ *  alternatives (OR), `!term` excludes docs. Rich grammar upstream
+ *  (silo), anti-soup downstream (fzf --exact). Pure-ish. */
 export function rankedShortlistEntries(query: string, cwd: string = process.cwd()): string[] {
-  // Channel 1 — registry field hits, callsign-anchored (ADR-025).
-  const registry = registryRows(query, cwd).map((r) => {
-    const snippet = clipSnippet(r.summary ? `${r.callsign} — ${r.summary}` : r.callsign);
-    return `${r.path}${SEP}${snippet}`;
-  });
-  // Channel 2 — body hits with the matching line as evidence. The
-  // pattern is phrase-tolerant (see bodyPattern): literal for one word,
-  // bounded-gap join for multi-word, so prose hyphenation can't hide a
-  // document. rg output is `path:line:text`; paths in this silo contain
-  // no colons, so split on the first two.
-  const body: string[] = [];
-  const seenBody = new Set<string>();
-  const { kind, pattern } = bodyPattern(query);
-  const bodyArgs = ["-n", "-m", "1", "--no-heading", ...CORPUS_EXCLUSIONS];
-  if (kind === "fixed") bodyArgs.push("-F", pattern);
-  else bodyArgs.push("-i", pattern);
-  bodyArgs.push("--type", "md");
-  for (const line of rgLines(bodyArgs, cwd)) {
-    const i = line.indexOf(":");
-    const j = i === -1 ? -1 : line.indexOf(":", i + 1);
-    if (i === -1 || j === -1) continue;
-    const path = line.slice(0, i);
-    const text = line.slice(j + 1).trim();
-    if (!seenBody.has(path)) {
-      seenBody.add(path);
-      body.push(`${path}${SEP}${clipSnippet(text)}`);
-    }
-  }
-  // The shelf and the dive (the filter model's state rule, landed
-  // 2026-09-04). No text → the SHELF: root files only — arrive, see the
-  // silo's top level; the &-family and the root content documents are
-  // the whole floor. Text → the DIVE: corpus search results, root files
-  // excluded entirely — you have expressed intent, the shelf steps
-  // aside, and the documents it announced take the floor. Arrive and
-  // know what you want: type it. Do not know: read the root, which
-  // links everywhere.
   const searching = query.trim().length > 0;
   const all = listMarkdownFiles(cwd);
   const rootFiles = all.filter((f) => !f.includes("/"));
   const isRoot = new Set(rootFiles);
+  if (!searching) {
+    // The shelf: root files with first-line previews as evidence.
+    // rg with empty pattern matches every file's first line.
+    const evidenceOf = new Map<string, string>();
+    for (const line of rgLines(["-n", "-m", "1", "--no-heading", ...CORPUS_EXCLUSIONS, "--type", "md", ""], cwd)) {
+      const i = line.indexOf(":");
+      const j = i === -1 ? -1 : line.indexOf(":", i + 1);
+      if (i === -1 || j === -1) continue;
+      const path = line.slice(0, i);
+      const text = line.slice(j + 1).trim();
+      if (isRoot.has(path) && !evidenceOf.has(path)) evidenceOf.set(path, `${path}${SEP}${clipSnippet(text)}`);
+    }
+    return dedupeEntries([rootFiles.map((f) => evidenceOf.get(f) ?? `${f}${SEP}`)]);
+  }
+  // The dive: parse the concordance grammar (| OR, ! exclude), run the
+  // channels per-alternative, union, then strip negated docs.
+  const { alternatives, exclude } = parseQuery(query);
+  // Build exclude set: paths matching any !term (case-insensitive).
+  const excludePaths = new Set<string>();
+  for (const term of exclude) {
+    const hits = rgLines(["--files", "-i", "-g", `*${term}*`, "--type", "md", ...CORPUS_EXCLUSIONS], cwd);
+    for (const h of hits) excludePaths.add(h);
+    // Also match file *content* containing the term — a doc that
+    // mentions the negated term is excluded.
+    for (const line of rgLines(["-i", "-l", "--type", "md", term, ...CORPUS_EXCLUSIONS], cwd)) {
+      excludePaths.add(line);
+    }
+  }
+  // Channel 1 — registry field hits, callsign-anchored (ADR-025), per alternative.
+  const registry: string[] = [];
+  const seenReg = new Set<string>();
+  for (const alt of alternatives) {
+    for (const r of registryRows(alt, cwd)) {
+      if (excludePaths.has(r.path)) continue;
+      if (seenReg.has(r.path)) continue;
+      seenReg.add(r.path);
+      const snippet = clipSnippet(r.summary ? `${r.callsign} — ${r.summary}` : r.callsign);
+      registry.push(`${r.path}${SEP}${snippet}`);
+    }
+  }
+  // Channel 2 — body hits with the matching line as evidence, per alternative.
+  const body: string[] = [];
+  const seenBody = new Set<string>();
+  for (const alt of alternatives) {
+    const { kind, pattern } = bodyPattern(alt);
+    const bodyArgs = ["-n", "-m", "1", "--no-heading", ...CORPUS_EXCLUSIONS];
+    if (kind === "fixed") bodyArgs.push("-F", "-i", pattern);
+    else bodyArgs.push("-i", pattern);
+    bodyArgs.push("--type", "md");
+    for (const line of rgLines(bodyArgs, cwd)) {
+      const i = line.indexOf(":");
+      const j = i === -1 ? -1 : line.indexOf(":", i + 1);
+      if (i === -1 || j === -1) continue;
+      const path = line.slice(0, i);
+      if (excludePaths.has(path)) continue;
+      if (seenBody.has(path)) continue;
+      seenBody.add(path);
+      const text = line.slice(j + 1).trim();
+      body.push(`${path}${SEP}${clipSnippet(text)}`);
+    }
+  }
+  // Evidence map for the dive: first channel to find a path carries its evidence.
   const evidenceOf = new Map<string, string>();
   for (const e of [...registry, ...body]) {
     const p = e.split(SEP)[0]!;
     if (!evidenceOf.has(p)) evidenceOf.set(p, e);
   }
-  if (!searching) {
-    // The shelf: every root file, first-line preview as evidence.
-    return dedupeEntries([rootFiles.map((f) => evidenceOf.get(f) ?? `${f}${SEP}`)]);
-  }
   // The dive: corpus results; root files are not destinations here.
-  const inCorpus = (e: string): boolean => !isRoot.has(e.split(SEP)[0]!);
+  const inCorpus = (e: string): boolean => !isRoot.has(e.split(SEP)[0]!) && !excludePaths.has(e.split(SEP)[0]!);
   const registryRest = registry.filter(inCorpus);
   const bodyRest = body.filter(inCorpus);
   const remainder = all
-    .filter((f) => !isRoot.has(f) && !evidenceOf.has(f))
+    .filter((f) => !isRoot.has(f) && !evidenceOf.has(f) && !excludePaths.has(f))
     .map((f) => `${f}${SEP}`);
   return dedupeEntries([registryRest, bodyRest, remainder]);
 }
