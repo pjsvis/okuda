@@ -316,7 +316,11 @@ describe("render — mermaid pipe + colour classification", () => {
       width: W,
       color: "none",
     });
-    expect(plain).not.toContain("\x1b");
+    // NO_COLOR strips colour, not attributes — the diagram art is unpainted
+    // (byte-identical to the binary), only the `⋮` indicator keeps its
+    // bold. Assert no colour escapes, not no escapes.
+    expect(plain).not.toContain("\x1b[38;2;");
+    expect(plain).not.toContain("\x1b[48;2;");
     // compare against a direct binary run
     const proc = Bun.spawn(
       [`${process.env.HOME}/.local/bin/mermaid-to-md`],

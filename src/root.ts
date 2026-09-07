@@ -18,8 +18,10 @@ import { basename, join } from "node:path";
 
 /** Tier directories and their registry filenames. The pre-OKF fallback
  *  signature: a silo that indexes itself already has these; the OKF
- *  root `index.md` supersedes them once the migration (td-bdfce0) lands. */
-const TIER_REGISTRIES: Array<[dir: string, file: string]> = [
+ *  root `index.md` supersedes them once the migration (td-bdfce0) lands.
+ *  Exported: the launcher's registry channel (BRF-CONTENT-SHORTLIST)
+ *  walks the same tiers — one list, two consumers, no drift. */
+export const TIER_REGISTRIES: Array<[dir: string, file: string]> = [
   ["briefs", "INDEX.jsonl"],
   ["decisions", "INDEX.jsonl"],
   ["debriefs", "INDEX.jsonl"],
@@ -152,7 +154,19 @@ function tierFileKey(p: string): string {
 /** Resolve a callsign to its path. Returns null when unknown — the caller
  *  decides what an unknown code means. Pure-ish (reads fs). */
 export function resolveByCallsign(callsign: string, cwd: string = process.cwd()): string | null {
-  return loadCallsigns(cwd).find((r) => r.callsign === callsign)?.path ?? null;
+  const callsigns = loadCallsigns(cwd);
+  const exact = callsigns.find((r) => r.callsign === callsign);
+  if (exact) return exact.path;
+  // Ordinal shorthand (ADR-031 dogfood, 2026-09-04): prose says "ADR-030"
+  // — tier + ordinal — the way humans abbreviate. Resolve within the
+  // tier when EXACTLY ONE registered callsign carries the prefix and
+  // ordinal; ambiguous or absent → null (the actuator flashes honestly).
+  const m = callsign.match(/^([A-Z]{2,})-(\d{2,3})$/);
+  if (!m) return null;
+  const tierMatches = callsigns.filter(
+    (r) => r.callsign.startsWith(`${m[1]}-`) && r.callsign.endsWith(`-${m[2]}`),
+  );
+  return tierMatches.length === 1 ? tierMatches[0]!.path : null;
 }
 
 /** Resolve a document's callsign from its path. Pure-ish (reads fs). */

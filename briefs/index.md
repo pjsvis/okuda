@@ -10,6 +10,9 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-09-02 | BRF-SCROLL-REPAINT | open | One line per scroll — scroll-region repaint for the TUI | 2026-09-02-brief-scroll-region-repaint.md |
+| 2026-09-05 | BRF-STREAM-IDENTITY-HEADER | open | Stream identity header — name the document for the unknown destination | 2026-09-05-brief-stream-identity-header.md |
+| 2026-09-04 | BRF-PORCH-MATRIX | open | The porch matrix — click a URL, land in a terminal, read the silo | 2026-09-04-brief-porch-matrix.md |
+| 2026-09-04 | BRF-WORKING-COPY | open | The working copy — vector render mode, 99 clone, honest actuator | 2026-09-04-brief-working-copy.md |
 | 2026-09-02 | BRF-SYNC-OUTPUT | open | Synchronized output — deliver each paint as one frame | 2026-09-02-brief-synchronized-output.md |
 | 2026-09-01 | BRF-FLOW-WRAP | open | Flow wrap — internal break opportunities so paths flow as text | 2026-09-01-brief-flow-wrap.md |
 | 2026-09-01 | BRF-MERMAID-SOURCE-OMITTED | open | Omit the mermaid source from the render | 2026-09-01-brief-mermaid-source-omitted.md |
@@ -21,7 +24,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-29 | BRF-FZF-OWNS-LOOP | open | fzf owns the loop (cursor-preserve experiment) | 2026-08-29-brief-fzf-owns-the-loop.md |
 | 2026-08-29 | BRF-MENU-TEMPLATES | open | Menu templates (deferred — fires on the second menu kind) | 2026-08-29-brief-menu-templates-deferred.md |
 | 2026-08-29 | BRF-OKF-CALLSIGN | done | OKF conformance migration and the callsign layer | 2026-08-29-brief-okf-callsign-migration.md |
-| 2026-08-29 | BRF-PAGED-OKUDAGRAM | open | Paged okudagram view — block-aware paging (candidate invariant) | 2026-08-29-brief-paged-okudagram.md |
+| 2026-08-29 | BRF-PAGED-OKUDAGRAM | open | The okudagram frame — a portioning rule | 2026-08-29-brief-okudagram-frame.md |
 | 2026-08-29 | BRF-RESTICTED-GRAMMAR | open | Okuda Markdown AST to W3C SSML Mapping Investigation | 2026-08-29-brief-resticted-grammar-speech.md |
 | 2026-08-29 | BRF-TERMINAL-SPEECH | open | Terminal Speech Pipeline Easter Egg | 2026-08-29-brief-terminal-speech.md |
 | 2026-08-29 | BRF-MERMAID-HARD | open | Mermaid Rendering Hard Boundary State Machine (CSN Diagnostics) | 2026-08-29-mermaid-hard-boundary-CSN.md |

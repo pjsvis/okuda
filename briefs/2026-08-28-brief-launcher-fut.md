@@ -39,7 +39,21 @@ The FUT is not one bug, it's two compounding.
    comment at `launcher.ts:134` — "The reader's own alt-screen exit is
    paired in tui.ts" — records the bug as if it were a feature.
 
-## What
+## Why (revised on landing — ordering, not scoping)
+
+The FUT is a gap in the *primary screen* during a transition. Two
+gaps exist: the launch/read edge (fzf select → reader) and the return
+edge (reader quit → fzf). The launch edge was fixed by the ordering half
+(enter alt-screen before the async read). The return edge is the same
+shape of bug and admits the same shape of fix: the launcher re-enters
+and clears the alt-screen the instant the reader returns (before the
+rg spawns), so the gap is a blank alt-screen, not shell scrollback.
+Microsecond primary exposure between the reader's `?1049l` and the
+launcher's `?1049h` is imperceptible; the rg gap + fzf startup that
+followed it was the visible flash, and it now runs in a blank
+alt-screen.
+
+## What (original scoping design — considered, rejected on landing)
 
 The alt-screen belongs to the **session**, not the reader. Extend the
 framing ADR-016 already established ("the picker is a guest of the

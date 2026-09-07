@@ -21,5 +21,6 @@
   "state-todo": "#ffe066",
   "state-parked": "#ff9933",
   "state-failed": "#ff5555",
-  "doc-ref": "#e8c44a"
+  "doc-ref": "#e8c44a",
+  "vector": "#fb7185"
 }

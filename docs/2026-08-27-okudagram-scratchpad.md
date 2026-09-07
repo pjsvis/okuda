@@ -28,12 +28,33 @@ they either earn a brief or get foxtrot-oscar'd. The Edinburgh lexicon
 - **Book-binding.** The renderer owns the binding (header, closer,
   margins); the author owns the pages. Per-author binding goes scrappy;
   renderer-owned binding is uniform across every document, forever.
+  The two fixed points — the start-anchor (frame-0, the existence
+  condition) and the terminator (the last frame's natural close) — are
+  the binding's structural anchors. They do not move while the document
+  exists; they are source-derived, recomputed, never stored. The anchor
+  says *you are here*; the terminator says *you have arrived*; the
+  document is the territory between them.
+- **Step, scroll, vector.** Three motions, three scopes, three acts.
+  A *vector* is cross-document — dereference a reference, leave this
+  document for that one (transcendent). A *step* is within-document —
+  progress along structure, land on the next header, recompose the
+  frame (immanent). A *scroll* is within-frame — translate through
+  lines, see every line, cross frame boundaries without recomposing
+  (continuous). **Paging is a category error, not a concept** — it was
+  a fourth thing that did not exist, a screen-sized leap to an
+  arbitrary position, which is neither a reference nor a structural
+  progression. The space a step traverses is the document itself,
+  portioned into a 1D sequence of frames bounded by the two fixed
+  points; you move *along* the sequence — ordinal, next/previous. Not
+  a grid, not a deck, not a graph. A strand with a head and a tail.
+  (Founding lexicon entry for the okudagram-frame rule,
+  `BRF-PAGED-OKUDAGRAM`; the callsign stays to remind us paging didn't.)
 - **Soup spilled by an avant-garde artist.** What `ls` looks like. No
   binder. We aim a tad higher.
 - **Availability without insistence.** The muted source echo: it does
   not ask to be read; it waits to be needed. Art foreground, structure
   receding, source quiet underneath. *(Retired 2026-09-01: the echo is
-  gone — a viewer who needed the source on a narrow pane got elided
+  gone — a reader who needed the source on a narrow pane got elided
   fragments, not the source. A `⋮` renderer statement now names what
   was elided, keeping availability honest without pretending to show it.
   brief: mermaid-source-omitted.)*
@@ -54,9 +75,9 @@ they either earn a brief or get foxtrot-oscar'd. The Edinburgh lexicon
 - **The surface fits the activity.** Not the document to the surface, not
   the surface to the document — the *activity* picks the surface, and
   the surface's input contract matches the verb class of the activity.
-- **The content is the content.** The viewer presents, it doesn't
+- **The content is the content.** okuda presents, it doesn't
   editorialise, it doesn't retain, it doesn't reward. Three words; the
-  viewer's whole constitution. Presence without persuasion.
+  renderer's whole constitution. Presence without persuasion.
 - **Render for the car radio, not the studio monitor.** The Tamla
   Motown test: mix for the medium you can't control — a car speaker,
   road noise, a distracted driver. If the track survived that, it was
@@ -70,7 +91,7 @@ they either earn a brief or get foxtrot-oscar'd. The Edinburgh lexicon
   the surveyor's desk.
 - **One job; get on with it.** Tawny Madison's job in *Galaxy Quest* —
   repeat what the computer says, in the uniform, and resist every
-  invitation to do more. The viewer is the channel, not the content; a
+  invitation to do more. okuda is the channel, not the content; a
   channel that improvises is a channel that's broken. Shrink-wrapping
   the table was Tawny editing the table; OSC 8 would have been Tawny
   hiding the URL; the dopamine features would be Tawny tap-dancing.
@@ -110,22 +131,22 @@ they either earn a brief or get foxtrot-oscar'd. The Edinburgh lexicon
   reader's effort to find the change is the effort that makes the
   change *stick* — the elision principle one layer up. Whether the
   changes should be obvious is not our concern.
-- **Read here, act there.** The viewer is not a product; it does not
+- **Read here, act there.** okuda is not a product; it does not
   retain, suggest, or reward. You read a document in Gloam, you act on
   it *somewhere else* — another pane, another session, another tool —
-  and you come back. The document is the shared substrate; the viewer
-  presents it and gets out of the way. The moment a viewer starts
+  and you come back. The document is the shared substrate; okuda
+  presents it and gets out of the way. The moment okuda starts
   demanding (recents, stacks, cloud sync, "smart" suggestions) it
-  stops being a viewer and becomes a chip pan fire: reactive, expensive,
+  stops being a renderer and becomes a chip pan fire: reactive, expensive,
   out of control. The pizza-shop doctrine: consistent, acceptable,
-  sustainable. The viewer's secret is *restraint* — the closed grammar,
-  the LCARS frame, the two-chip bookend. A viewer that does less than
+  sustainable. The secret is *restraint* — the closed grammar,
+  the LCARS frame, the two-chip bookend. A renderer that does less than
   the competition but does that less reliably, legibly, and without
-  surprise has a moat; a viewer that adds a settings panel has an
+  surprise has a moat; a renderer that adds a settings panel has an
   excuse. (Sharpens *the content is the content* and *one job; get on
-  with it*: the viewer's constitution is presence without persuasion,
+  with it*: the renderer's constitution is presence without persuasion,
   and the persuasion it most refuses is self-promotion.)
-- **Three concerns, three owners.** Every other markdown viewer folds
+- **Three concerns, three owners.** Every other markdown renderer folds
   them into one; okuda refuses all three folds. (1) **Compositing** —
   where the text comes from, how it's assembled — belongs to the
   environment: a filesystem, a chat, an agent's stream, another human's

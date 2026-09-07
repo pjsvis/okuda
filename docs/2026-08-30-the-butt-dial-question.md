@@ -75,7 +75,7 @@ back-stack already absorbs that. So the correct premium is near zero:
 Passing a tablet to someone and fumbling the pass is the butt-dial's touch
 cousin — garbage input, no intent. The existing concept already covers it:
 the **tied-to-the-mast freeze** (SLIPPY → FROZEN, brief
-2026-08-29-brief-paged-okudagram) — no input; refresh on demand.
+2026-08-29-brief-okudagram-frame) — no input; refresh on demand.
 
 The discriminator a timeout will never have: **during a handoff, nobody
 intends anything.** Normal use has occasional unintentional keys amid real

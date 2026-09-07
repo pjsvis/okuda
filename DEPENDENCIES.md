@@ -11,8 +11,9 @@ an assumption.
 | `git` | 2.54.0 | Version control | 2026-08-20 |
 | `td` | 0.61.0 | Task management | 2026-08-27 |
 | `mermaid-to-md` | 0.1.0* | Mermaid → ASCII | 2026-09-02 |
-| `fzf` | 0.73.1 | Fuzzy picker — runtime dep of no-arg `gloam` mode | 2026-08-27 |
-| `fd` | 10.4.2 | File finder — preferred by `gloam` (in-process walk if absent) | 2026-08-27 |
+| `fzf` | 0.73.1 | Fuzzy picker — runtime dep of the `gloam` launcher (both modes) | 2026-08-27 |
+| `rg` | 15.1.0 | Source for both `gloam` picker modes — file list, body shortlist, registry prefilter | 2026-09-04 |
+| `fd` | 10.4.2 | ~~File finder — preferred by `gloam`~~ RETIRED from the launcher path (BRF-CONTENT-SHORTLIST) | 2026-08-27 |
 
 \* Self-reports as `mermaid-tui 0.1.0`, lives at `~/.local/bin/` — binary
 name and package name differ. The origin doc's `spacex-mermaid` is stale;
@@ -58,11 +59,16 @@ name and package name differ. The origin doc's `spacex-mermaid` is stale;
   Wide `flowchart LR` with long node labels hits this; short labels at the
   same node count do not. (`docs/diagram-monster.md` is the live exhibit.)
 
-The pair (`fzf`, `fd`) serves the no-arg `gloam` launcher (see
-`src/launcher.ts`, ADR-016). `fzf` is a runtime dep of that mode
-(clean error + exit 1 if missing); `fd` is preferred but has an
-in-process recursive-walk fallback. The `okuda <file>` reader does
-not require either.
+The pair (`rg`, `fzf`) serves the `gloam` launcher (see
+`src/launcher.ts`, ADR-016; BRF-CONTENT-SHORTLIST). `gloam` (no arg)
+seeds fzf from `rg --files --type md`; `gloam -g <query>` seeds it with
+the ranked merge — registry field hits, body hits (`rg -l -F`),
+filename remainder. Both `rg` and `fzf` are runtime deps of that mode
+(clean error + exit 1 if missing); the `okuda <file>` reader does not
+require either. `fd` and the in-process walk fallback retired
+2026-09-04 — rg respects `.gitignore` uniformly, so the
+include/exclude question is a `.gitignore` decision, not a codepath
+accident.
 
 ## Runtime dependency note
 

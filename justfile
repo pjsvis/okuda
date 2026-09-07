@@ -63,6 +63,25 @@ check:
 ship:
     @bun test && just check && just build && just install && just fresh
 
+# Search conformance smoke
+[group('quality gate')]
+search-smoke:
+    @bash scripts/search-smoke.sh
+
+# Picker instance replay
+[group('quality gate')]
+search-replay *args:
+    @bash scripts/search-replay.sh {{args}}
+
+# Vector contract dogfood
+[group('quality gate')]
+smoke-test:
+    @bun scripts/vector-check.ts
+    @bun test tests/keygrammar.test.ts tests/frames.test.ts tests/clone.test.ts tests/vectors.test.ts
+
+dogfood: smoke-test
+    @./okuda --tui '&alpha.md'
+
 # Freshness check
 [group('quality gate')]
 fresh:
@@ -88,9 +107,9 @@ install:
 
 # Gloam launcher
 [group('build')]
-gloam:
+gloam *args:
     @just build >/dev/null
-    @bash -c 'exec -a gloam ./okuda'
+    @bash -c 'exec -a gloam ./okuda "$@"' -- {{args}}
     @echo "okuda → ~/.local/bin/okuda  (run `just build` to refresh after edits)"
 
 # Tests
@@ -175,6 +194,16 @@ state-colours-doc:
 [group('build')]
 state-colours:
     @bun scripts/state-colours.ts
+
+# Palette swatch doc
+[group('build')]
+palette-swatch:
+    @bun scripts/palette-swatch.ts > docs/2026-09-05-palette-swatch.md
+
+# Palette swatch viewer
+[group('build')]
+palette-swatch-doc:
+    @./okuda docs/2026-09-05-palette-swatch.md --tui
 
 # Chip dogfood
 [group('build')]

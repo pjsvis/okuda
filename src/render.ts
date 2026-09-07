@@ -51,15 +51,21 @@ const LIST_INDENT = 2;
 /** Inline vector paint — strip the token and any comment-wrapped path
  *  from a rendered child string, returning the remaining slug and the
  *  token number for bracket painting. Tolerant of the inline parser's
- *  mangling: the token may arrive with one or two percents per side
- *  (`%%okuda-rhs:NN%%` in source, often `%okuda-rhs:NN%` in the stream).
- *  The jump map is built from the *source* (extractJumps); this only
- *  paints. Returns null when the child carries no vector. Pure. */
-function stripVector(children: string): { slug: string; num: string } | null {
-  const m = children.match(/%{1,2}okuda-rhs:(\d{1,2})%{1,2}/);
+ *  mangling: the token may arrive with one or two percents per side.
+ *  Two token kinds (ADR-031):
+ *    - `%okuda-vector:NN%` — live: painted as a badge in the reserved
+ *      vector role (the main document's derived jump map made visible).
+ *    - `%okuda-rhs:NN%` — legacy (ADR-022, retired): stripped silently,
+ *      no badge — the authored numbers are not honored.
+ *  The jump map is derived from the *source* (vectors.ts); this only
+ *  paints. Returns null when the child carries neither token. Pure. */
+function stripVector(children: string): { slug: string; num: string; live: boolean } | null {
+  const vec = children.match(/%{1,2}okuda-vector:(\d{1,2})%{1,2}/);
+  const legacy = children.match(/%{1,2}okuda-rhs:(\d{1,2})%{1,2}/);
+  const m = vec ?? legacy;
   if (!m) return null;
-  const slug = children.replace(/%{1,2}okuda-rhs:(\d{1,2})%{1,2}/, "").replace(RE_INLINE_HTML, "").trim();
-  return { slug, num: m[1]! };
+  const slug = children.replace(/%{1,2}okuda-(?:vector|rhs):(\d{1,2})%{1,2}/, "").replace(RE_INLINE_HTML, "").trim();
+  return { slug, num: m[1]!, live: vec !== null };
 }
 
 /** The closed state-glyph vocabulary — lexicon-applied, not author-editable.
@@ -78,8 +84,8 @@ const STATE_GLYPH_ROLE: Record<string, keyof Palette> = {
 /** If `text` begins with a state glyph (the closed set), colour + bold
  *  that leading glyph via its lexicon role; leave the rest unchanged.
  *  Detects the glyph after any leading ANSI escapes (inline-styled
- *  cells may carry SGR before the visible char). Pure; no-op in none
- *  mode (roleBold returns the glyph plain — NO_COLOR parity). */
+ *  cells may carry SGR before the visible char). Pure; in none mode the
+ *  colour drops but the weight survives (roleBold emits SGR 1). */
 function styleStateGlyph(text: string, styler: ReturnType<typeof makeStyler>): string {
   if (text === "") return text;
   // Find the first visible char by skipping leading ANSI SGR sequences.
@@ -562,19 +568,19 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         if (entry !== undefined) return diagramBlock(entry.art, ctx, entry.title);
         return ""; // pipe failed → drop the placeholder silently
       }
-      // Inline vector paint: strip the token, paint a bracketed badge in
-      // the accent role, right after the slug. No layout assumptions —
-      // the badge travels with the text (ADR-026 paint direction: the
-      // BBS/lynx bracket cadence, adopted). The RHS right-aligned form
-      // was retired: it required width math per handler and leaked raw
-      // tokens from handlers without it (the listItem bug).
+      // Inline vector paint: strip the token; live vectors paint a
+      // bracketed badge in the reserved vector role, right after the
+      // slug — no layout assumptions, the badge travels with the text
+      // (ADR-026 paint direction). Legacy tokens strip silently (ADR-031:
+      // the authored numbers are not honored).
       const v = stripVector(children);
       if (v) {
-        const badge = `[${v.num}]`;
+        if (!v.live) return wrapBlock(stripHtml(v.slug)).join("\n") + "\n\n";
+        const badge = `\u00a7${v.num}`;
         const slugLines = wrapBlock(stripHtml(v.slug));
         const avail = Math.max(width - 2 - badge.length - 1, 8);
         const body = elideToWidth(slugLines.join(" "), avail);
-        return body + " " + styler.roleBold("strong", badge) + "\n\n";
+        return body + " " + styler.roleBold("vector", badge) + "\n\n";
       }
       const lines = wrapBlock(stripHtml(children));
       return lines.join("\n") + "\n\n";
@@ -586,6 +592,12 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // mark; residuals are swept by stripTags at finalize. (td-b81597.)
       if (RE_RHS_WIRE.test(children)) return TAG_RHS_WIRE;
       let out = stripHtml(children);
+      // Vector markers (ADR-031) — table cells route through here, not
+      // the paragraph handler: live tokens paint as rose silcrows, legacy
+      // tokens strip silently (retired, not honored).
+      out = out.replace(/%{1,2}okuda-vector:(\d{1,2})%{1,2}/g, (_m, n: string) =>
+        " " + styler.roleBold("vector", `§${n}`));
+      out = out.replace(/%{1,2}okuda-(?:vector|rhs):\d{1,2}%{1,2}/g, "");
       // Bare .md-path tokens in prose recede to the muted (far) register
       // — near/far: paths are provenance, not content. They read like
       // the status bar's folder/file text. (brief: index-and-jump.)
@@ -674,7 +686,10 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // Inline vector paint for list items too — the same badge, no
       // layout math; the token used to leak raw from this handler.
       const v = stripVector(children);
-      if (v) return TAG_ITEM + v.slug + " " + styler.roleBold("strong", `[${v.num}]`);
+      if (v) {
+        if (!v.live) return TAG_ITEM + v.slug;
+        return TAG_ITEM + v.slug + " " + styler.roleBold("vector", `\u00a7${v.num}`);
+      }
       return TAG_ITEM + children;
     },
 
@@ -754,7 +769,8 @@ function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   // caption follows in the muted register. Untitled diagrams fall back to
   // the renderer statement (`mermaid source elided`) — the source is
   // tautological in a single-render seam and is not echoed. The glyph
-  // survives NO_COLOR as plain content (roleBold is a no-op then).
+  // keeps its weight under NO_COLOR (roleBold emits SGR 1 — colour drops,
+  // attributes survive); the `⋮` reads as a control among the art.
   const glyph = ctx.styler.roleBold("state-parked", "⋮");
   const stmt = title
     ? ctx.styler.role("muted", " " + title)
@@ -780,12 +796,24 @@ function quoteBlock(children: string, ctx: Ctx): string {
       }
       continue;
     }
-    // Pass B (2026-08-24): blockquote text styled to match glow —
-    // yellow (#f1fa8c) italic, the same SGR as emphasis. (snagging item 6)
-    // The │ pipe stays as an okuda divergence (candidate ADR-007 row).
+    // An aside is italic — that is the invariant. The pipe is the
+    // blockquote cue; the italic is the aside's identity. Inline
+    // emphasis inside an aside composes: bold renders bold-italic
+    // (visible), italic renders italic (same as the aside — redundant,
+    // but correct). The catch: inline spans emit full RESET (styler
+    // reset) that kills the outer italic. The fix: wrap the line in
+    // italic and re-open italic after every reset in the content. We
+    // own the render; the styler gives mode-aware reset (empty in
+    // NO_COLOR) so parity holds.
+    const reset = styler.reset();
+    const italicOpen = styler.roleItalic("emphasis", "").replace(/\x1b\[0m$/, "");
     const lines = wrapANSI(seg.text, { width: width - 2 });
     for (const line of lines) {
-      out.push(line === "" ? "" : styler.quotePipe() + " " + styler.roleItalic("emphasis", line));
+      if (line === "") { out.push(""); continue; }
+      // Re-open italic after every reset so inline spans compose instead
+      // of spilling; close with a single reset at the end.
+      const reItalicised = reset ? line.replace(/\x1b\[0m/g, `${reset}${italicOpen}`) : line;
+      out.push(styler.quotePipe() + " " + italicOpen + reItalicised + reset);
     }
   }
   return out.join("\n") + "\n\n";

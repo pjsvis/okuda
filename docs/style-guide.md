@@ -101,7 +101,7 @@ No state glyph on the line — the number (action) outranks the glyph (state) fo
 
 - **Column order: content → address → action** — slug → callsign → number. The eye scans words, notes the durable handle, acts on the number sitting right there: the number is a column near the slug, not a distant RHS anchor the eye must travel to. The trade is explicit — the list's boldest-thing-at-the-far-edge strong-stop is lost, column coherence is gained; the eye learns the number's home.
 - **The glyph nests as a trailing mark on the slug** — state is a property of content, not a channel; no glyph column. Only deviations wear theirs, as ever.
-- **Wiring hides in the row's HTML comment** — `**17** <!-- %%okuda-rhs:17%% decisions/foo.md -->` — the visible number is plain strong (white-bold via the digits-only rule); the token + path are wiring the renderer strips and `extractJumps` reads per line.
+- **References are visible text** (ADR-031) — the row names its target (a callsign or a local `.md` link) and the renderer derives the vector: gold `§NN` in the reserved paint, painted after the reference, map rebuilt per render. No wiring, no authored numbers; the former hidden-comment form is retired.
 
 Then a **status key at the bottom** — the legend, kept in reserve:
 

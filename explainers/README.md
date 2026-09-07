@@ -14,14 +14,14 @@
 
 ## The reading path
 
-| Destination | # |
-|---|---|
-| **The terminal** — why this silo lives in the glass | **11** <!-- %%okuda-rhs:11%% explainers/the-terminal.md --> |
-| **Concepts and terms** — the vocabulary, defined before it is used | **12** <!-- %%okuda-rhs:12%% explainers/concepts-and-terms.md --> |
-| **The diagram tool** — mermaid fences become ASCII art | **13** <!-- %%okuda-rhs:13%% explainers/the-diagram-tool.md --> |
-| **SSH** — the silo on any device | **14** <!-- %%okuda-rhs:14%% explainers/ssh.md --> |
-| **&next** — the decision table (you are ready for this one) | **15** <!-- %%okuda-rhs:15%% &next.md --> |
-| **Accessibility** — the hit list, and what the design already gives | **16** <!-- %%okuda-rhs:16%% explainers/accessibility.md --> |
+| Destination |
+|---|
+| [The terminal](explainers/the-terminal.md) — why this silo lives in the glass | **11** |
+| [Concepts and terms](explainers/concepts-and-terms.md) — the vocabulary, defined before it is used | **12** |
+| [The diagram tool](explainers/the-diagram-tool.md) — mermaid fences become ASCII art | **13** |
+| [SSH](explainers/ssh.md) — the silo on any device | **14** |
+| [&next](&next.md) — the decision table (you are ready for this one) | **15** |
+| [Accessibility](explainers/accessibility.md) — the hit list, and what the design already gives | **16** |
 
 New explainers join the path. The rule is the house rule: explain the
 concept before using the word, and lead with why the reader should

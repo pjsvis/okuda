@@ -2,40 +2,95 @@
 
 ## what is this
 
-- **okuda** renders restricted grammer markdown in the terminal pretty fast.
+- **okuda** renders restricted-grammar markdown in the terminal, fast.
 
-- **Gloam** combines fzf and okuda to find markdown files and render them.
+- **Gloam** is the search: type to find filenames and content at once;
+  every keystroke re-ranks the silo. Enter reads the document. 
 
-- **Silo** gloam can be rooted in a silo, ie a github repo
+- **Rooted in a silo** a git repo when launched there. 
 
-- **Comms** gloam uses SSH for network communications
+- **Over `ssh://`** when the silo is another machine.
 
-## how do i use this
 
-**How to move.** Type a two-digit number to jump to the document beside
-it. `u` (or Backspace) goes back to the previous document. `q` quits.
-That is the whole vocabulary — number keys to go, `u` to return.
+## how to move
 
-## The silo — jump table
+- **Type** — the live search is the dereference path. The document's
+  references are plain text; type the callsign and it resolves.
 
-| Destination | # |
+- **§NN** — rose vectors after a document's references. The section
+  sign means *reference*: actuate to dereference — the target renders
+  clean, and its references are not shown. The tour cannot run away.
+  [The silcrow explainer](docs/2026-09-04-the-silcrow.md).
+
+- **u** — unwind: back to the main document, annotated again.
+
+- **99** — clone: the document you are reading becomes the main
+  document of a new terminal, vectors live. Each level of the tour is
+  a deliberate keystroke and a fresh, stateless instance.
+
+- **q** — quit.
+
+No menus, no state. The map is derived; the paint is illustrative.
+(ADR-031.)
+
+## first reads
+
+- ADR-031 — the main document and the working copy
+- ADR-030 — the live search
+- BRF-PORCH-MATRIX — click a URL, land in a terminal
+- [the constitution](system.md)
+- [the origin doc](docs/2026-08-20-origin-doc.md)
+- [dependencies](DEPENDENCIES.md)
+- [today, recorded](debriefs/2026-09-04-debrief-gloam-live-search.md)
+
+## the dogfood range — every vector case, live
+
+This section is the test bench (`just dogfood` asserts it headless).
+Each case names what should happen. If a case lies, the renderer is
+lying.
+
+1. **Callsign in prose** — ADR-030: one silcrow after the token.
+2. **Callsign in bold** — **ADR-031**: the vector paints outside the
+   bold, in the reserved rose.
+3. **Callsign in a list item** — the *first reads* list above: every
+   entry carries its silcrow.
+4. **Local document link** — [the constitution](system.md): the badge
+   follows the link's URL.
+5. **Repeat citation** — ADR-030 again: a second mention, the SAME
+   silcrow (§13). One destination, one number — the citation
+   convention, everywhere.
+6. **Garden-path regression** — [the silcrow
+   explainer](docs/2026-09-04-the-silcrow.md): a noun-phrase label; the
+   URL must read as an address, never as a sentence.
+7. **Zero-padded numbers are text** — steps [07] and [3] are never
+   vectors, whatever the brackets promise.
+8. **An external URL is never a vector** — [the silo's
+   repository](https://github.com/pjsvis/okuda) renders as a link;
+   the web is not the silo.
+9. **Legacy wiring is silent** — the token at the end of this line is
+   stripped without a badge: %%okuda-rhs:11%% briefs/x.md — retired,
+   not honored (ADR-022 reversed).
+10. **Callsign in a table cell** — vectors paint in tables too:
+
+| ADR | Rule |
 |---|---|
-| **Briefs** — what will we build? | **11** <!-- %%okuda-rhs:11%% briefs/index.md --> |
-| **Decisions** — why did we choose X over Y? | **22** <!-- %%okuda-rhs:22%% decisions/index.md --> |
-| **Debriefs** — what happened and why? | **33** <!-- %%okuda-rhs:33%% debriefs/index.md --> |
-| **Playbooks** — how do we do X? | **44** <!-- %%okuda-rhs:44%% playbooks/index.md --> |
-| **Live state** — `NOW.md` (where was I?) | **55** <!-- %%okuda-rhs:55%% NOW.md --> |
-| **Explainers** — the quiet introduction | **66** <!-- %%okuda-rhs:66%% explainers/README.md --> |
+| ADR-024 | callsigns are data, not machinery |
+| ADR-020 | the renderer never reads registries — a closure, always |
 
-A jump table is just a markdown file with `%%okuda-rhs:NN%%` wiring.
-This is the default vector file; any other such file, once loaded,
-rebinds the number keys to its destinations. `u` returns here.
+11. **In bold, mid-sentence** — the working copy of **ADR-031** is the
+    specification for everything on this page.
 
-## Notes
+## notes
 
 - This file sorts first by ASCII (`&` 0x26 beats `2` 0x32, so it
   precedes every dated file). The ugly prefix is the moat — no one else
   wants it, so it is ours alone.
+
 - No logo, no colours, no chrome: okuda renders text in a fixed
   palette and rejects images (the grammar strips them). The branding
   *is* the absence of branding; the orientation *is* the landing page.
+
+- The tier registries (`INDEX.jsonl`) are the data; their generated
+  `index.md` views exist for other tools and are not in the search
+  corpus. If you want the briefs, type `BRF-` — the picker is the
+  better index.

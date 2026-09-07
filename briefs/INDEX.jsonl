@@ -30,7 +30,7 @@
 {"file":"2026-08-29-brief-fzf-owns-the-loop.md","date":"2026-08-29","status":"open","summary":"fzf owns the loop (cursor-preserve experiment)","meta":{},"callsign":"BRF-FZF-OWNS-LOOP"}
 {"file":"2026-08-29-brief-menu-templates-deferred.md","date":"2026-08-29","status":"open","summary":"Menu templates (deferred — fires on the second menu kind)","meta":{},"callsign":"BRF-MENU-TEMPLATES"}
 {"file":"2026-08-29-brief-okf-callsign-migration.md","date":"2026-08-29","status":"done","summary":"OKF conformance migration and the callsign layer","meta":{},"callsign":"BRF-OKF-CALLSIGN"}
-{"file":"2026-08-29-brief-paged-okudagram.md","date":"2026-08-29","status":"open","summary":"Paged okudagram view — block-aware paging (candidate invariant)","meta":{},"callsign":"BRF-PAGED-OKUDAGRAM"}
+{"file":"2026-08-29-brief-okudagram-frame.md","date":"2026-08-29","status":"open","summary":"The okudagram frame — a portioning rule","meta":{},"callsign":"BRF-PAGED-OKUDAGRAM"}
 {"file":"2026-08-29-brief-resticted-grammar-speech.md","date":"2026-08-29","status":"open","summary":"Okuda Markdown AST to W3C SSML Mapping Investigation","meta":{},"callsign":"BRF-RESTICTED-GRAMMAR"}
 {"file":"2026-08-29-brief-terminal-speech.md","date":"2026-08-29","status":"open","summary":"Terminal Speech Pipeline Easter Egg","meta":{},"callsign":"BRF-TERMINAL-SPEECH"}
 {"file":"2026-08-29-mermaid-hard-boundary-CSN.md","date":"2026-08-29","status":"open","summary":"Mermaid Rendering Hard Boundary State Machine (CSN Diagnostics)","meta":{},"callsign":"BRF-MERMAID-HARD"}
@@ -42,3 +42,6 @@
 {"file":"2026-09-01-brief-mermaid-source-omitted.md","date":"2026-09-01","status":"open","summary":"Omit the mermaid source from the render","meta":{},"callsign":"BRF-MERMAID-SOURCE-OMITTED"}
 {"file":"2026-09-02-brief-scroll-region-repaint.md","date":"2026-09-02","status":"open","summary":"One line per scroll — scroll-region repaint for the TUI","meta":{},"callsign":"BRF-SCROLL-REPAINT"}
 {"file":"2026-09-02-brief-synchronized-output.md","date":"2026-09-02","status":"open","summary":"Synchronized output — deliver each paint as one frame","meta":{},"callsign":"BRF-SYNC-OUTPUT"}
+{"file":"2026-09-04-brief-porch-matrix.md","date":"2026-09-04","status":"open","summary":"The porch matrix — click a URL, land in a terminal, read the silo","meta":{},"callsign":"BRF-PORCH-MATRIX"}
+{"file":"2026-09-04-brief-working-copy.md","date":"2026-09-04","status":"open","summary":"The working copy — vector render mode, 99 clone, honest actuator","meta":{},"callsign":"BRF-WORKING-COPY"}
+{"file":"2026-09-05-brief-stream-identity-header.md","date":"2026-09-05","status":"open","summary":"Stream identity header — name the document for the unknown destination","meta":{},"callsign":"BRF-STREAM-IDENTITY-HEADER"}

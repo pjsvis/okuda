@@ -16,8 +16,13 @@
  */
 
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
+import { annotateSource, jumpMapFor, CLONE_TOKEN } from "./vectors";
+import { cloneArgs } from "./clone";
+import { frameBounds, headingLines, snapFrame } from "./frames";
+import { splitKeyEvents, verbFor, type Verb } from "./keygrammar";
 import { loadPalette, type Palette } from "./palette";
 import { renderDocument } from "./render";
+import { basename, dirname, join } from "node:path";
 import { padStartDisplay, terminalCols, terminalRows } from "./width";
 
 export interface TuiOptions {
@@ -33,6 +38,11 @@ export interface TuiOptions {
    *  knows nothing of registries — ADR-020). Called per paint with the
    *  current file, so the identity run follows jumps. */
   callsignFor?: (file: string) => string | null;
+  /** Vector actuation resolver (ADR-031): vector target → document path.
+   *  File-existence first, callsign dispatch where rooted; null = no
+   *  document (the actuator flashes honestly). Same ADR-020 boundary —
+   *  a closure, never registry knowledge. */
+  resolveTarget?: (target: string) => string | null;
 }
 
 /** Decoded keystroke action. `null` = unhandled (no-op). */
@@ -57,10 +67,9 @@ export function decodeKey(buf: Uint8Array): KeyAction {
   const b0 = buf[0]!;
   // Single-byte controls.
   switch (b0) {
-    case 0x03: return "quit";            // Ctrl-C
+    case 0x03: return "quit";            // Ctrl-C — the interrupt; OFF is 00
     case 0x04: return "half-down";      // Ctrl-D
     case 0x15: return "half-up";        // Ctrl-U
-    case 0x1a: return "quit";           // Ctrl-Z (raw mode swallows SIGTSTP)
     case 0x71: return "quit";           // q
     case 0x51: return "quit";           // Q (Glow's convention)
     case 0x6a: return "down";           // j
@@ -72,6 +81,11 @@ export function decodeKey(buf: Uint8Array): KeyAction {
     case 0x62: return "page-up";        // b — less/man back convention
     case 0x3f: return "help";           // ? — toggle verbose hints
     case 0x75: return "back";           // u — pop the backstack
+    // Backspace unwinds — restored 2026-09-05 on ergonomics: it sits
+    // on the RHS beside the less-used keys, the natural rest for the
+    // right hand between reads. It has no job outside the dereferenced
+    // document: at main the backstack is empty and `back` is a no-op —
+    // the depth-one stack makes it safe by construction.
     case 0x7f: return "back";           // DEL (Backspace on most terminals)
     case 0x08: return "back";           // BS  (Backspace on some terminals)
   }
@@ -95,8 +109,9 @@ export function decodeKey(buf: Uint8Array): KeyAction {
       case 0x36: return buf[3] === 0x7e ? "page-down" : null;  // ESC O 6 ~
     }
   }
-  // Lone Esc (length 1) — treat as quit; common pager convention.
-  if (b0 === ESC && buf.length === 1) return "quit";
+  // Lone Esc (length 1) — the partial-vector cancel, applied by
+  // applyKey before decodeKey is reached. Here it is null.
+  if (b0 === ESC && buf.length === 1) return null;
   return null;
 }
 
@@ -187,7 +202,7 @@ export function viewport(
   return { visible: lines.slice(s, s + height), maxScroll, scroll: s };
 }
 
-const HINTS = "q quit · j/k · ␣/b page · g/G ends · ^D/^U · r reload · NN jump · u back";
+const HINTS = "00 off · j/k · ␣/b · g/G · r reload · NN deref · 99 clone · u unwind";
 
 /** Display path: folder/basename (Glow convention). Pure. */
 /** ADR-010 re-anchor as a pure function: given the pre- and post-re-render
@@ -451,27 +466,110 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   // unstyled terminal). A blank alt-screen during the read reads as
   // "loading," not "glitch"; content of the transitional frame beats its
   // duration (brief: launcher-fut — the ordering half of the fix).
-  process.stdout.write(ENTER_ALT + HIDE_CURSOR);
+  // Alt-scroll is the reader's own mode (ADR-031 dogfood: the launcher
+  // used to own it, but direct `okuda --tui` and `just dogfood` enter
+  // without the launcher — the wheel died at every non-launcher door).
+  process.stdout.write(ENTER_ALT + HIDE_CURSOR + "\x1b[?1007h");
+
+  // Main-document state (ADR-031) — declared before the first render,
+  // which annotates from the map. The jump map belongs to the MAIN
+  // document and is derived from its source (vectors.ts) — rebuilt on
+  // main reload, never on dereference. The backstack is depth one
+  // (main → one dereference → u unwinds); the painted `[NN]` badges are
+  // a projection of the map — the main render annotates, dereferenced
+  // renders are clean.
+  const mainFile = opts.file;
+  const deriveMain = (text: string): Map<number, string> => jumpMapFor(text);
+  let mainText = "";
+  let mainJumps: Map<number, string> = new Map();
+  let backstack: { file: string; scroll: number }[] = [];
+  let numBuffer: string | null = null;
 
   // Initial fetch through the gate: prev=null is the initial-load sentinel,
   // so a successful first read is `changed` (content arrived) and a failed
   // first read is `failed` with empty lines (no last-known-good to retain).
+  // The map is derived BEFORE the first render — the initial frame is a
+  // main render and must arrive annotated. (Bug, found by dogfood: the
+  // map was derived after the initial render, so the first frame
+  // annotated against an empty map and opened bare.)
   const initialFetch = await readSource();
+  if (initialFetch.ok) {
+    mainText = initialFetch.text;
+    mainJumps = deriveMain(mainText);
+  }
   const initialRender = initialFetch.ok
-    ? await renderLines(initialFetch.text, opts.width)
+    ? await renderLines(annotateSource(initialFetch.text, mainJumps), opts.width)
     : [];
   const init = gateFetch(null, initialFetch, initialRender);
   let lines: string[] = init.lines;
   let fetchState: FetchState = init.state; // footer stamp reads this (brief: fetch-state-stamp)
   let scroll = 0;
   let showHints = false; // `?` toggles: compact % footer ↔ verbose hints
-  // Index-and-jump state (brief 2026-08-28). The jump table is extracted
-  // from the live source whenever it changes; the backstack records
-  // {file, scroll} for `u`/Backspace traversal; numBuffer collects the
-  // two-digit token before a jump resolves.
-  let jumps = extractJumps(initialFetch.ok ? initialFetch.text : "");
-  let backstack: { file: string; scroll: number }[] = [];
-  let numBuffer: string | null = null;
+
+  /** Footer flash (ADR-031): the actuator's honest failure surface and
+   *  the clone verb's receipt. Drawn on the hints row for a breath, then
+   *  cleared — never a crash, never a silent nothing. */
+  let flashMsg: string | null = null;
+  let flashTimer: ReturnType<typeof setTimeout> | null = null;
+  const flash = (msg: string, role: "alert" | "state-ok" = "alert"): void => {
+    flashMsg = msg;
+    if (flashTimer) clearTimeout(flashTimer);
+    flashTimer = setTimeout(() => {
+      flashMsg = null;
+      flashTimer = null;
+      paint();
+    }, 2500);
+    paint();
+  };
+
+  /** The clone verb (`99`, ADR-031): promote the currently rendered
+   *  document to main of a NEW instance, via the host. tmux is the
+   *  contract (the porch matrix's landing surface); OKUDA_CLONE_CMD is
+   *  the escape hatch ($1 = the document); no host → honest flash. The
+   *  clone re-derives its own map — nothing transfers, nothing mutates. */
+  /** Frozen mode (`03`, keyboard-controls): the document stays still —
+   *  the fs.watch auto-re-render is suppressed. `r` remains the manual
+   *  override, resize still follows the glass. */
+  let frozen = false;
+  /** Render mode (keyboard-controls): `slide` = the continuous surface
+   *  (default); `frame` = the okudagram frame — j/k step header to
+   *  header, arrows stay slippy within, ␣/b page within (BRF-
+   *  PAGED-OKUDAGRAM). Mode is per-instance, no memory across clones. */
+  let renderMode: "slide" | "frame" = "slide";
+
+  /** Edit a blank document (`09`): a new note in the CURRENT
+   *  document's directory, opened in the declared editor inside a
+   *  separate terminal (the clone grammar's own spin-up). The file is
+   *  the contract — the silo picks it up by search; nothing mutates. */
+  const editNew = (): void => {
+    const dir = dirname(currentFile);
+    const stamp = new Date().toISOString().replace(/[-:T]/g, "").slice(0, 12);
+    const note = join(dir, `note-${stamp}.md`);
+    const editor = process.env.OKUDA_EDITOR ?? process.env.EDITOR ?? "vi";
+    const integration = process.env.OKUDA_CLONE ?? "edit-terminal";
+    const spec = cloneArgs(integration, note, process.platform, dir, editor);
+    if ("error" in spec) {
+      flash(`edit: ${spec.error}`);
+      return;
+    }
+    Bun.spawn([spec.cmd, ...spec.args], { stdio: "ignore" });
+    flash(`editing: ${basename(note)}`, "state-ok");
+  };
+
+  const clone = (): void => {
+    const doc = currentFile;
+    if (process.env.TMUX) {
+      const r = Bun.spawnSync(["tmux", "new-window", "-c", process.cwd(), "gloam", doc]);
+      if (r.exitCode === 0) flash(`cloned: ${doc}`, "state-ok");
+      else flash(`clone failed (tmux new-window exit ${r.exitCode})`);
+    } else if (process.env.OKUDA_CLONE_CMD) {
+      const r = Bun.spawnSync(["sh", "-c", process.env.OKUDA_CLONE_CMD, "okuda-clone", doc]);
+      if (r.exitCode === 0) flash(`cloned: ${doc}`, "state-ok");
+      else flash(`clone failed (OKUDA_CLONE_CMD exit ${r.exitCode})`);
+    } else {
+      flash("no clone host: run inside tmux or set OKUDA_CLONE_CMD");
+    }
+  };
 
   const dims = () => ({
     // terminalCols/Rows handle the Bun --compile columns=0 bug (tput fallback);
@@ -494,15 +592,16 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // blank gap on the wire; removing it is option 1, deferred.
     let frame = "\x1b[2J\x1b[H"; // clear + home
     frame += view.visible.join("\n");
-    if (showHints) {
-      // Badge row up one; hints own the last row, right-justified, corner pad.
-      frame += `\x1b[${rows - 1};1H`;
-      frame += footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined);
+    const footer = footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined);
+    frame += `\x1b[${rows - 1};1H`;
+    frame += footer;
+    if (flashMsg) {
+      // The flash owns the last row while visible — warnings outrank hints.
+      frame += `\x1b[${rows};1H`;
+      frame += styler.roleBold("alert", ` ${flashMsg} `.padEnd(cols).slice(0, cols));
+    } else if (showHints) {
       frame += `\x1b[${rows};1H`;
       frame += hintsLine(cols, muted);
-    } else {
-      frame += `\x1b[${rows};1H`;
-      frame += footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined);
     }
     process.stdout.write(syncWrap(frame));
   };
@@ -513,22 +612,33 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  screen row. The gate is the mechanised "neither": identical content
    *  → `same`, no repaint; a failed fetch → `failed`, retain the
    *  last-known-good, no repaint; only a real change repaints. */
-  const rerenderAnchored = async (): Promise<void> => {
+  const rerenderAnchored = async (reason: "watch" | "resize" | "reload"): Promise<void> => {
+    // Frozen gates only the WATCHER — the document stays still while an
+    // agent edits; resize follows the glass and `r` is the manual
+    // override (keyboard-controls, 2026-09-05). No flag save/restore.
+    if (frozen && reason === "watch") return;
     const { rows, cols } = dims();
     const height = contentHeight(rows, showHints);
     const fetch = await readSource();
-    const next = fetch.ok ? await renderLines(fetch.text, cols) : [];
+    const atMain = backstack.length === 0;
+    if (fetch.ok && atMain) {
+      mainText = fetch.text;
+      mainJumps = deriveMain(mainText); // the map re-derives; no invalidation
+    }
+    // The main render annotates (ADR-031); dereferenced renders are clean.
+    const next = fetch.ok
+      ? await renderLines(atMain ? annotateSource(fetch.text, mainJumps) : fetch.text, cols)
+      : [];
     const decision = gateFetch(lines, fetch, next);
     fetchState = decision.state;
     if (!decision.repaint) return; // gate held, or source lost — keep the screen
     const oldLines = lines;
     lines = decision.lines;
-    if (fetch.ok) jumps = extractJumps(fetch.text); // re-extract on change
     scroll = reanchoredScroll(oldLines, lines, scroll, height);
     paint();
   };
 
-  const reload = (): void => { void rerenderAnchored(); };
+  const reload = (): void => { void rerenderAnchored("reload"); };
 
   /** Present a freshly fetched doc: set lines, re-extract the jump table,
    *  set scroll, repaint. Used by jump and back (forced loads — the gate's
@@ -537,49 +647,100 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  caller has already verified fetch.ok and pushed the backstack. */
   const present = (fetch: Fetch, next: string[], nextScroll: number): void => {
     lines = next;
-    jumps = fetch.ok ? extractJumps(fetch.text) : jumps;
     fetchState = fetch.ok ? "changed" : "failed";
     scroll = nextScroll;
     paint();
   };
 
-  /** Jump to the document behind a two-digit token. Pushes the current
-   *  view onto the backstack, loads the target at scroll 0. A missing
-   *  token or a vanished target is a silent no-op (acceptance: "numeric
-   *  input is ignored if the requested index does not exist"). */
+  /** Actuate a vector: dereference the map's target and render it CLEAN
+   *  (its references are not shown — the tour cannot proceed from here).
+   *  Depth one: only the main document actuates. Optimistic paint means
+   *  the target may not exist — the failure is a footer flash, and the
+   *  wording belongs to the vector: "[14] — no document to render". */
   const jumpTo = async (token: number): Promise<void> => {
-    const path = jumps.get(token);
-    if (!path) return;
+    if (backstack.length > 0) return; // dereferenced render is clean — nothing to actuate
+    const target = mainJumps.get(token);
+    if (!target) return; // no such vector — silent, per the old contract
+    const path = opts.resolveTarget ? opts.resolveTarget(target) : target;
+    if (!path) {
+      flash(`§${token} — no document to render`);
+      return;
+    }
     const fetch = await readSource(path);
-    if (!fetch.ok) return; // target gone — stay put, no backstack push
+    if (!fetch.ok) {
+      flash(`§${token} — no document to render`);
+      return; // optimistic paint, honest failure — stay put, no stack push
+    }
     backstack.push({ file: currentFile, scroll });
     currentFile = path;
     const next = await renderLines(fetch.text, dims().cols);
     present(fetch, next, 0);
   };
 
-  /** Pop the backstack: return to the previous document with its scroll
-   *  intact. Empty stack → no-op. A vanished target is dropped (the file
-   *  is gone; the user stays on the current doc). */
+  /** Unwind (`u`): pop the dereference and re-render the MAIN document —
+   *  annotated again, at its stored scroll. The map re-derives from the
+   *  main source (which may have changed under us; derivation replaces
+   *  invalidation). A vanished main is the one state we cannot rebuild —
+   *  stay put. */
   const back = async (): Promise<void> => {
     const prev = backstack.pop();
     if (!prev) return;
     const fetch = await readSource(prev.file);
-    if (!fetch.ok) return; // target gone — stay; entry dropped
+    if (!fetch.ok) return; // main gone — stay; entry dropped
+    mainText = fetch.text;
+    mainJumps = deriveMain(mainText);
     currentFile = prev.file;
-    const next = await renderLines(fetch.text, dims().cols);
+    const next = await renderLines(annotateSource(fetch.text, mainJumps), dims().cols);
     present(fetch, next, prev.scroll);
   };
 
-  const onKey = (data: Buffer): void => {
-    const bytes = new Uint8Array(data);
-    // Numeric jump buffer: two digits → token lookup. Any non-digit
+  /** The verb handler table — the dispatch half of the grammar, beside
+   *  KEYBINDINGS (the binding half). A new verb is one entry here and
+   *  one there; the onKey loop never grows. */
+  const verbHandlers: Partial<Record<Verb, () => void>> = {
+    exit: () => cleanup(),
+    frame: () => {
+      renderMode = "frame";
+      scroll = snapFrame(headingLines(lines), lines.length, scroll, 1);
+      flash("frame mode — j/k steps, arrows slippy within");
+    },
+    slide: () => {
+      renderMode = "slide";
+      frozen = false;
+      flash("sliding mode");
+    },
+    freeze: () => {
+      frozen = true;
+      flash("frozen — the document stays still (r re-renders)");
+    },
+    editNew: () => editNew(),
+    edit: () => flash("edit current — the edit brief is not wired yet"),
+    clone: () => clone(),
+  };
+
+  /** Reduce ONE key event to its effect. The reducer is pure up to the
+   *  verb handlers; onKey feeds it every event in the read. */
+  const applyKey = (bytes: Uint8Array): void => {
+    // A lone ESC (keyboard-controls: "ESC cancels partial vector") —
+    // the user's escape from a half-typed sequence. Arrow sequences
+    // arrive as multi-byte events (the lexer keeps them whole), so a
+    // single-byte ESC is genuinely alone: stand the buffer down.
+    if (bytes.length === 1 && bytes[0] === ESC) {
+      if (numBuffer !== null) numBuffer = advanceNumBuffer(numBuffer, null).buffer;
+      return;
+    }
+    // Numeric jump buffer: two digits → token → verb. Any non-digit
     // (motion, escape sequence, letters) cancels a pending buffer.
     const digit = digitOf(bytes);
     const step = advanceNumBuffer(numBuffer, digit);
     numBuffer = step.buffer;
     if (step.token !== null) {
-      void jumpTo(step.token);
+      const verb = verbFor(step.token);
+      if (verb === "vector") {
+        void jumpTo(step.token);
+      } else {
+        verbHandlers[verb]?.();
+      }
       return;
     }
     if (digit !== null) return; // first digit only — buffer pending
@@ -597,8 +758,16 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     const { maxScroll } = viewport(lines, 0, height);
     const half = Math.max(1, Math.floor(height / 2));
     switch (action) {
-      case "down": scroll += 1; break;
-      case "up": scroll -= 1; break;
+      case "down":
+        if (renderMode === "frame") {
+          scroll = snapFrame(headingLines(lines), lines.length, scroll, 1);
+        } else scroll += 1;
+        break;
+      case "up":
+        if (renderMode === "frame") {
+          scroll = snapFrame(headingLines(lines), lines.length, scroll, -1);
+        } else scroll -= 1;
+        break;
       case "page-down": scroll += height; break;
       case "page-up": scroll -= height; break;
       case "half-down": scroll += half; break;
@@ -609,6 +778,12 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     }
     scroll = Math.min(Math.max(0, scroll), maxScroll);
     paint();
+  };
+
+  /** The reader's entry point: split the read into key events, reduce
+   *  each. (The reducer is `applyKey`; the lexer is `splitKeyEvents`.) */
+  const onKey = (data: Buffer): void => {
+    for (const event of splitKeyEvents(new Uint8Array(data))) applyKey(event);
   };
 
   // runTui blocks until the reader session ends. The `done` promise is
@@ -626,7 +801,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     process.stdin.removeListener("data", onKey);
     process.stdin.setRawMode?.(false);
     process.stdin.pause?.();
-    process.stdout.write(SHOW_CURSOR + EXIT_ALT);
+    process.stdout.write(SHOW_CURSOR + "\x1b[?1007l" + EXIT_ALT);
     process.removeListener("SIGWINCH", onWinch);
     process.removeListener("SIGINT", onSignal);
     process.removeListener("SIGTERM", onSignal);
@@ -648,7 +823,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   // never jumps to the top. Vertical resize doesn't reflow, so the null
   // path keeps index-preservation, honest there. (brief:
   // resize-content-anchor)
-  const onWinch = (): void => { void rerenderAnchored(); };
+  const onWinch = (): void => { void rerenderAnchored("resize"); };
   process.on("SIGWINCH", onWinch);
 
   // Clean exit on signal: restore the terminal, then hard-exit. A signal

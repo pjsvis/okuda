@@ -38,9 +38,9 @@ just prints — composes:
 
 ## Next
 
-| Open | # |
-|---|---|
-| **Concepts and terms** — the vocabulary, defined before it is used | **11** <!-- %%okuda-rhs:11%% explainers/concepts-and-terms.md --> |
+| Open |
+|---|
+| [Concepts and terms](explainers/concepts-and-terms.md) — the vocabulary, defined before it is used  |
 
 ## Why this beats a web page for a knowledge base
 

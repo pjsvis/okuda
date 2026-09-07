@@ -125,10 +125,13 @@ describe("render — heading RHS chip (right-edge tab)", () => {
     const src = "# " + "heading word ".repeat(6);
     const tc = await render(src, 26, "truecolor");
     const none = await render(src, 26, "none");
-    expect(none).not.toContain("\x1b");
+    // NO_COLOR strips colour, not attributes — heading text keeps its bold
+    // (SGR 1), but no colour escapes survive. The chip stays a plain `█`.
+    expect(none).not.toContain("\x1b[38;2;");
+    expect(none).not.toContain("\x1b[48;2;");
     expect(none).toContain("█"); // glyph present in plain mode too
-    // Structural parity: strip escapes from truecolor → identical lines.
-    expect(stripANSI(tc).split("\n")).toEqual(none.split("\n"));
+    // Structural parity: strip escapes from both → identical lines.
+    expect(stripANSI(tc).split("\n")).toEqual(stripANSI(none).split("\n"));
   });
 
   test("reflow on resize keeps the chip at the right bound", async () => {
@@ -349,7 +352,23 @@ describe("render — lists (loose, markers, continuation)", () => {
 describe("render — blockquote", () => {
   test("muted pipe + indent, single level", async () => {
     const out = await render("> quoted line");
+    // An aside is italic — the invariant. The pipe is the blockquote
+    // cue; the italic is the aside's identity.
     expect(out).toContain("\x1b[38;2;118;118;118m│\x1b[0m \x1b[38;2;241;250;140;3mquoted line\x1b[0m");
+  });
+
+  test("inline emphasis inside a blockquote renders correctly", async () => {
+    const out = await render("> **bold** and *italic* and plain");
+    // Bold and italic spans must survive the blockquote container —
+    // no RESET spill killing surrounding emphasis, no double-italic.
+    // The strong span uses roleBold (colour + ;1m); italic uses ;3m.
+    expect(out).toContain(";1m"); // bold survives
+    expect(out).toContain(";3m"); // italic survives
+    // The plain tail after the inline spans must still be in the quote
+    // (pipe prefix present on the line, content not lost).
+    const line = lines(out).find((l) => l.includes("plain"));
+    expect(line).toBeDefined();
+    expect(stripANSI(line!)).toContain("plain");
   });
 
   test("quote content re-wraps inside the pipe column", async () => {
@@ -466,13 +485,16 @@ describe("render — NO_COLOR parity", () => {
     "",
   ].join("\n");
 
-  test("plain output is the colored output minus escapes (identical line breaks)", async () => {
+  test("plain output is the colored output minus colour (attributes retained, identical line breaks)", async () => {
     const colored = await render(doc, 40, "truecolor");
     const plain = await render(doc, 40, "none");
-    expect(plain).not.toContain("\x1b");
-    // identical structure: strip escapes from colored → same lines
+    // NO_COLOR strips colour, not attributes — bold (SGR 1) survives on
+    // headings/strong; no truecolour escapes remain in the plain output.
+    expect(plain).not.toContain("\x1b[38;2;");
+    expect(plain).not.toContain("\x1b[48;2;");
+    // identical structure: strip escapes from both → same lines
     const cLines = colored.split("\n").map((l) => stripANSI(l).replace(/ +$/, ""));
-    const pLines = plain.split("\n").map((l) => l.replace(/ +$/, ""));
+    const pLines = plain.split("\n").map((l) => stripANSI(l).replace(/ +$/, ""));
     expect(cLines).toEqual(pLines);
   });
 
@@ -534,11 +556,20 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
     expect(out).not.toContain("<!--");
   });
 
-  test("the vector renders as an accent bracket after the slug", async () => {
+  test("legacy okuda-rhs strips silently — retired, no badge (ADR-031)", async () => {
     const out = await render("*Title* %%okuda-rhs:01%% <!-- docs/foo.md -->");
-    // ADR-026 paint direction: the bracket badge in the accent role
-    // (strong #ffb86c), bold. Tolerant of the inline parser's % mangling.
-    expect(out).toContain("\x1b[38;2;255;184;108;1m[01]\x1b[0m");
+    expect(out).not.toContain("[01]");
+    expect(out).not.toContain("okuda-rhs");
+    expect(out).toContain("Title");
+  });
+
+  test("the vector badge paints in the reserved vector role after the slug", async () => {
+    const out = await render("*Title* %okuda-vector:01% <!-- docs/foo.md -->");
+    // ADR-031 + td-c31929: the badge in the reserved vector paint (rose
+    // #fb7185 → 251;113;133) AND bold — the silcrow is a control among
+    // information; controls earn both channels (colour + weight).
+    // Tolerant of the inline parser's % mangling.
+    expect(out).toContain("\x1b[38;2;251;113;133;1m§01\x1b[0m");
   });
 
   test("the slug renders as emphasis (yellow, italic) on the left", async () => {
@@ -548,25 +579,23 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
   });
 
   test("the slug and number are on one line (no wrap)", async () => {
-    const out = await render("*Short* %%okuda-rhs:01%% <!-- docs/foo.md -->");
+    const out = await render("*Short* %okuda-vector:01% <!-- docs/foo.md -->");
     // The item is one line of body text (plus the header/footer rails).
     const bodyLines = out.split("\n").filter((l) => l.trim() && !l.includes("─") && !l.includes("█"));
     expect(bodyLines.length).toBe(1);
   });
 
-  test("a long slug truncates with … and the badge still paints", async () => {
+  test("a long slug truncates with … and the vector badge still paints", async () => {
     const out = await render(
-      "*A very long slug that will not fit in a narrow terminal* %%okuda-rhs:05%% <!-- docs/x.md -->",
+      "*A very long slug that will not fit in a narrow terminal* %okuda-vector:05% <!-- docs/x.md -->",
       40,
     );
     const plain = out.replace(/\x1b\[[0-9;]*m/g, "");
-    expect(plain).toContain("…");
-    expect(plain).toContain("[05]");
-    // One body line (not wrapped): the body lines, excluding rails.
-    const bodyLines = plain.split("\n").filter((l) => l.trim() && !l.includes("─") && !l.includes("█"));
-    expect(bodyLines.length).toBe(1);
-    // The full uncut text is not present (truncated).
-    expect(plain).not.toContain("narrow terminal");
+    expect(plain).toContain("§05");
+    // ADR-031: references are prose — the badge wraps with the text
+    // (the elide-to-one-line behavior was the legacy menu-row pattern).
+    expect(plain.split("\n").some((l) => l.trimEnd().endsWith("§05"))).toBe(true);
+    expect(plain).toContain("narrow terminal");
   });
 
   test("greedy: a .md mention in ordinary prose still mutes (the far register)", async () => {

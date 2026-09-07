@@ -62,12 +62,15 @@ describe("tui — synchronized output bracket (BRF-SYNC-OUTPUT)", () => {
 });
 
 describe("tui — decodeKey (single-byte controls)", () => {
-  test("quit: q, Q, Ctrl-C (0x03), Ctrl-Z (0x1a), lone Esc", () => {
+  test("quit: q, Q, Ctrl-C (0x03) — Ctrl-Z is unbound, lone Esc is the cancel", () => {
     expect(decodeKey(buf(0x71))).toBe("quit"); // q
     expect(decodeKey(buf(0x51))).toBe("quit"); // Q (Glow's convention)
     expect(decodeKey(buf(0x03))).toBe("quit"); // Ctrl-C
-    expect(decodeKey(buf(0x1a))).toBe("quit"); // Ctrl-Z
-    expect(decodeKey(buf(0x1b))).toBe("quit"); // lone Esc
+    // Ctrl-Z unbound (the flense): raw mode turned it into a surprise
+    // exit — the OFF verb is 00. Lone Esc is the partial-vector cancel,
+    // handled in applyKey before decodeKey.
+    expect(decodeKey(buf(0x1a))).toBeNull();
+    expect(decodeKey(buf(0x1b))).toBeNull();
   });
   test("motion: j down, k up, g top, G bottom", () => {
     expect(decodeKey(buf(0x6a))).toBe("down");
@@ -216,12 +219,12 @@ describe("tui — footerLine (identity left, affordance right)", () => {
     const h = hintsLine(80, plain);
     expect(h.endsWith(" ")).toBe(true); // corner pad
     expect(h.startsWith(" ")).toBe(true); // right-justified
-    expect(h.trimStart().startsWith("q quit")).toBe(true);
+    expect(h.trimStart().startsWith("00 off")).toBe(true);
     expect(displayWidth(h)).toBe(80); // fills the row exactly
   });
   test("hintsLine: too narrow → no left pad, text starts at col 1 (legible)", () => {
     const plain = (s: string) => s;
-    expect(hintsLine(60, plain).startsWith("q")).toBe(true);
+    expect(hintsLine(60, plain).startsWith("0")).toBe(true);
   });
 });
 
@@ -427,14 +430,12 @@ describe("tui — gateFetch (changed / same / failed, retain-on-failure)", () =>
 
 // ── Index-and-jump (brief 2026-08-28) ───────────────────────────────
 
-describe("tui — decodeKey (back-nav: u / Backspace)", () => {
+describe("tui — decodeKey (back-nav: u and Backspace are synonyms)", () => {
   test("u → back", () => {
     expect(decodeKey(buf(0x75))).toBe("back");
   });
-  test("DEL (0x7f) → back (Backspace on most terminals)", () => {
+  test("DEL/BS → back — RHS ergonomics; no-op at main by the depth-one stack", () => {
     expect(decodeKey(buf(0x7f))).toBe("back");
-  });
-  test("BS (0x08) → back (Backspace on some terminals)", () => {
     expect(decodeKey(buf(0x08))).toBe("back");
   });
 });

@@ -25,3 +25,7 @@
 {"file":"025-mnemonic-namespace-model.md","date":"2026-08-30","status":"Accepted","summary":"The mnemonic namespace model","meta":{},"callsign":"ADR-MNEMONIC-MODEL-025"}
 {"file":"026-wire-format.md","date":"2026-08-31","status":"Accepted","summary":"The wire format — one grammar, two forms, paint decoupled","meta":{},"callsign":"ADR-WIRE-FORMAT-026"}
 {"file":"027-temperament-is-downstream-of-discipline.md","date":"2026-08-31","status":"Accepted","summary":"Temperament is downstream of discipline","meta":{},"callsign":"ADR-TEMPERAMENT-DISCIPLINE-027"}
+{"file":"028-wire-budget.md","date":"2026-09-02","status":"Accepted","summary":"The wire is the budget","meta":{},"callsign":"ADR-WIRE-BUDGET-028"}
+{"file":"029-renderer-reader-glass.md","date":"2026-09-03","status":"Accepted","summary":"Disambiguate the renderer, the reader, and the glass","meta":{},"callsign":"ADR-RENDERER-READER-029"}
+{"file":"030-live-search-picker.md","date":"2026-09-04","status":"Accepted","summary":"The picker is a live search","meta":{},"callsign":"ADR-LIVE-SEARCH-030"}
+{"file":"031-main-document.md","date":"2026-09-04","status":"Accepted","summary":"The main document — optimistic vectors, 99 promotes, u unwinds","meta":{},"callsign":"ADR-MAIN-DOCUMENT-031"}
