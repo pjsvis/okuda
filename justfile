@@ -97,6 +97,18 @@ tts-rate file rate:
 fresh:
     @bash scripts/fresh.sh
 
+# ── Search comparison dogfood (regular vs ours) ──────────────
+
+[group('search')]
+search-regular query:
+    @echo "REGULAR (rg -n — the wall): every matching line, no ranking"
+    @rg -i -n "$(echo '{{query}}' | sed 's/ | /|/g')" --type md
+
+[group('search')]
+search-ours query:
+    @echo "OURS (gloam --entries — the dive): ranked, deduped, evidence"
+    @./okuda gloam --entries '{{query}}' | awk -F'\t' 'NF>1 && $2 != ""'
+
 # ── Build ────────────────────────────────────────────────────
 
 [group('build')]
