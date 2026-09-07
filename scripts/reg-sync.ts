@@ -138,6 +138,23 @@ export function docCallsign(content: string): string | null {
   return fm ? fmValue(fm, "callsign") : null;
 }
 
+/** Group per-file callsigns; return any callsign claimed by more than one
+ *  file — the duplicate-callsign lint (ADR-025 clause 4). Frontmatter is
+ *  truth; a collision is unfiixable (a human renames), never silently
+ *  first-wins. Callsign-less docs carry no identity and don't collide. Pure. */
+export function findCallsignCollisions(records: { file: string; callsign?: string }[]): { callsign: string; files: string[] }[] {
+  const byCallsign = new Map<string, string[]>();
+  for (const r of records) {
+    if (!r.callsign) continue;
+    const arr = byCallsign.get(r.callsign);
+    if (arr) arr.push(r.file);
+    else byCallsign.set(r.callsign, [r.file]);
+  }
+  return [...byCallsign.entries()]
+    .filter(([, files]) => files.length > 1)
+    .map(([callsign, files]) => ({ callsign, files: [...files].sort() }));
+}
+
 // ── Registry derivation (unchanged semantics) ──────────────────────────
 
 function readIndex(indexPath: string): Entry[] {
@@ -301,13 +318,24 @@ function deriveEntry(dir: string, file: string, def: RegistryDef, registry: stri
   return entry;
 }
 
-function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { missing: number; stale: number; csDrift: number; indexDoc: number } {
+function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { missing: number; stale: number; csDrift: number; indexDoc: number; collisions: number } {
   const def = REGISTRIES[name]!;
   const dir = join(ROOT, def.dir);
   const indexPath = join(dir, def.index);
   const entries = readIndex(indexPath);
   const docs = listDocs(dir, def.exclude);
   const indexed = new Set(entries.map((e) => e.file));
+
+  // Collision lint (ADR-025 clause 4): a callsign resolves to exactly one
+  // doc within a registry. Frontmatter is truth — group by callsign; any
+  // group with >1 file is a collision, loudly unfiixable (a human renames,
+  // sync never silently first-wins). Callsign-less docs don't collide.
+  const collisions = findCallsignCollisions(
+    docs.map((f) => ({ file: f, callsign: docCallsign(readFileSync(join(dir, f), "utf8")) })),
+  );
+  for (const c of collisions) {
+    console.log(`  ${name}: COLLISION ${c.callsign} ← ${c.files.join(", ")}`);
+  }
 
   const missing = docs.filter((f) => !indexed.has(f));
   const stale = entries.filter((e) => !docs.includes(e.file));
@@ -352,7 +380,7 @@ function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { miss
   }
 
   const indexDoc = syncIndexDoc(name, def, kept, fix);
-  return { missing: missing.length, stale: stale.length, csDrift, indexDoc };
+  return { missing: missing.length, stale: stale.length, csDrift, indexDoc, collisions: collisions.length };
 }
 
 // ── Tier index.md export (ADR-019: generated, never hand-edited) ───────
@@ -414,14 +442,23 @@ if (import.meta.main) {
   console.log(`reg-sync ${fix ? "(fix mode)" : "(check mode)"} — ${names.join(", ")}`);
   const { perRegistry, fmDrift } = migrateCorpus(fix);
   let drift = fmDrift;
+  let collisions = 0;
   for (const n of names) {
-    const { missing, stale, csDrift, indexDoc } = syncOne(n, fix, perRegistry.get(n) ?? new Map());
+    const { missing, stale, csDrift, indexDoc, collisions: c } = syncOne(n, fix, perRegistry.get(n) ?? new Map());
     drift += missing + stale + csDrift + indexDoc;
+    collisions += c;
+  }
+  if (collisions > 0) {
+    console.log(`${collisions} callsign collision(s) — unfiixable; rename a document's callsign (ADR-025 clause 4)`);
   }
   if (drift > 0) {
     console.log(`${drift} drift item(s) ${fix ? "repaired" : "found"} — run reg-list to review`);
     if (!fix) process.exitCode = 1;
-  } else {
+  }
+  if (collisions > 0) {
+    process.exitCode = 1; // unfiixable in both modes — the loud gate
+  }
+  if (drift === 0 && collisions === 0) {
     console.log("All registries in sync");
   }
 }

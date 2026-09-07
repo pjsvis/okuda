@@ -165,6 +165,25 @@ describe("root — callsigns (resolution, not derivation)", () => {
       expect(r("nowhere/x.md")).toBeNull();
     } finally { cleanup(); }
   });
+
+  test("resolveByCallsign: a collision is ambiguous → null (ADR-025 clause 4 — retire silent first-wins)", () => {
+    const dir = mkdtempSync(join(tmpdir(), "callsign-collision-"));
+    mkdirSync(join(dir, "briefs"));
+    writeFileSync(
+      join(dir, "briefs", "INDEX.jsonl"),
+      [
+        JSON.stringify({ file: "a.md", date: "2026-09-07", status: "open", summary: "A", callsign: "BRF-DUP" }),
+        JSON.stringify({ file: "b.md", date: "2026-09-07", status: "open", summary: "B", callsign: "BRF-DUP" }),
+      ].join("\n") + "\n",
+    );
+    try {
+      // two records, one callsign — the retired .find() would silently
+      // return a.md; the exactly-one resolver returns null (ambiguous).
+      expect(resolveByCallsign("BRF-DUP", dir)).toBeNull();
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
 });
 describe("cli — versionLine (single source of truth, v0.1.0 trifecta)", () => {
   test("reported version is the manifest's version, not a twin string", () => {

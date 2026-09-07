@@ -155,8 +155,14 @@ function tierFileKey(p: string): string {
  *  decides what an unknown code means. Pure-ish (reads fs). */
 export function resolveByCallsign(callsign: string, cwd: string = process.cwd()): string | null {
   const callsigns = loadCallsigns(cwd);
-  const exact = callsigns.find((r) => r.callsign === callsign);
-  if (exact) return exact.path;
+  // Exactly-one resolution (ADR-025 clause 4): a callsign resolves to one
+  // path or none — never the silent first-wins of .find(). A collision
+  // (two records sharing a callsign) is ambiguous → null; the reg-sync
+  // lint is the loud gate, the resolver is honest. The ordinal shorthand
+  // below already follows the same exactly-one-or-null rule.
+  const exact = callsigns.filter((r) => r.callsign === callsign);
+  if (exact.length === 1) return exact[0]!.path;
+  if (exact.length > 1) return null; // collision — ambiguous, not first-wins
   // Ordinal shorthand (ADR-031 dogfood, 2026-09-04): prose says "ADR-030"
   // — tier + ordinal — the way humans abbreviate. Resolve within the
   // tier when EXACTLY ONE registered callsign carries the prefix and

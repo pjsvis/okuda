@@ -4,6 +4,7 @@ import {
   bootstrapCallsign,
   docCallsign,
   ensureFrontmatter,
+  findCallsignCollisions,
   fmValue,
   renderIndexDoc,
   splitFrontmatter,
@@ -115,5 +116,37 @@ describe("renderIndexDoc", () => {
     expect(rows[0]).toContain("|  | done | Newer \\| with pipe | b.md |");
     expect(rows[1]).toContain("| BRF-OLD | open | Older | a.md |");
     expect(renderIndexDoc("briefs", entries)).toBe(doc); // deterministic
+  });
+});
+
+describe("findCallsignCollisions (ADR-025 clause 4 — the duplicate-callsign lint)", () => {
+  test("clean registry → no collisions (callsign-less docs carry no identity)", () => {
+    expect(
+      findCallsignCollisions([
+        { file: "a.md", callsign: "BRF-A" },
+        { file: "b.md", callsign: "BRF-B" },
+        { file: "c.md" }, // callsign-less — no identity, no collision
+      ]),
+    ).toEqual([]);
+  });
+
+  test("two docs sharing a callsign → one collision, files sorted", () => {
+    expect(
+      findCallsignCollisions([
+        { file: "z.md", callsign: "BRF-DUP" },
+        { file: "a.md", callsign: "BRF-DUP" },
+        { file: "b.md", callsign: "BRF-OTHER" },
+      ]),
+    ).toEqual([{ callsign: "BRF-DUP", files: ["a.md", "z.md"] }]);
+  });
+
+  test("three on one callsign → one collision group, sorted", () => {
+    expect(
+      findCallsignCollisions([
+        { file: "x.md", callsign: "BRF-S" },
+        { file: "y.md", callsign: "BRF-S" },
+        { file: "z.md", callsign: "BRF-S" },
+      ]),
+    ).toEqual([{ callsign: "BRF-S", files: ["x.md", "y.md", "z.md"] }]);
   });
 });
