@@ -12,6 +12,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-05 | BRF-STREAM-IDENTITY-HEADER | open | Stream identity header — name the document for the unknown destination | 2026-09-05-brief-stream-identity-header.md |
 | 2026-09-04 | BRF-PORCH-MATRIX | open | The porch matrix — click a URL, land in a terminal, read the silo | 2026-09-04-brief-porch-matrix.md |
 | 2026-09-04 | BRF-WORKING-COPY | open | The working copy — vector render mode, 99 clone, honest actuator | 2026-09-04-brief-working-copy.md |
+| 2026-09-02 | BRF-SCROLL-REPAINT | open | One line per scroll — scroll-region repaint for the TUI | 2026-09-02-brief-scroll-region-repaint.md |
 | 2026-09-02 | BRF-SYNC-OUTPUT | open | Synchronized output — deliver each paint as one frame | 2026-09-02-brief-synchronized-output.md |
 | 2026-09-01 | BRF-FLOW-WRAP | open | Flow wrap — internal break opportunities so paths flow as text | 2026-09-01-brief-flow-wrap.md |
 | 2026-09-01 | BRF-MERMAID-SOURCE-OMITTED | open | Omit the mermaid source from the render | 2026-09-01-brief-mermaid-source-omitted.md |
