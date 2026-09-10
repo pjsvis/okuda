@@ -92,9 +92,9 @@ tts file:
 tts-rate file rate:
     @./okuda {{file}} --no-color | tee /dev/tty | say -r {{rate}}
 
-# TTS dogfood
+# Moira prosody probe
 [group('quality gate')]
-tts-probe:
+moira:
     say -v Moira -f docs/2026-09-10-moira-prosody-probe.md
 
 # Freshness check
