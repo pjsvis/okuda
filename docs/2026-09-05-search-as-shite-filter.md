@@ -125,5 +125,6 @@ The search is a shite filter; the default is nothing; the exit is Ctrl-C; the do
 ## Related
 
 - `docs/2026-09-04-filter-model.md` — the shelf and the dive, in the straight register. This note is the frame to read it in.
+- `docs/2026-09-10-benchmaxxing-considered-harmful.md` — external testimony: Simon's satisficing is this posture at the human scale; the maximizer is the benchmaxxer. Review beside it (`docs/2026-09-10-benchmaxxing-considered-harmful-review.md`).
 - `docs/2026-09-05-i811-dual-layer-output.md` — the i811 refusal; the same posture applied to accessibility.
 - `advisories/AI-HR-MANUAL.md` — the door is held open; walking away is as easy as walking in.
