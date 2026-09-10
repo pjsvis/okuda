@@ -254,6 +254,20 @@ hatch's (4b): reach for the operator when the dogfood shows the need,
 not from habit. The three-word phrase that returns zero is the dogfood;
 the pipe is the operator.
 
+**The extension token — kind-recall (dogfood 2026-09-10).** A
+filename-fragment term narrows by *evidence shape*, not topic:
+`delusion` returns three (two documents discussing it, one named it);
+`delusion .md` returns one, because `.md` appears in an evidence row
+only where the evidence is path-shaped — a filename, a citation, a
+mention. The term selects documents *named* X against documents
+*discussing* X: the use/mention distinction
+(`docs/2026-09-10-use-vs-mention.md`) surfaced in the query grammar,
+where nobody put it. The operator taxonomy stands: spaces =
+phrase-recall; pipe = theme-recall; `!` = negation; extension token =
+kind-recall — name-shape vs theme-shape. Found by typing an extension
+into the search for no reason; the composition produced a feature
+nobody specified.
+
 ## The house vocabulary
 
 The terms for "looking something up", gathered from a thousand years of
