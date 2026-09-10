@@ -25,7 +25,7 @@ Standard software tries to "gracefully degrade" around bad input, turning sludge
 
 ```mermaid
 flowchart LR
-  title: The TFS Inversion — Overhead to Sovereign Ground
+  title: "The TFS Inversion — Overhead to Sovereign Ground"
   subgraph TRAD["TRADITIONAL IT STACK · Pure Overhead"]
     direction TB
     T1["Themes, Fonts, Animations"]
