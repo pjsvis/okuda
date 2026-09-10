@@ -53,6 +53,7 @@ The clip was Stuff — content without structure, invisible to its own filter's 
 ## Related
 
 - `docs/2026-09-10-benchmaxxing-considered-harmful.md` — the clip under review, now framed.
+- `docs/2026-09-10-use-vs-mention.md` — follow-on: why the clip's citation rubricates by callsign but not by path; the promotion rule.
 - `docs/2026-09-05-search-as-shite-filter.md` — the search-level instance; cross-linked from here.
 - `docs/2026-09-04-filter-model.md` — the shelf and the dive; the rank-is-admission-order rule; the sqlite refusal.
 - `docs/2026-09-05-frame-as-shite-filter.md` — the document-level instance.
