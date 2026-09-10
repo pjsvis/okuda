@@ -65,6 +65,24 @@ A path mentioned but not rubricated (`docs/2026-09-10-use-vs-mention.md`) is not
 
 Best of both worlds, and the price is the point. A link click costs nothing, which is why the web drowns in them; spawn-and-type costs just enough to make the reader decide. The friction is the filter, at the affordance scale — and the mention stays inert in-instance, live inter-instance: the address sleeps until a new context is opened for it.
 
+## Addendum: the excursion contract
+
+Go off mid-document, and the instance waits: no updates, no lazy-loads, nothing shifts the furniture while you are not looking. The static stream sits until told to do something else. On return, the place is not *restored* — it was never surrendered. The web's back button prays the stack remembered; this one never let go, so there is nothing to pray for.
+
+The mechanism beneath the stillness: the stream has no autonomous dynamics. The render is a pure function of file and glass, and the only actors are the reader's keystrokes and the file itself. No reflow-on-injection, no sticky headers, no scroll-jacking, no resize-observer rearranging the room. Even the one legitimate actor — the file, the message bus — has a suspender: `03` frozen is the shipped verb for *not even the file's gravity while I read* (`src/tui.ts` — watch re-renders suppressed, `r` stays manual).
+
+The pause, extended: from between keystrokes to between visits. Time belongs to the reader, including the time spent elsewhere — and the anchor, already named the time-independent affordance, is what the excursion was for.
+
+## Addendum: the canvas serves the document
+
+On the web the viewport is sovereign and the document must fit it — and when it does not, the document is abridged into the chrome's shapes: scrollbars, accordions, "read more", truncated cards. The document becomes second-class in its own rendering, edited by the UI's convenience without the author's consent.
+
+Here the sovereignty is inverted: the paint is a projection of the map (`docs/2026-09-04-filter-model.md`, lesson 4) — the UI derives from the document, never the reverse. The glass is honest about being a glass: the frame cuts and defers, and the edges say *there is more below* (`docs/2026-09-05-frame-as-shite-filter.md`) — not the scrollbar's promise of infinite slide, but an honest bound with a priced door.
+
+The reveal — a bigger canvas without falling off the table — is what the anchor-as-mast buys: zoom out or resize, the canvas grows while the eye stays pinned. Wrap re-derives, the frame re-derives, the mast holds. The document is never abridged to fit; it is framed, and the frame's growth costs a declared intent.
+
+The pair, compressed: time — the stream waits, no gravity-mice, `03` for even the file; space — the glass serves, no abridgement, the anchor for the reveal. The reader owns both clocks and both axes, and the document is first-class in each.
+
 ## The one line
 
 The grammar is the state machine; the keyboard is its anatomy; the left hand negates and the right hand commits; verbs are doubles and addresses are pairs; the buffers absorb the rush; and the pause between the clusters is the reader's own time, which the system spends none of and waits for entirely.
@@ -78,3 +96,5 @@ The grammar is the state machine; the keyboard is its anatomy; the left hand neg
 - `docs/2026-08-31-vector-resource-locators.md` — the radiotelephony lineage of the digit cadence.
 - `docs/2026-09-10-use-vs-mention.md` — why mentions don't rubricate; the promotion rule this note's spawn-and-type addendum completes on the reader's side.
 - `briefs/2026-09-05-brief-stream-identity-header.md` — the identity line the trusted negative glances at.
+- `docs/2026-09-05-frame-as-shite-filter.md` — cut and defer; the edges as the honest bound the canvas addendum reads.
+- `src/tui.ts` — frozen mode, shipped: the excursion contract's suspender for the file's gravity.
