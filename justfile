@@ -95,7 +95,7 @@ tts-rate file rate:
 # Moira prosody probe
 [group('quality gate')]
 moira:
-    say -v Moira -r 160 -f docs/2026-09-10-moira-prosody-probe.md
+    say -v Moira -r 140 -f docs/2026-09-10-moira-prosody-probe.md
 
 # Freshness check
 [group('quality gate')]
