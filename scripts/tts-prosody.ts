@@ -7,18 +7,9 @@
  * — `[[slnc N]]`, the gap where the speaker draws air). Two signals,
  * two jobs, no smearing.
  *
- * Content-weighted breath: the breath before a paragraph scales with
- * the paragraph's word count. A human speaker reads ahead and draws
- * a deeper breath before a longer stretch. The lungs scale with the
- * load. (NASA HR boundary condition: breathe deeper before longer.)
- *
- * Mandatory breath breaks: if a paragraph has no punctuation for more
- * than `max_words_without_breath` words, a mandatory breath is
- * inserted at the word boundary. Moira is not required to operate
- * outside the parameters defined by NASA HR and her Union. Below the
- * Saramago Barrier (`saramago_barrier: false`), the breaks are
- * required. Above it, the flow is the content and breaks would
- * destroy it — a declared exemption, not the default.
+ * Moira knows her job. The marks are the level register with
+ * occasional emphasis; the breaths are the silence between them.
+ * Variation keeps the listener listening.
  *
  * Usage:
  *   bun scripts/tts-prosody.ts <source.md> [output.txt]
@@ -28,6 +19,10 @@
 import { readFileSync, writeFileSync } from "fs";
 
 // ─── The table ───────────────────────────────────────────────
+// Each value is a silence duration in milliseconds. The punctuation
+// is the edge (it stays); the silence is the breath (it follows).
+// The table is the product (BRF-TTS-TEMPORAL) — tuned by ear, not
+// by assertion. A one-line edit changes any breath length.
 
 interface ProsodyTable {
   comma: number;
@@ -38,12 +33,6 @@ interface ProsodyTable {
   exclamation: number;
   para_break: number;
   header_end: number;
-  silcrow_after: number;
-  para_weight_rate: number;
-  para_weight_max: number;
-  max_words_without_breath: number;
-  mandatory_breath: number;
-  saramago_barrier: boolean;
 }
 
 function loadTable(path: string): ProsodyTable {
@@ -51,12 +40,10 @@ function loadTable(path: string): ProsodyTable {
 }
 
 // ─── Stage 1: flatten ─────────────────────────────────────────
-// Walk the markdown; strip visual markup; collect paragraphs with
-// word counts for the breath-weighting pass.
+// Walk the markdown; strip visual markup; collect paragraphs.
 
 interface Paragraph {
   text: string;
-  wordCount: number;
   isHeader: boolean;
 }
 
@@ -77,12 +64,7 @@ function flatten(text: string): Paragraph[] {
 
   const flush = () => {
     if (current.length > 0) {
-      const joined = current.join(" ");
-      paras.push({
-        text: joined,
-        wordCount: joined.split(/\s+/).filter(Boolean).length,
-        isHeader,
-      });
+      paras.push({ text: current.join(" "), isHeader });
       current = [];
       isHeader = false;
     }
@@ -138,9 +120,7 @@ function flatten(text: string): Paragraph[] {
 
 // ─── Stage 2: edge-then-breath ────────────────────────────────
 // The punctuation stays (the edge); silence follows (the breath).
-// Para breaks are content-weighted: deeper breath before a longer
-// paragraph. Mandatory breaks inserted within long unpunctuated
-// stretches (unless saramago_barrier is set).
+// Para breaks between paragraphs; header-end after headers.
 
 function applyProsody(paras: Paragraph[], table: ProsodyTable): string {
   const breath: Record<string, string> = {
@@ -152,66 +132,16 @@ function applyProsody(paras: Paragraph[], table: ProsodyTable): string {
     "!": `[[slnc ${table.exclamation}]]`,
   };
 
-  // Insert mandatory breath breaks within long unpunctuated
-  // stretches. Walks the text word by word; if no punctuation has
-  // been seen for max_words_without_breath words, inserts a
-  // mandatory breath at the next word boundary. Below the Saramago
-  // Barrier (saramago_barrier: false), the breaks are required.
-  function mandatoryBreaks(text: string): string {
-    if (table.saramago_barrier) return text;
-    const words = text.split(/(\s+)/);
-    let wordsSincePunct = 0;
-    const result: string[] = [];
-    for (const word of words) {
-      result.push(word);
-      if (/[,.?!;:]/.test(word)) {
-        wordsSincePunct = 0;
-      } else if (/^\s+$/.test(word)) {
-        // whitespace — don't count
-      } else if (word.length > 0) {
-        wordsSincePunct++;
-        if (wordsSincePunct >= table.max_words_without_breath) {
-          result.push(`[[slnc ${table.mandatory_breath}]]`);
-          wordsSincePunct = 0;
-        }
-      }
-    }
-    return result.join("");
-  }
-
-  // Content-weighted para break: base + (wordCount * rate), capped
-  // at base + max. A deeper breath before a longer paragraph.
-  const paraBreak = (wc: number): string => {
-    const weighted = Math.min(
-      table.para_break + wc * table.para_weight_rate,
-      table.para_break + table.para_weight_max,
-    );
-    return `[[slnc ${weighted}]]`;
-  };
-
   const parts: string[] = [];
 
   for (let i = 0; i < paras.length; i++) {
     const para = paras[i]!;
 
-    // Breath BEFORE this paragraph (content-weighted by its word
-    // count). The first paragraph gets a para-break too — the
-    // "clear your throat" before starting.
-    if (i > 0) {
-      parts.push("\n");
-      parts.push(paraBreak(para.wordCount));
-      parts.push("\n");
-    } else {
-      parts.push(paraBreak(para.wordCount));
-      parts.push("\n");
-    }
+    // Breath between paragraphs
+    if (i > 0) parts.push(`[[slnc ${table.para_break}]]\n`);
 
-    // The paragraph text: edge-then-breath per punctuation mark,
-    // plus mandatory breaks for long unpunctuated stretches.
+    // Edge-then-breath: punctuation stays, silence follows
     let text = para.text;
-    text = mandatoryBreaks(text);
-
-    // Character walk: punctuation stays, silence follows
     let result = "";
     for (const ch of text) {
       if (ch in breath) {
@@ -222,8 +152,6 @@ function applyProsody(paras: Paragraph[], table: ProsodyTable): string {
     }
 
     if (para.isHeader) {
-      // Header: the header text already has the edge; add the
-      // header-end breath after it.
       result += `[[slnc ${table.header_end}]]`;
     }
 
