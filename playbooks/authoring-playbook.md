@@ -238,10 +238,15 @@ Add here as they surface from dogfooding. Each entry: the pattern, why it earns 
     measurable — the reflow rule is the precedent.
   - **The boundary.** The gate is on the house register: documents written
     to be consulted. Clips are preserved as-clipped, and literature is
-    exempt — Saramago's walls are instruments, not failures, and
-    instruments are exempt (in *Blindness* the unpunctuated flow enacts
-    its subject; every harm-mode bounces). We FO walls we wrote; we do not
-    reformat the world.
+    exempt — we FO walls we wrote; we do not reformat the world.
+  - **The Saramago Barrier.** The exemption is a gate, not a loophole. A
+    slab is admissible only if its author clears the barrier: demonstrated
+    mastery where the wall is the instrument, not the failure (in
+    *Blindness* the unpunctuated flow enacts its subject; every harm-mode
+    bounces). The burden of proof sits with the proposer of the slabby
+    document — if you think you're up to José's level, try it on. Below
+    the barrier, a slab is decorated Stuff; above it, the slab is the
+    Thing.
   - **In reserve, not decided.** A hard para-length rule. The only
     threshold that would carry a perceptual justification is glass-bound:
     a paragraph taller than the glass breaks the glance-confirm, because
