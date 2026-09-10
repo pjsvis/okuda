@@ -47,6 +47,24 @@ This is Watt's governor in miniature: a flyball system absorbs overspeed mechani
 
 Every phase boundary costs a deliberate keystroke; a keystroke costs a hand-relocation; the relocation *is* the pause. The system cannot rush the reader: it must wait for a hand to move. That pause is where the shite filter actually lives — not in the query, not in the frame, but in the judgement between them. Continue, refine (left), commit (right), or Ctrl-C. The exit is always one keystroke and never discouraged.
 
+## Addendum: the trusted negative
+
+When the dive returns nothing, the reader does not retry — they look down. The footer's identity line (`silo · callsign · filename`, muted, ADR-020) answers the only question a trusted miss leaves open: *am I in the right room?* Usually not; walk to the correct silo.
+
+The miss is true because the instrument is honest: exact grammar, real files, three channels, re-derived per keystroke, bounded corpus. A reliable instrument localises faults — and the fault was never in the search, it was in the navigation. An unreliable engine produces diffuse doubt (retry-refine, keyword soup: maximizing born of distrust); a trusted one produces precise doubt, settled by one glance. Zero results is the filter succeeding (`docs/2026-09-05-search-as-shite-filter.md`): the miss routes the reader to the correct corpus. The stopping rule is Simon's again, one scale down — a few tries, then conclude, then act.
+
+## Addendum: mirror symmetry — the boundary, not its direction
+
+The lateral line is convention, not anatomy. A right-to-left setup by key remap works, because the load-bearing property was never *which hand dismisses*: it is that the two motor clusters are distinct and do not overlap. The grammar is abstract over the keymap (verbs `00`–`10`, addresses `11`–`98`, promotion `99`); swap the bindings and the buffers, the no-op probes, the pauses, and the phase-impossibility all survive.
+
+The invariant a mirror must not break: dismissal and commitment must never collapse onto the same key or the same motor act. Distinctness is the contract; direction is a projection — the same posture as the i811 refusal. The system does not hard-code a body.
+
+## Addendum: the mention is a dormant address
+
+A path mentioned but not rubricated (`docs/2026-09-10-use-vs-mention.md`) is not a dead end — it is a self-contained locator with no paint. If the interest is real, open another Gloam instance and type the distinctive characters of the filename: the dive finds it, the reading context is never spent, and both windows live — window A is document A, window B is document B (`docs/2026-09-04-nae-links-either.md`).
+
+Best of both worlds, and the price is the point. A link click costs nothing, which is why the web drowns in them; spawn-and-type costs just enough to make the reader decide. The friction is the filter, at the affordance scale — and the mention stays inert in-instance, live inter-instance: the address sleeps until a new context is opened for it.
+
 ## The one line
 
 The grammar is the state machine; the keyboard is its anatomy; the left hand negates and the right hand commits; verbs are doubles and addresses are pairs; the buffers absorb the rush; and the pause between the clusters is the reader's own time, which the system spends none of and waits for entirely.
@@ -58,3 +76,5 @@ The grammar is the state machine; the keyboard is its anatomy; the left hand neg
 - `docs/2026-09-04-nae-links-either.md` — the two-digit space as zero-ambiguity instant fire; the mouse refusal this note grounds more deeply.
 - `docs/2026-09-08-unnecesary-abstractions-considered-harmful.md` — the tacit knowledge the hands hold before the docs do.
 - `docs/2026-08-31-vector-resource-locators.md` — the radiotelephony lineage of the digit cadence.
+- `docs/2026-09-10-use-vs-mention.md` — why mentions don't rubricate; the promotion rule this note's spawn-and-type addendum completes on the reader's side.
+- `briefs/2026-09-05-brief-stream-identity-header.md` — the identity line the trusted negative glances at.
