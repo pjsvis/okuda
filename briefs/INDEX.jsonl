@@ -50,3 +50,4 @@
 {"file":"2026-09-07-brief-diagram-ingestion.md","date":"2026-09-07","status":"open","summary":"The diagram ingestion pipeline — mermaid-to-md as the show/elide/hide gate","meta":{},"callsign":"BRF-DIAGRAM-INGESTION"}
 {"file":"2026-09-07-brief-okudagram-step.md","date":"2026-09-07","status":"open","summary":"The okudagram step — no gaps in coverage","meta":{},"callsign":"BRF-OKUDAGRAM-STEP"}
 {"file":"2026-09-07-brief-onion-search-grammar.md","date":"2026-09-07","status":"open","summary":"The onion search grammar — staged filtering, path/content separation","meta":{},"callsign":"BRF-ONION-SEARCH-GRAMMAR"}
+{"file":"2026-09-09-brief-tts-temporal-punctuation.md","date":"2026-09-09","status":"open","summary":"Temporal punctuation — markdown prosody for say (the boundary-to-pause extractor)","meta":{},"callsign":"BRF-TTS-TEMPORAL"}

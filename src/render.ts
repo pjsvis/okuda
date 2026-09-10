@@ -612,6 +612,13 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         (_whole, pre: string, g: string) =>
           pre + styler.roleBold(STATE_GLYPH_ROLE[g]!, g),
       );
+      // The L§AB wordmark — the § rubricated (rose, the vector role),
+      // LA and B in context colour. A literal-string glyph ligature:
+      // the renderer kerns the wordmark, the source stays clean. The
+      // mystery logo — the colour appears at render time, by
+      // recognition, not by syntax. (L§AB — Leith Scriptorium & Bond.)
+      out = out.replace(/L§AB/g, (m) =>
+        "L" + styler.roleBold("vector", "§") + "AB");
       return out;
     },
 

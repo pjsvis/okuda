@@ -13,6 +13,9 @@ okuda
 # td task database (runtime state)
 .todos/
 
+# WorkBuddy session metadata (agent memory, per-project)
+.workbuddy-ai/
+
 # Island (ephemeral, regenerated — never registered)
 NOW.md
 STANCE.md
