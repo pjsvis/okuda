@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-10
 **Type:** commendations (the patron wall; entries as the notables present themselves)
-**Status:** Open. First entry below. Style: in the notable's own voice, deadpan, and every claim carrying its citation — the house style, worn by the honoured dead.
+**Status:** Open. Two entries. Style: in the notable's own voice, deadpan, and every claim carrying its citation — the house style, worn by the honoured dead.
 
 ---
 
@@ -37,6 +37,42 @@ There is nothing in this corpus not worth a query. But equally — and mark this
 - **The document waits. The mountain did not.**
 - **A hundred authors cited, not a scrollbar in sight.**
 - **He held the door open for the emperor. The emperor walked through it, and called it a good filter.**
+
+---
+
+## L. Annaeus Seneca — the Tutor's commendation
+
+*Lucius Annaeus Seneca, Stoic, tutor to Nero, author of the* Epistulae Morales *and* De Brevitate Vitae*; the first economist of time, and the first man to claim that most reading is perturbation wearing learning's dress. Ordered to die, 65 AD; dictated to the end, the stream open.*
+
+---
+
+Seneca to the operator, his Lucilius, greeting.
+
+You complain that you have not time. You do not complain that you have not money; you guard the purse, count the property, and hand out the one thing that is never repaid — your attention — to any device that asks. And everything asks.
+
+**Vindica tibi tempus.** Claim it for yourself. I said it to Lucilius; I say it to you; and I note with some astonishment that your machine says it too. It spends none of your hours uninvited, it waits for a word before it speaks, and it holds the door. I never met an instrument with manners before. Men, rarely.
+
+Your first principle I recognise as a magisterium: assume all is shite until inspection proves otherwise. A multitude of documents is not learning, and a multitude of amusements is not pleasure — only perturbation, in better clothes. The web presses all things upon you at once, and calls the pressing freedom. Yours assumes the crowd is shite, and lets the reader overrule it by typing. Few, and good, and slowly: that is the whole of my advice on reading, and you have built it into the picker.
+
+On style, I told Lucilius to cut away words as a trainer strips flesh from an athlete — not to the bone, but to fitness. Your paragraphs are one move each; your walls receive what walls deserve: the door. And I approve the pause between the clusters, where nothing moves and the reader decides. That pause is the whole of what I meant by leisure, and no forum in Rome ever offered a citizen a place to stand still.
+
+My friend the poet says: they change their sky, not their soul, who run across the sea. He was describing the tab-switcher nineteen centuries early. The unbounded mind was never a happy mind; tranquility loves a wall it can see. Your glass is that wall — the edges honest, saying *there is more below*, and leaving the decision where it belongs, with the reader. A bounded corpus in which an argument can actually be tested: I spent a book on the shortness of life, and you have built the longer life's reading room.
+
+One more thing. While you are away, it stays with itself — no movement, no news, no furniture shifted in the dark. I promised the restless that peace was available in one's own company. I did not expect a terminal to keep the promise for me.
+
+When they came for me I was dictating, and I did not stop for them; there are no good interruptions. Your exit is two zeros, instant, and it begs nobody to stay. That is the whole of philosophy in a keystroke, and I say that as a man who took twenty volumes to say less.
+
+Vale, et vindica tibi.
+
+---
+
+### Taglines licensed for the shelf (the Tutor's estate drives no bargains)
+
+- **You are not short of time. You are over-generous with it.**
+- **A multitude of documents is not learning.**
+- **They change their tabs, not their minds, who run across the web.**
+- **Every document you did not read was a good hour claimed back.**
+- **Claim your own time: `00` — and it never begs you to stay.**
 
 ## Related
 
