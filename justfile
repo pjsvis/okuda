@@ -105,27 +105,27 @@ moira-showcase:
 # Moira, brief (pick)
 [group('quality gate')]
 moira-brief:
-    bun scripts/tts-prosody.ts $$(gum file briefs/ --file) | say -v Moira -r 140
+    bun scripts/tts-prosody.ts $(gum file briefs/ --file) | say -v Moira -r 140
 
 # Moira, debrief (pick)
 [group('quality gate')]
 moira-debrief:
-    bun scripts/tts-prosody.ts $$(gum file debriefs/ --file) | say -v Moira -r 140
+    bun scripts/tts-prosody.ts $(gum file debriefs/ --file) | say -v Moira -r 140
 
 # Moira, decision (pick)
 [group('quality gate')]
 moira-decision:
-    bun scripts/tts-prosody.ts $$(gum file decisions/ --file) | say -v Moira -r 140
+    bun scripts/tts-prosody.ts $(gum file decisions/ --file) | say -v Moira -r 140
 
 # Moira, playbook (pick)
 [group('quality gate')]
 moira-playbook:
-    bun scripts/tts-prosody.ts $$(gum file playbooks/ --file) | say -v Moira -r 140
+    bun scripts/tts-prosody.ts $(gum file playbooks/ --file) | say -v Moira -r 140
 
 # Moira, pick
 [group('quality gate')]
 moira-pick:
-    bun scripts/tts-prosody.ts $$(gum file . --file) | say -v Moira -r 140
+    bun scripts/tts-prosody.ts $(gum file . --file) | say -v Moira -r 140
 
 # Freshness check
 [group('quality gate')]
