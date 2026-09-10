@@ -82,7 +82,7 @@ smoke-test:
 dogfood: smoke-test
     @./okuda --tui '&alpha.md'
 
-# Coupled-frame TTS dogfood
+# TTS dogfood (rendered)
 [group('quality gate')]
 tts file:
     @./okuda {{file}} --no-color | tee /dev/tty | say
@@ -91,6 +91,11 @@ tts file:
 [group('quality gate')]
 tts-rate file rate:
     @./okuda {{file}} --no-color | tee /dev/tty | say -r {{rate}}
+
+# TTS dogfood
+[group('quality gate')]
+tts-probe:
+    say -v Moira -f docs/2026-09-10-moira-prosody-probe.md
 
 # Freshness check
 [group('quality gate')]
