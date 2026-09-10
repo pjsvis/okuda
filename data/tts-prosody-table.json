@@ -1,0 +1,11 @@
+{
+  "comma": 4,
+  "semicolon": 5,
+  "colon": 5,
+  "question": 6,
+  "full_stop": 6,
+  "exclamation": 7,
+  "para_break": 8,
+  "header_end": 10,
+  "silcrow_after": 6
+}
