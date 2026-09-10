@@ -5,25 +5,30 @@
  * Reads a markdown source, a JSON lookup table, and emits the
  * comma-marked plain text that `say` reads with prosody.
  *
- * The pipeline (BRF-TTS-TEMPORAL): flatten → apply character-level
- * lookup → elide provenance. Four stages, one pass. Pure function:
- * same source + same table = same output. Restartable: clone the
- * repo, run the script, get the same result.
+ * The pipeline (BRF-TTS-TEMPORAL): flatten → apply edge-then-breath
+ * → elide provenance. Pure function: same source + same table =
+ * same output. Restartable: clone the repo, run the script, same
+ * result.
+ *
+ * Edge-then-breath: the punctuation stays (the edge — the prosodic
+ * boundary, the drop, the rise), and silence follows it (the breath
+ * — `[[slnc N]]`, the gap where the speaker draws air). Two signals,
+ * two jobs, no smearing. The comma hack conflated them; the stutter
+ * at 6 commas was the proxy breaking. The breath is not a comma —
+ * the breath is silence.
  *
  * Usage:
  *   bun scripts/tts-prosody.ts <source.md> [output.txt]
- *   bun scripts/tts-prosody.ts <source.md> | say -v Moira
- *
- * The table is data (data/tts-prosody-table.json) — tuned by ear,
- * not by assertion. A one-line edit changes any pause length.
+ *   bun scripts/tts-prosody.ts <source.md> | say -v Moira -r 140
  */
 
 import { readFileSync, writeFileSync } from "fs";
 
 // ─── The table ───────────────────────────────────────────────
-// Loaded from data/tts-prosody-table.json. Each value is a comma
-// count; the punctuation character is replaced by that many commas
-// at render time. The table is the product (BRF-TTS-TEMPORAL).
+// Each value is a silence duration in milliseconds. The punctuation
+// is the edge (it stays); the silence is the breath (it follows).
+// The table is the product (BRF-TTS-TEMPORAL) — tuned by ear, not
+// by assertion. A one-line edit changes any breath length.
 
 interface ProsodyTable {
   comma: number;
@@ -42,19 +47,13 @@ function loadTable(path: string): ProsodyTable {
   return JSON.parse(raw) as ProsodyTable;
 }
 
-// ─── Structural sentinels ─────────────────────────────────────
-// Non-comma markers emitted by the flattening pass, replaced with
-// their comma clusters AFTER the character walk — so the commas in
-// the clusters are not double-processed. (The bug that taught us
-// to sentinel, not to bake.)
+// ─── Stage 1: flatten ─────────────────────────────────────────
+// Walk the markdown; strip visual markup; emit structural markers.
+// The markers are sentinels (\x00..) that survive the character walk
+// and get replaced with silence in the breath stage.
 
 const PARA_BREAK = "\x00PARA\x00";
 const HEADER_END = "\x00HEAD\x00";
-
-// ─── Stage 1: flatten ─────────────────────────────────────────
-// Walk the markdown; strip visual markup; emit structural sentinels.
-// Code blocks skipped entirely; tables rendered as dot-separated rows;
-// headers stripped of # and marked; list items stripped of bullets.
 
 function stripMarkdown(text: string): string {
   const lines = text.split("\n");
@@ -74,7 +73,7 @@ function stripMarkdown(text: string): string {
     // Table rows
     if (stripped.startsWith("|") && stripped.endsWith("|")) {
       const cells = stripped.slice(1, -1).split("|").map((c) => c.trim());
-      if (cells.every((c) => /^[-:]+$/.test(c))) continue; // separator
+      if (cells.every((c) => /^[-:]+$/.test(c))) continue;
       out.push(cells.join(" . ") + ".");
       continue;
     }
@@ -120,41 +119,54 @@ function stripInline(text: string): string {
     .replace(/\[(.+?)\]\(.+?\)/g, "$1");
 }
 
-// ─── Stage 2: apply prosody ───────────────────────────────────
-// Walk the flattened text; replace each punctuation character with
-// its comma cluster from the table. Sentinels replaced after the
-// walk so their commas are not double-processed.
+// ─── Stage 2: edge-then-breath ────────────────────────────────
+// Walk the flattened text. Each punctuation mark stays (the edge);
+// silence follows it (the breath). Structural sentinels are
+// replaced with their silence values. The marks are the prosody;
+// the silence is the breath. Two signals, two jobs, no smearing.
 
 function applyProsody(flat: string, table: ProsodyTable): string {
-  const charTable: Record<string, string> = {
-    ",": ",".repeat(table.comma),
-    ";": ",".repeat(table.semicolon),
-    ":": ",".repeat(table.colon),
-    "?": ",".repeat(table.question),
-    ".": ",".repeat(table.full_stop),
-    "!": ",".repeat(table.exclamation),
+  // Punctuation → edge (kept) + breath (silence after)
+  const breath: Record<string, string> = {
+    ",": `[[slnc ${table.comma}]]`,
+    ";": `[[slnc ${table.semicolon}]]`,
+    ":": `[[slnc ${table.colon}]]`,
+    "?": `[[slnc ${table.question}]]`,
+    ".": `[[slnc ${table.full_stop}]]`,
+    "!": `[[slnc ${table.exclamation}]]`,
   };
 
-  // Character walk: punctuation → comma clusters
+  // Character walk: punctuation stays, silence follows
   let result = "";
   for (const ch of flat) {
-    result += ch in charTable ? charTable[ch] : ch;
+    if (ch in breath) {
+      result += ch + breath[ch];
+    } else {
+      result += ch;
+    }
   }
 
-  // Structural sentinels → their pre-baked pause strings
-  result = result.replaceAll(PARA_BREAK, ",".repeat(table.para_break));
-  result = result.replaceAll(HEADER_END, ",".repeat(table.header_end));
+  // Structural sentinels → silence (no edge — the newline before
+  // the sentinel is the edge; the sentinel is the breath)
+  result = result.replaceAll(
+    PARA_BREAK,
+    `[[slnc ${table.para_break}]]`,
+  );
+  result = result.replaceAll(
+    HEADER_END,
+    `[[slnc ${table.header_end}]]`,
+  );
 
   return result;
 }
 
 // ─── Stage 3: elide provenance ────────────────────────────────
-// The spoken shit filter — replace .md paths and provenance with a
-// bare audible "..." (not silent; lying by absence is not ok).
+// The spoken shit filter — replace .md paths with a bare audible
+// `[[slnc]]` (not silent; lying by absence is not ok).
 // TODO: implement when the dogfood surfaces provenance noise.
 
 function elideProvenance(text: string): string {
-  return text; // placeholder — no provenance in the test doc yet
+  return text;
 }
 
 // ─── Main ────────────────────────────────────────────────────

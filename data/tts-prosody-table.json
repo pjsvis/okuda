@@ -1,11 +1,11 @@
 {
-  "comma": 4,
-  "semicolon": 5,
-  "colon": 5,
-  "question": 6,
-  "full_stop": 6,
-  "exclamation": 7,
-  "para_break": 8,
-  "header_end": 10,
-  "silcrow_after": 6
+  "comma": 150,
+  "semicolon": 250,
+  "colon": 250,
+  "question": 300,
+  "full_stop": 400,
+  "exclamation": 350,
+  "para_break": 600,
+  "header_end": 800,
+  "silcrow_after": 400
 }
