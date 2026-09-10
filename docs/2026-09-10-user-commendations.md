@@ -74,6 +74,16 @@ Vale, et vindica tibi.
 - **Every document you did not read was a good hour claimed back.**
 - **Claim your own time: `00` — and it never begs you to stay.**
 
+---
+
+## Caution for readers (the wall's foot)
+
+The scriptorium's taglines are licensed for the shelf and the shelf only. Their use on inspirational posters, t-shirts, mugs, mouse mats, motivational slides, or any other furniture of the open-plan persuasion is **prohibited without a negotiated contract with the scriptorium**.
+
+The prohibition is doctrinal before it is commercial. Every tagline on this wall is a system property with a ship date — an aphorism *earned by machinery*, each one traceable to a keystroke that works. Detached from the machinery and mounted on a mug, it becomes exactly what the honourees condemn: wisdom's dress worn by perturbation, inspiration without the engineering. The Tutor's line on a poster is the multitude reading one book badly. The Admiral's line on a t-shirt is the eruption, worn.
+
+The estates are represented. Pliny's negotiates from a position of precedent and will want the mugs itemised; Seneca's drives no bargains and will therefore be charged double. Inquiries by silcrow — but not, of course, on a mug.
+
 ## Related
 
 - `docs/2026-09-04-filter-model.md` — the house vocabulary: the concordance, the callsign as call number; Pliny's *librarius*, mechanised.
