@@ -97,6 +97,36 @@ tts-rate file rate:
 moira:
     say -v Moira -r 140 -f docs/2026-09-10-moira-prosody-probe-rendered.txt
 
+# Moira showcase
+[group('quality gate')]
+moira-showcase:
+    bun scripts/tts-prosody.ts docs/2026-09-10-moira-showcase.md docs/2026-09-10-moira-showcase-rendered.txt && say -v Moira -r 140 -f docs/2026-09-10-moira-showcase-rendered.txt
+
+# Moira, brief
+[group('quality gate')]
+moira-brief file:
+    bun scripts/tts-prosody.ts {{file}} | say -v Moira -r 140
+
+# Moira, debrief
+[group('quality gate')]
+moira-debrief file:
+    bun scripts/tts-prosody.ts {{file}} | say -v Moira -r 140
+
+# Moira, decision
+[group('quality gate')]
+moira-decision file:
+    bun scripts/tts-prosody.ts {{file}} | say -v Moira -r 140
+
+# Moira, playbook
+[group('quality gate')]
+moira-playbook file:
+    bun scripts/tts-prosody.ts {{file}} | say -v Moira -r 140
+
+# Moira, any document
+[group('quality gate')]
+moira-doc file:
+    bun scripts/tts-prosody.ts {{file}} | say -v Moira -r 140
+
 # Freshness check
 [group('quality gate')]
 fresh:
