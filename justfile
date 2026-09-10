@@ -102,30 +102,30 @@ moira:
 moira-showcase:
     bun scripts/tts-prosody.ts docs/2026-09-10-moira-showcase.md docs/2026-09-10-moira-showcase-rendered.txt && say -v Moira -r 140 -f docs/2026-09-10-moira-showcase-rendered.txt
 
-# Moira, brief
+# Moira, brief (pick)
 [group('quality gate')]
-moira-brief file:
-    bun scripts/tts-prosody.ts {{file}} | say -v Moira -r 140
+moira-brief:
+    bun scripts/tts-prosody.ts $$(gum file briefs/ --file) | say -v Moira -r 140
 
-# Moira, debrief
+# Moira, debrief (pick)
 [group('quality gate')]
-moira-debrief file:
-    bun scripts/tts-prosody.ts {{file}} | say -v Moira -r 140
+moira-debrief:
+    bun scripts/tts-prosody.ts $$(gum file debriefs/ --file) | say -v Moira -r 140
 
-# Moira, decision
+# Moira, decision (pick)
 [group('quality gate')]
-moira-decision file:
-    bun scripts/tts-prosody.ts {{file}} | say -v Moira -r 140
+moira-decision:
+    bun scripts/tts-prosody.ts $$(gum file decisions/ --file) | say -v Moira -r 140
 
-# Moira, playbook
+# Moira, playbook (pick)
 [group('quality gate')]
-moira-playbook file:
-    bun scripts/tts-prosody.ts {{file}} | say -v Moira -r 140
+moira-playbook:
+    bun scripts/tts-prosody.ts $$(gum file playbooks/ --file) | say -v Moira -r 140
 
-# Moira, any document
+# Moira, pick
 [group('quality gate')]
-moira-doc file:
-    bun scripts/tts-prosody.ts {{file}} | say -v Moira -r 140
+moira-pick:
+    bun scripts/tts-prosody.ts $$(gum file . --file) | say -v Moira -r 140
 
 # Freshness check
 [group('quality gate')]
