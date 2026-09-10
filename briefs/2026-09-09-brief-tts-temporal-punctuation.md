@@ -80,6 +80,31 @@ audio artefacts in the visual.
          boundary note below.
        - Blank line — the baseline; the unit of pause, not a special
          case.
+       - Silcrow announcement (before and after) — pregnant pauses;
+         the listener needs time to perceive and actuate the vector.
+         See the Silcrow announcement note below.
+       - *Elided:* local file references (`.md` paths in prose).
+         These already mute to the far register in visual
+         (`src/render.ts:607` — "paths are provenance, not
+         content"). In TTS they elide to a bare `…` pause —
+         "docs slash twenty twenty dash" is noise; the listener
+         does not navigate by path. The `…` is a **spoken, audible
+         pause** — not a silent elision. The listener hears the gap
+         and knows something was elided, even if they don't know
+         what. That's the honest signal; silent elision would be
+         invisible omission, lying by absence — the audio equivalent
+         of truncating with no `…` marker, which the visual channel
+         explicitly rejected (`elideToWidth`'s contract: the glyph
+         is the invitation). Whether the elision refers to something
+         actuate-able (a real file) is resolved later, by the host —
+         not by reading the path aloud. See the Spoken shit filter
+         note below.
+       - *Elided:* other provenance artefacts the visual channel
+         already mutes or recedes — the fetch-state stamp, the
+         footer's folder/file text, status-bar noise. If the visual
+         channel demotes it to the far register, the TTS channel
+         elides it. The rule is consistent: far-register in visual
+         = elision in TTS.
        - *Excluded:* inline bold, inline code, links. These are
          emphasis, not structure; `say` does not honour them, and
          inserting pauses mid-sentence is the ventilator.
@@ -96,13 +121,41 @@ audio artefacts in the visual.
        - `code-fence: ",,,"`
        - `table-row: ",,"`
        - `mermaid-flow-node: ","` (same as list-item)
+       - `vector-before: ""` (no pause — the word "silcrow" is
+         the affordance; a pre-pause would be decorated Stuff)
+       - `vector-after: ",,,,,"` (pregnant pause — time to actuate)
        The table is the product. It is data, not code.
-3. [ ] **Build the pipeline.** Three stages, one pass:
+       **The digit-pronunciation sub-table.** A second lookup,
+       `Record<string, string>` mapping each digit to its spoken form.
+       The silcrow marker `%okuda-vector:NN%` expands to "silcrow"
+       + digit-by-digit pronunciation ("silcrow one three" for §13),
+       wrapped in the before/after pauses. What you hear is what you
+       press — no translation back from "thirteen" to `1` then `3`.
+       Starting values (aviation phonetic — clarity-optimised for the
+       audio channel; tuned by ear):
+       - `0: "zero"`
+       - `1: "one"`
+       - `2: "two"`
+       - `3: "tree"`  ("three" can blur; "tree" is distinct)
+       - `4: "fower"`
+       - `5: "fife"`  ("five" can blur into "nine"; "fife" won't)
+       - `6: "six"`
+       - `7: "seven"`
+       - `8: "eight"`
+       - `9: "niner"` ("nine" can blur into "five"; "niner" won't)
+       The table is data. If a different pronunciation tests better
+       on the host `say` voice, it's a one-line edit, not a recompile.
+3. [ ] **Build the pipeline.** Four stages, one pass:
        - Walk the markdown (Bun.markdown's parser, or a lightweight
          walk — the structure is already there).
        - At each boundary, emit the comma-sequence from the table.
        - Strip visual markup (`#`, `**`, backticks, ANSI, front
          matter) — flatten to plain text.
+       - Apply the elision filter (the spoken shit filter) — replace
+         far-register artefacts (`.md` paths, provenance, status
+         noise) with a bare `…` pause. A pure function; the input
+         is the structured-and-stripped text, the output is the
+         same text with noise elided.
        Output: a single string, piped to `say` or written to a file.
 4. [ ] **Dogfood against the tips-and-tricks doc.** Pipe the output to
        `say`; listen; adjust the table; listen again. The dogfood
@@ -130,9 +183,55 @@ audio artefacts in the visual.
 - [ ] The operator, listening blind, can distinguish the
       extractor-output `say` from a comma-less `say -f` reading
       within the first two headings.
+- [ ] Provenance artefacts (`.md` paths, fetch-state stamps, footer
+      noise) are elided to `…` — not spoken aloud. The spoken shit
+      filter is a pure function; its elisions are audible only as a
+      brief pause, not as noise.
 
 ## Notes
 
+- **Spoken shit filter — elide the provenance.** The visual channel
+  already demotes provenance to the far register: `.md` paths mute
+  (`src/render.ts:607`), the fetch-state stamp recedes, the footer's
+  folder/file text is muted. The TTS channel elides the same content
+  to a bare `…` pause — the spoken equivalent of the far register.
+  "Docs slash twenty twenty dash zero nine zero nine say tts tips
+  and tricks dot em dee" is noise the listener cannot act on; `…` is
+  the honest signal (something was here, it's not for you). The `…`
+  is **spoken** — an audible pause, not a silent elision. Silent
+  elision would be invisible omission (lying by absence); the spoken
+  `…` is the audio equivalent of the visible `…` marker in
+  `elideToWidth` — the marker is the invitation, the signal that
+  content was elided. Whether the elision refers to a real file is
+  resolved later, by the host — not by reading the path aloud. The
+  filter is a pure function in
+  the processing pipeline — input: structured text, output: same
+  text with provenance elided. Hardly rocket science.
+- **Silcrow announcement — prosody as affordance.** The silcrow
+  marker (`%okuda-vector:NN%`, injected by `annotateSource` in
+  `src/vectors.ts`) is the same marker in both channels. The visual
+  renderer paints it as `§NN` in rose bold; the TTS transform renders
+  it as spoken text — "silcrow one three" for §13 — followed by a
+  pregnant pause (the `vector-after` entry in the pause table). No
+  pre-pause: the word "silcrow" is the affordance — the audio
+  equivalent of the rose bold. Adding a before-pause on top would be
+  decorated Stuff (redundancy pretending to be thoroughness). The
+  **Digit-by-digit, not whole-number.** "Silcrow one three," not
+  "silcrow thirteen" — because the listener presses `1` then `3`,
+  not "thirteen." What you hear is what you press, digit for digit;
+  no cognitive translation back from the whole number to the token.
+  The digit-pronunciation sub-table (aviation phonetic: `niner`,
+  `tree`, `fife`) is clarity-optimised for the audio channel — "nine"
+  can blur into "five" on some engines; "niner" won't. "Silcrow,"
+  not "section symbol" — it's our word. The operator is in our
+  world; the vocabulary is the lexicon. Degrading to "section
+  symbol" to appease the engine would be the `--dunt` error — we
+  emit the right text; `say` speaks it. The announcement is
+  ephemeral (the glyph is persistent in visual); the pregnant pause
+  compensates, and the freeze path (`escape` → stop, `b` → back,
+  re-hear, actuate) is the fallback for any affordance missed. The
+  actuation is the existing two-digit grammar — press `13`, jump to
+  §13's target, both channels.
 - **Mermaid linear flowcharts — say the labels.** A linear TD
   flowchart (boxes in a vertical line, arrows top to bottom) is a
   list wearing a diagram's clothes. The labels are the content; the
