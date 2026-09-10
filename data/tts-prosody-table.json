@@ -7,5 +7,10 @@
   "exclamation": 350,
   "para_break": 600,
   "header_end": 800,
-  "silcrow_after": 400
+  "silcrow_after": 400,
+  "para_weight_rate": 5,
+  "para_weight_max": 400,
+  "max_words_without_breath": 35,
+  "mandatory_breath": 250,
+  "saramago_barrier": false
 }

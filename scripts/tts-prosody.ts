@@ -2,20 +2,23 @@
 /**
  * tts-prosody.ts — the TTS prosody render pipeline (prototype).
  *
- * Reads a markdown source, a JSON lookup table, and emits the
- * comma-marked plain text that `say` reads with prosody.
- *
- * The pipeline (BRF-TTS-TEMPORAL): flatten → apply edge-then-breath
- * → elide provenance. Pure function: same source + same table =
- * same output. Restartable: clone the repo, run the script, same
- * result.
- *
  * Edge-then-breath: the punctuation stays (the edge — the prosodic
  * boundary, the drop, the rise), and silence follows it (the breath
  * — `[[slnc N]]`, the gap where the speaker draws air). Two signals,
- * two jobs, no smearing. The comma hack conflated them; the stutter
- * at 6 commas was the proxy breaking. The breath is not a comma —
- * the breath is silence.
+ * two jobs, no smearing.
+ *
+ * Content-weighted breath: the breath before a paragraph scales with
+ * the paragraph's word count. A human speaker reads ahead and draws
+ * a deeper breath before a longer stretch. The lungs scale with the
+ * load. (NASA HR boundary condition: breathe deeper before longer.)
+ *
+ * Mandatory breath breaks: if a paragraph has no punctuation for more
+ * than `max_words_without_breath` words, a mandatory breath is
+ * inserted at the word boundary. Moira is not required to operate
+ * outside the parameters defined by NASA HR and her Union. Below the
+ * Saramago Barrier (`saramago_barrier: false`), the breaks are
+ * required. Above it, the flow is the content and breaks would
+ * destroy it — a declared exemption, not the default.
  *
  * Usage:
  *   bun scripts/tts-prosody.ts <source.md> [output.txt]
@@ -25,10 +28,6 @@
 import { readFileSync, writeFileSync } from "fs";
 
 // ─── The table ───────────────────────────────────────────────
-// Each value is a silence duration in milliseconds. The punctuation
-// is the edge (it stays); the silence is the breath (it follows).
-// The table is the product (BRF-TTS-TEMPORAL) — tuned by ear, not
-// by assertion. A one-line edit changes any breath length.
 
 interface ProsodyTable {
   comma: number;
@@ -40,75 +39,25 @@ interface ProsodyTable {
   para_break: number;
   header_end: number;
   silcrow_after: number;
+  para_weight_rate: number;
+  para_weight_max: number;
+  max_words_without_breath: number;
+  mandatory_breath: number;
+  saramago_barrier: boolean;
 }
 
 function loadTable(path: string): ProsodyTable {
-  const raw = readFileSync(path, "utf-8");
-  return JSON.parse(raw) as ProsodyTable;
+  return JSON.parse(readFileSync(path, "utf-8")) as ProsodyTable;
 }
 
 // ─── Stage 1: flatten ─────────────────────────────────────────
-// Walk the markdown; strip visual markup; emit structural markers.
-// The markers are sentinels (\x00..) that survive the character walk
-// and get replaced with silence in the breath stage.
+// Walk the markdown; strip visual markup; collect paragraphs with
+// word counts for the breath-weighting pass.
 
-const PARA_BREAK = "\x00PARA\x00";
-const HEADER_END = "\x00HEAD\x00";
-
-function stripMarkdown(text: string): string {
-  const lines = text.split("\n");
-  const out: string[] = [];
-  let prevBlank = false;
-  let inCode = false;
-
-  for (const line of lines) {
-    const stripped = line.trim();
-
-    if (stripped.startsWith("```")) {
-      inCode = !inCode;
-      continue;
-    }
-    if (inCode) continue;
-
-    // Table rows
-    if (stripped.startsWith("|") && stripped.endsWith("|")) {
-      const cells = stripped.slice(1, -1).split("|").map((c) => c.trim());
-      if (cells.every((c) => /^[-:]+$/.test(c))) continue;
-      out.push(cells.join(" . ") + ".");
-      continue;
-    }
-
-    if (!stripped) {
-      if (out.length > 0 && !prevBlank) out.push(PARA_BREAK);
-      prevBlank = true;
-      continue;
-    }
-    prevBlank = false;
-
-    // Headers
-    if (stripped.startsWith("#")) {
-      const level = stripped.match(/^#+/)![0].length;
-      out.push(stripped.slice(level).trim() + HEADER_END);
-      continue;
-    }
-
-    // List items
-    const bulletMatch = stripped.match(/^[\*\-+]\s+(.+)/);
-    if (bulletMatch) {
-      out.push(stripInline(bulletMatch[1]));
-      continue;
-    }
-    const numMatch = stripped.match(/^\d+\.\s+(.+)/);
-    if (numMatch) {
-      out.push(stripInline(numMatch[1]));
-      continue;
-    }
-
-    // Regular paragraph
-    out.push(stripInline(stripped));
-  }
-
-  return out.join("\n");
+interface Paragraph {
+  text: string;
+  wordCount: number;
+  isHeader: boolean;
 }
 
 function stripInline(text: string): string {
@@ -119,14 +68,81 @@ function stripInline(text: string): string {
     .replace(/\[(.+?)\]\(.+?\)/g, "$1");
 }
 
-// ─── Stage 2: edge-then-breath ────────────────────────────────
-// Walk the flattened text. Each punctuation mark stays (the edge);
-// silence follows it (the breath). Structural sentinels are
-// replaced with their silence values. The marks are the prosody;
-// the silence is the breath. Two signals, two jobs, no smearing.
+function flatten(text: string): Paragraph[] {
+  const lines = text.split("\n");
+  const paras: Paragraph[] = [];
+  let inCode = false;
+  let current: string[] = [];
+  let isHeader = false;
 
-function applyProsody(flat: string, table: ProsodyTable): string {
-  // Punctuation → edge (kept) + breath (silence after)
+  const flush = () => {
+    if (current.length > 0) {
+      const joined = current.join(" ");
+      paras.push({
+        text: joined,
+        wordCount: joined.split(/\s+/).filter(Boolean).length,
+        isHeader,
+      });
+      current = [];
+      isHeader = false;
+    }
+  };
+
+  for (const line of lines) {
+    const stripped = line.trim();
+
+    if (stripped.startsWith("```")) {
+      inCode = !inCode;
+      continue;
+    }
+    if (inCode) continue;
+
+    if (stripped.startsWith("|") && stripped.endsWith("|")) {
+      const cells = stripped.slice(1, -1).split("|").map((c) => c.trim());
+      if (cells.every((c) => /^[-:]+$/.test(c))) continue;
+      current.push(cells.join(" . ") + ".");
+      continue;
+    }
+
+    if (!stripped) {
+      flush();
+      continue;
+    }
+
+    if (stripped.startsWith("#")) {
+      flush();
+      const level = stripped.match(/^#+/)![0].length;
+      current.push(stripped.slice(level).trim());
+      isHeader = true;
+      flush();
+      continue;
+    }
+
+    const bulletMatch = stripped.match(/^[\*\-+]\s+(.+)/);
+    if (bulletMatch) {
+      current.push(stripInline(bulletMatch[1]));
+      continue;
+    }
+    const numMatch = stripped.match(/^\d+\.\s+(.+)/);
+    if (numMatch) {
+      current.push(stripInline(numMatch[1]));
+      continue;
+    }
+
+    current.push(stripInline(stripped));
+  }
+  flush();
+
+  return paras;
+}
+
+// ─── Stage 2: edge-then-breath ────────────────────────────────
+// The punctuation stays (the edge); silence follows (the breath).
+// Para breaks are content-weighted: deeper breath before a longer
+// paragraph. Mandatory breaks inserted within long unpunctuated
+// stretches (unless saramago_barrier is set).
+
+function applyProsody(paras: Paragraph[], table: ProsodyTable): string {
   const breath: Record<string, string> = {
     ",": `[[slnc ${table.comma}]]`,
     ";": `[[slnc ${table.semicolon}]]`,
@@ -136,34 +152,91 @@ function applyProsody(flat: string, table: ProsodyTable): string {
     "!": `[[slnc ${table.exclamation}]]`,
   };
 
-  // Character walk: punctuation stays, silence follows
-  let result = "";
-  for (const ch of flat) {
-    if (ch in breath) {
-      result += ch + breath[ch];
-    } else {
-      result += ch;
+  // Insert mandatory breath breaks within long unpunctuated
+  // stretches. Walks the text word by word; if no punctuation has
+  // been seen for max_words_without_breath words, inserts a
+  // mandatory breath at the next word boundary. Below the Saramago
+  // Barrier (saramago_barrier: false), the breaks are required.
+  function mandatoryBreaks(text: string): string {
+    if (table.saramago_barrier) return text;
+    const words = text.split(/(\s+)/);
+    let wordsSincePunct = 0;
+    const result: string[] = [];
+    for (const word of words) {
+      result.push(word);
+      if (/[,.?!;:]/.test(word)) {
+        wordsSincePunct = 0;
+      } else if (/^\s+$/.test(word)) {
+        // whitespace — don't count
+      } else if (word.length > 0) {
+        wordsSincePunct++;
+        if (wordsSincePunct >= table.max_words_without_breath) {
+          result.push(`[[slnc ${table.mandatory_breath}]]`);
+          wordsSincePunct = 0;
+        }
+      }
     }
+    return result.join("");
   }
 
-  // Structural sentinels → silence (no edge — the newline before
-  // the sentinel is the edge; the sentinel is the breath)
-  result = result.replaceAll(
-    PARA_BREAK,
-    `[[slnc ${table.para_break}]]`,
-  );
-  result = result.replaceAll(
-    HEADER_END,
-    `[[slnc ${table.header_end}]]`,
-  );
+  // Content-weighted para break: base + (wordCount * rate), capped
+  // at base + max. A deeper breath before a longer paragraph.
+  const paraBreak = (wc: number): string => {
+    const weighted = Math.min(
+      table.para_break + wc * table.para_weight_rate,
+      table.para_break + table.para_weight_max,
+    );
+    return `[[slnc ${weighted}]]`;
+  };
 
-  return result;
+  const parts: string[] = [];
+
+  for (let i = 0; i < paras.length; i++) {
+    const para = paras[i]!;
+
+    // Breath BEFORE this paragraph (content-weighted by its word
+    // count). The first paragraph gets a para-break too — the
+    // "clear your throat" before starting.
+    if (i > 0) {
+      parts.push("\n");
+      parts.push(paraBreak(para.wordCount));
+      parts.push("\n");
+    } else {
+      parts.push(paraBreak(para.wordCount));
+      parts.push("\n");
+    }
+
+    // The paragraph text: edge-then-breath per punctuation mark,
+    // plus mandatory breaks for long unpunctuated stretches.
+    let text = para.text;
+    text = mandatoryBreaks(text);
+
+    // Character walk: punctuation stays, silence follows
+    let result = "";
+    for (const ch of text) {
+      if (ch in breath) {
+        result += ch + breath[ch];
+      } else {
+        result += ch;
+      }
+    }
+
+    if (para.isHeader) {
+      // Header: the header text already has the edge; add the
+      // header-end breath after it.
+      result += `[[slnc ${table.header_end}]]`;
+    }
+
+    parts.push(result);
+    parts.push("\n");
+  }
+
+  return parts.join("");
 }
 
 // ─── Stage 3: elide provenance ────────────────────────────────
-// The spoken shit filter — replace .md paths with a bare audible
-// `[[slnc]]` (not silent; lying by absence is not ok).
-// TODO: implement when the dogfood surfaces provenance noise.
+// The spoken shit filter. TODO: implement when the dogfood surfaces
+// provenance noise (.md paths, fetch-state stamps, etc.).
 
 function elideProvenance(text: string): string {
   return text;
@@ -186,8 +259,8 @@ function main() {
   const source = readFileSync(sourcePath, "utf-8");
   const table = loadTable(tablePath);
 
-  const flat = stripMarkdown(source);
-  const prosodied = applyProsody(flat, table);
+  const paras = flatten(source);
+  const prosodied = applyProsody(paras, table);
   const clean = elideProvenance(prosodied);
 
   const outPath = process.argv[3];
