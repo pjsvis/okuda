@@ -217,7 +217,37 @@ Add here as they surface from dogfooding. Each entry: the pattern, why it earns 
 - **Hash headers only.** Unambiguous structure, LCARS-tab rendering. Calming.
 - **Front matter elided.** Provenance is not content. Calming.
 - **Vertical-pipe blockquote.** Pull-aside signal — worth remembering, not in the flow. Leading (sets the block apart).
-- **Short paragraphs — no walls of text.** Split at the argument's natural seams: one move of the argument per paragraph. Wrap-early prose reads as discrete blocks; a long paragraph reads as a wall, and a wall has no seams — no entry point for the eye, no inspection point for the scanning reader. The renderer hard-wraps at width, but short source paragraphs add an extra beat. Confirmed by dogfood: the 2026-09-10 readability pass on the use-vs-mention note split its walls and the doc gained the scan. Calming.
+- **Short paragraphs — no walls of text.** One move of the argument per
+  paragraph, split at the natural seams. The justification is procedural,
+  not cosmetic: **the FO verdict must be informed, and a wall makes an
+  informed verdict impossible.** A wall forces a blind exit; a blind exit
+  is a surrender, not a judgement. The paragraph is the unit of inspection,
+  and an uninspectable unit denies the verdict its evidence. The target is
+  *excessive* length in the house register: walls get FO'd on presentation,
+  which is legitimate — it's our silo, and the door is held open for
+  readers, not for walls. Confirmed by dogfood: the 2026-09-10 readability
+  pass on the use-vs-mention note split its walls and the doc gained the
+  scan. Calming + leading.
+  - **The split caveat.** Bunging in breaks can do more harm than good,
+    three ways: the *severed argument* (fragments read as separate claims;
+    the seam destroys the inferential chain), the *false topic sentence*
+    (a break says "a new move starts here" — arbitrary breaks manufacture
+    fake topic sentences, and the scanned document lies), and the *staccato
+    chop* (split to list-granularity and you've built a worse list instead
+    of a better paragraph). Where to split is editorial judgement, not a
+    measurable — the reflow rule is the precedent.
+  - **The boundary.** The gate is on the house register: documents written
+    to be consulted. Clips are preserved as-clipped, and literature is
+    exempt — Saramago's walls are instruments, not failures, and
+    instruments are exempt (in *Blindness* the unpunctuated flow enacts
+    its subject; every harm-mode bounces). We FO walls we wrote; we do not
+    reformat the world.
+  - **In reserve, not decided.** A hard para-length rule. The only
+    threshold that would carry a perceptual justification is glass-bound:
+    a paragraph taller than the glass breaks the glance-confirm, because
+    start and end cannot be seen together. Hold until the dogfood shows
+    it; a line-count threshold would be benchmaxxing prose (the measurable
+    proxy over the real property).
 - **Colons over em-dashes.** Prefer the colon; it is the house's native connective and it declares the relationship: *this, and here is what it means* — the reader predicts expansion before reading it. The em-dash is context-dependent punctuation (parenthetical? connective? a break?) and context-dependence is stress, by the hash-header rule's own logic. The boundary, learned the day the rule was written: the colon misreads in exactly two shapes — paired parentheticals (*the prose tier — design notes, clips — and…*) and before conjunctions (*history — but it converges*) — where the dash is doing connective work a colon cannot. There the dash survives. Found in the 2026-09-10 mechanical dash-to-colon sweep on the use-vs-mention note: four misreads, four dashes restored, the rest of the conversions kept. Calming.
 - **Mermaid diagrams must fit the medium.** The binary renders ASCII art into a character grid; a wide `flowchart LR` with long labels overflows and degrades to a "too wide" notice plus source. Prefer `flowchart TD`, short node labels, short edge labels — the diagram earns its place only as art, not as a fenced slab of source. (Found persisting the okuda-stack riff doc: the LR version degraded; the TD version rendered.)
 - **Reflow prose, never fences.** When reflowing soft returns in a doc (joining single `\n` to spaces so prose wraps to width), **skip fenced code blocks** — ``` ... ``` and mermaid fences are verbatim, load-bearing input. The renderer already treats fences as verbatim (`src/wrap.ts`, commit 24c50ff), but a *manual* doc-edit that reflows the whole file sweeps the fence into the reflow and collapses multi-line source onto one line. The signature failure: a mermaid `flowchart` with each edge on its own line becomes one space-joined line, `mermaid-to-md` can't parse it, and the ASCII diagram degrades to a boxed echo of the source. Found in `docs/showcase.md`: commit 24c50ff's "reflowed soft returns in showcase.md" collapsed the six-line mermaid fence; the diagram silently disappeared and was only noticed when someone ran `just showcase` weeks later. **The fence is not prose. Reflow stops at ``` .**
