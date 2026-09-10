@@ -112,19 +112,29 @@ audio artefacts in the visual.
          sequence, branching flowcharts). The topological order is
          not the reading order, and "say the labels in order" loses
          the branching. Deferred — see the Mermaid boundary note.
-2. [ ] **Define the boundary-to-pause mapping as a lookup table.**
-       `Record<BoundaryType, string>` where the string is the
-       comma-sequence. Starting values (to be tuned by ear):
-       - `heading-end: ",,,,"`
-       - `paragraph-break: ",,,"`
-       - `list-item: ","`
-       - `code-fence: ",,,"`
-       - `table-row: ",,"`
-       - `mermaid-flow-node: ","` (same as list-item)
-       - `vector-before: ""` (no pause — the word "silcrow" is
-         the affordance; a pre-pause would be decorated Stuff)
-       - `vector-after: ",,,,,"` (pregnant pause — time to actuate)
-       The table is the product. It is data, not code.
+2. [ ] **Define the punctuation-to-pause lookup table.**
+       `Record<string, string>` where the key is a single character
+       (or structural marker) and the value is the comma-sequence.
+       This is a **character-level lookup**, not a structural-boundary
+       parse: the flattened text is walked character by character;
+       each punctuation mark is replaced by its comma cluster; the
+       original character is consumed (not reversible - it's a render
+       artefact). The structural breaks (para, header) are markers
+       the flattening pass emits, looked up the same way. Starting
+       values (two confirmed by ear with Moira; four to tune):
+       - `,` to `,,,,`          (4 - confirmed, comma)
+       - `;` to `,,,,,`         (5 - semicolon, between comma and stop)
+       - `:` to `,,,,,`         (5 - colon, similar to semicolon)
+       - `.` to `,,,,,,`        (6 - confirmed, full stop)
+       - `para break` to `,,,,,,,,` (8 - longer than a full stop)
+       - `header end` to `,,,,,,,,,,` (10 - the longest pause)
+       The silcrow announcement (`silcrow one three`) carries its
+       own after-pause (`,,,,,`, 6 - the pregnant pause for actuation,
+       per ADR-034: no pre-pause, the word is the affordance).
+       The ladder escalates: comma < semicolon = colon < full stop
+       < para < header. Each step is a longer breath. The table is
+       the product. It is data, not code. A one-line edit changes
+       any pause length without a recompile.
        **The digit-pronunciation sub-table.** A second lookup,
        `Record<string, string>` mapping each digit to its spoken form.
        The silcrow marker `%okuda-vector:NN%` expands to "silcrow"
@@ -147,15 +157,20 @@ audio artefacts in the visual.
        on the host `say` voice, it's a one-line edit, not a recompile.
 3. [ ] **Build the pipeline.** Four stages, one pass:
        - Walk the markdown (Bun.markdown's parser, or a lightweight
-         walk — the structure is already there).
-       - At each boundary, emit the comma-sequence from the table.
-       - Strip visual markup (`#`, `**`, backticks, ANSI, front
-         matter) — flatten to plain text.
-       - Apply the elision filter (the spoken shit filter) — replace
+         walk - the structure is already there).
+       - Flatten to plain text: strip visual markup (`#`, `**`,
+         backticks, ANSI, front matter); emit structural markers
+         (para-break marker, header-end marker) where the markdown
+         structure was.
+       - Apply the character-level lookup: walk the flattened text;
+         each punctuation character or structural marker is replaced
+         by its comma cluster from the table. Pure function; not
+         reversible; render artefact.
+       - Apply the elision filter (the spoken shit filter) - replace
          far-register artefacts (`.md` paths, provenance, status
-         noise) with a bare `…` pause. A pure function; the input
-         is the structured-and-stripped text, the output is the
-         same text with noise elided.
+         noise) with a bare `...` pause. A pure function; the input
+         is the comma-marked text, the output is the same text
+         with noise elided.
        Output: a single string, piped to `say` or written to a file.
 4. [ ] **Dogfood against the tips-and-tricks doc.** Pipe the output to
        `say`; listen; adjust the table; listen again. The dogfood
@@ -257,6 +272,15 @@ audio artefacts in the visual.
   by the same Derrida Question that Foxtrot Oscar'd the legacy tags:
   should it be in the consideration set? Not yet — we haven't
   produced any, and the linear flow is the current vocabulary.
+- **Character-level lookup, not structural-boundary parse.** The
+  earlier draft specified a boundary vocabulary (heading-end,
+  paragraph-break, list-item, code-fence, table-row, mermaid-flow-
+  node). The simplification: the flattened text carries punctuation
+  characters (`,`, `;`, `:`, `.`) and structural markers (para,
+  header); the lookup is keyed by character, not by boundary type.
+  One pass, one table, one pure function. The structural boundaries
+  are still pauses - they're just looked up by their marker, not
+  parsed as a separate vocabulary. Less code, same prosody.
 - **The table is the product.** The pipeline is mechanics; the
   boundary-to-pause mapping is the design decision, and it is the
   thing that will be tuned by dogfood. Treat it as data.
