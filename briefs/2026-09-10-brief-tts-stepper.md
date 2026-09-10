@@ -85,9 +85,9 @@ to `say`.
    `tee /dev/tty | say` from the dogfood is the degenerate case;
    production is a route parameter on the egress.
 6. **The keygrammar.** Already defined (`src/keygrammar.ts`: two-digit
-   modes `01` frame / `02` slide / `03` freeze; arrows in
-   `src/tui.ts:95–98`). Same keys, both channels. No TTS-specific
-   grammar to invent.
+   modes `01` frame / `02` slide / `03` freeze / `04` size (sketched);
+   arrows in `src/tui.ts:95–98`). Same keys, both channels. No
+   TTS-specific grammar to invent.
 
 Six free. The ratio is the tell: the TTS channel is a *mode of the
 existing pipeline*, not a new machine.
@@ -173,6 +173,51 @@ inputs to the prosody, both already in the render's parameter set.
 equivalent of font size. Not navigation, not prosody structure, not a
 directional key. Sink-side, by the three-concerns test.
 
+## Mode 04 — the sizing control surface (sketched)
+
+The terminal dimensions control breath (width) and frame (height),
+but resizing the actual terminal requires seeing the glass — dragging
+a corner, eyes open. In TTS that's not available. The sizing control
+surface is the keyboard-accessible version of the resize gesture: the
+same dimensions, adjusted from the keys, eyes-closed.
+
+`04` is currently unbound (`04`–`08` are reserved-unassigned in
+`src/keygrammar.ts`; `verbFor(4)` returns `null`). The binding is
+one line — add `4: "size"` to `KEYBINDINGS`. The mode repurposes the
+arrows from navigation to dimension adjustment:
+
+| Key (in mode 04) | Dimension | Visual effect | TTS effect |
+|---|---|---|---|
+| up | height ↑ | more lines per viewport | more breaths per frame |
+| down | height ↓ | fewer lines per viewport | fewer breaths per frame |
+| right | width ↑ | wider wrap | more words per breath |
+| left | width ↓ | narrower wrap | fewer words per breath |
+
+Same arrows, same directions, both channels — up = more capacity,
+right = wider flow. The dimensions are channel-agnostic; the
+interpretation is channel-specific. Consistent with the directional
+grammar: the arrows are directional primitives, the axes are
+channel-specific projections.
+
+**Why `04` and not SIGWINCH only.** In visual, SIGWINCH already does
+this — resize the terminal, the render adapts. `04` is redundant-but-
+harmless in visual (a convenience: adjust effective width without
+resizing the glass). In TTS it is *essential* — the only way to
+adjust breath/frame without opening your eyes. The mode is the
+TTS-accessibility feature that happens to work in visual too.
+
+**Why a mode, not a modifier.** The two-digit grammar is mode-based
+(`01`/`02`/`03` are persistent modes). `04` follows the pattern: enter
+the mode, adjust with arrows, switch back to a nav mode. The mode
+switch is the commitment; the arrows do the work. No new grammar — a
+new entry in `KEYBINDINGS`, same dispatch.
+
+**Sketch status.** This section is sketched, not specced. The binding
+(`4: "size"`) is one line; the dimension-adjustment on the arrows is
+a mode-gated branch in the reducer. The exact increment (1 col? 4?
+sticky-vs-transient?) is a dogfood question. The shape is clear; the
+numbers are by ear.
+
 ## Escape is freeze, not skip
 
 Escape is the universal abort — it never doubles as "skip." In the
@@ -202,8 +247,16 @@ overloading.
    parameter to set breath density. The transform already takes the
    source; it takes the dimensions too — parameters the render already
    receives.
+5. **Mode `04` binding (size).** Add `4: "size"` to `KEYBINDINGS` in
+   `src/keygrammar.ts` (currently `04` is reserved-unassigned). Gate
+   a dimension-adjustment branch on the arrows in the reducer: in mode
+   04, up/down adjust height, left/right adjust width. The
+   adjustment triggers a rerender with the new dimensions — the
+   existing re-render pipeline, no new path. The exact increment and
+   stickiness are dogfood questions; the shape is sketched in the
+   Mode 04 section above.
 
-Four small additions. The rest is inherited.
+Five small additions. The rest is inherited.
 
 ## Scope
 
