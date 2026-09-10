@@ -24,8 +24,8 @@ Standard software tries to "gracefully degrade" around bad input, turning sludge
 * **Auditory Stream:** `"... I could continue ..."` followed by an icy 800ms of dead air, giving you time to hit the exit ramp before we lodge a copyright strike on behalf of the José Saramago estate.
 
 ```mermaid
-title: The TFS Inversion — Overhead to Sovereign Ground
 flowchart LR
+  title: The TFS Inversion — Overhead to Sovereign Ground
   subgraph TRAD["TRADITIONAL IT STACK · Pure Overhead"]
     direction TB
     T1["Themes, Fonts, Animations"]
