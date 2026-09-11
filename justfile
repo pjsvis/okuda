@@ -113,10 +113,11 @@ moira-showcase:
 moira-pick:
     #!/bin/bash
     set -euo pipefail
+    mkdir -p tmp
     f="$(gum file . --file)"
-    speak-md --dry "$f" > /tmp/moira-flat.txt
-    bun scripts/tts-prosody.ts /tmp/moira-flat.txt /tmp/moira-pick.txt
-    say -v Moira -r 140 -f /tmp/moira-pick.txt
+    speak-md --dry "$f" > tmp/moira-flat.txt
+    bun scripts/tts-prosody.ts tmp/moira-flat.txt tmp/moira-pick.txt
+    say -v Moira -r 140 -f tmp/moira-pick.txt
 
 # Freshness check
 [group('quality gate')]
