@@ -121,6 +121,14 @@ moira-pick:
     bun scripts/tts-prosody.ts tmp/moira-flat.txt tmp/moira-pick.txt
     say -v Moira -r 140 -f tmp/moira-pick.txt
 
+# Moira, ent probe — the -ent dogfood: corpus -ent words isolated,
+# control words included. Tune by ear; round two follows the report.
+[group('speech')]
+moira-ent:
+    @mkdir -p tmp
+    @speak-md --dry tmp/ent-probe.md > tmp/ent-flat.txt
+    @say -v Moira -r 140 -f tmp/ent-flat.txt
+
 # Freshness check
 [group('quality gate')]
 fresh:
