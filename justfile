@@ -22,14 +22,16 @@ island:
 # Jump demo
 [group('navigation')]
 jump-demo:
-    @bun scripts/jump-demo.ts > /tmp/okuda-jump-demo.md
-    @./okuda /tmp/okuda-jump-demo.md --tui
+    @mkdir -p tmp
+    @bun scripts/jump-demo.ts > tmp/okuda-jump-demo.md
+    @./okuda tmp/okuda-jump-demo.md --tui
 
 # Menu
 [group('navigation')]
 menu tier:
-    @bun scripts/reg-menu.ts {{tier}} > /tmp/okuda-menu-{{tier}}.md
-    @./okuda /tmp/okuda-menu-{{tier}}.md --tui
+    @mkdir -p tmp
+    @bun scripts/reg-menu.ts {{tier}} > tmp/okuda-menu-{{tier}}.md
+    @./okuda tmp/okuda-menu-{{tier}}.md --tui
 
 # Rationale
 [group('navigation')]
@@ -106,7 +108,7 @@ moira-showcase:
 
 # Moira, pick — the dogfood pipeline: flatten+respell (speak-md, the
 # environment silo) → prosody breath (tts-prosody) → say. The phoneme
-# fix, then the breath, then the voice. Intermediates land in /tmp —
+# fix, then the breath, then the voice. Intermediates land in tmp/ —
 # watch the input, listen to the output. More showcase docs join this
 # pattern as we dogfood.
 [group('speech')]
