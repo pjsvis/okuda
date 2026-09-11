@@ -94,18 +94,18 @@ tts file:
 tts-rate file rate:
     @./okuda {{file}} --no-color | tee /dev/tty | say -r {{rate}}
 
-# Moira prosody probe
-[group('speech')]
+# Prosody probe
+[group('moira')]
 moira:
     say -v Moira -r 140 -f docs/2026-09-10-moira-prosody-probe-rendered.txt
 
-# Moira showcase
-[group('speech')]
+# Performance
+[group('moira')]
 moira-showcase:
     bun scripts/tts-prosody.ts docs/2026-09-10-moira-showcase.md docs/2026-09-10-moira-showcase-rendered.txt && say -v Moira -r 140 -f docs/2026-09-10-moira-showcase-rendered.txt
 
-# Moira, pick
-[group('speech')]
+# Pick, then hear
+[group('moira')]
 moira-pick:
     #!/bin/bash
     set -euo pipefail
@@ -115,8 +115,8 @@ moira-pick:
     bun scripts/tts-prosody.ts tmp/moira-flat.txt tmp/moira-pick.txt
     say -v Moira -r 140 -f tmp/moira-pick.txt
 
-# Moira, ent probe
-[group('speech')]
+# Ent probe
+[group('moira')]
 moira-ent:
     @mkdir -p tmp
     @speak-md --dry tmp/ent-probe.md > tmp/ent-flat.txt
