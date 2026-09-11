@@ -129,6 +129,33 @@ moira-ride:
     @speak-md ride --dry > tmp/ride.txt
     @say -v Moira -r 140 -f tmp/ride.txt
 
+# The audition book
+[group('moira')]
+moira-auditions:
+    @speak-md ../speak-md/auditions.md
+
+# Literature stress test
+[group('moira')]
+moira-story:
+    @speak-md ../speak-md/narratives/the-new-accelerator.md
+
+# Repertoire audit
+[group('moira')]
+moira-recital:
+    @speak-md recite
+
+# Avionics test bed
+[group('moira')]
+moira-drill:
+    @speak-md drill
+
+# Latin audition
+[group('moira')]
+moira-latin:
+    @mkdir -p tmp
+    @speak-md probe --dry tmp/latin-probe.md > tmp/latin-flat.txt
+    @say -v Moira -r 140 -f tmp/latin-flat.txt
+
 # House terms
 [group('moira')]
 moira-house:
