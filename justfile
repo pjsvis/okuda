@@ -127,6 +127,12 @@ moira-ent:
 speech:
     @./okuda --tui '&speak.md'
 
+# Vocabulary census
+[group('speech')]
+census:
+    @mkdir -p tmp
+    @speak-md census > tmp/census.md
+
 # Freshness check
 [group('quality gate')]
 fresh:
