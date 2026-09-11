@@ -163,6 +163,19 @@ moira-register:
     say -v Moira -r 140 "Register D. Fifteen below."
     speak-md --style narrative --pitch -15 tmp/register-passage.md
 
+# The aunt probe
+[group('moira')]
+moira-aunt:
+    #!/bin/bash
+    set -euo pipefail
+    mkdir -p tmp
+    say -v Moira -r 140 "The aunt probe. Pitch down is casting, not attitude. Silcrow one one. The control. All Moira, no pitch anywhere."
+    speak-md --style narrative tmp/aunt-passage.md
+    say -v Moira -r 140 "Silcrow one two. The interleave. The reverend's lines at pitch base minus ten. Freddie's first answers carry no restore; his last one carries an explicit restore. Two speakers, or one in a mood. Does the base come back."
+    say -v Moira -r 140 -f tmp/aunt-interleave.txt
+    say -v Moira -r 140 "Silcrow one tree. The recital. The reverend's turns in sequence, all at minus ten. Does the auntie hold to the end, or slide into the husk."
+    say -v Moira -r 140 -f tmp/aunt-recital.txt
+
 # BRF probe
 [group('moira')]
 moira-brf:
