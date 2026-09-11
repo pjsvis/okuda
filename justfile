@@ -83,49 +83,40 @@ dogfood: smoke-test
     @./okuda --tui '&alpha.md'
 
 # TTS dogfood (rendered)
-[group('quality gate')]
+[group('speech')]
 tts file:
     @./okuda {{file}} --no-color | tee /dev/tty | say
 
 # TTS dogfood, rate
-[group('quality gate')]
+[group('speech')]
 tts-rate file rate:
     @./okuda {{file}} --no-color | tee /dev/tty | say -r {{rate}}
 
 # Moira prosody probe
-[group('quality gate')]
+[group('speech')]
 moira:
     say -v Moira -r 140 -f docs/2026-09-10-moira-prosody-probe-rendered.txt
 
-# Moira showcase
-[group('quality gate')]
+# Moira showcase — pure prosody performance: hand-crafted source, no
+# mangled tokens, so it skips the flattener on purpose. The control
+# that shows what breath + voice alone do.
+[group('speech')]
 moira-showcase:
     bun scripts/tts-prosody.ts docs/2026-09-10-moira-showcase.md docs/2026-09-10-moira-showcase-rendered.txt && say -v Moira -r 140 -f docs/2026-09-10-moira-showcase-rendered.txt
 
-# Moira, brief (pick)
-[group('quality gate')]
-moira-brief:
-    bun scripts/tts-prosody.ts $(gum file briefs/ --file) | say -v Moira -r 140
-
-# Moira, debrief (pick)
-[group('quality gate')]
-moira-debrief:
-    bun scripts/tts-prosody.ts $(gum file debriefs/ --file) | say -v Moira -r 140
-
-# Moira, decision (pick)
-[group('quality gate')]
-moira-decision:
-    bun scripts/tts-prosody.ts $(gum file decisions/ --file) | say -v Moira -r 140
-
-# Moira, playbook (pick)
-[group('quality gate')]
-moira-playbook:
-    bun scripts/tts-prosody.ts $(gum file playbooks/ --file) | say -v Moira -r 140
-
-# Moira, pick
-[group('quality gate')]
+# Moira, pick — the dogfood pipeline: flatten+respell (speak-md, the
+# environment silo) → prosody breath (tts-prosody) → say. The phoneme
+# fix, then the breath, then the voice. Intermediates land in /tmp —
+# watch the input, listen to the output. More showcase docs join this
+# pattern as we dogfood.
+[group('speech')]
 moira-pick:
-    bun scripts/tts-prosody.ts $(gum file . --file) | say -v Moira -r 140
+    #!/bin/bash
+    set -euo pipefail
+    f="$(gum file . --file)"
+    speak-md --dry "$f" > /tmp/moira-flat.txt
+    bun scripts/tts-prosody.ts /tmp/moira-flat.txt /tmp/moira-pick.txt
+    say -v Moira -r 140 -f /tmp/moira-pick.txt
 
 # Freshness check
 [group('quality gate')]
