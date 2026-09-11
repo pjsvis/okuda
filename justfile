@@ -99,18 +99,12 @@ tts-rate file rate:
 moira:
     say -v Moira -r 140 -f docs/2026-09-10-moira-prosody-probe-rendered.txt
 
-# Moira showcase — pure prosody performance: hand-crafted source, no
-# mangled tokens, so it skips the flattener on purpose. The control
-# that shows what breath + voice alone do.
+# Moira showcase
 [group('speech')]
 moira-showcase:
     bun scripts/tts-prosody.ts docs/2026-09-10-moira-showcase.md docs/2026-09-10-moira-showcase-rendered.txt && say -v Moira -r 140 -f docs/2026-09-10-moira-showcase-rendered.txt
 
-# Moira, pick — the dogfood pipeline: flatten+respell (speak-md, the
-# environment silo) → prosody breath (tts-prosody) → say. The phoneme
-# fix, then the breath, then the voice. Intermediates land in tmp/ —
-# watch the input, listen to the output. More showcase docs join this
-# pattern as we dogfood.
+# Moira, pick
 [group('speech')]
 moira-pick:
     #!/bin/bash
@@ -121,15 +115,14 @@ moira-pick:
     bun scripts/tts-prosody.ts tmp/moira-flat.txt tmp/moira-pick.txt
     say -v Moira -r 140 -f tmp/moira-pick.txt
 
-# Moira, ent probe — the -ent dogfood: corpus -ent words isolated,
-# control words included. Tune by ear; round two follows the report.
+# Moira, ent probe
 [group('speech')]
 moira-ent:
     @mkdir -p tmp
     @speak-md --dry tmp/ent-probe.md > tmp/ent-flat.txt
     @say -v Moira -r 140 -f tmp/ent-flat.txt
 
-# Speech vector — the speak-md silo, from the reader
+# Speech vector
 [group('speech')]
 speech:
     @./okuda --tui '&speak.md'
