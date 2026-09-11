@@ -42,3 +42,15 @@ century's guess becomes a paper.
 Noted 2026-09-11, session's end, en route to Voyager — another crew
 waylaid on a wine-dark sea, seven seasons of unresolved tension,
 trying to get home.
+
+## Entry two — the Soft Boys
+
+Robyn Hitchcock's band (Cambridge, 1976-1980; *A Can of Bees*,
+*Underwater Moonlight*) — the group that made the unresolved chord a
+career. Sequences that decline to cadence; hooks that suspend and
+leave; lyrics that are fixed carriers with open payloads — images
+that never explain themselves and never stop meaning. The wine-dark
+sea's seventh chord, four instruments strong, three minutes at a
+time. Noted 2026-09-11, days after the sea's entry: the register
+required an audio witness, and the right sort of thing turned out
+to have been playing in the better design space all along.
