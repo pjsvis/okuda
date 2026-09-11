@@ -85,12 +85,12 @@ dogfood: smoke-test
     @./okuda --tui '&alpha.md'
 
 # TTS dogfood (rendered)
-[group('speech')]
+[group('moira')]
 tts file:
     @./okuda {{file}} --no-color | tee /dev/tty | say
 
 # TTS dogfood, rate
-[group('speech')]
+[group('moira')]
 tts-rate file rate:
     @./okuda {{file}} --no-color | tee /dev/tty | say -r {{rate}}
 
@@ -122,13 +122,34 @@ moira-ent:
     @speak-md --dry tmp/ent-probe.md > tmp/ent-flat.txt
     @say -v Moira -r 140 -f tmp/ent-flat.txt
 
+# March ride
+[group('moira')]
+moira-ride:
+    @mkdir -p tmp
+    @speak-md ride --dry > tmp/ride.txt
+    @say -v Moira -r 140 -f tmp/ride.txt
+
+# House terms
+[group('moira')]
+moira-house:
+    @mkdir -p tmp
+    @speak-md --dry ../speak-md/house-terms.md > tmp/house-flat.txt
+    @say -v Moira -r 140 -f tmp/house-flat.txt
+
+# Commendation rehearsal
+[group('moira')]
+moira-commendation:
+    @mkdir -p tmp
+    @speak-md --dry docs/2026-09-10-user-commendations.md > tmp/commendation-flat.txt
+    @say -v Moira -r 140 -f tmp/commendation-flat.txt
+
 # Speech vector
-[group('speech')]
+[group('moira')]
 speech:
     @./okuda --tui '&speak.md'
 
-# Vocabulary census
-[group('speech')]
+# March map
+[group('moira')]
 census:
     @mkdir -p tmp
     @speak-md census > tmp/census.md
