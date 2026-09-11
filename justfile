@@ -136,8 +136,8 @@ moira-auditions:
 
 # Literature stress test
 [group('moira')]
-moira-story:
-    @speak-md ../speak-md/narratives/the-new-accelerator.md
+moira-story file:
+    @speak-md ../speak-md/narratives/{{file}}
 
 # Repertoire audit
 [group('moira')]
