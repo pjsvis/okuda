@@ -10,6 +10,8 @@ Built 2026-09-11, the day the probes multiplied past session memory.
 |---|---|---|---|
 | The he rush — round fower: the rate ladder | just moira-he | rung by rung: the lowest audible delta; a dead ladder means rate never actuates mid-utterance, and the actuator loses its airtime | "lowest audible: <rung>" / "ladder dead" |
 | The aunt — the casting test | just moira-aunt | the reverend at minus ten: two speakers or one in a mood; the base's return (Freddie's bare answers vs his explicit restore); the recital holds without the husk | "cast lands, resets" / "cast lands, sticks" / "no cast — mood only" |
+| The epilogue — the send-off | just moira-epilogue | the context marker, the cold phrase, the hope; and the rise — does the exit land flat at last (see docs/2026-09-11-field-notes-from-paper.md) | candidate number + "rise gone" / "rise stays" |
+| The names session — Moir, X and Y | just moira-house | the new house rows: Moir (mwah vs mwar vs more), the Cartesian pair's standing; the Latin row rides the same run | per-name verdicts |
 | The Latin | just moira-latin | the v-class: classical w (WAH-lay, win-dee-kah) vs schoolroom v; also whether the candidates' vowels survive | "classical" / "schoolroom" / specific rejections |
 | CSN — the deadpan | just moira-auditions | the rate-only Computer Says No; does the drawl land without the husk | "deadpan lands" / "fails" |
 

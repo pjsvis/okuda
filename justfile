@@ -176,6 +176,17 @@ moira-aunt:
     say -v Moira -r 140 "Silcrow one tree. The recital. The reverend's turns in sequence, all at minus ten. Does the auntie hold to the end, or slide into the husk."
     say -v Moira -r 140 -f tmp/aunt-recital.txt
 
+# Epilogue audition
+[group('moira')]
+moira-epilogue:
+    #!/bin/bash
+    set -euo pipefail
+    say -v Moira -r 140 "The epilogue audition. Candidate zero, the incumbent. Document complete. The exit is two zeros."
+    say -v Moira -r 140 "Candidate one, at an end. This document is at an end. There are others. The exit is two zeros."
+    say -v Moira -r 140 "Candidate two, concluded, the vernacular. This document is concluded. Others exist, and some of them might not be shite.[[slnc 500]] The exit is two zeros."
+    say -v Moira -r 140 "Candidate three, finished. This document is finished. Further documents are available. The exit is two zeros."
+    say -v Moira -r 140 "Candidate fower, zero zero. This document is at an end. There are others. The exit is zero zero."
+
 # BRF probe
 [group('moira')]
 moira-brf:
