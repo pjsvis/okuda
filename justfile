@@ -163,6 +163,13 @@ moira-register:
     say -v Moira -r 140 "Register D. Fifteen below."
     speak-md --style narrative --pitch -15 tmp/register-passage.md
 
+# Reverend probe
+[group('moira')]
+moira-rev:
+    @mkdir -p tmp
+    @speak-md probe --dry tmp/rev-probe.md > tmp/rev-flat.txt
+    @say -v Moira -r 140 -f tmp/rev-flat.txt
+
 # He probe
 [group('moira')]
 moira-he:
