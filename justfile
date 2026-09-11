@@ -156,12 +156,12 @@ moira-register:
     set -euo pipefail
     say -v Moira -r 140 "Register A. Plain Moira."
     speak-md --style narrative tmp/register-passage.md
-    say -v Moira -r 140 "Register B. Ten below."
+    say -v Moira -r 140 "Register B. Five below."
+    speak-md --style narrative --pitch -5 tmp/register-passage.md
+    say -v Moira -r 140 "Register C. Ten below."
     speak-md --style narrative --pitch -10 tmp/register-passage.md
-    say -v Moira -r 140 "Register C. Twenty below."
-    speak-md --style narrative --pitch -20 tmp/register-passage.md
-    say -v Moira -r 140 "Register D. Thirty below."
-    speak-md --style narrative --pitch -30 tmp/register-passage.md
+    say -v Moira -r 140 "Register D. Fifteen below."
+    speak-md --style narrative --pitch -15 tmp/register-passage.md
 
 # He probe
 [group('moira')]
