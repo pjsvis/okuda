@@ -149,6 +149,20 @@ moira-recital:
 moira-drill:
     @speak-md drill
 
+# Register bisection
+[group('moira')]
+moira-register:
+    #!/bin/bash
+    set -euo pipefail
+    say -v Moira -r 140 "Register A. Plain Moira."
+    speak-md --style narrative tmp/register-passage.md
+    say -v Moira -r 140 "Register B. Ten below."
+    speak-md --style narrative --pitch -10 tmp/register-passage.md
+    say -v Moira -r 140 "Register C. Twenty below."
+    speak-md --style narrative --pitch -20 tmp/register-passage.md
+    say -v Moira -r 140 "Register D. Thirty below."
+    speak-md --style narrative --pitch -30 tmp/register-passage.md
+
 # He probe
 [group('moira')]
 moira-he:
