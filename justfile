@@ -149,6 +149,13 @@ moira-recital:
 moira-drill:
     @speak-md drill
 
+# He probe
+[group('moira')]
+moira-he:
+    @mkdir -p tmp
+    @speak-md probe --dry tmp/he-probe.md > tmp/he-flat.txt
+    @say -v Moira -r 140 -f tmp/he-flat.txt
+
 # Latin audition
 [group('moira')]
 moira-latin:
