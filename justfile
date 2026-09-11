@@ -153,7 +153,7 @@ moira-drill:
 [group('moira')]
 moira-he:
     @mkdir -p tmp
-    @speak-md probe --dry tmp/he-probe.md > tmp/he-flat.txt
+    @speak-md probe --dry tmp/he-fix.md > tmp/he-flat.txt
     @say -v Moira -r 140 -f tmp/he-flat.txt
 
 # Latin audition
