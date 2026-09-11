@@ -102,18 +102,15 @@ moira:
 # Performance
 [group('moira')]
 moira-showcase:
-    bun scripts/tts-prosody.ts docs/2026-09-10-moira-showcase.md docs/2026-09-10-moira-showcase-rendered.txt && say -v Moira -r 140 -f docs/2026-09-10-moira-showcase-rendered.txt
+    @speak-md --dry docs/2026-09-10-moira-showcase.md > docs/2026-09-10-moira-showcase-rendered.txt && say -v Moira -r 140 -f docs/2026-09-10-moira-showcase-rendered.txt
 
 # Pick, then hear
 [group('moira')]
 moira-pick:
     #!/bin/bash
     set -euo pipefail
-    mkdir -p tmp
     f="$(gum file . --file)"
-    speak-md --dry "$f" > tmp/moira-flat.txt
-    bun scripts/tts-prosody.ts tmp/moira-flat.txt tmp/moira-pick.txt
-    say -v Moira -r 140 -f tmp/moira-pick.txt
+    [ -n "$f" ] && speak-md "$f"
 
 # Ent probe
 [group('moira')]
@@ -140,7 +137,7 @@ moira-story:
     #!/bin/bash
     set -euo pipefail
     f="$(gum file ../speak-md/narratives --file)"
-    [ -n "$f" ] && speak-md "$f"
+    [ -n "$f" ] && speak-md --style narrative "$f"
 
 # Repertoire audit
 [group('moira')]
