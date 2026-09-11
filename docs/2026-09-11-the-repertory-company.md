@@ -50,6 +50,18 @@ is discussion, and cheap to keep.
    ear's signature — muppet-exclusion, applied to tracts.
 3. Frequency is rent: airtime decides casting priority.
 
+## The control case — Uncle Colm, never to be booked
+
+Kevin McAleer's *Derry Girls* uncle: the monologue below the barrier,
+held by inescapability where Saramago holds by craft — that line
+between them *is* the barrier, made audible. Uniform density, the
+house taxonomy's drone, no pauses where meaning demands them. Not a
+voice talent for the long listen: the barrier's definition by
+negative, and the pipeline's null hypothesis — register-castable by
+omission (the flattener with every house instrument disabled, at a
+rate drag). One audition no one attends; the ear rules by leaving
+the room.
+
 ## What a production still lacks
 
 The players and the script are awaited; so is the machinery between
