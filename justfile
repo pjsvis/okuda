@@ -129,6 +129,11 @@ moira-ent:
     @speak-md --dry tmp/ent-probe.md > tmp/ent-flat.txt
     @say -v Moira -r 140 -f tmp/ent-flat.txt
 
+# Speech vector — the speak-md silo, from the reader
+[group('speech')]
+speech:
+    @./okuda --tui '&speak.md'
+
 # Freshness check
 [group('quality gate')]
 fresh:
