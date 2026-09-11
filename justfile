@@ -136,8 +136,11 @@ moira-auditions:
 
 # Literature stress test
 [group('moira')]
-moira-story file:
-    @speak-md ../speak-md/narratives/{{file}}
+moira-story:
+    #!/bin/bash
+    set -euo pipefail
+    f="$(gum file ../speak-md/narratives --file)"
+    [ -n "$f" ] && speak-md "$f"
 
 # Repertoire audit
 [group('moira')]
