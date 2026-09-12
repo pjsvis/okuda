@@ -45,6 +45,28 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
     expect(scanReferences("the SSH-2 protocol").map((r) => r.target)).toEqual(["SSH-2"]);
   });
 
+  test("the callsign scan is token-boundaried — no mid-word anchoring", () => {
+    // The phantom-§13 in Babylon-to-Stars: the matcher anchored one
+    // character inside YYYY-MM-DD and read YYY-MM-DD; ISO-Date truncated
+    // to ISO-D. A token has boundaries; a date template is not a call.
+    expect(scanReferences("dates like (YYYY-MM-DD-mnemonic-slug.md) and ISO-Date anchors.")).toEqual([]);
+    expect(scanReferences("ADR-031's clause and BRF-X, pinned.").map((r) => r.target)).toEqual(["ADR-031", "BRF-X"]);
+  });
+
+  test("discovery stops at fences — a badge that cannot paint is not a reference", () => {
+    // The phantom-§12 in Babylon-to-Stars: ISO-Date inside a mermaid
+    // fence took the floor; the mermaid pipe swallowed its badge. The
+    // fence is not prose.
+    const fenced = '```mermaid\nF3["Flat Silo (ISO-Date Anchored)"]\n```\n\nADR-031 in prose.';
+    expect(scanReferences(fenced).map((r) => r.target)).toEqual(["ADR-031"]);
+    const linked = '```text\nsee [x](docs/z.md)\n```\n\n[real](docs/y.md)';
+    expect(scanReferences(linked).map((r) => r.target)).toEqual(["docs/y.md"]);
+  });
+
+  test("an unterminated fence fences the rest — no half-open escape hatch", () => {
+    expect(scanReferences('```\nADR-031\n').map((r) => r.target)).toEqual([]);
+  });
+
   test("legacy okuda-rhs wiring is not honored — and is not a reference", () => {
     // The legacy row's path lives in an HTML comment as wiring; bare .md
     // paths in prose are provenance (the near/far register), not
@@ -63,18 +85,19 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
     const src = Array.from({ length: 120 }, (_, i) => `ADR-${1000 + i}`).join(" ");
     const refs = scanReferences(src);
     expect(refs.length).toBe(MAX_REFS);
-    // ADR-032: 5 repeated-digit actuators reserved → 83 addresses, not 88.
-    expect(MAX_REFS).toBe(VECTOR_MAX - VECTOR_MIN + 1 - 5);
+    // The canon (2026-09-12): 8 doubled pairs reserved → 80 addresses, not 88.
+    expect(MAX_REFS).toBe(VECTOR_MAX - VECTOR_MIN + 1 - 8);
   });
 });
 
 describe("vectors — the jump map (the translation table)", () => {
-  test("numbers run from 11, in reading order — one destination, one silcrow", () => {
+  test("numbers run from 12, in reading order — one destination, one silcrow", () => {
     const map = jumpMapFor("ADR-002 early, ADR-002 again, [x](docs/z.md).");
-    expect(map.get(11)).toBe("ADR-002");
-    expect(map.get(12)).toBe("docs/z.md");
-    expect(map.has(13)).toBe(false); // the repeat reuses §11
+    expect(map.get(12)).toBe("ADR-002");
+    expect(map.get(13)).toBe("docs/z.md");
+    expect(map.has(14)).toBe(false); // the repeat reuses §12
     expect(map.has(10)).toBe(false);
+    expect(map.has(11)).toBe(false);  // the double-tap pocket — never a silcrow
   });
 
   test("buildJumpMap caps at MAX_REFS", () => {
@@ -84,15 +107,15 @@ describe("vectors — the jump map (the translation table)", () => {
     expect(map.has(VECTOR_MAX + 1)).toBe(false);
   });
 
-  test("the allocator skips the reserved actuators (ADR-032)", () => {
-    // 84 distinct refs: fills 11-43, skips 44, fills 45-54, skips 55, …
+  test("the allocator skips the reserved actuators (the doubled-pair canon)", () => {
+    // 84 distinct refs: fills 12-21, skips 22, fills 23-32, skips 33, …
     const refs = Array.from({ length: 84 }, (_, i) => ({ pos: i, end: i + 1, target: `ADR-${i}` }));
     const map = buildJumpMap(refs);
-    expect(map.size).toBe(MAX_REFS); // 83 — one short of 84
-    for (const r of [44, 55, 66, 77, 88]) expect(map.has(r)).toBe(false);
-    expect(map.get(11)).toBe("ADR-0");
-    expect(map.get(43)).toBe("ADR-32"); // last before the 44 gap
-    expect(map.get(45)).toBe("ADR-33"); // first after the 44 gap
+    expect(map.size).toBe(MAX_REFS); // 80 — four short of 84
+    for (const r of [11, 22, 33, 44, 55, 66, 77, 88]) expect(map.has(r)).toBe(false);
+    expect(map.get(12)).toBe("ADR-0");
+    expect(map.get(21)).toBe("ADR-9");  // last before the 22 gap
+    expect(map.get(23)).toBe("ADR-10"); // first after the 22 gap
   });
 
   test("99 is not derivable — the clone verb is reserved", () => {
@@ -105,26 +128,26 @@ describe("vectors — annotation (illustrative paint markers)", () => {
   test("injects the marker after each reference occurrence, per the map", () => {
     const map = jumpMapFor("the live search is ADR-030, amended.");
     const out = annotateSource("the live search is ADR-030, amended.", map);
-    expect(out).toBe("the live search is ADR-030 %okuda-vector:11%, amended.");
+    expect(out).toBe("the live search is ADR-030 %okuda-vector:12%, amended.");
   });
 
   test("repeated references reuse the silcrow (the citation convention)", () => {
     const src = "ADR-030 once, ADR-030 twice.";
     const map = jumpMapFor(src);
     const out = annotateSource(src, map);
-    expect(out.match(/%okuda-vector:11%/g)!.length).toBe(2); // same number, both cites
+    expect(out.match(/%okuda-vector:12%/g)!.length).toBe(2); // same number, both cites
   });
 
   test("links: badge after the closing paren", () => {
     const map = jumpMapFor("see [the doc](docs/x.md) here.");
     const out = annotateSource("see [the doc](docs/x.md) here.", map);
-    expect(out).toBe("see [the doc](docs/x.md) %okuda-vector:11% here.");
+    expect(out).toBe("see [the doc](docs/x.md) %okuda-vector:12% here.");
   });
 
   test("targets with regex metacharacters are literal", () => {
     const map = jumpMapFor("see [x](docs/x(1).md) here.");
     const out = annotateSource("see [x](docs/x(1).md) here.", map);
-    expect(out).toContain("%okuda-vector:11%");
+    expect(out).toContain("%okuda-vector:12%");
   });
 
   test("no references → source unchanged", () => {

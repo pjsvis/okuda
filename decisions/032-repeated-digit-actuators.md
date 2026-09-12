@@ -5,8 +5,34 @@ callsign: ADR-REPEATED-DIGIT-ACTUATORS-032
 
 # Decision: Repeated-digit actuators — [44,55,66,77,88] reserved
 
-**Date:** 2026-09-06
+**Date:** 2026-09-06 · **amended 2026-09-12** ([11] joins the pocket)
 **Status:** Accepted
+
+## Amendment (2026-09-12): the doubled pairs are one actuator class
+
+Two passes, one day — recorded in the git history. The morning pass
+reserved [11] alone and left 22/33 addressable ("on demand, never
+speculatively" — this ADR's own discipline). The afternoon pass
+**completed the class**: all doubled pairs {00, 11, 22, 33, 44, 55, 66,
+77, 88, 99} are one actuator type, and no doubled pair is ever a jump
+vector. The rationale is accessibility, and it outranks the on-demand
+discipline: a doubled pair is the lowest-effort input on the number
+row (same key twice), and "doubled = the system talks, mixed = the
+document moves" with zero exceptions is one rule the fingers and the
+memory never have to qualify. The 2026-09-08 accessibility audit
+anticipated the canon: "doubled pairs cannot jump documents."
+
+The keyboard space is now partitioned by actuator type, named by token
+shape (the canon):
+
+- **01–10** — verbs and modes (the command set)
+- **00, 11, 22, … 99** — the doubled pairs: one actuator class (00 exit
+  and 99 clone bound; the rest the pocket); never jumps
+- **mixed digits 12–98** — the jump vectors (80 addresses)
+
+Cost: two more addresses (82 → 80) — free by this ADR's own argument.
+`jumpToken` now skips the class in place, so a generated menu can never
+express a reserved token (an 11th row emits 23, not 22).
 
 ## Context
 
@@ -51,14 +77,15 @@ exception. The grammar is cleaner, not weaker.
 
 ## The numbering contract, amended
 
-- Vectors run **11–98** *minus* the reserved actuators {44,55,66,77,88} —
-  **83 addresses**. Silcrow 11 is still always the first.
+- Vectors run **12–98** *minus* the doubled-pair class {22,…,88} —
+  **80 addresses** (the canon, 2026-09-12). Silcrow 12 is always the
+  first.
 - The allocator skips the reserved digits globally (see
   `src/vectors.ts:buildJumpMap`). The gap is invisible because numbers
   are dynamic, never authored.
-- `MAX_REFS` is now 83, not 88 (`VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size`).
-- `verbFor` resolves {44,55,66,77,88} to `null` (reserved-unassigned),
-  not `"vector"` (`src/keygrammar.ts`).
+- `MAX_REFS` is 80 (`VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size`).
+- `verbFor` resolves the class {11,22,33,44,55,66,77,88} to `null`
+  (reserved-unassigned), not `"vector"` (`src/keygrammar.ts`).
 
 ## Discipline — non-negotiable
 
@@ -77,11 +104,14 @@ Reserved for future double-tap verbs (binding is a one-line table edit
 in `src/keygrammar.ts`):
 
 - `[00]` — exit (bound, ADR-031)
-- `[44]` — *unassigned* (actuator pocket)
-- `[55]` — *unassigned* (actuator pocket)
-- `[66]` — *unassigned* (actuator pocket)
-- `[77]` — *unassigned* (actuator pocket)
-- `[88]` — *unassigned* (actuator pocket)
+- `[11]` — *unassigned* (the class, joined 2026-09-12)
+- `[22]` — *unassigned* (the class, joined 2026-09-12)
+- `[33]` — *unassigned* (the class, joined 2026-09-12)
+- `[44]` — *unassigned* (the class)
+- `[55]` — *unassigned* (the class)
+- `[66]` — *unassigned* (the class)
+- `[77]` — *unassigned* (the class)
+- `[88]` — *unassigned* (the class)
 - `[99]` — clone (bound, ADR-031)
 
 The unassigned `[04]`–`[08]` pocket remains (single-key reserved

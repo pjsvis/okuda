@@ -24,16 +24,16 @@ describe("reg-menu — composeMenu (registry → wired table)", () => {
     expect(doc).toContain("# Menu — briefs");
     expect(doc).toContain("| Document | Callsign | # |");
     const rows = doc.split("\n").filter((l) => l.startsWith("| *"));
-    expect(rows[0]).toContain("| *Newer \\| piped* \u2717 |  | **11**"); // newest, rejected glyph, empty callsign, pipe escaped
-    expect(rows[1]).toContain("| *Older doc* | BRF-OLD | **12**");
+    expect(rows[0]).toContain("| *Newer \\| piped* \u2717 |  | **12**"); // newest, rejected glyph, empty callsign, pipe escaped; 12 — [11] is the pocket
+    expect(rows[1]).toContain("| *Older doc* | BRF-OLD | **13**");
   });
 
   test("the menu resolves: every row's wiring lands in extractJumps", () => {
     const doc = composeMenu("decisions", entries);
     const jumps = extractJumps(doc);
     expect(jumps.size).toBe(2);
-    expect(jumps.get(11)).toBe("decisions/new.md"); // newest → token 11
-    expect(jumps.get(12)).toBe("decisions/old.md");
+    expect(jumps.get(12)).toBe("decisions/new.md"); // newest → token 12 (11 is reserved)
+    expect(jumps.get(13)).toBe("decisions/old.md");
   });
 
   test("long slugs emit in full — the renderer truncates to the live budget (ADR-022; cap retired)", () => {

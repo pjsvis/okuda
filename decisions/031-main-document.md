@@ -58,7 +58,8 @@ registry-validated at render time.
 - Vectors run **11–98**. The two-digit space is 00–99; **reserved:
   00–09** (unreachable padding), **10** (numeric sanity — the floor
   stays 11), and **99** (the clone verb). The buffer closes the space;
-  no leading-zero ambiguity; silcrow 11 is always the first vector.
+  no leading-zero ambiguity; silcrow 12 is always the first vector
+  (12 since 2026-09-12 — [11] joined the ADR-032 actuator pocket).
 - **Overflow stops**: past 98 references, the map simply ends. The
   remedy is editorial — make the document smaller, or clone and search.
 - **Always two digits** in the painted form, led by the section sign:

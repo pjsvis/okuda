@@ -5,8 +5,10 @@ callsign: ADR-JUMP-TOKEN-021
 
 # Decision: Jump tokens number from 11, not 01 — the ergonomic offset
 
-**Date:** 2026-08-28
-**Status:** Accepted
+**Date:** 2026-08-28 · **amended 2026-09-12** (floor 11 → 12; the spaced
+corollary retired)
+**Status:** Accepted (the 2026-08-30 spaced-double-tap corollary below is
+Superseded — see the amendment at the end)
 
 ## Context
 
@@ -63,7 +65,11 @@ unclaimed by the default numbering.
   any 1–2 digit token, so legacy `01` tokens and new `11` tokens both
   resolve. No migration of existing rendered docs.
 
-## Corollary: spaced tokens for short menus (2026-08-30)
+## Corollary: spaced tokens for short menus (2026-08-30) — SUPERSEDED 2026-09-12
+
+*Retired by the [11] reservation (see the amendment below). Left
+visible as the record of a working pattern that the actuator grammar
+outgrew.*
 
 For a *short* menu (≤ ~9 items), compositors emit **spaced double-taps**
 — `11, 22, 33, 44, …` — not the sequential `11, 12, 13`. Two reasons:
@@ -83,6 +89,29 @@ The cut-off is self-limiting: the spaced form serves ≤ ~9 items
 (`11`+ runs to 89). A compositor emitting `11, 22, …, 99, 110` is
 broken — switch to sequential at ~10 items. Documented in
 `playbooks/authoring-playbook.md` ("The jump-token menu pattern").
+
+## Amendment (2026-09-12): the floor moves to 12; the spaced corollary retires; the doubled pairs are one class
+
+[11] joined the ADR-032 actuator class — doubled pairs are never jump
+tokens — so jump tokens number from **12** and skip the whole class in
+place. Consequences:
+
+- The 0-free neighbourhood shrinks by one: ≤ 8-item lists stay 0-free
+  (was ≤ 9). The common case still costs zero 0-key stretches.
+- `jumpToken` emits the index-th **mixed-digit** number from 12:
+  `12…21, 23…32, 34…43, …, 89…98` — 80 tokens; a generated menu can
+  never express 22, 33, or any doubled pair (an 11th row emits 23).
+  The resolver is unchanged (it reads any 1–2 digit token).
+- **The spaced corollary above is retired.** A spaced menu's first
+  token was always [11]; with the whole doubled-pair class reserved
+  (ADR-032 canon), the pattern cannot express even a two-item menu.
+  Its two motives survive in weaker form: ergonomics belongs to the
+  double-tap *actuators* now, and anti-precedence ordering remains
+  top-to-bottom — structural, not semantic.
+- Hand-authored wiring that used spaced tokens: none in the corpus
+  (audited 2026-09-12; one tmp/ scratch artifact, regenerated).
+- Machine-generated menus (reg-menu, jump-demo) renumber automatically
+  — numbers are derived, never persisted.
 
 ## Related
 

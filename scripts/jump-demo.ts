@@ -65,15 +65,22 @@ export function stateGlyph(content: string): string {
   return "";  // open / pending / unknown — the default; no glyph
 }
 
-/** The jump token for a zero-based index. Numbers from 11, not 01 — the
- *  0 key sits at the opposite end of the number row from 1, and the tokens
- *  are ephemeral codes (never counts), so they should be easy to type. The
- *  offset removes the 0-key stretch for the common <=~10-item list and
- *  reserves 01-09 as a free namespace. Two digits cover 11-99 (89 items);
- *  lists over ~10 are the compositor's concern, not the renderer's.
- *  (ADR-021.) */
+/** The jump token for a zero-based index: the index-th mixed-digit
+ *  number from 12 — doubled pairs are NEVER expressible (the canon,
+ *  2026-09-12: 00,11,…,99 are one actuator class, never jumps; an
+ *  accessibility rule — zero exceptions). Sequence: 12-21, 23-32,
+ *  34-43, … 89-98 — 80 tokens; item 79 → 98, item 80 → three digits
+ *  (already out-of-scope; lists that long are the compositor's
+ *  concern). The 0 key sits at the opposite end of the number row
+ *  from 1; ≤ 8-item lists pay zero 0-key stretches (12-19). (ADR-021,
+ *  amended.) */
 export function jumpToken(index: number): string {
-  return String(index + 11);
+  let n = 11;
+  for (let k = 0; k <= index; k++) {
+    n++;
+    while (n % 11 === 0) n++; // skip 22, 33, … 99 — the doubled pairs
+  }
+  return String(n);
 }
 
 /** Compose one table row of the menu: slug (content) → callsign

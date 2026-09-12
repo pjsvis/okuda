@@ -8,10 +8,12 @@
  * with: just the system invariants and the inescapable side effects,
  * which live in the actuators, at the edge, visibly.
  *
- * The two-digit space has three zones:
- *   00–10  verbs and modes — what the instance DOES
- *   11–98  addresses — what the instance SHOWS (the silcrows)
- *   99     promotion — clone to a new instance
+ * The two-digit space has three zones, one per actuator type (the
+ *   canon, 2026-09-12):
+ *   01-10  verbs and modes — what the instance DOES
+ *   00,11,22,…,99  the doubled pairs — one actuator class (00 exit,
+ *          99 clone bound; the rest the pocket); never jumps
+ *   mixed digits 12-98 — what the instance SHOWS (the silcrows)
  *
  * The bindings are a TABLE, not code: the numbers may move as the
  * fingers learn them, and moving one is a one-line edit here — never a
@@ -46,8 +48,9 @@ export const KEYBINDINGS: Record<number, Verb> = {
 /** Reduce a completed two-digit token to its verb. Returns `"vector"`
  *  for the address range, `null` for reserved-unassigned tokens (the
  *  press is acknowledged and does nothing — reserved, not missing).
- *  The repeated-digit actuators {44,55,66,77,88} (ADR-032) are reserved
- *  for future double-tap verbs and resolve to null until bound. Pure. */
+ *  The doubled pairs {11,22,33,44,55,66,77,88} (ADR-032, canonized
+ *  2026-09-12 — one actuator class, never jumps) are reserved for
+ *  future double-tap verbs and resolve to null until bound. Pure. */
 export function verbFor(token: number): Verb | "vector" | null {
   if (token === 99) return "clone";
   const verb = KEYBINDINGS[token];

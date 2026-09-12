@@ -14,10 +14,10 @@ the wall lives in this corpus, the rehearsal is Moira's.
 
 | Doc | What it answers | |
 |---|---|---|
-| README.md — the register | usage, the naming (elocution, auditions, repertoire, recital, drill), preferences doctrine | <!-- %%okuda-rhs:11%% ../speak-md/README.md -->
-| Elocution playbook | here's what to do: the ear-driven tuning loop for any word class (-ent in flight, -ing pre-scanned) | <!-- %%okuda-rhs:12%% ../speak-md/playbooks/elocution-playbook.md -->
-| AGENTS.md — silo rules | the six rules (lexicon earned by ear; artifacts in tmp/; oracle out-of-band) | <!-- %%okuda-rhs:13%% ../speak-md/AGENTS.md -->
-| House terms | the proper nouns, word and lip perfect — L§AB, silcrow, the commendation standard | <!-- %%okuda-rhs:14%% ../speak-md/house-terms.md -->
+| README.md — the register | usage, the naming (elocution, auditions, repertoire, recital, drill), preferences doctrine | <!-- %%okuda-rhs:12%% ../speak-md/README.md -->
+| Elocution playbook | here's what to do: the ear-driven tuning loop for any word class (-ent in flight, -ing pre-scanned) | <!-- %%okuda-rhs:13%% ../speak-md/playbooks/elocution-playbook.md -->
+| AGENTS.md — silo rules | the six rules (lexicon earned by ear; artifacts in tmp/; oracle out-of-band) | <!-- %%okuda-rhs:14%% ../speak-md/AGENTS.md -->
+| House terms | the proper nouns, word and lip perfect — L§AB, silcrow, the commendation standard | <!-- %%okuda-rhs:15%% ../speak-md/house-terms.md -->
 
 ## Not documents
 
