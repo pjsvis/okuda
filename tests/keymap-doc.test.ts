@@ -22,12 +22,16 @@ describe("keymap doc — the map is refereed against the territory", () => {
   );
 
   test("the bound rows ARE the KEYBINDINGS table, both directions", () => {
-    const bound = rows.filter(([, v]) => v !== "reserved");
-    const table = Object.entries(KEYBINDINGS).map(([k, v]) => [
-      Number(k),
-      v,
-    ] as [number, string]);
-    expect(bound).toEqual(table); // same rows, same order, nothing hidden
+    // Presentation order is the page's choice — the table follows the
+    // keyboard (00 sits last: the zero key ends the number row, and
+    // exit is the last press). The referee checks membership both
+    // directions, not order.
+    const byToken = ([a]: [number, string], [b]: [number, string]) => a - b;
+    const bound = rows.filter(([, v]) => v !== "reserved").sort(byToken);
+    const table = Object.entries(KEYBINDINGS)
+      .map(([k, v]) => [Number(k), v] as [number, string])
+      .sort(byToken);
+    expect(bound).toEqual(table); // same rows, nothing hidden
   });
 
   test("the pocket rows are exactly the reserved-unassigned tokens", () => {

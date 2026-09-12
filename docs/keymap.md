@@ -22,19 +22,38 @@ timeout, and any non-digit cancels a pending token (the buffer is a
 low-pass filter over actuator noise — see
 `docs/keyboard-dogfood.md`).
 
+Three kinds of numbered keys, told apart by who owns them. Verbs
+and modes are the machine's — bound in the grammar, the same in
+every document, forever. The vectors are the document's — derived
+from its references at render time, different in every document.
+The pockets are the future's — reserved by key shape, silent until
+bound.
+
 ### Bound verbs and modes
+
+The command set: what the instance DOES. A verb acts once — exit,
+edit, clone; one keystroke, one effect, done. A mode changes the
+meaning of the keys that follow — frame, slide, and freeze re-map
+the stride of j/k and space/b. That is the whole difference between
+the two words in this heading.
 
 | Token | Verb | Actuation |
 | ----- | ---- | --------- |
-| **00** | exit | quit the control plane — the screen releases |
 | **01** | frame | frame mode — j/k and space/b step one glass page |
 | **02** | slide | sliding mode — the continuous surface, the default |
 | **03** | freeze | the document stays still; r re-renders on demand |
 | **09** | editNew | a blank note in the editor, a second terminal |
 | **10** | edit | edit the current document — not wired yet, flashes honestly |
 | **99** | clone | this document becomes main of a new instance, via the host |
+| **00** | exit | quit the control plane — the screen releases — the last press |
 
 ### The reserved pockets
+
+The same zones, held unbound. Two pockets by key shape: 04–08, the
+single-key verbs; 11 and 22–88, the doubled pairs — the lowest-effort
+inputs on the number row, reserved precisely because they are easy
+(ADR-032). A doubled pair is never an address; a mixed-digit pair is
+never a verb.
 
 | Token | State | Note |
 | ----- | ----- | ---- |
@@ -57,6 +76,9 @@ reserved, not missing.
 
 ### The vectors
 
+What the instance SHOWS — the only numbered keys that belong to the
+document rather than the grammar.
+
 Mixed digits 12–98 are the jump vectors — 80 addresses, silcrow 12
 always first, the numbers dynamic and never authored. The paint
 badge beside each reference states the number; the jump renders the
@@ -68,8 +90,12 @@ target clean and `u` unwinds. A dead reference fails honestly:
 
 Mirrored by hand from `decodeKey` (`src/tui.ts`), unrefereed: the
 motions are mode dispatch, stable, and not assignments under
-discussion. The step's unit is the mode's — j/k steps a line in
-slide mode, a page in frame mode.
+discussion. They differ from the numbered keys in kind, not just
+count — no buffer, no token; one key, one stride. The stride
+belongs to the mode, not the key: j/k steps a line in slide mode,
+a page in frame mode. That is what makes frame and slide modes
+rather than verbs — they add no actions, they change what the
+motion keys mean.
 
 | Key | Motion |
 | --- | ----- |
