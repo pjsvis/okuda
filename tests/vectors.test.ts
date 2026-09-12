@@ -63,8 +63,8 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
     const src = Array.from({ length: 120 }, (_, i) => `ADR-${1000 + i}`).join(" ");
     const refs = scanReferences(src);
     expect(refs.length).toBe(MAX_REFS);
-    // ADR-032 + [11] (2026-09-12): 6 reserved tokens → 82 addresses, not 88.
-    expect(MAX_REFS).toBe(VECTOR_MAX - VECTOR_MIN + 1 - 6);
+    // The canon (2026-09-12): 8 doubled pairs reserved → 80 addresses, not 88.
+    expect(MAX_REFS).toBe(VECTOR_MAX - VECTOR_MIN + 1 - 8);
   });
 });
 
@@ -85,15 +85,15 @@ describe("vectors — the jump map (the translation table)", () => {
     expect(map.has(VECTOR_MAX + 1)).toBe(false);
   });
 
-  test("the allocator skips the reserved actuators (ADR-032 + [11])", () => {
-    // 84 distinct refs: fills 12-43, skips 44, fills 45-54, skips 55, …
+  test("the allocator skips the reserved actuators (the doubled-pair canon)", () => {
+    // 84 distinct refs: fills 12-21, skips 22, fills 23-32, skips 33, …
     const refs = Array.from({ length: 84 }, (_, i) => ({ pos: i, end: i + 1, target: `ADR-${i}` }));
     const map = buildJumpMap(refs);
-    expect(map.size).toBe(MAX_REFS); // 82 — two short of 84
-    for (const r of [11, 44, 55, 66, 77, 88]) expect(map.has(r)).toBe(false);
+    expect(map.size).toBe(MAX_REFS); // 80 — four short of 84
+    for (const r of [11, 22, 33, 44, 55, 66, 77, 88]) expect(map.has(r)).toBe(false);
     expect(map.get(12)).toBe("ADR-0");
-    expect(map.get(43)).toBe("ADR-31"); // last before the 44 gap
-    expect(map.get(45)).toBe("ADR-32"); // first after the 44 gap
+    expect(map.get(21)).toBe("ADR-9");  // last before the 22 gap
+    expect(map.get(23)).toBe("ADR-10"); // first after the 22 gap
   });
 
   test("99 is not derivable — the clone verb is reserved", () => {

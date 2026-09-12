@@ -22,20 +22,19 @@ export const VECTOR_MIN = 11;
 export const VECTOR_MAX = 98;
 /** The clone verb (ADR-031): not a vector — reserved in the two-digit space. */
 export const CLONE_TOKEN = 99;
-/** Repeated-digit actuators (ADR-032, extended 2026-09-12):
- *  reserved for double-tap verbs ([00] exit and [99] clone already set
- *  the precedent; [11] joined the pocket — the operator's verb plan).
- *  The silcrow allocator skips these globally — a shape rule, not a
- *  range rule: repeated digit = actuator, mixed digits = address. The
+/** Repeated-digit actuators (ADR-032; the canon 2026-09-12: ALL doubled
+ *  pairs are one actuator class — 00, 11, 22, … 99 — system verbs,
+ *  never jumps; an accessibility rule, zero exceptions). The silcrow
+ *  allocator and jumpToken skip these globally — a shape rule, not a
+ *  range rule: doubled pair = actuator, mixed digits = address. The
  *  grammar reserves them; documents never see the gap (numbers are
- *  dynamic). 22/33 stay addressable — reserved on demand, never
- *  speculatively (ADR-032's discipline). */
-export const RESERVED_VECTORS = new Set([11, 44, 55, 66, 77, 88]);
-/** The two-digit space is 00-99; reserved: 00-09 (unreachable padding),
- *  10 (numeric sanity), 11 (the double-tap pocket, 2026-09-12), 99 (the
- *  clone verb), and the repeated-digit actuators {44,55,66,77,88}
- *  (ADR-032). Vectors: 12-98 minus the 5 reserved actuators — 82
- *  addresses, and silcrow 12 is always first. */
+ *  dynamic). */
+export const RESERVED_VECTORS = new Set([11, 22, 33, 44, 55, 66, 77, 88]);
+/** The two-digit space is 00-99, partitioned by actuator type (the
+ *  canon): 00-10 verbs/modes; 00,11,22,…,99 the doubled-pair class
+ *  (00 and 99 bound — exit, clone — the rest the pocket); mixed
+ *  digits 12-98 the jump vectors — 80 addresses, silcrow 12 always
+ *  first. */
 /** The two-digit buffer only ever completes on two digits, so painted
  *  forms are always two characters wide. */
 export const MAX_REFS = VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size;

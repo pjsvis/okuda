@@ -32,13 +32,14 @@
 ## The grammar this gives us (2026-09-04, mapped to ADR-031)
 
 The reserved block was unassigned; this draft assigns it. The two-digit
-space becomes a closed keyboard language with three zones:
+space becomes a closed keyboard language — partitioned by actuator
+type, named by token shape (the canon, 2026-09-12):
 
-| Zone | Keys | Meaning |
+| Zone | Token | Actuator type |
 |---|---|---|
-| Verbs & modes | `00`–`10` | what the instance *does* |
-| Addresses | `12`–`98` | what the instance *shows* (the silcrows); `11` joined the double-tap pocket 2026-09-12 |
-| Promotion | `99` | clone the rendered document to a new instance |
+| Verbs & modes | `01`–`10` | what the instance *does* |
+| The doubled pairs | `00`, `11`, `22`, … `99` | one actuator class — system verbs, **never jumps** (00 exit, 99 clone bound; the rest the pocket) |
+| Jump vectors | mixed digits `12`–`98` | what the instance *shows* (the silcrows) — 80 addresses |
 
 Every two-digit press is exactly one of the three. No mode toggles,
 no modifier keys, no state beyond the render stack — the grammar is

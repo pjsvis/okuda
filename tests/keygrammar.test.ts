@@ -26,8 +26,8 @@ describe("keygrammar — the two-digit language as data", () => {
     for (const t of [4, 5, 6, 7, 8]) expect(verbFor(t)).toBeNull();
   });
 
-  test("repeated-digit actuators are reserved (ADR-032 + the 2026-09-12 [11] extension), not vectors", () => {
-    for (const t of [11, 44, 55, 66, 77, 88]) expect(verbFor(t)).toBeNull();
+  test("repeated-digit actuators are reserved (ADR-032 canonized 2026-09-12 — one class, never vectors)", () => {
+    for (const t of [11, 22, 33, 44, 55, 66, 77, 88]) expect(verbFor(t)).toBeNull();
   });
 
   test("the bindings are a table — renumbering is data, not code", () => {

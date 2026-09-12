@@ -8,21 +8,31 @@ callsign: ADR-REPEATED-DIGIT-ACTUATORS-032
 **Date:** 2026-09-06 · **amended 2026-09-12** ([11] joins the pocket)
 **Status:** Accepted
 
-## Amendment (2026-09-12): [11] joins the pocket
+## Amendment (2026-09-12): the doubled pairs are one actuator class
 
-The operator reserved [11] for a planned double-tap verb. [11] was the
-first silcrow and the first menu jump token — both floors move to 12
-(`RESERVED_VECTORS`, `jumpToken`, ADR-021's floor). The shape rule gets
-*truer*: [11] was the most prominent exception to *repeated digit =
-actuator*, unexplained by anything but history. The cost is the "silcrow
-11 is always the first" mnemonic (ADR-031/032 both cited it); its
-successor 12 is still 0-free, so ADR-021's keyboard rationale survives.
-MAX_REFS drops 83 → 82 — free, by this ADR's own argument.
+Two passes, one day — recorded in the git history. The morning pass
+reserved [11] alone and left 22/33 addressable ("on demand, never
+speculatively" — this ADR's own discipline). The afternoon pass
+**completed the class**: all doubled pairs {00, 11, 22, 33, 44, 55, 66,
+77, 88, 99} are one actuator type, and no doubled pair is ever a jump
+vector. The rationale is accessibility, and it outranks the on-demand
+discipline: a doubled pair is the lowest-effort input on the number
+row (same key twice), and "doubled = the system talks, mixed = the
+document moves" with zero exceptions is one rule the fingers and the
+memory never have to qualify. The 2026-09-08 accessibility audit
+anticipated the canon: "doubled pairs cannot jump documents."
 
-**22 and 33 stay addressable** — reserved on demand when a verb needs
-a home, never speculatively (this ADR's discipline). The spaced-menu
-corollary of ADR-021 does not survive this amendment and is retired
-there (palimpsest, same day).
+The keyboard space is now partitioned by actuator type, named by token
+shape (the canon):
+
+- **01–10** — verbs and modes (the command set)
+- **00, 11, 22, … 99** — the doubled pairs: one actuator class (00 exit
+  and 99 clone bound; the rest the pocket); never jumps
+- **mixed digits 12–98** — the jump vectors (80 addresses)
+
+Cost: two more addresses (82 → 80) — free by this ADR's own argument.
+`jumpToken` now skips the class in place, so a generated menu can never
+express a reserved token (an 11th row emits 23, not 22).
 
 ## Context
 
@@ -67,15 +77,15 @@ exception. The grammar is cleaner, not weaker.
 
 ## The numbering contract, amended
 
-- Vectors run **12–98** *minus* the reserved actuators {44,55,66,77,88}
-  — **82 addresses** (2026-09-12: [11] joined the pocket; was 83).
-  Silcrow 12 is always the first.
+- Vectors run **12–98** *minus* the doubled-pair class {22,…,88} —
+  **80 addresses** (the canon, 2026-09-12). Silcrow 12 is always the
+  first.
 - The allocator skips the reserved digits globally (see
   `src/vectors.ts:buildJumpMap`). The gap is invisible because numbers
   are dynamic, never authored.
-- `MAX_REFS` is 82 (`VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size`).
-- `verbFor` resolves {11,44,55,66,77,88} to `null` (reserved-unassigned),
-  not `"vector"` (`src/keygrammar.ts`).
+- `MAX_REFS` is 80 (`VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size`).
+- `verbFor` resolves the class {11,22,33,44,55,66,77,88} to `null`
+  (reserved-unassigned), not `"vector"` (`src/keygrammar.ts`).
 
 ## Discipline — non-negotiable
 
@@ -94,12 +104,14 @@ Reserved for future double-tap verbs (binding is a one-line table edit
 in `src/keygrammar.ts`):
 
 - `[00]` — exit (bound, ADR-031)
-- `[11]` — *unassigned* (actuator pocket, joined 2026-09-12)
-- `[44]` — *unassigned* (actuator pocket)
-- `[55]` — *unassigned* (actuator pocket)
-- `[66]` — *unassigned* (actuator pocket)
-- `[77]` — *unassigned* (actuator pocket)
-- `[88]` — *unassigned* (actuator pocket)
+- `[11]` — *unassigned* (the class, joined 2026-09-12)
+- `[22]` — *unassigned* (the class, joined 2026-09-12)
+- `[33]` — *unassigned* (the class, joined 2026-09-12)
+- `[44]` — *unassigned* (the class)
+- `[55]` — *unassigned* (the class)
+- `[66]` — *unassigned* (the class)
+- `[77]` — *unassigned* (the class)
+- `[88]` — *unassigned* (the class)
 - `[99]` — clone (bound, ADR-031)
 
 The unassigned `[04]`–`[08]` pocket remains (single-key reserved

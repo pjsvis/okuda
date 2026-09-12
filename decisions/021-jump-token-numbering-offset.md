@@ -90,20 +90,22 @@ The cut-off is self-limiting: the spaced form serves ≤ ~9 items
 broken — switch to sequential at ~10 items. Documented in
 `playbooks/authoring-playbook.md` ("The jump-token menu pattern").
 
-## Amendment (2026-09-12): the floor moves to 12; the spaced corollary retires
+## Amendment (2026-09-12): the floor moves to 12; the spaced corollary retires; the doubled pairs are one class
 
-[11] joined the ADR-032 actuator pocket — a double-tap verb is planned
-for it — so jump tokens number from **12**: item 1 is `12`, item 2 is
-`13`, … item 8 is `19`. Consequences:
+[11] joined the ADR-032 actuator class — doubled pairs are never jump
+tokens — so jump tokens number from **12** and skip the whole class in
+place. Consequences:
 
 - The 0-free neighbourhood shrinks by one: ≤ 8-item lists stay 0-free
   (was ≤ 9). The common case still costs zero 0-key stretches.
-- `jumpToken` emits `String(index + 12)`; the resolver is unchanged
-  (it reads any 1–2 digit token).
+- `jumpToken` emits the index-th **mixed-digit** number from 12:
+  `12…21, 23…32, 34…43, …, 89…98` — 80 tokens; a generated menu can
+  never express 22, 33, or any doubled pair (an 11th row emits 23).
+  The resolver is unchanged (it reads any 1–2 digit token).
 - **The spaced corollary above is retired.** A spaced menu's first
-  token was always [11]; with [11] a verb (and 44–88 reserved since
-  ADR-032), the pattern cannot express even a three-item menu. Its
-  two motives survive in weaker form: ergonomics belongs to the
+  token was always [11]; with the whole doubled-pair class reserved
+  (ADR-032 canon), the pattern cannot express even a two-item menu.
+  Its two motives survive in weaker form: ergonomics belongs to the
   double-tap *actuators* now, and anti-precedence ordering remains
   top-to-bottom — structural, not semantic.
 - Hand-authored wiring that used spaced tokens: none in the corpus

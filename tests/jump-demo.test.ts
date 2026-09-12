@@ -53,7 +53,7 @@ describe("jump-demo — stateGlyph (deviations earn their mark; default bare)", 
   });
 });
 
-describe("jump-demo — jumpToken (numbers from 12, not 01 — ADR-021 amended: [11] joined the ADR-032 pocket 2026-09-12)", () => {
+describe("jump-demo — jumpToken (mixed digits from 12 — ADR-021 amended: the doubled-pair canon, 2026-09-12)", () => {
   test("item 0 (the first) → 12, not 01 — and never 11, which is reserved", () => {
     expect(jumpToken(0)).toBe("12");
   });
@@ -67,17 +67,21 @@ describe("jump-demo — jumpToken (numbers from 12, not 01 — ADR-021 amended: 
     expect(jumpToken(8)).toBe("20");
     expect(jumpToken(8)).toContain("0");
   });
-  test("two digits through 88 items (item 87 → 99); the 0-free floor holds", () => {
-    expect(jumpToken(87)).toBe("99");
-    expect(jumpToken(0)).toBe("12");
+  test("the two-digit ceiling: item 79 → 98 (80 mixed-digit tokens); item 80 goes three-digit", () => {
+    expect(jumpToken(79)).toBe("98");
+    expect(jumpToken(80)).toBe("100");
   });
-  test("01-09 and 11 are reserved namespaces — jumpToken never emits them", () => {
-    for (let i = 0; i < 100; i++) {
+  test("the sequence skips the doubled pairs in place: 21 → 23, 32 → 34", () => {
+    expect(jumpToken(9)).toBe("21");
+    expect(jumpToken(10)).toBe("23");
+    expect(jumpToken(19)).toBe("32");
+    expect(jumpToken(20)).toBe("34");
+  });
+  test("01-09 and every doubled pair are reserved — jumpToken never emits them (the canon)", () => {
+    for (let i = 0; i < 80; i++) {
       const n = Number(jumpToken(i));
-      if (i < 88) {
-        expect(n).toBeGreaterThanOrEqual(12);
-        expect(n).not.toBe(11);
-      }
+      expect(n).toBeGreaterThanOrEqual(12);
+      expect(n % 11).not.toBe(0); // never 22, 33, … — the actuator class
     }
   });
 });
