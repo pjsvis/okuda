@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { KEYBINDINGS, verbFor } from "../src/keygrammar";
+import { KEYBINDINGS, verbFor, splitKeyEvents } from "../src/keygrammar";
 import { CLONE_TOKEN, VECTOR_MIN, VECTOR_MAX } from "../src/vectors";
 
 describe("keygrammar — the two-digit language as data", () => {
@@ -38,5 +38,27 @@ describe("keygrammar — the two-digit language as data", () => {
       const n = Number(key);
       expect(n < VECTOR_MIN || n > VECTOR_MAX).toBe(true);
     }
+  });
+});
+
+describe("keygrammar — splitKeyEvents (the lexer)", () => {
+  test("vim section pairs ride whole: ]] and [[ are one event each", () => {
+    // BRF-OKUDAGRAM-STEP: the declared header-to-header jump. A burst
+    // paste of "]]j" is a frame jump then a line step, not two loose
+    // brackets swallowed one at a time.
+    const events = splitKeyEvents(new Uint8Array([0x5d, 0x5d, 0x6a]));
+    expect(events.map((e) => Array.from(e))).toEqual([[0x5d, 0x5d], [0x6a]]);
+    const up = splitKeyEvents(new Uint8Array([0x5b, 0x5b]));
+    expect(up.map((e) => Array.from(e))).toEqual([[0x5b, 0x5b]]);
+  });
+
+  test("mixed brackets split — [ and ] alone are single events", () => {
+    const events = splitKeyEvents(new Uint8Array([0x5d, 0x5b, 0x5d]));
+    expect(events.map((e) => Array.from(e))).toEqual([[0x5d], [0x5b], [0x5d]]);
+  });
+
+  test("escape sequences still ride whole — the ESC [ A family", () => {
+    const events = splitKeyEvents(new Uint8Array([0x1b, 0x5b, 0x41, 0x6b]));
+    expect(events.map((e) => Array.from(e))).toEqual([[0x1b, 0x5b, 0x41], [0x6b]]);
   });
 });

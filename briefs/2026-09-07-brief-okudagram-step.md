@@ -5,8 +5,10 @@ callsign: BRF-OKUDAGRAM-STEP
 
 # Brief: The okudagram step — no gaps in coverage
 
-**Date:** 2026-09-07
-**Status:** Open
+**Date:** 2026-09-07 · amended 2026-09-12 (the two strides)
+**Status:** LANDED 2026-09-12 with the VI amendment — the step is
+  contiguous (pageStep) in frame mode, `}`/`{` walk paragraphs, `]]`/`[[`
+  inherit the header jump as the declared skip; live-smoked in tmux.
 **Lineage:** dialog session (okudagram framing riff → over-engineered
 sticky-header plan → FO'd → the kernel extracted). The correction that
 produced this brief: the frame's job is coverage, not context. An
@@ -62,6 +64,42 @@ and answers.
   brief adds the no-gaps stepping invariant; it does not reverse
   cut-and-defer (the over-tail is still deferred — it's now reachable
   by stepping, an addition not a reversal) or the frame's identity.
+
+## Two strides, one contract (the VI amendment)
+
+The step is a contract; the stride is the mode. One semantic — *advance
+coverage by one unit, never gap* — with the unit swapped per mode:
+
+- **UI:** stride = one glass page (height − overlap). For the eye, a
+gap is an unseen line.
+- **VI (voice interface):** stride = one paragraph. For the ear, a gap
+is an unheard word.
+
+The cursor substrate is the scroll offset in both modes — a VI
+paragraph step sets scroll to the paragraph's first rendered line — so
+mode-switching mid-document is free and coverage is continuous by
+construction.
+
+**The boundary: okuda owns the paragraph *bounds*, not the voice.**
+`paragraphBounds` (pure, over the rendered line array) is okuda's
+export; speak-md owns the voice stepping, and any future read-along
+visual follows via the filesystem (the message bus) — okuda reacts, it
+never narrates. No speech code lands in this repo (`&speak.md`). The
+one real coupling is the paragraph *definition*, which must be
+identical in both silos or the screen and the voice desync: a paragraph
+is a blank-separated block of rendered lines. The fence markers do not
+survive render, so a code block's internal blank lines split it — every
+line stays reachable (the invariant holds); unit purity inside fences
+is dogfood's to request.
+
+**The binds** (vim's own grammar already made the distinction — steal
+it): `j`/`k` = the step (frame mode: one page; slide mode: one line),
+`␣`/`b` = page stride, `}`/`{` = paragraph motions (the VI unit,
+available in every mode), `]]`/`[[` = frame jumps header-to-header
+(the declared skip, may gap — honest because named). The latent bug
+this fixes: `j`/`k` and the arrows shared one action, so the frame
+brief's "arrows stay slippy within" was never true in code; the arrows
+get their own line-scroll actions and the claim becomes true.
 
 ## How
 

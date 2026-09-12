@@ -18,7 +18,7 @@
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
 import { annotateSource, jumpMapFor, CLONE_TOKEN } from "./vectors";
 import { cloneArgs } from "./clone";
-import { frameBounds, headingLines, snapFrame } from "./frames";
+import { frameBounds, headingLines, pageStep, paragraphStarts, snapFrame } from "./frames";
 import { splitKeyEvents, verbFor, type Verb } from "./keygrammar";
 import { loadPalette, type Palette } from "./palette";
 import { renderDocument } from "./render";
@@ -45,9 +45,15 @@ export interface TuiOptions {
   resolveTarget?: (target: string) => string | null;
 }
 
-/** Decoded keystroke action. `null` = unhandled (no-op). */
+/** Decoded keystroke action. `null` = unhandled (no-op). The
+ *  motions are split by unit (BRF-OKUDAGRAM-STEP): line (arrows,
+ *  slide-mode j/k), page (␣/b, frame-mode j/k), paragraph (}/{ — the
+ *  VI stride), frame (]]/[[ — the declared header-to-header jump). */
 export type KeyAction =
   | "quit" | "down" | "up"
+  | "line-down" | "line-up"
+  | "para-down" | "para-up"
+  | "frame-down" | "frame-up"
   | "page-down" | "page-up"
   | "half-down" | "half-up"
   | "top" | "bottom" | "reload"
@@ -58,9 +64,10 @@ const ESC = 0x1b;
 
 /**
  * Decode a raw stdin buffer to a symbolic action. Single-byte controls
- * (Ctrl-C/D/U, q, j, k, g, G, r) and the four common arrow/page escape
- * sequences (ESC [ A/B/5~/6~). Unknown bytes and partial sequences are
- * `null` (no-op) — a split escape read is re-synthesised on the next chunk.
+ * (Ctrl-C/D/U, q, j, k, g, G, r), the two vim motion pairs (}/{, ]]/[[)
+ * and the four common arrow/page escape sequences (ESC [ A/B/5~/6~).
+ * Unknown bytes and partial sequences are `null` (no-op) — a split escape
+ * read is re-synthesised on the next chunk.
  */
 export function decodeKey(buf: Uint8Array): KeyAction {
   if (buf.length === 0) return null;
@@ -72,8 +79,10 @@ export function decodeKey(buf: Uint8Array): KeyAction {
     case 0x15: return "half-up";        // Ctrl-U
     case 0x71: return "quit";           // q
     case 0x51: return "quit";           // Q (Glow's convention)
-    case 0x6a: return "down";           // j
+    case 0x6a: return "down";           // j — the step (unit is the mode's)
     case 0x6b: return "up";             // k
+    case 0x7d: return "para-down";      // } — vim paragraph motion (VI stride)
+    case 0x7b: return "para-up";        // {
     case 0x67: return "top";            // g
     case 0x47: return "bottom";         // G
     case 0x72: return "reload";         // r
@@ -89,11 +98,15 @@ export function decodeKey(buf: Uint8Array): KeyAction {
     case 0x7f: return "back";           // DEL (Backspace on most terminals)
     case 0x08: return "back";           // BS  (Backspace on some terminals)
   }
+  // Vim's section motions, kept whole by the lexer — the declared
+  // header-to-header jump (may gap; honest because named).
+  if (buf.length === 2 && buf[0] === 0x5d && buf[1] === 0x5d) return "frame-down";  // ]]
+  if (buf.length === 2 && buf[0] === 0x5b && buf[1] === 0x5b) return "frame-up";    // [[
   // Escape sequences: ESC [ <final> or ESC [ <n> ~.
   if (b0 === ESC && buf.length >= 3 && buf[1] === 0x5b) {
     switch (buf[2]) {
-      case 0x41: return "up";            // ESC [ A — ↑
-      case 0x42: return "down";          // ESC [ B — ↓
+      case 0x41: return "line-up";      // ESC [ A — ↑ (slippy, always)
+      case 0x42: return "line-down";    // ESC [ B — ↓
       case 0x35: return "page-up";      // ESC [ 5 ~ — PgUp
       case 0x36: return "page-down";     // ESC [ 6 ~ — PgDn
     }
@@ -103,8 +116,8 @@ export function decodeKey(buf: Uint8Array): KeyAction {
   // keys as CSI arrows; alt-scroll wheels emit this form too.
   if (b0 === ESC && buf.length >= 3 && buf[1] === 0x4f) {
     switch (buf[2]) {
-      case 0x41: return "up";            // ESC O A — ↑
-      case 0x42: return "down";          // ESC O B — ↓
+      case 0x41: return "line-up";      // ESC O A — ↑
+      case 0x42: return "line-down";    // ESC O B — ↓
       case 0x35: return buf[3] === 0x7e ? "page-up" : null;    // ESC O 5 ~
       case 0x36: return buf[3] === 0x7e ? "page-down" : null;  // ESC O 6 ~
     }
@@ -202,7 +215,7 @@ export function viewport(
   return { visible: lines.slice(s, s + height), maxScroll, scroll: s };
 }
 
-const HINTS = "00 off · j/k · ␣/b · g/G · r reload · NN deref · 99 clone · u unwind";
+const HINTS = "00 off · j/k ␣/b · }/{ para · ]]/[[ frame · g/G · r · NN · 99 clone · u";
 
 /** Display path: folder/basename (Glow convention). Pure. */
 /** ADR-010 re-anchor as a pure function: given the pre- and post-re-render
@@ -532,9 +545,12 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  override, resize still follows the glass. */
   let frozen = false;
   /** Render mode (keyboard-controls): `slide` = the continuous surface
-   *  (default); `frame` = the okudagram frame — j/k step header to
-   *  header, arrows stay slippy within, ␣/b page within (BRF-
-   *  PAGED-OKUDAGRAM). Mode is per-instance, no memory across clones. */
+   *  (default); `frame` = the okudagram frame — j/k and ␣/b step one
+   *  contiguous glass page (height − overlap, BRF-OKUDAGRAM-STEP:
+   *  no gaps in coverage), arrows stay slippy within (their own
+   *  line actions — the frame brief's claim, true in code at last),
+   *  }/{ and ]]/[[ serve every mode. Mode is per-instance, no memory
+   *  across clones. */
   let renderMode: "slide" | "frame" = "slide";
 
   /** Edit a blank document (`09`): a new note in the CURRENT
@@ -701,8 +717,11 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     exit: () => cleanup(),
     frame: () => {
       renderMode = "frame";
-      scroll = snapFrame(headingLines(lines), lines.length, scroll, 1);
-      flash("frame mode — j/k steps, arrows slippy within");
+      // Snap to the CURRENT frame's header — the frame fills from the
+      // top, and a backward snap never gaps (forward would skip the
+      // tail the reader is standing in; the step is theirs to take).
+      scroll = frameBounds(headingLines(lines), lines.length, scroll).start;
+      flash("frame mode — j/k ␣/b step a page, }/{ paragraph, ]]/[[ frame");
     },
     slide: () => {
       renderMode = "slide";
@@ -758,18 +777,52 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     const { maxScroll } = viewport(lines, 0, height);
     const half = Math.max(1, Math.floor(height / 2));
     switch (action) {
+      // The step (BRF-OKUDAGRAM-STEP): the unit is the mode's. Frame
+      // mode steps one contiguous glass page — height − overlap, never
+      // a header-to-header leap, no gaps in coverage. Slide mode keeps
+      // the line stride (the continuous surface).
       case "down":
-        if (renderMode === "frame") {
-          scroll = snapFrame(headingLines(lines), lines.length, scroll, 1);
-        } else scroll += 1;
+        scroll = renderMode === "frame"
+          ? pageStep(scroll, height, 1)
+          : scroll + 1;
         break;
       case "up":
-        if (renderMode === "frame") {
-          scroll = snapFrame(headingLines(lines), lines.length, scroll, -1);
-        } else scroll -= 1;
+        scroll = renderMode === "frame"
+          ? pageStep(scroll, height, -1)
+          : scroll - 1;
         break;
-      case "page-down": scroll += height; break;
-      case "page-up": scroll -= height; break;
+      // The page stride: ␣/b and the Pg keys. The same contiguous unit
+      // as the frame-mode step (one step, one contract); slide mode
+      // keeps the full-page stride — also gap-free, zero overlap.
+      case "page-down":
+        scroll = renderMode === "frame"
+          ? pageStep(scroll, height, 1)
+          : scroll + height;
+        break;
+      case "page-up":
+        scroll = renderMode === "frame"
+          ? pageStep(scroll, height, -1)
+          : scroll - height;
+        break;
+      // Slippy within — the arrows' own actions, in every mode.
+      case "line-down": scroll += 1; break;
+      case "line-up": scroll -= 1; break;
+      // The paragraph motions (the VI stride): }/{ in every mode —
+      // context on demand, the unit the voice interface steps by.
+      case "para-down":
+        scroll = snapFrame(paragraphStarts(lines), lines.length, scroll, 1);
+        break;
+      case "para-up":
+        scroll = snapFrame(paragraphStarts(lines), lines.length, scroll, -1);
+        break;
+      // The frame jumps (]]/[[): the declared header-to-header skip —
+      // may gap, honest because named. The step is not this.
+      case "frame-down":
+        scroll = snapFrame(headingLines(lines), lines.length, scroll, 1);
+        break;
+      case "frame-up":
+        scroll = snapFrame(headingLines(lines), lines.length, scroll, -1);
+        break;
       case "half-down": scroll += half; break;
       case "half-up": scroll -= half; break;
       case "top": scroll = 0; break;

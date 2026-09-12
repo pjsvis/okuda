@@ -1,6 +1,7 @@
 /**
  * frames.ts — the okudaframe helpers (BRF-PAGED-OKUDAGRAM, ADR-031
- * frame mode, keyboard-controls [01]).
+ * frame mode, keyboard-controls [01]) and the step's two strides
+ * (BRF-OKUDAGRAM-STEP: page and paragraph).
  *
  * Naming (the attribution badge): Okuda's name goes on artifacts that
  * carry the design language — okudagram (the diagrams), okudaframe
@@ -61,4 +62,38 @@ export function snapFrame(
   if (step < 0) return line > start ? start : headings[Math.max(index + step, 0)]!;
   const next = Math.min(index + step, headings.length - 1);
   return headings[next]!;
+}
+
+/** The step's seam overlap (BRF-OKUDAGRAM-STEP): the last line of the
+ *  previous glass is the first line of the next. Overlap, not gap —
+ *  the seam lines are shown twice rather than hidden twice. One line
+ *  is the elision ladder's bottom rung; dogfood raises it, never
+ *  lowers it below the invariant. */
+export const STEP_OVERLAP = 1;
+
+/** The contiguous page step (BRF-OKUDAGRAM-STEP): advance the scroll
+ *  by one coverage unit — (glass height − overlap) lines — never by a
+ *  header-to-header leap. Pure; the caller clamps to maxScroll. */
+export function pageStep(scroll: number, height: number, step: number): number {
+  const stride = Math.max(1, height - STEP_OVERLAP);
+  return Math.max(0, scroll + step * stride);
+}
+
+/** Indices of paragraph-start lines (BRF-OKUDAGRAM-STEP, the VI
+ *  stride): the first line of each blank-separated block, over the
+ *  rendered array. A paragraph is the unit the voice interface steps
+ *  by — the shared definition speak-md must honour or the screen and
+ *  the voice desync. The fence markers do not survive render, so a
+ *  code block's internal blank lines split it: every line stays
+ *  reachable (the invariant holds); unit purity inside fences is
+ *  dogfood's to request. Pure. */
+export function paragraphStarts(lines: string[]): number[] {
+  const out: number[] = [];
+  let inBlock = false;
+  for (let i = 0; i < lines.length; i++) {
+    const blank = bare(lines[i]!).trim() === "";
+    if (!blank && !inBlock) out.push(i);
+    inBlock = !blank;
+  }
+  return out;
 }
