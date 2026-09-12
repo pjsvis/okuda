@@ -6,7 +6,9 @@ callsign: BRF-OKUDAGRAM-STEP
 # Brief: The okudagram step — no gaps in coverage
 
 **Date:** 2026-09-07 · amended 2026-09-12 (the two strides)
-**Status:** In progress
+**Status:** LANDED 2026-09-12 with the VI amendment — the step is
+  contiguous (pageStep) in frame mode, `}`/`{` walk paragraphs, `]]`/`[[`
+  inherit the header jump as the declared skip; live-smoked in tmux.
 **Lineage:** dialog session (okudagram framing riff → over-engineered
 sticky-header plan → FO'd → the kernel extracted). The correction that
 produced this brief: the frame's job is coverage, not context. An
