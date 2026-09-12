@@ -133,6 +133,14 @@ buffer, deliberately — pure no-timeout dispatch would make a stray
 keystroke ambush a half-typed token. Timing exists; it is protocol, not
 debounce.
 
+(2026-09-12 correction: the spaced double-tap protocol retired —
+ADR-021's amendment — and the shipped buffer is the pure no-timeout
+machine. The ambush is prevented by cancel-on-any-non-digit, not by
+timing. The consequence is noted in `docs/keyboard-dogfood.md`: the
+buffer is a low-pass filter over actuator noise — no clock, two
+different keys for every address, and noise degrades to silence or a
+reversible detour, never a persistent wrong actuation.)
+
 ## Related
 
 - `src/tui.ts` — `advanceNumBuffer`, `decodeKey` (the shipped machine)

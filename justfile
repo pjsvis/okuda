@@ -381,6 +381,12 @@ chip:
     @just build >/dev/null
     @./okuda docs/chip-dogfood.md --tui
 
+# Keyboard dogfood
+[group('build')]
+keyboard-dogfood:
+    @just build >/dev/null
+    @./okuda docs/keyboard-dogfood.md --tui
+
 # Stamp state diagram
 [group('build')]
 stamp:
