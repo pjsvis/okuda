@@ -9,8 +9,8 @@ annotated. The annotation is the **silcrow**: `§`, the section sign,
 followed by two digits. Rose, after the reference it points at — the rubricator's ink (`rubric` = *ruber*, red): the medieval navigation marks were red for the same reason we are.
 
 ```text
-ADR-030 §11
-BRF-PORCH-MATRIX §19
+ADR-030 §12
+BRF-PORCH-MATRIX §13
 [the constitution](system.md) §14
 ```
 
@@ -26,12 +26,15 @@ meaning; we inherited it, intact.
 
 ## The notation
 
-`§NN`, two digits, `11` through `98`. The number is an **address in the
+`§NN`, two digits, `12` through `98` (the floor moved from 11 to 12
+when [11] joined the doubled-pair actuator class, 2026-09-12; the
+canon: doubled = the system talks, mixed = the document moves). The
+number is an **address in the
 main document's jump map** — an in-memory structure derived from the
 document's own text at render time: callsign-shaped tokens, local
 `.md` links, in reading order, unique, capped. The paint is
 **illustrative**: the source document is never modified, the map is
-rebuilt on every render, and the numbers are deterministic — `§11`
+rebuilt on every render, and the numbers are deterministic — `§12`
 means the same thing on every glass, until the document changes, at
 which point the map re-derives and the numbers follow. Derivation
 replaces invalidation.
@@ -70,6 +73,30 @@ fails in the same vocabulary it painted in — `§14 — no document to
 render` — a footer flash, stay put, no crash. A silcrow that turns out
 to be mistaken was still a correct description of an intention; the
 corpus may reference documents that do not exist yet.
+
+## The reader's habit (found in dogfood, 2026-09-12)
+
+At the start of any document the silcrows are always 12, 13, 14 —
+floor plus offset, zero bits of information. So the eye learns in the
+first ten seconds to skip the numeral and read the *name* of the
+reference instead: **names for recognition, numbers for actuation.**
+The callsign is stable and semantic; it survives every render. The
+silcrow is a two-keystroke pointer into this render's alias table; it
+evaporates with the glass. The number is furniture; the name is the
+content. (Eco: *stat rosa pristina nomine* — the rose persists by its
+name; the naked name is what we keep.)
+
+The emergent flips deep in the document, and that flip is the
+channel earning its keep: a *low* silcrow on page four means
+"back-reference — you have seen this name before." The number is
+zero-information exactly where novelty makes it redundant, and
+information-bearing exactly where a repeat makes it meaningful: it
+tells you novelty, while the name tells you identity.
+
+The trap this forbids: any feature that made silcrow numbers stable
+across renders (`§12 always means system.md`) would fight the trained
+eye and lose. Numbers are pointers, never identities; the derived map
+is the guard — keep it that way.
 
 ## The vocabulary
 
