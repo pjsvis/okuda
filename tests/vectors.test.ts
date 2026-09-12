@@ -4,6 +4,7 @@ import {
   VECTOR_MAX,
   CLONE_TOKEN,
   MAX_REFS,
+  RESERVED_VECTORS,
   scanReferences,
   buildJumpMap,
   jumpMapFor,
@@ -85,8 +86,20 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
     const src = Array.from({ length: 120 }, (_, i) => `ADR-${1000 + i}`).join(" ");
     const refs = scanReferences(src);
     expect(refs.length).toBe(MAX_REFS);
-    // The canon (2026-09-12): 8 doubled pairs reserved → 80 addresses, not 88.
-    expect(MAX_REFS).toBe(VECTOR_MAX - VECTOR_MIN + 1 - 8);
+    // The canon (2026-09-12): the doubled pairs reserved → 80 addresses.
+    expect(MAX_REFS).toBe(80);
+  });
+
+  test("the pocket Set's invariant: exactly the doubled pairs in range", () => {
+    // MAX_REFS derives from RESERVED_VECTORS.size — the derivation is
+    // only honest while the Set is the doubled-pair class *inside* the
+    // vector range. This is the check that keeps it so.
+    for (const n of RESERVED_VECTORS) {
+      expect(Math.floor(n / 10)).toBe(n % 10); // a doubled pair…
+      expect(n).toBeGreaterThanOrEqual(VECTOR_MIN); // …inside the range
+      expect(n).toBeLessThanOrEqual(VECTOR_MAX);
+    }
+    expect(RESERVED_VECTORS.size).toBe(7);
   });
 });
 

@@ -2,7 +2,7 @@
  * vectors.ts — the main document's jump map (ADR-031).
  *
  * The main document renders with its references annotated as optimistic
- * vectors: `[11]` … `[98]`, painted after each reference in the reserved
+ * vectors: `[12]` … `[98]`, painted after each reference in the reserved
  * vector paint. The map is an in-memory structure belonging to the main
  * document — vector number → target string — derived by scanning the
  * source at render time. The paint is illustrative; the source is never
@@ -23,25 +23,26 @@
  * token-boundaried (`YYYY-MM-DD` is a date template, not `YYY-MM-DD`).
  */
 
-export const VECTOR_MIN = 11;
+export const VECTOR_MIN = 12;
 export const VECTOR_MAX = 98;
 /** The clone verb (ADR-031): not a vector — reserved in the two-digit space. */
 export const CLONE_TOKEN = 99;
 /** Repeated-digit actuators (ADR-032; the canon 2026-09-12: ALL doubled
  *  pairs are one actuator class — 00, 11, 22, … 99 — system verbs,
- *  never jumps; an accessibility rule, zero exceptions). The silcrow
- *  allocator and jumpToken skip these globally — a shape rule, not a
- *  range rule: doubled pair = actuator, mixed digits = address. The
- *  grammar reserves them; documents never see the gap (numbers are
- *  dynamic). */
-export const RESERVED_VECTORS = new Set([11, 22, 33, 44, 55, 66, 77, 88]);
+ *  never jumps; an accessibility rule, zero exceptions). This Set is the
+ *  class *inside the vector range* — the unbound pocket {22,…,88}.
+ *  The bound members live elsewhere: 00 and 99 in KEYBINDINGS
+ *  (`src/keygrammar.ts`); 11 sits below the floor and resolves to null
+ *  by range, not membership. The allocator and verbFor share this one
+ *  Set — a shape rule, not a range rule: doubled pair = actuator,
+ *  mixed digits = address. The grammar reserves them; documents
+ *  never see the gap (numbers are dynamic). */
+export const RESERVED_VECTORS = new Set([22, 33, 44, 55, 66, 77, 88]);
 /** The two-digit space is 00-99, partitioned by actuator type (the
  *  canon): 00-10 verbs/modes; 00,11,22,…,99 the doubled-pair class
  *  (00 and 99 bound — exit, clone — the rest the pocket); mixed
  *  digits 12-98 the jump vectors — 80 addresses, silcrow 12 always
  *  first. */
-/** The two-digit buffer only ever completes on two digits, so painted
- *  forms are always two characters wide. */
 export const MAX_REFS = VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size;
 
 /** Callsign shape: tier prefix + significant tokens, uppercase. Moved
@@ -139,8 +140,8 @@ export function jumpMapFor(source: string): Map<number, string> {
   return buildJumpMap(scanReferences(source));
 }
 
-/** Inject one paint marker after each reference occurrence — the i-th
- *  occurrence carries vector `VECTOR_MIN + i`, per the map. The marker
+/** Inject one paint marker after each reference occurrence — each
+ *  occurrence carries the vector its target holds in the map. The marker
  *  (`%okuda-vector:NN%`) is consumed by the renderer's inline paint;
  *  the painted `§NN` is illustrative text, and the returned string is
  *  used for rendering only, never persisted. Replaces from the end so

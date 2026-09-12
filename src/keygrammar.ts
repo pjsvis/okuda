@@ -22,7 +22,7 @@
  * missing.
  */
 
-import { RESERVED_VECTORS } from "./vectors";
+import { RESERVED_VECTORS, VECTOR_MIN, VECTOR_MAX } from "./vectors";
 
 export type Verb =
   | "exit"
@@ -48,15 +48,16 @@ export const KEYBINDINGS: Record<number, Verb> = {
 /** Reduce a completed two-digit token to its verb. Returns `"vector"`
  *  for the address range, `null` for reserved-unassigned tokens (the
  *  press is acknowledged and does nothing — reserved, not missing).
- *  The doubled pairs {11,22,33,44,55,66,77,88} (ADR-032, canonized
- *  2026-09-12 — one actuator class, never jumps) are reserved for
- *  future double-tap verbs and resolve to null until bound. Pure. */
+ *  The doubled pairs (ADR-032, canonized 2026-09-12 — one actuator
+ *  class, never jumps) all resolve to null: 11 by range (below the
+ *  floor), {22,…,88} via the pocket Set, 00 and 99 via their bound
+ *  verbs in the table. The boundaries are read from the constants,
+ *  never retyped here. Pure. */
 export function verbFor(token: number): Verb | "vector" | null {
-  if (token === 99) return "clone";
   const verb = KEYBINDINGS[token];
   if (verb) return verb;
   if (RESERVED_VECTORS.has(token)) return null; // ADR-032 actuator pocket
-  if (token >= 11 && token <= 98) return "vector";
+  if (token >= VECTOR_MIN && token <= VECTOR_MAX) return "vector";
   return null;
 }
 
