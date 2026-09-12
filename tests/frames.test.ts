@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { headingLines, frameBounds, snapFrame } from "../src/frames";
+import { headingLines, frameBounds, snapFrame, pageStep, paragraphStarts, STEP_OVERLAP } from "../src/frames";
 
 const doc = [
   "  # Title",            // 0 — heading
@@ -45,5 +45,59 @@ describe("frames — the okudagram rule (BRF-PAGED-OKUDAGRAM)", () => {
     const flat = ["just", "text"];
     expect(headingLines(flat)).toEqual([]);
     expect(snapFrame([], flat.length, 0, 1)).toBe(0);
+  });
+});
+
+describe("frames — the step's two strides (BRF-OKUDAGRAM-STEP)", () => {
+  test("pageStep: one contiguous glass page — height − overlap, overlap not gap", () => {
+    expect(STEP_OVERLAP).toBe(1);
+    expect(pageStep(0, 24, 1)).toBe(23);    // 24 − 1: the seam line shows twice
+    expect(pageStep(23, 24, 1)).toBe(46);
+    expect(pageStep(10, 24, -1)).toBe(0);   // clamped at the top, never negative
+    expect(pageStep(0, 1, 1)).toBe(1);      // tiny glass: the stride never dies
+  });
+
+  test("the step never gaps: a full walk covers every line", () => {
+    // The invariant as a property: walking page steps from the top,
+    // every line of the document lands on some glass. Snap-to-header
+    // fails this (the tails vanish); the contiguous step passes.
+    const height = 5;
+    const total = 17;
+    const seen = new Set<number>();
+    let scroll = 0;
+    for (;;) {
+      for (let i = scroll; i < Math.min(scroll + height, total); i++) seen.add(i);
+      if (scroll + height >= total) break; // maxScroll lives in the TUI; here it's total − height
+      const next = pageStep(scroll, height, 1);
+      if (next <= scroll) break;
+      scroll = next;
+    }
+    for (let i = 0; i < total; i++) expect(seen.has(i)).toBe(true);
+  });
+
+  test("paragraphStarts: blank-separated blocks over the rendered array", () => {
+    const doc = [
+      "  # Heading",   // 0 — a heading is a block start
+      "",              // 1
+      "  one",         // 2
+      "  two",         // 3
+      "",              // 4
+      "",              // 5 — consecutive blanks don't mint starts
+      "  three",       // 6
+      "",              // 7
+      "  code",        // 8 — a code block's first line, still a block
+    ];
+    expect(paragraphStarts(doc)).toEqual([0, 2, 6, 8]);
+    expect(paragraphStarts([])).toEqual([]);
+  });
+
+  test("the VI stride: }/{ walk paragraph starts, back-steps snap to the current start", () => {
+    const doc = ["  a1", "", "  b1", "  b2", "", "  c1"];
+    const starts = paragraphStarts(doc);
+    expect(starts).toEqual([0, 2, 5]);
+    expect(snapFrame(starts, doc.length, 0, 1)).toBe(2);   // } from a1 → b1
+    expect(snapFrame(starts, doc.length, 3, 1)).toBe(5);  // } mid-b → c1
+    expect(snapFrame(starts, doc.length, 3, -1)).toBe(2); // { mid-b → b's start
+    expect(snapFrame(starts, doc.length, 2, -1)).toBe(0);  // { at b's start → a's
   });
 });

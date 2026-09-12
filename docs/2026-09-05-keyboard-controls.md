@@ -53,10 +53,12 @@ the state machine.
   default until [01] lands.
 - **[03] frozen mode** — cheap: suppress the fs.watch/rerender path
   (`r` stays manual). For reading while an agent edits.
-- **[01] frame mode — LANDED (v1, 2026-09-05), named the okudaframe**: j/k step header to
-  header (k from mid-frame snaps to the current frame's header first),
-  arrows slippy within, ␣/b page within. The brief's EC1–EC9 walk
-  remains the residue.
+- **[01] frame mode — LANDED (v1, 2026-09-05), named the okudaframe;
+  the step re-cut 2026-09-12 (BRF-OKUDAGRAM-STEP)**: j/k and ␣/b step
+  one contiguous glass page (height − overlap — no gaps in coverage;
+  the header-to-header jump moved to `]]`/`[[`, the declared skip),
+  arrows slippy within (their own line actions — the claim is true in
+  code at last), `}`/`{` step by paragraph (the VI stride, every mode).
 - **[10] edit** — the retired edit-dispatch idea returns as a verb:
   `$EDITOR` (or the declared agent channel) on the current document,
   in a separate terminal. File is the contract; no state.

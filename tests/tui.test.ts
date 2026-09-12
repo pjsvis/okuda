@@ -91,6 +91,16 @@ describe("tui — decodeKey (single-byte controls)", () => {
   test("empty buffer → null", () => {
     expect(decodeKey(buf())).toBeNull();
   });
+  test("the VI stride: } para-down, { para-up (BRF-OKUDAGRAM-STEP)", () => {
+    expect(decodeKey(buf(0x7d))).toBe("para-down"); // }
+    expect(decodeKey(buf(0x7b))).toBe("para-up");   // {
+  });
+  test("the frame jumps: ]] down, [[ up — single brackets unbound", () => {
+    expect(decodeKey(buf(0x5d, 0x5d))).toBe("frame-down"); // ]]
+    expect(decodeKey(buf(0x5b, 0x5b))).toBe("frame-up");   // [[
+    expect(decodeKey(buf(0x5d))).toBeNull();               // lone ]
+    expect(decodeKey(buf(0x5b))).toBeNull();               // lone [
+  });
   test("unknown byte → null", () => {
     expect(decodeKey(buf(0x7a))).toBeNull(); // 'z' — unbound
   });
@@ -98,9 +108,9 @@ describe("tui — decodeKey (single-byte controls)", () => {
 
 describe("tui — decodeKey (escape sequences)", () => {
   // ESC [ A = ↑, ESC [ B = ↓, ESC [ 5 ~ = PgUp, ESC [ 6 ~ = PgDn
-  test("arrows → up/down", () => {
-    expect(decodeKey(buf(0x1b, 0x5b, 0x41))).toBe("up");
-    expect(decodeKey(buf(0x1b, 0x5b, 0x42))).toBe("down");
+  test("arrows → line-up/line-down (slippy — their own actions, BRF-OKUDAGRAM-STEP)", () => {
+    expect(decodeKey(buf(0x1b, 0x5b, 0x41))).toBe("line-up");
+    expect(decodeKey(buf(0x1b, 0x5b, 0x42))).toBe("line-down");
   });
   test("page keys → page-up/page-down", () => {
     expect(decodeKey(buf(0x1b, 0x5b, 0x35, 0x7e))).toBe("page-up");
@@ -115,9 +125,9 @@ describe("tui — decodeKey (escape sequences)", () => {
   });
   // ESC O A/B = ↑/↓ under DECCKM (application cursor mode) — the form the
   // shell's line editor leaves active, and what alt-scroll wheels emit.
-  test("SS3 arrows (DECCKM on) → up/down", () => {
-    expect(decodeKey(buf(0x1b, 0x4f, 0x41))).toBe("up");
-    expect(decodeKey(buf(0x1b, 0x4f, 0x42))).toBe("down");
+  test("SS3 arrows (DECCKM on) → line-up/line-down", () => {
+    expect(decodeKey(buf(0x1b, 0x4f, 0x41))).toBe("line-up");
+    expect(decodeKey(buf(0x1b, 0x4f, 0x42))).toBe("line-down");
   });
   test("SS3 page keys → page-up/page-down; malformed → null", () => {
     expect(decodeKey(buf(0x1b, 0x4f, 0x35, 0x7e))).toBe("page-up");

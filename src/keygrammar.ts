@@ -78,6 +78,15 @@ export function splitKeyEvents(bytes: Uint8Array): Uint8Array[] {
         continue;
       }
     }
+    // Vim's section motions ride whole: `]]` and `[[` (BRF-
+    // OKUDAGRAM-STEP — the declared header-to-header jump). A single
+    // bracket stays a single event; the pair is one key event, burst-
+    // safe like the escape sequences.
+    if ((bytes[i] === 0x5d || bytes[i] === 0x5b) && bytes[i] === bytes[i + 1]) {
+      events.push(bytes.slice(i, i + 2));
+      i += 2;
+      continue;
+    }
     events.push(bytes.slice(i, i + 1));
     i += 1;
   }
