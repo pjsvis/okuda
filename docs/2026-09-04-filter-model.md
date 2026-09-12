@@ -204,6 +204,70 @@ natively (`echo -e "alpha\nbeta\ngamma" | fzf --exact --filter="alpha
 so the entry list is correct; fzf's native `|` coexists for in-fzf
 refinement.
 
+### 4d. Spaces vs pipe — phrase-recall vs theme-recall (dogfood 2026-09-07)
+
+**Status: documented (no code change — the grammar already works; the
+lesson is which operator to reach for).** The OR grammar (4c) and the
+phrase-tolerant body regex (the `.{0,3}` bounded gap) answer two
+different recall questions, and the dogfood that surfaced the
+distinction was a query that returned zero when it should have surfaced:
+
+- `foucault car park` (spaces) → **0 body hits.** The body regex
+  becomes `foucault.{0,3}car.{0,3}park` — three words joined by a
+  3-character leash, on one line. The only line carrying both
+  `foucault` and `car park` is `We fight Foucault in the car park` —
+  the gap is ` in the ` (8 chars). The leash allows 3. Miss.
+- `foucault | car park` (pipe) → **4 body hits, target at #1.** The
+  union of the `foucault` hits and the `car park` hits; the target is
+  a hit on both, so dedup ranks it first.
+- `foucault` (alone) → **1 body hit, the target.** The quiet coda: one
+  distinctive word beats a three-theme phrase every time.
+
+The distinction the two operators express:
+
+- **Spaces = phrase-recall.** You remember a phrase that sits together:
+  `load bearing`, `car park`. The 3-char gap tolerates prose glue
+  (hyphens, table pipes) — `load-bearing` and `load | bearing` — but
+  not whole intervening phrases. Spaces answer "is this phrase in the
+  corpus?"
+- **Pipe = theme-recall.** You remember themes that may not co-occur on
+  one line: `foucault` and `car park`, a paragraph apart. `|` unions
+  the per-theme hit sets; a document in *both* sets ranks high. The
+  pipe answers "which documents carry any of these themes?"
+
+**Why the anti-shite filter survives.** The two operators live at
+different layers, as 4c established: `|` runs upstream in the silo
+pre-filter (widens the entry list honestly — a union, not a guess);
+fzf `--exact` runs downstream (narrows it with substring AND). The
+pipe does not weaken the anti-soup guarantee; it feeds the soup-filter
+an honest union instead of the falsely-narrow zero that spaces
+produced. `--exact`'s job (refuse `state` matching `estate`) is
+untouched — it never saw the gap, and the pipe never asks it to.
+
+**The web-search habit, named.** Typing three space-separated themes is
+a web-search reflex — the web's inverted index ORs them silently and
+ranks by co-occurrence. The concordance does not share the reflex:
+space-separated words are a *phrase* here, not an implicit OR. The
+honest operator for theme-union is `|`, explicit and upstream. The
+discipline is the same as `!`'s (section 4) and the uppercase escape
+hatch's (4b): reach for the operator when the dogfood shows the need,
+not from habit. The three-word phrase that returns zero is the dogfood;
+the pipe is the operator.
+
+**The extension token — kind-recall (dogfood 2026-09-10).** A
+filename-fragment term narrows by *evidence shape*, not topic:
+`delusion` returns three (two documents discussing it, one named it);
+`delusion .md` returns one, because `.md` appears in an evidence row
+only where the evidence is path-shaped — a filename, a citation, a
+mention. The term selects documents *named* X against documents
+*discussing* X: the use/mention distinction
+(`docs/2026-09-10-use-vs-mention.md`) surfaced in the query grammar,
+where nobody put it. The operator taxonomy stands: spaces =
+phrase-recall; pipe = theme-recall; `!` = negation; extension token =
+kind-recall — name-shape vs theme-shape. Found by typing an extension
+into the search for no reason; the composition produced a feature
+nobody specified.
+
 ## The house vocabulary
 
 The terms for "looking something up", gathered from a thousand years of

@@ -1,4 +1,8 @@
-# okuda
+# okuda — a Leith §criptorium & Bond instrument
+
+L§AB
+
+LEITH SCRIPTORIUM & BOND
 
 A terminal markdown viewer built on `Bun.markdown` and compiled to a single binary. Named for Michael Okuda — high-contrast, functional, uncluttered.
 
@@ -27,7 +31,7 @@ The filesystem is the message bus; any tool that writes markdown to a file is al
 
 ## Status
 
-Pre-implementation. Design source: [docs/2026-08-20-origin-doc.md](docs/2026-08-20-origin-doc.md) — the *what*. Design rationale: [docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md](docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md) — the *why* (the Derrida gate, the Foxtrot Oscar, and the ventilator).
+L§AB — the Leith Scriptorium & Bond. Pre-implementation instrument. Design source: [docs/2026-08-20-origin-doc.md](docs/2026-08-20-origin-doc.md) — the *what*. Design rationale: [docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md](docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md) — the *why* (the Derrida gate, the Foxtrot Oscar, and the ventilator).
 
 ## Repository Layout
 
@@ -38,3 +42,7 @@ just help     # workflow guide
 just orient   # current state
 just check    # quality gate
 ```
+
+---
+
+*L§AB* — Leith Scriptorium & Bond

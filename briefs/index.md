@@ -9,6 +9,8 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-10 | BRF-TTS-STEPPER | open | The TTS stepper — frame-as-para, prosody-as-colour | 2026-09-10-brief-tts-stepper.md |
+| 2026-09-09 | BRF-TTS-TEMPORAL | open | Temporal punctuation — markdown prosody for say (the boundary-to-pause extractor) | 2026-09-09-brief-tts-temporal-punctuation.md |
 | 2026-09-07 | BRF-DIAGRAM-INGESTION | open | The diagram ingestion pipeline — mermaid-to-md as the show/elide/hide gate | 2026-09-07-brief-diagram-ingestion.md |
 | 2026-09-07 | BRF-OKUDAGRAM-STEP | open | The okudagram step — no gaps in coverage | 2026-09-07-brief-okudagram-step.md |
 | 2026-09-07 | BRF-ONION-SEARCH-GRAMMAR | open | The onion search grammar — staged filtering, path/content separation | 2026-09-07-brief-onion-search-grammar.md |
