@@ -15,7 +15,12 @@
  *   - markdown inline links to local `.md` paths
  * Never vectors: zero-padded or single-digit bracketed numbers (`[07]`
  * is text, always); `okuda-rhs` tokens (ADR-022 legacy — retired, their
- * numbers not honored; their .md paths are ordinary references).
+ * numbers not honored; their .md paths are ordinary references); fenced
+ * blocks — the fence is not prose, and a badge injected inside a fence
+ * never renders (the phantom-§12 defect, found in Babylon-to-Stars
+ * 2026-09-12: a mermaid node label ate the floor and the mermaid pipe
+ * swallowed the badge); mid-word callsign anchoring — the scan is
+ * token-boundaried (`YYYY-MM-DD` is a date template, not `YYY-MM-DD`).
  */
 
 export const VECTOR_MIN = 11;
@@ -45,7 +50,35 @@ export const MAX_REFS = VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size;
 export const CALLSIGN_SHAPE = /^[A-Z]{3}(-[A-Z0-9]+)+$/;
 
 const RE_MD_LINK = /\[[^\]\n]*\]\((\S+?\.md)\)/g;
-const RE_CALLSIGN = /[A-Z]{3}(?:-[A-Z0-9]+)+/g;
+const RE_CALLSIGN = /\b[A-Z]{3}(?:-[A-Z0-9]+)+\b/g;
+
+/** Fenced blocks as (start, end) offset ranges. The house rule: the
+ *  fence is not prose — verbatim, load-bearing input. A badge injected
+ *  inside a fence never renders (mermaid fences are replaced by art;
+ *  code fences render literally), so a reference born inside a fence
+ *  is a hole in the numbering, not a vector. Discovery stops at the
+ *  fence line. An unterminated fence fences the rest of the document.
+ *  Pure. */
+function fenceRanges(source: string): Array<[number, number]> {
+  const ranges: Array<[number, number]> = [];
+  let pos = 0;
+  let open: number | null = null;
+  for (const line of source.split("\n")) {
+    if (/^\s*(```|~~~)/.test(line)) {
+      if (open === null) open = pos;
+      else {
+        ranges.push([open, pos + line.length]);
+        open = null;
+      }
+    }
+    pos += line.length + 1;
+  }
+  if (open !== null) ranges.push([open, source.length]);
+  return ranges;
+}
+
+const inFence = (pos: number, ranges: Array<[number, number]>): boolean =>
+  ranges.some(([a, b]) => pos >= a && pos < b);
 
 /** Reference occurrences: every reference-shaped span in the document,
  *  in reading order, **with repeats** — the vector↔filename relationship
@@ -63,12 +96,15 @@ export interface RefOccurrence {
 export function scanReferences(source: string): RefOccurrence[] {
   const fm = source.match(/^---\n[\s\S]*?\n---/);
   const bodyStart = fm ? fm[0]!.length : 0;
+  const fences = fenceRanges(source);
   const hits: RefOccurrence[] = [];
   for (const m of source.matchAll(RE_MD_LINK)) {
-    if (m.index! >= bodyStart) hits.push({ pos: m.index!, end: m.index! + m[0]!.length, target: m[1]! });
+    const i = m.index!;
+    if (i >= bodyStart && !inFence(i, fences)) hits.push({ pos: i, end: i + m[0]!.length, target: m[1]! });
   }
   for (const m of source.matchAll(RE_CALLSIGN)) {
-    if (m.index! >= bodyStart) hits.push({ pos: m.index!, end: m.index! + m[0]!.length, target: m[0]! });
+    const i = m.index!;
+    if (i >= bodyStart && !inFence(i, fences)) hits.push({ pos: i, end: i + m[0]!.length, target: m[0]! });
   }
   hits.sort((a, b) => a.pos - b.pos);
   return hits.slice(0, MAX_REFS);

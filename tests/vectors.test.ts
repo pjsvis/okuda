@@ -45,6 +45,28 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
     expect(scanReferences("the SSH-2 protocol").map((r) => r.target)).toEqual(["SSH-2"]);
   });
 
+  test("the callsign scan is token-boundaried — no mid-word anchoring", () => {
+    // The phantom-§13 in Babylon-to-Stars: the matcher anchored one
+    // character inside YYYY-MM-DD and read YYY-MM-DD; ISO-Date truncated
+    // to ISO-D. A token has boundaries; a date template is not a call.
+    expect(scanReferences("dates like (YYYY-MM-DD-mnemonic-slug.md) and ISO-Date anchors.")).toEqual([]);
+    expect(scanReferences("ADR-031's clause and BRF-X, pinned.").map((r) => r.target)).toEqual(["ADR-031", "BRF-X"]);
+  });
+
+  test("discovery stops at fences — a badge that cannot paint is not a reference", () => {
+    // The phantom-§12 in Babylon-to-Stars: ISO-Date inside a mermaid
+    // fence took the floor; the mermaid pipe swallowed its badge. The
+    // fence is not prose.
+    const fenced = '```mermaid\nF3["Flat Silo (ISO-Date Anchored)"]\n```\n\nADR-031 in prose.';
+    expect(scanReferences(fenced).map((r) => r.target)).toEqual(["ADR-031"]);
+    const linked = '```text\nsee [x](docs/z.md)\n```\n\n[real](docs/y.md)';
+    expect(scanReferences(linked).map((r) => r.target)).toEqual(["docs/y.md"]);
+  });
+
+  test("an unterminated fence fences the rest — no half-open escape hatch", () => {
+    expect(scanReferences('```\nADR-031\n').map((r) => r.target)).toEqual([]);
+  });
+
   test("legacy okuda-rhs wiring is not honored — and is not a reference", () => {
     // The legacy row's path lives in an HTML comment as wiring; bare .md
     // paths in prose are provenance (the near/far register), not
