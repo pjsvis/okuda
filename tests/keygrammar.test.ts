@@ -17,8 +17,8 @@ describe("keygrammar — the two-digit language as data", () => {
     expect(CLONE_TOKEN).toBe(99);
   });
 
-  test("the address range resolves to vectors", () => {
-    expect(verbFor(11)).toBe("vector");
+  test("the address range resolves to vectors — the floor is 12 now, 11 is the pocket", () => {
+    expect(verbFor(12)).toBe("vector");
     expect(verbFor(98)).toBe("vector");
   });
 
@@ -26,8 +26,8 @@ describe("keygrammar — the two-digit language as data", () => {
     for (const t of [4, 5, 6, 7, 8]) expect(verbFor(t)).toBeNull();
   });
 
-  test("repeated-digit actuators are reserved (ADR-032), not vectors", () => {
-    for (const t of [44, 55, 66, 77, 88]) expect(verbFor(t)).toBeNull();
+  test("repeated-digit actuators are reserved (ADR-032 + the 2026-09-12 [11] extension), not vectors", () => {
+    for (const t of [11, 44, 55, 66, 77, 88]) expect(verbFor(t)).toBeNull();
   });
 
   test("the bindings are a table — renumbering is data, not code", () => {

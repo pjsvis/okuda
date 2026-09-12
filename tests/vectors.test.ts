@@ -63,18 +63,19 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
     const src = Array.from({ length: 120 }, (_, i) => `ADR-${1000 + i}`).join(" ");
     const refs = scanReferences(src);
     expect(refs.length).toBe(MAX_REFS);
-    // ADR-032: 5 repeated-digit actuators reserved → 83 addresses, not 88.
-    expect(MAX_REFS).toBe(VECTOR_MAX - VECTOR_MIN + 1 - 5);
+    // ADR-032 + [11] (2026-09-12): 6 reserved tokens → 82 addresses, not 88.
+    expect(MAX_REFS).toBe(VECTOR_MAX - VECTOR_MIN + 1 - 6);
   });
 });
 
 describe("vectors — the jump map (the translation table)", () => {
-  test("numbers run from 11, in reading order — one destination, one silcrow", () => {
+  test("numbers run from 12, in reading order — one destination, one silcrow", () => {
     const map = jumpMapFor("ADR-002 early, ADR-002 again, [x](docs/z.md).");
-    expect(map.get(11)).toBe("ADR-002");
-    expect(map.get(12)).toBe("docs/z.md");
-    expect(map.has(13)).toBe(false); // the repeat reuses §11
+    expect(map.get(12)).toBe("ADR-002");
+    expect(map.get(13)).toBe("docs/z.md");
+    expect(map.has(14)).toBe(false); // the repeat reuses §12
     expect(map.has(10)).toBe(false);
+    expect(map.has(11)).toBe(false);  // the double-tap pocket — never a silcrow
   });
 
   test("buildJumpMap caps at MAX_REFS", () => {
@@ -84,15 +85,15 @@ describe("vectors — the jump map (the translation table)", () => {
     expect(map.has(VECTOR_MAX + 1)).toBe(false);
   });
 
-  test("the allocator skips the reserved actuators (ADR-032)", () => {
-    // 84 distinct refs: fills 11-43, skips 44, fills 45-54, skips 55, …
+  test("the allocator skips the reserved actuators (ADR-032 + [11])", () => {
+    // 84 distinct refs: fills 12-43, skips 44, fills 45-54, skips 55, …
     const refs = Array.from({ length: 84 }, (_, i) => ({ pos: i, end: i + 1, target: `ADR-${i}` }));
     const map = buildJumpMap(refs);
-    expect(map.size).toBe(MAX_REFS); // 83 — one short of 84
-    for (const r of [44, 55, 66, 77, 88]) expect(map.has(r)).toBe(false);
-    expect(map.get(11)).toBe("ADR-0");
-    expect(map.get(43)).toBe("ADR-32"); // last before the 44 gap
-    expect(map.get(45)).toBe("ADR-33"); // first after the 44 gap
+    expect(map.size).toBe(MAX_REFS); // 82 — two short of 84
+    for (const r of [11, 44, 55, 66, 77, 88]) expect(map.has(r)).toBe(false);
+    expect(map.get(12)).toBe("ADR-0");
+    expect(map.get(43)).toBe("ADR-31"); // last before the 44 gap
+    expect(map.get(45)).toBe("ADR-32"); // first after the 44 gap
   });
 
   test("99 is not derivable — the clone verb is reserved", () => {
@@ -105,26 +106,26 @@ describe("vectors — annotation (illustrative paint markers)", () => {
   test("injects the marker after each reference occurrence, per the map", () => {
     const map = jumpMapFor("the live search is ADR-030, amended.");
     const out = annotateSource("the live search is ADR-030, amended.", map);
-    expect(out).toBe("the live search is ADR-030 %okuda-vector:11%, amended.");
+    expect(out).toBe("the live search is ADR-030 %okuda-vector:12%, amended.");
   });
 
   test("repeated references reuse the silcrow (the citation convention)", () => {
     const src = "ADR-030 once, ADR-030 twice.";
     const map = jumpMapFor(src);
     const out = annotateSource(src, map);
-    expect(out.match(/%okuda-vector:11%/g)!.length).toBe(2); // same number, both cites
+    expect(out.match(/%okuda-vector:12%/g)!.length).toBe(2); // same number, both cites
   });
 
   test("links: badge after the closing paren", () => {
     const map = jumpMapFor("see [the doc](docs/x.md) here.");
     const out = annotateSource("see [the doc](docs/x.md) here.", map);
-    expect(out).toBe("see [the doc](docs/x.md) %okuda-vector:11% here.");
+    expect(out).toBe("see [the doc](docs/x.md) %okuda-vector:12% here.");
   });
 
   test("targets with regex metacharacters are literal", () => {
     const map = jumpMapFor("see [x](docs/x(1).md) here.");
     const out = annotateSource("see [x](docs/x(1).md) here.", map);
-    expect(out).toContain("%okuda-vector:11%");
+    expect(out).toContain("%okuda-vector:12%");
   });
 
   test("no references → source unchanged", () => {

@@ -5,8 +5,24 @@ callsign: ADR-REPEATED-DIGIT-ACTUATORS-032
 
 # Decision: Repeated-digit actuators — [44,55,66,77,88] reserved
 
-**Date:** 2026-09-06
+**Date:** 2026-09-06 · **amended 2026-09-12** ([11] joins the pocket)
 **Status:** Accepted
+
+## Amendment (2026-09-12): [11] joins the pocket
+
+The operator reserved [11] for a planned double-tap verb. [11] was the
+first silcrow and the first menu jump token — both floors move to 12
+(`RESERVED_VECTORS`, `jumpToken`, ADR-021's floor). The shape rule gets
+*truer*: [11] was the most prominent exception to *repeated digit =
+actuator*, unexplained by anything but history. The cost is the "silcrow
+11 is always the first" mnemonic (ADR-031/032 both cited it); its
+successor 12 is still 0-free, so ADR-021's keyboard rationale survives.
+MAX_REFS drops 83 → 82 — free, by this ADR's own argument.
+
+**22 and 33 stay addressable** — reserved on demand when a verb needs
+a home, never speculatively (this ADR's discipline). The spaced-menu
+corollary of ADR-021 does not survive this amendment and is retired
+there (palimpsest, same day).
 
 ## Context
 
@@ -51,13 +67,14 @@ exception. The grammar is cleaner, not weaker.
 
 ## The numbering contract, amended
 
-- Vectors run **11–98** *minus* the reserved actuators {44,55,66,77,88} —
-  **83 addresses**. Silcrow 11 is still always the first.
+- Vectors run **12–98** *minus* the reserved actuators {44,55,66,77,88}
+  — **82 addresses** (2026-09-12: [11] joined the pocket; was 83).
+  Silcrow 12 is always the first.
 - The allocator skips the reserved digits globally (see
   `src/vectors.ts:buildJumpMap`). The gap is invisible because numbers
   are dynamic, never authored.
-- `MAX_REFS` is now 83, not 88 (`VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size`).
-- `verbFor` resolves {44,55,66,77,88} to `null` (reserved-unassigned),
+- `MAX_REFS` is 82 (`VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size`).
+- `verbFor` resolves {11,44,55,66,77,88} to `null` (reserved-unassigned),
   not `"vector"` (`src/keygrammar.ts`).
 
 ## Discipline — non-negotiable
@@ -77,6 +94,7 @@ Reserved for future double-tap verbs (binding is a one-line table edit
 in `src/keygrammar.ts`):
 
 - `[00]` — exit (bound, ADR-031)
+- `[11]` — *unassigned* (actuator pocket, joined 2026-09-12)
 - `[44]` — *unassigned* (actuator pocket)
 - `[55]` — *unassigned* (actuator pocket)
 - `[66]` — *unassigned* (actuator pocket)

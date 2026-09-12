@@ -53,28 +53,31 @@ describe("jump-demo — stateGlyph (deviations earn their mark; default bare)", 
   });
 });
 
-describe("jump-demo — jumpToken (numbers from 11, not 01 — ADR-021)", () => {
-  test("item 0 (the first) → 11, not 01", () => {
-    expect(jumpToken(0)).toBe("11");
+describe("jump-demo — jumpToken (numbers from 12, not 01 — ADR-021 amended: [11] joined the ADR-032 pocket 2026-09-12)", () => {
+  test("item 0 (the first) → 12, not 01 — and never 11, which is reserved", () => {
+    expect(jumpToken(0)).toBe("12");
   });
-  test("item 1 → 12", () => {
-    expect(jumpToken(1)).toBe("12");
+  test("item 1 → 13", () => {
+    expect(jumpToken(1)).toBe("13");
   });
-  test("a ≤9-item list never pays the 0-key stretch (11–19 are 0-free)", () => {
-    for (let i = 0; i < 9; i++) expect(jumpToken(i)).not.toContain("0");
+  test("a ≤8-item list never pays the 0-key stretch (12–19 are 0-free)", () => {
+    for (let i = 0; i < 8; i++) expect(jumpToken(i)).not.toContain("0");
   });
-  test("the 10th item (i=9 → 20) reintroduces the 0 — the decade boundary still bites", () => {
-    expect(jumpToken(9)).toBe("20");
-    expect(jumpToken(9)).toContain("0");
+  test("the 9th item (i=8 → 20) reintroduces the 0 — the decade boundary bites one item earlier now", () => {
+    expect(jumpToken(8)).toBe("20");
+    expect(jumpToken(8)).toContain("0");
   });
-  test("two digits through 89 items (item 88 → 99); the 0-free floor holds", () => {
-    expect(jumpToken(88)).toBe("99");
-    expect(jumpToken(0)).toBe("11");
+  test("two digits through 88 items (item 87 → 99); the 0-free floor holds", () => {
+    expect(jumpToken(87)).toBe("99");
+    expect(jumpToken(0)).toBe("12");
   });
-  test("01-09 is the reserved namespace — jumpToken never emits it", () => {
+  test("01-09 and 11 are reserved namespaces — jumpToken never emits them", () => {
     for (let i = 0; i < 100; i++) {
       const n = Number(jumpToken(i));
-      if (i < 89) expect(n).toBeGreaterThanOrEqual(11);
+      if (i < 88) {
+        expect(n).toBeGreaterThanOrEqual(12);
+        expect(n).not.toBe(11);
+      }
     }
   });
 });

@@ -37,7 +37,7 @@ space becomes a closed keyboard language with three zones:
 | Zone | Keys | Meaning |
 |---|---|---|
 | Verbs & modes | `00`–`10` | what the instance *does* |
-| Addresses | `11`–`98` | what the instance *shows* (the silcrows) |
+| Addresses | `12`–`98` | what the instance *shows* (the silcrows); `11` joined the double-tap pocket 2026-09-12 |
 | Promotion | `99` | clone the rendered document to a new instance |
 
 Every two-digit press is exactly one of the three. No mode toggles,

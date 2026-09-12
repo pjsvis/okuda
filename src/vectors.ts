@@ -22,16 +22,20 @@ export const VECTOR_MIN = 11;
 export const VECTOR_MAX = 98;
 /** The clone verb (ADR-031): not a vector — reserved in the two-digit space. */
 export const CLONE_TOKEN = 99;
-/** Repeated-digit actuators (ADR-032): reserved for double-tap verbs
- *  ([00] exit and [99] clone already set the precedent). The silcrow
- *  allocator skips these globally — a shape rule, not a range rule:
- *  repeated digit = actuator, mixed digits = address. The grammar
- *  reserves them; documents never see the gap (numbers are dynamic). */
-export const RESERVED_VECTORS = new Set([44, 55, 66, 77, 88]);
+/** Repeated-digit actuators (ADR-032, extended 2026-09-12):
+ *  reserved for double-tap verbs ([00] exit and [99] clone already set
+ *  the precedent; [11] joined the pocket — the operator's verb plan).
+ *  The silcrow allocator skips these globally — a shape rule, not a
+ *  range rule: repeated digit = actuator, mixed digits = address. The
+ *  grammar reserves them; documents never see the gap (numbers are
+ *  dynamic). 22/33 stay addressable — reserved on demand, never
+ *  speculatively (ADR-032's discipline). */
+export const RESERVED_VECTORS = new Set([11, 44, 55, 66, 77, 88]);
 /** The two-digit space is 00-99; reserved: 00-09 (unreachable padding),
- *  10 (numeric sanity), 99 (the clone verb), and the repeated-digit
- *  actuators {44,55,66,77,88} (ADR-032). Vectors: 11-98 minus the 5
- *  reserved actuators — 83 addresses, and silcrow 11 is always first. */
+ *  10 (numeric sanity), 11 (the double-tap pocket, 2026-09-12), 99 (the
+ *  clone verb), and the repeated-digit actuators {44,55,66,77,88}
+ *  (ADR-032). Vectors: 12-98 minus the 5 reserved actuators — 82
+ *  addresses, and silcrow 12 is always first. */
 /** The two-digit buffer only ever completes on two digits, so painted
  *  forms are always two characters wide. */
 export const MAX_REFS = VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size;

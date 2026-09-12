@@ -65,15 +65,17 @@ export function stateGlyph(content: string): string {
   return "";  // open / pending / unknown — the default; no glyph
 }
 
-/** The jump token for a zero-based index. Numbers from 11, not 01 — the
+/** The jump token for a zero-based index. Numbers from 12, not 01 — the
  *  0 key sits at the opposite end of the number row from 1, and the tokens
  *  are ephemeral codes (never counts), so they should be easy to type. The
- *  offset removes the 0-key stretch for the common <=~10-item list and
- *  reserves 01-09 as a free namespace. Two digits cover 11-99 (89 items);
- *  lists over ~10 are the compositor's concern, not the renderer's.
- *  (ADR-021.) */
+ *  offset removes the 0-key stretch for the common <=~8-item list and
+ *  reserves 01-09 as a free namespace. 11 joined the double-tap pocket
+ *  (ADR-032, 2026-09-12), so the floor is 12 — the first menu row can no
+ *  longer be [11]. Two digits cover 12-99 minus the reserved pocket
+ *  (87 minus 5 = 82 usable); lists over ~10 are the compositor's
+ *  concern, not the renderer's. (ADR-021, amended.) */
 export function jumpToken(index: number): string {
-  return String(index + 11);
+  return String(index + 12);
 }
 
 /** Compose one table row of the menu: slug (content) → callsign
