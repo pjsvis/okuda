@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-13 | BRF-TIDY-FIRST | in_progress | Tidy-first — the path to a good place | 2026-09-13-brief-tidy-first.md |
 | 2026-09-10 | BRF-TTS-STEPPER | open | The TTS stepper — frame-as-para, prosody-as-colour | 2026-09-10-brief-tts-stepper.md |
 | 2026-09-09 | BRF-TTS-TEMPORAL | open | Temporal punctuation — markdown prosody for say (the boundary-to-pause extractor) | 2026-09-09-brief-tts-temporal-punctuation.md |
 | 2026-09-07 | BRF-DIAGRAM-INGESTION | open | The diagram ingestion pipeline — mermaid-to-md as the show/elide/hide gate | 2026-09-07-brief-diagram-ingestion.md |
