@@ -12,12 +12,15 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 - **BRF-CONTENT-SHORTLIST** — the discovery gap, the oldest standing
   complaint: closed. The live search shipped as the default (ADR-030),
   ranked and evidence-carrying; the picker is the index now.
-- **The keyboard grammar** — 00-10 verbs and modes, 11-98 addresses, 99
+- **The keyboard grammar** — 00-10 verbs and modes, 12-98 addresses, 99
   promotion: the two-digit space is a language with a bindings table
   (src/keygrammar.ts); renumbering is a one-line edit. **Amended
-  2026-09-06 (ADR-032):** repeated-digit actuators {44,55,66,77,88}
-  reserved; shape rule (repeated = actuator, mixed = address) supersedes
-  the range split; 83 addresses, not 88.
+  2026-09-06 (ADR-032):** repeated-digit actuators {00,11,22,…,99} — one
+  class, never jumps — reserved; shape rule (repeated = actuator, mixed =
+  address) supersedes the range split. **Corrected 2026-09-13:** the
+  vectors are 12–98 *minus* the doubled-pair class = **80 addresses**, not
+  88 (and not the 83 this line said in between, which predates 11 joining
+  the pocket). Canon: `src/vectors.ts` `MAX_REFS`, ADR-032:81.
 - **Frame mode (BRF-PAGED-OKUDAGRAM, v1)** — `01` actuates: a frame is
   a header and its content to the next header; j/k step frames, arrows
   slippy within, ␣/b page. The brief's EC walk remains.
