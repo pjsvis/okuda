@@ -70,8 +70,9 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
 
   test("legacy okuda-rhs wiring is not honored — and is not a reference", () => {
     // The legacy row's path lives in an HTML comment as wiring; bare .md
-    // paths in prose are provenance (the near/far register), not
-    // references. The authored number is not honored. The row is inert.
+    // paths in prose are not references — discovery scans links and
+    // callsigns only, and colour is a separate register question. So the
+    // authored number is not honored, and the row is inert.
     const src = "| *slug* | CS | **14** <!-- %%okuda-rhs:14%% briefs/x.md --> |";
     expect(scanReferences(src).length).toBe(0);
   });

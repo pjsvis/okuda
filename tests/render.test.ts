@@ -598,9 +598,11 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
     expect(plain).toContain("narrow terminal");
   });
 
-  test("greedy: a .md mention in ordinary prose still mutes (the far register)", async () => {
+  test("greedy: a .md mention in ordinary prose lifts to doc-ref gold (the affordance register)", async () => {
     const out = await render("See the notes in docs/essay.md for more.");
-    expect(out).toContain("\x1b[38;2;88;88;88mdocs/essay.md\x1b[0m");
+    // doc-ref #e8c44a → 232;196;74 — the affordance register, not the
+    // gloaming (amended 2026-09-12: actable paths are near by function).
+    expect(out).toContain("\x1b[38;2;232;196;74mdocs/essay.md\x1b[0m");
   });
 
   test("a non-digit strong run keeps the amber strong colour (not white)", async () => {

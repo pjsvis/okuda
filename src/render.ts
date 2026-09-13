@@ -598,11 +598,14 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       out = out.replace(/%{1,2}okuda-vector:(\d{1,2})%{1,2}/g, (_m, n: string) =>
         " " + styler.roleBold("vector", `§${n}`));
       out = out.replace(/%{1,2}okuda-(?:vector|rhs):\d{1,2}%{1,2}/g, "");
-      // Bare .md-path tokens in prose recede to the muted (far) register
-      // — near/far: paths are provenance, not content. They read like
-      // the status bar's folder/file text. (brief: index-and-jump.)
+      // Bare .md-path tokens in prose are affordances, not provenance
+      // (amended 2026-09-12 — the 2026-08-28 gloaming called them far by
+      // location; the test is by function). An actable path lifts to
+      // the doc-ref gold: visible, subordinate to the rose vector
+      // paint — the silcrow is the actuation point, the path is the
+      // address. Type it in the search and it resolves.
       out = out.replace(/\b([\w][\w/.-]*\.md)\b/g, (m) =>
-        styler.role("muted", m));
+        styler.role("doc-ref", m));
       // A standalone state glyph colours in prose — the vocabulary's
       // "colour + bold" intent applies wherever the glyph appears as a
       // glyph (standalone, not embedded). The lexicon is consistent
