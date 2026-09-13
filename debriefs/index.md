@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-13 | DBF-TIDY-FIRST | done | Debrief: Tidy-first — the path to a good place | 2026-09-13-debrief-tidy-first.md |
 | 2026-09-06 | DBF-PROTOCOL-FREE-TTS | done | Debrief: the protocol-free TTS day — a dunt demolished, a moat proven | 2026-09-06-debrief-protocol-free-tts.md |
 | 2026-09-05 | DBF-PALETTE-PAGE | done | Debrief: the palette page — hand-crafting that would have lied | 2026-09-05-debrief-palette-page.md |
 | 2026-09-04 | DBF-GLOAM-LIVE-SEARCH | done | Debrief: the gloam live search — one day, three UX failures, one ADR | 2026-09-04-debrief-gloam-live-search.md |

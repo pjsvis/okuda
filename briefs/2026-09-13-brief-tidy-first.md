@@ -7,8 +7,8 @@ callsign: BRF-TIDY-FIRST
 
 **Created:** 2026-09-13
 **TD:** td-8969cf
-**Status:** In Progress
-**Phases:** 0, 3 and 5 done; 1, 2 and 4 open.
+**Status:** Done
+**Phases:** 0–5 done — merged, reconciled, and debriefed (DBF-TIDY-FIRST).
 **Lineage:** moved here on 2026-09-13 from `docs/2026-09-13-tidy-first.md` per the
 reader's instruction — *"create the brief and we will debrief after the merge."*
 The original brief answered *"lets tidy-first and get ourselves to a good place;
