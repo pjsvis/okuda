@@ -21,12 +21,12 @@ its base**, and the tip subsumes three of them. So the work to land is **nine
 unique commits across five branches**, and it is already written.
 
 ```mermaid
-title: Thirty-one branches, five merge targets
+title: Thirteen carry work, eight merge targets
 flowchart LR
     B[31 local] --> M[23 dead]
-    B --> W[7 carry work]
-    W --> T[5 merge targets]
-    W --> A[2 absorbed]
+    B --> W[13 carry commits]
+    W --> T[8 merge targets]
+    W --> A[5 absorbed]
 ```
 
 ## The stack — and it forks
@@ -53,12 +53,18 @@ it hides the shape. The check that actually answers the question is
 **two merges, not one**.
 
 ```mermaid
-title: The three independents
+title: Two independents, and the chain's base
 flowchart LR
     M[main] --> A[doc-ref-gold]
     M --> B[related-callsign]
     M --> C[census-mode]
+    C --> D[references-section]
+    D --> E[prolonged-press]
+    E --> F[audio-discovery - the tip]
 ```
+
+`census-mode` is off `main` like the other two, but it is **the base of the
+registry chain**, not an independent — and it must not land on its own. See Phase 4.
 
 ## The branches, and what each one closes
 
