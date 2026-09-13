@@ -26,6 +26,13 @@ jump-demo:
     @bun scripts/jump-demo.ts > tmp/okuda-jump-demo.md
     @./okuda tmp/okuda-jump-demo.md --tui
 
+# References demo
+[group('navigation')]
+references-demo:
+    @mkdir -p tmp
+    @bun scripts/references-demo.ts > tmp/okuda-references-demo.md
+    @./okuda tmp/okuda-references-demo.md --tui
+
 # Menu
 [group('navigation')]
 menu tier:

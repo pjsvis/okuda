@@ -53,3 +53,4 @@
 {"file":"2026-09-09-brief-tts-temporal-punctuation.md","date":"2026-09-09","status":"open","summary":"Temporal punctuation — markdown prosody for say (the boundary-to-pause extractor)","meta":{},"callsign":"BRF-TTS-TEMPORAL"}
 {"file":"2026-09-10-brief-tts-stepper.md","date":"2026-09-10","status":"open","summary":"The TTS stepper — frame-as-para, prosody-as-colour","meta":{},"callsign":"BRF-TTS-STEPPER"}
 {"file":"2026-09-12-brief-census-mode.md","date":"2026-09-12","status":"open","summary":"Census mode — the mentions-inclusive map, as a reader's opt-in","meta":{},"callsign":"BRF-CENSUS-MODE"}
+{"file":"2026-09-13-brief-references-section.md","date":"2026-09-13","status":"open","summary":"The References section — the renderer emits its own map","meta":{},"callsign":"BRF-REFERENCES-SECTION"}
