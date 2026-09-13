@@ -7,6 +7,7 @@ lineage: the reader's instruction — *"lets tidy-first and get ourselves to a g
 # Tidy-first — the path to a good place
 
 **Date:** 2026-09-13
+**Status:** Phases 0 and 3 done; 1, 2, 4 and 5 open.
 **Scope:** the repository's branch and review state. Not a brief, not a plan to
 build anything — a plan to *reconcile* what already exists.
 
@@ -125,20 +126,38 @@ one commit each, clean against `main`. Merge, `just check`, delete the branches.
 Both touch the registries, which are **derived** — if either conflicts there, the
 resolution is `just reg-sync-fix` and stage the result, not a hand-merge.
 
-### Phase 3 — split the current branch
+### Phase 3 — split the current branch  ✓ done 2026-09-13
 
-`feat/census-mode-brief` currently holds `d6a60e1` (census mode — legitimately its
-own branch) **plus** four unrelated workstreams uncommitted on top. Per AGENTS.md
-rule 4, these want their own branches:
+`feat/census-mode-brief` held `d6a60e1` (census mode — legitimately its own
+branch) **plus** four unrelated workstreams uncommitted on top. Per AGENTS.md
+rule 4, these got their own branches. **Six landed, in two shapes:**
 
-| New branch | Contents |
-|---|---|
-| `feat/references-section` | `briefs/2026-09-13-brief-references-section.md`, `scripts/references-demo.ts`, `justfile` (the demo recipe), `playbooks/authoring-playbook.md` (the Cap-80 fix) |
-| `feat/prolonged-press` | `briefs/2026-09-13-brief-prolonged-press.md` |
-| `feat/audio-discovery` | `briefs/2026-09-13-brief-audio-discovery.md`, `decisions/036-no-speech-code.md`, `&ear.md`, and the one-line citation fix in `briefs/2026-09-12-brief-census-mode.md` |
+**A registry chain, off `feat/census-mode-brief`** — it must sit on census,
+because the audio work edits `briefs/2026-09-12-brief-census-mode.md`, a file
+`d6a60e1` created:
 
-Leave `feat/census-mode-brief` holding only `d6a60e1`, and move `td-39ce31` to
-`in_review`.
+| Branch | Commit | Contents |
+|---|---|---|
+| `feat/references-section` | `f02adeb` | the brief, `scripts/references-demo.ts`, the `just references-demo` recipe, and the Cap-80 fix in `playbooks/authoring-playbook.md` |
+| `feat/prolonged-press` | `b33ea1d` | the brief — the three gestures, the swallow, no clock |
+| `feat/audio-discovery` | `e7dee51` | the brief, `decisions/036-no-speech-code.md`, the `&ear.md` register addendum, the citation fix |
+
+**Three independents, off `main`** — `docs/` is not a registered tier, so these
+touch no registry and stand alone:
+
+| Branch | Commit | Contents |
+|---|---|---|
+| `docs/cognition-in-the-wild` | `a20496d` | the 184-line Hutchins summary, and retiring the zero-byte `docs/cognition-in-the-wild-md` |
+| `docs/tidy-first` | `9a7d3d5` | this document, and the `&next.md` 83 → 80 correction |
+| `docs/terminal-development` | `c17caf0` | the four-line note, two typos fixed |
+
+Each branch regenerated its own registry entries with `just reg-sync-fix` and
+passed `just check` **at its own commit**, so every commit is self-consistent
+rather than carrying entries for files it does not contain. `bun test` on the
+tip: 411 pass, 7 skip by design, 0 fail.
+
+`feat/census-mode-brief` now holds only `d6a60e1`, and **`td-39ce31` is in
+review** — the brief is committed and the task state has caught up.
 
 ### Phase 4 — hygiene
 
@@ -155,20 +174,20 @@ a reading, not a build.
 
 ## What needs a decision, not a tidy
 
-1. **Two files in the tree are not mine and I have not touched them.**
-   - `docs/2026-09-13-terminal-development.md` (new, 08:24 today) — no brief, no
-     task, no callsign.
-   - `docs/cognition-in-the-wild.md` (new, Sep 12 18:53) **and** the deletion of
-     `docs/cognition-in-the-wild-md` — the latter is a **zero-byte file with a
-     typo'd name**, added by `dfbcfa0` and still in `main`. So this pair is a
-     clean typo fix (delete the empty mis-named file, add the real doc), but it
-     belongs to someone else's session and wants its own branch.
+1. ~~**Two files in the tree are not mine.**~~ **Settled 2026-09-13** — the reader
+   asked for both checked in. `docs/cognition-in-the-wild.md` landed with the
+   zero-byte `docs/cognition-in-the-wild-md` retired
+   (`docs/cognition-in-the-wild`, `a20496d`); the terminal-development note landed
+   on its own branch (`c17caf0`), two unambiguous typos fixed and the trailing
+   whitespace trimmed, committed as a fragment rather than dressed up as a
+   document.
 2. **Phase 1 merges to `main` without the reviews having been approved.** The
    order is review → approve → close → merge, and landing first inverts it. The
    honest reading is that the reviews are *readings* and the merges are
    mechanical, so landing first and reviewing after is defensible — but it is a
    choice, not a default.
-3. **Branch names for Phase 3.** The three proposed names are guesses.
+3. **The three proposed branch names** became six, and are now real. The names in
+   Phase 3 above are the ones that landed; rename them if they read wrong.
 
 ## The good place, defined
 
