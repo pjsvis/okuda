@@ -5,8 +5,9 @@
  * Renders &alpha.md the way the TUI does (annotated, through
  * renderDocument) and asserts every case in the dogfood range:
  *   - every discovered reference carries its painted silcrow
- *   - the numbers run 11+ in reading order (one-to-many: repeats keep
- *     their own vectors)
+ *   - the numbers run from VECTOR_MIN in reading order, skipping the
+ *     doubled pairs (ADR-032 canon — one actuator class, never jumps);
+ *     one destination, one silcrow — repeats reuse the number
  *   - zero-padded bracketed numbers, external URLs, and legacy
  *     okuda-rhs tokens are never painted
  *   - no paint marker leaks into the frame
@@ -18,7 +19,7 @@
 import { renderDocument } from "../src/render";
 import { loadPalette } from "../src/palette";
 import { detectColorMode } from "../src/ansi";
-import { jumpMapFor, annotateSource, scanReferences, VECTOR_MIN, MAX_REFS } from "../src/vectors";
+import { jumpMapFor, annotateSource, scanReferences, VECTOR_MIN, VECTOR_MAX, MAX_REFS, RESERVED_VECTORS } from "../src/vectors";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -28,6 +29,13 @@ const DOC = join(ROOT, "&alpha.md");
 const source = await Bun.file(DOC).text();
 const palette = loadPalette();
 const color = detectColorMode(process.env as NodeJS.ProcessEnv);
+// The premise is RGB: silcrows paint in the palette's truecolour rose.
+// Under `none` (NO_COLOR/dumb) there is no RGB to match — fail once,
+// named, not 22 times as "not painted".
+if (color !== "truecolor") {
+  console.error(`vector-check: needs truecolor, got '${color}' (NO_COLOR? TERM=dumb?)`);
+  process.exit(1);
+}
 
 const map = jumpMapFor(source);
 const annotated = annotateSource(source, map);
@@ -37,7 +45,11 @@ const plain = out.replace(/\x1b\[[0-9;]*m/g, "");
 // user's, and the reserved paint is what makes ours ours.
 const vectorHex = palette["vector"]!.replace("#", "");
 const vectorRgb = [0, 2, 4].map((i) => parseInt(vectorHex.slice(i, i + 2), 16)).join(";");
-const paintedRe = new RegExp(`\\x1b\\[38;2;${vectorRgb}m§(\\d{2})\\x1b\\[0m`, "g");
+// b6b701c: the silcrow is bold everywhere (weight reconciled) — the
+// paint reads `SGR 38;2;R;G;B;1`, and the bold attribute is part of the
+// contract. The colour-only form is stale: af72d3e wrote it, the weight
+// reconciliation outran it, and the smoke ran red for ~115 commits.
+const paintedRe = new RegExp(`\\x1b\\[38;2;${vectorRgb};1m§(\\d{2})\\x1b\\[0m`, "g");
 
 let fail = 0;
 const ok = (msg: string): void => console.log(`  ✓ ${msg}`);
@@ -48,8 +60,16 @@ const bad = (msg: string): void => { console.error(`  ✗ ${msg}`); fail++; };
 const refs = scanReferences(source);
 const unique = [...new Set(refs.map((r) => r.target))];
 const painted = [...out.matchAll(paintedRe)].map((m) => Number(m[1]!));
+// The i-th unique destination holds the i-th assignable address:
+// ascend from VECTOR_MIN, skipping the doubled pairs — the walk
+// buildJumpMap performs (ADR-032 canon). Walked independently here so
+// the check catches an allocator that lies, rather than trusting the
+// map's own numbering.
+let n = VECTOR_MIN;
 for (let i = 0; i < unique.length; i++) {
-  const num = VECTOR_MIN + i;
+  while (RESERVED_VECTORS.has(n)) n++;
+  const num = n++;
+  if (num > VECTOR_MAX) break; // over-cap destinations carry no vector
   if (!painted.includes(num)) bad(`§${num} (${unique[i]!}) is not painted`);
 }
 if (painted.length >= unique.length && unique.length > 0) ok(`${painted.length} silcrow(s) painted, ${unique.length} destinations, map size ${map.size}`);
