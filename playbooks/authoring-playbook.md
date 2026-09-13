@@ -202,8 +202,10 @@ that survive:
 - **Numbering is structural, not authored.** Reading order, unique by
   target — the compositor's ordering is the only ordering, and it
   cannot read as ranking because it is not chosen.
-- **Cap at 88.** Past `§98` the map stops. The remedy is editorial:
-  split the document, or clone and search.
+- **Cap at 80.** Past `§98` the map stops — the vectors are 12–98 minus
+  the doubled-pair class, which is 80 addresses, not 88 (ADR-032's
+  amendment). The remedy is editorial: split the document, or clone and
+  search.
 - **Optimistic.** A reference to a document that does not exist yet
   renders as a vector and fails honestly on actuation. Intentions are
   navigable; the flash says so when they are premature.
