@@ -13,11 +13,20 @@ build anything — a plan to *reconcile* what already exists.
 
 ## The finding, in one line
 
-**Twenty-eight local branches is not twenty-eight pieces of work.** Twenty-three
-are already merged into `main` and are dead pointers. Of the five that carry
-work, **four are a stack that forks at its base** and three are independent. So
-the work to land is **nine commits across five branches**, and it is already
-written.
+**Thirty-one local branches is not thirty-one pieces of work.** Twenty-three are
+already merged into `main` and are dead pointers. Seven carry commits, but only
+**five are merge targets** — because four of the seven are a **stack that forks at
+its base**, and the tip subsumes three of them. So the work to land is **nine
+unique commits across five branches**, and it is already written.
+
+```mermaid
+title: Thirty-one branches, five merge targets
+flowchart LR
+    B[31 local] --> M[23 dead]
+    B --> W[7 carry work]
+    W --> T[5 merge targets]
+    W --> A[2 absorbed]
+```
 
 ## The stack — and it forks
 
@@ -191,6 +200,15 @@ a reading, not a build.
 
 ## The good place, defined
 
-`main` at the tip of everything reviewed · five branches, not twenty-eight ·
-`NOW.md` true · no task in `in_review` whose work is unmerged · the registry
-numbers unique across every branch, not just across `main`.
+Stated without a branch count, because the count is a symptom and not the goal:
+
+- `main` is at the tip of everything reviewed and merged.
+- **No local branch whose work is already merged.** A branch that `main` already
+  contains is a stale pointer and nothing else — that is what the 23 dead ones
+  are, and deleting them is the whole of Phase 4's first line.
+- `NOW.md` is true (regenerated, not five days stale).
+- **No task in `in_review` whose work is unmerged.** The review queue and the
+  branch list agree with each other.
+- **Registry numbers are unique across every branch, not just across `main`** —
+  the failure that produced the ADR-035 collision, and the only one on this list
+  that `main` alone cannot detect.
