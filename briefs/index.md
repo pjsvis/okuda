@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-13 | BRF-AUDIO-DISCOVERY | open | Audio discovery — the actuator grammar, heard | 2026-09-13-brief-audio-discovery.md |
 | 2026-09-13 | BRF-PROLONGED-PRESS | open | The prolonged press — three gestures, one actuation, no leak | 2026-09-13-brief-prolonged-press.md |
 | 2026-09-13 | BRF-REFERENCES-SECTION | open | The References section — the renderer emits its own map | 2026-09-13-brief-references-section.md |
 | 2026-09-12 | BRF-CENSUS-MODE | open | Census mode — the mentions-inclusive map, as a reader's opt-in | 2026-09-12-brief-census-mode.md |

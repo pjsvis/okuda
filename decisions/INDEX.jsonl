@@ -32,3 +32,4 @@
 {"file":"032-repeated-digit-actuators.md","date":"2026-09-06","status":"Accepted","summary":"Repeated-digit actuators — [44,55,66,77,88] reserved","meta":{},"callsign":"ADR-REPEATED-DIGIT-ACTUATORS-032"}
 {"file":"033-punctuation-over-legacy-speech-tags.md","date":"2026-09-09","status":"Accepted","summary":"Punctuation over legacy speech tags — temporal prosody for portable TTS","meta":{},"callsign":"ADR-PUNCTUATION-OVER-LEGACY-SPEECH-TAGS-033"}
 {"file":"034-no-unnecessary-rubrication.md","date":"2026-09-10","status":"Accepted","summary":"No unnecessary rubrication — the affordance is the affordance","meta":{},"callsign":"ADR-NO-UNNECESSARY-RUBRICATION-034"}
+{"file":"036-no-speech-code.md","date":"2026-09-13","status":"Accepted","summary":"No speech code in this repo — the cue is okuda's, the voice is the environment's","meta":{},"callsign":"ADR-NO-SPEECH-CODE-036"}

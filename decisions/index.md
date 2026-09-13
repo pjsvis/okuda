@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-13 | ADR-NO-SPEECH-CODE-036 | Accepted | No speech code in this repo — the cue is okuda's, the voice is the environment's | 036-no-speech-code.md |
 | 2026-09-10 | ADR-NO-UNNECESSARY-RUBRICATION-034 | Accepted | No unnecessary rubrication — the affordance is the affordance | 034-no-unnecessary-rubrication.md |
 | 2026-09-09 | ADR-PUNCTUATION-OVER-LEGACY-SPEECH-TAGS-033 | Accepted | Punctuation over legacy speech tags — temporal prosody for portable TTS | 033-punctuation-over-legacy-speech-tags.md |
 | 2026-09-06 | ADR-REPEATED-DIGIT-ACTUATORS-032 | Accepted | Repeated-digit actuators — [44,55,66,77,88] reserved | 032-repeated-digit-actuators.md |

@@ -82,7 +82,8 @@ and it exists for one reason: accessibility.
 
 - No change to the default render. The uses map stays the floor;
   the appetite guard stands for everyone who doesn't ask.
-- No speech anywhere (ADR-035); this is actuation-side only.
+- No speech code in okuda, and no narration (ADR-036); this is
+  actuation-side only.
 - No authoring-convention pressure — the census reads the corpus
   as written; promotion (use-vs-mention's rule) remains the
   author-side valve.
