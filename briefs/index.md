@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-14 | BRF-ADDRESS-CAP | open | The address cap — the invariant is the destination | 2026-09-14-brief-address-cap.md |
 | 2026-09-14 | BRF-TABLE-WIDTH | open | The cut cell — the renderer breaks words the glass had room for | 2026-09-14-brief-table-width.md |
 | 2026-09-13 | BRF-AUDIO-DISCOVERY | open | Audio discovery — the actuator grammar, heard | 2026-09-13-brief-audio-discovery.md |
 | 2026-09-13 | BRF-PROLONGED-PRESS | open | The prolonged press — three gestures, one actuation, no leak | 2026-09-13-brief-prolonged-press.md |
