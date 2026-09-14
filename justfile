@@ -1,6 +1,9 @@
 # okuda — terminal markdown viewer (origin: docs/2026-08-20-origin-doc.md)
 # Silo facade: recipes are one-line delegations; logic lives in scripts/.
 
+# Args unparsed
+set positional-arguments
+
 # List recipes
 [group('navigation')]
 @default:
@@ -81,6 +84,11 @@ search-smoke:
 [group('quality gate')]
 search-replay *args:
     @bash scripts/search-replay.sh {{args}}
+
+# Table cut report
+[group('quality gate')]
+tables-check *args:
+    @bun scripts/tables-check.ts "$@"
 
 # Vector contract dogfood
 [group('quality gate')]
