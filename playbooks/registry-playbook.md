@@ -21,20 +21,22 @@ All registries use the same JSONL structure — one line per document, one field
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `file` | yes | Filename only (no path), relative to the registry directory |
-| `date` | yes | ISO date `YYYY-MM-DD` of creation or last meaningful update |
+| `file` | yes | Filename only, relative to the registry directory |
+| `date` | yes | ISO date of creation or last meaningful update |
 | `status` | yes | Registry-specific state (see below) |
-| `summary` | yes | One-sentence description, no trailing period. Imperative: "Add mermaid ASCII rendering" not "Added mermaid ASCII rendering" |
+| `summary` | yes | One-sentence description, no trailing period |
 | `meta` | no | Registry-specific fields (keep lightweight) |
 
 ## Registry-Specific Mappings
 
-| Registry | Index file | `status` values | `meta` fields |
-|----------|------------|-----------------|---------------|
-| **briefs** | `briefs/INDEX.jsonl` | `open`, `in_progress`, `done` | — |
-| **debriefs** | `debriefs/INDEX.jsonl` | `done` | `adr`, `brief` |
-| **decisions** | `decisions/INDEX.jsonl` | `Proposed`, `Accepted`, `Superseded` | `supersedes`, `superseded_by` |
-| **playbooks** | `playbooks/REGISTRY.jsonl` | `canonical`, `project` | `source` |
+| Registry | Index file | `meta` fields |
+|----------|------------|---------------|
+| **briefs** | `briefs/INDEX.jsonl` | — |
+| **debriefs** | `debriefs/INDEX.jsonl` | `adr`, `brief` |
+| **decisions** | `decisions/INDEX.jsonl` | `supersedes`, `superseded_by` |
+| **playbooks** | `playbooks/REGISTRY.jsonl` | `source` |
+
+Status values per registry: see *Status values* below.
 
 ---
 
@@ -114,6 +116,40 @@ bun scripts/reg-list.ts playbooks
 ### No parallel stores
 
 The index is the single source of truth for directory contents. Do not maintain a separate spreadsheet, Notion doc, or other parallel tracking system. If the index is stale, fix the index — don't create a shadow tracker.
+
+**Read at full strength, this is the silo's knowledge rule too: if it is not in the
+silo, it does not exist.** The index is the single source of truth for *contents*;
+the silo is the single source of truth for *knowledge*. A principle that lives only
+in an agent's private memory file, a chat, or a skill outside the tree cannot be
+searched, cited from a brief, reviewed in a PR, or read aloud — so it is not a
+record. The test that separates a cache from a shadow store: **can it be deleted and
+regenerated from the silo?** If yes it is a cache and may be lossy; if no it is a
+shadow store and the knowledge belongs in a document.
+
+---
+
+## Traps
+
+Five ways this machinery misleads. All verified against `scripts/reg-sync.ts`.
+
+- **`summary` is derived once, never re-derived.** It comes from the H1 (title minus
+  the `# ` prefix). Retitle a document later and the stored summary goes stale —
+  while `just reg-sync` still reports **OK (0 missing, 0 stale)**, because `stale`
+  means *the file is gone*, not *the fields changed*. A retitle needs a **hand-edit
+  to `INDEX.jsonl`**, then `reg-sync-fix` to regenerate `index.md`.
+- **A conflict marker in `INDEX.jsonl` survives the gate.** `reg-sync-fix` *silently
+  skips* unparseable lines: the conflicted line is neither reported nor repaired, and
+  gets committed. **Fix conflict markers by hand** before running the gate.
+- **`deriveStatus` (`scripts/reg-sync.ts:202`) runs only for *missing* entries.** An
+  existing entry keeps its stored `status` indefinitely, so a status change in the
+  document does not propagate on its own.
+- **`**Status:**` must be bare.** `**Status:** In Progress` maps correctly; trailing
+  prose on the same line maps to `open`.
+- **The key is `file`, not `path`** — filename only, relative to the registry
+  directory.
+
+`docs/` is **not a registered tier**. reg-sync covers briefs, debriefs, decisions,
+playbooks and advisories; a new document in `docs/` needs no JSONL entry.
 
 ---
 

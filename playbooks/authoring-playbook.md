@@ -174,6 +174,76 @@ house already knows it.
 
 ---
 
+## Tables have a width contract
+
+A table is **layout**, not art: okuda computes the column widths from the content
+and the glass. That makes a table the one structure whose *content changes* when the
+window does. A diagram is pre-baked and never re-wrapped, so its bytes are identical
+at 40 columns and at 200 — a table's are not.
+
+**Below its natural width a table shatters.** The cells wrap *mid-word*, with no
+elision notice and no marker:
+
+```text
+  Motio │ Scope          │ Act                     │ Target
+  n     │                │                         │
+  vecto   cross-document   dereference a reference   another document
+  r
+```
+
+**The number that matters is 80, because the voice reads at 80.** `terminalSize()`
+returns `null` for a non-TTY (`src/width.ts:286`), so the piped voice path
+(`okuda file | say`) falls back to `terminalCols(80)` — the rendered bytes are
+byte-identical to an 80-column render whatever the reader's window is. So a table
+needing more than 80 columns is broken for the ear *always*, not merely when the
+window is narrow. And the failure is audible rather than cosmetic: **`say` treats a
+line break as a word boundary** — measured, `vector` 0.545 s against `vec\ntor`
+0.755 s, identical to `vec tor`. The fragments are spoken as separate words, so the
+reader hears `Motio … n` with three other column names interposed.
+
+**Measure the natural width; do not guess it.** Render the document at increasing
+widths and diff the cell text against a wide reference:
+
+```bash
+for w in 76 80 88 100; do FZF_PREVIEW_COLUMNS=$w ./okuda doc.md --no-color > /tmp/w$w.txt; done
+# then compare the cell text of /tmp/w80.txt against a 240-column render
+```
+
+**Relabelling the header does not help; shortening the longest cell does.** A real
+case: a boundary-conditions table had a natural width of **88**, and at 80 the header
+`Direction` shattered. Renaming it to `Flow` — four characters — broke too
+(`Flo` / `w`), because the allocation is dominated by the longest cell in the table,
+not by the header. Trimming one content cell (*"the row degrades to the stem"* →
+*"the stem remains"*) took the whole table from 88 to **76**. Reach for the longest
+cell first; treat a header rename as a non-fix.
+
+**And the word count is not a fidelity metric.** Fragmentation *inflates* it: the
+same document measured 1,824 words at 40 columns against 1,787 at 82. The ear is
+losing content while the count goes up.
+
+### The state of the tree, measured 2026-09-14
+
+**43 of 250 documents in the silo have a table header that breaks at 80 columns.**
+A sweep over `playbooks/`, `briefs/`, `debriefs/`, `decisions/` and `docs/`,
+comparing header cells at 80 against a 240-column reference. The worst offenders
+are the documents *about* tables: `docs/tables-monster.md` loses all 23 of its
+header cells, `docs/tables.md` loses 3 of 31, and `docs/2026-08-28-brief-state-glyph-vocabulary.md`
+loses all 18. `playbooks/registry-playbook.md` and `playbooks/playbooks-playbook.md`
+lose 4 each.
+
+This is outstanding work, not a defect in this playbook: **the rule is new and the
+tree predates it.** The remedy is per-table and mechanical — shorten the longest
+cell — and the check is one loop. It is recorded here so the next author inherits
+the number rather than rediscovering the problem.
+
+**A caution on measuring it.** A line containing a literal `│` is not a table row:
+prose that *mentions* the pipe character, and box-drawing art, both fool a naive
+scanner. Count only a `│`-bearing line whose next line is a rule (`─`), which is how
+okuda marks a header. A sweep without that filter reported 46 documents; the honest
+number is 43.
+
+---
+
 ## Link labels are noun phrases
 
 The renderer paints a link as `text url` on one line. A label that ends
