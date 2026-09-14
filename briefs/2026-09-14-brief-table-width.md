@@ -33,14 +33,16 @@ CLI render at `FZF_PREVIEW_COLUMNS=80` (verified, md5 `ba64ba5a`).
 
 | what | count |
 |---|---|
-| tracked markdown, `.archive/` out | 278 |
-| documents carrying a table | 125 |
-| tables | 209 |
+| tracked markdown, `.archive/` out | 279 |
+| documents carrying a table | 126 |
+| tables | 211 |
 | tables that cut a word | 106 |
 | documents with at least one cut | 73 |
-| individual cut points | 1490 |
+| individual cut points | 1495 |
 
-The cut is not rare and it is not confined to the worst files: 51% of tables.
+The cut is not rare and it is not confined to the worst files: half of all
+tables. This brief is one of the 279 files and two of the 211 tables — it is
+under its own rule, and it does not cut.
 
 ## The fault
 
@@ -77,7 +79,7 @@ The `Note` column took 32.
 Longest word per column, summed with the gutters, is the width a word-aware
 allocation needs. Against that measure:
 
-- 209 tables; **153** exceed the 76-column content width and get shrunk;
+- 211 tables; **153** exceed the 76-column content width and get shrunk;
 - of those 153, **144** fit a longest-word-per-column allocation;
 - of the **106 that cut**, **97** fit — the allocator had the room and spent it
   on the widest column anyway;
