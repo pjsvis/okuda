@@ -1,6 +1,7 @@
 ---
 type: Brief
 callsign: BRF-ADDRESS-CAP
+date: 2026-09-14
 ---
 
 # Brief: The address cap — the invariant is the destination
