@@ -223,24 +223,28 @@ losing content while the count goes up.
 
 ### The state of the tree, measured 2026-09-14
 
-**43 of 250 documents in the silo have a table header that breaks at 80 columns.**
-A sweep over `playbooks/`, `briefs/`, `debriefs/`, `decisions/` and `docs/`,
-comparing header cells at 80 against a 240-column reference. The worst offenders
-are the documents *about* tables: `docs/tables-monster.md` loses all 23 of its
-header cells, `docs/tables.md` loses 3 of 31, and `docs/2026-08-28-brief-state-glyph-vocabulary.md`
-loses all 18. `playbooks/registry-playbook.md` and `playbooks/playbooks-playbook.md`
-lose 4 each.
+**78 of the 111 documents that contain a table have at least one table that wraps at
+80 columns** — 104 of 187 tables. A sweep over `playbooks/`, `briefs/`, `debriefs/`,
+`decisions/` and `docs/`, comparing each table's rendered row count at 80 columns
+against its row count in the source. The worst offenders are the documents *about*
+tables: `docs/2026-09-05-palette-page.md` (7 of 8 tables), `docs/tables-monster.md`
+(3 of 5), `docs/tables.md` (3 of 10). `playbooks/mermaid-diagrams-playbook.md`
+breaks both of its own.
 
 This is outstanding work, not a defect in this playbook: **the rule is new and the
 tree predates it.** The remedy is per-table and mechanical — shorten the longest
-cell — and the check is one loop. It is recorded here so the next author inherits
-the number rather than rediscovering the problem.
+cell — and the check is one loop.
 
-**A caution on measuring it.** A line containing a literal `│` is not a table row:
-prose that *mentions* the pipe character, and box-drawing art, both fool a naive
-scanner. Count only a `│`-bearing line whose next line is a rule (`─`), which is how
-okuda marks a header. A sweep without that filter reported 46 documents; the honest
-number is 43.
+**Count correctly, or the number is wrong twice.** Two mistakes were made while
+measuring this, and both are easy to repeat:
+
+- **A line containing a literal `│` is not a table row.** Prose that *mentions* the
+  pipe, and box-drawing art, both fool a naive scanner. A header is a `│`-bearing
+  line whose *next* line is a rule (`─`).
+- **Body rows wrap too, and they carry no pipes at all** — okuda renders them
+  space-aligned, so a header-only scan misses them. That scan reported 43 documents;
+  comparing each table's rows against its source gives 78. **The header is the less
+  fragile half.**
 
 ---
 

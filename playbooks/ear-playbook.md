@@ -12,8 +12,8 @@ How a document in this silo reaches a voice. Three stages, three owners:
 | Stage | Owner | Artefact |
 |---|---|---|
 | Render | okuda | coloured bytes for the glass |
-| Flatten | `speak-md` (the silo at `~/Dev/GitHub/speak-md`) | prose plus breath markers |
-| Speak | the environment (`say`, or whatever is bound) | sound |
+| Flatten | `speak-md` (a separate silo) | prose plus breath markers |
+| Speak | the environment (`say`) | sound |
 
 **okuda emits text and stops.** There is no speech code in this repo (ADR-036) —
 no voice name, no rate, no pause constant, no prosody parameter. The seam, when it
