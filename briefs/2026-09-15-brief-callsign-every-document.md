@@ -36,6 +36,9 @@ O(N), and the bootstrap that mints the names is unsound.
 **ADR-036** owns the division of labour — okuda owns the cue, the silo owns the
 voice — and the spoken form below is a cue, not speech. **ADR-025** owns
 resolution: exactly-one-or-null, never the silent first-wins.
+**ADR-CHUNK-SEQUENCE-038** owns the trailing ordinal: a `slug.md` / `slug-02.md`
+sequence is one document, the head is unnumbered, and a part takes no key. Step 5
+is the change that runs its reversal.
 
 ## Objective
 
@@ -250,6 +253,15 @@ because it is what the reader will hear after the name resolves.
       under the observed skew. And the *usable* space is smaller again: 82% of
       registered keys cost 7–10 spoken tokens, one costs 16+, and a key that
       costs 16+ tokens is a sentence rather than a handle.
+- [x] **The trailing ordinal is reserved, and the bootstrap cannot see one.**
+      **Verified 2026-09-15** — ADR-CHUNK-SEQUENCE-038 names the chunk sequence
+      (`slug.md`, `slug-02.md`): the head is unnumbered and a part takes no key.
+      `tmp/chunk-sequence-probe.ts` measures the ground it stands on: a trailing
+      ordinal is dropped at **every** slug length — six files, two names — while
+      a *leading* ordinal survives (`030-live-search-picker` →
+      `ADR-LIVE-SEARCH-030`). So the ordinal survives in the position a document
+      never chunks from and is lost in the position it always does, and
+      `avoidingCollisions` then mints a name indistinguishable from a chunk's.
 - [ ] The reader has chosen the tier nouns. **Not verified** — this is the
       audition's output, and `brief`/`debrief` is the pair that decides it.
 
@@ -277,13 +289,17 @@ because it is what the reader will hear after the name resolves.
        carries `decisions/030-live-search-picker.md` at rank 1 with evidence.
 5. [ ] **Make the bootstrap sound, then register `docs/`.** The bootstrap is the
        generator for every key this brief mints, and it truncates, collapses
-       series, and can invert a negation. Fix all three: keep the trailing
-       ordinal as well as the leading one, drop `no` and `not` from
-       `STOPWORDS`, and stop truncating at two tokens where the slug has more.
-       Then derive the 131 `docs/` keys, review the derived rows by hand, and
-       add the `DOC-` prefix to the tier list. The acceptance is a bootstrap
-       that round-trips: for every existing registered key, the bootstrap of its
-       filename either reproduces it or is refused, never silently differs.
+       series, and can invert a negation. Fix all three: drop `no` and `not`
+       from `STOPWORDS`, stop truncating at two tokens where the slug has more,
+       and **see the chunk sequence before it truncates** — a trailing `-NN`
+       names a part of the head's document and takes no key of its own
+       (ADR-CHUNK-SEQUENCE-038). Delete `avoidingCollisions`'s suffix in the
+       same change: the trailing ordinal is now reserved, so the assignment loop
+       refuses on collision and reports it. Then derive the 131 `docs/` keys,
+       review the derived rows by hand, and add the `DOC-` prefix to the tier
+       list. The acceptance is a bootstrap that round-trips: for every existing
+       registered key, the bootstrap of its filename either reproduces it or is
+       refused, never silently differs.
 6. [ ] **Name the rest.** `explainers/` (9) and the root documents (10) take
        prefixes; `advisories/`'s two unnamed take `ADV-`. The three existing
        `docs/` callsigns (`DOC-`, `REF-`) are reconciled against the `DOC-`
@@ -300,8 +316,9 @@ because it is what the reader will hear after the name resolves.
        written where the author meets it — `playbooks/briefs-playbook.md` and
        `playbooks/registry-playbook.md` are the two doors. The key-space ceiling
        above is what makes this urgent rather than theoretical: the naming
-       scheme needs a rule for when names run out, and currently has a `-2`
-       suffix instead.
+       scheme needs a rule for when names run out. The `-2` suffix that stood in
+       for one is retired by ADR-CHUNK-SEQUENCE-038, which reserves the trailing
+       ordinal for a chunk and turns a collision into a refusal.
 9. [ ] **Re-measure and correct.** Re-run the census against the committed set
        at every phase boundary. A silo-wide measurement excludes the document
        taking it, so the totals move by the measuring document's own weight —
@@ -324,6 +341,12 @@ because it is what the reader will hear after the name resolves.
   (`BRF-CALLSIGN-EVERY` against `BRF-CALLSIGN-EVERY-DOC`), collapses a series
   (`from-intent-to-task-01..06` → one key), and inverts a negation
   (`036-no-speech-code` → `ADR-SPEECH-CODE-036`).
+- **A chunk sequence resolves to one name.** Given `slug.md`, `slug-02.md`,
+  `slug-03.md`, the registry holds **one** row — for the head — and
+  bootstrapping any part yields the head's key. A sequence with a gap is
+  reported as a broken document. The assignment path mints **no** trailing
+  ordinal: a collision is refused and reported, per ADR-025 and
+  ADR-CHUNK-SEQUENCE-038.
 - Every registered callsign resolves: a script walks the registries through
   `resolveByCallsign` and reports **0 orphans** (today: 5).
 - No registered callsign wears a prefix outside its tier: a script asserts
@@ -369,6 +392,18 @@ because it is what the reader will hear after the name resolves.
   What is broken is narrower and different — the ordinal shorthand, and the
   list's length. Stated because a brief that carries a false premise carries it
   into the work.
+- **Amended again 2026-09-15 — the trailing ordinal is now reserved.** The
+  instruction: *the silo implies in several places that a document with too many
+  links should be bisected, so provide a `slug.md`, `slug-02.md` sequence that
+  allows documents to be chunked.* Recorded as ADR-CHUNK-SEQUENCE-038. It
+  corrects this brief rather than extending it: step 5 as written said *keep the
+  trailing ordinal as well as the leading one*, and the trailing ordinal is now
+  the chunk marker — a part of the head's document, taking no key of its own.
+  The step is rewritten, `avoidingCollisions` is reversed with it, and the
+  collision the assignment path used to paper over becomes a refusal. The
+  brief's step 8 asked for a rule for when names run out and noted that the
+  scheme *"currently has a `-2` suffix instead"*; the suffix is retired and the
+  step now points at the ADR.
 - **The two `DBR-` rows are not a typo to fix quietly.** They are the evidence
   for the prefix lint, and the lint is the deliverable. Repairing them without
   the lint leaves the next one to be found by ear.
@@ -410,6 +445,8 @@ because it is what the reader will hear after the name resolves.
   resolution, exactly-one-or-null, the mnemonic namespace.
 - `decisions/030-live-search-picker.md` (ADR-LIVE-SEARCH-030) — the headless
   entry printer the picker runs on.
+- `decisions/038-the-chunk-sequence.md` (ADR-CHUNK-SEQUENCE-038) — the trailing
+  ordinal, the chunk sequence, and the reversal step 5 runs.
 - `playbooks/registry-playbook.md` — the registry's schema and its traps.
 - `playbooks/briefs-playbook.md` — the brief's shape, and one of the two doors
   the stability rule is written into.

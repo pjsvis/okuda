@@ -10,6 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-09-15 | ADR-TABLE-CURSOR-037 | Accepted | The table cursor — position within the render, spoken through two registers | 037-table-cursor.md |
+| 2026-09-15 | ADR-CHUNK-SEQUENCE-038 | Accepted | The chunk sequence — the head is unnumbered, the trailing ordinal is part N | 038-the-chunk-sequence.md |
 | 2026-09-13 | ADR-NO-SPEECH-CODE-036 | Accepted | No speech code in this repo — the cue is okuda's, the voice is the environment's | 036-no-speech-code.md |
 | 2026-09-12 | ADR-DOGFOODS-ARE-SINGLE-MODALITY-035 | Accepted | Dogfoods are single-modality — the primary field is the test field | 035-dogfoods-are-single-modality.md |
 | 2026-09-10 | ADR-NO-UNNECESSARY-RUBRICATION-034 | Accepted | No unnecessary rubrication — the affordance is the affordance | 034-no-unnecessary-rubrication.md |
