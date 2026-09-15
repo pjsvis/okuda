@@ -43,6 +43,10 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 - **Duplicate-callsign lint** (td-040450) — ADR-025's exactly-one
   contract is prose until this ships; the resolver is still
   silent-first-wins. Freshest debt, smallest fix · **S**
+- **The conceptual lexicon extraction** (BRF-CONCEPTUAL-LEXICON) —
+  brief drafted, awaiting TD decomposition; a fresh oriented agent
+  reviews and builds the workflow. The `briefs/evals` barnacle
+  resolves or removes with it · **M**
 
 ## Ready — when the pain flares
 
@@ -76,5 +80,9 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 ## Not next — deliberately
 
 - **BRF-FLOW-WRAP** (fresh) · **BRF-MERMAID-HARD** (waits on a
-  paged-view world) · **the speech set** (research landed; no pipeline
-  brief yet) · **everything parked** (still parked).
+  paged-view world) · **the speech set** (research landed, pipeline
+  brief drafted — BRF-SPOKEN-BLOCK-GRAMMAR, 2026-09-15; the ear owes
+  the corpus its auditions) · **the docs candidates** (speech-driven
+  design, the intention loop — landed, unregistered, awaiting the
+  Derrida and Foxtrot-Oscar gates) · **everything parked** (still
+  parked).
