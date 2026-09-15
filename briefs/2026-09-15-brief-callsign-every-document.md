@@ -8,8 +8,9 @@ date: 2026-09-15
 
 **Created:** 2026-09-15
 **Status:** Open
-**TD:** td-ec6bb0 (epic) — td-86432c one tier list · td-32e679 the prefix
-lint · td-30b1d5 the shorthand reaches the picker · td-070a26 register `docs/` ·
+**TD:** td-ec6bb0 (epic) — td-6613b3 the Map · td-86432c one tier list ·
+td-32e679 the prefix lint · td-30b1d5 the shorthand reaches the picker ·
+td-070a26 the bootstrap, then `docs/` · td-e9ccd2 name the rest ·
 td-6d25bd the spoken form, auditioned · td-8e71ef the stability rule
 **Lineage:** the reader's 2026-09-15 session, in moves. The proposal — *for our
 registered folders we maintain a silo-unique call-sign for each document; what
@@ -29,6 +30,9 @@ looking for a cool way to remember shit***.
 **Extends:** **BRF-ADDRESS-CAP** owns the vector and its bound; nothing here
 touches it. `docs/2026-09-15-the-search-panel-speech-first.md` owns the panel
 that will consume these names; this brief supplies them and nothing else.
+**`docs/2026-09-15-the-scaling-profile.md`** owns the cost curve of the store
+around them, and amended this brief on the day it landed — the point lookup is
+O(N), and the bootstrap that mints the names is unsound.
 **ADR-036** owns the division of labour — okuda owns the cue, the silo owns the
 voice — and the spoken form below is a cue, not speech. **ADR-025** owns
 resolution: exactly-one-or-null, never the silent first-wins.
@@ -219,53 +223,86 @@ because it is what the reader will hear after the name resolves.
       rank 1 of 283 in nine of ten cases; the tenth is the ordinal shorthand.
 - [x] The prefix namespace is measured. **Verified 2026-09-15** — six prefixes,
       two one-letter pairs, `DBR` ×2.
-- [x] `docs/` derivation is collision-free. **Verified 2026-09-15** — 131
-      documents, 131 distinct `DOC-<SLUG>` candidates, 0 collisions, mean 24
-      characters.
+- [x] **The cost of resolving a key is measured.** **Verified 2026-09-15** —
+      `resolveByCallsign` is **O(N)**: 0.34 ms at 317 keys, **10.61 ms at
+      20,224**, because it calls `loadCallsigns()` per invocation.
+      `makeCallsignResolver` holds the Map and stays flat at 0.12 µs. The
+      store's point lookup is the fast path this brief depends on, and it is
+      not wired in. `docs/2026-09-15-the-scaling-profile.md`.
+- [x] **The bootstrap is measured as a generator, and it is unsound.**
+      **Verified 2026-09-15** — `bootstrapCallsign` keeps only the first ≤2
+      tokens (`2026-09-15-brief-callsign-every-document` → `BRF-CALLSIGN-EVERY`);
+      it strips only a *leading* ordinal, so `from-intent-to-task-01..06`
+      collapses to **one key**; and `STOPWORDS` holds `no`, so
+      `036-no-speech-code` → **`ADR-SPEECH-CODE-036`**, asserting the opposite
+      of its document. Step 5 derives 131 keys with this function.
+- [x] Full-stem derivation is collision-free. **Verified 2026-09-15** — 131
+      documents, 131 distinct `DOC-<FULL-STEM>` candidates, 0 collisions. **This
+      is not what the code does**: `bootstrapCallsign` truncates to two tokens,
+      so the measured figure belongs to a derivation that does not exist yet.
+      The sound generator is step 5's work, not a precondition already met.
 - [x] Resolution is exactly-one-or-null and survives a rename. **Verified
       2026-09-15** — `resolveByCallsign` returns `null` on collision
       (`src/root.ts:163–165`); `loadCallsigns` keys on the registry record.
+- [x] The key space has a measured ceiling. **Verified 2026-09-15** — 519
+      distinct slug tokens, 72% used once; two-token keys give ~269k slots, so
+      the birthday floor for the first collision is **~730 documents**, earlier
+      under the observed skew. And the *usable* space is smaller again: 82% of
+      registered keys cost 7–10 spoken tokens, one costs 16+, and a key that
+      costs 16+ tokens is a sentence rather than a handle.
 - [ ] The reader has chosen the tier nouns. **Not verified** — this is the
       audition's output, and `brief`/`debrief` is the pair that decides it.
 
 ## Work Plan
 
-1. [ ] **One tier list.** Choose the direction — the resolver reads the
+1. [ ] **The Map.** Hold the registry index in `resolveByCallsign` and
+       `callsignForFile` — build it once, as `makeCallsignResolver` already
+       does. O(N) → O(1) on the path a callsign is *resolved* by. Acceptance is
+       a test asserting the lookup does not re-read the registries, and a
+       measured curve flat against key count where it is currently linear.
+2. [ ] **One tier list.** Choose the direction — the resolver reads the
        registry's list, or the registry reads the resolver's — and record the
        choice as an ADR. Add the test that asserts the two are equal, so the
        drift cannot return silently. Advisories becomes reachable as a
        consequence: 142 registered, 142 reachable.
-2. [ ] **The prefix lint.** Assert `callsign.startsWith(csPrefix + "-")` for
+3. [ ] **The prefix lint.** Assert `callsign.startsWith(csPrefix + "-")` for
        every registered row in `reg-sync`'s gate. Repair the two `DBR-` rows to
        `DBF-` and confirm `resolveByCallsign("DBR-SSH-BRINGUP")` returns `null`
        — the honest failure, per ADR-025.
-3. [ ] **The shorthand reaches the picker.** Measure both candidate mechanisms
+4. [ ] **The shorthand reaches the picker.** Measure both candidate mechanisms
        before choosing: (a) the registry row carries the tier+ordinal as a
        searchable alias, or (b) the entry builder calls `resolveByCallsign`
        first and pins the hit at rank 1 with the registry row as its evidence.
        The acceptance is the same either way — `./okuda --entries "ADR-030"`
        carries `decisions/030-live-search-picker.md` at rank 1 with evidence.
-4. [ ] **Register `docs/`.** A `docs/INDEX.jsonl` and a `DOC-` prefix in the
-       tier list, following the registry principle. Derive the 131 callsigns
-       from the filename stems (0 collisions measured), then review the derived
-       rows before committing — `reg-sync-fix` writes `index.md` only, so the
-       JSONL is hand-checked.
-5. [ ] **Name the rest.** `explainers/` (9) and the root documents (10) take
+5. [ ] **Make the bootstrap sound, then register `docs/`.** The bootstrap is the
+       generator for every key this brief mints, and it truncates, collapses
+       series, and can invert a negation. Fix all three: keep the trailing
+       ordinal as well as the leading one, drop `no` and `not` from
+       `STOPWORDS`, and stop truncating at two tokens where the slug has more.
+       Then derive the 131 `docs/` keys, review the derived rows by hand, and
+       add the `DOC-` prefix to the tier list. The acceptance is a bootstrap
+       that round-trips: for every existing registered key, the bootstrap of its
+       filename either reproduces it or is refused, never silently differs.
+6. [ ] **Name the rest.** `explainers/` (9) and the root documents (10) take
        prefixes; `advisories/`'s two unnamed take `ADV-`. The three existing
        `docs/` callsigns (`DOC-`, `REF-`) are reconciled against the `DOC-`
        prefix decision — `REF-` is a second prefix in one tier, the D2 defect
        again, and it is settled here rather than later.
-6. [ ] **The spoken form.** Pin the prefix→noun map. Audition the nouns through
+7. [ ] **The spoken form.** Pin the prefix→noun map. Audition the nouns through
        Moira on the real corpus — the pair at risk is `brief`/`debrief`, and the
        question is whether the ear survives the ending. If it does not, the
        debrief tier takes a distinct noun and the map is amended. One variable
        per audition or the ear cannot attribute cause.
-7. [ ] **The stability rule.** Decide what a retitle does to a name: freeze it
+8. [ ] **The stability rule.** Decide what a retitle does to a name: freeze it
        (and accept that a name describes an old title), or re-mint it (and break
        every note citing it). Record as an ADR. Whichever is chosen, the rule is
        written where the author meets it — `playbooks/briefs-playbook.md` and
-       `playbooks/registry-playbook.md` are the two doors.
-8. [ ] **Re-measure and correct.** Re-run the census against the committed set
+       `playbooks/registry-playbook.md` are the two doors. The key-space ceiling
+       above is what makes this urgent rather than theoretical: the naming
+       scheme needs a rule for when names run out, and currently has a `-2`
+       suffix instead.
+9. [ ] **Re-measure and correct.** Re-run the census against the committed set
        at every phase boundary. A silo-wide measurement excludes the document
        taking it, so the totals move by the measuring document's own weight —
        this brief's own figures are post-commit for that reason (Notes), and
@@ -277,6 +314,16 @@ because it is what the reader will hear after the name resolves.
 
 - `just check` passes, and a test asserts the resolver's tier list equals the
   registry's tier list.
+- **Resolving a callsign does not re-read the registries.** A test asserts
+  `resolveByCallsign` builds the index once; a measured curve against key count
+  is flat where it is currently linear (0.34 ms at 317 keys, 10.61 ms at
+  20,224).
+- **The bootstrap round-trips.** For every registered key, bootstrapping its
+  filename either reproduces the key or is refused with a reason — never
+  silently differs. Today it differs on truncation
+  (`BRF-CALLSIGN-EVERY` against `BRF-CALLSIGN-EVERY-DOC`), collapses a series
+  (`from-intent-to-task-01..06` → one key), and inverts a negation
+  (`036-no-speech-code` → `ADR-SPEECH-CODE-036`).
 - Every registered callsign resolves: a script walks the registries through
   `resolveByCallsign` and reports **0 orphans** (today: 5).
 - No registered callsign wears a prefix outside its tier: a script asserts
@@ -296,6 +343,14 @@ because it is what the reader will hear after the name resolves.
 
 ## Notes
 
+- **Amended 2026-09-15, the day it landed.** The scaling measurement
+  (`docs/2026-09-15-the-scaling-profile.md`) found two things this brief's
+  subject owns and the brief did not know: the point lookup it depends on is
+  **O(N)**, and the generator it plans to mint 131 keys with is **unsound**. Both
+  became preconditions; the Map became step 1, and the bootstrap became the first
+  half of step 5. The brief grew a step and lost a false claim — the `docs/`
+  derivation was measured collision-free on the *full stem*, which is not the
+  derivation the code performs.
 - **The census probe had a bug, and it was a tier-name bug.** The first run read
   `INDEX.jsonl` in every tier and reported 126 callsigns; playbooks uses
   `REGISTRY.jsonl`, so 15 rows were invisible. The corrected census reports 142.
@@ -320,7 +375,15 @@ because it is what the reader will hear after the name resolves.
 - **`REF-PALETTE-PAGE` and `REF-PALETTE-SWATCH` are a second prefix in the
   `docs/` tier** — `DOC-` and `REF-` both naming documents in one directory. That
   is D2 in a new tier, arriving before the tier is registered. Settle it in step
-  5, not after.
+  6, not after.
+- **The lookup and the generator are the two defects this brief owns, and both
+  arrived late.** The scaling measurement found them after the brief landed: a
+  point lookup that rebuilds its index per call, and a bootstrap that produces
+  keys the silo would not accept. Neither is a naming *policy* question — both
+  are the machinery under the names — and both are now steps. Worth recording
+  that the first version of this brief would have shipped step 5 as written and
+  minted 131 keys with a generator that truncates, collapses series, and can
+  invert a negation.
 - **`summary`-derived-once and the name-stability problem are one trap.** Both
   are derived fields that nothing re-derives; both go stale silently; both are
   found by a human reading the document, not by `just check`.
@@ -340,6 +403,8 @@ because it is what the reader will hear after the name resolves.
   its bound; the orthogonal concern, and the one this brief does not enter.
 - `docs/2026-09-15-the-search-panel-speech-first.md` — the panel, the jump list,
   the elision; the consumer of these names.
+- `docs/2026-09-15-the-scaling-profile.md` — the store's cost curve, and the two
+  defects that amended this brief on the day it landed.
 - `docs/2026-09-15-the-cap-is-on-the-wrong-quantity.md` — the vector's record.
 - `decisions/025-mnemonic-namespace-model.md` (ADR-MNEMONIC-MODEL-025) —
   resolution, exactly-one-or-null, the mnemonic namespace.
