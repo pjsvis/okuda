@@ -5,8 +5,8 @@ callsign: ADR-JUMP-TOKEN-021
 
 # Decision: Jump tokens number from 11, not 01 — the ergonomic offset
 
-**Date:** 2026-08-28 · **amended 2026-09-12** (floor 11 → 12; the spaced
-corollary retired)
+**Date:** 2026-08-28 · **amended 2026-09-12** (floor 11 → 12, cap 89 → 80;
+the spaced corollary retired)
 **Status:** Accepted (the 2026-08-30 spaced-double-tap corollary below is
 Superseded — see the amendment at the end)
 

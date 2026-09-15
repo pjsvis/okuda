@@ -22,7 +22,7 @@ boundary is *what the command acts on*:
 1. **Document navigation** — `Vector` (jump to token), `AMPER` (open a
    `&`-family vector), *echo-tango* (the operator's phonetic prefix,
    concept unfiled). These act on the **corpus**: they move between
-   documents, consume the ephemeral token space (11–99), and are
+   documents, consume the ephemeral token space (12–98), and are
    mode-dependent (reader jump buffer vs picker filter, per the
    two-keymap reconciliation). This is the VRL grammar.
 2. **System commands** — `Glow` (luminance), `Zoom` (viewport), and
@@ -54,7 +54,7 @@ the corpus or in the process, never in a third file. Three layers:
    two panes at two brightnesses, no settings file anywhere.
 3. **TUI nudge keys are the live scalar.** After boot, `+` / `−`
    (non-digits: they cancel the jump buffer cleanly; no collision with
-   the 11–99 grammar). Voice phrases in the same idiom: "Glow
+   the 12–98 grammar). Voice phrases in the same idiom: "Glow
    brighter", never "Glow seven three".
 
 The zoom parallel proves the shape: the host zooms, okuda detects the
@@ -72,7 +72,7 @@ The state machine below is not a proposal — it is `advanceNumBuffer`
 ```bnf
 <jump_command>   ::= <digit> <digit>          ; implicit vector — no opcode
 <back_command>   ::= "u" | Backspace          ; pop the backstack
-<digit>          ::= "0" | ... | "9"          ; convention: 11–99, ADR-021
+<digit>          ::= "0" | ... | "9"          ; convention: 12–98, ADR-021
 ```
 
 ```mermaid
@@ -146,7 +146,7 @@ reversible detour, never a persistent wrong actuation.)
 - `src/tui.ts` — `advanceNumBuffer`, `decodeKey` (the shipped machine)
 - `docs/2026-08-30-search-conventions.md` — the two-keymap reconciliation
   (mode-dependence of injected keys)
-- ADR: `decisions/021-jump-token-numbering-offset.md` (the 11–99 space)
+- ADR: `decisions/021-jump-token-numbering-offset.md` (the 12–98 space)
 - ADR: `decisions/026-wire-format.md` (grammar changes are versioned
   decisions; the opcode question belongs there if it ever ripens)
 - td-b4bae8 — the luminance scalar (the system-command category's first
