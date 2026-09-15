@@ -63,14 +63,15 @@ Six clauses.
 `avoidingCollisions` (`scripts/reg-sync.ts:126`) suffixes `base-2`, `base-3`,
 … when two files bootstrap to the same key. That is a trailing ordinal, and
 after this ADR the trailing ordinal is the chunk marker. Two mechanisms, one
-shape, two meanings — and they are indistinguishable in the output. Measured
-by `tmp/chunk-sequence-probe.ts`:
+shape, two meanings — and they are indistinguishable in the output. All three
+examples below bootstrap to `DOC-CHUNKED-DOCUMENT`; the assignment is what
+diverges. Measured by `tmp/chunk-sequence-probe.ts`:
 
-| created as | bootstrap gives | assignment gives | it means |
-|---|---|---|---|
-| `a-chunked-document.md` | `DOC-CHUNKED-DOCUMENT` | `DOC-CHUNKED-DOCUMENT` | the head |
-| `a-chunked-document-02.md` | `DOC-CHUNKED-DOCUMENT` | `DOC-CHUNKED-DOCUMENT-2` | part two |
-| a different doc, same tokens | `DOC-CHUNKED-DOCUMENT` | `DOC-CHUNKED-DOCUMENT-2` | a collision |
+| created as | assignment gives | it means |
+|---|---|---|
+| `a-chunked-document.md` | `DOC-CHUNKED-DOCUMENT` | the head |
+| `a-chunked-document-02.md` | `DOC-CHUNKED-DOCUMENT-2` | part two |
+| a different doc, same tokens | `DOC-CHUNKED-DOCUMENT-2` | a collision |
 
 The second and third rows are the same string. **Nothing downstream — reader,
 lint, or resolver — can tell a chunked document from two unrelated documents
