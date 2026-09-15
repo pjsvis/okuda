@@ -4,17 +4,28 @@ kind: design note — a defect, its measured reach, and a fork in the plan that 
 lineage: BRF-ADDRESS-CAP, landed 2026-09-14 and still unbuilt; the reader's words,
   *"the invariant is the destination, and we have messed with an invariant"*. Written
   before any of that brief's five tasks were started, because its step 1 rests on a
-  performance claim that the measurement does not support.
-status: open — nothing is built. One step of the brief is the open question.
+  performance claim that the measurement does not support. **Corrected 2026-09-15**,
+  the day it landed — the first version measured the wrong regime; see *The finding*.
+status: open — nothing is built. One step of the brief is the open question, and it
+  now has a step in front of it.
 ---
 
 # The cap is on the wrong quantity
 
-> ◆ The occurrence bound in `scanReferences` guards nothing. Measured, the whole
-> annotate path costs **0.34 ms** at 4,096 occurrences on a document the size of the
-> largest in the silo. So step 1 of the brief — *"the occurrence bound becomes its own
-> constant, chosen as a performance guard"* — is a guard invented after the fact, and
-> the smaller change is to **delete** the bound rather than rename it.
+> ◆ The occurrence bound in `scanReferences` guards the **paint**, and it bounds the
+> wrong half of the cost. The paint is *occurrences × f(length)* — the cap bounds the
+> occurrences, and length is whatever document the reader opens. So step 1 of the
+> brief — *"the occurrence bound becomes its own constant, chosen as a performance
+> guard"* — is a guard on the wrong quantity, and the change is to **delete** the bound
+> — **after** the splice is made one pass, because deleting it first is a quadratic.
+>
+> **Corrected 2026-09-15.** This note first concluded the bound *guards nothing*, from a
+> probe that varied occurrences and length **independently** and found sub-linearity on
+> each axis. In a real document the axes are coupled — reference density is roughly
+> constant in prose — and moving them together is super-linear. Both measurements were
+> correct; only one of them was the regime a reader is in. The error is kept and named
+> under *The finding*, and the measurement that found it is
+> `docs/2026-09-15-the-scaling-profile.md`.
 
 ## What we are deciding
 
@@ -93,39 +104,58 @@ busiest five:
   65 destinations — every citation distinct. Repetition lives in the hand-written
   prose, and no hand-written document is long enough yet.
 
-## The finding: there is nothing to guard
+## The finding: the cost is occurrences × f(length), and the cap bounds the occurrences
 
-◆ The brief's step 1 assumes the paint's cost is a function of the occurrence count.
-It is not. `annotateSource` replaces from the end — `out.slice(0, end) + marker +
-out.slice(end)` per occurrence — which *reads* as O(k·L) and measures as O(k) with a
-small constant, because the engine builds a rope rather than copying the string.
+◆ The first version of this section was wrong, and the way it was wrong is worth
+keeping, because it is the error this whole note is about — *a bound chosen from the
+quantity in the hand rather than the quantity in the cost*.
 
-Occurrences varied, document length pinned at 37,759 bytes:
+It varied **occurrences** at fixed length (80 → 4,096: 0.129 → 0.335 ms) and **length**
+at fixed occurrences (38 → 640 KB: 0.34 → 2.07 ms), found sub-linearity on both axes,
+and concluded the paint carries no quadratic term — *"the engine builds a rope rather
+than copying the string."* That conclusion does not survive coupling the axes. And the
+axes are coupled in every real document: reference density across the 220 documents
+over 2 KB has a **median of 0.60 occurrences per KB**, with hand-written prose at
+1.1–1.4. A longer document carries more references. The two move together.
 
-| Occurrences | Scan | Map | Paint |
+At realistic density — one reference per ~146 bytes:
+
+| Document | Occurrences | Paint | ms per occ×MB |
 | --- | --- | --- | --- |
-| 80 | 0.010 ms | 0.016 ms | 0.129 ms |
-| 400 | 0.023 ms | 0.026 ms | 0.146 ms |
-| 1,600 | 0.084 ms | 0.079 ms | 0.199 ms |
-| 4,096 | 0.166 ms | 0.180 ms | 0.335 ms |
+| 37 KB | 259 | 0.7 ms | 74.9 |
+| 128 KB | 897 | 4.8 ms | 42.5 |
+| 512 KB | 3,591 | 77.2 ms | 43.0 |
+| 1 MB | 7,182 | 352.0 ms | 49.0 |
+| 2 MB | 14,364 | 1,055.4 ms | 36.7 |
+| 4 MB | 28,728 | 3,440.9 ms | 29.9 |
 
-Fifty-one times the occurrences buys 2.6× the time, and 0.21 ms of it. Length varied
-at 4,096 occurrences:
+The last column is flat from 128 KB up, and a flat cost per *occurrences × MB* is the
+signature of **copying**: the paint is *k × L*. Because occurrences grow with length,
+the cost then grows with length squared — **111× the document costs 4,900× the time**,
+an exponent near 1.8.
 
-| Document | Paint |
-| --- | --- |
-| 38 KB | 0.34 ms |
-| 160 KB | 0.89 ms |
-| 640 KB | 2.07 ms |
+At a fixed 80 occurrences — the cap doing its job — the same probe stays sub-linear in
+length, and cheap:
 
-Sixteen times the length buys 6.1× — sub-linear, so the quadratic term is not there.
-A 640 KB document is 17× the largest document in the silo and would still paint in
-about 2 ms.
+| Document | Occurrences | Paint |
+| --- | --- | --- |
+| 37 KB | 80 | 0.41 ms |
+| 1 MB | 80 | 3.82 ms |
+| 8 MB | 80 | 21.58 ms |
 
-**The conclusion is not that the bound is harmless. It is that the bound has no job.**
-It was not chosen for a measured cost; it was the address count, reused because a
-bound was already in the hand. Removing it cannot regress anything measurable, because
-nothing measurable depends on it.
+So **the cap is load-bearing.** The same 1 MB document paints in **3.82 ms capped and
+352 ms uncapped — a 92× difference.** The first version of this note missed it by
+measuring the uncapped case at 37 KB, where occurrences and length are both small
+enough to hide the product. Both probes were honest; one of them was in a regime no
+reader is ever in.
+
+**What survives is the thesis, with the reason corrected.** The cap bounds occurrences;
+the cost is occurrences × length; and length is unbounded — it is whatever document the
+reader opens. **A bound on one half of a product is not a bound.** And the bound is
+currently guarding a cost nothing in the silo can incur: the largest document is
+36.9 KB and carries 44 references, so the paint is about **0.4 ms** — two orders of
+magnitude below anything a reader could feel. The cap will not fire, and it is not what
+keeps this silo fast.
 
 ## The fork
 
@@ -150,11 +180,14 @@ nothing measurable depends on it.
 - The only bound left is the map's 80 addresses, which is the one that is actually an
   invariant.
 - No new constant, no unreachable value, no second shape of the same defect.
-- `annotateSource` is untouched. Its behaviour does not change; only the length of the
-  list it is handed.
+- **`annotateSource` is made one pass first.** Its *behaviour* does not change — verified
+  byte-for-byte against the current splice — but its *cost* does: it copies the source
+  once per occurrence today, so handing it an unbounded list is a quadratic. That is a
+  prerequisite, not an extra, and it makes the paint 60× faster on the way past.
 
-B is smaller than A in every dimension that matters — one fewer concept, one fewer
-line, no invented number — and it is the version that matches the doc comment.
+B is smaller than A in every dimension that matters — one fewer concept, no invented
+number — and it is the version that matches the doc comment. It costs one step, in
+`annotateSource`, taken **before** the deletion rather than after.
 
 ## What is not in question
 
@@ -230,36 +263,57 @@ Two of these are worth a second look.
 
 ## Where I would land
 
-**Take B, and amend the brief's step 1 to say so.**
+**Take B, and amend the brief's step 1 — in two parts, in this order.**
 
 The reasoning is not that the guard is too small or too large — it is that the guard
-is a *second bound on a quantity that is not the invariant*. The whole point of
-BRF-ADDRESS-CAP is that the cap belongs on destinations. Adding a differently-named
-cap on occurrences keeps the wrong quantity bounded, which is the defect wearing a
-better label. Measurement says we can simply stop bounding it.
+bounds **one half of a product**. The whole point of BRF-ADDRESS-CAP is that the cap
+belongs on destinations. Adding a differently-named cap on occurrences keeps the wrong
+quantity bounded, which is the defect wearing a better label. Measurement says we can
+stop bounding it — but only once the splice is linear, because the bound is currently
+the only thing keeping it so.
 
-That makes the change smaller than the brief predicted: delete one line, rename one
-constant, correct four comment sites, add two tests. No new constant, no new number to
-justify.
+**First — make the splice one pass.** `annotateSource` emits the segments between
+occurrences and joins them, instead of slicing the whole source per occurrence.
+Byte-identical output, verified; **60× faster** on the capped list (0.15 ms against
+9.16 ms at 1 MB) and 13–24× faster uncapped.
+
+**Second — delete the occurrence bound.** Rename the constant to `MAX_ADDRESSES`,
+correct the four comment sites, add the two tests.
+
+The change is one step larger than the brief predicted and one constant smaller: no new
+number to justify, and the paint gets *faster* rather than slower. The first version of
+this note said the deletion was free. It is not free — it is worth paying for, which is
+a better reason.
 
 If you would rather keep a guard for reasons the measurement cannot see — a document
 you expect to arrive, a cost model I have not modelled — say so and we take A, and I
 would want the guard's comment to admit that it is prophylactic rather than
 performance-driven. That is an honest constant. "Chosen as a performance guard" is
-not, now that we have looked.
+not, now that we have looked: the guard that would matter is on the product, not on
+one factor of it.
 
 ## Evidence
 
-Both probes are in `tmp/` (scratch, gitignored):
+Four probes, all in `tmp/` (scratch, gitignored):
 
-- `tmp/guard-cost-probe.ts` — the cost table, the length table, and the starved-target
-  case reproduced on the current tree.
-- `tmp/corpus-cap-probe.ts` — the reach: 174 documents, 0 at the cap, 15 occurrences
-  of headroom.
+- `tmp/guard-cost-probe.ts` — the first cost table, the length table, and the
+  starved-target case. **This is the probe whose regime was wrong**: it varied the two
+  axes independently, at 37 KB.
+- `tmp/corpus-cap-probe.ts` — the reach: 174 documents, 0 at the cap, 15 occurrences of
+  headroom.
+- `tmp/annotate-cost-probe.ts` — the splice loop isolated, capped against uncapped, at
+  three or four lengths. This is where the ratio doubling per 4× of length showed up.
+- `tmp/splice-cliff-probe.ts` — the same splice at realistic density and at a fixed 80
+  occurrences, across 37 KB → 8 MB. The `ms per occ×MB` column is the verdict: flat
+  means copying.
+- `tmp/splice-fix-probe.ts` — the one-pass splice against the current one, with a
+  byte-for-byte output comparison in the same run.
 
 ## Related
 
 - `briefs/2026-09-14-brief-address-cap.md` — the brief this reopens, one step of it
+- `docs/2026-09-15-the-scaling-profile.md` — the measurement that corrected this note,
+  and the cost curves of the store around it
 - `src/vectors.ts` — the defect, and a doc comment that already states the fix
 - ADR-031 — the main document and the vector map
 - ADR-032 — the reserved doubled pairs, which moved the space from 88 to 80
