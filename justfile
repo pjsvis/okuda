@@ -244,6 +244,18 @@ moira-commendation:
     @speak-md --dry docs/2026-09-10-user-commendations.md > tmp/commendation-flat.txt
     @say -v Moira -r 140 -f tmp/commendation-flat.txt
 
+# Table auditions, Moira
+[group('moira')]
+moira-audition file:
+    #!/bin/bash
+    set -euo pipefail
+    mkdir -p tmp
+    for v in speak ordinals records shape; do
+        speak-md --tables "$v" --dry "{{file}}" > "tmp/audition-$v.txt"
+        echo "— audition $v ({{file}})"
+        say -v Moira -r 140 -f "tmp/audition-$v.txt"
+    done
+
 # Roofscape, Moira
 [group('moira')]
 moira-roofs:

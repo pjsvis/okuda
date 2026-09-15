@@ -177,10 +177,14 @@ The matrix, played through Moira on real corpus tables: `&speak.md`'s own
 
 | audition | what plays | the question it answers |
 |---|---|---|
-| A | status quo + row ordinals | does the ordinal alone fix the boundary? |
-| B | full records — key-value per row, one-shot | the slow register as a pass: meaning at what cost? |
-| C | announce-once + ordinals — values per row | the fast register as a pass: can the listener hold the axis? |
-| D | row ordinal spoken on navigation moves, or not | one word, restores the held axis — or edges toward coordinates? |
+| A | status quo + "Row k." ordinals | the boundary alone: does the ordinal fix the comma collision? |
+| B | full records — key-value per row, one-shot | the slow register as a pass: meaning at what word cost? |
+| C | A + the shape preamble — "Table of N rows, M columns." | the commitment device: does knowing the shape before entering change the experience? |
+| D | row ordinal spoken on navigation moves, or not | one word, restores the held axis — or edges toward coordinates? (deferred to stream B) |
+
+One variable per audition, or the ear cannot attribute cause. A isolates
+the boundary, C isolates the shape announcement on top of A, B isolates
+the register. D waits for the cursor.
 
 Acceptance: each audition heard and judged by ear; wording earned, never
 invented speculatively — the silo's own doctrine, and the research note's
