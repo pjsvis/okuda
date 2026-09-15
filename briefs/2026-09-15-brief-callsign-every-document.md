@@ -85,12 +85,12 @@ live-search brief at rank 1. The slug is the word the reader says and the word
 the search matches; the type word is the disambiguator, and the ear needs it
 only when two documents share a slug.
 
-**The saving is real and it is in the ear.** Across 141 registered callsigns:
+**The saving is real and it is in the ear.** Across 142 registered callsigns:
 
 | | path | callsign |
 |---|---|---|
-| characters | 5,979 | 2,607 (−56%) |
-| spoken tokens | 2,493 | 1,128 (−55%) |
+| characters | 6,029 | 2,629 (−56%) |
+| spoken tokens | 2,515 | 1,137 (−55%) |
 | per document | 17.7 | 8.0 |
 
 And the spoken form costs **half the token again**: 4.0 spoken tokens against
@@ -106,7 +106,7 @@ true.
 **D1 — Two tier lists, one drift.** `scripts/reg-sync.ts:34–42` names **five**
 tiers — briefs, debriefs, decisions, playbooks, **advisories**. `src/root.ts:24–29`
 names **four**; advisories is absent. `advisories/INDEX.jsonl` exists and carries
-five callsigns. Measured: **141 registered, 136 reachable, 5 orphaned.** The
+five callsigns. Measured: **142 registered, 137 reachable, 5 orphaned.** The
 registry writes a name the resolver can never return. Two lists, two consumers,
 drift — and the silo's own principle (`src/root.ts:22–23`, *one list, two
 consumers, no drift*) is the rule being broken.
@@ -131,11 +131,11 @@ documents.** The spoken form is *slug then type*, so the type word is the last
 thing heard and the only thing that distinguishes two tiers. `brief` / `debrief`
 — one contains the other; the ending carries the whole signal. `BRF` / `DBF`
 differ at one letter of three. The tier pair that collides is the pair holding
-**84 of 141** callsigns. The prefix probe finds exactly two one-letter pairs in
+**85 of 142** callsigns. The prefix probe finds exactly two one-letter pairs in
 the namespace — `ADR`/`ADV` (42 callsigns) and `DBF`/`DBR` (19) — and the noun
 map finds exactly one containment pair, `brief`/`debrief`.
 
-**D5 — 174 of 315 documents have no name.** Measured, by tier:
+**D5 — 174 of 316 documents have no name.** Measured, by tier:
 
 | tier | unnamed |
 |---|---|
@@ -155,7 +155,7 @@ index*). So the three `docs/` callsigns that do exist — `DOC-FRAME-EDGE-CASES`
 Measured: `callsignForFile("docs/style-guide.md")` → `null`.
 
 **D6 — The name's stability is undecided, and it is the same trap the registry
-already has.** 104 of 141 callsigns (**74%**) are slug-only; 37 carry an ordinal
+already has.** 105 of 142 callsigns (**74%**) are slug-only; 37 carry an ordinal
 tail. Resolution survives a retitle — `loadCallsigns` keys on the record, never
 the filename stem (`src/root.ts:121–124`). But a slug-only callsign **is** the
 document's old title: retitle the document and the name becomes a lie, and every
@@ -213,8 +213,8 @@ because it is what the reader will hear after the name resolves.
 - [x] Both tier lists are readable and disagree. **Verified 2026-09-15** —
       `src/root.ts:24–29` (four tiers) against `scripts/reg-sync.ts:34–42`
       (five, including `advisories`).
-- [x] The callsign census is measured. **Verified 2026-09-15** — 141 registered,
-      136 reachable, 174 unnamed of 315 tracked, 55% spoken saving.
+- [x] The callsign census is measured. **Verified 2026-09-15** — 142 registered,
+      137 reachable, 174 unnamed of 316 tracked, 55% spoken saving.
 - [x] The reach of an exact callsign query is measured. **Verified 2026-09-15** —
       rank 1 of 283 in nine of ten cases; the tenth is the ordinal shorthand.
 - [x] The prefix namespace is measured. **Verified 2026-09-15** — six prefixes,
@@ -234,7 +234,7 @@ because it is what the reader will hear after the name resolves.
        registry's list, or the registry reads the resolver's — and record the
        choice as an ADR. Add the test that asserts the two are equal, so the
        drift cannot return silently. Advisories becomes reachable as a
-       consequence: 141 registered, 141 reachable.
+       consequence: 142 registered, 142 reachable.
 2. [ ] **The prefix lint.** Assert `callsign.startsWith(csPrefix + "-")` for
        every registered row in `reg-sync`'s gate. Repair the two `DBR-` rows to
        `DBF-` and confirm `resolveByCallsign("DBR-SSH-BRINGUP")` returns `null`
@@ -265,10 +265,11 @@ because it is what the reader will hear after the name resolves.
        every note citing it). Record as an ADR. Whichever is chosen, the rule is
        written where the author meets it — `playbooks/briefs-playbook.md` and
        `playbooks/registry-playbook.md` are the two doors.
-8. [ ] **Re-measure and correct.** Re-run the census against the committed set.
-       The 315/174 counts above are taken before this brief exists; a
-       silo-wide measurement excludes the document taking it, so the totals move
-       by this brief's own weight after the commit that lands it.
+8. [ ] **Re-measure and correct.** Re-run the census against the committed set
+       at every phase boundary. A silo-wide measurement excludes the document
+       taking it, so the totals move by the measuring document's own weight —
+       this brief's own figures are post-commit for that reason (Notes), and
+       they move again with every brief that lands beside it.
 
 ## Acceptance Criteria
 
@@ -297,11 +298,16 @@ because it is what the reader will hear after the name resolves.
 
 - **The census probe had a bug, and it was a tier-name bug.** The first run read
   `INDEX.jsonl` in every tier and reported 126 callsigns; playbooks uses
-  `REGISTRY.jsonl`, so 15 rows were invisible. The corrected census reports 141.
+  `REGISTRY.jsonl`, so 15 rows were invisible. The corrected census reports 142.
   A tier's registry filename is not uniform — a census that assumes it is
   under-counts by a whole tier, silently. Fixed in
   `tmp/callsign-census-probe.py` and recorded here because the same assumption
   is easy to make again.
+- **This brief is under its own rule.** Every count above is taken against the
+  committed set, after this brief landed — 316 tracked documents, 142 of them
+  named. Taken before the commit it is 315 and 141, because a silo-wide
+  measurement excludes the document taking it. The figures here are the
+  post-commit ones; the brief that measures the silo is part of the silo.
 - **The brief's own first premise was wrong.** It began from *the callsign is
   not searchable today*. The reach probe overturned that: an exact callsign puts
   its document at rank 1, including for the tiers the resolver cannot reach.
