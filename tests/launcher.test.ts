@@ -156,8 +156,12 @@ describe("launcher — rankedShortlistEntries (the -g merge, integration)", () =
 
   test("generated index.md surfaces in no channel", () => {
     // Body hits and remainder alike exclude the generated views.
+    // basename, not endsWith: the exclusion is a path component. A
+    // suffix test also swallows any document whose slug ends in
+    // `-index.md` (docs/2026-09-15-the-invariants-and-the-index.md),
+    // which is a hand-written document and belongs in the corpus.
     const entries = rankedShortlistEntries("silo index generated", process.cwd());
-    expect(entries.some((e) => pathOf(e).endsWith("index.md"))).toBe(false);
+    expect(entries.some((e) => basename(pathOf(e)) === "index.md")).toBe(false);
   });
 
   test("orientation: the landing is the shelf — root files, nothing else", () => {
