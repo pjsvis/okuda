@@ -2,7 +2,7 @@
 
 L§AB
 
-LEITH SCRIPTORIUM & BOND
+LEITH §CRIPTORIUM & BOND
 
 A terminal markdown viewer built on `Bun.markdown` and compiled to a single binary. Named for Michael Okuda — high-contrast, functional, uncluttered.
 

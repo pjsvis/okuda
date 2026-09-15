@@ -244,6 +244,48 @@ moira-commendation:
     @speak-md --dry docs/2026-09-10-user-commendations.md > tmp/commendation-flat.txt
     @say -v Moira -r 140 -f tmp/commendation-flat.txt
 
+# Roofscape, Moira
+[group('moira')]
+moira-roofs:
+    @mkdir -p tmp
+    @speak-md probe --dry tmp/roofscape-probe.md > tmp/roofs-flat.txt
+    @say -v Moira -r 140 -f tmp/roofs-flat.txt
+
+# Roofscape, Moir
+[group('moira')]
+moir-roofs voice:
+    @mkdir -p tmp
+    @speak-md probe --dry tmp/roofscape-probe.md > tmp/roofs-moir-flat.txt
+    @say -v {{voice}} -r 140 -f tmp/roofs-moir-flat.txt
+
+# Roofscape, long listen
+[group('moira')]
+moira-roofs-long:
+    @mkdir -p tmp
+    @speak-md --style narrative --dry tmp/roofscape-long.md > tmp/roofs-long-flat.txt
+    @say -v Moira -r 140 -f tmp/roofs-long-flat.txt
+
+# Roofscape, recital
+[group('moira')]
+moira-roofs-recital:
+    @mkdir -p tmp
+    @speak-md --style narrative --dry tmp/roofscape-recital.md > tmp/recital-flat.txt
+    @say -v Moira -r 140 -f tmp/recital-flat.txt
+
+# Poet, Moira
+[group('moira')]
+moira-poet:
+    @mkdir -p tmp
+    @speak-md probe --dry tmp/poet-probe.md > tmp/poet-flat.txt
+    @say -v Moira -r 140 -f tmp/poet-flat.txt
+
+# Poet, Moir
+[group('moira')]
+moir-poet voice:
+    @mkdir -p tmp
+    @speak-md probe --dry tmp/poet-probe.md > tmp/poet-moir-flat.txt
+    @say -v {{voice}} -r 140 -f tmp/poet-moir-flat.txt
+
 # Speech vector
 [group('moira')]
 speech:
