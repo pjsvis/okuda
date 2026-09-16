@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-16 | BRF-MATH-GLYPHS | open | The Math Glyph Pass — inline LaTeX to Unicode, closed vocabulary, corpus-gated | 2026-09-16-brief-math-glyphs.md |
 | 2026-09-15 | BRF-CALLSIGN-EVERY-DOC | open | A callsign for every document — the name and the address are orthogonal | 2026-09-15-brief-callsign-every-document.md |
 | 2026-09-15 | BRF-SPOKEN-BLOCK-GRAMMAR | open | The spoken block grammar — announce the kind, enumerate the elements, never elide silently | 2026-09-15-brief-spoken-block-grammar.md |
 | 2026-09-14 | BRF-ADDRESS-CAP | open | The address cap — the invariant is the destination | 2026-09-14-brief-address-cap.md |
