@@ -56,6 +56,30 @@ Briefs are the spine: everything else derives from and references them,
 never the reverse. Schema and workflow: `registry-playbook.md`.
 Format and naming: `briefs-playbook.md`.
 
+## The Scratch Tier
+
+`tmp/` is the one directory that is **not** a compartment. It is gitignored
+(`.gitignore:25`), never registered, never indexed, and regenerated at will.
+Probes, dogfood artifacts and rendered specimens live there and are expected to be
+lost. **A finding that matters does not live in `tmp/`** — the silo is what git
+tracks, so a scratch file is not in the silo and cannot be cited. That is the whole
+reason the tier is safe: it is the one place a copyrighted specimen may sit
+(`ear-playbook.md`).
+
+The tier was **created by an agent, not by a plan**, and it earns its place by being
+useful: it is where a measurement is made before a brief is written. The probe-first
+habit is the house's (`briefs-playbook.md`, `decisions-playbook.md`), and this is
+where the probe goes.
+
+**Language.** TypeScript is the **release** language: everything in `src/`,
+`scripts/` and the compiled binary is TypeScript, and nothing in the release path
+invokes an interpreter (verified 2026-09-18 — no recipe or script calls `python`).
+Probes, smoke tests and dogfooding harnesses are written in **whatever the executing
+agent prefers, usually Python** — they are scratch, they are not reviewed as
+product, and the release path never depends on them. Both are present today: 58
+TypeScript probes and 21 Python ones. A probe that graduates becomes a test in
+`tests/` (TypeScript) or a script in `scripts/`, and stops being scratch.
+
 ## The justfile Facade
 
 The `justfile` is the **shared operational lexicon** for agent and
