@@ -13,6 +13,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-18 | BRF-PERIMETER-GATE | open | The perimeter gate — the moira group holds only recipes that invoke okuda | 2026-09-18-brief-perimeter-gate.md |
 | 2026-09-18 | BRF-PERIMETER-RUNNER | open | The perimeter runner — the tuning recipes and their artifacts leave the task runner | 2026-09-18-brief-perimeter-runner.md |
 | 2026-09-18 | BRF-PERIMETER-SILO | open | The perimeter silo — the speech doctrine and its records leave okuda | 2026-09-18-brief-perimeter-silo.md |
+| 2026-09-17 | BRF-BM25-EVALUATION | open | Benchmark Local BM25 Against Ripgrep and AST Traversal Over Markdown SSOT | 2026-09-17-brief-bm25-evaluation.md |
 | 2026-09-16 | BRF-MATH-GLYPHS | open | The Math Glyph Pass — inline LaTeX to Unicode, closed vocabulary, corpus-gated | 2026-09-16-brief-math-glyphs.md |
 | 2026-09-15 | BRF-CALLSIGN-EVERY-DOC | open | A callsign for every document — the name and the address are orthogonal | 2026-09-15-brief-callsign-every-document.md |
 | 2026-09-15 | BRF-SPOKEN-BLOCK-GRAMMAR | open | The spoken block grammar — announce the kind, enumerate the elements, never elide silently | 2026-09-15-brief-spoken-block-grammar.md |
