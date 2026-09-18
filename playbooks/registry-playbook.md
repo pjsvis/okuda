@@ -143,8 +143,17 @@ Five ways this machinery misleads. All verified against `scripts/reg-sync.ts`.
 - **`deriveStatus` (`scripts/reg-sync.ts:202`) runs only for *missing* entries.** An
   existing entry keeps its stored `status` indefinitely, so a status change in the
   document does not propagate on its own.
-- **`**Status:**` must be bare.** `**Status:** In Progress` maps correctly; trailing
-  prose on the same line maps to `open`.
+- **`**Status:**` must be bare — for briefs only.** `deriveStatus`
+  (`scripts/reg-sync.ts:201`) is **tier-specific**, and the difference is the
+  branch you are in. For `briefs` it takes the **whole** trimmed remainder of the
+  line (`/\*\*Status:\*\*\s*(.+)/`) and looks that string up in a three-key map
+  (`open` / `in progress` / `done`), so trailing prose misses the map and falls
+  back to **`open`** — a brief written `**Status:** Done (shipped in abc123)` files
+  itself as open. For `decisions` the match is **unanchored**
+  (`/\*\*Status:\*\*\s*(Proposed|Accepted|Superseded)/i`), so a parenthetical is
+  safe: `037-table-cursor` and `038-the-chunk-sequence` both read
+  `Accepted (implementation pending — BRF-…)` and both store
+  `"status":"Accepted"`. **Read the branch, not the rule.**
 - **The key is `file`, not `path`** — filename only, relative to the registry
   directory.
 
