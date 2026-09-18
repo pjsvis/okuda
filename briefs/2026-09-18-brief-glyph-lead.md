@@ -8,7 +8,7 @@ date: 2026-09-18
 
 **Created:** 2026-09-18
 **Status:** Open
-**TD:** pending
+**TD:** td-59e161 (epic) — td-d4420d the failing tests · td-075ae8 the repair · td-5928c9 the corpus pass
 **Lineage:** found while verifying `docs/2026-09-18-simplified-technical-english.md` — the doubled glyph was visible in the render and absent from the source, which is the house's own way of catching a rendering defect
 **Extends:** `briefs/2026-08-28-brief-state-glyph-render-path.md` (BRF-STATE-GLYPH) — the list-lead call this brief repairs
 
