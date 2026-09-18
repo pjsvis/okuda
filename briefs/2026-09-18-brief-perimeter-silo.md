@@ -8,6 +8,7 @@ date: 2026-09-18
 
 **Created:** 2026-09-18
 **Status:** Open
+**TD:** td-1bb4c4 (epic) — td-0a5aa5 the split and the records
 **Lineage:** ADR-PERIMETER-039 and the tier census in `docs/2026-09-18-a-perimeter-not-a-project.md` — the silo carries 25 speech-named documents, and every `.txt` file git tracks in okuda is a rendered TTS artifact
 **Extends:** `BRF-PERIMETER-GATE` and `BRF-PERIMETER-RUNNER` — those clear the task runner; this clears the silo.
 
