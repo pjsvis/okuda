@@ -1,7 +1,7 @@
 ---
 date: 2026-09-18
 kind: survey — an external standard tested against the silo, and where it lands
-lineage: the clip at docs/2026-09-18-aircraft-manual-grammar.md; the reader's question — "and its relevance to our Okuda project, opinion"
+lineage: the reader's question — "and its relevance to our Okuda project, opinion" — tested against the STE skill kit at chele.bi/videos/the-cure-for-ai-slop/kit/asd-ste100/SKILL; the local copy of that clip was removed 2026-09-18, because a mirror of a live external document cannot be kept true
 status: open — nothing is built; two adoptions proposed, one collision named
 ---
 
@@ -87,7 +87,7 @@ Four things. The first is about the probe, not the standard.
 
 Two places, both narrow.
 
-- **The system's own failure text.** The flash (`§14 — no document to render`), `gloam: rg not
+- **The system's own failure text** — the CSN class and its neighbours. The flash (`§14 — no document to render`), `gloam: rg not
   found — see DEPENDENCIES.md`, `clone failed (exit 1)`, the too-narrow notice. Each is read
   once, mid-gesture, by a reader who did not choose to read it and cannot re-read it. That is
   STE's reader exactly. And the class is already recognised: ADR-032 gives the system a doubled
@@ -164,7 +164,7 @@ own text. Until then the number is not a measurement.
 ## Evidence
 
 - `tmp/ste-probe.py` — the counters, six documents, run 2026-09-18.
-- `docs/2026-09-18-aircraft-manual-grammar.md` — the clip and its scope table.
+- The clip itself, at `https://www.chele.bi/videos/the-cure-for-ai-slop/kit/asd-ste100/SKILL` — its scope table and rule numbers are what the test is calibrated against. No local copy is held: it is a mirror of a live document, and a mirror drifts.
 - `docs/2026-09-10-use-vs-mention.md` — the distinction the counter cannot make.
 - `docs/2026-09-17-ssml-voice-tags.md` — the TTS clip's 15 to 20 words.
 - `playbooks/authoring-playbook.md` — the width contract, the rule about rules, the semicolon's
