@@ -77,10 +77,10 @@ not okuda's. A document that does not describe okuda's output is not okuda's.
 
 ```mermaid
 title: The perimeter test
-flowchart LR
-    R[a recipe, or a document] --> Q{does it read okuda's bytes, or describe them?}
-    Q -->|yes| O[okuda's, and it stays]
-    Q -->|no| E[the environment's, and it goes]
+flowchart TD
+    R[recipe or document] --> Q{reads okuda's bytes?}
+    Q -->|yes| O[okuda's]
+    Q -->|no| E[the environment's]
 ```
 
 ## Alternatives Considered
