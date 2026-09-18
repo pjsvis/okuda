@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-18 | ADR-PERIMETER-039 | Accepted | The perimeter — the voice reads okuda and does not live in it | 039-the-perimeter.md |
 | 2026-09-15 | ADR-TABLE-CURSOR-037 | Accepted | The table cursor — position within the render, spoken through two registers | 037-table-cursor.md |
 | 2026-09-15 | ADR-CHUNK-SEQUENCE-038 | Accepted | The chunk sequence — the head is unnumbered, the trailing ordinal is part N | 038-the-chunk-sequence.md |
 | 2026-09-13 | ADR-NO-SPEECH-CODE-036 | Accepted | No speech code in this repo — the cue is okuda's, the voice is the environment's | 036-no-speech-code.md |

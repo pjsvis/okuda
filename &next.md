@@ -33,6 +33,15 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 
 ## Recommended — start these next
 
+- **The perimeter** (ADR-PERIMETER-039, 2026-09-18) — the speech work
+  leaves okuda, and a check keeps it out. Three briefs, independently
+  closable: the tuning recipes and their artifacts go
+  (BRF-PERIMETER-RUNNER), the doctrine and the records go
+  (BRF-PERIMETER-SILO), and the report that becomes a gate lands first
+  (BRF-PERIMETER-GATE). The measurement is
+  `docs/2026-09-18-a-perimeter-not-a-project.md`: **22 of the 28
+  `[moira]` recipes touch nothing of okuda's**, and every `.txt` the
+  silo tracks is a rendered TTS artifact · **M**
 - **The frame thing, two objectives** (2026-09-07) — (1) figure out how
   to best do the frame thing (the semantic pager, chunk = heading-subtree
   vs sub-heading/paragraph for the ear); (2) determine if the frame
@@ -80,9 +89,10 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 ## Not next — deliberately
 
 - **BRF-FLOW-WRAP** (fresh) · **BRF-MERMAID-HARD** (waits on a
-  paged-view world) · **the speech set** (research landed, pipeline
-  brief drafted — BRF-SPOKEN-BLOCK-GRAMMAR, 2026-09-15; the ear owes
-  the corpus its auditions) · **the docs candidates** (speech-driven
-  design, the intention loop — landed, unregistered, awaiting the
-  Derrida and Foxtrot-Oscar gates) · **everything parked** (still
-  parked).
+  paged-view world) · **the speech set** (leaves this table —
+  ADR-PERIMETER-039: the tuning loop is `../speak-md/`'s, and the ear
+  owes its own corpus the auditions. **BRF-SPOKEN-BLOCK-GRAMMAR stays**,
+  because ADR-037 cites it and moving it breaks the record) · **the docs
+  candidates** (speech-driven design, the intention loop — landed,
+  unregistered, awaiting the Derrida and Foxtrot-Oscar gates) ·
+  **everything parked** (still parked).

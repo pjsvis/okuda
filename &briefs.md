@@ -50,6 +50,9 @@ Editorial surface; `just amp` checks the drift against the registry.
 | BRF-SILO-MNEMONICS | · ready | amended: data not machinery; small remainder | — |
 | BRF-FLOW-WRAP | · ready | break opportunities so paths flow | — |
 | BRF-CITTY-CLI | · ready | citty parses; stateless stance; three gates | — |
+| BRF-PERIMETER-GATE | · ready | the report that becomes a gate; lands first | — |
+| BRF-PERIMETER-RUNNER | · ready | the tuning recipes and artifacts leave | — |
+| BRF-PERIMETER-SILO | · ready | the doctrine and the records leave | — |
 
 ## In flight — partially landed, has commits
 
