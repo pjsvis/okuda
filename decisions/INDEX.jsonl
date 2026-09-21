@@ -38,3 +38,4 @@
 {"file":"038-the-chunk-sequence.md","date":"2026-09-15","status":"Accepted","summary":"The chunk sequence — the head is unnumbered, the trailing ordinal is part N","meta":{},"callsign":"ADR-CHUNK-SEQUENCE-038"}
 {"file":"039-the-perimeter.md","date":"2026-09-18","status":"Accepted","summary":"The perimeter — the voice reads okuda and does not live in it","meta":{},"callsign":"ADR-PERIMETER-039"}
 {"file":"040-build-signs-its-output.md","date":"2026-09-21","status":"Accepted","summary":"The build signs its own output — re-sign after compile, verify in the gate","meta":{},"callsign":"ADR-BUILD-SIGNS-040"}
+{"file":"041-a-gate-names-its-precondition.md","date":"2026-09-21","status":"Accepted","summary":"A gate names its own precondition — a missing instrument is not a verdict","meta":{},"callsign":"ADR-GATE-NAMES-041"}

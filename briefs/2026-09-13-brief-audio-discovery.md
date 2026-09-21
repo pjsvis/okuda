@@ -39,7 +39,8 @@ that changes the design.
 **A pending digit cannot name the actuator.** On a single `9` the actuator is not
 yet determined, and for `9` the odds are stark: `9` then `9` is the clone, but
 `9` then any of `0`–`8` resolves `90`–`98`, every one of which is a **vector**
-(`src/keygrammar.ts`'s `verbFor`: `11`–`98` are vectors, `99` is the clone).
+(`src/keygrammar.ts`'s `verbFor`: `12`–`98` less the doubled pairs are vectors, `99`
+is the clone).
 Announcing *"clone pending"* on a single `9` would be **wrong nine times out of
 ten** — and it would be wrong about the one thing the reader most needs to know.
 
@@ -508,6 +509,19 @@ ingress. They need a policy, because both can want the speaker at once:
 - **Opt-in, or always on when bound?** Silence by default is settled; whether the
   cues are individually selectable (pending / identity / mode) is not. Leaning:
   one binding, three cue classes, all on — a reader who binds it wants to hear it.
+- **Added 2026-09-21 — does the cast survive a device boundary?** The voice inventory is
+  not shared across macOS, iOS and iPadOS, so *Moir is never a character in the document*
+  cannot be enforced by name on a device whose voice set differs. Proposal: declare the
+  cast as a **role with a per-device binding** (`role → voice`), which is the shape the
+  cue seam already uses for `class → text`. `docs/2026-09-21-the-model-beside-the-loop.md`.
+- **Added 2026-09-21 — is the phrase set safe per recognizer?** The destructive tokens
+  (`99`, `00`) are the two whose failure mode is worst, and a phone's recognizer is not
+  the Mac's, so the adversarial pass over the spoken phrases wants running once per
+  recognizer, with the ear as the judge. Same document.
+- **Added 2026-09-21 — the mapping table has an inert row.** `"Vector one one"` injects
+  `11`, a doubled pair that resolves to `null`; the phrase does nothing. The live claim is
+  `docs/2026-08-30-voice-actuator-testing.md:69`, and the sweep is scoped in
+  `docs/2026-09-21-the-model-beside-the-loop.md`.
 - **Does the mode cue belong at the session boundary or in the grammar?** It is
   arguably the *host's* (it is a focus transition, and windowing is the host's).
   But okuda is the thing that knows the session ended, so okuda is the thing that
@@ -649,3 +663,6 @@ ingress. They need a policy, because both can want the speaker at once:
 - `src/tui.ts:527` — `flash`: the visual precedent for an actuator receipt, and
   the shape the cue seam should mirror
 - td-101a0f — the keymap reference: the refereed place the bindings are recorded
+- `docs/2026-09-21-the-model-beside-the-loop.md` — the capability assessment that
+  cross-references this brief: the three clocks, the model beside the loop, the cast as a
+  role bound per device, and the `11` defect in the voice mapping

@@ -13,7 +13,8 @@
 #   4. No default values on parameterized recipes (`param="..."` pins the
 #      column; the signature is the only lever on alignment).
 #
-# Exit 0 if all pass, 1 with a named violation list if any fail.
+# Exit 0 if all pass, 1 with a named violation list if any fail, 2 if the gate
+# cannot run — a missing instrument is not a verdict. ADR-041.
 # Run by `just check` alongside reg-sync.
 set -euo pipefail
 
@@ -21,6 +22,19 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 JUSTFILE="$REPO/justfile"
 fail=0
 violations=()
+
+# ── 0. Precondition ───────────────────────────────────────────────────
+# Invariant 1 derives the comment column from `just --list`, so the gate
+# needs `just` on PATH. Unguarded, the probe below exits 127, `pipefail`
+# propagates it, and `set -e` aborts before any diagnostic — exit 1 with
+# zero bytes, indistinguishable from a named violation. Say so instead.
+if ! command -v just >/dev/null 2>&1; then
+  echo "facade-lint: cannot run — 'just' is not on PATH (exit 2, not a verdict)" >&2
+  echo "  Invariant 1 (comment column) is derived from 'just --list'." >&2
+  echo "  Run this gate as 'just check', or put 'just' on PATH." >&2
+  echo "  The facade is UNVERIFIED — do not read this as a pass." >&2
+  exit 2
+fi
 
 # ── 1. Comment column ──────────────────────────────────────────────────
 # `just --list` prints recipes indented 4 spaces; the comment column is the
