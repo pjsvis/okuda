@@ -68,7 +68,7 @@ orient:
 # Sync gate
 [group('quality gate')]
 check:
-    @bun scripts/reg-sync.ts --all && bash scripts/facade-lint.sh
+    @bash scripts/signature-check.sh && bun scripts/reg-sync.ts --all && bash scripts/facade-lint.sh
 
 # Tests gate build
 [group('quality gate')]
@@ -332,10 +332,12 @@ search-ours query:
 dev file:
     @bun run src/cli.ts {{file}}
 
-# Compile (stamped)
+# Compile, re-sign, verify
 [group('build')]
 build:
     @bun build --compile --define "BUILD_SHA=\"$(git rev-parse --short=7 HEAD)\"" src/cli.ts --outfile okuda
+    @codesign --force --sign - okuda
+    @bash scripts/signature-check.sh okuda
 
 # Install
 [group('build')]
