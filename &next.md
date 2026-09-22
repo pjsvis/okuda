@@ -51,12 +51,6 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
   the paid-claim inventory: what okuda can do right now, every entry
   citing its landing record. The reader asked for a changelog; this is
   the snapshot that doesn't rot · **S**
-- **The search-area redesign — scheduled session** — the cluster is
-  named: **BRF-GLOAM-OWNS-THE-LOOP** (own the search TUI in-process;
-  79% of the keystroke is the process boundary) needs its scope
-  settled, then `td epic create`; **BRF-JUMP-LIST** (td-34479f) rides
-  the same surface. Book the session; the scope conversation is the
-  first agenda item · **M**
 - **The perimeter** (ADR-PERIMETER-039, 2026-09-18) — the speech work
   leaves okuda, and a check keeps it out. Three briefs, independently
   closable: the tuning recipes and their artifacts go
@@ -110,6 +104,12 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 
 ## Hygiene — small, owed
 
+- **The amp-check backlog** (pre-existing, measured during td-1c8fca)
+  — `just amp-check` is red with 29 items: 28 registry briefs absent
+  from the `&briefs.md` state table (the facade stopped updating 28
+  briefs ago), and one dead legacy wire at `&alpha.md:71`
+  (`briefs/x.md` — ADR-031 retired the grammar; the straggler wire
+  should become a real reference like the `&speak.md` rows) · **M**
 - **BRF-SILO-MNEMONICS — close or scope** — resolution shipped, badge
   shipped, bootstrap deferred: what remains is likely a debrief and a
   close · **S**
@@ -119,7 +119,12 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 ## Not next — deliberately
 
 - **BRF-FLOW-WRAP** (fresh) · **BRF-MERMAID-HARD** (waits on a
-  paged-view world) · **the speech set** (leaves this table —
+  paged-view world) · **the search-area redesign session** (td-3ac46b,
+  2026-09-19 — deferred behind the rest of the action list by
+  dependency: the wire fix, math glyphs, the cut cell, the palette
+  audit, the capabilities doc, the seam verdict; it clears when they
+  do, not by a date. GLOAM-OWNS-THE-LOOP scoping is the first agenda
+  item) · **the speech set** (leaves this table —
   ADR-PERIMETER-039: the tuning loop is `../speak-md/`'s, and the ear
   owes its own corpus the auditions. **BRF-SPOKEN-BLOCK-GRAMMAR stays**,
   because ADR-037 cites it and moving it breaks the record) · **the docs
