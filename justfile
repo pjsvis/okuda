@@ -326,7 +326,31 @@ search-ours query:
     @echo "OURS (gloam --entries — the dive): ranked, deduped, evidence"
     @./okuda gloam --entries '{{query}}' | awk -F'\t' 'NF>1 && $2 != ""'
 
-# ── Build ────────────────────────────────────────────────────
+# ── Dogfood sessions ──────────────────────────────────────
+
+# Decision table
+[group('dogfood')]
+next:
+    @./okuda --tui '&next.md'
+
+# State table
+[group('dogfood')]
+briefs:
+    @./okuda --tui '&briefs.md'
+
+# Listening queue
+[group('dogfood')]
+ear:
+    @./okuda --tui '&ear.md'
+
+# Palette exhibits
+[group('dogfood')]
+palette-audit:
+    @./okuda docs/state-colours.md --tui
+    @./okuda docs/showcase.md --tui
+    @./okuda docs/2026-09-05-palette-swatch.md --tui
+
+# ── Build ───────────────────────────────────────────────────
 
 [group('build')]
 dev file:

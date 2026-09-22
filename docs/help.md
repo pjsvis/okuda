@@ -26,6 +26,14 @@ Work cycle: **brief → branch → implement → check → review → debrief**
 - `just reg-sync-fix` — regenerate indexes from filesystem
 - `just reg-briefs` / `reg-decisions` / `reg-debriefs` / `reg-playbooks` — list one registry
 
+## Dogfood sessions
+
+- `just next` — the decision table (`&next.md`): what to start, what waits, what's parked.
+- `just briefs` — the registry state table; the visible face of `just amp`'s drift count.
+- `just ear` — the listening queue: open verdicts, one recipe per row.
+- `just palette-audit` — the three audit exhibits in sequence (quit each to advance); the rig BRF-PALETTE-AUDIT names. Revisit when the brightness controller lands — the exhibits gain their α extremes.
+- Older sessions live elsewhere in the menu: `just dogfood` (α), `just speech` (the speech vector), `just showcase` (the grammar tour), `just chip` / `keyboard-dogfood` / `stamp` (build group).
+
 ## Searching
 
 One mode, live (ADR-030 + the filter model): **`gloam` is the search.**
