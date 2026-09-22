@@ -3,6 +3,7 @@ import {
   decodeKey,
   digitOf,
   extractJumps,
+  resolveJumpTarget,
   advanceNumBuffer,
   footerLine,
   viewport,
@@ -25,6 +26,8 @@ import {
 import { makeStyler } from "../src/ansi";
 import { DRACULA_PALETTE } from "../src/palette";
 import { displayWidth, stripANSI } from "../src/width";
+import { resolve } from "node:path";
+import { existsSync } from "node:fs";
 
 function buf(...bytes: number[]): Uint8Array {
   return new Uint8Array(bytes);
@@ -538,5 +541,41 @@ describe("tui — advanceNumBuffer (the two-digit jump state machine)", () => {
   });
   test("typing '0'+'0' → token 0 (matches [00] if the compositor emits it)", () => {
     expect(advanceNumBuffer("0", "0").token).toBe(0);
+  });
+});
+
+describe("tui — resolveJumpTarget (a relative target anchors to the main document)", () => {
+  // td-1c8fca: `&speak.md` rows wire `../speak-md/` targets — relative to
+  // the page, not to the process. A foreign cwd must not sever the jump;
+  // HTML semantics, the document is the base URL.
+  const main = resolve(import.meta.dir, "..", "AGENTS.md");
+  const home = process.cwd();
+
+  test("a relative target resolves against the main document's directory", () => {
+    process.chdir("/tmp"); // a foreign cwd — the anchor is the document
+    try {
+      const got = resolveJumpTarget(
+        main,
+        "briefs/2026-09-19-brief-capabilities-doc.md",
+        () => null,
+      );
+      expect(got).not.toBeNull();
+      expect(existsSync(got!)).toBe(true);
+      expect(got!.endsWith("briefs/2026-09-19-brief-capabilities-doc.md")).toBe(true);
+    } finally {
+      process.chdir(home);
+    }
+  });
+
+  test("the fallback carries what the anchor misses (callsigns, cwd)", () => {
+    expect(resolveJumpTarget(main, "BRF-NOT-A-PATH", (t) => `fallback:${t}`)).toBe(
+      "fallback:BRF-NOT-A-PATH",
+    );
+  });
+
+  test("absolute targets pass through to the fallback untouched", () => {
+    expect(resolveJumpTarget(main, "/tmp/whatever.md", (t) => `fallback:${t}`)).toBe(
+      "fallback:/tmp/whatever.md",
+    );
   });
 });
