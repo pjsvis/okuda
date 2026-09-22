@@ -9,7 +9,10 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-19 | BRF-CAPABILITIES-DOC | open | The capabilities doc — a snapshot inventory, not a changelog | 2026-09-19-brief-capabilities-doc.md |
 | 2026-09-19 | BRF-GLOAM-OWNS-LOOP | open | GLoam owns the search TUI — the fzf dependency retires | 2026-09-19-brief-gloam-owns-the-loop.md |
+| 2026-09-19 | BRF-PALETTE-AUDIT | open | The palette audit — review the colours before the brightness controller scales them | 2026-09-19-brief-palette-audit.md |
+| 2026-09-19 | BRF-REMOTE-SPEECH-SEAM | open | The remote speech seam — a question to settle before anything builds | 2026-09-19-brief-remote-speech-seam.md |
 | 2026-09-18 | BRF-GLYPH-LEAD | open | The state glyph is emitted twice on a list lead | 2026-09-18-brief-glyph-lead.md |
 | 2026-09-18 | BRF-PERIMETER-GATE | open | The perimeter gate — the moira group holds only recipes that invoke okuda | 2026-09-18-brief-perimeter-gate.md |
 | 2026-09-18 | BRF-PERIMETER-RUNNER | open | The perimeter runner — the tuning recipes and their artifacts leave the task runner | 2026-09-18-brief-perimeter-runner.md |
