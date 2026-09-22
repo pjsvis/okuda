@@ -16,6 +16,9 @@ okuda
 # WorkBuddy session metadata (agent memory, per-project)
 .workbuddy-ai/
 
+# VMark editor state (local, per-directory)
+.vmark/
+
 # Island (ephemeral, regenerated — never registered)
 NOW.md
 STANCE.md

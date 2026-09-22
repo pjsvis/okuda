@@ -119,7 +119,7 @@ retired only by the death of its document.
 
 **Constraints this imposes:**
 - The wire format and the callsign format remain distinct instruments:
-  callsigns are durable identity; jump tokens (11–99) are ephemeral session
+  callsigns are durable identity; jump tokens (12–98) are ephemeral session
   codes with no register and no lifecycle. This ADR does not touch the
   ephemeral keyspace.
 - `.archive/<tier>/` naming is now a contract, not a convention.

@@ -62,7 +62,7 @@ file list.)
 ## The two-digit grammar
 
 In any index or jump-wired document, type two digits to open the row
-beside the number; `u` walks back. Tokens 11–99, per ADR-021's offset.
+beside the number; `u` walks back. Tokens 12–98, per ADR-021's offset.
 Ephemeral by design — never jotted, never referenced; the durable codes
 are callsigns. The distinction in one line: *jump tokens are for this
 session; callsigns are for next week's phone call.*

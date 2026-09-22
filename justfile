@@ -1,6 +1,9 @@
 # okuda — terminal markdown viewer (origin: docs/2026-08-20-origin-doc.md)
 # Silo facade: recipes are one-line delegations; logic lives in scripts/.
 
+# Args unparsed
+set positional-arguments
+
 # List recipes
 [group('navigation')]
 @default:
@@ -65,7 +68,7 @@ orient:
 # Sync gate
 [group('quality gate')]
 check:
-    @bun scripts/reg-sync.ts --all && bash scripts/facade-lint.sh
+    @bash scripts/signature-check.sh && bun scripts/reg-sync.ts --all && bash scripts/facade-lint.sh
 
 # Tests gate build
 [group('quality gate')]
@@ -81,6 +84,11 @@ search-smoke:
 [group('quality gate')]
 search-replay *args:
     @bash scripts/search-replay.sh {{args}}
+
+# Table cut report
+[group('quality gate')]
+tables-check *args:
+    @bun scripts/tables-check.ts "$@"
 
 # Vector contract dogfood
 [group('quality gate')]
@@ -236,6 +244,60 @@ moira-commendation:
     @speak-md --dry docs/2026-09-10-user-commendations.md > tmp/commendation-flat.txt
     @say -v Moira -r 140 -f tmp/commendation-flat.txt
 
+# Table auditions, Moira
+[group('moira')]
+moira-audition file:
+    #!/bin/bash
+    set -euo pipefail
+    mkdir -p tmp
+    for v in speak ordinals records shape; do
+        speak-md --tables "$v" --dry "{{file}}" > "tmp/audition-$v.txt"
+        echo "— audition $v ({{file}})"
+        say -v Moira -r 140 -f "tmp/audition-$v.txt"
+    done
+
+# Roofscape, Moira
+[group('moira')]
+moira-roofs:
+    @mkdir -p tmp
+    @speak-md probe --dry tmp/roofscape-probe.md > tmp/roofs-flat.txt
+    @say -v Moira -r 140 -f tmp/roofs-flat.txt
+
+# Roofscape, Moir
+[group('moira')]
+moir-roofs voice:
+    @mkdir -p tmp
+    @speak-md probe --dry tmp/roofscape-probe.md > tmp/roofs-moir-flat.txt
+    @say -v {{voice}} -r 140 -f tmp/roofs-moir-flat.txt
+
+# Roofscape, long listen
+[group('moira')]
+moira-roofs-long:
+    @mkdir -p tmp
+    @speak-md --style narrative --dry tmp/roofscape-long.md > tmp/roofs-long-flat.txt
+    @say -v Moira -r 140 -f tmp/roofs-long-flat.txt
+
+# Roofscape, recital
+[group('moira')]
+moira-roofs-recital:
+    @mkdir -p tmp
+    @speak-md --style narrative --dry tmp/roofscape-recital.md > tmp/recital-flat.txt
+    @say -v Moira -r 140 -f tmp/recital-flat.txt
+
+# Poet, Moira
+[group('moira')]
+moira-poet:
+    @mkdir -p tmp
+    @speak-md probe --dry tmp/poet-probe.md > tmp/poet-flat.txt
+    @say -v Moira -r 140 -f tmp/poet-flat.txt
+
+# Poet, Moir
+[group('moira')]
+moir-poet voice:
+    @mkdir -p tmp
+    @speak-md probe --dry tmp/poet-probe.md > tmp/poet-moir-flat.txt
+    @say -v {{voice}} -r 140 -f tmp/poet-moir-flat.txt
+
 # Speech vector
 [group('moira')]
 speech:
@@ -270,10 +332,12 @@ search-ours query:
 dev file:
     @bun run src/cli.ts {{file}}
 
-# Compile (stamped)
+# Compile, re-sign, verify
 [group('build')]
 build:
     @bun build --compile --define "BUILD_SHA=\"$(git rev-parse --short=7 HEAD)\"" src/cli.ts --outfile okuda
+    @codesign --force --sign - okuda
+    @bash scripts/signature-check.sh okuda
 
 # Install
 [group('build')]

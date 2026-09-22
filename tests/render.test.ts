@@ -660,3 +660,45 @@ describe("render — state glyphs colour in prose (the lexicon leap)", () => {
     expect(out).not.toContain("\x1b[38;2;255;224;102;1m◆");
   });
 });
+
+// ── The GLöam wordmark (the BÖC move) ──
+// The metal umlaut exists only at render time: source "GLoam"/"Gloam",
+// screen GLöam, the ö rubricated in the vector rose — the wordmark
+// channel, recognition not syntax (the mystery-logo pattern, second
+// of its name after L§AB).
+describe("render — the GLöam wordmark (render-time metal umlaut)", () => {
+  test("GLoam and Gloam both paint the canonical GLöam, ö in vector rose", async () => {
+    const out = await render("GLoam hosts, Gloam narrates.");
+    const rose = "\x1b[38;2;251;113;133;1m";
+    expect(out).toContain("GL" + rose + "\u00f6\x1b[0m" + "am");
+    // Both source spellings canonicalise to the one wordmark.
+    expect(stripANSI(out)).toContain("GL\u00f6am");
+    expect(stripANSI(out)).toContain("GL\u00f6am hosts");
+    expect(stripANSI(out)).toContain("GL\u00f6am narrates");
+    // The un-umlauted source form never leaks to screen.
+    expect(stripANSI(out)).not.toContain("GLoam");
+    expect(stripANSI(out)).not.toContain("Gloam");
+  });
+  test("the lowercase Scots word (gloam) stays plain — word, not name", async () => {
+    const out = await render("the gloam gathers");
+    expect(stripANSI(out)).toContain("the gloam gathers");
+    expect(out).not.toContain("\x1b[38;2;251;113;133;1m\u00f6");
+  });
+  test("the lowercase command (gloam) in a codespan stays literal — word, not name", async () => {
+    // The corpus rule: code spans carry the command (lowercase `gloam`,
+    // the launcher); prose carries the name (capitalized). The wordmark
+    // paints the name; the command is never touched, in prose or code.
+    const out = await render("`gloam -g flux` is the search");
+    expect(stripANSI(out)).toContain("gloam -g flux");
+    expect(out).not.toContain("\u00f6");
+  });
+  test("NO_COLOR parity: plain bold ö, no colour", async () => {
+    const out = await render("GLoam in none mode", 60, "none");
+    expect(out).toContain("\x1b[1m\u00f6\x1b[0m");
+    expect(out).not.toContain("\x1b[38;2;251;113;133;1m");
+  });
+  test("the ö measures width 1 (table column math depends on it)", () => {
+    expect(displayWidth("\u00f6")).toBe(1);
+    expect(displayWidth("GL\u00f6am")).toBe(5);
+  });
+});

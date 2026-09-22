@@ -31,7 +31,7 @@ declaration.
 ## Decision
 
 **1. The grammar is `%%okuda-rhs:NN%%`.** `NN` is the two-digit token,
-11–99 by convention (ADR-021's offset; the `\d{1,2}` regex is retained for
+12–98 by convention (ADR-021's offset; the `\d{1,2}` regex is retained for
 tolerance, the convention is enforced by people and lints). The namespace
 prefix `okuda-rhs` is load-bearing: it makes every wire in the corpus
 greppable and self-identifying, and it cannot collide with legitimate HTML
@@ -98,7 +98,7 @@ is the point.
 
 - ADR: `decisions/025-mnemonic-namespace-model.md` (namespace model; the
   second-producer threshold this ADR formalises)
-- ADR: `decisions/021-jump-token-numbering-offset.md` (the 11–99 space)
+- ADR: `decisions/021-jump-token-numbering-offset.md` (the 12–98 space)
 - Doc: `docs/2026-08-31-okuda-precedents.md` (visual precedents — paint
   direction adopted; parser proposals declined with reasons above)
 - Doc: `docs/2026-08-30-from-babylon-to-the-stars.md` (the `[NN] ──►`

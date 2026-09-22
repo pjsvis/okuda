@@ -8,6 +8,7 @@ an assumption.
 |------|---------|---------|----------|
 | `bun` | 1.4.0 | Runtime & renderer | 2026-08-27 |
 | `just` | 1.53.0 | Task runner | 2026-08-20 |
+| `codesign` | system (macOS 27.0) | Build — re-signs the compiled binary | 2026-09-21 |
 | `git` | 2.54.0 | Version control | 2026-08-20 |
 | `td` | 0.61.0 | Task management | 2026-08-27 |
 | `mermaid-to-md` | 0.1.0* | Mermaid → ASCII | 2026-09-02 |
@@ -115,9 +116,55 @@ the *next* winsize-reporting regression, and removing it reintroduces the
 Alacritty failure. `tput` is present on every POSIX system with a terminfo
 db; it is an implicit dependency of the compiled binary's width detection.
 
+## Bun `--compile` signature defect (load-bearing re-sign)
+
+`bun build --compile` emits a Mach-O whose adhoc, linker-signed
+`CodeDirectory` carries **one stale page hash** — the last slot, which is
+the only *partial* page (672 bytes at the tail of the `__LINKEDIT` symbol
+string table). `codesign -vvv` reports `invalid signature (code or
+signature have been modified)`, and macOS arm64 requires a **valid**
+signature: the process is SIGKILLed on exec — exit 137, zero bytes, no
+message. `zsh: killed` is that, and it reads exactly like a corrupt
+artifact, a bad checkout, or a sandbox.
+
+**macOS 26.6.2 tolerated it; macOS 27.0 does not.** Same bytes, same
+compiler: the binary built 2026-09-16 ran twenty timed times on 2026-09-19
+(`tmp/reload-cost-probe.py`) and was dead on 2026-09-21, the day after the
+upgrade. Verified 2026-09-21, macOS 27.0 (26A428), arm64. The upgrade date
+is in `system_profiler SPInstallHistoryDataType` — it is in no log this
+silo keeps.
+
+Four controls, and the first two are the ones that mislead:
+
+| Binary | `codesign -vvv` | exec |
+|--------|-----------------|------|
+| as emitted | invalid signature | **exit 137** |
+| re-signed `-s -` | valid on disk | exit 0 |
+| signed, then +1 byte | failed strict validation | exit 0 |
+| signature stripped | not signed at all | **exit 137** |
+
+Bytes past `codeLimit` warn and the binary **runs** — so "trailing data" is
+the plausible wrong answer. Stripping the signature is not a remedy either:
+unsigned is killed too, so the requirement is a *valid* signature, not any
+and not none.
+
+**Workaround (in the `build` recipe):** `codesign --force --sign - okuda`
+after the compile, then `scripts/signature-check.sh` to verify. The re-sign
+must stay **after** the compile. The binary **shrinks** on re-sign —
+63,976,562 → 63,604,752 bytes — because Apple's `codesign` uses 16 KiB
+pages where the linker used 4 KiB. That is not damage.
+
+`codesign` ships with macOS, so the re-sign adds no install — but it is a
+**build dependency**: a Linux or CI build of okuda must skip the step, not
+fail on it, which is why `scripts/signature-check.sh` exits 0 for an absent
+binary.
+
+See `ADR-BUILD-SIGNS-040` and `docs/2026-09-21-the-page-the-signature-got-wrong.md`.
+
 ## Verification discipline
 
 - Preconditions in briefs verify tools listed here (existence, version, behaviour) before work starts.
 - Re-verify on environment change (new machine, PATH change, major version bump) and update the Verified date.
 - A missing dependency halts the brief — it does not get worked around silently.
 - A *silent* regression (columns=0) is a missing dependency in disguise — the `tput` fallback is the verification that the terminal, not just the runtime, reports its width. Re-verify width detection on every Bun major bump, on more than one terminal emulator.
+- **An artifact's precondition is a dependency too.** The build emitted an unrunnable binary for four days because nothing verified the signature — the same shape as columns=0, a silent regression the runtime reports as success. `scripts/signature-check.sh`, run by `just check` and by `just build`, is that verification. **Re-run it on every OS major bump**: macOS 27 changed which signatures it enforces, and the compiler did not change at all.

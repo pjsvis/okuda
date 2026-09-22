@@ -25,7 +25,7 @@ already integrated, by construction.
   mouse: two-digit jumps, single-letter motion, one-word search. No
   aiming, no precision, no drag targets.
 - **The vector density profile is biased low.** The most likely actions
-  carry the lowest numbers — 11, 12, 13 — because numbering follows
+  carry the lowest numbers — 12, 13, 14 — because numbering follows
   visible order, and visible order follows likelihood. For someone
   with limited reach or fatiguing hands, the common case is always the
   shortest press, always in the same place. Motor ergonomics for free.
@@ -80,7 +80,7 @@ glass was the barrier, and the design removes it.
 ### Cognitive
 
 - **The vocabulary fits on one screen** — and is documented in the
-  reading path. Bounded grammar, bounded keyspace (11–99), bounded
+  reading path. Bounded grammar, bounded keyspace (12–98), bounded
   states. The same restriction that makes ASCII diagrams deterministic
   makes the interface learnable in an afternoon.
 - **No hidden state.** The three breadcrumbs (query, backstack,

@@ -622,6 +622,20 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // recognition, not by syntax. (L§AB — Leith Scriptorium & Bond.)
       out = out.replace(/L§AB/g, (m) =>
         "L" + styler.roleBold("vector", "§") + "AB");
+      // The GLöam wordmark — the BÖC move: the metal umlaut exists only
+      // at render time. The source stays clean ("GLoam"/"Gloam"); the
+      // terminal shows the canonical GLöam, the ö rubricated in the
+      // vector rose (the wordmark channel, §'s role — recognition, not
+      // syntax, the mystery-logo pattern, second of its name). The
+      // lowercase Scots word ("gloam", the gloaming) is the word, not
+      // the name — it stays plain, and the launcher command (lowercase
+      // `gloam`) is the word in corpus codespans too: never touched, in
+      // prose or code. Like L§AB, this fires inside codespans as
+      // well — accepted: the capitalized form never appears in code in
+      // the corpus, only in prose mentions. Precomposed U+00F6: width
+      // 1; the combining diaeresis would lie to displayWidth.
+      out = out.replace(/GLoam|Gloam/g, () =>
+        "GL" + styler.roleBold("vector", "\u00f6") + "am");
       return out;
     },
 

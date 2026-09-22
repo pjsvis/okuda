@@ -37,9 +37,10 @@ express a reserved token (an 11th row emits 23, not 22).
 ## Context
 
 ADR-031 allocated the two-digit space by *range*: 00–10 verbs/modes,
-11–98 addresses (vectors/silcrows), 99 the clone verb. The range split
-left [99] as an awkward outlier — a verb sitting at the top of the
-address range, a special case in the range rule.
+11–98 addresses (vectors/silcrows; 12–98 once this ADR landed), 99 the
+clone verb. The range split left [99] as an awkward outlier — a verb
+sitting at the top of the address range, a special case in the range
+rule.
 
 A practical need arrived from the TTS dogfood session
 (`briefs/2026-09-06-brief-tts-dogfood.md`): double-tap keys are valuable

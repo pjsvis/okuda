@@ -9,7 +9,7 @@ callsign: BRF-WORKING-COPY
 **Status:** Open
 **Context:** ADR-031 is the decision; this brief is the build. The
 model: the main document renders with its references annotated as
-optimistic vectors `[11]–[98]`; actuating one renders the target clean
+optimistic vectors `[12]–[98]`; actuating one renders the target clean
 in the same instance; `u` unwinds; `99` clones the current render into
 a new terminal via the host, where it becomes main — annotated. The
 jump map is in-memory, derived from the main source per render; the
@@ -26,7 +26,7 @@ paint is illustrative; the source is never mutated; legacy wiring
    - **never**: zero-padded or single-digit bracketed numbers (`[07]`
      is text, always); `okuda-rhs` tokens (retired, ignored); anything
      a user authored as a bracketed number.
-2. **The map — `buildJumpMap(refs): Map<number, string>`.** 11–98 in
+2. **The map — `buildJumpMap(refs): Map<number, string>`.** 12–98 in
    reading order. In-memory, per render, rebuilt on `r` reload.
    Deterministic per (document, content).
 3. **The paint.** The main document's render projects the map: the
@@ -96,7 +96,7 @@ paint is illustrative; the source is never mutated; legacy wiring
 ## Acceptance
 
 - Viewing any silo document: its callsigns and local `.md` links carry
-  amber two-digit vectors `[11]…`, in reading order, deterministic
+  amber two-digit vectors `[12]…`, in reading order, deterministic
   across reloads.
 - Actuating a vector renders the target clean; `u` returns to the
   annotated main; the map re-derives correctly after `u` and after
