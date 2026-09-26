@@ -26,6 +26,12 @@ export const TIER_REGISTRIES: Array<[dir: string, file: string]> = [
   ["decisions", "INDEX.jsonl"],
   ["debriefs", "INDEX.jsonl"],
   ["playbooks", "REGISTRY.jsonl"],
+  // advisories joined 2026-09-24 (BRF-VALIDATED-SILCROWS P-0): the tier
+  // was added to reg-sync's config (69122be) but never here — 51 corpus
+  // references to ADV-* callsigns painted silcrows that could not jump.
+  // One list, two consumers (the resolver + the launcher channel), and
+  // the drift test in reg-callsign.test.ts keeps the claim honest now.
+  ["advisories", "INDEX.jsonl"],
 ];
 
 /** Rooted detection result. `badge` is the silo name the renderer paints
