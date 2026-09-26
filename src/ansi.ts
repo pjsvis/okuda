@@ -11,6 +11,7 @@
  */
 
 import { type Palette, RESET, bg, fg } from "./palette";
+import { stripANSI } from "./width";
 
 /** Build \x1b[...m from params, e.g. sgr("1", "38;2;224;222;244"). */
 function sgr(...params: string[]): string {
@@ -20,6 +21,28 @@ function sgr(...params: string[]): string {
 /** Foreground params without the wrapper, for composition. */
 function fgParams(hex: string): string {
   return fg(hex).slice(2, -1);
+}
+
+/** URL scheme shape — `scheme://…` (mailto: excluded: no `//`). */
+const RE_SCHEME = /^[a-z][a-z0-9+.-]*:\/\//i;
+
+/** True when the link label IS the address (BRF-SELF-IDENTICAL-LINK):
+ *  the label, ANSI-stripped, equals the href exactly (any link — a
+ *  relative self-link is the same zero-information case), or both are
+ *  scheme-shaped and equal modulo trailing slashes. The slash rule is
+ *  safe only because both strings are addresses: the click goes to the
+ *  href regardless, and the label never said anything the href didn't.
+ *  No further normalization — every rule beyond the root-slash makes
+ *  semantic claims about URLs. Pure. */
+export function sameAddress(label: string, url: string): boolean {
+  if (!url || !label) return false;
+  const bare = stripANSI(label).trim();
+  if (bare === url) return true;
+  return (
+    RE_SCHEME.test(bare) &&
+    RE_SCHEME.test(url) &&
+    bare.replace(/\/+$/, "") === url.replace(/\/+$/, "")
+  );
 }
 
 
@@ -64,7 +87,9 @@ export interface Styler {
   /** Render a hyperlink: link text (rose) + visible URL (cyan underline),
    *  glow-faithful. No OSC 8 — the URL is displayed, satisfying terminals
    *  that need it visible. (Pass C, 2026-08-24; superseded the OSC 8-only
-   *  approach that hid the URL.) */
+   *  approach that hid the URL.) When the label IS the address
+   *  (sameAddress), the address is said once, in this destination paint
+   *  (BRF-SELF-IDENTICAL-LINK — the label carries zero information). */
   link(text: string, url: string): string;
   /** Blockquote pipe prefix. */
   quotePipe(): string;
@@ -111,8 +136,10 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       codeLine: (line) => line,
       codespan: (text) => text, // Pass B: backticks stripped in both modes (parity)
       // Pass C: none-mode link still shows the URL (parity invariant —
-      // truecolor emits 'text url', none must too, or line breaks differ).
-      link: (text, url) => url ? `${text} ${url}` : text,
+      // both modes emit the same visible text, or line breaks differ).
+      // Self-identical links: the address once (BRF-SELF-IDENTICAL-LINK).
+      link: (text, url) =>
+        url ? (sameAddress(text, url) ? url : `${text} ${url}`) : text,
       quotePipe: () => "│",
       tablePipe: () => "│",
       rule: (width) => "─".repeat(width),
@@ -155,8 +182,11 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     // Pass C (2026-08-24): glow-faithful link — rose text + visible
     // cyan-underlined URL, no OSC 8. The URL is displayed inline (the
     // operator's terminal requires it visible, not just clickable).
+    // Self-identical: once, destination paint (BRF-SELF-IDENTICAL-LINK).
     link: (text, url) =>
-      `${wrap(sgr(fgParams(palette["link-text"])), text)} ${wrap(sgr(fgParams(palette["link-url"]), "4"), url)}`,
+      sameAddress(text, url)
+        ? wrap(sgr(fgParams(palette["link-url"]), "4"), url)
+        : `${wrap(sgr(fgParams(palette["link-text"])), text)} ${wrap(sgr(fgParams(palette["link-url"]), "4"), url)}`,
     quotePipe: () => `${fg(palette.blockquote)}│${RESET}`,
     tablePipe: () => `${fg(palette.muted)}│${RESET}`,
     rule: (width) => `${fg(palette.muted)}${"─".repeat(width)}${RESET}`,

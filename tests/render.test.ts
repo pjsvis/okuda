@@ -240,6 +240,20 @@ describe("render — paragraphs and inline styles", () => {
     expect(out).not.toContain("\x1b]8;;"); // no OSC 8 (Pass C)
   });
 
+  test("bare autolink / self-identical link: the address once, not twice", async () => {
+    const out = await render(
+      "See <https://example.com> and [https://example.com/](https://example.com)",
+    );
+    const stripped = stripANSI(out);
+    expect(stripped.match(/https:\/\/example\.com/g)).toHaveLength(2); // once per link — was four
+  });
+
+  test("noun-phrase label keeps the two-part paint (the designed case)", async () => {
+    const out = await render("[the okuda repo](https://github.com/x)");
+    expect(out).toContain("\x1b[38;2;255;121;198mthe okuda repo\x1b[0m"); // rose label
+    expect(out).toContain("\x1b[38;2;139;233;253;4mhttps://github.com/x\x1b[0m"); // cyan-underlined URL
+  });
+
   test("image rejected as [image: alt]", async () => {
     const out = await render("![the alt](pic.png)");
     expect(out).toContain("[image: the alt]");
