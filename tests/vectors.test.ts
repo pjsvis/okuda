@@ -46,6 +46,32 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
     expect(scanReferences("the SSH-2 protocol").map((r) => r.target)).toEqual(["SSH-2"]);
   });
 
+  test("the ADR-044 gate: inferred callsigns resolve or are retracted; the default stays optimistic", () => {
+    // The registry says ADR-031 exists and UTF-8 does not. Under the
+    // gate the acronym is retracted — a bare UTF-8 in prose made no
+    // claim; the registry check is the retraction.
+    const resolves = (t: string) => t === "ADR-031";
+    expect(scanReferences("see ADR-031 but not UTF-8", resolves).map((r) => r.target)).toEqual(["ADR-031"]);
+    // No predicate = the pre-ADR-044 contract (the pure scan, the tests).
+    expect(scanReferences("see ADR-031 but not UTF-8").map((r) => r.target)).toEqual(["ADR-031", "UTF-8"]);
+  });
+
+  test("the gate never touches explicit .md links — the author's link is a deliberate claim", () => {
+    const none = () => false; // an empty registry: nothing resolves
+    const src = "[the brief](briefs/2026-09-24-brief-validated-silcrows.md) survives; ADR-031 does not.";
+    expect(scanReferences(src, none).map((r) => r.target)).toEqual(["briefs/2026-09-24-brief-validated-silcrows.md"]);
+  });
+
+  test("junk no longer consumes reading-order addresses — the 80-cap budget goes to genuine references", () => {
+    const resolves = (t: string) => t === "ADR-031";
+    const map = jumpMapFor("UTF-8 noise, then ADR-031", resolves);
+    expect(map.get(VECTOR_MIN)).toBe("ADR-031"); // 12 is first — UTF-8 did not eat it
+    // The optimistic default, for contrast: UTF-8 at 12, ADR-031 at 13.
+    const optimistic = jumpMapFor("UTF-8 noise, then ADR-031");
+    expect(optimistic.get(VECTOR_MIN)).toBe("UTF-8");
+    expect(optimistic.get(VECTOR_MIN + 1)).toBe("ADR-031");
+  });
+
   test("the callsign scan is token-boundaried — no mid-word anchoring", () => {
     // The phantom-§13 in Babylon-to-Stars: the matcher anchored one
     // character inside YYYY-MM-DD and read YYY-MM-DD; ISO-Date truncated

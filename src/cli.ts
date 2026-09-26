@@ -16,7 +16,7 @@ import { loadPalette } from "./palette";
 import { renderDocument } from "./render";
 import { runTui } from "./tui";
 import { runLauncher, invokedAsGloam, rankedShortlistEntries } from "./launcher";
-import { detectRoot, makeCallsignResolver, resolveByCallsign } from "./root";
+import { detectRoot, makeCallsignResolver, makeCallsignValidator, resolveByCallsign } from "./root";
 import { CALLSIGN_SHAPE, jumpMapFor, annotateSource } from "./vectors";
 import { terminalCols, terminalRows } from "./width";
 import { existsSync } from "node:fs";
@@ -138,6 +138,10 @@ async function main(): Promise<void> {
     if (root) return resolveByCallsign(target);
     return null;
   };
+  // The silcrow gate (ADR-044): built once per run beside its actuator
+  // sibling — the paint and the keypress share the one resolution
+  // semantics, so they cannot disagree.
+  const silcrowResolves = makeCallsignValidator();
   if (invokedAsGloam() && process.stdin.isTTY) {
     // `-g <query>`: seed alias (ADR-030 §4) — same as a bare-arg query.
     if (args.grep !== null) {
@@ -177,6 +181,7 @@ async function main(): Promise<void> {
       silo: root?.badge,
       callsignFor: makeCallsignResolver(),
       resolveTarget,
+      resolves: silcrowResolves,
     });
     return;
   }
@@ -196,7 +201,7 @@ async function main(): Promise<void> {
     // gets its silcrows. Piped output stays clean — the paint is for
     // glass, not for downstream tools.
     const source2 = process.stdout.isTTY
-      ? annotateSource(source, jumpMapFor(source))
+      ? annotateSource(source, jumpMapFor(source, silcrowResolves))
       : source;
     const out = await renderDocument(source2, { width, palette, color });
     if (args.watch) {
@@ -221,6 +226,7 @@ async function main(): Promise<void> {
       rows: terminalRows(24),
       palette,
       resolveTarget,
+      resolves: silcrowResolves,
     });
     return;
   }
