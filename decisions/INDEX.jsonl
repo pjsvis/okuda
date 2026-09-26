@@ -40,3 +40,4 @@
 {"file":"040-build-signs-its-output.md","date":"2026-09-21","status":"Accepted","summary":"The build signs its own output — re-sign after compile, verify in the gate","meta":{},"callsign":"ADR-BUILD-SIGNS-040"}
 {"file":"041-a-gate-names-its-precondition.md","date":"2026-09-21","status":"Accepted","summary":"A gate names its own precondition — a missing instrument is not a verdict","meta":{},"callsign":"ADR-GATE-NAMES-041"}
 {"file":"042-the-test-runner-is-scoped.md","date":"2026-09-21","status":"Accepted","summary":"The test runner is scoped to the silo — `tmp/` is scratch, and a walker must not see it","meta":{},"callsign":"ADR-TEST-SCOPED-042"}
+{"file":"044-validated-silcrows.md","date":"2026-09-24","status":"Accepted","summary":"Validated silcrows — inferred references gate on the registry; explicit references stay optimistic","meta":{},"callsign":"ADR-VALIDATED-SILCROWS-044"}

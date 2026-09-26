@@ -7,7 +7,7 @@ date: 2026-09-24
 # Brief: Validated silcrows — the shape scan consults the registry it stands on
 
 **Created:** 2026-09-24
-**Status:** Open
+**Status:** Done — shipped 2026-09-24 (P-0 commit 9712702; gate commit follows it). ADR-044 accepted; td-8394c0.
 **TD:** td-8394c0 (created 2026-09-24 as the operator's todo item; this brief is that item's scope). The P-0 tier fix is separable and ships first, its own commit.
 **Lineage:** the operator, verbatim: *"we want to avoid applying a silcrow to UTF-8 and the like"* — and *"we should be able to maintain a map of call-signs and file-paths and use that to disambiguate prospective call signs."* The probe commissioned before this brief (`tmp/silcrow-junk-probe.ts`) found the map already exists and found something better besides: a resolver blind to an entire tier.
 **Extends:** ADR-031 (supersession of the *optimism* clause — one clause, not the ADR; dynamism, one-destination-one-silcrow, the citation convention, the doubled-pair reservations all hold). ADR-024 (callsigns are data — the shape regex was only ever the discovery heuristic; the registry is the semantic anchor). ADR-025 (exactly-one resolution — the gate reuses it, no new resolution semantics). ADR-020 (the render-path boundary — holds by parameter, not violation).
@@ -74,7 +74,7 @@ Default `resolves = () => true` keeps `vectors.ts` pure and the tests shape-only
 
 - [x] **P-1 — the probe ran** (`tmp/silcrow-junk-probe.ts`): 117/1,155 junk ratio, class table above. **Verified 2026-09-24.**
 - [x] **P-2 — every gate-suppressed token fails at actuation today**: established by construction — the probe and the actuator call the same `resolveByCallsign`. **Verified 2026-09-24.**
-- [ ] **P-3 — the class-(a) probe re-run is clean**: after P-0, `ADV-*` counts migrate from junk to genuine; the probe output is the acceptance evidence.
+- [x] **P-3 — the class-(a) probe re-run is clean**: after P-0, `ADV-*` migrated from junk to genuine (probe: genuine 1155 → 1223+; junk 117 → 98, of which 66 non-tier-gap classes now unpainted under the gate — `UTF-8`, `OSC-8`, stale callsigns, malformed shorthands, forward refs). **Verified 2026-09-24** — live proof: the gated map paints `ADR-031 §12` and `ADV-READER-SIDE-FILTER §13` (the P-0 fix visible in the same map), retracts the acronyms, and leaves the `.md` link ungated.
 
 ## Risks
 

@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { REGISTRIES } from "../scripts/reg-sync";
+import { TIER_REGISTRIES } from "../src/root";
 import {
   avoidingCollisions,
   bootstrapCallsign,
@@ -9,6 +11,22 @@ import {
   renderIndexDoc,
   splitFrontmatter,
 } from "../scripts/reg-sync";
+
+describe("tier drift (BRF-VALIDATED-SILCROWS P-0)", () => {
+  test("TIER_REGISTRIES is 1:1 with reg-sync's REGISTRIES — the two lists cannot drift again", () => {
+    // The advisories tier drifted between the two lists for weeks
+    // (69122be added it to reg-sync, never to root.ts — 51 corpus
+    // references painted dead silcrows). Both directions are checked:
+    // a registry the resolver can't see, and a resolver entry with the
+    // wrong index filename.
+    const regDirs = new Set(Object.keys(REGISTRIES));
+    const tierDirs = new Set(TIER_REGISTRIES.map(([dir]) => dir));
+    expect(tierDirs).toEqual(regDirs); // 1:1 — every tier resolves, none dangles
+    for (const [dir, file] of TIER_REGISTRIES) {
+      expect(REGISTRIES[dir]!.index).toBe(file); // the same index file
+    }
+  });
+});
 
 describe("splitFrontmatter", () => {
   test("splits a fenced document", () => {

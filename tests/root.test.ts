@@ -103,13 +103,16 @@ describe("root — detectRoot (rooted/unrooted gloam signature)", () => {
   });
 
   test("presentRegistries lists the tiers this silo actually indexes", () => {
-    // This repo is itself a rooted silo (the dogfood case): all four tiers.
+    // This repo is itself a rooted silo (the dogfood case): all five
+    // tiers — advisories joined 2026-09-24 (BRF-VALIDATED-SILCROWS P-0;
+    // this test's "all four" was itself a record of the drift).
     const here = presentRegistries();
-    expect(here.length).toBe(4);
+    expect(here.length).toBe(5);
     expect(here).toContain("briefs/INDEX.jsonl");
     expect(here).toContain("decisions/INDEX.jsonl");
     expect(here).toContain("debriefs/INDEX.jsonl");
     expect(here).toContain("playbooks/REGISTRY.jsonl");
+    expect(here).toContain("advisories/INDEX.jsonl");
   });
 });
 
@@ -146,6 +149,23 @@ describe("root — callsigns (resolution, not derivation)", () => {
       expect(resolveByCallsign("BRF-ALPHA", dir)).toBe(join(dir, "briefs", "a.md"));
       expect(resolveByCallsign("BRF-NOPE", dir)).toBeNull();
     } finally { cleanup(); }
+  });
+
+  test("resolveByCallsign: the advisories tier resolves (BRF-VALIDATED-SILCROWS P-0 — the 2026-09-24 drift repair)", () => {
+    const dir = mkdtempSync(join(tmpdir(), "adv-tier-"));
+    try {
+      mkdirSync(join(dir, "advisories"));
+      writeFileSync(
+        join(dir, "advisories", "INDEX.jsonl"),
+        JSON.stringify({ file: "adv.md", date: "2026-09-24", status: "open", summary: "A", callsign: "ADV-READER-SIDE-FILTER" }) + "\n",
+      );
+      // 17 corpus references to this exact callsign painted dead
+      // silcrows while the tier was invisible to the resolver.
+      expect(resolveByCallsign("ADV-READER-SIDE-FILTER", dir)).toBe(join(dir, "advisories", "adv.md"));
+      expect(resolveByCallsign("ADV-NOPE", dir)).toBeNull();
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   test("file lookup matches on tier/file segments, however the path arrived", () => {

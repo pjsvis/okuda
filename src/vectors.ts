@@ -1,18 +1,25 @@
 /**
  * vectors.ts — the main document's jump map (ADR-031).
  *
- * The main document renders with its references annotated as optimistic
- * vectors: `[12]` … `[98]`, painted after each reference in the reserved
+ * The main document renders with its references annotated as vectors:
+ * `[12]` … `[98]`, painted after each reference in the reserved
  * vector paint. The map is an in-memory structure belonging to the main
  * document — vector number → target string — derived by scanning the
  * source at render time. The paint is illustrative; the source is never
- * mutated; nothing persists. Optimism is the contract: discovery never
- * validates, the actuator fails honestly ("[14] — no document to
- * render") when a destination isn't there.
+ * mutated; nothing persists. Callsign optimism is retired (ADR-044 —
+ * 117 corpus silcrows pointed at nothing): the inferred reference now
+ * gates on the registry, and the paint and the actuator share one
+ * resolution semantics, so they cannot disagree. Explicit .md links
+ * stay optimistic; the actuator still fails honestly ("[14] — no
+ * document to render") when a destination isn't there.
  *
  * Discovery (reading order, unique targets, capped):
- *   - callsign-shaped tokens (`CALLSIGN_SHAPE` — ADR-024's vocabulary)
- *   - markdown inline links to local `.md` paths
+ *   - callsign-shaped tokens (`CALLSIGN_SHAPE` — ADR-024's vocabulary) —
+ *     gated by the `resolves` predicate (ADR-044: the tier registries,
+ *     built launcher/TUI-side — ADR-020's boundary holds by parameter;
+ *     no predicate = the pre-ADR-044 optimism, for the pure scan)
+ *   - markdown inline links to local `.md` paths — never gated: the
+ *     author's link is a deliberate claim, the shape scan's match is not
  * Never vectors: zero-padded or single-digit bracketed numbers (`[07]`
  * is text, always); `okuda-rhs` tokens (ADR-022 legacy — retired, their
  * numbers not honored; their .md paths are ordinary references); fenced
@@ -94,7 +101,10 @@ export interface RefOccurrence {
   target: string;
 }
 
-export function scanReferences(source: string): RefOccurrence[] {
+export function scanReferences(
+  source: string,
+  resolves?: (target: string) => boolean,
+): RefOccurrence[] {
   const fm = source.match(/^---\n[\s\S]*?\n---/);
   const bodyStart = fm ? fm[0]!.length : 0;
   const fences = fenceRanges(source);
@@ -103,9 +113,14 @@ export function scanReferences(source: string): RefOccurrence[] {
     const i = m.index!;
     if (i >= bodyStart && !inFence(i, fences)) hits.push({ pos: i, end: i + m[0]!.length, target: m[1]! });
   }
+  // The ADR-044 gate applies to the inferred reference only — the bare
+  // callsign-shaped token. A bare UTF-8 in prose made no claim; the
+  // registry check is the retraction.
   for (const m of source.matchAll(RE_CALLSIGN)) {
     const i = m.index!;
-    if (i >= bodyStart && !inFence(i, fences)) hits.push({ pos: i, end: i + m[0]!.length, target: m[0]! });
+    if (i >= bodyStart && !inFence(i, fences) && (!resolves || resolves(m[0]!))) {
+      hits.push({ pos: i, end: i + m[0]!.length, target: m[0]! });
+    }
   }
   hits.sort((a, b) => a.pos - b.pos);
   return hits.slice(0, MAX_REFS);
@@ -135,9 +150,13 @@ export function buildJumpMap(refs: RefOccurrence[]): Map<number, string> {
   return map;
 }
 
-/** Convenience: derive the map straight from a main document's source. */
-export function jumpMapFor(source: string): Map<number, string> {
-  return buildJumpMap(scanReferences(source));
+/** Convenience: derive the map straight from a main document's source.
+ *  The optional `resolves` is the ADR-044 gate — see scanReferences. */
+export function jumpMapFor(
+  source: string,
+  resolves?: (target: string) => boolean,
+): Map<number, string> {
+  return buildJumpMap(scanReferences(source, resolves));
 }
 
 /** Inject one paint marker after each reference occurrence — each

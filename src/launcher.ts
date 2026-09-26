@@ -19,7 +19,7 @@
 
 import { existsSync } from "node:fs";
 import { basename, join } from "node:path";
-import { detectRoot, makeCallsignResolver, resolveByCallsign, TIER_REGISTRIES } from "./root";
+import { detectRoot, makeCallsignResolver, makeCallsignValidator, resolveByCallsign, TIER_REGISTRIES } from "./root";
 import { runTui } from "./tui";
 import { terminalCols, terminalRows } from "./width";
 
@@ -515,6 +515,10 @@ export async function runLauncher(opts: { query?: string } = {}): Promise<void> 
           if (existsSync(target)) return target;
           return root ? resolveByCallsign(target) : null;
         },
+        // The silcrow gate (ADR-044), built per round: re-derivation
+        // replaces invalidation — a document landed mid-session is
+        // validated on the next pick, not remembered as absent.
+        resolves: makeCallsignValidator(),
       });
     }
   } finally {

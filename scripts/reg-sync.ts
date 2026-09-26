@@ -30,7 +30,11 @@ interface RegistryDef {
   csPrefix: string;
 }
 
-const REGISTRIES: Record<string, RegistryDef> = {
+// Exported for the drift test (BRF-VALIDATED-SILCROWS P-0): root.ts's
+// TIER_REGISTRIES must stay 1:1 with this config — two lists that must
+// agree drifted once (advisories, 2026-09-24); the test makes the next
+// drift loud, not silent.
+export const REGISTRIES: Record<string, RegistryDef> = {
   briefs: { dir: "briefs", index: "INDEX.jsonl", defaultStatus: "open", exclude: ["index.md"], fmType: "Brief", csPrefix: "BRF" },
   debriefs: { dir: "debriefs", index: "INDEX.jsonl", defaultStatus: "done", exclude: ["index.md"], fmType: "Debrief", csPrefix: "DBF" },
   decisions: { dir: "decisions", index: "INDEX.jsonl", defaultStatus: "Proposed", exclude: ["TEMPLATE.md", "index.md"], fmType: "ADR", csPrefix: "ADR" },

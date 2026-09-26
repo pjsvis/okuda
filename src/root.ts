@@ -26,6 +26,12 @@ export const TIER_REGISTRIES: Array<[dir: string, file: string]> = [
   ["decisions", "INDEX.jsonl"],
   ["debriefs", "INDEX.jsonl"],
   ["playbooks", "REGISTRY.jsonl"],
+  // advisories joined 2026-09-24 (BRF-VALIDATED-SILCROWS P-0): the tier
+  // was added to reg-sync's config (69122be) but never here — 51 corpus
+  // references to ADV-* callsigns painted silcrows that could not jump.
+  // One list, two consumers (the resolver + the launcher channel), and
+  // the drift test in reg-callsign.test.ts keeps the claim honest now.
+  ["advisories", "INDEX.jsonl"],
 ];
 
 /** Rooted detection result. `badge` is the silo name the renderer paints
@@ -151,28 +157,44 @@ function tierFileKey(p: string): string {
   return parts.length <= 1 ? p : parts.slice(-2).join("/");
 }
 
-/** Resolve a callsign to its path. Returns null when unknown — the caller
- *  decides what an unknown code means. Pure-ish (reads fs). */
-export function resolveByCallsign(callsign: string, cwd: string = process.cwd()): string | null {
-  const callsigns = loadCallsigns(cwd);
-  // Exactly-one resolution (ADR-025 clause 4): a callsign resolves to one
-  // path or none — never the silent first-wins of .find(). A collision
-  // (two records sharing a callsign) is ambiguous → null; the reg-sync
-  // lint is the loud gate, the resolver is honest. The ordinal shorthand
-  // below already follows the same exactly-one-or-null rule.
-  const exact = callsigns.filter((r) => r.callsign === callsign);
+/** The pure resolution core, shared by the actuator and the silcrow
+ *  gate (ADR-044) — one semantics, so the paint and the keypress cannot
+ *  disagree. Exactly-one resolution (ADR-025 clause 4): a callsign
+ *  resolves to one path or none — never the silent first-wins of
+ *  .find(); a collision is ambiguous → null. The ordinal shorthand
+ *  (ADR-031 dogfood, 2026-09-04): prose says "ADR-030" — resolve
+ *  within the tier when EXACTLY ONE registered callsign carries the
+ *  prefix and ordinal. Pure. */
+export function resolveAmongCallsigns(
+  records: CallsignRecord[],
+  callsign: string,
+): string | null {
+  const exact = records.filter((r) => r.callsign === callsign);
   if (exact.length === 1) return exact[0]!.path;
   if (exact.length > 1) return null; // collision — ambiguous, not first-wins
-  // Ordinal shorthand (ADR-031 dogfood, 2026-09-04): prose says "ADR-030"
-  // — tier + ordinal — the way humans abbreviate. Resolve within the
-  // tier when EXACTLY ONE registered callsign carries the prefix and
-  // ordinal; ambiguous or absent → null (the actuator flashes honestly).
   const m = callsign.match(/^([A-Z]{2,})-(\d{2,3})$/);
   if (!m) return null;
-  const tierMatches = callsigns.filter(
+  const tierMatches = records.filter(
     (r) => r.callsign.startsWith(`${m[1]}-`) && r.callsign.endsWith(`-${m[2]}`),
   );
   return tierMatches.length === 1 ? tierMatches[0]!.path : null;
+}
+
+/** Resolve a callsign to its path. Returns null when unknown — the caller
+ *  decides what an unknown code means. Pure-ish (reads fs). */
+export function resolveByCallsign(callsign: string, cwd: string = process.cwd()): string | null {
+  return resolveAmongCallsigns(loadCallsigns(cwd), callsign);
+}
+
+/** The silcrow gate (ADR-044): loads the tier registries ONCE, answers
+ *  whether a prospective callsign resolves. Built launcher/TUI-side —
+ *  ADR-020's boundary holds by parameter: the pure discovery scan
+ *  receives this predicate and stays fs-free. Outside a silo the
+ *  registries are empty and every callsign is suppressed — honest:
+ *  there was nothing to jump to. Pure-ish (reads fs once). */
+export function makeCallsignValidator(cwd: string = process.cwd()): (target: string) => boolean {
+  const records = loadCallsigns(cwd);
+  return (target: string) => resolveAmongCallsigns(records, target) !== null;
 }
 
 /** Resolve a document's callsign from its path. Pure-ish (reads fs). */

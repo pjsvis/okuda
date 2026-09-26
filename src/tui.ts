@@ -44,6 +44,11 @@ export interface TuiOptions {
    *  document (the actuator flashes honestly). Same ADR-020 boundary —
    *  a closure, never registry knowledge. */
   resolveTarget?: (target: string) => string | null;
+  /** The silcrow gate (ADR-044): a prospective callsign resolves through
+   *  the tier registries — built launcher/cli-side (one load per run),
+   *  never here. ADR-020's boundary: a closure, never registry
+   *  knowledge. Undefined = the pre-ADR-044 optimism (pure scan). */
+  resolves?: (target: string) => boolean;
 }
 
 /** Decoded keystroke action. `null` = unhandled (no-op). The
@@ -512,7 +517,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   // a projection of the map — the main render annotates, dereferenced
   // renders are clean.
   const mainFile = opts.file;
-  const deriveMain = (text: string): Map<number, string> => jumpMapFor(text);
+  const deriveMain = (text: string): Map<number, string> => jumpMapFor(text, opts.resolves);
   let mainText = "";
   let mainJumps: Map<number, string> = new Map();
   let backstack: { file: string; scroll: number }[] = [];
