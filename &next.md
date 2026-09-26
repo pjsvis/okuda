@@ -33,6 +33,24 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 
 ## Recommended — start these next
 
+- **The wire fix** (td-1c8fca, pre-existing) — `&speak.md` rows don't
+  jump: the okuda-rhs wiring to `../speak-md` targets fails resolve,
+  found during the [11] reservation smoke. The severed rail under every
+  navigational ambition — fix it before anything strides over it · **S**
+- **BRF-MATH-GLYPHS** (2026-09-16, Draft) — `$...$` spans render as their
+  raw LaTeX source today; the closed-vocabulary Unicode pass is fully
+  specified and corpus-gated. The smallest well-specified ship on the
+  list · **S**
+- **The cut cell** (BRF-TABLE-WIDTH, td-b78642) — 104 tables in the
+  corpus, 106 cuts, 97 with room already on the glass; the allocator
+  spends the columns wrong. Highest dogfood leverage per hour · **M**
+- **BRF-PALETTE-AUDIT** (td-bb44ca, 2026-09-19) — per-role verdict at
+  α = 0.2 and 1.2, the precondition; then **BRF-OKLCH-TUNING** wires the
+  brightness keys to a palette that has already passed review · **M**
+- **BRF-CAPABILITIES-DOC** (td-8f49bd, 2026-09-19) — `docs/capabilities.md`,
+  the paid-claim inventory: what okuda can do right now, every entry
+  citing its landing record. The reader asked for a changelog; this is
+  the snapshot that doesn't rot · **S**
 - **The perimeter** (ADR-PERIMETER-039, 2026-09-18) — the speech work
   leaves okuda, and a check keeps it out. Three briefs, independently
   closable: the tuning recipes and their artifacts go
@@ -63,6 +81,8 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
   `--no-color` leaves 28 bold ANSI escapes; `say` reads them as noise.
   Either strip bold too (a future `--plain` render dial), or accept the
   audio path skips okuda. The clean audio input today is `cat doc.md`.
+  Routed 2026-09-19: the `--plain` dial is the one okuda-side artifact
+  of **BRF-REMOTE-SPEECH-SEAM** — build it when the verdict confirms.
   · **S**
 
 - **BRF-REFRESH-OFF-DISK** — real bug (resize race, R placebo), td
@@ -74,12 +94,22 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 
 ## Exploration — read-and-think, no code
 
+- **BRF-REMOTE-SPEECH-SEAM** (td-9dac3b, proposal) — the verdict before
+  any build: confirm okuda's duty ends at a `--plain` dial (the
+  perimeter already carries the transport), or veto with the property
+  that touches the byte stream · **S**
 - **BRF-PAGED-OKUDAGRAM — the EC walk** — frame mode v1 shipped; the
   brief's EC1–EC9 edge cases need a validation walk against real
   documents (tall frames, blank frames, nested headers) · **S**
 
 ## Hygiene — small, owed
 
+- **The amp-check backlog** (pre-existing, measured during td-1c8fca)
+  — `just amp-check` is red with 29 items: 28 registry briefs absent
+  from the `&briefs.md` state table (the facade stopped updating 28
+  briefs ago), and one dead legacy wire at `&alpha.md:71`
+  (`briefs/x.md` — ADR-031 retired the grammar; the straggler wire
+  should become a real reference like the `&speak.md` rows) · **M**
 - **BRF-SILO-MNEMONICS — close or scope** — resolution shipped, badge
   shipped, bootstrap deferred: what remains is likely a debrief and a
   close · **S**
@@ -89,7 +119,12 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 ## Not next — deliberately
 
 - **BRF-FLOW-WRAP** (fresh) · **BRF-MERMAID-HARD** (waits on a
-  paged-view world) · **the speech set** (leaves this table —
+  paged-view world) · **the search-area redesign session** (td-3ac46b,
+  2026-09-19 — deferred behind the rest of the action list by
+  dependency: the wire fix, math glyphs, the cut cell, the palette
+  audit, the capabilities doc, the seam verdict; it clears when they
+  do, not by a date. GLOAM-OWNS-THE-LOOP scoping is the first agenda
+  item) · **the speech set** (leaves this table —
   ADR-PERIMETER-039: the tuning loop is `../speak-md/`'s, and the ear
   owes its own corpus the auditions. **BRF-SPOKEN-BLOCK-GRAMMAR stays**,
   because ADR-037 cites it and moving it breaks the record) · **the docs

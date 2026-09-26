@@ -22,7 +22,8 @@ import { frameBounds, headingLines, pageStep, paragraphStarts, snapFrame } from 
 import { splitKeyEvents, verbFor, type Verb } from "./keygrammar";
 import { loadPalette, type Palette } from "./palette";
 import { renderDocument } from "./render";
-import { basename, dirname, join } from "node:path";
+import { basename, dirname, isAbsolute, join, resolve } from "node:path";
+import { existsSync } from "node:fs";
 import { padStartDisplay, terminalCols, terminalRows } from "./width";
 
 export interface TuiOptions {
@@ -392,6 +393,25 @@ export function extractJumps(source: string): Map<number, string> {
   return out;
 }
 
+/** Resolve a jump target the way a document means it: a relative path
+ *  is relative to the MAIN document's directory (HTML semantics —
+ *  `&speak.md`'s `../speak-md/` targets anchor to the silo root, not to
+ *  wherever the process happens to stand), and the caller's fallback
+ *  (cwd, then the callsign registry — ADR-031) carries everything else.
+ *  Pure. (td-1c8fca: rows wired to sibling-silo targets failed resolve
+ *  the moment the cwd moved; the anchor is the document.) */
+export function resolveJumpTarget(
+  mainFile: string,
+  target: string,
+  fallback?: (t: string) => string | null,
+): string | null {
+  if (!isAbsolute(target)) {
+    const candidate = join(dirname(resolve(mainFile)), target);
+    if (existsSync(candidate)) return candidate;
+  }
+  return fallback ? fallback(target) : target;
+}
+
 /**
  * Compose the footer: badge + silo? + callsign? + folder/filename left
  * (identity leads — the glance position), `? help` right (affordance
@@ -677,7 +697,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     if (backstack.length > 0) return; // dereferenced render is clean — nothing to actuate
     const target = mainJumps.get(token);
     if (!target) return; // no such vector — silent, per the old contract
-    const path = opts.resolveTarget ? opts.resolveTarget(target) : target;
+    const path = resolveJumpTarget(mainFile, target, opts.resolveTarget);
     if (!path) {
       flash(`§${token} — no document to render`);
       return;

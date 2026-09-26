@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { detectColorMode, makeStyler } from "../src/ansi";
+import { detectColorMode, makeStyler, sameAddress } from "../src/ansi";
 import { DRACULA_PALETTE, loadPalette } from "../src/palette";
 import okudaPreset from "../src/palettes/okuda.json";
 
@@ -65,6 +65,26 @@ describe("styler — byte-exact SGR sequences", () => {
     expect(out).not.toContain("\x1b]8;;"); // no OSC 8
   });
 
+  test("link self-identical: the address once, destination paint (BRF-SELF-IDENTICAL-LINK)", () => {
+    const s = makeStyler(DRACULA_PALETTE, "truecolor");
+    const out = s.link("https://x.example", "https://x.example");
+    expect(out).toBe("\x1b[38;2;139;233;253;4mhttps://x.example\x1b[0m"); // once, cyan+underline
+    // Trailing-slash equivalence — still once, no rose twin.
+    const slash = s.link("https://x.example/", "https://x.example");
+    expect(slash.match(/https:\/\/x\.example/g)).toHaveLength(1);
+  });
+
+  test("sameAddress: exact or scheme-shaped slash-equal — nothing further", () => {
+    expect(sameAddress("https://a.b", "https://a.b")).toBe(true);
+    expect(sameAddress("https://a.b/", "https://a.b")).toBe(true); // root-slash equivalence
+    expect(sameAddress("foo", "foo")).toBe(true); // relative self-link: same zero-information case
+    expect(sameAddress("a.b", "https://a.b")).toBe(false); // shortened label — two-part paint stands
+    expect(sameAddress("text", "https://a.b")).toBe(false);
+    expect(sameAddress("http://a.b", "https://a.b")).toBe(false); // no scheme equivalence
+    expect(sameAddress("x", "")).toBe(false);
+    expect(sameAddress("", "https://a.b")).toBe(false);
+  });
+
   test("emphasis: italic + \\x1b[38;2;241;250;140;3m (glow Dracula yellow, colour-first)", () => {
     const s = makeStyler(DRACULA_PALETTE, "truecolor");
     expect(s.roleItalic("emphasis", "i")).toBe("\x1b[38;2;241;250;140;3mi\x1b[0m");
@@ -109,6 +129,7 @@ describe("styler — byte-exact SGR sequences", () => {
     expect(s.role("heading", "T")).toBe("T"); // colour-only role → plain
     expect(s.codespan("c")).toBe("c");
     expect(s.link("text", "url")).toBe("text url"); // parity: URL shown in both modes
+    expect(s.link("https://x.example", "https://x.example")).toBe("https://x.example"); // parity: once in both modes
     expect(s.badge("G")).toBe(" G "); // padding kept, no colour
     expect(s.bold("01")).toBe("01"); // plain digits, no colour
     expect(s.rule(4)).toBe("────");
