@@ -9,6 +9,8 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-24 | BRF-SRC-LINE-LEDGER | open | The source-line ledger — `10` edit lands the editor at the eye | 2026-09-24-brief-source-line-ledger.md |
+| 2026-09-24 | BRF-VALIDATED-SILCROWS | open | Validated silcrows — the shape scan consults the registry it stands on | 2026-09-24-brief-validated-silcrows.md |
 | 2026-09-19 | BRF-CAPABILITIES-DOC | open | The capabilities doc — a snapshot inventory, not a changelog | 2026-09-19-brief-capabilities-doc.md |
 | 2026-09-19 | BRF-GLOAM-OWNS-LOOP | open | GLoam owns the search TUI — the fzf dependency retires | 2026-09-19-brief-gloam-owns-the-loop.md |
 | 2026-09-19 | BRF-PALETTE-AUDIT | open | The palette audit — review the colours before the brightness controller scales them | 2026-09-19-brief-palette-audit.md |
