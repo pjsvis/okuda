@@ -1,14 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import {
+  EXCLUSIONS,
   FZF_FIXED_ARGS,
   FZF_HL_ARG,
   GLOAM_FZF_BINDS,
   bodyPattern,
-  dedupeByPath,
   fzfEnv,
   invokedAsGloam,
   listMarkdownFiles,
-  parseQuery,
   rankedShortlistEntries,
   registryHits,
   selfEntriesCmd,
@@ -108,25 +107,6 @@ describe("launcher — listMarkdownFiles (rg-sourced, BRF-CONTENT-SHORTLIST)", (
     // documents; the picker is the better index.
     const files = listMarkdownFiles(process.cwd());
     expect(files.some((f) => f.endsWith("/index.md") || f === "index.md")).toBe(false);
-  });
-});
-
-describe("launcher — dedupeByPath (feed order = priority)", () => {
-  test("first occurrence wins; channel order preserved", () => {
-    expect(dedupeByPath([["a.md", "b.md"], ["b.md", "c.md"], ["c.md", "d.md"]])).toEqual([
-      "a.md",
-      "b.md",
-      "c.md",
-      "d.md",
-    ]);
-  });
-
-  test("a document matching every channel appears once, at its highest channel", () => {
-    expect(dedupeByPath([["hit.md"], ["hit.md"], ["hit.md"]])).toEqual(["hit.md"]);
-  });
-
-  test("empty channels are honest no-ops", () => {
-    expect(dedupeByPath([[], ["a.md"], []])).toEqual(["a.md"]);
   });
 });
 
@@ -478,30 +458,7 @@ describe("launcher — fzf env ownership (the picker inherits no FZF_* furniture
   });
 });
 
-describe("launcher — the concordance pre-filter (BRF-CONCORDANCE-PREFILTER)", () => {
-  test("parseQuery: splits | into alternatives", () => {
-    const q = parseQuery("alpha | beta | gamma");
-    expect(q.alternatives).toEqual(["alpha", "beta", "gamma"]);
-    expect(q.exclude).toEqual([]);
-  });
-
-  test("parseQuery: extracts !term as exclusion", () => {
-    const q = parseQuery("state !colours");
-    expect(q.alternatives).toEqual(["state"]);
-    expect(q.exclude).toEqual(["colours"]);
-  });
-
-  test("parseQuery: combines | and !", () => {
-    const q = parseQuery("alpha | beta !gamma");
-    expect(q.alternatives).toEqual(["alpha", "beta"]);
-    expect(q.exclude).toEqual(["gamma"]);
-  });
-
-  test("parseQuery: empty alternatives dropped", () => {
-    const q = parseQuery("alpha | | beta");
-    expect(q.alternatives).toEqual(["alpha", "beta"]);
-  });
-
+describe("launcher — the search grammar at the seam (BRF-ONION-SEARCH-GRAMMAR; routing unit-tested in onion.test.ts)", () => {
   test("case fix: zod finds ZOG in the body channel", () => {
     // The single-word body channel was case-sensitive (rg -F without -i).
     // The modern concordance style: case-insensitive everywhere.
@@ -529,17 +486,18 @@ describe("launcher — the concordance pre-filter (BRF-CONCORDANCE-PREFILTER)", 
     expect(unique.size).toBe(okudaPaths.length);
   });
 
-  test("negation: !term excludes docs matching the negated term", () => {
-    // Search for "concordance" but exclude docs mentioning "filter".
-    const withAll = rankedShortlistEntries("concordance", process.cwd());
-    const withoutFilter = rankedShortlistEntries("concordance !filter", process.cwd());
-    const withPaths = new Set(withAll.map((e) => e.split("\t")[0]!));
-    const withoutPaths = withoutFilter.map((e) => e.split("\t")[0]!);
-    // Exclusion should remove some results (if any matched "filter").
-    expect(withoutPaths.length).toBeLessThanOrEqual(withPaths.size);
-    // Every surviving doc should NOT contain "filter" in its path.
-    for (const p of withoutPaths) {
-      expect(p.toLowerCase()).not.toContain("filter");
+  test("negation: !word is content exclude-by-result (Layer 3) — not a filename glob", () => {
+    // The onion split the old double net (filename glob + content
+    // match — defect 3): `!word` excludes docs whose BODIES mention
+    // the term; the path way to exclude is `!dir/`. Corpus-independent
+    // assertion: no surviving doc mentions the negated term.
+    const rg = Bun.spawnSync(["rg", "-l", "-i", "-F", "filter", "--type", "md", "-g", "!**/index.md"], {
+      cwd: process.cwd(),
+    });
+    const mentioning = new Set((rg.stdout.toString() ?? "").split("\n").filter(Boolean));
+    const entries = rankedShortlistEntries("concordance !filter", process.cwd());
+    for (const e of entries) {
+      expect(mentioning.has(e.split("\t")[0]!)).toBe(false);
     }
   });
 
@@ -550,54 +508,46 @@ describe("launcher — the concordance pre-filter (BRF-CONCORDANCE-PREFILTER)", 
 });
 
 // ─── The onion search grammar (BRF-ONION-SEARCH-GRAMMAR) ─────────────
-// Red by design: these assert the contract the onion brief specifies.
-// They fail today because the grammar is not implemented — `@`, `dir/`,
-// and `!path` are treated as literal content, so every query returns
-// the whole corpus (~214 entries) instead of the path-filtered set.
-// Skipped by design — these encode the contract the onion brief
-// specifies, but the grammar is not implemented, so they would fail
-// today and block the ship gate. `describe.skip` keeps the bodies
-// ready: remove `.skip` when the onion grammar lands (BRF-ONION-
-// SEARCH-GRAMMAR, td-d95cf3) and the 7 tests go green in one flip.
-// The counts are the ground truth (verified 2026-09-07 against the
-// filesystem); each test names the number expected, then confirms
-// via the onion search. The decisive shape — name the number,
-// confirm the search.
-describe.skip("launcher — the onion search grammar (BRF-ONION-SEARCH-GRAMMAR, skipped by design)", () => {
-  // Ground truth, verified 2026-09-07 (the contract these tests pin):
-  //   briefs/2026-09-02-*         → 1 file
-  //   briefs/2026-09-*            → 10 files
-  //   briefs/2026-08-*            → 40 files
-  //   briefs/ (all dated)          → 50 files
-  //   decisions/ (undated, numbered) → 0 dated 2026-09-*
-  // The corpus is ~214 .md files total — the baseline failure: every
-  // query below returns ~214 today because path predicates aren't parsed.
+// Green since the onion landed (td-d95cf3, 2026-09-24). Written red
+// by design 2026-09-07 against the then-filesystem (1/10/50); the
+// corpus has since grown, so the counts are named from the
+// filesystem at test time — the decisive shape survives: the search
+// count EQUALS the ground-truth count, or the grammar lies.
+describe("launcher — the onion search grammar (BRF-ONION-SEARCH-GRAMMAR)", () => {
+  // Ground truth via the filesystem (2026-09-07 originals in braces):
+  //   briefs/2026-09-02-*  → 2 {1} · briefs/2026-09-* → 39 {10} · briefs/ → 78 {50}
+  //   decisions/ (numbered, undated) → 0 dated anything
 
-  test("@date is a path predicate: briefs/ @2026-09-02 → exactly 1 entry", () => {
-    // The smoke-test query that motivated the brief. One brief is dated
-    // 2026-09-02 (brief-synchronized-output). Today returns 214.
+  test("@date is a path predicate: briefs/ @2026-09-02 → the filesystem count {was 1}", () => {
+    // The smoke-test query that motivated the brief.
+    const expected = listMarkdownFiles(process.cwd())
+      .filter((p) => p.startsWith("briefs/") && p.includes("2026-09-02")).length;
     const entries = rankedShortlistEntries("briefs/ @2026-09-02", process.cwd());
     const paths = entries.map((e) => e.split("\t")[0]!);
-    expect(paths.length).toBe(1);
+    expect(paths.length).toBe(expected);
     expect(paths.every((p) => p.startsWith("briefs/"))).toBe(true);
     expect(paths.every((p) => p.includes("2026-09-02"))).toBe(true);
   });
 
-  test("@YYYY-MM is a path predicate: briefs/ @2026-09 → exactly 10 entries", () => {
-    // Month-granularity date predicate. 10 briefs dated 2026-09-*.
+  test("@YYYY-MM is a path predicate: briefs/ @2026-09 → the filesystem count {was 10}", () => {
+    // Month-granularity date predicate.
+    const expected = listMarkdownFiles(process.cwd())
+      .filter((p) => p.startsWith("briefs/") && p.includes("2026-09")).length;
     const entries = rankedShortlistEntries("briefs/ @2026-09", process.cwd());
     const paths = entries.map((e) => e.split("\t")[0]!);
-    expect(paths.length).toBe(10);
+    expect(paths.length).toBe(expected);
     expect(paths.every((p) => p.startsWith("briefs/"))).toBe(true);
     expect(paths.every((p) => p.includes("2026-09"))).toBe(true);
   });
 
-  test("dir/ is a path predicate: briefs/ → exactly 50 entries", () => {
-    // A bare directory token. 50 briefs (the whole briefs/ tier). A bare
-    // word is content today; the trailing / is the path signal.
+  test("dir/ is a path predicate: briefs/ → the filesystem count {was 50}", () => {
+    // A bare directory token. The whole briefs/ tier and nothing
+    // else — a bare word is content; the trailing / is the path signal.
+    const expected = listMarkdownFiles(process.cwd())
+      .filter((p) => p.startsWith("briefs/")).length;
     const entries = rankedShortlistEntries("briefs/", process.cwd());
     const paths = entries.map((e) => e.split("\t")[0]!);
-    expect(paths.length).toBe(50);
+    expect(paths.length).toBe(expected);
     expect(paths.every((p) => p.startsWith("briefs/"))).toBe(true);
   });
 

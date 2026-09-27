@@ -19,6 +19,7 @@
 
 import { existsSync } from "node:fs";
 import { basename, join } from "node:path";
+import { type ChannelHit, type OnionDeps, onionMerge, routeQuery } from "./onion";
 import { detectRoot, makeCallsignResolver, makeCallsignValidator, resolveByCallsign, TIER_REGISTRIES } from "./root";
 import { runTui } from "./tui";
 import { terminalCols, terminalRows } from "./width";
@@ -72,7 +73,7 @@ function clipSnippet(s: string): string {
 // document. The old esc:cancel made a double-ESC exit the game.
 const FZF_BINDS = "ctrl-d:page-down,ctrl-u:page-up,esc:clear-query";
 const HEADER =
-  "type: search everything · enter: read · ctrl-w: clear word · esc: clear/done\n ";
+  "type: search · dir/ and @2026-08 filter paths · !word excludes · enter: read · ctrl-w: word · esc: clear/done\n ";
   // The trailing space-line is the breath after the help text — fzf
   // renders header rows literally, and an explicitly non-empty line
   // guarantees the gap on every glass (a bare "\n\n" can collapse).
@@ -145,43 +146,23 @@ function escapeRegex(q: string): string {
   return q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-/** The parsed query — the concordance's extended-search grammar at the
- *  silo's seam (BRF-CONCORDANCE-PREFILTER). `|` splits alternatives
- *  (OR); `!term` negates (exclude docs matching `term`). The silo
- *  resolves these upstream of the rg channels; fzf's `--exact` does
- *  the final substring refinement (and supports `|`/`!` natively,
- *  verified 2026-09-06 — but the entry list must be correct first).
- *  Pure. */
-export interface ParsedQuery {
-  alternatives: string[]; // OR alternatives, each a raw query string
-  exclude: string[]; // `!term` → terms to exclude (strip from results)
+/** rg over an explicit path list — the onion's channel edge
+ *  (BRF-ONION-SEARCH-GRAMMAR): Layers 3 run over the Layer-1 survivors,
+ *  never the raw corpus, so rg never searches an excluded path. The
+ *  list is chunked: argv bounds stated, not discovered (the ~350-path
+ *  corpus fits one argv; a 10× corpus re-states the bound — the
+ *  brief's Layer-1 license). Empty list → no rg (rg with no path
+ *  argument reads stdin — the guard is load-bearing). */
+const RG_PATH_CHUNK = 256;
+function rgOverPaths(args: string[], paths: string[], cwd: string): string[] {
+  if (paths.length === 0) return [];
+  const out: string[] = [];
+  for (let i = 0; i < paths.length; i += RG_PATH_CHUNK) {
+    out.push(...rgLines([...args, "--", ...paths.slice(i, i + RG_PATH_CHUNK)], cwd));
+  }
+  return out;
 }
 
-/** Parse a raw query into the concordance grammar: `|` → OR
- *  alternatives, `!word` → negation. Whitespace-delimited; `!` prefix
- *  on a word marks it as an exclude term. Empty alternatives (consecutive
- *  `|`, leading/trailing) are dropped. Pure. */
-export function parseQuery(query: string): ParsedQuery {
-  const alternatives = query
-    .split("|")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  const exclude: string[] = [];
-  const cleaned = alternatives.map((alt) =>
-    alt
-      .split(/\s+/)
-      .filter((w) => {
-        if (w.startsWith("!") && w.length > 1) {
-          exclude.push(w.slice(1));
-          return false;
-        }
-        return Boolean(w);
-      })
-      .join(" ")
-      .trim(),
-  );
-  return { alternatives: cleaned.filter(Boolean), exclude };
-}
 
 /** The body-channel rg pattern for a query. Single word → literal
  *  (`-F`, case-insensitive — the modern concordance style, BRF-
@@ -198,13 +179,15 @@ export function bodyPattern(query: string): { kind: "fixed" | "regex"; pattern: 
   return { kind: "regex", pattern: words.map(escapeRegex).join(".{0,3}") };
 }
 
-/** List markdown files: `rg --files --type md` (respects .gitignore
- *  uniformly — the include/exclude question is a .gitignore decision,
- *  not a per-codepath accident). Sorted ASCII-deterministic (LC_ALL=C
- *  equivalent) so the picker's `--tiebreak=index` keeps a canonical
- *  order. Pure-ish (reads fs). */
+/** Layer 0 — the candidate set, materialised once per query: every
+ *  later layer sees this list, never the raw disk. `rg --files --type
+ *  md` (respects .gitignore uniformly — the include/exclude question
+ *  is a .gitignore decision, not a per-codepath accident) minus
+ *  EXCLUSIONS. Sorted ASCII-deterministic (LC_ALL=C equivalent) so the
+ *  picker's `--tiebreak=index` keeps a canonical order. Pure-ish
+ *  (reads fs). */
 export function listMarkdownFiles(cwd: string = process.cwd()): string[] {
-  return rgLines(["--files", "--type", "md", ...CORPUS_EXCLUSIONS], cwd).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  return rgLines(["--files", "--type", "md", ...EXCLUSIONS], cwd).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 }
 
 /** Registry field hits (channel 1, owner-only per ADR-025): rg the tier
@@ -250,134 +233,86 @@ export function registryHits(query: string, cwd: string = process.cwd()): string
   return registryRows(query, cwd).map((r) => r.path);
 }
 
-/** Dedupe ranked channels by path, preserving first occurrence (feed
- *  order = priority: a document that appears in several channels ranks
- *  at its highest). Pure; exported for the contract test. */
-export function dedupeByPath(channels: string[][]): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const channel of channels) {
-    for (const f of channel) {
-      if (!seen.has(f)) {
-        seen.add(f);
-        out.push(f);
-      }
-    }
-  }
-  return out;
-}
-
-/** Same dedupe for whole entries (`path\tsnippet`) — dedupe key is the
- *  path before the separator. Pure. */
-function dedupeEntries(entries: string[][]): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const channel of entries) {
-    for (const e of channel) {
-      const path = e.split(SEP)[0]!;
-      if (!seen.has(path)) {
-        seen.add(path);
-        out.push(e);
-      }
-    }
-  }
-  return out;
-}
-
 /** The `-g` shortlist as picker entries (BRF-CONTENT-SHORTLIST, ranked
- *  sources; 2026-09-04 conformance amendment; ADR-030). Each entry is
- *  `path\tsnippet` so fzf matches content and filename in one query:
- *  - orientation channel: silo-root markdown (the &files) float first,
- *    carrying their evidence when they have any
- *  - registry channel: snippet = `CALLSIGN — summary` (owner evidence)
- *  - body channel: snippet = the first matching line (`rg -n -F -m 1`)
- *  - filename remainder: path only (fzf matches it by name)
- *  Prioritisation is feed order; fzf's `--tiebreak=index` (already
- *  pinned) makes ties rank by input position. The pipe is the ranker.
- *
- *  The concordance pre-filter (BRF-CONCORDANCE-PREFILTER): `|` splits
- *  alternatives (OR), `!term` excludes docs. Rich grammar upstream
- *  (silo), anti-soup downstream (fzf --exact). Pure-ish. */
+ *  sources; 2026-09-04 conformance amendment; ADR-030; rebuilt as the
+ *  onion, BRF-ONION-SEARCH-GRAMMAR — four smoke-test defects, one root
+ *  cause: the grammar, the channels, and the exclusion were one
+ *  undifferentiated mass. Each entry is `path\tsnippet` so fzf matches
+ *  content and filename in one query. The pipeline is staged
+ *  (src/onion.ts): Layer 0 materialises the candidate set once;
+ *  Layer 1 narrows it in memory (`@date` global scope, `dir/`
+ *  clauses, `!path` kills); Layers 2-4 run the channels over the
+ *  survivors only — rg never searches an excluded directory, and the
+ *  grammar routes rather than parses. Channels: registry
+ *  (`CALLSIGN — summary`), body (the matching line), filename
+ *  remainder (path only). Feed order is the rank; fzf's
+ *  `--tiebreak=index` ranks ties by input position and `--exact`
+ *  stays the anti-soup AND. Pure-ish (rg at the edges only). */
 export function rankedShortlistEntries(query: string, cwd: string = process.cwd()): string[] {
-  const searching = query.trim().length > 0;
-  const all = listMarkdownFiles(cwd);
+  const all = listMarkdownFiles(cwd); // Layer 0 — the candidate set
   const rootFiles = all.filter((f) => !f.includes("/"));
-  const isRoot = new Set(rootFiles);
-  if (!searching) {
+  if (!query.trim().length) {
     // The shelf: root files with first-line previews as evidence.
-    // rg with empty pattern matches every file's first line.
+    // Narrowed to the root files themselves — the onion's rule: no
+    // channel sees more of the disk than it needs.
     const evidenceOf = new Map<string, string>();
-    for (const line of rgLines(["-n", "-m", "1", "--no-heading", ...CORPUS_EXCLUSIONS, "--type", "md", ""], cwd)) {
+    for (const line of rgOverPaths(["-n", "-m", "1", "--no-heading", ""], rootFiles, cwd)) {
       const i = line.indexOf(":");
       const j = i === -1 ? -1 : line.indexOf(":", i + 1);
       if (i === -1 || j === -1) continue;
       const path = line.slice(0, i);
       const text = line.slice(j + 1).trim();
-      if (isRoot.has(path) && !evidenceOf.has(path)) evidenceOf.set(path, `${path}${SEP}${clipSnippet(text)}`);
+      if (!evidenceOf.has(path)) evidenceOf.set(path, `${path}${SEP}${clipSnippet(text)}`);
     }
-    return dedupeEntries([rootFiles.map((f) => evidenceOf.get(f) ?? `${f}${SEP}`)]);
+    return rootFiles.map((f) => evidenceOf.get(f) ?? `${f}${SEP}`);
   }
-  // The dive: parse the concordance grammar (| OR, ! exclude), run the
-  // channels per-alternative, union, then strip negated docs.
-  const { alternatives, exclude } = parseQuery(query);
-  // Build exclude set: paths matching any !term (case-insensitive).
-  const excludePaths = new Set<string>();
-  for (const term of exclude) {
-    const hits = rgLines(["--files", "-i", "-g", `*${term}*`, "--type", "md", ...CORPUS_EXCLUSIONS], cwd);
-    for (const h of hits) excludePaths.add(h);
-    // Also match file *content* containing the term — a doc that
-    // mentions the negated term is excluded.
-    for (const line of rgLines(["-i", "-l", "--type", "md", term, ...CORPUS_EXCLUSIONS], cwd)) {
-      excludePaths.add(line);
-    }
-  }
-  // Channel 1 — registry field hits, callsign-anchored (ADR-025), per alternative.
-  const registry: string[] = [];
-  const seenReg = new Set<string>();
-  for (const alt of alternatives) {
-    for (const r of registryRows(alt, cwd)) {
-      if (excludePaths.has(r.path)) continue;
-      if (seenReg.has(r.path)) continue;
-      seenReg.add(r.path);
-      const snippet = clipSnippet(r.summary ? `${r.callsign} — ${r.summary}` : r.callsign);
-      registry.push(`${r.path}${SEP}${snippet}`);
-    }
-  }
-  // Channel 2 — body hits with the matching line as evidence, per alternative.
-  const body: string[] = [];
-  const seenBody = new Set<string>();
-  for (const alt of alternatives) {
-    const { kind, pattern } = bodyPattern(alt);
-    const bodyArgs = ["-n", "-m", "1", "--no-heading", ...CORPUS_EXCLUSIONS];
-    if (kind === "fixed") bodyArgs.push("-F", "-i", pattern);
-    else bodyArgs.push("-i", pattern);
-    bodyArgs.push("--type", "md");
-    for (const line of rgLines(bodyArgs, cwd)) {
-      const i = line.indexOf(":");
-      const j = i === -1 ? -1 : line.indexOf(":", i + 1);
-      if (i === -1 || j === -1) continue;
-      const path = line.slice(0, i);
-      if (excludePaths.has(path)) continue;
-      if (seenBody.has(path)) continue;
-      seenBody.add(path);
-      const text = line.slice(j + 1).trim();
-      body.push(`${path}${SEP}${clipSnippet(text)}`);
-    }
-  }
-  // Evidence map for the dive: first channel to find a path carries its evidence.
-  const evidenceOf = new Map<string, string>();
-  for (const e of [...registry, ...body]) {
-    const p = e.split(SEP)[0]!;
-    if (!evidenceOf.has(p)) evidenceOf.set(p, e);
-  }
-  // The dive: corpus results; root files are not destinations here.
-  const inCorpus = (e: string): boolean => !isRoot.has(e.split(SEP)[0]!) && !excludePaths.has(e.split(SEP)[0]!);
-  const registryRest = registry.filter(inCorpus);
-  const bodyRest = body.filter(inCorpus);
-  const remainder = all
-    .filter((f) => !isRoot.has(f) && !evidenceOf.has(f) && !excludePaths.has(f))
-    .map((f) => `${f}${SEP}`);
-  return dedupeEntries([registryRest, bodyRest, remainder]);
+  // The dive — the onion. The deps are the rg edges; the routing,
+  // narrowing, and ranking live in the pure layers.
+  const routed = routeQuery(query);
+  const deps: OnionDeps = {
+    // Layer 2 — callsign-anchored registry rows (ADR-025), survivors only.
+    registryHitsFor: (clauseQuery, survivors) => {
+      const sv = new Set(survivors);
+      const seen = new Set<string>();
+      const hits: ChannelHit[] = [];
+      for (const r of registryRows(clauseQuery, cwd)) {
+        if (!sv.has(r.path) || seen.has(r.path)) continue;
+        seen.add(r.path);
+        hits.push({
+          path: r.path,
+          evidence: clipSnippet(r.summary ? `${r.callsign} — ${r.summary}` : r.callsign),
+        });
+      }
+      return hits;
+    },
+    // Layer 3 — body matches over the survivors (explicit path list):
+    // rg never searches an excluded directory (defect 2, by construction).
+    bodyHitsFor: (clauseQuery, survivors) => {
+      const { kind, pattern } = bodyPattern(clauseQuery);
+      const args = ["-n", "-m", "1", "--no-heading"];
+      if (kind === "fixed") args.push("-F", "-i", pattern);
+      else args.push("-i", pattern);
+      const seen = new Set<string>();
+      const hits: ChannelHit[] = [];
+      for (const line of rgOverPaths(args, survivors, cwd)) {
+        const i = line.indexOf(":");
+        const j = i === -1 ? -1 : line.indexOf(":", i + 1);
+        if (i === -1 || j === -1) continue;
+        const path = line.slice(0, i);
+        if (seen.has(path)) continue;
+        seen.add(path);
+        hits.push({ path, evidence: clipSnippet(line.slice(j + 1).trim()) });
+      }
+      return hits;
+    },
+    // Exclude-by-result: survivors whose bodies mention the term. The
+    // old double net (filename glob + content) is gone — two mechanisms,
+    // two layers: `!dir/` for paths, `!word` for bodies (defect 3).
+    contentMentions: (term, survivors) => rgOverPaths(["-l", "-i", "-F", term], survivors, cwd),
+  };
+  return onionMerge(all, routed, deps).map((hit) =>
+    hit.evidence ? `${hit.path}${SEP}${hit.evidence}` : `${hit.path}${SEP}`,
+  );
 }
 
 /** The fzf argv that never changes: the picker instance's fixed spine.
@@ -396,12 +331,19 @@ export const FZF_FIXED_ARGS = [
   "--delimiter=\t", // entries are `path\tsnippet`; match the whole line
 ];
 
-/** Corpus exclusions: generated registry views are build artifacts, not
- *  documents — `reg-sync` regenerates every `index.md` from the JSONL
- *  ("hand-edits are overwritten", by the silo's own constitution). They
- *  crowd the search results with tables nobody searches for; the picker
- *  itself is the better index. Applied to every corpus rg call. */
-export const CORPUS_EXCLUSIONS = ["-g", "!**/index.md"];
+/** Layer-0 exclusions (the onion): generated registry views are build
+ *  artifacts, not documents — `reg-sync` regenerates every `index.md`
+ *  from the JSONL ("hand-edits are overwritten", by the silo's own
+ *  constitution), and the JSONL indexes are stated non-corpus for
+ *  honesty (`--type md` already filters them) — they power Layer 2 as
+ *  data and must never surface as results. A documented constant, not
+ *  a user knob; no later layer sees the raw filesystem, so the
+ *  exclusion holds by construction, not by glob discipline. */
+export const EXCLUSIONS = [
+  "-g", "!**/index.md",
+  "-g", "!**/INDEX.jsonl",
+  "-g", "!**/REGISTRY.jsonl",
+];
 
 /** Match highlighting: the query's matched substrings render in the
  *  okuda palette's strong amber (#dfa21a — the reader's own `strong`,
