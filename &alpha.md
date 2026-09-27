@@ -33,6 +33,69 @@
 No menus, no state. The map is derived; the paint is illustrative.
 (ADR-031.)
 
+## the words
+
+- **A silo** is a repo that indexes itself — five tiers of documents,
+  one registry each. The registries are the data; the picker is the
+  better index of them.
+
+- **A callsign** is the human code — `ADR-031`,
+  `BRF-ONION-SEARCH-GRAMMAR`. Tier prefix plus slug. Type it; the
+  search resolves it.
+
+- **A silcrow §NN** is a painted jump. The references in the document
+  you are reading carry their numbers, and every painted number
+  resolves — the registry validates before the paint. (ADR-044.)
+
+- **Shelf and dive** — an empty search is the shelf: the silo's top
+  level, root files as destinations. Any query is the dive: the
+  corpus, ranked, evidence attached.
+
+- **The onion** is the search grammar — staged narrowing, one concern
+  per layer. The next section is the whole grammar. 
+  (BRF-ONION-SEARCH-GRAMMAR.)
+
+## the search — the onion grammar
+
+- **`dir/` is a path; `dir` is content.** `decisions/` lists the tier;
+  `decisions` finds documents about decisions, in any tier, with the
+  matching line attached. The trailing slash is the signal — stated,
+  never guessed.
+
+- **`@YYYY-MM` scopes the date** across the whole query:
+  `briefs/ @2026-09` is the month's briefs. The day shape too:
+  `@2026-09-02`. The date is a path predicate — it filters the
+  stream, not the view.
+
+- **`!` excludes.** `!word` removes bodies that mention it; `!dir/`
+  removes a path. Two operators, two layers.
+
+- **`|` is OR** — `debriefs/ | decisions/ | docs/`. Flat, no brackets;
+  every real query fits.
+
+- **Words AND within a clause** — `@2026-09 briefs/ elision` is all
+  three at once.
+
+- **The picker refines, exactly.** What you keep typing is an
+  exact-match AND over what survived. Watch fzf's counter: the
+  `@`-form narrows the stream itself; the bare word narrows the
+  view. Same destination, different layer.
+
+The worked example — September outside briefs:
+`!briefs/ @2026-09 debriefs/ | decisions/ | docs/`
+
+## the state — where we are
+
+- [the island](NOW.md) — today, generated: branch, counts, the
+  board. Stale on creation; `just island` regenerates.
+
+- [the decision table](&next.md) — what is next, what is outstanding,
+  what landed: name, verdict, cost.
+
+- This month is a query away: `@2026-09`. Outstanding work is the
+  table's to answer — the grammar does not yet filter status, and
+  the curated table does it better than a filter would.
+
 ## first reads
 
 - ADR-031 — the main document and the working copy
