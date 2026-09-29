@@ -790,14 +790,21 @@ function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   // Indicator line: the diagram's caption. A leading `title: <caption>`
   // in the mermaid fence (extracted pre-pipe by interceptMermaid) lands
   // here — the `⋮` leads (state-parked colour, vocabulary parity), the
-  // caption follows in the muted register. Untitled diagrams fall back to
-  // the renderer statement (`mermaid source elided`) — the source is
-  // tautological in a single-render seam and is not echoed. The glyph
-  // keeps its weight under NO_COLOR (roleBold emits SGR 1 — colour drops,
-  // attributes survive); the `⋮` reads as a control among the art.
+  // caption follows in the muted register. Every fence states the elision
+  // (BRF-PROJECTION-LOSSES): the notice used to ride only the untitled
+  // branch, so 22 of the silo's 58 fences never said the source is not
+  // shown. The titled branch appends the SHORTER clause, and the reason
+  // is measured — this line is RAW-protected and never wrapped, and the
+  // silo's longest title (51 columns) plus `· mermaid source elided`
+  // measures 79 against a 78-column budget at width 80. `source elided`
+  // measures 71. The untitled branch keeps its exact bytes: 36 fences
+  // already read `mermaid source elided` and nothing here changes them.
+  // The glyph keeps its weight under NO_COLOR (roleBold emits SGR 1 —
+  // colour drops, attributes survive); the `⋮` reads as a control among
+  // the art.
   const glyph = ctx.styler.roleBold("state-parked", "⋮");
   const stmt = title
-    ? ctx.styler.role("muted", " " + title)
+    ? ctx.styler.role("muted", " " + title + " · source elided")
     : ctx.styler.role("muted", " mermaid source elided");
   const indOpen = tagRawOpen("diagramsrc");
   return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n${indOpen}${glyph}${stmt}${TAG_RAW_CLOSE}\n\n`;

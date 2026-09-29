@@ -295,6 +295,43 @@ describe("render — mermaid pipe + colour classification", () => {
     for (const l of art) expect(l.endsWith("\x1b[0m")).toBe(true);
   });
 
+  test("the elision notice reaches a titled fence too (BRF-PROJECTION-LOSSES)", async () => {
+    // The caption used to be a ternary: a title OR the notice. So the 22
+    // titled fences in the silo never said the source is not shown. The
+    // notice now rides both branches; the titled one appends the shorter
+    // clause because the caption is RAW-protected (never wrapped) and the
+    // silo's longest title plus `· mermaid source elided` measures 79
+    // against a 78-column budget at width 80.
+    const titled = "```mermaid\ntitle: The cycle\nflowchart LR\n  A --> B\n```\n";
+    const untitled = "```mermaid\nflowchart LR\n  A --> B\n```\n";
+    const line = (out: string) => out.split("\n").find((l) => l.includes("⋮"));
+
+    const titledNone = await renderDocument(titled, { width: W, color: "none" });
+    expect(line(titledNone)).toBe(
+      "  \x1b[1m⋮\x1b[0m The cycle · source elided",
+    );
+    expect(titledNone).toContain("The cycle");
+    expect(titledNone).not.toContain("mermaid source elided");
+
+    // The untitled line keeps its exact bytes — 36 fences already read
+    // this and nothing here changes them.
+    const untitledNone = await renderDocument(untitled, { width: W, color: "none" });
+    expect(line(untitledNone)).toBe("  \x1b[1m⋮\x1b[0m mermaid source elided");
+
+    // Colour mode: the glyph keeps its weight (state-parked + SGR 1), the
+    // caption rides the muted register, and both close with a full reset.
+    const titledTC = await renderDocument(titled, { width: W, palette: DRACULA_PALETTE });
+    expect(line(titledTC)).toBe(
+      "  \x1b[38;2;255;153;51;1m⋮\x1b[0m\x1b[38;2;88;88;88m" +
+        " The cycle · source elided\x1b[0m",
+    );
+    const untitledTC = await renderDocument(untitled, { width: W, palette: DRACULA_PALETTE });
+    expect(line(untitledTC)).toBe(
+      "  \x1b[38;2;255;153;51;1m⋮\x1b[0m\x1b[38;2;88;88;88m" +
+        " mermaid source elided\x1b[0m",
+    );
+  });
+
   test("no ASCII character is ever an arrow: v2.0 label stays text", async () => {
     const out = await renderDocument("```mermaid\n" + MERMAID_SRC + "```\n", {
       width: W,
