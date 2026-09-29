@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-29 | ADR-SILCROW-PATHS-045 | Accepted | Silcrow paths — the gate's second substrate is the filesystem | 045-silcrow-paths.md |
 | 2026-09-24 | ADR-VALIDATED-SILCROWS-044 | Accepted | Validated silcrows — inferred references gate on the registry; explicit references stay optimistic | 044-validated-silcrows.md |
 | 2026-09-21 | ADR-BUILD-SIGNS-040 | Accepted | The build signs its own output — re-sign after compile, verify in the gate | 040-build-signs-its-output.md |
 | 2026-09-21 | ADR-GATE-NAMES-041 | Accepted | A gate names its own precondition — a missing instrument is not a verdict | 041-a-gate-names-its-precondition.md |
