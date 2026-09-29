@@ -194,3 +194,71 @@ describe("vectors — annotation (illustrative paint markers)", () => {
     expect(annotateSource("plain text.", jumpMapFor("plain text."))).toBe("plain text.");
   });
 });
+
+describe("vectors — Ring A: code-file mentions (BRF-SILCROW-PATHS)", () => {
+  test("a dir/name.ext mention is a reference (non-md extension)", () => {
+    const refs = scanReferences("the scan lives in src/vectors.ts, pure.").map((r) => r.target);
+    expect(refs).toEqual(["src/vectors.ts"]);
+  });
+
+  test("bare filenames and extensionless binaries are not (no slash, no intent)", () => {
+    const refs = scanReferences("see justfile, package.json, tui.ts, and UTF-8 too.").map((r) => r.target);
+    // UTF-8 is the callsign loop's own optimism (the ADR-044 gate
+    // retracts it at the TUI); the point here: no PATH tokens discovered —
+    // Ring C owns bare basenames, none carry a slash.
+    expect(refs).toEqual(["UTF-8"]);
+  });
+
+  test("named .md paths are NOT Ring A — Ring B's own step, unwired", () => {
+    const refs = scanReferences("see docs/help.md for keys.").map((r) => r.target);
+    expect(refs).toEqual([]); // no link syntax: a bare mention, unpainted this ring
+  });
+
+  test("the ADR-045 gate: the filesystem decides — phantom and URL retract", () => {
+    const resolves = (t: string) => t === "src/vectors.ts";
+    const src = "real: src/vectors.ts. phantom: palettes/okuda.json. URL: example.com/chime.mp3.";
+    expect(scanReferences(src, resolves).map((r) => r.target)).toEqual(["src/vectors.ts"]);
+    // No predicate = the pure scan (discovery validates nothing, ADR-044 contract)
+    expect(scanReferences(src).map((r) => r.target)).toEqual([
+      "src/vectors.ts",
+      "palettes/okuda.json",
+      "example.com/chime.mp3",
+    ]);
+  });
+
+  test("W2: the :NNN suffix is swallowed into the span, stripped from the target", () => {
+    const src = "the edit brief is wired at src/tui.ts:756 today.";
+    const refs = scanReferences(src);
+    expect(refs.length).toBe(1);
+    expect(refs[0]!.target).toBe("src/tui.ts"); // the silcrow is file-level
+    expect(src.slice(refs[0]!.pos, refs[0]!.end)).toBe("src/tui.ts:756"); // paint covers the mention
+  });
+
+  test("W2: suffixed and plain mentions share the vector (one destination, one silcrow)", () => {
+    const resolves = (t: string) => t === "src/tui.ts";
+    const map = jumpMapFor("see src/tui.ts:756, then src/tui.ts plain.", resolves);
+    expect([...map.values()]).toEqual(["src/tui.ts"]);
+    expect(map.size).toBe(1);
+  });
+
+  test("W1: paint inside the codespan — the badge lands before the closing backtick", () => {
+    const resolves = (t: string) => t === "src/vectors.ts";
+    const src = "the scan is `src/vectors.ts`, pure.";
+    const map = jumpMapFor(src, resolves);
+    const out = annotateSource(src, map);
+    expect(out).toBe("the scan is `src/vectors.ts %okuda-vector:12%`, pure.");
+  });
+
+  test("fences and frontmatter stay prose-free (the standing discipline)", () => {
+    const src = "---\ncallsign: BRF-X\n---\n\n```\nsrc/vectors.ts\n```\n\nprose src/vectors.ts after.";
+    const refs = scanReferences(src);
+    expect(refs.map((r) => r.target)).toEqual(["src/vectors.ts"]);
+  });
+
+  test("reading order: Ring A joins the map in position, after earlier refs", () => {
+    const resolves = () => true;
+    const src = "first ADR-030, then src/vectors.ts, then [a doc](docs/x.md).";
+    const map = jumpMapFor(src, resolves);
+    expect([...map.values()]).toEqual(["ADR-030", "src/vectors.ts", "docs/x.md"]);
+  });
+});
