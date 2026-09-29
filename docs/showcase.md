@@ -60,6 +60,8 @@ should hand off to the browser.
 // reader widens; the bytes stay honest. function render(source: string): string { return source .split("\n") .map((line) => line.trimEnd()) .join("\n"); }
 ```
 
+A tagged fence is coloured (BRF-FENCE-COLOUR): `chroma` classifies the tokens, the terminal's own palette supplies the hues — the tool classifies, the terminal themes, and no TrueColor Kool-Aid rides the code. The fence above, rendered, is the proof. An untagged fence stays exactly as it was; an unknown tag renders untagged (chroma never rejects an unknown lexer — it colours plaintext white, silently — so the alias table decides, not a guess); the binary absent, the code renders uncoloured and the viewer never dies with the coloriser. And a source file is a one-fence document: `okuda src/render.ts` renders the renderer, coloured.
+
 ---
 
 ## Diagrams: mermaid → ASCII

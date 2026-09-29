@@ -19,6 +19,7 @@
 import { type ColorMode, makeStyler, unwrapStrongSpan } from "./ansi";
 import {
   PARSER_OPTIONS,
+  RE_CODE_TOKEN,
   RE_INLINE_HTML,
   RE_MERMAID_TOKEN,
   RE_PB_TAG,
@@ -29,6 +30,7 @@ import {
   TAG_PROBE_CLOSE,
   TAG_RAW_CLOSE,
   TAG_RHS_WIRE,
+  codeToken,
   mermaidToken,
   stripTags,
   tagNestedOpen,
@@ -127,6 +129,8 @@ export interface RenderOptions {
   color?: ColorMode;
   /** Override mermaid binary path (default: ~/.local/bin/mermaid-to-md, then $PATH). */
   mermaidBin?: string;
+  /** Override chroma binary path (default: $PATH lookup). */
+  chromaBin?: string;
 }
 
 // ── Mermaid pipe ─────────────────────────────────────────────────────
@@ -266,6 +270,8 @@ interface Ctx {
   palette: Palette;
   table: TableState | null;
   mermaid: Map<string, { art: string; title?: string | null }>;
+  /** Coloured fence lines keyed by token id (BRF-FENCE-COLOUR). */
+  code: Map<string, string[]>;
   /** When set, `list` handlers record structure instead of rendering
    *  (the probe pass — see probeListDepths). */
   listProbe?: (children: string) => string;
@@ -295,6 +301,7 @@ export async function renderDocument(
     palette,
     table: null,
     mermaid: new Map(),
+    code: new Map(),
     listSeq: 0,
   };
 
@@ -313,6 +320,13 @@ export async function renderDocument(
   // Pre-pass 3: intercept mermaid fences → pipe to binary → placeholder tokens.
   const source3 = await interceptMermaid(source2, opts, ctx);
 
+  // Pre-pass 3.5: intercept tagged code fences → chroma → placeholder
+  // tokens (BRF-FENCE-COLOUR). Runs after mermaid so its fences are already
+  // gone; only a *successful* colour buys a token — unknown tags, absent
+  // binary, and none mode leave the fence in place for `code()`, so those
+  // paths are byte-identical to yesterday by construction.
+  const source4 = await interceptCode(source3, opts, ctx);
+
   // Pre-pass 4 (structural probe): each list's nesting depth. Post-order
   // callbacks mean a nested list renders before its parent fires — depth
   // (top-down) can't reach it in one pass. The probe renders once with
@@ -320,10 +334,10 @@ export async function renderDocument(
   // descendants, giving the containment chain. The render pass then draws
   // depths from it in identical call order (same source, same parser —
   // deterministic sequence).
-  ctx.listDepths = probeListDepths(source3, ctx);
+  ctx.listDepths = probeListDepths(source4, ctx);
   ctx.listSeq = 0;
 
-  const rendered = Bun.markdown.render(source3, handlers(ctx), {
+  const rendered = Bun.markdown.render(source4, handlers(ctx), {
     ...PARSER_OPTIONS,
   }).replace(/\n+$/, "\n\n"); // terminator wants exactly one blank line above
 
@@ -513,6 +527,129 @@ async function interceptMermaid(
   return src;
 }
 
+// ── Chroma pipe (BRF-FENCE-COLOUR) ───────────────────────────────────
+
+/** A fence tag we will forward: one conservative word (ts, c++, c#,
+ * objective-c). Anything else is not a language claim. */
+const RE_FENCE_TAG = /^[A-Za-z0-9][A-Za-z0-9_+#.-]*$/;
+
+/** chroma's alias table, parsed once per process from `chroma --list`.
+ * Why a table at all: chroma never rejects an unknown --lexer — it falls
+ * back to plaintext, colours it white, and exits 0 with empty stderr.
+ * "An unknown tag renders as today" is reachable only by knowing the
+ * table. The cache holds *successful* probes only, so an absent binary
+ * is retried per render (cheap) and never poisons a later one. */
+let chromaAliases: Set<string> | undefined;
+
+async function getChromaAliases(bin: string): Promise<Set<string> | null> {
+  if (chromaAliases !== undefined) return chromaAliases;
+  try {
+    const proc = Bun.spawn([bin, "--list"], {
+      stdin: "ignore",
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    const out = await new Response(proc.stdout).text();
+    await proc.exited;
+    const set = new Set<string>();
+    for (const m of out.matchAll(/^ {4}aliases:[ \t]*([^\n]*)$/gm)) {
+      for (const a of m[1]!.split(/\s+/)) if (a) set.add(a);
+    }
+    if (set.size > 0) chromaAliases = set;
+    return set.size > 0 ? set : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Pipe one fence through chroma — `--formatter terminal16`: 16-colour
+ * class codes, the terminal's palette supplies the hues. BRF-FENCE-COLOUR's
+ * one rule: the tool classifies, the terminal themes. Returns null on any
+ * failure — absent binary, dead pipe, empty output. */
+async function spawnChroma(
+  bin: string,
+  tag: string,
+  code: string,
+): Promise<string | null> {
+  try {
+    const proc = Bun.spawn(
+      [bin, "--formatter", "terminal16", "--lexer", tag],
+      { stdin: "pipe", stdout: "pipe", stderr: "pipe" },
+    );
+    proc.stdin.write(code);
+    proc.stdin.end();
+    const out = await new Response(proc.stdout).text();
+    await proc.exited;
+    const body = out.replace(/\n$/, "");
+    return body.trim() === "" ? null : body;
+  } catch {
+    return null;
+  }
+}
+
+/** Pre-pass 3.5: tagged, non-mermaid fences → chroma → tokens. The
+ * mermaid shape exactly: handlers are sync, the pipe is not, so colour
+ * is bought before the parse and `code()` never sees a fence it must
+ * colour. Only a *successful* pipe buys a token — the fence otherwise
+ * stays in the source and renders through `code()` as always, so the
+ * unknown-tag, absent-binary, and none-mode paths are byte-identical to
+ * yesterday by construction, not by imitation. */
+async function interceptCode(
+  source: string,
+  opts: RenderOptions,
+  ctx: Ctx,
+): Promise<string> {
+  if ((opts.color ?? "truecolor") === "none") return source;
+  const bin = opts.chromaBin ?? "chroma";
+  const aliases = await getChromaAliases(bin);
+  if (!aliases) return source;
+  const re = /(^|\n)```([^\n`]*)\n([\s\S]*?)\n?```/g;
+  const found: { tag: string; code: string; valid: boolean }[] = [];
+  for (const m of source.matchAll(re)) {
+    // The info string's first word is the tag; the rest is ignored
+    // (`js title=...` is still js). lowercase — chroma's aliases are.
+    const tag = (m[2] ?? "").trim().split(/\s+/)[0]!.toLowerCase();
+    const valid = tag !== "mermaid" && RE_FENCE_TAG.test(tag) && aliases.has(tag);
+    found.push({ tag, code: m[3] ?? "", valid });
+  }
+  if (!found.some((f) => f.valid)) return source;
+  const arts = await Promise.all(
+    found.map((f) => (f.valid ? spawnChroma(bin, f.tag, f.code) : null)),
+  );
+  let i = 0;
+  return source.replace(re, (m, lead: string) => {
+    const art = arts[i++];
+    if (art === null || art === undefined) return m;
+    ctx.code.set(String(ctx.code.size), art.split("\n"));
+    return `${lead}${codeToken(String(ctx.code.size - 1))}`;
+  });
+}
+
+/** The coloured fence block: chroma's lines with `code()`'s RAW
+ * protection, indent, and elision — but no `codeLine` wrap. chroma's
+ * class codes ARE the styling; layering the palette's code colour over
+ * them would fight the terminal's palette for the same bytes. */
+function codeBlockLines(lines: string[], ctx: Ctx): string {
+  const open = tagRawOpen("code");
+  const body = lines.map((l) => (l === "" ? "" : "  " + elideToWidth(l, ctx.width)));
+  return `${open}${body.join("\n")}${TAG_RAW_CLOSE}\n\n`;
+}
+
+/** Whole-file rendering (BRF-FENCE-COLOUR P2): a code file is a
+ * one-fence document. Input normalisation at the source boundary — the
+ * extension becomes the fence tag, and chroma's alias table does the
+ * mapping (we own no map). No text is invented or merged: the file IS
+ * the fence, so this is normalisation, not compositing. Markdown stays
+ * itself; extensionless and dotless files pass through untouched. */
+export function wrapWholeFile(file: string, text: string): string {
+  if (/\.markdown$/i.test(file) || /\.md$/i.test(file)) return text;
+  const dot = file.lastIndexOf(".");
+  if (dot <= 0) return text;
+  const tag = file.slice(dot + 1).toLowerCase();
+  if (!RE_FENCE_TAG.test(tag)) return text;
+  return `\`\`\`${tag}\n${text.replace(/\n+$/, "")}\n\`\`\`\n`;
+}
+
 /** Build the Bun.markdown handler set. */
 function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => string | null> {
   const { styler, width } = ctx;
@@ -561,6 +698,14 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
     },
 
     paragraph(children: string) {
+      // Code placeholder paragraph → the chroma-painted fence
+      // (BRF-FENCE-COLOUR: the same resolution shape as mermaid below).
+      const c = children.trim().match(RE_CODE_TOKEN);
+      if (c) {
+        const lines = ctx.code.get(c[1]!);
+        if (lines !== undefined) return codeBlockLines(lines, ctx);
+        return ""; // tokenised then dropped — unreachable by construction
+      }
       // Mermaid placeholder paragraph → the classified ASCII block.
       const m = children.trim().match(RE_MERMAID_TOKEN);
       if (m) {

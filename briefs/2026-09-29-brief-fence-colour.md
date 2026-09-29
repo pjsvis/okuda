@@ -7,7 +7,8 @@ date: 2026-09-29
 # Brief: Fence colour — chroma at the mermaid seam, the terminal's palette as the theme
 
 **Created:** 2026-09-29
-**Status:** Proposed — awaiting operator review
+**Status:** Done — shipped 2026-09-29 (td-dfa601: 444 tests green, `just check` green;
+the showcase's own `typescript` fence now renders coloured — dogfood as acceptance)
 **TD:** td-dfa601 (epic; P1 the fences, P2 the whole files)
 **Branch:** feat/fence-colour
 **Lineage:** the operator, verbatim: *"is there a basic code fence coloriser
@@ -81,8 +82,11 @@ text is invented or merged — the file *is* the fence, so this is input
 normalisation, not compositing, and "we don't care where the text
 comes from" is the constitution already saying yes.
 
-- **Lexer choice:** `--filename`, not an extension map we own — chroma
-  maps extensions to lexers itself, and the map stays theirs.
+- **The lexer choice** rides chroma's alias table via the extension-as-tag
+  (`--filename` was the brief's letter; the implementation uses one path for
+  fences and files alike — `--lexer py` resolves `py` whether it arrived as a
+  fence tag or a `.py` extension — same ownership property: the map stays
+  chroma's).
 - **The fork, recorded:** renderer-level normalisation (recommended —
   one function, deterministic, testable, every consumer gets it) vs
   launcher-level wrapping (`{ echo '```py'; cat f; }` — keeps the
@@ -98,18 +102,18 @@ comes from" is the constitution already saying yes.
 
 ## Acceptance criteria
 
-- [ ] A tagged `python` fence renders with chroma's terminal16 bytes,
+- [x] A tagged `python` fence renders with chroma's terminal16 bytes,
       pinned exactly in tests.
-- [ ] An untagged fence is byte-identical to today's render.
-- [ ] An unknown language tag renders as untagged — deterministic, no
+- [x] An untagged fence is byte-identical to today's render.
+- [x] An unknown language tag renders as untagged — deterministic, no
       detection.
-- [ ] With chroma absent from the box, every fence renders as today and
+- [x] With chroma absent from the box, every fence renders as today and
       no error escapes to the reader.
-- [ ] A coloured line longer than the width elides at the same column
+- [x] A coloured line longer than the width elides at the same column
       as its uncoloured twin (ANSI invisible to the ruler).
-- [ ] P2: `okuda src/render.ts` renders as one coloured fence — the
+- [x] P2: `okuda src/render.ts` renders as one coloured fence — the
       dogfood case and the smoke test in one.
-- [ ] `just check` green; DEPENDENCIES.md entry verified with a date.
+- [x] `just check` green; DEPENDENCIES.md entry verified with a date.
 
 ## Out of scope
 

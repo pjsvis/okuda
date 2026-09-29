@@ -396,7 +396,10 @@ describe("render — blockquote", () => {
 describe("render — code fences", () => {
   test("2-space indent, code colours, elided at the content width (td-b81597)", async () => {
     const long = "x".repeat(70);
-    const out = await render("```ts\nconst line = \"" + long + "\"\n```", 40);
+    // Untagged by intent (BRF-FENCE-COLOUR): this test pins the codeLine
+    // palette path and the elision primitive — a tagged fence now goes
+    // through chroma, whose bytes are that brief's to pin.
+    const out = await render("```\nconst line = \"" + long + "\"\n```", 40);
     const codeLine = lines(out).find((l) => l.includes("const line"));
     expect(codeLine).toBeDefined();
     expect(stripANSI(codeLine!)).toStartWith("  ");

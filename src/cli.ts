@@ -1,7 +1,7 @@
 /**
  * cli.ts — okuda entry point.
  *
- * Usage: okuda <file.md> [--watch] [--tui] [--no-color] [--palette <name>]
+ * Usage: okuda <file> [--watch] [--tui] [--no-color] [--palette <name>]
  *        cat doc.md | okuda
  *
  *  - Terminal width: terminalCols() (handles Bun's columns=0 bug; fallback 80).
@@ -13,7 +13,7 @@
 
 import { detectColorMode } from "./ansi";
 import { loadPalette } from "./palette";
-import { renderDocument } from "./render";
+import { renderDocument, wrapWholeFile } from "./render";
 import { runTui } from "./tui";
 import { runLauncher, invokedAsGloam, rankedShortlistEntries } from "./launcher";
 import { detectRoot, makeCallsignResolver, makeCallsignValidator, resolveByCallsign } from "./root";
@@ -74,7 +74,7 @@ function parseArgs(argv: string[]): Args {
       args.entries = argv.slice(i + 1).join(" ");
       break;
     } else if (a === "--help" || a === "-h") {
-      process.stdout.write("usage: okuda <file.md> [--watch] [--tui] [--no-color] [--palette <name>]\n");
+      process.stdout.write("usage: okuda <file> [--watch] [--tui] [--no-color] [--palette <name>]\n");
       process.stdout.write("       gloam [<query words>] [-g <query>] [--entries <query>]  (live search → read → loop)\n");
       process.exit(0);
     } else if (a === "--version") {
@@ -104,11 +104,11 @@ async function readSource(file: string | null): Promise<string> {
       process.stderr.write(`okuda: no such file: ${file}\n`);
       process.exit(1);
     }
-    return await f.text();
+    return wrapWholeFile(file, await f.text());
   }
   // Stdin piping (origin doc): `cat doc.md | okuda`
   if (!process.stdin.isTTY) return await new Response(process.stdin).text();
-  process.stderr.write("usage: okuda <file.md> [--watch] [--no-color]\n");
+  process.stderr.write("usage: okuda <file> [--watch] [--no-color]\n");
   process.exit(1);
 }
 
