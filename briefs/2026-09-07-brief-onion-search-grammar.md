@@ -6,7 +6,10 @@ callsign: BRF-ONION-SEARCH-GRAMMAR
 # Brief: The onion search grammar — staged filtering, path/content separation
 
 **Date:** 2026-09-07
-**Status:** Open
+**Status:** Done — shipped 2026-09-24 (td-d95cf3). The design call the brief left
+open: @date landed as GLOBAL scope (the contract tests' reading — the smoke query
+dates every clause), not the clause-AND of the grammar sketch; per-clause dates
+park on the elision ladder. The 7 red-by-design tests went green in one flip.
 **Lineage:** dialog session (okudagram framing riff → concordance smoke
 test → four-defect finding → onion architecture). Successor to
 BRF-CONCORDANCE-PREFILTER (607e187), which landed `|`, `!`, and case at
