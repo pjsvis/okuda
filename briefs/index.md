@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-29 | BRF-FENCE-COLOUR | open | Fence colour — chroma at the mermaid seam, the terminal's palette as the theme | 2026-09-29-brief-fence-colour.md |
 | 2026-09-29 | BRF-PROJECTION-LOSSES | open | Projection losses — two surfaces that drop content they mean to keep | 2026-09-29-brief-projection-losses.md |
 | 2026-09-29 | BRF-SSH-HOST | open | SSH host — landing the ADR-013 reading room where SSH gives a shell | 2026-09-29-brief-ssh-host.md |
 | 2026-09-24 | BRF-SELF-IDENTICAL-LINK | open | The self-identical link — when the label is the address, say it once | 2026-09-24-brief-self-identical-link.md |
