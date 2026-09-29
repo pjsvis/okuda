@@ -6,13 +6,28 @@ callsign: BRF-MERMAID-SOURCE-OMITTED
 # Brief: Omit the mermaid source from the render
 
 **Date:** 2026-09-01
-**Status:** Open
+**Status:** Open (amended 2026-09-29 — the notice now reaches every fence; see Amendment below)
 **Branch:** feat/gloam-launcher
 **Context:** closing move on the mermaid render path, sequenced after
 td-b81597 (the elision primitive). A dogfood render of
 `docs/2026-08-29-from-intent-to-task-05.md` — three flowchart diagrams,
 each with a 15–20 line source block — surfaced the question: does the
 render need the source at all?
+
+> **Amendment (2026-09-29, BRF-PROJECTION-LOSSES).** This brief decided *that*
+> an indicator line exists and left the wording to implementation — so the
+> implementation made it a ternary, and a titled fence got its title *instead
+> of* the notice. 22 of the silo's 58 diagram fences therefore never stated
+> that the source is not shown. `BRF-PROJECTION-LOSSES` extends the doctrine
+> below — *render the **fact** of the source, not the source* — to the fences
+> the ternary excluded: the notice now rides both branches. The titled branch
+> appends the shorter clause (`· source elided`, not `· mermaid source
+> elided`) because the caption line is RAW-protected and never wrapped, and
+> the silo's longest title plus the full clause measures 79 columns against
+> the body's 78-column budget at width 80. **What stays this brief's:** the
+> `⋮` glyph and its state-parked role, the untitled wording `mermaid source
+> elided` byte-for-byte, the decision to omit the source block, and the
+> doctrine itself. Nothing here is reversed.
 
 ## The finding
 
@@ -173,4 +188,6 @@ source, not the source. Sketch:
   surfaced the question
 - `src/render.ts` — `diagramBlock`, `extractDiagramChecksum`,
   `interceptMermaid`
+- `briefs/2026-09-29-brief-projection-losses.md` — the amendment above: the
+  notice's coverage, extended to every fence
 - `DEPENDENCIES.md` — the `mermaid-to-md --verify` CI step (unchanged)

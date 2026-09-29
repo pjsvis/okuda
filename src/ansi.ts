@@ -125,10 +125,17 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       // NO_COLOR strips colour, not attributes — the silcrow's redundant
       // weight channel survives (SGR 1 is not colour). The doc's "weight
       // remains" claim is true. Closed with a full \x1b[0m reset per the
-      // wrap invariant (no partial \x1b[22m).
+      // wrap invariant (no partial \x1b[22m). Italic and bold-italic are
+      // attributes under the same rule, and the voice path is colourless
+      // (`justfile:110`), so an emphasis written as italics is otherwise
+      // invisible to the ear (BRF-PROJECTION-LOSSES).
       roleBold: (_n, text) => `\x1b[1m${text}${RESET}`,
-      roleItalic: (_n, text) => text,
-      roleBoldItalic: (_n, text) => text,
+      roleItalic: (_n, text) => `\x1b[3m${text}${RESET}`,
+      roleBoldItalic: (_n, text) => `\x1b[1;3m${text}${RESET}`,
+      // Underline stays plain here, and the reason is not parity of
+      // attributes: a link's cue is its address, and the `link` emitter
+      // below still shows it in this mode. Same for `bold`/`strike` — a
+      // heading keeps its `#`, a table keeps its pipes.
       roleUnderline: (_n, text) => text,
       badge: (text) => ` ${text} `, // padding kept in both modes (shape parity)
       bold: (text) => text,

@@ -244,6 +244,24 @@ describe("palette — dracula contract + override loader", () => {
     expect(none.roleBold("state-failed", "✗")).toBe("\x1b[1m✗\x1b[0m");
   });
 
+  test("emphasis attributes survive in none mode (BRF-PROJECTION-LOSSES)", () => {
+    // The rule `roleBold` above states — NO_COLOR strips colour, not
+    // attributes — applies to italic and bold-italic too. It did not:
+    // both were plain text, so `*emphasis*` was indistinguishable from
+    // body prose once colour was dropped, and the voice path
+    // (`justfile:110`) passes `--no-color`. One reset each, full, per
+    // the wrap invariant.
+    const none = makeStyler(DRACULA_PALETTE, "none");
+    expect(none.roleItalic("emphasis", "e")).toBe("\x1b[3me\x1b[0m");
+    expect(none.roleBoldItalic("emphasis", "e")).toBe("\x1b[1;3me\x1b[0m");
+    // Truecolor composes the same attributes with a colour first.
+    const tc = makeStyler(DRACULA_PALETTE, "truecolor");
+    expect(tc.roleItalic("emphasis", "e")).toBe("\x1b[38;2;241;250;140;3me\x1b[0m");
+    expect(tc.roleBoldItalic("emphasis", "e")).toBe("\x1b[38;2;241;250;140;1;3me\x1b[0m");
+    // Underline stays plain: a link's cue is its address, shown in both modes.
+    expect(none.roleUnderline("link", "l")).toBe("l");
+  });
+
   test("override file replaces known roles, ignores junk", () => {
     // Pinned to the dracula preset (brief option b): the assertions anchor
     // to Dracula bytes, and the override mechanism is base-independent —

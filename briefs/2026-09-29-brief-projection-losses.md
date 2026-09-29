@@ -7,7 +7,7 @@ date: 2026-09-29
 # Brief: Projection losses — two surfaces that drop content they mean to keep
 
 **Created:** 2026-09-29
-**Status:** Open
+**Status:** Done — shipped 2026-09-29 (td-e03cd7 the emphasis channel, td-3b3f1b the elision notice; 435 tests green, `just check` green)
 **TD:** td-4e1aa2 (epic) — td-e03cd7 the emphasis channel, td-3b3f1b the elision notice
 **Lineage:** `docs/2026-09-29-text-streams-and-the-typed-action.md` — the survey that found both, from the operator's question about streams of text against UI operation
 **Extends:** `BRF-MERMAID-SOURCE-OMITTED` — the elision notice's *coverage*. The notice itself, its glyph and its wording stay that brief's.
@@ -56,20 +56,22 @@ measurement while writing the survey above, and neither is a decision anybody ma
 
 ## Work Plan
 
-1. [ ] `src/ansi.ts` — under `none`, `roleItalic` emits SGR 3 and `roleBoldItalic` emits SGR 1;3,
+1. [x] `src/ansi.ts` — under `none`, `roleItalic` emits SGR 3 and `roleBoldItalic` emits SGR 1;3,
        each closed with a full reset the way `roleBold` closes.
-2. [ ] `tests/ansi-palette.test.ts` — assert the none-mode bytes for both, beside the existing
+2. [x] `tests/ansi-palette.test.ts` — assert the none-mode bytes for both, beside the existing
        `roleBold` assertions.
-3. [ ] `src/render.ts` — `diagramBlock` emits the notice on the titled branch as well.
-4. [ ] `tests/table-diagram.test.ts` — assert a titled fence carries both its title and the notice,
+3. [x] `src/render.ts` — `diagramBlock` emits the notice on the titled branch as well.
+4. [x] `tests/table-diagram.test.ts` — assert a titled fence carries both its title and the notice,
        and that the untitled case stays byte-identical to today's line.
-5. [ ] `docs/showcase.md` — record the coverage where it teaches the indicator line.
-6. [ ] `briefs/2026-09-01-brief-mermaid-source-omitted.md` — amend: extend its doctrine to every
+5. [x] `docs/showcase.md` — record the coverage where it teaches the indicator line.
+6. [x] `briefs/2026-09-01-brief-mermaid-source-omitted.md` — amend: extend its doctrine to every
        fence, and name what stays its own.
-7. [ ] `docs/2026-09-29-text-streams-and-the-typed-action.md` — correct the claim that a reader
+7. [x] `docs/2026-09-29-text-streams-and-the-typed-action.md` — correct the claim that a reader
        cannot tell a titled diagram from an untitled one. The caption text does differ; the
        unrecorded thing is the coverage.
-8. [ ] `just test` and `just check`.
+8. [x] `just test` and `just check`. **Verified 2026-09-29** — 435 pass, 0 fail;
+      `just check`: signature-check skipped (binary not yet rebuilt), five registries
+      and facade-lint all OK.
 
 ## Acceptance Criteria
 
@@ -80,8 +82,10 @@ measurement while writing the survey above, and neither is a decision anybody ma
   titled or not: 58 of 58, against 36 of 58 today.
 - **The untitled case is unchanged.** Its line is byte-identical to today's, so the 36 fences that
   already carry the notice keep their exact bytes.
-- **The caption fits the pane.** The longest title in the silo is 53 characters; with the notice
-  appended the caption line measures 73 columns against a 78-column budget at width 80.
+- **The caption fits the pane.** The longest title in the silo is 51 columns; with the notice
+  appended the caption line measures 71 columns against a 78-column budget at width 80 (2-column
+  margin + 76-column content). The full clause would measure 79 — one over. Measured by
+  `tmp/caption-budget-probe.py`.
 - **The suite is green.** `just test` and `just check` both pass.
 
 ## Notes
@@ -98,9 +102,12 @@ option space above to reverse.
 
 **The notice clause is shorter in the titled case, and the reason is measured.** The caption line is
 never wrapped, so the notice spends the author's title budget. `mermaid source elided` is 21
-characters, and appending it to the longest existing title measures 81 columns — one over the pane.
-`source elided` is 13 and measures 73. The two clauses differ in length by design, and the binding
-constraint is the title, not the notice.
+characters, and appending it to the longest existing title (`The page census — 15,498 pages verify,
+one is stale`, 51 columns, in `docs/2026-09-21-the-page-the-signature-got-wrong.md`) measures **79**
+columns against the 78-column budget — one over. `source elided` is 13 and measures **71**. The two
+clauses differ in length by design, and the binding constraint is the title, not the notice. (An
+earlier draft of this brief carried 53/81/73; the probe in `tmp/caption-budget-probe.py` re-measured
+and this paragraph carries its figures.)
 
 **One detector is not enough for the coverage number.** A count of `⋮`-led lines reads 67 where the
 fences number 58, because 9 of them are a document's own parked ellipsis. The notice side agrees

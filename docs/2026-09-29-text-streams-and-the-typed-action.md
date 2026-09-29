@@ -117,10 +117,15 @@ rendered caption, titled fence    : ⋮ The intent and the artifact
 rendered caption, untitled fence  : ⋮ mermaid source elided
 ```
 
-The indicator glyph is identical in both, and the only difference is the title text. So the
-indicator distinguishes nothing by itself: it fires for every fence in the silo, titled or
-not, and a reader cannot tell a titled diagram from an untitled one, or either from a document
-that simply ends.
+The glyph is identical in both, and that is by design — it is the elision mark and it fires on
+every fence (`BRF-MERMAID-SOURCE-OMITTED`: *a 3-line source and a 25-line source both collapse to
+one indicator*). The caption **text** differs, so a reader can tell a titled diagram from an
+untitled one; an earlier draft of this paragraph claimed otherwise and the claim was too strong.
+What the ternary actually costs is the **notice**: a titled fence is given its title *instead of*
+the statement that the source is not shown, so 22 of the silo's 58 fences never say it. The loss
+is a dropped sentence, not a lost distinction — and it is the second of the two defects
+`BRF-PROJECTION-LOSSES` repairs. The transcript above is the measurement as taken; after the
+repair the titled line reads `⋮ The intent and the artifact · source elided`.
 
 ## How far it reaches
 
@@ -130,14 +135,15 @@ machine can see:
 | Projection | Optimised for | Silently narrowed |
 |---|---|---|
 | `fzf --with-nth` | a readable list | the match scope |
-| the diagram caption | one indicator per fence | whether a title exists |
-| the spoken render | the ear | every diagram in 20 of 34 documents |
+| the diagram caption | one indicator per fence | the notice, on titled fences |
+| the spoken render | the ear | every diagram in 20 of 35 documents |
 
 The corpus numbers are a re-run, not a quotation. The silo's recorded figure was 20 of 29
-documents; the corpus has since moved to **57 mermaid fences in 34 documents, 21 of them
-titled (37%), with 20 documents where no fence is titled** — so under the title rule those 20
-lose every diagram. The denominator changed and the numerator did not, which is the whole
-reason the probe is re-run rather than cited.
+documents; the corpus has since moved to **58 mermaid fences in 35 documents, 22 of them
+titled (38%), with 20 documents where no fence is titled** — so under the title rule those 20
+lose every diagram. The count moved again while this note was being written (one document
+arrived), which is the whole reason the probe is re-run rather than cited: two detectors agree
+on the 58 fences, and the document count is the figure that moved.
 
 There is a fourth projection, and it is the one this note is written in. **Bold survives
 `--no-color`; italic does not.** A fixture carrying one of each renders two bold sequences and
@@ -148,6 +154,11 @@ to the ear. That is why this note carries its emphasis as bold and as straight q
 the same defect as the other three, one layer down: a projection chosen for one reader
 silently redefines what the text is. (A fixture, not a census — the count of affected italics
 in the silo is not measured.)
+
+Both defects this note found are now repaired, the day it was written: `BRF-PROJECTION-LOSSES`
+gives `roleItalic` and `roleBoldItalic` their attributes under `none` (so the ear keeps the
+emphasis), and puts the notice on every fence. The finding above stands as the measurement; the
+surfaces it names no longer behave as measured.
 
 ## The finding
 
