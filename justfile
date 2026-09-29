@@ -350,6 +350,13 @@ palette-audit:
     @./okuda docs/showcase.md --tui
     @./okuda docs/2026-09-05-palette-swatch.md --tui
 
+# ── Writing ──────────────────────────────────────────────
+
+# Two-panel writing
+[group('writing')]
+write file:
+    @gloam-edit {{file}}
+
 # ── Build ───────────────────────────────────────────────────
 
 [group('build')]
