@@ -56,11 +56,26 @@ should hand off to the browser.
 
 ```typescript
 // Fenced code is never wrapped — long lines elide at the content
-// boundary with … at the cut (td-b81597). Wrapping code mangles it;// letting the terminal soft-wrap it lies about the line count. The
-// reader widens; the bytes stay honest. function render(source: string): string { return source .split("\n") .map((line) => line.trimEnd()) .join("\n"); }
+// boundary with … at the cut (td-b81597). Wrapping code mangles it;
+// letting the terminal soft-wrap it lies about the line count. The
+// reader widens; the bytes stay honest.
+function elide(line: string, width: number): string {
+  if (line.length <= width) return line;
+  return line.slice(0, width - 1) + "…";
+}
 ```
 
-A tagged fence is coloured (BRF-FENCE-COLOUR): `chroma` classifies the tokens, the terminal's own palette supplies the hues — the tool classifies, the terminal themes, and no TrueColor Kool-Aid rides the code. The fence above, rendered, is the proof. An untagged fence stays exactly as it was; an unknown tag renders untagged (chroma never rejects an unknown lexer — it colours plaintext white, silently — so the alias table decides, not a guess); the binary absent, the code renders uncoloured and the viewer never dies with the coloriser. And a source file is a one-fence document: `okuda src/render.ts` renders the renderer, coloured.
+```python
+# The same rule, a second lexer: chroma classifies the tokens, the
+# terminal's palette supplies the hues — the tool classifies, the
+# reader themes (BRF-FENCE-COLOUR).
+def elide(line: str, width: int) -> str:
+    if len(line) <= width:
+        return line
+    return line[: width - 1] + "…"
+```
+
+A tagged fence is coloured (BRF-FENCE-COLOUR): `chroma` classifies the tokens, the terminal's own palette supplies the hues — the tool classifies, the terminal themes, and no TrueColor Kool-Aid rides the code. The fences above, rendered, are the proof. An untagged fence stays exactly as it was; an unknown tag renders untagged (chroma never rejects an unknown lexer — it colours plaintext white, silently — so the alias table decides, not a guess); the binary absent, the code renders uncoloured and the viewer never dies with the coloriser. And a source file is a one-fence document: `okuda src/render.ts` renders the renderer, coloured.
 
 ---
 
