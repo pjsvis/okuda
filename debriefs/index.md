@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-29 | DBF-COLOUR-DAY | done | Debrief: The colour day — chroma, the shelf, and the curiosity that became a must-have | 2026-09-29-debrief-the-colour-day.md |
 | 2026-09-24 | DBF-ONION-SEARCH-GRAMMAR | done | Debrief: The onion search grammar — what shipped, what the tests decided, what stayed parked | 2026-09-24-debrief-onion-search-grammar.md |
 | 2026-09-22 | DBF-ORNAMENT | done | Debrief: The ornament that pays rent — the branch landed, and a close-out found unclosed | 2026-09-22-debrief-the-ornament.md |
 | 2026-09-21 | DBF-OS-UPGRADE | done | Debrief: The OS upgrade — one stale page hash, and two lessons the silo already held | 2026-09-21-debrief-the-os-upgrade.md |
