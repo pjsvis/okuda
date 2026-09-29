@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-09-29 | BRF-SSH-HOST | open | SSH host — landing the ADR-013 reading room where SSH gives a shell | 2026-09-29-brief-ssh-host.md |
 | 2026-09-24 | BRF-SELF-IDENTICAL-LINK | open | The self-identical link — when the label is the address, say it once | 2026-09-24-brief-self-identical-link.md |
 | 2026-09-24 | BRF-SRC-LINE-LEDGER | open | The source-line ledger — `10` edit lands the editor at the eye | 2026-09-24-brief-source-line-ledger.md |
 | 2026-09-24 | BRF-VALIDATED-SILCROWS | open | Validated silcrows — the shape scan consults the registry it stands on | 2026-09-24-brief-validated-silcrows.md |
