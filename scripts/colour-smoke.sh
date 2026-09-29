@@ -20,10 +20,11 @@ cd "$REPO"
 
 fail() { echo "smoke: FAIL — $*" >&2; exit 1; }
 
-# chroma 2.27.0, --formatter terminal16: keyword = SGR 1 + 97.
-# grep -F wherever an ANSI pattern appears — ESC[97m is a literal
-# byte sequence, not a regex (BRE reads [97m] as a bracket expression).
-KW=$'\x1b[97m'
+# chroma 2.27.0, --formatter terminal16 --style monokai: keyword =
+# SGR 96 (bright cyan); identifiers are 97 (full white).
+# grep -F wherever an ANSI pattern appears — ESC[96m is a literal
+# byte sequence, not a regex (BRE reads [96m] as a bracket expression).
+KW=$'\x1b[96m'
 
 MD="$(mktemp "${TMPDIR:-/tmp}/okuda-smoke-md.XXXXXX")"
 TS="$(mktemp "${TMPDIR:-/tmp}/okuda-smoke-ts.XXXXXX")"
@@ -36,13 +37,13 @@ bash scripts/fresh.sh
 # ── 2. .md — the showcase carries the two tagged fences ────────────────
 ./okuda docs/showcase.md > "$MD" || fail "showcase.md: render exited non-zero"
 grep -Fq "$KW" "$MD" || fail "showcase.md: no chroma keyword colour — tagged fences render untagged"
-grep -Fq $'\x1b[97mdef\x1b[0m' "$MD" || fail "showcase.md: the python fence is uncoloured"
+grep -Fq $'\x1b[96mdef\x1b[0m' "$MD" || fail "showcase.md: the python fence is uncoloured"
 grep -q "⋮" "$MD" || fail "showcase.md: mermaid lost its glyph"
 od -An -c "$MD" | grep -q '\\0' && fail "showcase.md: a NUL protocol tag leaked into glass output"
 
 # ── 3. .ts — a whole source file is one coloured fence ─────────────────
 ./okuda src/cli.ts > "$TS" || fail "src/cli.ts: render exited non-zero"
-grep -Fq $'\x1b[97mimport\x1b[0m' "$TS" || fail "src/cli.ts: no keyword colour — the file parsed as something other than a ts fence"
+grep -Fq $'\x1b[96mimport\x1b[0m' "$TS" || fail "src/cli.ts: no keyword colour — the file parsed as something other than a ts fence"
 grep -q "wrapWholeFile" "$TS" || fail "src/cli.ts: expected content absent"
 
 # ── 4. .py — the fixture, another lexer ────────────────────────────────
@@ -54,6 +55,6 @@ def elide(line: str, width: int) -> str:
     return line[: width - 1] + "…"
 PY
 ./okuda tmp/colour-smoke.py > "$PY_OUT" || fail "tmp/colour-smoke.py: render exited non-zero"
-grep -Fq $'\x1b[97mdef\x1b[0m' "$PY_OUT" || fail "tmp/colour-smoke.py: the extension did not colour the file"
+grep -Fq $'\x1b[96mdef\x1b[0m' "$PY_OUT" || fail "tmp/colour-smoke.py: the extension did not colour the file"
 
 echo "smoke: colour OK — .md corpus (chroma + mermaid + no tag leak), .ts whole file, .py fixture: 3/3 classes painted"

@@ -16,16 +16,18 @@ const BODY = "def f():\n    pass\n";
 describe("render — fence colour (BRF-FENCE-COLOUR)", () => {
   test.skipIf(!CHROMA)("tagged py fence paints chroma's class codes", async () => {
     const out = await renderDocument(PY, { width: W, palette: DRACULA_PALETTE });
-    // chroma 2.27.0, --formatter terminal16: keyword = SGR 1 + 97,
-    // plain = 37. Pinned exactly — 4 visible indent columns like every
-    // fence (2 handler + 2 finalize margin), no codeLine wrap (chroma's
-    // codes are the styling). The fence body reaches chroma without its
-    // trailing newline (the closing-fence regex eats it), so the last
-    // line ends at `pass\x1b[0m` — the pin mirrors that, not a fresh
-    // `printf | chroma` run.
+    // chroma 2.27.0, --formatter terminal16 --style monokai: keyword =
+    // SGR 96 (bright cyan), function name = 93 (bright yellow), plain =
+    // 97 (full white — brighter than the default style's gray 37), and
+    // the function name is classified separately (Name.Function), which
+    // the default lumped in with identifiers. Pinned exactly — 4 visible
+    // indent columns like every fence (2 handler + 2 finalize margin), no
+    // codeLine wrap (chroma's codes are the styling). The fence body
+    // reaches chroma without its trailing newline (the closing-fence
+    // regex eats it), so the pin mirrors that, not a fresh pipe run.
     expect(out).toContain(
-      "    \x1b[1m\x1b[97mdef\x1b[0m\x1b[37m \x1b[0m\x1b[37mf\x1b[0m\x1b[37m():\x1b[0m\x1b[37m\x1b[0m\n" +
-        "    \x1b[37m    \x1b[0m\x1b[1m\x1b[97mpass\x1b[0m",
+      "    \x1b[96mdef\x1b[0m\x1b[97m \x1b[0m\x1b[93mf\x1b[0m\x1b[97m():\x1b[0m\x1b[97m\x1b[0m\n" +
+        "    \x1b[97m    \x1b[0m\x1b[96mpass\x1b[0m",
     );
   });
 
@@ -120,6 +122,6 @@ describe("wrapWholeFile — a code file is a one-fence document (P2)", () => {
       palette: DRACULA_PALETTE,
     });
     expect(out).toBe(tagged);
-    expect(out).toContain("\x1b[1m");
+    expect(out).toContain("\x1b[96m");
   });
 });

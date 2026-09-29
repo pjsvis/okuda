@@ -169,9 +169,18 @@ See `ADR-BUILD-SIGNS-040` and `docs/2026-09-21-the-page-the-signature-got-wrong.
   provisioning shape as `mermaid-to-md`, so the reading room's deploy script
   installs both without a second pattern.
 - **Pinned bytes**: `tests/fence-colour.test.ts` pins chroma's terminal16
-  output exactly; a chroma major bump re-pins (the version above is the
-  pin). The colour tests `skipIf` an absent binary — the renderer degrades
-  the same way the tests do.
+  `--style monokai` output exactly; a chroma major bump re-pins (the
+  version above is the pin). The colour tests `skipIf` an absent binary —
+  the renderer degrades the same way the tests do.
+- **Pinned style — `--style monokai`** (2026-09-29, same day): the style is
+  the emphasis *map* — which token class lands in which 16-slot — while
+  the hues stay the terminal's palette (no TrueColor, no 256, no hex; the
+  brief's "no styles" clause meant the hue palette, which terminal16 never
+  emits). Measured out: the default (swapoff) quantises identifiers — the
+  bulk of every fence — to ANSI-white 37, gray on every dark terminal;
+  monokai's quantised hierarchy is the classic contrast structure (cyan
+  keywords, yellow function names, full-white identifiers, dim comments).
+  A style change re-pins the tests and the smoke — both carry the bytes.
 - **The alias table is load-bearing**: chroma never rejects an unknown
   `--lexer` (plaintext fallback, exit 0, empty stderr), so the renderer
   validates tags against `chroma --list` before piping. The table is

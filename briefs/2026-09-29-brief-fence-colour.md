@@ -7,8 +7,24 @@ date: 2026-09-29
 # Brief: Fence colour — chroma at the mermaid seam, the terminal's palette as the theme
 
 **Created:** 2026-09-29
-**Status:** Done — shipped 2026-09-29 (td-dfa601: 444 tests green, `just check` green;
+**Status:** Done — shipped 2026-09-29, amended same-day (style monokai pinned
+— see Amendment); td-dfa601: 444 tests green, `just check` green;
 the showcase's own `typescript` fence now renders coloured — dogfood as acceptance)
+
+> **Amendment (2026-09-29, same day).** The What's "no styles" clause was
+> over-broad: a chroma style piped through `terminal16` is the emphasis
+> *map* — which token class lands in which of the 16 slots — not the hue
+> palette, which is the thing the rule banned and terminal16 never emits.
+> The default style (swapoff) was measured out: it quantises identifiers —
+> the bulk of every fence — to ANSI-white 37, gray on every dark terminal,
+> so most of the code rendered dimmer than the prose around it. The
+> operator's eye caught it ("the code colouring is visible but a bit
+> muted"); the probe over styles settled it. `--style monokai` is pinned:
+> cyan keywords, yellow function names (chroma classifies `Name.Function`
+> separately), full-white identifiers, dim comments — the classic contrast
+> structure. Dracula was tried and refuted (pastels quantise to
+> yellow-everything). Nothing else in this brief moves; tests and smoke
+> re-pinned to the monokai bytes.
 **TD:** td-dfa601 (epic; P1 the fences, P2 the whole files)
 **Branch:** feat/fence-colour
 **Lineage:** the operator, verbatim: *"is there a basic code fence coloriser

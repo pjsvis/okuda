@@ -562,10 +562,19 @@ async function getChromaAliases(bin: string): Promise<Set<string> | null> {
   }
 }
 
-/** Pipe one fence through chroma — `--formatter terminal16`: 16-colour
- * class codes, the terminal's palette supplies the hues. BRF-FENCE-COLOUR's
- * one rule: the tool classifies, the terminal themes. Returns null on any
- * failure — absent binary, dead pipe, empty output. */
+/** Pipe one fence through chroma — `--formatter terminal16 --style
+ * monokai`: 16-colour class codes, the terminal's palette supplies the
+ * hues. BRF-FENCE-COLOUR's one rule holds: the tool classifies, the
+ * terminal themes. The style is the emphasis *map* — which token class
+ * lands in which slot (monokai quantised: loud cyan keywords, yellow
+ * function names, full-white identifiers, dim comments) — while the
+ * hues themselves stay the terminal's; no TrueColor, no 256, no hex.
+ * The default style was measured out: swapoff quantises identifiers —
+ * the bulk of every fence — to ANSI-white 37, gray on every dark
+ * terminal, so most of the code was the dimmest text on screen.
+ * Dracula quantises to yellow-everything (pastels have no 16-slot
+ * equivalents) — the probe refuted it. Returns null on any failure —
+ * absent binary, dead pipe, empty output. */
 async function spawnChroma(
   bin: string,
   tag: string,
@@ -573,7 +582,7 @@ async function spawnChroma(
 ): Promise<string | null> {
   try {
     const proc = Bun.spawn(
-      [bin, "--formatter", "terminal16", "--lexer", tag],
+      [bin, "--formatter", "terminal16", "--style", "monokai", "--lexer", tag],
       { stdin: "pipe", stdout: "pipe", stderr: "pipe" },
     );
     proc.stdin.write(code);
