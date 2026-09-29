@@ -190,6 +190,15 @@ export function listMarkdownFiles(cwd: string = process.cwd()): string[] {
   return rgLines(["--files", "--type", "md", ...EXCLUSIONS], cwd).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 }
 
+/** All tracked files, no type gate (BRF-CODE-SHELF). The code-shelf
+ *  corpus: same EXCLUSIONS, same .gitignore respect — only the type
+ *  flag drops. A query that names a `dir/` predicate scopes to this;
+ *  every other query stays on the md corpus, so the default corpus is
+ *  never flooded with identifiers. Pure-ish (reads fs). */
+export function listAllFiles(cwd: string = process.cwd()): string[] {
+  return rgLines(["--files", ...EXCLUSIONS], cwd).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+}
+
 /** Registry field hits (channel 1, owner-only per ADR-025): rg the tier
  *  INDEX.jsonl files with a callsign-anchored pattern, parse each match
  *  as JSON, return the owning rows (path + callsign + summary). The rg
@@ -249,7 +258,16 @@ export function registryHits(query: string, cwd: string = process.cwd()): string
  *  `--tiebreak=index` ranks ties by input position and `--exact`
  *  stays the anti-soup AND. Pure-ish (rg at the edges only). */
 export function rankedShortlistEntries(query: string, cwd: string = process.cwd()): string[] {
-  const all = listMarkdownFiles(cwd); // Layer 0 — the candidate set
+  // Layer 0 — the candidate set. Route FIRST, then choose the corpus
+  // (BRF-CODE-SHELF): a query naming a positive dir/ predicate asks
+  // for a directory, not its md subset — `src/ elide` searches source.
+  // A predicate-less query stays doc-scoped, so `render` never drowns
+  // in identifiers. Negations don't widen (exclusion kills, never
+  // scopes) — the check is on positive dirs only. Route once here; the
+  // same routed query feeds onionMerge below (no double parse).
+  const routedEarly = routeQuery(query);
+  const wantsShelf = routedEarly.clauses.some((c) => c.dirs.length > 0);
+  const all = wantsShelf ? listAllFiles(cwd) : listMarkdownFiles(cwd);
   const rootFiles = all.filter((f) => !f.includes("/"));
   if (!query.trim().length) {
     // The shelf: root files with first-line previews as evidence.
@@ -267,8 +285,9 @@ export function rankedShortlistEntries(query: string, cwd: string = process.cwd(
     return rootFiles.map((f) => evidenceOf.get(f) ?? `${f}${SEP}`);
   }
   // The dive — the onion. The deps are the rg edges; the routing,
-  // narrowing, and ranking live in the pure layers.
-  const routed = routeQuery(query);
+  // narrowing, and ranking live in the pure layers. routedEarly is the
+  // same parse Layer 0 chose the corpus on — one route, one truth.
+  const routed = routedEarly;
   const deps: OnionDeps = {
     // Layer 2 — callsign-anchored registry rows (ADR-025), survivors only.
     registryHitsFor: (clauseQuery, survivors) => {

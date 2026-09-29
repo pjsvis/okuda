@@ -112,9 +112,11 @@ comes from" is the constitution already saying yes.
   input classes. If the scope line wants redrawing on paper, it lands
   with the implementation commit.
 - **The consumers appear on their own:** the gloam picker can offer
-  `src/` files (its `rg` source already indexes them), and the SSH
-  reading room can serve source, not just docs — BRF-SSH-HOST's room
-  gets a second shelf without asking.
+  `src/` files ~~(its `rg` source already indexes them)~~ **(corrected
+  2026-09-29, BRF-CODE-SHELF: false — the picker's corpus was
+  `--type md` gated; the code shelf adds the dir-scoped widening)**, and
+  the SSH reading room can serve source, not just docs — BRF-SSH-HOST's
+  room gets a second shelf without asking.
 
 ## Acceptance criteria
 

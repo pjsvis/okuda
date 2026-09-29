@@ -601,4 +601,41 @@ describe("launcher — the onion search grammar (BRF-ONION-SEARCH-GRAMMAR)", () 
     const paths = entries.map((e) => e.split("\t")[0]!);
     expect(paths.length).toBe(0);
   });
+
+  // ─── The code shelf (BRF-CODE-SHELF) ──────────────────────────
+  // A dir predicate scopes the tier: naming a directory asks for the
+  // directory, not its md subset. Predicate-less queries stay
+  // doc-scoped — code never floods the default corpus.
+
+  test("src/ scopes Layer 0 to all files — code surfaces with hit-line evidence", () => {
+    const entries = rankedShortlistEntries("src/ wrapWholeFile", process.cwd());
+    const paths = entries.map((e) => e.split("\t")[0]!);
+    expect(paths).toContain("src/cli.ts");
+    expect(paths).toContain("src/render.ts");
+    // the evidence is the MATCHING line, not line 1 — a code hit shows
+    // the hit, the same contract the body channel always had.
+    const cli = entries.find((e) => e.startsWith("src/cli.ts"))!;
+    expect(cli).toContain("wrapWholeFile");
+  });
+
+  test("a predicate-less query stays doc-scoped — no src/ leakage", () => {
+    const entries = rankedShortlistEntries("render", process.cwd());
+    expect(entries.length).toBeGreaterThan(0);
+    expect(entries.some((e) => e.startsWith("src/"))).toBe(false);
+  });
+
+  test("doc tier queries are unchanged by the widening", () => {
+    // briefs/ is all-md, so the widened corpus narrows to the same set
+    // it always had — the load-bearing smoke path, asserted here.
+    const entries = rankedShortlistEntries("briefs/ load bearing", process.cwd());
+    const paths = entries.map((e) => e.split("\t")[0]!);
+    expect(paths).toContain("briefs/2026-08-26-brief-tui-live-documents.md");
+  });
+
+  test("src/ alone lists the directory's files", () => {
+    const entries = rankedShortlistEntries("src/", process.cwd());
+    expect(entries.length).toBeGreaterThan(0);
+    expect(entries.every((e) => e.startsWith("src/"))).toBe(true);
+    expect(entries.some((e) => e.startsWith("src/onion.ts"))).toBe(true);
+  });
 });
