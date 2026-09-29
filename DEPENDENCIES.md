@@ -12,6 +12,7 @@ an assumption.
 | `git` | 2.54.0 | Version control | 2026-08-20 |
 | `td` | 0.61.0 | Task management | 2026-08-27 |
 | `mermaid-to-md` | 0.1.0* | Mermaid → ASCII | 2026-09-02 |
+| `chroma` | 2.27.0 | Code-fence colour — 16-colour class codes (BRF-FENCE-COLOUR) | 2026-09-29 |
 | `fzf` | 0.73.1 | Fuzzy picker — runtime dep of the `gloam` launcher (both modes) | 2026-08-27 |
 | `rg` | 15.1.0 | Source for both `gloam` picker modes — file list, body shortlist, registry prefilter | 2026-09-04 |
 | `fd` | 10.4.2 | ~~File finder — preferred by `gloam`~~ RETIRED from the launcher path (BRF-CONTENT-SHORTLIST) | 2026-08-27 |
@@ -160,6 +161,30 @@ fail on it, which is why `scripts/signature-check.sh` exits 0 for an absent
 binary.
 
 See `ADR-BUILD-SIGNS-040` and `docs/2026-09-21-the-page-the-signature-got-wrong.md`.
+
+### `chroma` (verified 2026-09-29, macOS arm64 — BRF-FENCE-COLOUR)
+
+- **macOS**: `brew install chroma` (2.27.0).
+- **Linux x64**: single static Go binary from GitHub releases — the same
+  provisioning shape as `mermaid-to-md`, so the reading room's deploy script
+  installs both without a second pattern.
+- **Pinned bytes**: `tests/fence-colour.test.ts` pins chroma's terminal16
+  `--style monokai` output exactly; a chroma major bump re-pins (the
+  version above is the pin). The colour tests `skipIf` an absent binary —
+  the renderer degrades the same way the tests do.
+- **Pinned style — `--style monokai`** (2026-09-29, same day): the style is
+  the emphasis *map* — which token class lands in which 16-slot — while
+  the hues stay the terminal's palette (no TrueColor, no 256, no hex; the
+  brief's "no styles" clause meant the hue palette, which terminal16 never
+  emits). Measured out: the default (swapoff) quantises identifiers — the
+  bulk of every fence — to ANSI-white 37, gray on every dark terminal;
+  monokai's quantised hierarchy is the classic contrast structure (cyan
+  keywords, yellow function names, full-white identifiers, dim comments).
+  A style change re-pins the tests and the smoke — both carry the bytes.
+- **The alias table is load-bearing**: chroma never rejects an unknown
+  `--lexer` (plaintext fallback, exit 0, empty stderr), so the renderer
+  validates tags against `chroma --list` before piping. The table is
+  chroma's; okuda owns no extension→language map.
 
 ## Verification discipline
 

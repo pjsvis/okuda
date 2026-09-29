@@ -94,6 +94,13 @@ export function mermaidToken(id: string): string {
 }
 export const RE_MERMAID_TOKEN = /%%okuda-mmd-([a-z0-9]+)%%/;
 
+/** Coloured code-fence placeholder paragraph token — survives markdown
+ * parsing, resolves to the chroma-painted fence (BRF-FENCE-COLOUR). */
+export function codeToken(id: string): string {
+  return `%%okuda-code-${id}%%`;
+}
+export const RE_CODE_TOKEN = /%%okuda-code-([a-z0-9]+)%%/;
+
 /** RHS number token — a trailing `%%okuda-rhs:NN%%` in a paragraph marks
  *  a one-line list item: the slug renders left, truncated to fit, the
  *  number renders bold at the RHS (the action follows the content). The

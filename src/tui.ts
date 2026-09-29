@@ -21,7 +21,7 @@ import { cloneArgs } from "./clone";
 import { frameBounds, headingLines, pageStep, paragraphStarts, snapFrame } from "./frames";
 import { splitKeyEvents, verbFor, type Verb } from "./keygrammar";
 import { loadPalette, type Palette } from "./palette";
-import { renderDocument } from "./render";
+import { renderDocument, wrapWholeFile } from "./render";
 import { basename, dirname, isAbsolute, join, resolve } from "node:path";
 import { existsSync } from "node:fs";
 import { padStartDisplay, terminalCols, terminalRows } from "./width";
@@ -487,7 +487,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     const f = Bun.file(file);
     try {
       if (!(await f.exists())) return { ok: false, reason: "missing" };
-      return { ok: true, text: await f.text() };
+      return { ok: true, text: wrapWholeFile(file, await f.text()) };
     } catch (err) {
       return { ok: false, reason: String(err) };
     }

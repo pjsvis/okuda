@@ -80,6 +80,19 @@ ship:
 search-smoke:
     @bash scripts/search-smoke.sh
 
+# Colour smoke
+[group('quality gate')]
+colour-smoke:
+    @just build >/dev/null
+    @bash scripts/colour-smoke.sh
+
+# Colour dogfood
+[group('quality gate')]
+dogfood-colour: colour-smoke
+    @./okuda docs/showcase.md --tui
+    @./okuda src/cli.ts --tui
+    @./okuda tmp/colour-smoke.py --tui
+
 # Picker instance replay
 [group('quality gate')]
 search-replay *args:
@@ -349,6 +362,13 @@ palette-audit:
     @./okuda docs/state-colours.md --tui
     @./okuda docs/showcase.md --tui
     @./okuda docs/2026-09-05-palette-swatch.md --tui
+
+# ── Writing ──────────────────────────────────────────────
+
+# Two-panel writing
+[group('writing')]
+write file:
+    @gloam-edit {{file}}
 
 # ── Build ───────────────────────────────────────────────────
 
