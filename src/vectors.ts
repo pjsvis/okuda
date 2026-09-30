@@ -202,3 +202,37 @@ export function annotateSource(source: string, map: Map<number, string>): string
   }
   return out;
 }
+
+/** The generated References section (ADR-047, BRF-REFERENCES-SECTION):
+ *  the main document's jump map projected as the render's foot — one
+ *  line per destination, in map order (reading order, ascending), each
+ *  line the silcrow and its target: `%okuda-vector:12% ADR-034`. The
+ *  silcrow rides the same marker the body paint rides, so the renderer
+ *  paints it on glass and keeps it plain piped/NO_COLOR — identical on
+ *  every rung. Targets are plain text on purpose: a bare `.md` path is a
+ *  mention, never a link, so the section cannot re-mint the map that
+ *  lists it. Empty map, empty string — no section, no empty header.
+ *  Pure: map in, section source out. */
+export function referencesSection(map: Map<number, string>): string {
+  if (map.size === 0) return "";
+  // `[...map]` iterates insertion order — the map's minting order,
+  // reading order ascending. The section reorders nothing.
+  const entries = [...map].map(([num, target]) => `%okuda-vector:${num}% ${target}`);
+  // Each entry is its own loose line: one paragraph per destination, so
+  // the renderer keeps one § per line (consecutive bare lines would join
+  // into one paragraph and lose the scannable ascent).
+  return ["## References", "", entries.join("\n\n")].join("\n");
+}
+
+/** The section's junction (ADR-047): append the generated section to a
+ *  render INPUT — never the source. The join normalises trailing
+ *  whitespace to exactly one blank line so the header lands as a header
+ *  whatever the document ends with. Call sites sit downstream of
+ *  `annotateSource` (the section's own callsigns are never re-scanned,
+ *  never double-marked — the loop's only guard, held by construction).
+ *  Empty map: the source passes through untouched. Pure. */
+export function appendReferences(source: string, map: Map<number, string>): string {
+  const section = referencesSection(map);
+  if (!section) return source;
+  return source.replace(/\s*$/, "\n\n") + section + "\n";
+}
