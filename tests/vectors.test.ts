@@ -12,6 +12,7 @@ import {
   referencesSection,
   appendReferences,
 } from "../src/vectors";
+import { buildFixture } from "../scripts/references-demo";
 
 describe("vectors — discovery (occurrences, reading order, one-to-many)", () => {
   test("callsign-shaped tokens are references", () => {
@@ -255,6 +256,22 @@ describe("vectors — the generated References section (ADR-047, BRF-REFERENCES-
     // and the sectioned doc stays fixed-point: appending again changes
     // only whitespace, not the map.
     expect(jumpMapFor(appendReferences(withSection, jumpMapFor(withSection)))).toEqual(map);
+  });
+
+  test("the dogfood: the demo fixture asserts the generated section lists every destination (td-3562fe)", () => {
+    // The brief's settling diff: the hand-written section listed 6 of
+    // 9. The generated section must list every destination of the
+    // fixture's map — 10 today (Ring A minted the generator's own path
+    // after the brief was written; the invariant is "every", not "nine").
+    const src = buildFixture();
+    const map = jumpMapFor(src);
+    expect(map.size).toBeGreaterThan(0); // the fixture carries references
+    const rendered = referencesSection(map).replace(/%okuda-vector:(\d+)%/g, "§$1");
+    const listed = new Set(
+      rendered.split("\n").map((l) => l.replace(/^§\d+ /, "")).filter((l) => l !== "" && l !== "## References"),
+    );
+    for (const target of map.values()) expect(listed.has(target)).toBe(true);
+    expect(listed.size).toBe(map.size);
   });
 });
 

@@ -48,6 +48,16 @@ This closes the honest gap (an author previously had no grammar for "I want this
 
 Promotion on demand, not wholesale: the same ladder discipline, applied to the registry instead of the grammar.
 
+## Addendum: the generated section settles the minting debate (2026-09-30)
+
+The References section is now generated (ADR-047): the renderer lists the
+map's own destinations at the foot of every main-document render. The
+minting question — whether a section should promote bare-path mentions
+into the map, as the hand-written convention did by linking them in — is
+moot. A projection cannot mint: the section lists the map as it stands,
+a mention stays a mention, and the promotion rule above remains the one
+declared-intent channel.
+
 ## The one line
 
 Callsigns are uses, paths are mentions; the silcrow is earned by declared intent, not by the shape of a string; the promotion is the declared intent for the unregistered; and the appetite for more grammar is the maximizer: we decided what we need.
