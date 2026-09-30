@@ -304,11 +304,25 @@ export function terminalSize(): { cols: number; rows: number } | null {
  *  Glow, the thing this project exists to abolish. fzf exports the pane's
  *  real width to its preview processes as FZF_PREVIEW_COLUMNS; when set,
  *  it is authoritative (its presence *means* "you are in a preview pane"),
- *  so it takes precedence over both the TTY read and the fallback. */
+ *  so it takes precedence over both the TTY read and the fallback.
+ *
+ *  OKUDA_WIDTH (BRF-TELEVISION-PREVIEW): a user pin for preview hosts
+ *  that do not export a pane width — television's cable channels, where
+ *  `[preview] env` is static and the pane is a fixed percentage the
+ *  user chose (their #999 will export fzf-style vars; until then, the
+ *  pin). Precedence: the FZF var is a *live pane claim* by the host, so
+ *  it outranks the user pin — a globally exported OKUDA_WIDTH must not
+ *  veto the pane it is actually rendering into. The pin outranks the
+ *  TTY read and the fallback. Same validation shape as the FZF var. */
 export function terminalCols(fallback = 80): number {
   const preview = process.env.FZF_PREVIEW_COLUMNS;
   if (preview !== undefined) {
     const n = parseInt(preview, 10);
+    if (Number.isFinite(n) && n > 0) return n;
+  }
+  const pin = process.env.OKUDA_WIDTH;
+  if (pin !== undefined) {
+    const n = parseInt(pin, 10);
     if (Number.isFinite(n) && n > 0) return n;
   }
   return terminalSize()?.cols ?? fallback;

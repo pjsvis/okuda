@@ -174,3 +174,57 @@ describe("terminalCols — fzf preview width (FZF_PREVIEW_COLUMNS)", () => {
     expect(terminalCols(80)).toBe(80);
   });
 });
+
+describe("terminalCols — user width pin (OKUDA_WIDTH, BRF-TELEVISION-PREVIEW)", () => {
+  // Same non-TTY forcing as the FZF block above: the pipe/preview
+  // condition, isolated from the host terminal.
+  let savedIsTTY: boolean | undefined;
+  let savedColumns: number | undefined;
+  let savedRows: number | undefined;
+  beforeEach(() => {
+    savedIsTTY = (process.stdout as any).isTTY;
+    savedColumns = (process.stdout as any).columns;
+    savedRows = (process.stdout as any).rows;
+    Object.defineProperty(process.stdout, "isTTY", { value: false, configurable: true });
+    Object.defineProperty(process.stdout, "columns", { value: 0, configurable: true });
+    Object.defineProperty(process.stdout, "rows", { value: 0, configurable: true });
+  });
+  afterEach(() => {
+    Object.defineProperty(process.stdout, "isTTY", { value: savedIsTTY, configurable: true });
+    Object.defineProperty(process.stdout, "columns", { value: savedColumns, configurable: true });
+    Object.defineProperty(process.stdout, "rows", { value: savedRows, configurable: true });
+  });
+
+  test("the pin overrides the fallback when stdout is a pipe", () => {
+    process.env.OKUDA_WIDTH = "60";
+    try {
+      expect(terminalCols(80)).toBe(60);
+    } finally {
+      delete process.env.OKUDA_WIDTH;
+    }
+  });
+
+  test("a live pane claim (FZF var) outranks the user pin", () => {
+    process.env.OKUDA_WIDTH = "60";
+    process.env.FZF_PREVIEW_COLUMNS = "70";
+    try {
+      // Both set: the host's live pane claim wins over the global pin —
+      // the pin must not veto the pane it is actually rendering into.
+      expect(terminalCols(80)).toBe(70);
+    } finally {
+      delete process.env.OKUDA_WIDTH;
+      delete process.env.FZF_PREVIEW_COLUMNS;
+    }
+  });
+
+  test("garbage and non-positive pins fall through to the fallback", () => {
+    for (const bad of ["", "0", "-3", "nan"]) {
+      process.env.OKUDA_WIDTH = bad;
+      try {
+        expect(terminalCols(80)).toBe(80);
+      } finally {
+        delete process.env.OKUDA_WIDTH;
+      }
+    }
+  });
+});
