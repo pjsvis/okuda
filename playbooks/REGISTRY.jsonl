@@ -7,6 +7,7 @@
 {"file":"ear-playbook.md","date":"2026-09-14","status":"canonical","summary":"Ear Playbook — getting a document spoken","meta":{},"callsign":"PLY-EAR"}
 {"file":"gloam-launcher-playbook.md","date":"2026-08-26","status":"canonical","summary":"Gloam Launcher Playbook","meta":{},"callsign":"PLY-GLOAM-LAUNCHER"}
 {"file":"gloam-preview-playbook.md","date":"2026-09-27","status":"canonical","summary":"Gloam Preview Playbook","meta":{},"callsign":"PLY-GLOAM-PREVIEW"}
+{"file":"grep-playbook.md","date":"2026-09-30","status":"canonical","summary":"Grep Playbook — the probe instrument, and its two traps","meta":{},"callsign":"PLY-GREP"}
 {"file":"herdr-cast-playbook.md","date":"2026-08-31","status":"canonical","summary":"Herdr cast playbook — casting documents to panes, scripting the host","meta":{},"callsign":"PLY-HERDR-CAST"}
 {"file":"justfile-playbook.md","date":"2026-09-14","status":"canonical","summary":"Justfile facade: house style (noun-phrase comments, comment-attribute-recipe order, groups, @-silencing), tricky parts, revit protocol","meta":{"source":"observed","origin":"feat/help-recipe session, Aug 2026"},"callsign":"PLY-JUSTFILE"}
 {"file":"mermaid-diagrams-playbook.md","date":"2026-09-01","status":"canonical","summary":"Mermaid diagrams playbook — authoring for the SpaceXAi renderer","meta":{},"callsign":"PLY-MERMAID-DIAGRAMS"}
