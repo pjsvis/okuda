@@ -567,14 +567,28 @@ async function getChromaAliases(bin: string): Promise<Set<string> | null> {
  * hues. BRF-FENCE-COLOUR's one rule holds: the tool classifies, the
  * terminal themes. The style is the emphasis *map* — which token class
  * lands in which slot (monokai quantised: loud cyan keywords, yellow
- * function names, full-white identifiers, dim comments) — while the
+ * function names, full-white identifiers, blue comments — 94, the one
+ * hand-patch, see below) — while the
  * hues themselves stay the terminal's; no TrueColor, no 256, no hex.
  * The default style was measured out: swapoff quantises identifiers —
  * the bulk of every fence — to ANSI-white 37, gray on every dark
  * terminal, so most of the code was the dimmest text on screen.
  * Dracula quantises to yellow-everything (pastels have no 16-slot
- * equivalents) — the probe refuted it. Returns null on any failure —
- * absent binary, dead pipe, empty output. */
+ * equivalents) — the probe refuted it.
+ *
+ * The hand-patch (td-3e6d24, measured at the glass): monokai lands
+ * comments on class 90 (bright black — the dimmest slot on every dark
+ * terminal, unreadable there, the same register as the chrome footer's
+ * muted #445566). The emphasis map is ours to choose, so the comment
+ * class is remapped 90 → 94: the one free bright slot in monokai's map
+ * (96 keywords, 97 identifiers, 93 functions, 91 operators, 33
+ * numbers, 37 strings). Probes refuted the alternatives — 37 collides
+ * with strings, 92/95 shout past identifiers, 34 is the dark-on-dark
+ * trap, and every stock style that brightens comments (vim, doom-one,
+ * github-dark) does it by dropping identifiers to dim 37, the exact
+ * failure the default was measured out of. The hues stay the
+ * terminal's; only the slot assignment changes. Returns null on any
+ * failure — absent binary, dead pipe, empty output. */
 async function spawnChroma(
   bin: string,
   tag: string,
@@ -589,7 +603,8 @@ async function spawnChroma(
     proc.stdin.end();
     const out = await new Response(proc.stdout).text();
     await proc.exited;
-    const body = out.replace(/\n$/, "");
+    // The hand-patch: monokai's comment class 90 → 94 (doc block above).
+    const body = out.replace(/\n$/, "").replace(/\x1b\[90m/g, "\x1b[94m");
     return body.trim() === "" ? null : body;
   } catch {
     return null;
