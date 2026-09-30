@@ -627,7 +627,17 @@ async function interceptCode(
   const bin = opts.chromaBin ?? "chroma";
   const aliases = await getChromaAliases(bin);
   if (!aliases) return source;
-  const re = /(^|\n)```([^\n`]*)\n([\s\S]*?)\n?```/g;
+  // CommonMark close discipline: a closing fence is its own line
+  // (`\n?```[ \t]*(?=\n|$)` — the close may end the document, and a
+  // trailing newline is eaten as before, keeping the pinned chroma
+  // bytes). Without the EOL lookahead the lazy match closes at the
+  // first ``` anywhere — mid-line included — so a source file that
+  // *contains* a fence-shaped regex (e.g. `/^\s*(```|~~~)/` in
+  // src/vectors.ts, rendered via wrapWholeFile) truncated the fence at
+  // its own fence-detector and the tail of the file fell out of the
+  // code path into prose: doc comments whitened, ` * ` lines became
+  // bullets, `**bold**` styled (td-3e6d24 glass session).
+  const re = /(^|\n)```([^\n`]*)\n([\s\S]*?)\n?```[ \t]*(?=\n|$)/g;
   const found: { tag: string; code: string; valid: boolean }[] = [];
   for (const m of source.matchAll(re)) {
     // The info string's first word is the tag; the rest is ignored
