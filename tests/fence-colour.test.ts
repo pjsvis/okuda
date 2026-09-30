@@ -124,4 +124,26 @@ describe("wrapWholeFile — a code file is a one-fence document (P2)", () => {
     expect(out).toBe(tagged);
     expect(out).toContain("\x1b[96m");
   });
+
+  test.skipIf(!CHROMA)("a mid-line ``` in the source cannot close the fence", async () => {
+    // The glass regression (td-3e6d24): src/vectors.ts carries the
+    // fence-detector regex /^\s*(```|~~~)/ — the lazy close once
+    // truncated the whole-file fence at that mid-line ```, and the
+    // tail fell out of the code path into prose: the doc comment
+    // rendered white, ` * ` lines became • bullets, `**bold**`
+    // styled. CommonMark: the close is its own line — the EOL
+    // lookahead enforces it.
+    const src = "const RE = /^\\s*(```|~~~)/;\n/** one doc */\nlet a = 1;\n";
+    const out = await renderDocument(wrapWholeFile("t.ts", src), {
+      width: W,
+      palette: DRACULA_PALETTE,
+    });
+    // The fence spans the whole file: the doc comment *after* the
+    // mid-line ``` still carries the comment class (94 — lifted from
+    // monokai's 90 by the spawnChroma hand-patch), a keyword paints,
+    // and no prose bullet appears.
+    expect(out).toContain("\x1b[94m/** one doc */");
+    expect(out).toContain("\x1b[96m");
+    expect(out).not.toContain("•");
+  });
 });

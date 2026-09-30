@@ -14,7 +14,7 @@
  */
 
 import { existsSync, readFileSync, statSync } from "node:fs";
-import { basename, join } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 
 /** Tier directories and their registry filenames. The pre-OKF fallback
  *  signature: a silo that indexes itself already has these; the OKF
@@ -195,6 +195,22 @@ export function resolveByCallsign(callsign: string, cwd: string = process.cwd())
 export function makeCallsignValidator(cwd: string = process.cwd()): (target: string) => boolean {
   const records = loadCallsigns(cwd);
   return (target: string) => resolveAmongCallsigns(records, target) !== null;
+}
+
+/** The path substrate of the silcrow gate (ADR-045): filesystem
+ *  existence, anchored the way actuation resolves a path target — the
+ *  document's directory first (resolveJumpTarget's HTML semantics), the
+ *  process cwd second (the launcher's resolveTarget fallback). The
+ *  filesystem is the domain's own live index — no second registry to
+ *  drift (BRF-CODE-SHELF's refusal of a src/ INDEX.jsonl, honored from
+ *  the paint side). Built beside makeCallsignValidator; the caller
+ *  composes the disjunct. Pure-ish (reads fs per call; anchor fixed at
+ *  construction — the main file is const for a session). */
+export function makePathValidator(
+  mainFile?: string,
+): (target: string) => boolean {
+  const dir = mainFile ? dirname(resolve(mainFile)) : process.cwd();
+  return (target) => existsSync(join(dir, target)) || existsSync(target);
 }
 
 /** Resolve a document's callsign from its path. Pure-ish (reads fs). */

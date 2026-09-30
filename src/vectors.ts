@@ -20,6 +20,13 @@
  *     no predicate = the pre-ADR-044 optimism, for the pure scan)
  *   - markdown inline links to local `.md` paths — never gated: the
  *     author's link is a deliberate claim, the shape scan's match is not
+ *   - code-file mentions — `dir/name.ext`, non-md (BRF-SILCROW-PATHS
+ *     Ring A) — gated like callsigns; for paths the gate's substrate is
+ *     the filesystem (ADR-045): a phantom, a typo, or a URL never paints.
+ *     A `:NNN` line suffix (`src/tui.ts:756`) is swallowed into the
+ *     occurrence span — the badge paints after the whole mention — and
+ *     stripped from the target: the silcrow is file-level, the line is
+ *     BRF-SRC-LINE-LEDGER's verb, unclaimed here
  * Never vectors: zero-padded or single-digit bracketed numbers (`[07]`
  * is text, always); `okuda-rhs` tokens (ADR-022 legacy — retired, their
  * numbers not honored; their .md paths are ordinary references); fenced
@@ -59,6 +66,12 @@ export const CALLSIGN_SHAPE = /^[A-Z]{3}(-[A-Z0-9]+)+$/;
 
 const RE_MD_LINK = /\[[^\]\n]*\]\((\S+?\.md)\)/g;
 const RE_CALLSIGN = /\b[A-Z]{3}(?:-[A-Z0-9]+)+\b/g;
+/** Code-file mentions (BRF-SILCROW-PATHS Ring A): at least one `/`, a
+ *  non-md extension, optional `:NNN` line suffix (W2: swallowed into the
+ *  span, stripped from the target). The slash is near-proof of intent —
+ *  `UTF-8` and `OSC-8` carry none. `.md` is excluded here: named md
+ *  paths are Ring B, unwired until its own step. */
+const RE_CODE_PATH = /\b[\w@&.-]+(?:\/[\w@&.-]+)+\.(?!md\b)[A-Za-z0-9]{1,5}(?::\d{1,4})?\b/g;
 
 /** Fenced blocks as (start, end) offset ranges. The house rule: the
  *  fence is not prose — verbatim, load-bearing input. A badge injected
@@ -120,6 +133,17 @@ export function scanReferences(
     const i = m.index!;
     if (i >= bodyStart && !inFence(i, fences) && (!resolves || resolves(m[0]!))) {
       hits.push({ pos: i, end: i + m[0]!.length, target: m[0]! });
+    }
+  }
+  // Ring A (BRF-SILCROW-PATHS): the code-file mention, gated on the
+  // filesystem (ADR-045's second substrate). The gate sees the stripped
+  // path — the suffix is presentation, not target. One destination, one
+  // silcrow: `src/tui.ts:756` and `src/tui.ts` share the vector.
+  for (const m of source.matchAll(RE_CODE_PATH)) {
+    const i = m.index!;
+    const target = m[0]!.replace(/:\d{1,4}$/, "");
+    if (i >= bodyStart && !inFence(i, fences) && (!resolves || resolves(target))) {
+      hits.push({ pos: i, end: i + m[0]!.length, target });
     }
   }
   hits.sort((a, b) => a.pos - b.pos);

@@ -16,7 +16,13 @@ import { loadPalette } from "./palette";
 import { renderDocument, wrapWholeFile } from "./render";
 import { runTui } from "./tui";
 import { runLauncher, invokedAsGloam, rankedShortlistEntries } from "./launcher";
-import { detectRoot, makeCallsignResolver, makeCallsignValidator, resolveByCallsign } from "./root";
+import {
+  detectRoot,
+  makeCallsignResolver,
+  makeCallsignValidator,
+  makePathValidator,
+  resolveByCallsign,
+} from "./root";
 import { CALLSIGN_SHAPE, jumpMapFor, annotateSource } from "./vectors";
 import { terminalCols, terminalRows } from "./width";
 import { existsSync } from "node:fs";
@@ -138,10 +144,14 @@ async function main(): Promise<void> {
     if (root) return resolveByCallsign(target);
     return null;
   };
-  // The silcrow gate (ADR-044): built once per run beside its actuator
-  // sibling — the paint and the keypress share the one resolution
-  // semantics, so they cannot disagree.
-  const silcrowResolves = makeCallsignValidator();
+  // The silcrow gate (ADR-044) and ADR-045's second substrate: a code-file
+  // mention validates against the filesystem, anchored the way actuation
+  // resolves. Built once per run beside the actuator siblings — the paint
+  // and the keypress share the one resolution semantics, so they cannot
+  // disagree.
+  const callsignResolves = makeCallsignValidator();
+  const pathValidates = makePathValidator(args.file ?? undefined);
+  const silcrowResolves = (t: string) => callsignResolves(t) || pathValidates(t);
   if (invokedAsGloam() && process.stdin.isTTY) {
     // `-g <query>`: seed alias (ADR-030 §4) — same as a bare-arg query.
     if (args.grep !== null) {

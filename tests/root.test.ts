@@ -7,6 +7,7 @@ import {
   detectRoot,
   loadCallsigns,
   makeCallsignResolver,
+  makePathValidator,
   presentRegistries,
   resolveByCallsign,
 } from "../src/root";
@@ -230,5 +231,29 @@ describe("resolveByCallsign — ordinal shorthand (ADR-031 dogfood)", () => {
 
   test("absent ordinals refuse", () => {
     expect(resolveByCallsign("ADR-999")).toBeNull();
+  });
+});
+
+describe("root — makePathValidator (ADR-045: the path substrate, anchored like actuation)", () => {
+  test("document-relative first, cwd second — the anchors actuation tries", () => {
+    const dir = mkdtempSync(join(tmpdir(), "okuda-pathval-"));
+    try {
+      mkdirSync(join(dir, "docs"));
+      mkdirSync(join(dir, "src"));
+      writeFileSync(join(dir, "docs", "sibling.ts"), "");
+      writeFileSync(join(dir, "src", "main.ts"), "");
+      // Anchor = the main document's dir (resolveJumpTarget's semantics)
+      const v = makePathValidator(join(dir, "docs", "doc.md"));
+      expect(v("sibling.ts")).toBe(true); // doc-relative: docs/sibling.ts
+      expect(v("src/main.ts")).toBe(false); // neither dir/docs/ nor repo cwd carries it
+      // Unanchored (no main file): cwd-relative only — the launcher's picker.
+      // The repo cwd carries src/vectors.ts (house style: root.test.ts
+      // already reads the real registries at cwd).
+      const cwdV = makePathValidator();
+      expect(cwdV("src/vectors.ts")).toBe(true);
+      expect(cwdV("no/such/file.ts")).toBe(false); // the fs gate: phantoms retract
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

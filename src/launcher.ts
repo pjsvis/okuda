@@ -20,7 +20,14 @@
 import { existsSync } from "node:fs";
 import { basename, join } from "node:path";
 import { type ChannelHit, type OnionDeps, onionMerge, routeQuery } from "./onion";
-import { detectRoot, makeCallsignResolver, makeCallsignValidator, resolveByCallsign, TIER_REGISTRIES } from "./root";
+import {
+  detectRoot,
+  makeCallsignResolver,
+  makeCallsignValidator,
+  makePathValidator,
+  resolveByCallsign,
+  TIER_REGISTRIES,
+} from "./root";
 import { runTui } from "./tui";
 import { terminalCols, terminalRows } from "./width";
 
@@ -476,10 +483,12 @@ export async function runLauncher(opts: { query?: string } = {}): Promise<void> 
           if (existsSync(target)) return target;
           return root ? resolveByCallsign(target) : null;
         },
-        // The silcrow gate (ADR-044), built per round: re-derivation
-        // replaces invalidation — a document landed mid-session is
-        // validated on the next pick, not remembered as absent.
-        resolves: makeCallsignValidator(),
+        // The silcrow gate (ADR-044 + ADR-045's path substrate), built
+        // per round: re-derivation replaces invalidation — a document
+        // (or a code file) landed mid-session is validated on the next
+        // pick, not remembered as absent.
+        resolves: (t) =>
+          makeCallsignValidator()(t) || makePathValidator(pick.file)(t),
       });
     }
   } finally {
