@@ -85,9 +85,11 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
   of **BRF-REMOTE-SPEECH-SEAM** — build it when the verdict confirms.
   · **S**
 
-- **BRF-REFRESH-OFF-DISK** — real bug (resize race, R placebo), td
-  ready; bites on mobile SSH only. Batch with the porch-matrix
-  dogfood · **M**
+- **BRF-REFRESH-OFF-DISK** — real bugs in the repaint path: the resize
+  race, the R placebo, and the **height-only resize** (fixed 2026-09-30 on
+  `fix/resize-height`, ADR-RESIZE-GEOMETRY-046). **Corrected 2026-09-30:**
+  this read *"bites on mobile SSH only"* — it bites on the desktop,
+  deterministically, for a height change. Faults 1 and 2 remain · **M**
 - **BRF-DOCUMENT-LINKS** — gopher links, keyspace unified and specced;
   the vector render supersedes part of it, the served-content half
   waits on a reason · **M**
