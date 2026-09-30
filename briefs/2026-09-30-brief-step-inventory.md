@@ -8,7 +8,8 @@ date: 2026-09-30
 
 **Created:** 2026-09-30
 **Status:** Open
-**TD:** td-000000 (epic) — three phases: the record, the stride, the ledger
+**TD:** td-91bf51 (epic) — td-0ea3c5 the record, td-4eb101 the census,
+td-8ca3f6 the reference stride, td-a7ef73 the ledger
 **Branch:** `feat/step-inventory`
 **Lineage:** the operator's question, 2026-09-29/30 — *"we are missing a
 structural stepper for heading to heading… are there any other stepping
