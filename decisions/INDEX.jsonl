@@ -43,3 +43,4 @@
 {"file":"044-validated-silcrows.md","date":"2026-09-24","status":"Accepted","summary":"Validated silcrows — inferred references gate on the registry; explicit references stay optimistic","meta":{},"callsign":"ADR-VALIDATED-SILCROWS-044"}
 {"file":"045-silcrow-paths.md","date":"2026-09-29","status":"Accepted","summary":"Silcrow paths — the gate's second substrate is the filesystem","meta":{},"callsign":"ADR-SILCROW-PATHS-045"}
 {"file":"046-resize-geometry.md","date":"2026-09-30","status":"Accepted","summary":"The repaint decision — the gate reads the content, the glass is a second input","meta":{},"callsign":"ADR-RESIZE-GEOMETRY-046"}
+{"file":"047-references-section.md","date":"2026-09-30","status":"Accepted","summary":"The References section — the renderer emits a receipt for its own map","meta":{},"callsign":"ADR-REFERENCES-SECTION-047"}

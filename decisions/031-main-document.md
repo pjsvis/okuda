@@ -16,6 +16,11 @@ reservations, and re-derivation-replaces-invalidation all stand.
 Explicit `.md` links stay optimistic — the author's link is a
 deliberate claim; the boundary holds by parameter, so the render path
 still reads no registry itself.)
+Amended 2026-09-30 by ADR-REFERENCES-SECTION-047: the map gains a
+visible projection — every main-document render ends with a generated
+`## References` section, the renderer's receipt for its own map. The
+discovery contract itself is unchanged; discovery still mints, the
+section only lists.
 
 ## Context
 

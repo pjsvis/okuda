@@ -10,6 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-09-30 | ADR-RESIZE-GEOMETRY-046 | Accepted | The repaint decision — the gate reads the content, the glass is a second input | 046-resize-geometry.md |
+| 2026-09-30 | ADR-REFERENCES-SECTION-047 | Accepted | The References section — the renderer emits a receipt for its own map | 047-references-section.md |
 | 2026-09-29 | ADR-SILCROW-PATHS-045 | Accepted | Silcrow paths — the gate's second substrate is the filesystem | 045-silcrow-paths.md |
 | 2026-09-24 | ADR-VALIDATED-SILCROWS-044 | Accepted | Validated silcrows — inferred references gate on the registry; explicit references stay optimistic | 044-validated-silcrows.md |
 | 2026-09-21 | ADR-BUILD-SIGNS-040 | Accepted | The build signs its own output — re-sign after compile, verify in the gate | 040-build-signs-its-output.md |
