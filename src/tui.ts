@@ -16,7 +16,7 @@
  */
 
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
-import { annotateSource, jumpMapFor, CLONE_TOKEN } from "./vectors";
+import { annotateSource, appendReferences, jumpMapFor, CLONE_TOKEN } from "./vectors";
 import { cloneArgs } from "./clone";
 import { frameBounds, headingLines, pageStep, paragraphStarts, snapFrame } from "./frames";
 import { splitKeyEvents, verbFor, type Verb } from "./keygrammar";
@@ -556,7 +556,10 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     mainJumps = deriveMain(mainText);
   }
   const initialRender = initialFetch.ok
-    ? await renderLines(annotateSource(initialFetch.text, mainJumps), opts.width)
+    ? await renderLines(
+        appendReferences(annotateSource(initialFetch.text, mainJumps), mainJumps),
+        opts.width,
+      )
     : [];
   const init = gateFetch(null, initialFetch, initialRender);
   let lines: string[] = init.lines;
@@ -695,9 +698,15 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       mainText = fetch.text;
       mainJumps = deriveMain(mainText); // the map re-derives; no invalidation
     }
-    // The main render annotates (ADR-031); dereferenced renders are clean.
+    // The main render annotates (ADR-031) and carries the generated
+    // References section (ADR-047 — the map's receipt, downstream of the
+    // paint so its callsigns never re-enter the map); dereferenced renders
+    // are clean — no section, the two-render contract.
     const next = fetch.ok
-      ? await renderLines(atMain ? annotateSource(fetch.text, mainJumps) : fetch.text, cols)
+      ? await renderLines(
+        atMain ? appendReferences(annotateSource(fetch.text, mainJumps), mainJumps) : fetch.text,
+        cols,
+      )
       : [];
     const decision = gateFetch(lines, fetch, next);
     fetchState = decision.state;
@@ -764,7 +773,12 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     mainText = fetch.text;
     mainJumps = deriveMain(mainText);
     currentFile = prev.file;
-    const next = await renderLines(annotateSource(fetch.text, mainJumps), dims().cols);
+    // Back is a MAIN render: annotated, and it ends with the map's
+    // receipt (ADR-047) — the same foot the initial render carries.
+    const next = await renderLines(
+      appendReferences(annotateSource(fetch.text, mainJumps), mainJumps),
+      dims().cols,
+    );
     present(fetch, next, prev.scroll);
   };
 
