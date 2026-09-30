@@ -8,6 +8,8 @@ import {
   footerLine,
   viewport,
   contentHeight,
+  geometryOf,
+  needsRepaint,
   hintsLine,
   displayPath,
   stripForAnchor,
@@ -438,6 +440,55 @@ describe("tui — gateFetch (changed / same / failed, retain-on-failure)", () =>
       gateFetch(prev, ok("alpha\nBETA\ngamma"), render("alpha\nBETA\ngamma")).state,
     ];
     expect(new Set(states).size).toBe(3);
+  });
+});
+
+// ── The glass's second input (ADR-RESIZE-GEOMETRY-046) ──────────────
+// The gate is tested above and is correct. These pin the seam ABOVE it:
+// the caller's use of the gate, where a height-only resize produced
+// `repaint:false` and the frame was never laid out.
+describe("tui — geometryOf / needsRepaint (content OR geometry)", () => {
+  const sameContent: Fetch = { ok: true, text: "alpha" };
+
+  test("geometryOf is one comparable token over both axes", () => {
+    expect(geometryOf(24, 80)).toBe("24x80");
+    expect(geometryOf(40, 80)).not.toBe(geometryOf(24, 80)); // height alone
+    expect(geometryOf(24, 100)).not.toBe(geometryOf(24, 80)); // width alone
+  });
+
+  test("a height-only resize repaints — the gate says `same`, the glass says otherwise", () => {
+    const d = gateFetch(["alpha"], sameContent, ["alpha"]);
+    expect(d.repaint).toBe(false); // the gate is right about the CONTENT
+    // …and the frame still needs laying out at the new height.
+    expect(needsRepaint(d.repaint, geometryOf(40, 80), geometryOf(24, 80))).toBe(true);
+  });
+
+  test("unchanged content at the same geometry does NOT repaint (the gate's property holds)", () => {
+    const d = gateFetch(["alpha"], sameContent, ["alpha"]);
+    expect(needsRepaint(d.repaint, geometryOf(24, 80), geometryOf(24, 80))).toBe(false);
+  });
+
+  test("changed content repaints at any geometry", () => {
+    expect(needsRepaint(true, geometryOf(24, 80), geometryOf(24, 80))).toBe(true);
+    expect(needsRepaint(true, geometryOf(40, 80), geometryOf(24, 80))).toBe(true);
+  });
+
+  test("a width-only resize repaints", () => {
+    expect(needsRepaint(false, geometryOf(24, 100), geometryOf(24, 80))).toBe(true);
+  });
+
+  test("the first paint always lands (nothing is on the glass yet)", () => {
+    // paintedGeometry starts empty, so no geometry can equal it.
+    expect(needsRepaint(false, geometryOf(24, 80), "")).toBe(true);
+  });
+
+  test("a failed fetch still re-lays-out when the glass changed", () => {
+    // Retain the last-known-good (the gate's job) but at the new geometry —
+    // otherwise a resize during an unreadable source leaves the rows blank.
+    const d = gateFetch(["alpha"], { ok: false, reason: "gone" }, []);
+    expect(d.state).toBe("failed");
+    expect(d.repaint).toBe(false);
+    expect(needsRepaint(d.repaint, geometryOf(40, 80), geometryOf(24, 80))).toBe(true);
   });
 });
 

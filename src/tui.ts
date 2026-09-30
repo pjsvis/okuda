@@ -325,6 +325,26 @@ export function contentHeight(rows: number, showHints: boolean): number {
   return rows - 1 - (showHints ? 1 : 0);
 }
 
+/** The glass geometry as one comparable token. Pure. */
+export const geometryOf = (rows: number, cols: number): string => `${rows}x${cols}`;
+
+/** The repaint rule: repaint when the content changed, **or** when the glass
+ *  was last painted at a different geometry. The content gate reads the
+ *  CONTENT — it cannot see the glass. A height-only resize re-renders
+ *  byte-identical lines (`cols` unchanged), so `gateFetch` reads `same` and
+ *  the frame still needs laying out at the new height: without the second
+ *  input the newly uncovered rows stay blank and a shrink leaves the old
+ *  footer's cursor address pointing at a row that no longer exists. Naming
+ *  the input here keeps the gate's meaning intact (*mtime is not meaning*)
+ *  rather than widening it. Pure. */
+export function needsRepaint(
+  contentChanged: boolean,
+  geometry: string,
+  paintedGeometry: string,
+): boolean {
+  return contentChanged || geometry !== paintedGeometry;
+}
+
 /** The verbose hints line, right-justified on the last row with the
  *  corner column reserved. If it can't fit, it wraps — a legible
  *  'you are too narrow' rather than silent truncation. Pure. */
@@ -542,6 +562,11 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   let lines: string[] = init.lines;
   let fetchState: FetchState = init.state; // footer stamp reads this (brief: fetch-state-stamp)
   let scroll = 0;
+  /** The geometry the glass currently holds — the frame's second input
+   *  (ADR-RESIZE-GEOMETRY-046). `paint` is the only writer, so the token
+   *  always describes what is actually on the screen, not what was asked
+   *  for. Empty until the first paint. */
+  let paintedGeometry = "";
   let showHints = false; // `?` toggles: compact % footer ↔ verbose hints
 
   /** Footer flash (ADR-031): the actuator's honest failure surface and
@@ -644,6 +669,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       frame += `\x1b[${rows};1H`;
       frame += hintsLine(cols, muted);
     }
+    paintedGeometry = geometryOf(rows, cols); // the glass now holds this
     process.stdout.write(syncWrap(frame));
   };
 
@@ -651,8 +677,11 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  semantics) — the one repaint path: resize, manual reload, and (brief:
    *  tui-live-documents) fs.watch all pin the line under the eye to its
    *  screen row. The gate is the mechanised "neither": identical content
-   *  → `same`, no repaint; a failed fetch → `failed`, retain the
-   *  last-known-good, no repaint; only a real change repaints. */
+   *  → `same`; a failed fetch → `failed`, retain the last-known-good. But
+   *  the gate reads the CONTENT and the glass is a second input it cannot
+   *  see, so the repaint decision is `needsRepaint`: a resize that changes
+   *  only the height repaints on geometry, not on content
+   *  (ADR-RESIZE-GEOMETRY-046). */
   const rerenderAnchored = async (reason: "watch" | "resize" | "reload"): Promise<void> => {
     // Frozen gates only the WATCHER — the document stays still while an
     // agent edits; resize follows the glass and `r` is the manual
@@ -672,7 +701,11 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       : [];
     const decision = gateFetch(lines, fetch, next);
     fetchState = decision.state;
-    if (!decision.repaint) return; // gate held, or source lost — keep the screen
+    // Repaint on a content change OR a geometry change. The gate answers the
+    // first; the glass answers the second — a height-only resize re-renders
+    // identical lines, so the gate reads `same` and the frame still needs
+    // laying out (ADR-RESIZE-GEOMETRY-046).
+    if (!needsRepaint(decision.repaint, geometryOf(rows, cols), paintedGeometry)) return;
     const oldLines = lines;
     lines = decision.lines;
     scroll = reanchoredScroll(oldLines, lines, scroll, height);
@@ -892,15 +925,18 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   process.stdin.resume();
   process.stdin.on("data", onKey);
 
-  // Resize: re-render at the new width. Preserve the reading position by
+  // Resize: re-render at the new geometry. Preserve the reading position by
   // anchoring on the non-blank line nearest the viewport middle (the eye
   // proxy) and pinning it back to the same screen row. The text-match is
   // bounded to one viewport — small-moderate reflow hits a near match
   // precisely; a big resize correctly misses and falls back to
   // proportional (preserve the reading fraction), which is imprecise but
-  // never jumps to the top. Vertical resize doesn't reflow, so the null
-  // path keeps index-preservation, honest there. (brief:
-  // resize-content-anchor)
+  // never jumps to the top. A vertical resize does not reflow, so the lines
+  // are unchanged and the anchor is index-preserving — but it DOES change
+  // the geometry, so the repaint is forced by `needsRepaint` and not by the
+  // gate; trusting the gate alone left the newly uncovered rows blank and a
+  // shrink's footer addressing a row that no longer existed
+  // (ADR-RESIZE-GEOMETRY-046). (brief: resize-content-anchor)
   const onWinch = (): void => { void rerenderAnchored("resize"); };
   process.on("SIGWINCH", onWinch);
 
