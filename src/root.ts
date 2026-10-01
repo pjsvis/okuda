@@ -77,6 +77,38 @@ function hasTierRegistry(cwd: string): boolean {
   });
 }
 
+/** The silo root (ADR-048): the git toplevel of the cwd, climbed the way
+ *  git itself climbs — `git rev-parse --show-toplevel`. Where git finds
+ *  no repo, the cwd stands — today's behaviour, the guaranteed fallback
+ *  (byte-identical, tested). Cached per cwd per process: the root does
+ *  not move while a session runs, and the --entries printer (a fresh
+ *  process per keystroke) pays one spawn, never one per query. Never
+ *  climbs above the toplevel — nested repos stop at the first `.git`
+ *  (git's semantics, inherited wholesale). Pure-ish. */
+const siloRootCache = new Map<string, string>();
+
+export function siloRoot(cwd: string = process.cwd()): string {
+  const cached = siloRootCache.get(cwd);
+  if (cached !== undefined) return cached;
+  let root = cwd;
+  try {
+    const p = Bun.spawnSync({
+      cmd: ["git", "rev-parse", "--show-toplevel"],
+      cwd,
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    if (p.exitCode === 0) {
+      const out = new TextDecoder().decode(p.stdout).trim();
+      if (out) root = out;
+    }
+  } catch {
+    /* git absent — the cwd stands */
+  }
+  siloRootCache.set(cwd, root);
+  return root;
+}
+
 /**
  * Detect whether `cwd` is a rooted knowledge silo and resolve its badge.
  * Order of precedence (the strongest signature wins):
@@ -85,7 +117,8 @@ function hasTierRegistry(cwd: string): boolean {
  *      renames; absent both → `basename(cwd)`.
  *   2. Tier registry presence (the pre-OKF fallback). Badge = `basename(cwd)`.
  * Returns `null` when no signature is present — unrooted, today's
- * behaviour, no badge.
+ * behaviour, no badge. Callers pass the SILO ROOT (ADR-048), not the
+ * launch cwd — the two differ whenever the user stands in a subfolder.
  */
 export function detectRoot(cwd: string = process.cwd()): RootInfo | null {
   const rootIndex = readRootIndex(cwd);
@@ -200,17 +233,18 @@ export function makeCallsignValidator(cwd: string = process.cwd()): (target: str
 /** The path substrate of the silcrow gate (ADR-045): filesystem
  *  existence, anchored the way actuation resolves a path target — the
  *  document's directory first (resolveJumpTarget's HTML semantics), the
- *  process cwd second (the launcher's resolveTarget fallback). The
- *  filesystem is the domain's own live index — no second registry to
- *  drift (BRF-CODE-SHELF's refusal of a src/ INDEX.jsonl, honored from
- *  the paint side). Built beside makeCallsignValidator; the caller
- *  composes the disjunct. Pure-ish (reads fs per call; anchor fixed at
- *  construction — the main file is const for a session). */
+ *  silo root second (the launcher's resolveTarget fallback, threaded by
+ *  ADR-048). The filesystem is the domain's own live index — no second
+ *  registry to drift (BRF-CODE-SHELF's refusal of a src/ INDEX.jsonl,
+ *  honored from the paint side). Built beside makeCallsignValidator; the
+ *  caller composes the disjunct. Pure-ish (reads fs per call; anchor
+ *  fixed at construction — the main file is const for a session). */
 export function makePathValidator(
   mainFile?: string,
+  cwd: string = process.cwd(),
 ): (target: string) => boolean {
-  const dir = mainFile ? dirname(resolve(mainFile)) : process.cwd();
-  return (target) => existsSync(join(dir, target)) || existsSync(target);
+  const dir = mainFile ? dirname(resolve(mainFile)) : cwd;
+  return (target) => existsSync(join(dir, target)) || existsSync(join(cwd, target));
 }
 
 /** Resolve a document's callsign from its path. Pure-ish (reads fs). */

@@ -9,7 +9,7 @@ an assumption.
 | `bun` | 1.4.0 | Runtime & renderer | 2026-08-27 |
 | `just` | 1.53.0 | Task runner | 2026-08-20 |
 | `codesign` | system (macOS 27.0) | Build — re-signs the compiled binary | 2026-09-21 |
-| `git` | 2.54.0 | Version control | 2026-08-20 |
+| `git` | 2.54.0 | Version control; launcher runtime (ADR-048 — the root climb) | 2026-08-20 |
 | `td` | 0.61.0 | Task management | 2026-08-27 |
 | `mermaid-to-md` | 0.1.0* | Mermaid → ASCII | 2026-09-02 |
 | `chroma` | 2.27.0 | Code-fence colour — 16-colour class codes (BRF-FENCE-COLOUR) | 2026-09-29 |
@@ -76,7 +76,10 @@ accident.
 
 The compiled okuda binary has zero external npm runtime dependencies;
 `mermaid-to-md` is its one runtime dependency — invoked per `mermaid`
-code fence via `Bun.spawn`, never parsed in-process.
+fence via `Bun.spawn`, never parsed in-process. The gloam launcher adds
+three more, all spawned, never parsed in-process: `rg` and `fzf` (the
+search surfaces) and `git` (ADR-048 — the silo root is the git toplevel,
+resolved once per process and cached; absent git, the cwd stands).
 
 ## Development dependencies
 

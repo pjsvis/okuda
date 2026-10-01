@@ -26,6 +26,7 @@ import {
   makeCallsignValidator,
   makePathValidator,
   resolveByCallsign,
+  siloRoot,
   TIER_REGISTRIES,
 } from "./root";
 import { runTui } from "./tui";
@@ -441,16 +442,20 @@ export async function runLauncher(opts: { query?: string } = {}): Promise<void> 
   // rg gap (rankedShortlistEntries) is a blank surface, not shell scrollback
   // — the launch-edge half of the same fix (BRF-LAUNCHER-FUT).
   process.stdout.write(ENTER_ALT_SCREEN + "\x1b[2J\x1b[H");
+  // The silo root (ADR-048): the git toplevel, resolved ONCE — the
+  // corpus, the badge, and every validator trust it, not the launch
+  // cwd. A gloam from a subfolder behaves as the silo.
+  const cwd = siloRoot();
   // Rooted gloam carries a silo badge the renderer paints at the head of
   // the footer identity run (brief: 2026-08-28-silo-mnemonics). Unrooted →
   // undefined → today's footer, no silo badge. Resolved once per session:
   // the root does not move while gloam is running.
-  const root = detectRoot();
+  const root = detectRoot(cwd);
   // Callsign layer (td-bdfce0): rooted gloam resolves per-file callsigns
   // from the registries for the footer's identity run. The root is static
   // for the session, so the index loads once — the resolver closure hands
   // the TUI strings, never registry knowledge (ADR-020).
-  const callsignFor = root ? makeCallsignResolver() : undefined;
+  const callsignFor = root ? makeCallsignResolver(cwd) : undefined;
   // Live search (ADR-030): the seed rows are the ranked merge for the
   // current query; while the picker is open, change:reload recomputes
   // them per keystroke via this binary's --entries printer. Per round,
@@ -468,7 +473,7 @@ export async function runLauncher(opts: { query?: string } = {}): Promise<void> 
       // spawn is idempotent against this. Alt-scroll re-armed per round
       // because the reader released it on exit.
       process.stdout.write(ENTER_ALT_SCREEN + "\x1b[2J\x1b[H" + "\x1b[?1007h");
-      const files = rankedShortlistEntries(query);
+      const files = rankedShortlistEntries(query, cwd);
       const pick = await pickFile(files, query, true);
       if (pick === null) break; // Esc / Ctrl-C in the picker
       query = pick.query; // reseed next round
@@ -481,14 +486,14 @@ export async function runLauncher(opts: { query?: string } = {}): Promise<void> 
         callsignFor,
         resolveTarget: (target: string): string | null => {
           if (existsSync(target)) return target;
-          return root ? resolveByCallsign(target) : null;
+          return root ? resolveByCallsign(target, cwd) : null;
         },
         // The silcrow gate (ADR-044 + ADR-045's path substrate), built
         // per round: re-derivation replaces invalidation — a document
         // (or a code file) landed mid-session is validated on the next
         // pick, not remembered as absent.
         resolves: (t) =>
-          makeCallsignValidator()(t) || makePathValidator(pick.file)(t),
+          makeCallsignValidator(cwd)(t) || makePathValidator(pick.file, cwd)(t),
       });
     }
   } finally {
