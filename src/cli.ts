@@ -22,6 +22,7 @@ import {
   makeCallsignValidator,
   makePathValidator,
   resolveByCallsign,
+  siloRoot,
 } from "./root";
 import { CALLSIGN_SHAPE, jumpMapFor, annotateSource, appendReferences } from "./vectors";
 import { terminalCols, terminalRows } from "./width";
@@ -122,9 +123,10 @@ async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
   // Headless entry-stream printer (ADR-030): the live picker's reload
   // target and the debugging surface. Works under both binary names, no
-  // TTY required — fzf spawns it per keystroke.
+  // TTY required — fzf spawns it per keystroke. The corpus is the SILO
+  // ROOT (ADR-048): one cached git spawn per process, never per query.
   if (args.entries !== null) {
-    process.stdout.write(rankedShortlistEntries(args.entries).join("\n") + "\n");
+    process.stdout.write(rankedShortlistEntries(args.entries, siloRoot()).join("\n") + "\n");
     return;
   }
   if (args.grep !== null && (!invokedAsGloam() || !process.stdin.isTTY)) {
@@ -137,11 +139,13 @@ async function main(): Promise<void> {
   }
   // The vector actuator's resolver (ADR-031): target → document path.
   // File existence first (works unrooted), callsign dispatch where the
-  // cwd is a rooted silo. Built once per run; handed to every runTui.
-  const root = detectRoot();
+  // SILO ROOT is a rooted silo (ADR-048 — resolved once, the launch cwd
+  // may be a subfolder). Built once per run; handed to every runTui.
+  const cwd = siloRoot();
+  const root = detectRoot(cwd);
   const resolveTarget = (target: string): string | null => {
     if (existsSync(target)) return target;
-    if (root) return resolveByCallsign(target);
+    if (root) return resolveByCallsign(target, cwd);
     return null;
   };
   // The silcrow gate (ADR-044) and ADR-045's second substrate: a code-file
@@ -149,8 +153,8 @@ async function main(): Promise<void> {
   // resolves. Built once per run beside the actuator siblings — the paint
   // and the keypress share the one resolution semantics, so they cannot
   // disagree.
-  const callsignResolves = makeCallsignValidator();
-  const pathValidates = makePathValidator(args.file ?? undefined);
+  const callsignResolves = makeCallsignValidator(cwd);
+  const pathValidates = makePathValidator(args.file ?? undefined, cwd);
   const silcrowResolves = (t: string) => callsignResolves(t) || pathValidates(t);
   if (invokedAsGloam() && process.stdin.isTTY) {
     // `-g <query>`: seed alias (ADR-030 §4) — same as a bare-arg query.
@@ -179,9 +183,9 @@ async function main(): Promise<void> {
   // for low-bandwidth channels. Unknown code or unrooted cwd → honest
   // error; anything else falls through to the reader's own diagnostics.
   if (invokedAsGloam() && args.file && !existsSync(args.file) && CALLSIGN_SHAPE.test(args.file) && process.stdin.isTTY) {
-    const path = root ? resolveByCallsign(args.file) : null;
+    const path = root ? resolveByCallsign(args.file, cwd) : null;
     if (!path) {
-      process.stderr.write(`gloam: unknown callsign: ${args.file}${root ? "" : " (cwd is not a rooted silo)"}\n`);
+      process.stderr.write(`gloam: unknown callsign: ${args.file}${root ? "" : " (the silo is not rooted)"}\n`);
       process.exit(1);
     }
     await runTui({
@@ -189,7 +193,7 @@ async function main(): Promise<void> {
       width: terminalCols(80),
       rows: terminalRows(24),
       silo: root?.badge,
-      callsignFor: makeCallsignResolver(),
+      callsignFor: makeCallsignResolver(cwd),
       resolveTarget,
       resolves: silcrowResolves,
     });

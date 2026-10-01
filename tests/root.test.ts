@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import {
@@ -10,6 +10,7 @@ import {
   makePathValidator,
   presentRegistries,
   resolveByCallsign,
+  siloRoot,
 } from "../src/root";
 import { versionLine } from "../src/cli";
 
@@ -255,5 +256,78 @@ describe("root — makePathValidator (ADR-045: the path substrate, anchored like
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+});
+
+describe("root — siloRoot (ADR-048: the silo root is the git toplevel)", () => {
+  /** git init a scratch dir; returns the toplevel and a cleanup thunk. */
+  function gitScratch(): { dir: string; cleanup: () => void } {
+    const dir = mkdtempSync(join(tmpdir(), "okuda-climb-"));
+    const p = Bun.spawnSync({ cmd: ["git", "init", "-q", dir], stdout: "ignore", stderr: "ignore" });
+    if (p.exitCode !== 0) throw new Error("git init failed — git is a listed dependency");
+    return { dir, cleanup: () => rmSync(dir, { recursive: true, force: true }) };
+  }
+
+  test("non-git cwd → itself (today's behaviour, the guaranteed fallback)", () => {
+    const { dir, cleanup } = scratch();
+    try {
+      expect(siloRoot(dir)).toBe(dir);
+    } finally { cleanup(); }
+  });
+
+  test("git repo subfolder → the toplevel (the climb)", () => {
+    const { dir, cleanup } = gitScratch();
+    try {
+      mkdirSync(join(dir, "docs", "deep"), { recursive: true });
+      // Two levels down: the climb must find the toplevel regardless.
+      // realpathSync: macOS /var → /private/var — git returns the
+      // canonical path, so the expectation must too.
+      const real = realpathSync(dir);
+      expect(siloRoot(join(dir, "docs", "deep"))).toBe(real);
+      expect(siloRoot(dir)).toBe(real);
+    } finally { cleanup(); }
+  });
+
+  test("cached per cwd: one spawn per process, not per call", () => {
+    const { dir, cleanup } = gitScratch();
+    try {
+      mkdirSync(join(dir, "sub"));
+      const sub = join(dir, "sub");
+      const real = realpathSync(dir); // macOS /var → /private/var
+      expect(siloRoot(sub)).toBe(real);      // resolves (and caches)
+      rmSync(join(dir, ".git"), { recursive: true, force: true });
+      // The repo is gone, but the cache is not: the SAME cwd returns the
+      // toplevel it already resolved. A fresh (uncached) cwd under the
+      // now-repoless tree falls back to itself.
+      expect(siloRoot(sub)).toBe(real);
+      expect(siloRoot(join(dir, "other"))).toBe(join(dir, "other"));
+    } finally { cleanup(); }
+  });
+
+  test("detectRoot through the climb: rooted from a subfolder (the contract)", () => {
+    const { dir, cleanup } = gitScratch();
+    try {
+      writeFileSync(join(dir, "index.md"), "---\nokf_version: \"0.2\"\nname: climbed\n---\n# x");
+      mkdirSync(join(dir, "docs", "deep"), { recursive: true });
+      // Without the climb: detectRoot(subfolder) → null (the measured
+      // defect — okuda/src was unrooted in its own silo). With it: rooted.
+      const sub = join(dir, "docs", "deep");
+      expect(detectRoot(sub)).toBeNull();
+      expect(detectRoot(siloRoot(sub))).not.toBeNull();
+      expect(detectRoot(siloRoot(sub))!.badge).toBe("climbed");
+    } finally { cleanup(); }
+  });
+
+  test("makePathValidator's second anchor is the passed cwd, not the ambient one", () => {
+    const { dir, cleanup } = scratch();
+    try {
+      mkdirSync(join(dir, "silo"));
+      writeFileSync(join(dir, "silo", "real.ts"), "");
+      // Anchored at silo/ — the target resolves against the passed root
+      // even though the ambient cwd (the okuda repo) does not carry it.
+      const v = makePathValidator(undefined, join(dir, "silo"));
+      expect(v("real.ts")).toBe(true);
+      expect(v("no/such.ts")).toBe(false);
+    } finally { cleanup(); }
   });
 });
