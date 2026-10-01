@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-01 | DBF-SILCROW-RING-B | done | Debrief: Ring B and the legibility gate — the silcrow grows a conscience | 2026-10-01-debrief-silcrow-ring-b.md |
 | 2026-09-30 | DBF-REFERENCES-SECTION | done | Debrief: The References section — the renderer's receipt for its own map | 2026-09-30-debrief-references-section.md |
 | 2026-09-30 | DBF-ROOT-CLIMB | done | Debrief: The root climb — same-day, one spawn, three seams | 2026-09-30-debrief-root-climb.md |
 | 2026-09-29 | DBF-COLOUR-DAY | done | Debrief: The colour day — chroma, the shelf, and the curiosity that became a must-have | 2026-09-29-debrief-the-colour-day.md |
