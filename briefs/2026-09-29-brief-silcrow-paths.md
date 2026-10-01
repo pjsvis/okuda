@@ -7,7 +7,7 @@ date: 2026-09-29
 # Brief: Silcrow paths — the gate grows a second substrate
 
 **Created:** 2026-09-29
-**Status:** In progress — ADR-045 accepted, Ring A shipped 2026-09-29 (482 tests green, `just check` green). W1 and W2 decided at the glass (see Preconditions); Ring B gated on a day at the glass with Ring A (P-4).
+**Status:** Step 3 shipped 2026-10-01 (DBF-SILCROW-RING-B) — Ring B + the legibility exile (ADR-049), 512/512, on `feat/silcrow-ring-b` awaiting merge. Ring A shipped 2026-09-29, reviewed and closed on main 2026-10-01 (503/503). Ring C parked with its census; the epic stays open until the operator's glass pass and the W5 drift list are dispositioned.
 **TD:** td-89d085 (epic). Only the first step's task is written (td-696449) — the operator's method: *"each step has its own wrinkles, that we have not discerned yet."* Later steps get their tasks when reached; the task list written before the step is an invented plan (BRF-SRC-LINE-LEDGER's own gate).
 **Lineage:** the operator, verbatim: *"we have integrated rendered code files into the Gloam ambit"* — *"lets consider extending the reach of our rubricated silcrows — ie if we mention a code file we can create a silcrow"* — *"and I am thinking for other named files and call-signed documents"* — and on method: *"there is a correct path here, so we should feel our way forward one step at a time."*
 **Extends:** ADR-044 (`decisions/044-validated-silcrows.md` — the gate on inferred references; this brief hands that gate a second substrate), BRF-CODE-SHELF (code entered the ambit and verified the read loop already closes: `resolveJumpTarget` existsSync's path targets, `wrapWholeFile` renders `.ts`), ADR-020 (the render-path boundary holds by parameter — unchanged), BRF-ADDRESS-CAP (the 80-address cap is the map's invariant; new token classes are new competitors for the addresses).
@@ -42,7 +42,8 @@ The ship order *is* the operator's method: each wrinkle is probed when its ring 
 |---|---|---|
 | W1 — backticks | **98% of code mentions are backtick-wrapped** (594/609) — the default case, not the tail. `annotateSource` injects after token-end, so §NN lands *inside* the code span, monospace. **Decided at the glass 2026-09-29:** paint-inside-span — the callsign convention inherited (backticked `ADR-031` already painted its badge inside; glass probe verified the marker renders in-span). | Ring A — done |
 | W2 — line suffixes | 119/609 mentions carry `:NNN` (`src/tui.ts:756`). **Decided at the glass 2026-09-29:** the suffix is swallowed into the occurrence span (badge paints after the whole mention) and stripped from the target — the silcrow is file-level, the line claim stays the prose's own, and BRF-SRC-LINE-LEDGER owns the line verb. Suffixed and plain mentions share the vector. | Ring A — done |
-| W3 — budget | 0/344 over cap at Ring A (above). Re-measured before Ring B. | Ring B |
+| W3 — budget | **Measured 2026-10-01** (`tmp/w3-ringb-probe.ts`, 372 docs, the real `makeCallsignValidator`/`makePathValidator` gates composed): Ring B adds **zero** docs over the 80 cap — worst Ring-B-inflated doc 34/80. The only cap-saturating doc is `briefs/index.md` (90 targets, +0 Ring B), a pre-existing property of an 88-brief index, at cap today (`tmp/w3-verify.ts`). `.jsonl` exile costs 22 mentions corpus-wide; 9 `.json` mentions survive. Ring B junk (never paints): stale renamed briefs, sibling-silo `AGENTS.md` — the W5 class, the gate holds. | Ring B — done |
+| W6 — legibility (`.jsonl`) | Horizontal data is not a readable render — a `.jsonl` deref lands in `wrapWholeFile` wrapping multi-kilobyte JSON records: all the bytes, none of the reading. Decided with the operator 2026-10-01: the gate's second criterion, after existence, is **legibility**; `.jsonl` never paints (ADR-049). `.json` stays — pretty-printed JSON is indented text; exile on evidence, not suspicion (Hume). | Ring B — ADR-049 |
 | W4 — URL hosts | `example.com/chime.mp3` — fs-miss, unpainted. No shape enumeration; gate on the property, not the list (ADR-044's own argument, re-worn). | solved by the gate |
 
 ## Design sketch
@@ -59,7 +60,7 @@ The ship order *is* the operator's method: each wrinkle is probed when its ring 
 
 1. **ADR-045 — the gate's second substrate.** Text only. Records: callsigns → registry, paths → filesystem (the domain's index is the anchor); fs-gate honesty (phantoms and typos paint nothing); re-derivation (the paint appears the day the file lands — ADR-044's self-heal precedent, re-worn).
 2. **Ring A — code files.** The W1/W2 glass pass; tests (`src/vectors.ts` paints; `example.com/chime.mp3` and `src/mermaid.rs` don't); `just check`; dogfood at the glass. Own commit on `feat/silcrow-paths`. (td-696449)
-3. **Ring B — named md paths.** Gated on Ring A's live behavior — at least a day at the glass before the second skin. W3's projection probe first. Own commit. Task written when reached.
+3. **Ring B — named md paths.** Gated on Ring A's live behavior — at least a day at the glass before the second skin. W3's projection probe first. Own commit. Task written when reached. **Reached 2026-10-01:** P-4 satisfied, W3 passed (zero new over-cap), the legibility exile rides the same commit (ADR-049). Link-internal `.md` targets are excluded from Ring B's scan — an explicit link already mints its occurrence; a second scan would double-badge it.
 4. **Ring C — parked.** Named, censused, unscheduled.
 
 ## Scope
@@ -73,7 +74,7 @@ The ship order *is* the operator's method: each wrinkle is probed when its ring 
 - [x] **P-1 — the probe ran** (`tmp/silcrow-ext-probe.ts`): the tables above. 2026-09-29.
 - [x] **P-2 — ADR-045 accepted** — `decisions/045-silcrow-paths.md`, 2026-09-29.
 - [x] **P-3 — Ring A glass pass** — W1: paint-inside-span (the callsign convention, glass-verified); W2: suffix swallowed into span, stripped from target. Evidence: `tmp/ring-a-glass.ts` — this brief's own mentions paint (`src/vectors.ts §18`), the phantom (`palettes/okuda.json`) and URLs don't.
-- [ ] **P-4 — Ring A shipped and lived-with ≥ a day** before Ring B's task list is written.
+- [x] **P-4 — Ring A shipped and lived-with ≥ a day** before Ring B's task list is written. Shipped 2026-09-29, reviewed 2026-10-01; task td-696449 closed on main.
 
 ## Risks
 
