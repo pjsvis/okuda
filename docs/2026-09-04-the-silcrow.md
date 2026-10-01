@@ -32,7 +32,9 @@ canon: doubled = the system talks, mixed = the document moves). The
 number is an **address in the
 main document's jump map** — an in-memory structure derived from the
 document's own text at render time: callsign-shaped tokens, local
-`.md` links, in reading order, unique, capped. The paint is
+`.md` links, and the file paths the corpus cites in prose — code
+files and named documents (Ring B, 2026-10-01), all gated on
+existence and legibility — in reading order, unique, capped. The paint is
 **illustrative**: the source document is never modified, the map is
 rebuilt on every render, and the numbers are deterministic — `§12`
 means the same thing on every glass, until the document changes, at
@@ -73,6 +75,16 @@ fails in the same vocabulary it painted in — `§14 — no document to
 render` — a footer flash, stay put, no crash. A silcrow that turns out
 to be mistaken was still a correct description of an intention; the
 corpus may reference documents that do not exist yet.
+
+The path gate is honest twice (ADR-045, ADR-049). Existence: a
+phantom, a typo, or an illustrative URL paints nothing — the
+filesystem is the gate's substrate, and it cannot drift from itself.
+Legibility: a destination can exist and still not be worth the
+keystroke — `.jsonl` is horizontal data, and a deref into it is a
+wall of wrapped JSON, a promise kept to the letter and broken in
+spirit. Exiled extensions never paint, never enter the map, never
+reach the References section — one denylist at discovery, no second
+filter anywhere. `.json` stays: exile on evidence, not suspicion.
 
 ## The reader's habit (found in dogfood, 2026-09-12)
 

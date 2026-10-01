@@ -27,8 +27,16 @@
  *     occurrence span — the badge paints after the whole mention — and
  *     stripped from the target: the silcrow is file-level, the line is
  *     BRF-SRC-LINE-LEDGER's verb, unclaimed here
+ *   - named md paths — `dir/name.md` (BRF-SILCROW-PATHS Ring B) — gated
+ *     like Ring A, same substrate, same suffix rule; a target inside
+ *     explicit link syntax is excluded (the link already minted its
+ *     occurrence — one claim, one badge)
  * Never vectors: zero-padded or single-digit bracketed numbers (`[07]`
- * is text, always); `okuda-rhs` tokens (ADR-022 legacy — retired, their
+ * is text, always); exiled extensions — ADR-049's legibility criterion:
+ * `.jsonl` is horizontal data, and a deref into it is a wall of wrapped
+ * JSON, a promise kept to the letter and broken in spirit — existence
+ * asks "is there a document?", legibility asks "is it worth the
+ * reader's keystroke?"; `okuda-rhs` tokens (ADR-022 legacy — retired, their
  * numbers not honored; their .md paths are ordinary references); fenced
  * blocks — the fence is not prose, and a badge injected inside a fence
  * never renders (the phantom-§12 defect, found in Babylon-to-Stars
@@ -70,8 +78,24 @@ const RE_CALLSIGN = /\b[A-Z]{3}(?:-[A-Z0-9]+)+\b/g;
  *  non-md extension, optional `:NNN` line suffix (W2: swallowed into the
  *  span, stripped from the target). The slash is near-proof of intent —
  *  `UTF-8` and `OSC-8` carry none. `.md` is excluded here: named md
- *  paths are Ring B, unwired until its own step. */
+ *  paths are Ring B's own regex (RE_MD_PATH), same step's commit. */
 const RE_CODE_PATH = /\b[\w@&.-]+(?:\/[\w@&.-]+)+\.(?!md\b)[A-Za-z0-9]{1,5}(?::\d{1,4})?\b/g;
+/** Named md paths (BRF-SILCROW-PATHS Ring B): `dir/name.md`, optional
+ *  `:NNN` — same shape as Ring A with the md exclusion lifted. The
+ *  corpus's own convention: 1,192 free-standing mentions, 1 inside link
+ *  syntax (the P-1 probe). Gated on the same `resolves` predicate as
+ *  every inferred reference; explicit links mint their own occurrence,
+ *  so a hit inside a link span is skipped (one claim, one badge). */
+const RE_MD_PATH = /\b[\w@&.-]+(?:\/[\w@&.-]+)+\.md(?::\d{1,4})?\b/g;
+/** The legibility denylist (ADR-049): extensions whose deref is a
+ *  render the silcrow cannot keep honest. `.jsonl` is horizontal data —
+ *  one record per line, multi-kilobyte — and `wrapWholeFile` wraps it
+ *  into a wall of JSON: all the bytes, none of the reading. Exiled at
+ *  discovery, so body, actuator, and the References section (ADR-047's
+ *  pure projection) retract in one move — no second filter anywhere.
+ *  `.json` stays: pretty-printed JSON is indented text; exile on
+ *  evidence, not suspicion. One line per future exile. */
+const EXILED_EXTS = new Set(["jsonl"]);
 
 /** Fenced blocks as (start, end) offset ranges. The house rule: the
  *  fence is not prose — verbatim, load-bearing input. A badge injected
@@ -136,13 +160,35 @@ export function scanReferences(
     }
   }
   // Ring A (BRF-SILCROW-PATHS): the code-file mention, gated on the
-  // filesystem (ADR-045's second substrate). The gate sees the stripped
-  // path — the suffix is presentation, not target. One destination, one
-  // silcrow: `src/tui.ts:756` and `src/tui.ts` share the vector.
+  // filesystem (ADR-045's second substrate) and exiled by extension
+  // (ADR-049's legibility criterion — the exile applies ungated: an
+  // exiled target can never enter the map, so it can never paint).
+  // The gate sees the stripped path — the suffix is presentation, not
+  // target. One destination, one silcrow: `src/tui.ts:756` and
+  // `src/tui.ts` share the vector.
   for (const m of source.matchAll(RE_CODE_PATH)) {
     const i = m.index!;
     const target = m[0]!.replace(/:\d{1,4}$/, "");
+    const ext = /\.([A-Za-z0-9]{1,5})$/.exec(target)?.[1]?.toLowerCase();
+    if (ext && EXILED_EXTS.has(ext)) continue; // ADR-049: never a vector
     if (i >= bodyStart && !inFence(i, fences) && (!resolves || resolves(target))) {
+      hits.push({ pos: i, end: i + m[0]!.length, target });
+    }
+  }
+  // Ring B (BRF-SILCROW-PATHS step 3): the named md path — the corpus's
+  // own citation convention, bare in prose. Same gate, same substrate,
+  // same suffix rule. A hit inside explicit link syntax is skipped: the
+  // link's own occurrence already minted the destination, and a second
+  // would double-badge one claim. (Any link span, validated or not —
+  // the link is a deliberate claim whose target Ring B has no business
+  // re-judging.)
+  const linkSpans: Array<[number, number]> = [];
+  for (const m of source.matchAll(RE_MD_LINK)) linkSpans.push([m.index!, m.index! + m[0]!.length]);
+  const inLink = (pos: number) => linkSpans.some(([a, b]) => pos >= a && pos < b);
+  for (const m of source.matchAll(RE_MD_PATH)) {
+    const i = m.index!;
+    const target = m[0]!.replace(/:\d{1,4}$/, "");
+    if (i >= bodyStart && !inFence(i, fences) && !inLink(i) && (!resolves || resolves(target))) {
       hits.push({ pos: i, end: i + m[0]!.length, target });
     }
   }

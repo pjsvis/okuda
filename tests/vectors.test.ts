@@ -97,13 +97,16 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
     expect(scanReferences('```\nADR-031\n').map((r) => r.target)).toEqual([]);
   });
 
-  test("legacy okuda-rhs wiring is not honored — and is not a reference", () => {
-    // The legacy row's path lives in an HTML comment as wiring; bare .md
-    // paths in prose are not references — discovery scans links and
-    // callsigns only, and colour is a separate register question. So the
-    // authored number is not honored, and the row is inert.
+  test("legacy okuda-rhs wiring is not honored — but Ring B mints its path", () => {
+    // The legacy row's path lives in an HTML comment as wiring; the
+    // authored NUMBER is dead (ADR-022) and the row stays inert as
+    // wiring. But the path itself is an ordinary reference since Ring
+    // B — it mints a vector, dedupes with any prose mention, and the
+    // References section lists it. One claim (the number) retired;
+    // another (the path) honored.
     const src = "| *slug* | CS | **14** <!-- %%okuda-rhs:14%% briefs/x.md --> |";
-    expect(scanReferences(src).length).toBe(0);
+    const refs = scanReferences(src).map((r) => r.target);
+    expect(refs).toEqual(["briefs/x.md"]); // no [14] honored — the vector is §12
   });
 
   test("the frontmatter is not scanned — a document's own callsign is not a reference", () => {
@@ -289,9 +292,9 @@ describe("vectors — Ring A: code-file mentions (BRF-SILCROW-PATHS)", () => {
     expect(refs).toEqual(["UTF-8"]);
   });
 
-  test("named .md paths are NOT Ring A — Ring B's own step, unwired", () => {
-    const refs = scanReferences("see docs/help.md for keys.").map((r) => r.target);
-    expect(refs).toEqual([]); // no link syntax: a bare mention, unpainted this ring
+  test("named .md paths are Ring B's own regex — see the Ring B block", () => {
+    // Retired here, asserted there (BRF-SILCROW-PATHS step 3): the
+    // original Ring A probe of the unwired state.
   });
 
   test("the ADR-045 gate: the filesystem decides — phantom and URL retract", () => {
@@ -340,5 +343,73 @@ describe("vectors — Ring A: code-file mentions (BRF-SILCROW-PATHS)", () => {
     const src = "first ADR-030, then src/vectors.ts, then [a doc](docs/x.md).";
     const map = jumpMapFor(src, resolves);
     expect([...map.values()]).toEqual(["ADR-030", "src/vectors.ts", "docs/x.md"]);
+  });
+});
+
+describe("vectors — Ring B: named md paths (BRF-SILCROW-PATHS step 3)", () => {
+  test("a bare dir/name.md mention is a reference — the corpus's own convention", () => {
+    // 1,192 free-standing mentions, 1 inside link syntax (the P-1
+    // probe): bare mention is how the silo cites its own documents.
+    const refs = scanReferences("see docs/help.md for keys.").map((r) => r.target);
+    expect(refs).toEqual(["docs/help.md"]);
+  });
+
+  test("the gate is the same substrate: a phantom md path never paints", () => {
+    const resolves = (t: string) => t === "docs/help.md";
+    const src = "real docs/help.md, phantom briefs/ghost-brief.md, both bare.";
+    expect(scanReferences(src, resolves).map((r) => r.target)).toEqual(["docs/help.md"]);
+    // no predicate = the pure scan, discovery validates nothing
+    expect(scanReferences(src).map((r) => r.target)).toEqual(["docs/help.md", "briefs/ghost-brief.md"]);
+  });
+
+  test("one claim, one badge: a link's internal target is never re-minted", () => {
+    const src = "one claim: [the doc](docs/help.md), and bare docs/help.md again.";
+    const refs = scanReferences(src);
+    expect(refs.map((r) => r.target)).toEqual(["docs/help.md", "docs/help.md"]); // two occurrences
+    const map = jumpMapFor(src);
+    expect([...map.values()]).toEqual(["docs/help.md"]); // one destination, one silcrow
+    const out = annotateSource(src, map);
+    expect((out.match(/%okuda-vector:12%/g) ?? []).length).toBe(2); // both painted, once each
+  });
+
+  test("W2 re-worn: an md :NNN suffix swallows into the span, strips from the target", () => {
+    const src = "the line is docs/help.md:42, file-level only.";
+    const refs = scanReferences(src);
+    expect(refs.length).toBe(1);
+    expect(refs[0]!.target).toBe("docs/help.md"); // the silcrow is file-level
+    expect(src.slice(refs[0]!.pos, refs[0]!.end)).toBe("docs/help.md:42"); // paint covers the mention
+  });
+
+  test("suffixed and plain md mentions share the vector", () => {
+    const resolves = (t: string) => t === "docs/help.md";
+    const map = jumpMapFor("see docs/help.md:42, then docs/help.md plain.", resolves);
+    expect([...map.values()]).toEqual(["docs/help.md"]);
+    expect(map.size).toBe(1);
+  });
+
+  test("legibility (ADR-049): .jsonl never paints — the exile applies ungated", () => {
+    // Horizontal data is not a readable render: the exile is a token
+    // class, not a gate — an exiled target can never enter the map,
+    // so body, actuator, and the References section retract in one move.
+    const src = "results data/graded_matrix.jsonl and data/eval_log.json.";
+    expect(scanReferences(src).map((r) => r.target)).toEqual(["data/eval_log.json"]); // .json survives
+    expect(jumpMapFor(src, () => true).size).toBe(1); // .jsonl never enters the map
+  });
+
+  test("fences still fence Ring B (the standing discipline)", () => {
+    const src = "```\ndocs/help.md\n```\n\nprose docs/help.md after.";
+    expect(scanReferences(src).map((r) => r.target)).toEqual(["docs/help.md"]);
+  });
+
+  test("no slash, no intent: bare basenames stay Ring C, parked", () => {
+    expect(scanReferences("see help.md and README.md, unprefixed.")).toEqual([]);
+  });
+
+  test("reading order: Ring B joins the map in position", () => {
+    const resolves = () => true;
+    const src = "first ADR-030, then src/vectors.ts, then docs/help.md bare, then [a doc](docs/x.md).";
+    expect([...jumpMapFor(src, resolves).values()]).toEqual([
+      "ADR-030", "src/vectors.ts", "docs/help.md", "docs/x.md",
+    ]);
   });
 });
