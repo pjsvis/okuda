@@ -6,7 +6,7 @@ callsign: BRF-ROOT-CLIMB
 # Brief: The root climb — the silo is the repo, not the cwd
 
 **Date:** 2026-09-30
-**Status:** Open
+**Status:** Done — implemented same-day; ADR-048 accepted, `td-8c1650`
 
 ---
 
@@ -67,16 +67,16 @@ argument meant. ADR-048 records the decision; this brief implements it.
 
 ## Work Plan
 
-1. [ ] `siloRoot()` + unit tests (tmp git repo via `git init`, subfolder launch,
+1. [x] `siloRoot()` + unit tests (tmp git repo via `git init`, subfolder launch,
    non-git cwd, `.git`-file worktree if cheap to fixture).
-2. [ ] Resolve once at `runLauncher`/cli entry; thread the root through the
+2. [x] Resolve once at `runLauncher`/cli entry; thread the root through the
    existing `cwd` parameters (the seams exist — no layer surgery).
-3. [ ] Thread the silcrow path validator's cwd anchor (ADR-045).
-4. [ ] The `process.cwd()` audit — every call site assigned or excused, in-code.
-5. [ ] Dogfood: `gloam` from `okuda/src` (badge + corpus), from
+3. [x] Thread the silcrow path validator's cwd anchor (ADR-045).
+4. [x] The `process.cwd()` audit — every call site assigned or excused, in-code.
+5. [x] Dogfood: `gloam` from `okuda/src` (badge + corpus), from
    `cool-pi-extensions/docs` (their corpus, honest unrooted), from `/tmp`
    (cwd fallback).
-6. [ ] Debrief.
+6. [x] Debrief.
 
 ## Acceptance Criteria
 

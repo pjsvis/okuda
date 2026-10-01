@@ -10,6 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-09-30 | DBF-REFERENCES-SECTION | done | Debrief: The References section — the renderer's receipt for its own map | 2026-09-30-debrief-references-section.md |
+| 2026-09-30 | DBF-ROOT-CLIMB | done | Debrief: The root climb — same-day, one spawn, three seams | 2026-09-30-debrief-root-climb.md |
 | 2026-09-29 | DBF-COLOUR-DAY | done | Debrief: The colour day — chroma, the shelf, and the curiosity that became a must-have | 2026-09-29-debrief-the-colour-day.md |
 | 2026-09-24 | DBF-ONION-SEARCH-GRAMMAR | done | Debrief: The onion search grammar — what shipped, what the tests decided, what stayed parked | 2026-09-24-debrief-onion-search-grammar.md |
 | 2026-09-22 | DBF-ORNAMENT | done | Debrief: The ornament that pays rent — the branch landed, and a close-out found unclosed | 2026-09-22-debrief-the-ornament.md |
