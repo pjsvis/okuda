@@ -6,7 +6,8 @@ callsign: BRF-REFERENCES-SECTION
 # Brief: The References section — the renderer emits its own map
 
 **Date:** 2026-09-13
-**Status:** Open
+**Status:** Done — shipped 2026-09-30 on `feat/references-section` (ADR-047;
+the URL channel td-9eb7a4 stays open, out of scope by design)
 **TD:** td-e45bda
 **Lineage:** the References-section design sessions (2026-09-13); the
 hand-written convention it retires; BRF-CENSUS-MODE's unanswered cap

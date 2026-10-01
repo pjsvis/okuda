@@ -23,7 +23,7 @@ import {
   makePathValidator,
   resolveByCallsign,
 } from "./root";
-import { CALLSIGN_SHAPE, jumpMapFor, annotateSource } from "./vectors";
+import { CALLSIGN_SHAPE, jumpMapFor, annotateSource, appendReferences } from "./vectors";
 import { terminalCols, terminalRows } from "./width";
 import { existsSync } from "node:fs";
 
@@ -209,11 +209,18 @@ async function main(): Promise<void> {
     const width = terminalCols(80);
     // A streaming render to a TTY is a main document too (ADR-031): it
     // gets its silcrows. Piped output stays clean — the paint is for
-    // glass, not for downstream tools.
-    const source2 = process.stdout.isTTY
-      ? annotateSource(source, jumpMapFor(source, silcrowResolves))
-      : source;
-    const out = await renderDocument(source2, { width, palette, color });
+    // glass, not for downstream tools. The map is built ALWAYS (ADR-047):
+    // the generated References section is a projection of the map, so it
+    // is present on every rung — glass, pipe, NO_COLOR — while the paint
+    // stays TTY-gated. The section joins downstream of the paint; its
+    // own callsigns never re-enter the map.
+    const map = jumpMapFor(source, silcrowResolves);
+    const source2 = process.stdout.isTTY ? annotateSource(source, map) : source;
+    const out = await renderDocument(appendReferences(source2, map), {
+      width,
+      palette,
+      color,
+    });
     if (args.watch) {
       process.stdout.write("\x1b[2J\x1b[3J\x1b[H"); // clear + home
     }

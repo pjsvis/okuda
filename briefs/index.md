@@ -11,6 +11,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 |---|---|---|---|---|
 | 2026-09-30 | BRF-FENCE-DISCIPLINE | open | One fence rule — five scanners, four disciplines, one of them fixed | 2026-09-30-brief-fence-discipline.md |
 | 2026-09-30 | BRF-STEP-INVENTORY | open | The stride inventory — what steps, what compounds, what is missing | 2026-09-30-brief-step-inventory.md |
+| 2026-09-30 | BRF-TERMINAL-CELL-GRID | parked | 2D Terminal Cell Grid Architecture (parked) | 2026-09-30-brief-terminal-cell-grid.md |
 | 2026-09-29 | BRF-CODE-SHELF | open | Code shelf — a dir predicate scopes the tier | 2026-09-29-brief-code-shelf.md |
 | 2026-09-29 | BRF-FENCE-COLOUR | open | Fence colour — chroma at the mermaid seam, the terminal's palette as the theme | 2026-09-29-brief-fence-colour.md |
 | 2026-09-29 | BRF-PROJECTION-LOSSES | open | Projection losses — two surfaces that drop content they mean to keep | 2026-09-29-brief-projection-losses.md |

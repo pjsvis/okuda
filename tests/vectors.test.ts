@@ -9,7 +9,10 @@ import {
   buildJumpMap,
   jumpMapFor,
   annotateSource,
+  referencesSection,
+  appendReferences,
 } from "../src/vectors";
+import { buildFixture } from "../scripts/references-demo";
 
 describe("vectors — discovery (occurrences, reading order, one-to-many)", () => {
   test("callsign-shaped tokens are references", () => {
@@ -192,6 +195,83 @@ describe("vectors — annotation (illustrative paint markers)", () => {
 
   test("no references → source unchanged", () => {
     expect(annotateSource("plain text.", jumpMapFor("plain text."))).toBe("plain text.");
+  });
+});
+
+describe("vectors — the generated References section (ADR-047, BRF-REFERENCES-SECTION)", () => {
+  test("one line per destination, in map order, silcrow first", () => {
+    const map = jumpMapFor("cite ADR-030, then BRF-CENSUS-MODE, then [a doc](docs/x.md).");
+    expect(referencesSection(map)).toBe(
+      [
+        "## References",
+        "",
+        "%okuda-vector:12% ADR-030",
+        "",
+        "%okuda-vector:13% BRF-CENSUS-MODE",
+        "",
+        "%okuda-vector:14% docs/x.md",
+      ].join("\n"),
+    );
+  });
+
+  test("the header is exactly `## References` — a level-2 hash header", () => {
+    const map = jumpMapFor("one cite: ADR-030.");
+    expect(referencesSection(map).split("\n")[0]).toBe("## References");
+  });
+
+  test("empty map → no section, no empty header", () => {
+    expect(referencesSection(new Map())).toBe("");
+    expect(referencesSection(jumpMapFor("no references here."))).toBe("");
+  });
+
+  test("repeated references list once (the map is one-destination-one-silcrow)", () => {
+    const map = jumpMapFor("ADR-030 and ADR-030 again.");
+    expect(referencesSection(map)).toBe("## References\n\n%okuda-vector:12% ADR-030");
+  });
+
+  test("appendReferences: the junction normalises the tail to one blank line", () => {
+    const map = jumpMapFor("cite ADR-030.");
+    // trailing newlines, whatever their count, collapse to exactly one
+    // blank line before the header — the header lands as a header.
+    expect(appendReferences("body\n\n\n\n", map)).toBe(
+      "body\n\n## References\n\n%okuda-vector:12% ADR-030\n",
+    );
+    expect(appendReferences("body", map)).toBe(
+      "body\n\n## References\n\n%okuda-vector:12% ADR-030\n",
+    );
+  });
+
+  test("appendReferences: empty map passes the source through untouched", () => {
+    expect(appendReferences("body\n", new Map())).toBe("body\n");
+  });
+
+  test("the map-identity invariant: the section never feeds the map (the loop's guard)", () => {
+    // A doc with its section appended derives the same map as the same
+    // doc without one — the acceptance criterion. Repeats dedupe by
+    // target; .md targets listed as bare paths are mentions, not uses.
+    const src = "cite ADR-030 and [a doc](docs/x.md) and src/vectors.ts, twice: ADR-030.";
+    const map = jumpMapFor(src);
+    const withSection = appendReferences(src, map);
+    expect(jumpMapFor(withSection)).toEqual(map);
+    // and the sectioned doc stays fixed-point: appending again changes
+    // only whitespace, not the map.
+    expect(jumpMapFor(appendReferences(withSection, jumpMapFor(withSection)))).toEqual(map);
+  });
+
+  test("the dogfood: the demo fixture asserts the generated section lists every destination (td-3562fe)", () => {
+    // The brief's settling diff: the hand-written section listed 6 of
+    // 9. The generated section must list every destination of the
+    // fixture's map — 10 today (Ring A minted the generator's own path
+    // after the brief was written; the invariant is "every", not "nine").
+    const src = buildFixture();
+    const map = jumpMapFor(src);
+    expect(map.size).toBeGreaterThan(0); // the fixture carries references
+    const rendered = referencesSection(map).replace(/%okuda-vector:(\d+)%/g, "§$1");
+    const listed = new Set(
+      rendered.split("\n").map((l) => l.replace(/^§\d+ /, "")).filter((l) => l !== "" && l !== "## References"),
+    );
+    for (const target of map.values()) expect(listed.has(target)).toBe(true);
+    expect(listed.size).toBe(map.size);
   });
 });
 

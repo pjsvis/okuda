@@ -32,11 +32,13 @@
  *   just references-demo                    # generate + frame in the TUI
  */
 
-import { scanReferences, jumpMapFor, annotateSource, MAX_REFS, VECTOR_MIN } from "../src/vectors";
+import { scanReferences, jumpMapFor, referencesSection, MAX_REFS, VECTOR_MIN } from "../src/vectors";
 
 /** The fixture. Every path is real and every callsign resolves, so the
- *  silcrows actuate — the demo is the corpus, not a mock of it. Pure. */
-function buildFixture(): string {
+ *  silcrows actuate — the demo is the corpus, not a mock of it. Pure.
+ *  Exported for the dogfood test (td-3562fe): the fixture asserts the
+ *  generated section lists every map destination. */
+export function buildFixture(): string {
   return [
     "# References section — the demo",
     "",
@@ -124,23 +126,40 @@ function buildFixture(): string {
   ].join("\n");
 }
 
-/** Print the derived map and the painted References section as plain
- *  text — the demo's arithmetic, without a glass. */
+/** Print the derived map and the GENERATED References section, and
+ *  assert the receipt lists every destination (td-3562fe, ADR-047): a
+ *  hand-written section omitted a third (six of nine); generation
+ *  cannot. The fixture's own hand-written section stays in its text as
+ *  the retired convention's specimen — the demo now shows the receipt.
+ *  (The brief's "nine" is now ten: Ring A, ADR-045, minted the demo's
+ *  own generator path after the brief was written — the assertion
+ *  targets the invariant, every destination listed, not the count.) */
 function reportMap(source: string): void {
   const occurrences = scanReferences(source);
   const map = jumpMapFor(source);
-  const annotated = annotateSource(source, map);
-  const heading = annotated.lastIndexOf("\n## 2. References");
-  const section = heading >= 0 ? annotated.slice(heading) : annotated;
+  const section = referencesSection(map).replace(/%okuda-vector:(\d+)%/g, "§$1");
+  const listed = new Set(
+    section
+      .split("\n")
+      .map((l) => l.replace(/^§\d+ /, ""))
+      .filter((l) => l !== "" && l !== "## References"),
+  );
+  const missing = [...map.values()].filter((t) => !listed.has(t));
 
   console.log(`references-demo — ${occurrences.length} occurrences, ${map.size} destinations`);
-  console.log(`floor ${VECTOR_MIN} · cap ${MAX_REFS} occurrences · the section below, as painted:`);
+  console.log(`floor ${VECTOR_MIN} · cap ${MAX_REFS} occurrences · the generated section (ADR-047):`);
   console.log("");
-  console.log(section.replace(/%okuda-vector:(\d+)%/g, " §$1").trimEnd());
+  console.log(section);
   console.log("");
   console.log("the map:");
   for (const [n, target] of [...map].sort((a, b) => a[0] - b[0])) {
     console.log(`  §${n} → ${target}`);
+  }
+  const ok = missing.length === 0;
+  console.log(`assert: the generated section lists ${listed.size} of ${map.size} — ${ok ? "OK" : "FAIL"}`);
+  if (!ok) {
+    console.error(`references-demo: missing from the generated section: ${missing.join(", ")}`);
+    process.exit(1);
   }
 }
 

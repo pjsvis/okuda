@@ -268,6 +268,15 @@ prose is discovered at render time, and the main document's vectors
 (`§11` … `§98`, gold, in the reserved paint) are derived from it —
 reading order, unique, no authoring.
 
+**The References section is generated (ADR-047).** The renderer ends
+every main-document render with `## References` — the map's own
+receipt, one line per destination, reading order, silcrow first. There
+is nothing to author: write the reference, the number takes care of
+itself, and the section takes care of the list. A hand-written index
+omits by omission (measured: nine in the map, six in the polished
+hand-written section); generation cannot. The convention is retired for
+new documents; the existing hand-written sections stay as history.
+
 **Write the reference; the number takes care of itself.** The rules
 that survive:
 
