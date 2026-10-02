@@ -1,9 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, realpathSync, symlinkSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, realpathSync, symlinkSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import {
   makeSelfExclusion,
+  makeSilcrowGate,
   callsignForFile,
   detectRoot,
   isWithinRoot,
@@ -403,5 +404,33 @@ describe("root — makeSelfExclusion (the md-path sibling of the callsign self-r
 
   test("no main file — nothing is self (the unrooted default)", () => {
     expect(makeSelfExclusion()("anything.md")).toBe(false);
+  });
+});
+
+describe("root — makeSilcrowGate (one composition, every caller — the launcher drift guard)", () => {
+  test("the gate excludes self, passes callsigns and real paths", () => {
+    const cwd = process.cwd();
+    const g = makeSilcrowGate("docs/showcase.md", cwd);
+    expect(g("docs/showcase.md")).toBe(false); // the drift the operator saw
+    expect(g("./docs/showcase.md")).toBe(false);
+    expect(g("ADR-030")).toBe(true); // callsign substrate
+    expect(g("docs/keymap.md")).toBe(true); // path substrate
+    expect(g("no/such.md")).toBe(false); // the gate still gates
+  });
+
+  test("no hand-composed gate outside root.ts — the next copy is loud", () => {
+    // The launcher drift: cli composed callsign||path, the launcher
+    // hand-composed its own copy per round, and a fix to one did not
+    // reach the other. The composition now lives in makeSilcrowGate;
+    // this guard reads the callers' source and fails if a second
+    // composition appears (the reg-sync precedent: two lists that must
+    // agree drifted once — the test makes the next drift loud).
+    for (const f of ["src/cli.ts", "src/launcher.ts"]) {
+      const src = readFileSync(f, "utf8");
+      expect(
+        /makeCallsignValidator\([^)]*\)\(\s*t\s*\)\s*\|\|\s*makePathValidator/.test(src),
+        `${f} hand-composes the silcrow gate — use makeSilcrowGate (one composition, every caller)`,
+      ).toBe(false);
+    }
   });
 });

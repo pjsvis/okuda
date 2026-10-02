@@ -19,10 +19,8 @@ import { runLauncher, invokedAsGloam, rankedShortlistEntries } from "./launcher"
 import {
   detectRoot,
   makeCallsignResolver,
-  makeCallsignValidator,
   isWithinRoot,
-  makePathValidator,
-  makeSelfExclusion,
+  makeSilcrowGate,
   resolveByCallsign,
   siloRoot,
 } from "./root";
@@ -158,14 +156,12 @@ async function main(): Promise<void> {
   // resolves. Built once per run beside the actuator siblings — the paint
   // and the keypress share the one resolution semantics, so they cannot
   // disagree.
-  const callsignResolves = makeCallsignValidator(cwd);
-  const pathValidates = makePathValidator(args.file ?? undefined, cwd);
-  // The self-path exclusion rides the gate (the showcase §12 nit): a
-  // target that resolves to THIS document mints nothing — the page is
-  // already on the glass. One composition feeds both surfaces (the
-  // streaming render and runTui's opts.resolves).
-  const isSelf = makeSelfExclusion(args.file ?? undefined, cwd);
-  const silcrowResolves = (t: string) => !isSelf(t) && (callsignResolves(t) || pathValidates(t));
+  // The silcrow gate, ONE composition (makeSilcrowGate): callsign ||
+  // path, minus self — a target that resolves to THIS document mints
+  // nothing (the showcase §12 nit). Feeds the streaming render and
+  // runTui's opts.resolves; the launcher builds the same gate per round
+  // — no second composition to drift (the launcher drift, 2026-10-02).
+  const silcrowResolves = makeSilcrowGate(args.file ?? undefined, cwd);
   if (invokedAsGloam() && process.stdin.isTTY) {
     // `-g <query>`: seed alias (ADR-030 §4) — same as a bare-arg query.
     if (args.grep !== null) {

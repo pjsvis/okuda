@@ -23,9 +23,8 @@ import { type ChannelHit, type OnionDeps, onionMerge, routeQuery } from "./onion
 import {
   detectRoot,
   makeCallsignResolver,
-  makeCallsignValidator,
+  makeSilcrowGate,
   isWithinRoot,
-  makePathValidator,
   resolveByCallsign,
   siloRoot,
   TIER_REGISTRIES,
@@ -499,8 +498,7 @@ export async function runLauncher(opts: { query?: string } = {}): Promise<void> 
         // per round: re-derivation replaces invalidation — a document
         // (or a code file) landed mid-session is validated on the next
         // pick, not remembered as absent.
-        resolves: (t) =>
-          makeCallsignValidator(cwd)(t) || makePathValidator(pick.file, cwd)(t),
+        resolves: makeSilcrowGate(pick.file, cwd),
       });
     }
   } finally {

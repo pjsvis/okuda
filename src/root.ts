@@ -316,6 +316,23 @@ export function makeSelfExclusion(
   };
 }
 
+/** The silcrow gate as ONE composition (the launcher drift, 2026-10-02:
+ *  cli composed callsign||path, the launcher hand-composed its own copy
+ *  per round, and a fix to one copy — the self-path exclusion — did not
+ *  reach the other; the operator saw the self-badge the streaming fix
+ *  had already killed). One builder, every caller: callsign || path,
+ *  minus self. A target that resolves to the main document mints
+ *  nothing (the page is already on the glass). Pure-ish (reads fs). */
+export function makeSilcrowGate(
+  mainFile: string | undefined,
+  cwd: string = process.cwd(),
+): (target: string) => boolean {
+  const callsignResolves = makeCallsignValidator(cwd);
+  const pathValidates = makePathValidator(mainFile, cwd);
+  const isSelf = makeSelfExclusion(mainFile, cwd);
+  return (t) => !isSelf(t) && (callsignResolves(t) || pathValidates(t));
+}
+
 /** Resolve a document's callsign from its path. Pure-ish (reads fs). */
 export function callsignForFile(file: string, cwd: string = process.cwd()): string | null {
   const key = tierFileKey(file);

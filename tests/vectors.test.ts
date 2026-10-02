@@ -13,7 +13,7 @@ import {
   appendReferences,
 } from "../src/vectors";
 import { buildFixture } from "../scripts/references-demo";
-import { makeCallsignValidator, makePathValidator, makeSelfExclusion } from "../src/root";
+import { makeSilcrowGate } from "../src/root";
 
 describe("vectors — discovery (occurrences, reading order, one-to-many)", () => {
   test("callsign-shaped tokens are references", () => {
@@ -143,9 +143,10 @@ describe("vectors — the self-path exclusion, composed as cli builds the gate (
     // `./okuda docs/showcase.md`" — Ring B's bare-path scan minted the
     // self-row. Composed exactly as cli.ts composes silcrowResolves.
     const cwd = process.cwd();
-    const resolves = (t: string) =>
-      !makeSelfExclusion("docs/showcase.md", cwd)(t) &&
-      (makeCallsignValidator(cwd)(t) || makePathValidator("docs/showcase.md", cwd)(t));
+    // The REAL composition, as cli and the launcher both build it —
+    // never a hand-copy: re-implementing the composition here re-creates
+    // the drift the test exists to catch (the launcher drift, 2026-10-02).
+    const resolves = makeSilcrowGate("docs/showcase.md", cwd);
     const src = [
       "Render it with `./okuda docs/showcase.md` and read it as a smoke test.",
       "",
@@ -161,9 +162,7 @@ describe("vectors — the self-path exclusion, composed as cli builds the gate (
 
   test("a sibling citation still mints (the exclusion is exact, not a blanket)", () => {
     const cwd = process.cwd();
-    const resolves = (t: string) =>
-      !makeSelfExclusion("docs/showcase.md", cwd)(t) &&
-      (makeCallsignValidator(cwd)(t) || makePathValidator("docs/showcase.md", cwd)(t));
+    const resolves = makeSilcrowGate("docs/showcase.md", cwd);
     const src = "docs/keymap.md is a sibling, decisions/004-hard-wrap-mandate.md is the law.";
     const map = jumpMapFor(src, resolves);
     expect([...map.values()]).toContain("docs/keymap.md");
