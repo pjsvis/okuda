@@ -144,6 +144,12 @@ export function scanReferences(
 ): RefOccurrence[] {
   const fm = source.match(/^---\n[\s\S]*?\n---/);
   const bodyStart = fm ? fm[0]!.length : 0;
+  // A document's own callsign mints nothing (td-e6e692): the frontmatter
+  // names the document, and a body/H1 mention of it is a self-citation
+  // — the vector would jump to the page already on the glass, and the
+  // References section would list the doc beneath itself. The exclusion
+  // reads the same frontmatter the body scan already skips.
+  const self = fm?.[0]!.match(/^\s*callsign:\s*(\S+)\s*$/m)?.[1];
   const fences = fenceRanges(source);
   const hits: RefOccurrence[] = [];
   for (const m of source.matchAll(RE_MD_LINK)) {
@@ -155,7 +161,7 @@ export function scanReferences(
   // registry check is the retraction.
   for (const m of source.matchAll(RE_CALLSIGN)) {
     const i = m.index!;
-    if (i >= bodyStart && !inFence(i, fences) && (!resolves || resolves(m[0]!))) {
+    if (i >= bodyStart && !inFence(i, fences) && m[0] !== self && (!resolves || resolves(m[0]!))) {
       hits.push({ pos: i, end: i + m[0]!.length, target: m[0]! });
     }
   }

@@ -136,6 +136,42 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
   });
 });
 
+describe("vectors — the self-citation exclusion (td-e6e692)", () => {
+  test("the document's own callsign mints no vector; others still do", () => {
+    const src = [
+      "---",
+      "type: Advisory",
+      "callsign: ADV-SELF",
+      "---",
+      "",
+      "# ADV-SELF — the heading cites itself",
+      "",
+      "Body cites ADR-030 for real work.",
+    ].join("\n");
+    const refs = scanReferences(src).map((r) => r.target);
+    expect(refs).not.toContain("ADV-SELF");
+    expect(refs).toContain("ADR-030");
+  });
+
+  test("no frontmatter callsign — today's behaviour stands", () => {
+    expect(scanReferences("see ADR-030.").map((r) => r.target)).toEqual(["ADR-030"]);
+  });
+
+  test("jumpMapFor: self excluded, the next callsign takes vector 12", () => {
+    const src = "---\ncallsign: ADV-SELF\n---\n\n# ADV-SELF\n\nBody: ADR-030.";
+    const map = jumpMapFor(src);
+    expect([...map.values()]).toEqual(["ADR-030"]);
+    expect(map.get(12)).toBe("ADR-030");
+  });
+
+  test("annotateSource paints no self-marker (the map is the projection)", () => {
+    const src = "---\ncallsign: ADV-SELF\n---\n\n# ADV-SELF and ADR-030.";
+    const annotated = annotateSource(src, jumpMapFor(src));
+    expect(annotated).not.toContain("ADV-SELF %okuda-vector");
+    expect(annotated).toContain("ADR-030 %okuda-vector:12%");
+  });
+});
+
 describe("vectors — the jump map (the translation table)", () => {
   test("numbers run from 12, in reading order — one destination, one silcrow", () => {
     const map = jumpMapFor("ADR-002 early, ADR-002 again, [x](docs/z.md).");
