@@ -89,6 +89,7 @@
 {"file":"2026-09-30-brief-television-preview.md","date":"2026-09-30","status":"parked","summary":"Television Preview — okuda as the renderer, OKUDA_WIDTH as the width knob","meta":{},"callsign":"BRF-TELEVISION-PREVIEW"}
 {"file":"2026-09-30-brief-terminal-cell-grid.md","date":"2026-09-30","status":"parked","summary":"2D Terminal Cell Grid Architecture (parked)","meta":{},"callsign":"BRF-TERMINAL-CELL-GRID"}
 {"file":"2026-10-01-brief-reading-fraction.md","date":"2026-10-01","status":"open","summary":"The reading fraction — a meter for the glass, from the state the glass already holds","meta":{},"callsign":"BRF-READING-FRACTION"}
+{"file":"2026-10-02-brief-callsign-checksum.md","date":"2026-10-02","status":"open","summary":"The callsign checksum — citations that resolve nowhere fail the gate","meta":{},"callsign":"BRF-CALLSIGN-CHECKSUM"}
 {"file":"2026-10-02-brief-demo-sandbox.md","date":"2026-10-02","status":"open","summary":"The public demo room — two access modes, one sandbox grammar","meta":{},"callsign":"BRF-DEMO-SANDBOX"}
 {"file":"2026-10-02-brief-root-containment.md","date":"2026-10-02","status":"done","summary":"Root containment — existence is not permission","meta":{},"callsign":"BRF-ROOT-CONTAINMENT"}
 {"file":"2026-10-02-brief-td-id-lint.md","date":"2026-10-02","status":"done","summary":"The valve lint — td-ID citations in persisted documents fail the gate","meta":{},"callsign":"BRF-VALVE-LINT"}
