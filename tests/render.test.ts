@@ -693,6 +693,36 @@ describe("render — state glyphs colour in prose (the lexicon leap)", () => {
     expect(out).not.toContain("\x1b[38;2;95;211;95;1m◆");
     expect(out).not.toContain("\x1b[38;2;255;224;102;1m◆");
   });
+
+  test("a list lead with a state glyph paints ONCE — no decapitated SGR leak", async () => {
+    // The inline paint reached the glyph before the list lead did; the
+    // splice used to skip ONE BYTE at the SGR boundary — decapitating
+    // the escape, leaking `[38;2;…` as literal text, doubling the glyph
+    // (the operator's snag: `• ✗[38;2;255;85;85;1m✗ Autolink`).
+    const out = await render("- ✗ Autolink pass. Rejected — URL detection is the terminal's job.");
+    const line = out.split("\n").find((l) => stripANSI(l).includes("Autolink"))!;
+    expect([...stripANSI(line).matchAll(/✗/g)].length).toBe(1); // once, never twice
+    expect(line).toContain("\x1b[38;2;255;85;85;1m✗\x1b[0m"); // styled lead
+    expect(stripANSI(line)).not.toContain("[38;"); // no escape body as text
+  });
+
+  test("a glyph under an enclosing style splices over the glyph — runs kept", async () => {
+    // Strong wraps the (already-painted) glyph: the leading runs are an
+    // enclosing style, the splice replaces exactly the glyph, and the
+    // strong run survives ahead of it.
+    const out = await render("- **✗ rejected inside strong** — the lead survives");
+    const line = out.split("\n").find((l) => stripANSI(l).includes("rejected"))!;
+    expect([...stripANSI(line).matchAll(/✗/g)].length).toBe(1);
+    expect(line).toContain("\x1b[38;2;255;85;85;1m✗\x1b[0m");
+    expect(stripANSI(line)).not.toContain("[38;");
+  });
+
+  test("a table cell glyph under an enclosing style — same splice, no leak", async () => {
+    const out = await render("| a | b |\n|---|---|\n| plain | **✗ in strong** |");
+    const line = out.split("\n").find((l) => stripANSI(l).includes("in strong"))!;
+    expect([...stripANSI(line).matchAll(/✗/g)].length).toBe(1);
+    expect(stripANSI(line)).not.toContain("[38;");
+  });
 });
 
 // ── The GLöam wordmark (the BÖC move) ──

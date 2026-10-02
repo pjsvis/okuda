@@ -85,9 +85,14 @@ const STATE_GLYPH_ROLE: Record<string, keyof Palette> = {
 
 /** If `text` begins with a state glyph (the closed set), colour + bold
  *  that leading glyph via its lexicon role; leave the rest unchanged.
- *  Detects the glyph after any leading ANSI escapes (inline-styled
- *  cells may carry SGR before the visible char). Pure; in none mode the
- *  colour drops but the weight survives (roleBold emits SGR 1). */
+ *  Detects the glyph after any leading ANSI SGR runs (inline-styled
+ *  cells may carry SGR before the visible char) and splices the styled
+ *  glyph over exactly the glyph — the leading runs are kept (they may
+ *  be the enclosing style; roleBold's reset is the guest's, handed
+ *  back like the heading's). Byte-idempotent: text already painted in
+ *  this role (the inline paint got here first) returns unchanged.
+ *  Pure; in none mode the colour drops but the weight survives
+ *  (roleBold emits SGR 1). */
 function styleStateGlyph(text: string, styler: ReturnType<typeof makeStyler>): string {
   if (text === "") return text;
   // Find the first visible char by skipping leading ANSI SGR sequences.
@@ -96,31 +101,23 @@ function styleStateGlyph(text: string, styler: ReturnType<typeof makeStyler>): s
   if (first === undefined) return text;
   const role = STATE_GLYPH_ROLE[first];
   if (!role) return text;
-  // Locate the glyph in the original (with ANSI) by matching the
-  // stripped prefix length, then splice the styled glyph in.
-  const prefixLen = stripped.length - [...stripped].slice(1).join("").length;
-  // Walk the original text, counting visible chars until we hit the glyph.
-  let visStart = -1;
-  let visible = 0;
+  // Already painted in this role? The inline text() paint reached the
+  // glyph before the list lead / table cell did — once is the lexicon.
+  if (text.startsWith(styler.roleBoldOpen(role))) return text;
+  // The glyph sits after any leading SGR runs (an enclosing style).
+  // Splice over exactly the glyph — its own code-unit length, never one
+  // byte at a run boundary: skipping one BYTE at the SGR decapitated
+  // the escape and its body leaked as literal `[38;2;…` text while the
+  // original glyph stayed (the list-lead fault, 2026-10-02).
+  let glyphStart = 0;
   const re = /\x1b\[[0-9;]*m/g;
-  let m: RegExpExecArray | null;
-  let i = 0;
   for (;;) {
-    re.lastIndex = i;
-    m = re.exec(text);
-    const ansiStart = m ? m.index : text.length;
-    if (visible === 0) { visStart = ansiStart; break; }
-    // count chars between i and ansiStart
-    if (ansiStart > i) {
-      const chunk = text.slice(i, ansiStart);
-      visible += [...chunk].length;
-    }
-    i = m ? m.index + m[0].length : text.length;
-    if (!m) break;
+    re.lastIndex = glyphStart;
+    const m = re.exec(text);
+    if (!m || m.index !== glyphStart) break;
+    glyphStart = m.index + m[0].length;
   }
-  if (visStart < 0) visStart = 0;
-  const glyph = first;
-  return text.slice(0, visStart) + styler.roleBold(role, glyph) + text.slice(visStart + prefixLen);
+  return text.slice(0, glyphStart) + styler.roleBold(role, first) + text.slice(glyphStart + first.length);
 }
 
 export interface RenderOptions {
