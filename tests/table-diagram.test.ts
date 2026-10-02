@@ -67,28 +67,27 @@ describe("render — tables (uniform presentation policy)", () => {
     }
   });
 
-  test("in-cell wrap zips line-by-line — columns hold through wraps", async () => {
-    // The word-salad fault: a wrapped cell's \n used to dump its tail to
-    // the left margin and drag siblings out of column. The zip fix makes
-    // line N of every cell sit in its column.
+  test("cells elide at their column budget — rows stay single-line (ADR-UNIVERSAL-ELISION-050)", async () => {
+    // The wrap policy (and the zip/word-salad stratum built to hold it)
+    // is repealed: a cell over its budget truncates with …, one line per
+    // row, columns hold by construction. The reader's remedy for the …
+    // is a wider glass, not a taller table.
     const out = await renderDocument(
-      "| a | b |\n|---|---|\n| heading | long cell content here |\n",
+      "| a | b |\n|---|---|\n| hi | long cell content here |\n",
       { width: 24 },
     );
     const ls = out.split("\n");
-    // Find the wrapped body row (two lines). The first column "heading"
-    // wraps; its continuation "g" must be in column 1 (left-padded),
-    // and the second column's content must start on line 1, not after
-    // the wrapped tail.
-    const bodyStart = ls.findIndex((l) => stripANSI(l).includes("head"));
-    expect(bodyStart).toBeGreaterThan(-1);
-    const line1 = stripANSI(ls[bodyStart]!);
-    const line2 = stripANSI(ls[bodyStart + 1]!);
-    // line 1: "head" (wrapped from "heading") in col 1, col 2 content starts
-    expect(line1).toMatch(/^\s+head\s+long/);
-    // line 2: "ing" continuation in col 1, col 2 content continues in its lane
-    expect(line2).toMatch(/^\s+ing\s+content/);
-    // No line exceeds the width
+    // The body row is ONE line — the short column intact, the long
+    // column elided, never wrapped.
+    const bodyRows = ls.filter((l) => stripANSI(l).includes("hi"));
+    expect(bodyRows.length).toBe(1);
+    const row = stripANSI(bodyRows[0]!);
+    expect(row).toMatch(/\bhi\b/);
+    expect(row).toContain("…");
+    // The wrap never happened: no continuation line carrying the
+    // elided cell's tail at the left margin.
+    expect(ls.filter((l) => stripANSI(l).match(/^\s+content/)).length).toBe(0);
+    // No line exceeds the width — the cut is ours, never the terminal's
     for (const l of ls) expect(displayWidth(l)).toBeLessThanOrEqual(24);
   });
 
@@ -204,15 +203,18 @@ describe("render — menu tables (ADR-022 right-anchored role fit, td-b81597)", 
     }
   });
 
-  test("unwired tables stay generic: shrink-wrap + wrap, no role fit", async () => {
+  test("unwired tables stay generic: proportional budget + per-cell elision, no role ladder", async () => {
     const plain =
       `| Document | Callsign | # |\n|---|---|---|\n` +
       row("A very long title that goes on and on far past the budget", "BRF-ELISION-PRIMITIVE", "11", "briefs/x.md")
         .replace(/ <!-- [^>]* -->/, ""); // wiring stripped → generic
     const out = await renderDocument(plain, { width: 40 });
-    // generic path: proportional shrink + in-cell wrap (multi-line rows),
-    // the callsign may wrap — ADR-022's scope gate leaves prose tables to wrap
-    expect(stripANSI(out)).not.toMatch(/…\s{2,}BRF/);
+    // generic path under ADR-UNIVERSAL-ELISION-050: proportional budget,
+    // single-line rows, per-cell … — the menu's right-anchored ladder
+    // (floor homes, suppression order) never runs on an unwired table.
+    const bodyRows = out.split("\n").filter((l) => stripANSI(l).includes("A very long"));
+    expect(bodyRows.length).toBe(1); // single-line — no zip, no ladder rows
+    expect(bodyRows[0]).toContain("…"); // the long title elides at its budget
   });
 
   test("wiring never leaks: the comment is invisible in output", async () => {

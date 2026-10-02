@@ -1230,8 +1230,9 @@ function renderTable(t: TableState, ctx: Ctx): string {
   const gutter = 3;
   let total = colWidth.reduce((a, b) => a + b, 0) + gutter * (cols - 1);
 
-  // Fit the terminal width — never overflow (table policy). Shrink wide
-  // tables by wrapping the widest columns to a proportional budget.
+  // Fit the terminal width — never overflow. Wide tables shrink by
+  // proportional budget; cells over budget ELIDE, never wrap
+  // (ADR-UNIVERSAL-ELISION-050 — the wrap policy's repeal).
   if (total > width && cols > 0) {
     const budget = width - gutter * (cols - 1);
     const sum = colWidth.reduce((a, b) => a + b, 0);
@@ -1254,9 +1255,10 @@ function renderTable(t: TableState, ctx: Ctx): string {
   // closing rule span the FULL content width (glow parity — the bar is
   // the table-scan signal, not the table's natural width). Body rows
   // keep a 3-space gutter so columns align with the header separators.
-  // In-cell wraps are zipped line-by-line (zipRow) so columns hold —
-  // the fix for the word-salad fault where a wrapped cell's \n dumped
-  // its tail to the left margin and dragged siblings out of column.
+  // Cells elide at their column budget: rows are single-line by
+  // construction and columns hold trivially — the wrap/zip stratum
+  // (and the word-salad fault it patched) is deleted with the policy
+  // it served (ADR-UNIVERSAL-ELISION-050).
   const sep = ` ${styler.tablePipe()} `;
   const bodySep = " ".repeat(gutter);
   if (header.length > 0) {
@@ -1266,11 +1268,11 @@ function renderTable(t: TableState, ctx: Ctx): string {
         i, colWidth,
       ),
     );
-    out.push(zipRow(cells, colWidth, sep));
+    out.push(cells.join(sep));
     out.push(styler.rule(width));
   }
   for (const r of rows) {
-    const cells: string[][] = [];
+    const cells: string[] = [];
     for (let i = 0; i < cols; i++) {
       const raw = r[i]?.text ?? "";
       // State-glyph column: colour + bold a leading state glyph via the
@@ -1284,7 +1286,7 @@ function renderTable(t: TableState, ctx: Ctx): string {
         : { text: styled, align: r[i]?.align };
       cells.push(padCell(cell, i, colWidth));
     }
-    out.push(zipRow(cells, colWidth, bodySep));
+    out.push(cells.join(bodySep));
   }
   // Closing rule under the table (Glow parity: tables are bracketed,
   // full content width).
@@ -1393,42 +1395,23 @@ function renderMenuTable(t: TableState, ctx: Ctx): string {
   return trimmed.join("\n\n") + "\n\n";
 }
 
-/** Pad a cell to its column width, returning one line per wrapped row.
- *  Colour is applied by the caller (to `c.text` before this call);
- *  wrapANSI is ANSI-state-aware and re-emits SGR at wrap boundaries, so
- *  coloured-then-wrapped cells stay coloured through the wrap. Each
- *  emitted line is padded to the column width (display-aware) so columns
- *  align under the header separators. */
-function padCell(c: Cell, i: number, colWidth: number[]): string[] {
+/** Pad a cell to its column width — one line, elided at the budget
+ *  when over (ADR-UNIVERSAL-ELISION-050): the in-cell wrap is
+ *  abolished, rows are single-line by construction. Colour is applied
+ *  by the caller; elideToWidth is ANSI-run-aware and closes open
+ *  styles before the marker, so coloured-then-cut cells stay honest at
+ *  the cut. */
+function padCell(c: Cell, i: number, colWidth: number[]): string {
   const w = colWidth[i]!;
-  const raw = c.text;
-  if (displayWidth(raw) > w) {
-    return wrapANSI(raw, { width: w }).map((l) => padDisplay(l, w));
-  }
+  const raw = displayWidth(c.text) > w ? elideToWidth(c.text, w) : c.text;
   switch (c.align) {
     case "right":
-      return [padStartDisplay(raw, w)];
+      return padStartDisplay(raw, w);
     case "center":
-      return [padCenterDisplay(raw, w)];
+      return padCenterDisplay(raw, w);
     default:
-      return [padDisplay(raw, w)];
+      return padDisplay(raw, w);
   }
-}
-
-/** Zip multi-line cells into aligned row lines. Each cell is an array
- *  of pre-padded lines (padCell output); blank-pad short cells to the
- *  row height, then join line N of every cell with the separator. This
- *  is what holds columns through in-cell wraps — the single fix for the
- *  word-salad fault on wide/crowded tables (sections 5/7/10 of the
- *  table audit). */
-function zipRow(cells: string[][], colWidth: number[], sep: string): string {
-  const height = Math.max(...cells.map((c) => c.length));
-  const lines: string[] = [];
-  for (let n = 0; n < height; n++) {
-    const parts = cells.map((c, i) => c[n] ?? " ".repeat(colWidth[i]!));
-    lines.push(parts.join(sep));
-  }
-  return lines.join("\n");
 }
 
 /** Final document assembly: strip tags, apply margins, tidy edges. */
