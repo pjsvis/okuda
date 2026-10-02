@@ -6,7 +6,7 @@ callsign: ADR-HARD-WRAP-004
 # Decision: Hard-wrap always — Okuda never delegates wrapping to the terminal
 
 **Date:** 2026-08-22
-**Status:** Accepted (amended 2026-08-30 — the fence exception closed; see below)
+**Status:** Accepted (amended 2026-08-30 — the fence exception closed; amended 2026-10-02 — the last raw-block exception, the diagram gutter, closed by ADR-UNIVERSAL-ELISION-050; see below)
 
 ## Context
 
@@ -35,7 +35,7 @@ Okuda inserts literal `\n` at the terminal width boundary (`stdout.columns`) its
 **What became harder:**
 - The wrap engine must be grapheme-aware (`Intl.Segmenter`, East Asian Width, zero-width ANSI) — no naive `string.length` cuts
 - Styles must re-emit at wrap boundaries (no style bleed across lines)
-- ~~Code fences and Mermaid blocks that exceed terminal width overflow ugly by design; the user, not okuda, resolves that~~ **Amended 2026-08-30 (td-b81597):** code fences (and the mermaid checksum block) no longer overflow — they elide at the content width with `…` at the cut (`elideToWidth`). The exception was the lesser evil when wrapping was the only alternative; elision is crueler and more useful — the line stays one line, the reader sees less but truthfully, and widening restores the bytes. Mermaid ASCII **diagrams** remain verbatim (art is art; the binary authors to width) **Note (2026-09-01, td-b81e58, brief mermaid-source-omitted): the checksum half is superseded — the source block is no longer rendered at all (tautological in a single-render seam); a `⋮` indicator names where the source lives. The code-fence elision half stands.**
+- ~~Code fences and Mermaid blocks that exceed terminal width overflow ugly by design; the user, not okuda, resolves that~~ **Amended 2026-08-30 (td-b81597):** code fences (and the mermaid checksum block) no longer overflow — they elide at the content width with `…` at the cut (`elideToWidth`). The exception was the lesser evil when wrapping was the only alternative; elision is crueler and more useful — the line stays one line, the reader sees less but truthfully, and widening restores the bytes. Mermaid ASCII **diagrams** remain verbatim (art is art; the binary authors to width) **Amended 2026-10-02 (ADR-UNIVERSAL-ELISION-050): the art-is-art exemption repeals — diagram lines elide at the code-fence budget; elision is the universal overflow policy and the terminal never soft-wraps what okuda emits.** **Note (2026-09-01, td-b81e58, brief mermaid-source-omitted): the checksum half is superseded — the source block is no longer rendered at all (tautological in a single-render seam); a `⋮` indicator names where the source lives. The code-fence elision half stands.**
 
 **Constraints this imposes:**
 - **Irreversible core contract** (per brief 002's decision table): layout, tests, and user expectations all assume okuda owns every `\n`. Reversal would break the copy-paste and diagram guarantees simultaneously.
