@@ -43,7 +43,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-14 | BRF-JUMP-LIST | open | The jump list — the search screen as its projection | 2026-09-14-brief-jump-list.md |
 | 2026-09-14 | BRF-SEARCH-SURFACE | parked | The search surface — the state machine, the array, and the invariant audit | 2026-09-14-brief-search-surface.md |
 | 2026-09-14 | BRF-SPEECH-STRIDE | open | The speech stride — the arrows given to the ear, the unit heard | 2026-09-14-brief-speech-stride.md |
-| 2026-09-14 | BRF-TABLE-WIDTH | open | The cut cell — the renderer breaks words the glass had room for | 2026-09-14-brief-table-width.md |
+| 2026-09-14 | BRF-TABLE-WIDTH | done | The cut cell — the renderer breaks words the glass had room for | 2026-09-14-brief-table-width.md |
 | 2026-09-13 | BRF-AUDIO-DISCOVERY | open | Audio discovery — the actuator grammar, heard | 2026-09-13-brief-audio-discovery.md |
 | 2026-09-13 | BRF-PROLONGED-PRESS | open | The prolonged press — three gestures, one actuation, no leak | 2026-09-13-brief-prolonged-press.md |
 | 2026-09-13 | BRF-REFERENCES-SECTION | done | The References section — the renderer emits its own map | 2026-09-13-brief-references-section.md |

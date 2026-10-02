@@ -6,7 +6,7 @@ callsign: BRF-TABLE-WIDTH
 # Brief: The cut cell — the renderer breaks words the glass had room for
 
 **Created:** 2026-09-14
-**Status:** Open
+**Status:** Done — shipped 2026-10-02 (866f1fc, ADR-UNIVERSAL-ELISION-050): cells elide at their column budget; the in-cell wrap and its holding stratum (zipRow, the word-salad machinery) deleted with the policy they served. No word broken mid-token again — the long tail truncates honestly, the glass is the reader's knob. Independently reviewed at the glass (width 46: honest ellipsis, single-line rows, columns hold).
 **TD:** td-b78642 (epic) — td-0949d4 the instrument, td-7b2a9c the allocator,
 td-629148 the ADR, td-8cf596 the test, td-48700c the nine, td-991964 the
 playbook return.
