@@ -13,6 +13,7 @@ import {
   appendReferences,
 } from "../src/vectors";
 import { buildFixture } from "../scripts/references-demo";
+import { makeCallsignValidator, makePathValidator, makeSelfExclusion } from "../src/root";
 
 describe("vectors — discovery (occurrences, reading order, one-to-many)", () => {
   test("callsign-shaped tokens are references", () => {
@@ -133,6 +134,40 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
       expect(n).toBeLessThanOrEqual(VECTOR_MAX);
     }
     expect(RESERVED_VECTORS.size).toBe(7);
+  });
+});
+
+describe("vectors — the self-path exclusion, composed as cli builds the gate (the showcase §12 nit)", () => {
+  test("the document's own filename mints nothing; the next reference takes §12", () => {
+    // The repro: docs/showcase.md line 3 — "Render it with
+    // `./okuda docs/showcase.md`" — Ring B's bare-path scan minted the
+    // self-row. Composed exactly as cli.ts composes silcrowResolves.
+    const cwd = process.cwd();
+    const resolves = (t: string) =>
+      !makeSelfExclusion("docs/showcase.md", cwd)(t) &&
+      (makeCallsignValidator(cwd)(t) || makePathValidator("docs/showcase.md", cwd)(t));
+    const src = [
+      "Render it with `./okuda docs/showcase.md` and read it as a smoke test.",
+      "",
+      "Then read decisions/004-hard-wrap-mandate.md for the law.",
+    ].join("\n");
+    const map = jumpMapFor(src, resolves);
+    expect([...map.values()]).not.toContain("docs/showcase.md"); // no self-row
+    expect(map.get(VECTOR_MIN)).toBe("decisions/004-hard-wrap-mandate.md"); // §12 re-mints to the first genuine ref
+    // The badge never paints beside the self-mention either (the map is
+    // the projection — annotateSource paints only map members).
+    expect(annotateSource(src, map)).not.toMatch(/docs\/showcase\.md.*%okuda-vector/);
+  });
+
+  test("a sibling citation still mints (the exclusion is exact, not a blanket)", () => {
+    const cwd = process.cwd();
+    const resolves = (t: string) =>
+      !makeSelfExclusion("docs/showcase.md", cwd)(t) &&
+      (makeCallsignValidator(cwd)(t) || makePathValidator("docs/showcase.md", cwd)(t));
+    const src = "docs/keymap.md is a sibling, decisions/004-hard-wrap-mandate.md is the law.";
+    const map = jumpMapFor(src, resolves);
+    expect([...map.values()]).toContain("docs/keymap.md");
+    expect([...map.values()]).toContain("decisions/004-hard-wrap-mandate.md");
   });
 });
 

@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync, realpathSync, symlinkSyn
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import {
+  makeSelfExclusion,
   callsignForFile,
   detectRoot,
   isWithinRoot,
@@ -377,5 +378,30 @@ describe("root — siloRoot (ADR-048: the silo root is the git toplevel)", () =>
       expect(v("real.ts")).toBe(true);
       expect(v("no/such.ts")).toBe(false);
     } finally { cleanup(); }
+  });
+});
+
+describe("root — makeSelfExclusion (the md-path sibling of the callsign self-rule)", () => {
+  test("every accepted form of the self-path is caught; siblings are not", () => {
+    const dir = mkdtempSync(join(tmpdir(), "okuda-self-"));
+    try {
+      mkdirSync(join(dir, "docs"));
+      writeFileSync(join(dir, "docs", "self.md"), "");
+      writeFileSync(join(dir, "docs", "other.md"), "");
+      const self = join(dir, "docs", "self.md");
+      const ex = makeSelfExclusion(self, dir);
+      expect(ex("self.md")).toBe(true); // doc-relative — the §12 nit's form
+      expect(ex("./self.md")).toBe(true); // the ./ prefix normalizes away
+      expect(ex(self)).toBe(true); // absolute — every accepted form
+      expect(ex("other.md")).toBe(false); // a sibling is a real reference
+      expect(ex("ADR-030")).toBe(false); // callsign-shaped tokens pass through
+      expect(ex("no/such.md")).toBe(false); // phantoms are not self
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("no main file — nothing is self (the unrooted default)", () => {
+    expect(makeSelfExclusion()("anything.md")).toBe(false);
   });
 });

@@ -148,7 +148,10 @@ export function scanReferences(
   // names the document, and a body/H1 mention of it is a self-citation
   // — the vector would jump to the page already on the glass, and the
   // References section would list the doc beneath itself. The exclusion
-  // reads the same frontmatter the body scan already skips.
+  // reads the same frontmatter the body scan already skips. The PATH
+  // sibling (a doc citing its own filename, the showcase §12 nit) rides
+  // the caller's resolves predicate instead — the file is caller-truth,
+  // not source-truth, so the scan stays pure (makeSelfExclusion).
   const self = fm?.[0]!.match(/^\s*callsign:\s*(\S+)\s*$/m)?.[1];
   const fences = fenceRanges(source);
   const hits: RefOccurrence[] = [];

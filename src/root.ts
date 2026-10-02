@@ -281,6 +281,41 @@ export function makePathValidator(
   };
 }
 
+/** The self-path exclusion (the md-path sibling of the scan's callsign
+ *  self-rule): a target that resolves to the MAIN document itself mints
+ *  nothing — the jump would land on the page already on the glass, the
+ *  References section would list the doc beneath itself (the showcase
+ *  §12 nit, 2026-10-02). Anchored like makePathValidator — the doc's
+ *  directory first, the cwd second — so every form the gate accepts
+ *  (`docs/x.md`, `./docs/x.md`, absolute) is caught. Rides the CALLER'S
+ *  composed predicate: the file is caller-truth, not source-truth, so
+ *  the scan stays pure. Pure-ish (reads fs per call). */
+export function makeSelfExclusion(
+  mainFile?: string,
+  cwd: string = process.cwd(),
+): (target: string) => boolean {
+  if (!mainFile) return () => false; // no main file — nothing is self
+  const dir = dirname(resolve(mainFile));
+  const self = () => {
+    try {
+      return realpathSync(mainFile);
+    } catch {
+      return resolve(mainFile);
+    }
+  };
+  const at = (t: string) => {
+    try {
+      return realpathSync(t);
+    } catch {
+      return resolve(t);
+    }
+  };
+  return (target) => {
+    const cands = isAbsolute(target) ? [target] : [join(dir, target), join(cwd, target)];
+    return cands.some((c) => at(c) === self());
+  };
+}
+
 /** Resolve a document's callsign from its path. Pure-ish (reads fs). */
 export function callsignForFile(file: string, cwd: string = process.cwd()): string | null {
   const key = tierFileKey(file);

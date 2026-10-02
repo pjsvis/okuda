@@ -22,6 +22,7 @@ import {
   makeCallsignValidator,
   isWithinRoot,
   makePathValidator,
+  makeSelfExclusion,
   resolveByCallsign,
   siloRoot,
 } from "./root";
@@ -159,7 +160,12 @@ async function main(): Promise<void> {
   // disagree.
   const callsignResolves = makeCallsignValidator(cwd);
   const pathValidates = makePathValidator(args.file ?? undefined, cwd);
-  const silcrowResolves = (t: string) => callsignResolves(t) || pathValidates(t);
+  // The self-path exclusion rides the gate (the showcase §12 nit): a
+  // target that resolves to THIS document mints nothing — the page is
+  // already on the glass. One composition feeds both surfaces (the
+  // streaming render and runTui's opts.resolves).
+  const isSelf = makeSelfExclusion(args.file ?? undefined, cwd);
+  const silcrowResolves = (t: string) => !isSelf(t) && (callsignResolves(t) || pathValidates(t));
   if (invokedAsGloam() && process.stdin.isTTY) {
     // `-g <query>`: seed alias (ADR-030 §4) — same as a bare-arg query.
     if (args.grep !== null) {
