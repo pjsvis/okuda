@@ -101,6 +101,12 @@ Before committing an ADR:
 - [ ] Consequences include both "easier" and "harder"
 - [ ] Constraints are specific and actionable
 - [ ] Related links are correct and files exist
+- [ ] **Amends a parent ADR? The parent carries the in-place annotation** (status
+  line + the amended body passage). A citation in the child is not enough: without
+  the annotation the parent keeps teaching repealed law to every reader who
+  lands on it alone. (Five in-place precedents, 004/021/024/032/007; ADR-004's
+  050 amendment was committed without it and caught in review, 2026-10-02 —
+  the sixth made it a checklist.)
 
 ---
 
