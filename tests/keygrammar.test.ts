@@ -1,6 +1,23 @@
 import { describe, expect, test } from "bun:test";
-import { KEYBINDINGS, verbFor, splitKeyEvents } from "../src/keygrammar";
+import { KEYBINDINGS, readOnlyActive, verbFor, splitKeyEvents } from "../src/keygrammar";
 import { CLONE_TOKEN, VECTOR_MIN, VECTOR_MAX } from "../src/vectors";
+
+describe("keygrammar — read-only mode (BRF-ROOT-CONTAINMENT: the spawn verbs retire)", () => {
+  test("OKUDA_READONLY=1 declares retirement; anything else does not", () => {
+    const saved = process.env.OKUDA_READONLY;
+    try {
+      delete process.env.OKUDA_READONLY;
+      expect(readOnlyActive()).toBe(false); // unset: the verbs stand
+      process.env.OKUDA_READONLY = "1";
+      expect(readOnlyActive()).toBe(true); // declared: editNew and clone flash
+      process.env.OKUDA_READONLY = "0";
+      expect(readOnlyActive()).toBe(false); // a declaration, not a truthiness
+    } finally {
+      if (saved === undefined) delete process.env.OKUDA_READONLY;
+      else process.env.OKUDA_READONLY = saved;
+    }
+  });
+});
 
 describe("keygrammar — the two-digit language as data", () => {
   test("verbs and modes occupy the reserved block 00-10", () => {

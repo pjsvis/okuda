@@ -28,8 +28,9 @@ import {
 import { makeStyler } from "../src/ansi";
 import { DRACULA_PALETTE } from "../src/palette";
 import { displayWidth, stripANSI } from "../src/width";
-import { resolve } from "node:path";
-import { existsSync } from "node:fs";
+import { join, resolve } from "node:path";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 
 function buf(...bytes: number[]): Uint8Array {
   return new Uint8Array(bytes);
@@ -628,5 +629,85 @@ describe("tui — resolveJumpTarget (a relative target anchors to the main docum
     expect(resolveJumpTarget(main, "/tmp/whatever.md", (t) => `fallback:${t}`)).toBe(
       "fallback:/tmp/whatever.md",
     );
+  });
+});
+
+describe("tui — resolveJumpTarget containment (BRF-ROOT-CONTAINMENT)", () => {
+  // Existence is not permission: a root (ADR-048's silo root, handed
+  // down by the launcher/cli) fences the doc-dir anchor and nulls
+  // absolute targets outside it. No root: the unrooted reader's
+  // semantics, unchanged.
+  /** Scratch tree: outer/{silo/docs/{doc,sibling}.md, outside.md}. */
+  function containTree(): { outer: string; silo: string; doc: string; cleanup: () => void } {
+    const outer = mkdtempSync(join(tmpdir(), "okuda-contain-"));
+    const silo = join(outer, "silo");
+    mkdirSync(join(silo, "docs"), { recursive: true });
+    writeFileSync(join(silo, "docs", "doc.md"), "");
+    writeFileSync(join(silo, "docs", "sibling.md"), "");
+    writeFileSync(join(outer, "outside.md"), "");
+    return {
+      outer,
+      silo,
+      doc: join(silo, "docs", "doc.md"),
+      cleanup: () => rmSync(outer, { recursive: true, force: true }),
+    };
+  }
+  const fb = (t: string): string | null => `fallback:${t}`;
+
+  test("doc-dir and cross-dir targets inside the root resolve directly", () => {
+    const { silo, doc, cleanup } = containTree();
+    try {
+      expect(resolveJumpTarget(doc, "sibling.md", fb, silo)).toBe(
+        join(silo, "docs", "sibling.md"),
+      );
+      expect(resolveJumpTarget(doc, "../docs/sibling.md", fb, silo)).toBe(
+        join(silo, "docs", "sibling.md"),
+      );
+    } finally {
+      cleanup();
+    }
+  });
+
+  test("traversal above the root falls to the fallback, not the read", () => {
+    // ../../outside.md EXISTS (outer/outside.md) — but existence is
+    // not permission: the anchor refuses it; the fallback decides.
+    const { silo, doc, cleanup } = containTree();
+    try {
+      expect(resolveJumpTarget(doc, "../../outside.md", fb, silo)).toBe(
+        "fallback:../../outside.md",
+      );
+    } finally {
+      cleanup();
+    }
+  });
+
+  test("absolute targets outside the root are null before the fallback", () => {
+    const { outer, silo, doc, cleanup } = containTree();
+    try {
+      expect(resolveJumpTarget(doc, join(outer, "outside.md"), fb, silo)).toBeNull();
+    } finally {
+      cleanup();
+    }
+  });
+
+  test("absolute targets inside the root reach the fallback's existsSync", () => {
+    const { silo, doc, cleanup } = containTree();
+    try {
+      const real = (t: string): string | null => (existsSync(t) ? t : null);
+      expect(resolveJumpTarget(doc, join(silo, "docs", "sibling.md"), real, silo)).toBe(
+        join(silo, "docs", "sibling.md"),
+      );
+    } finally {
+      cleanup();
+    }
+  });
+
+  test("no root: the unrooted reader keeps today's semantics", () => {
+    const { outer, doc, cleanup } = containTree();
+    try {
+      expect(resolveJumpTarget(doc, "../../outside.md", fb)).toBe(join(outer, "outside.md"));
+    } finally {
+      cleanup();
+    }
   });
 });

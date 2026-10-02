@@ -1,10 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, realpathSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, realpathSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import {
   callsignForFile,
   detectRoot,
+  isWithinRoot,
   loadCallsigns,
   makeCallsignResolver,
   makePathValidator,
@@ -255,6 +256,53 @@ describe("root — makePathValidator (ADR-045: the path substrate, anchored like
       expect(cwdV("no/such/file.ts")).toBe(false); // the fs gate: phantoms retract
     } finally {
       rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("containment conjunct: traversal and symlink escapes retract (BRF-ROOT-CONTAINMENT)", () => {
+    const outer = mkdtempSync(join(tmpdir(), "okuda-cval-"));
+    const silo = join(outer, "silo");
+    try {
+      mkdirSync(join(silo, "docs"), { recursive: true });
+      writeFileSync(join(silo, "docs", "sibling.ts"), "");
+      writeFileSync(join(outer, "escape.ts"), "");
+      symlinkSync(join(outer, "escape.ts"), join(silo, "docs", "link.ts"));
+      // Both anchors explicit: the doc dir and the silo root.
+      const v = makePathValidator(join(silo, "docs", "doc.md"), silo);
+      expect(v("sibling.ts")).toBe(true); // doc-dir anchor, contained
+      expect(v("../docs/sibling.ts")).toBe(true); // cwd anchor, contained
+      expect(v("../../escape.ts")).toBe(false); // exists — outside both anchors
+      expect(v("link.ts")).toBe(false); // symlink out collapses under resolve
+      // The launcher's picker shape: no main file, the root is the anchor.
+      const unanchored = makePathValidator(undefined, silo);
+      expect(unanchored("docs/sibling.ts")).toBe(true); // inside the root
+      expect(unanchored("../../escape.ts")).toBe(false); // above the root
+      expect(unanchored(join(outer, "escape.ts"))).toBe(false); // absolute, outside
+      expect(unanchored(join(silo, "docs", "sibling.ts"))).toBe(true); // absolute, inside
+    } finally {
+      rmSync(outer, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("root — isWithinRoot (BRF-ROOT-CONTAINMENT: existence is not permission)", () => {
+  test("the root itself, beneath it, and the three escapes", () => {
+    const outer = mkdtempSync(join(tmpdir(), "okuda-within-"));
+    const silo = join(outer, "silo");
+    try {
+      mkdirSync(join(silo, "docs"), { recursive: true });
+      writeFileSync(join(outer, "escape.md"), "");
+      symlinkSync(join(outer, "escape.md"), join(silo, "docs", "link.md"));
+      expect(isWithinRoot(silo, silo)).toBe(true); // the root itself
+      // doc.md is absent here — the PAIR degrades to the lexical basis
+      // (never one realpath against one lexical; the /var seam).
+      expect(isWithinRoot(join(silo, "docs", "doc.md"), silo)).toBe(true); // beneath, lexical
+      expect(isWithinRoot(join(silo, "docs", "..", "docs"), silo)).toBe(true); // normalizes inside
+      expect(isWithinRoot(join(outer, "escape.md"), silo)).toBe(false); // outside
+      expect(isWithinRoot(join(silo, "docs", "..", "..", "escape.md"), silo)).toBe(false); // traversal
+      expect(isWithinRoot(join(silo, "docs", "link.md"), silo)).toBe(false); // symlink collapse
+    } finally {
+      rmSync(outer, { recursive: true, force: true });
     }
   });
 });

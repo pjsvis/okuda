@@ -94,6 +94,11 @@ product, it is simply wrong.
   a symlink inside the silo pointing out renders the target's
   existence, not its containment. Ruling 1's `resolve` already closes
   this; a test should prove it, not assume it.
+  *Amended 2026-10-02, implementation:* the test disproved the
+  assumption — `path.resolve` is lexical and never follows symlinks.
+  The predicate realpaths both sides (`realpathSync`,
+  existsSync-gated, deletion races falling back to resolve); the
+  symlink-escape test now proves the closure.
 
 ## References
 

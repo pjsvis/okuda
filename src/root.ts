@@ -13,8 +13,8 @@
  * resolves the badge string and hands it over. Pure-ish (reads fs).
  */
 
-import { existsSync, readFileSync, statSync } from "node:fs";
-import { basename, dirname, join, resolve } from "node:path";
+import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
+import { basename, dirname, isAbsolute, join, resolve, sep } from "node:path";
 
 /** Tier directories and their registry filenames. The pre-OKF fallback
  *  signature: a silo that indexes itself already has these; the OKF
@@ -230,21 +230,55 @@ export function makeCallsignValidator(cwd: string = process.cwd()): (target: str
   return (target: string) => resolveAmongCallsigns(records, target) !== null;
 }
 
+/** Root containment (BRF-ROOT-CONTAINMENT): existence is not
+ *  permission. A path is inside a root iff it is the root or lies
+ *  beneath it. realpath — not resolve — is the closer: path.resolve
+ *  is lexical and never follows symlinks (the OQ2 assumption the
+ *  brief made and the test broke), so a symlink planted inside the
+ *  silo and pointing out realpaths outside and fails here. Both
+ *  sides realpath or NEITHER does: one realpath against one lexical
+ *  breaks on the /var→/private/var seam (macOS tmpdir), so a missing
+ *  side degrades the PAIR to the lexical basis, never each alone.
+ *  Pure-ish (reads fs). */
+export function isWithinRoot(path: string, root: string): boolean {
+  try {
+    const abs = realpathSync(path);
+    const base = realpathSync(root);
+    return abs === base || abs.startsWith(base + sep);
+  } catch {
+    const abs = resolve(path);
+    const base = resolve(root);
+    return abs === base || abs.startsWith(base + sep);
+  }
+}
+
 /** The path substrate of the silcrow gate (ADR-045): filesystem
  *  existence, anchored the way actuation resolves a path target — the
  *  document's directory first (resolveJumpTarget's HTML semantics), the
  *  silo root second (the launcher's resolveTarget fallback, threaded by
- *  ADR-048). The filesystem is the domain's own live index — no second
- *  registry to drift (BRF-CODE-SHELF's refusal of a src/ INDEX.jsonl,
- *  honored from the paint side). Built beside makeCallsignValidator; the
- *  caller composes the disjunct. Pure-ish (reads fs per call; anchor
- *  fixed at construction — the main file is const for a session). */
+ *  ADR-048). Existence carries a containment conjunct
+ *  (BRF-ROOT-CONTAINMENT): a candidate must land inside its anchor —
+ *  the doc's own directory or the silo root — so `..` traversal and
+ *  symlink escapes retract exactly like phantoms. The filesystem is the
+ *  domain's own live index — no second registry to drift
+ *  (BRF-CODE-SHELF's refusal of a src/ INDEX.jsonl, honored from the
+ *  paint side). Built beside makeCallsignValidator; the caller composes
+ *  the disjunct. Pure-ish (reads fs per call; anchor fixed at
+ *  construction — the main file is const for a session). */
 export function makePathValidator(
   mainFile?: string,
   cwd: string = process.cwd(),
 ): (target: string) => boolean {
   const dir = mainFile ? dirname(resolve(mainFile)) : cwd;
-  return (target) => existsSync(join(dir, target)) || existsSync(join(cwd, target));
+  return (target) => {
+    // An absolute target joins into nonsense (join is segment-wise) —
+    // checked against the root directly, containment conjunct first.
+    if (isAbsolute(target)) return existsSync(target) && isWithinRoot(target, cwd);
+    const fromDoc = join(dir, target);
+    if (existsSync(fromDoc) && (isWithinRoot(fromDoc, dir) || isWithinRoot(fromDoc, cwd))) return true;
+    const fromCwd = join(cwd, target);
+    return existsSync(fromCwd) && isWithinRoot(fromCwd, cwd);
+  };
 }
 
 /** Resolve a document's callsign from its path. Pure-ish (reads fs). */

@@ -20,6 +20,7 @@ import {
   detectRoot,
   makeCallsignResolver,
   makeCallsignValidator,
+  isWithinRoot,
   makePathValidator,
   resolveByCallsign,
   siloRoot,
@@ -143,8 +144,11 @@ async function main(): Promise<void> {
   // may be a subfolder). Built once per run; handed to every runTui.
   const cwd = siloRoot();
   const root = detectRoot(cwd);
+  // Containment conjunct (BRF-ROOT-CONTAINMENT): existence is not
+  // permission — a target outside the silo root falls through to the
+  // callsign registry, not the read.
   const resolveTarget = (target: string): string | null => {
-    if (existsSync(target)) return target;
+    if (existsSync(target) && isWithinRoot(target, cwd)) return target;
     if (root) return resolveByCallsign(target, cwd);
     return null;
   };
@@ -194,6 +198,8 @@ async function main(): Promise<void> {
       rows: terminalRows(24),
       silo: root?.badge,
       callsignFor: makeCallsignResolver(cwd),
+      // The TUI's fence: the silo root, handed down (BRF-ROOT-CONTAINMENT).
+      root: cwd,
       resolveTarget,
       resolves: silcrowResolves,
     });
@@ -246,6 +252,8 @@ async function main(): Promise<void> {
       width: terminalCols(80),
       rows: terminalRows(24),
       palette,
+      // The TUI's fence: the silo root, handed down (BRF-ROOT-CONTAINMENT).
+      root: cwd,
       resolveTarget,
       resolves: silcrowResolves,
     });

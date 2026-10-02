@@ -19,9 +19,10 @@ import { detectColorMode, makeStyler, type Styler } from "./ansi";
 import { annotateSource, appendReferences, jumpMapFor, CLONE_TOKEN } from "./vectors";
 import { cloneArgs } from "./clone";
 import { frameBounds, headingLines, pageStep, paragraphStarts, snapFrame } from "./frames";
-import { splitKeyEvents, verbFor, type Verb } from "./keygrammar";
+import { readOnlyActive, splitKeyEvents, verbFor, type Verb } from "./keygrammar";
 import { loadPalette, type Palette } from "./palette";
 import { renderDocument, wrapWholeFile } from "./render";
+import { isWithinRoot } from "./root";
 import { basename, dirname, isAbsolute, join, resolve } from "node:path";
 import { existsSync } from "node:fs";
 import { padStartDisplay, terminalCols, terminalRows } from "./width";
@@ -35,6 +36,12 @@ export interface TuiOptions {
    *  footer, no silo badge. The renderer paints the string; it learns
    *  nothing about trees or registries. */
   silo?: string;
+  /** Silo root path (ADR-048), the containment fence
+ *  (BRF-ROOT-CONTAINMENT): jump targets resolve only inside it — or
+ *  the document's own directory, the HTML anchor. Undefined =
+ *  unrooted, today's semantics. The path, not the badge: a boundary
+ *  handed down, never detected here. */
+  root?: string;
   /** Per-file callsign resolver (the rooted launcher passes one; the TUI
    *  knows nothing of registries — ADR-020). Called per paint with the
    *  current file, so the identity run follows jumps. */
@@ -423,16 +430,28 @@ export function extractJumps(source: string): Map<number, string> {
  *  `&speak.md`'s `../speak-md/` targets anchor to the silo root, not to
  *  wherever the process happens to stand), and the caller's fallback
  *  (cwd, then the callsign registry — ADR-031) carries everything else.
- *  Pure. (td-1c8fca: rows wired to sibling-silo targets failed resolve
+ *  A root fences both anchors (BRF-ROOT-CONTAINMENT: existence is not
+ *  permission): the doc-dir candidate must land inside the root or the
+ *  doc's own directory, and an absolute target outside the root is null
+ *  before the fallback. No root: the unrooted reader, today's
+ *  semantics. Pure. (td-1c8fca: rows wired to sibling-silo targets failed resolve
  *  the moment the cwd moved; the anchor is the document.) */
 export function resolveJumpTarget(
   mainFile: string,
   target: string,
   fallback?: (t: string) => string | null,
+  root?: string,
 ): string | null {
   if (!isAbsolute(target)) {
-    const candidate = join(dirname(resolve(mainFile)), target);
-    if (existsSync(candidate)) return candidate;
+    const dir = dirname(resolve(mainFile));
+    const candidate = join(dir, target);
+    if (
+      existsSync(candidate) &&
+      (root === undefined || isWithinRoot(candidate, root) || isWithinRoot(candidate, dir))
+    )
+      return candidate;
+  } else if (root !== undefined && !isWithinRoot(target, root)) {
+    return null; // outside the silo root — existence is not permission
   }
   return fallback ? fallback(target) : target;
 }
@@ -611,6 +630,10 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  separate terminal (the clone grammar's own spin-up). The file is
    *  the contract — the silo picks it up by search; nothing mutates. */
   const editNew = (): void => {
+    if (readOnlyActive()) {
+      flash("read-only: edit disabled");
+      return;
+    }
     const dir = dirname(currentFile);
     const stamp = new Date().toISOString().replace(/[-:T]/g, "").slice(0, 12);
     const note = join(dir, `note-${stamp}.md`);
@@ -626,6 +649,10 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   };
 
   const clone = (): void => {
+    if (readOnlyActive()) {
+      flash("read-only: clone disabled");
+      return;
+    }
     const doc = currentFile;
     if (process.env.TMUX) {
       const r = Bun.spawnSync(["tmux", "new-window", "-c", process.cwd(), "gloam", doc]);
@@ -744,7 +771,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     if (backstack.length > 0) return; // dereferenced render is clean — nothing to actuate
     const target = mainJumps.get(token);
     if (!target) return; // no such vector — silent, per the old contract
-    const path = resolveJumpTarget(mainFile, target, opts.resolveTarget);
+    const path = resolveJumpTarget(mainFile, target, opts.resolveTarget, opts.root);
     if (!path) {
       flash(`§${token} — no document to render`);
       return;

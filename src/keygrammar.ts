@@ -45,6 +45,14 @@ export const KEYBINDINGS: Record<number, Verb> = {
   99: "clone", // promotion (ADR-031)
 };
 
+/** Read-only mode (BRF-ROOT-CONTAINMENT): `OKUDA_READONLY=1` retires
+ *  the spawn verbs — `09`/`99` flash instead of spawning or computing
+ *  a write path. A declaration, like the bindings: the demo wrapper
+ *  sets it, the actuators obey it. Pure-ish (reads env). */
+export function readOnlyActive(): boolean {
+  return process.env.OKUDA_READONLY === "1";
+}
+
 /** Reduce a completed two-digit token to its verb. Returns `"vector"`
  *  for the address range, `null` for reserved-unassigned tokens (the
  *  press is acknowledged and does nothing — reserved, not missing).

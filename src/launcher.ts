@@ -24,6 +24,7 @@ import {
   detectRoot,
   makeCallsignResolver,
   makeCallsignValidator,
+  isWithinRoot,
   makePathValidator,
   resolveByCallsign,
   siloRoot,
@@ -484,10 +485,16 @@ export async function runLauncher(opts: { query?: string } = {}): Promise<void> 
         rows: terminalRows(24),
         silo: root?.badge,
         callsignFor,
+        // Containment conjunct (BRF-ROOT-CONTAINMENT): existence is
+        // not permission — an absolute or traversing target outside the
+        // silo root falls through to the callsign registry, not the read.
         resolveTarget: (target: string): string | null => {
-          if (existsSync(target)) return target;
+          if (existsSync(target) && isWithinRoot(target, cwd)) return target;
           return root ? resolveByCallsign(target, cwd) : null;
         },
+        // The TUI's fence: the same silo root, handed down for
+        // resolveJumpTarget's anchors (BRF-ROOT-CONTAINMENT).
+        root: cwd,
         // The silcrow gate (ADR-044 + ADR-045's path substrate), built
         // per round: re-derivation replaces invalidation — a document
         // (or a code file) landed mid-session is validated on the next
