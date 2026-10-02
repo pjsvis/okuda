@@ -30,9 +30,9 @@ Gloam becomes either **rooted** (launched on a self-describing knowledge tree �
 an OKF bundle per ADR-019, with registries present) or **unrooted** (a single
 document or pipe, from anywhere). When rooted, gloam passes a silo badge
 string to the renderer, which paints it in the footer identity slot; documents
-carry durable **callsigns** (e.g. `ADR-BOUND-010`) as registry/frontmatter
+carry durable **callsigns** (e.g. `ADR-BOUNDED-ANCHOR-010`) as registry/frontmatter
 data, displayed beside jump tokens in index views and resolvable as
-`gloam ADR-BOUND-010`.
+`gloam ADR-BOUNDED-ANCHOR-010`.
 
 ## Why
 
@@ -76,7 +76,7 @@ data, displayed beside jump tokens in index views and resolvable as
   collisions.)*
 - **Index views:** jump tokens (`01`–`99`) are owned by
   `briefs/2026-08-28-brief-index-and-jump.md`; this brief adds the callsign
-  column — `01: ADR-BOUND-010 — the full descriptive title`. Jump tokens are
+  column — `01: ADR-BOUNDED-ANCHOR-010 — the full descriptive title`. Jump tokens are
   ephemeral (die with the index document, never jotted); callsigns are durable.
 - **Resolution:** *(Amended 2026-08-30, ADR-024)* `gloam -g <callsign>` —
   the content shortlist, not a dedicated registry lookup. A callsign not

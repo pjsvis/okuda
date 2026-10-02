@@ -234,10 +234,10 @@ because it is what the reader will hear after the name resolves.
       not wired in. `docs/2026-09-15-the-scaling-profile.md`.
 - [x] **The bootstrap is measured as a generator, and it is unsound.**
       **Verified 2026-09-15** — `bootstrapCallsign` keeps only the first ≤2
-      tokens (`2026-09-15-brief-callsign-every-document` → `BRF-CALLSIGN-EVERY`);
+      tokens (`2026-09-15-brief-callsign-every-document` → `BRF-CALLSIGN-EVERY-DOC`);
       it strips only a *leading* ordinal, so `from-intent-to-task-01..06`
       collapses to **one key**; and `STOPWORDS` holds `no`, so
-      `036-no-speech-code` → **`ADR-SPEECH-CODE-036`**, asserting the opposite
+      `036-no-speech-code` → **`ADR-NO-SPEECH-CODE-036`**, asserting the opposite
       of its document. Step 5 derives 131 keys with this function.
 - [x] Full-stem derivation is collision-free. **Verified 2026-09-15** — 131
       documents, 131 distinct `DOC-<FULL-STEM>` candidates, 0 collisions. **This
@@ -338,9 +338,9 @@ because it is what the reader will hear after the name resolves.
 - **The bootstrap round-trips.** For every registered key, bootstrapping its
   filename either reproduces the key or is refused with a reason — never
   silently differs. Today it differs on truncation
-  (`BRF-CALLSIGN-EVERY` against `BRF-CALLSIGN-EVERY-DOC`), collapses a series
+  (`BRF-CALLSIGN-EVERY-DOC` against `BRF-CALLSIGN-EVERY-DOC`), collapses a series
   (`from-intent-to-task-01..06` → one key), and inverts a negation
-  (`036-no-speech-code` → `ADR-SPEECH-CODE-036`).
+  (`036-no-speech-code` → `ADR-NO-SPEECH-CODE-036`).
 - **A chunk sequence resolves to one name.** Given `slug.md`, `slug-02.md`,
   `slug-03.md`, the registry holds **one** row — for the head — and
   bootstrapping any part yields the head's key. A sequence with a gap is

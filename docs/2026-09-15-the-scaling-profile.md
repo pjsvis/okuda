@@ -102,13 +102,13 @@ Each is measured, each is live, and the first is on the fast path.
   `loadCallsigns` itself is a clean 0.49 µs per key, so there is no pathology here, only
   a per-call rebuild of a store whose whole point is that the lookup is a Map.
 - **The bootstrap truncates.** `2026-09-15-brief-callsign-every-document.md` →
-  `BRF-CALLSIGN-EVERY`, against the registered `BRF-CALLSIGN-EVERY-DOC`. Two tokens is
+  `BRF-CALLSIGN-EVERY-DOC`, against the registered `BRF-CALLSIGN-EVERY-DOC`. Two tokens is
   not a name.
 - **The bootstrap collapses a series.** Above. Six documents, one key, and the
   disambiguator is a trailing digit — the same eye-only class as `DBF`/`DBR`.
 - **The bootstrap can invert a name.** `STOPWORDS` (`scripts/reg-sync.ts:101`) contains
   **`no`** and **`not`**, so `036-no-speech-code.md` bootstraps to
-  **`ADR-SPEECH-CODE-036`** — a key asserting the *opposite* of its document. The
+  **`ADR-NO-SPEECH-CODE-036`** — a key asserting the *opposite* of its document. The
   registered key is `ADR-NO-SPEECH-CODE-036`, which a human got right.
 
 Stripping `no` from prose is harmless; stripping it from an *identifier* is a correctness

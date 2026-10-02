@@ -43,7 +43,7 @@ index-and-jump's close-out.
 - **Callsign bootstrap (deterministic, run once per document)**: type prefix
   (`ADR`/`BRF`/`DBF`/`PLY`) + first ≤2 significant slug tokens (stopwords
   dropped), uppercase, hyphen-joined; ADRs append the zero-padded sequence
-  (`ADR-BOUND-010`); collision → numeric suffix. Frontmatter is the source
+  (`ADR-BOUNDED-ANCHOR-010`); collision → numeric suffix. Frontmatter is the source
   of truth — a doc that already has a callsign is never re-derived; the
   registry is the fast index (`Entry.callsign?`, synced by `--fix`, drift
   flagged in check mode).

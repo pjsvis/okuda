@@ -25,7 +25,7 @@ The probe commissioned 2026-09-24 (`tmp/silcrow-junk-probe.ts`, measured
 in BRF-VALIDATED-SILCROWS) counted what optimism was painting: **117
 occurrences across 46 documents** resolve to nothing at actuation —
 acronym coincidences (`UTF-8`, `OSC-8`), stale callsigns (documents dead
-or renamed), malformed shorthands (`ADR-BOUND-010`), forward references
+or renamed), malformed shorthands (`ADR-BOUNDED-ANCHOR-010`), forward references
 (`ADR-043`), and — the majority, 51 — a resolver blind to the advisories
 tier (repaired same day as P-0, this decision's precondition). Every
 one of those silcrows was a promise the actuator could not keep. And

@@ -25,7 +25,7 @@ The silo lubricant is ample. Emergency repairs on aquatic mechanical
 keyboards will be conducted on a case-by-case basis as the cases
 arise, which is to say, they have not yet arisen.
 
-A note on stereotyping: this advisory is filed under `ADV-CEPHALOPOD`
+A note on stereotyping: this advisory is filed under `ADV-CEPHALOPOD-RFC`
 because the name fits the dispatch, not because the reader class is a
 monolith. Cephalopods are not defined by limb count, and limb count is
 not stable across the clade. Species 8742, included here, is

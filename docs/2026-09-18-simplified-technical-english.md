@@ -116,7 +116,7 @@ Both remedies make a cell **wider**. Unpacking adds words. Hyphenating removes b
 opportunities, and `wrapANSI` honours exactly one break character (U+0020). So the standard's
 remedy for a long noun cluster is the house's defect.
 
-**`ADR-CALLSIGN-EVERY-DOC` is the object both are describing**: a four-token hyphenated cluster,
+**`BRF-CALLSIGN-EVERY-DOC` is the object both are describing**: a four-token hyphenated cluster,
 the exact shape STE says to fix, and the exact shape `bootstrapCallsign` already fails to key.
 The house's position has a measurement behind it. The standard's does not.
 

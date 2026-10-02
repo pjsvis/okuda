@@ -33,7 +33,7 @@ The 117 decompose into classes, and the classes matter, because **only one is th
 | (a) Resolver tier gap | **51** | `ADV-READER-SIDE-FILTER` ×17, `ADV-SEARCH-TWO-FILTERS` ×10 | **Not the heuristic's fault.** `TIER_REGISTRIES` (src/root.ts) lists briefs/decisions/debriefs/playbooks — `advisories` was added later (`69122be`) and never joined the list. The files exist, `INDEX.jsonl` carries them, reg-sync validates the tier, and the resolver cannot see it. Two registry lists that must agree; one drifted. |
 | (b) Acronym coincidence | ~10 | `OSC-8` ×5, `UTF-8` ×3 | The operator's original complaint. Shape-match, not a reference: `OSC-8` is the hyperlink escape sequence's standard name and will never be a callsign. |
 | (c) Stale callsigns | ~20 | `BRF-SEARCH-SURFACE` ×7, `BRF-RESTRICTED-GRAMMAR` ×4 | Deliberate references to documents that have died or were renamed. Broken promises — the prose layer's drift, surfaced. |
-| (d) Malformed shorthand | ~7 | `ADR-BOUND-010` ×4, `ADR-SPEECH-CODE-036` ×3 | Deliberate references in broken form — the ordinal-shorthand grammar (`^([A-Z]{2,})-(\d{2,3})$`) can't parse a hyphenated prefix. Authoring-layer defect. |
+| (d) Malformed shorthand | ~7 | `ADR-BOUNDED-ANCHOR-010` ×4, `ADR-NO-SPEECH-CODE-036` ×3 | Deliberate references in broken form — the ordinal-shorthand grammar (`^([A-Z]{2,})-(\d{2,3})$`) can't parse a hyphenated prefix. Authoring-layer defect. |
 | (e) Forward references | 3 | `ADR-043` ×3 — all in BRF-SRC-LINE-LEDGER | Deliberate references to not-yet-written documents. |
 
 **Every class resolves to nothing at actuation today.** The gate removes zero working jumps; it removes promises that were never keepable. And class (a) is the argument *for* the gate wearing a disguise: a resolver gap this size (51 of 117) hid inside "optimism" for weeks because a painted §NN that fails on press looks the same as a working one until you press it.
@@ -68,7 +68,7 @@ Default `resolves = () => true` keeps `vectors.ts` pure and the tests shape-only
 
 **In:** `src/vectors.ts` (the predicate), `src/tui.ts`/`src/cli.ts` (the pass-down), `src/root.ts` P-0 line, vectors/launcher tests, the probe file (already in `tmp/`).
 
-**Out:** prose repair of class (c)/(d) stale references — an authoring pass over the probe's drift list, not a rendering change; shorthand-grammar extension for hyphenated prefixes (ADR-BOUND-010 is an ADR question if it recurs); a `docs/` tier registry (DOC-* callsigns — the unindexed narrative layer; naming it, not settling it); the actuator, unchanged.
+**Out:** prose repair of class (c)/(d) stale references — an authoring pass over the probe's drift list, not a rendering change; shorthand-grammar extension for hyphenated prefixes (ADR-BOUNDED-ANCHOR-010 is an ADR question if it recurs); a `docs/` tier registry (DOC-* callsigns — the unindexed narrative layer; naming it, not settling it); the actuator, unchanged.
 
 ## Preconditions
 

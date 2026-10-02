@@ -628,7 +628,7 @@ ingress. They need a policy, because both can want the speaker at once:
 - BRF-MERMAID-HARD / td-3f5fa1 — where `CSN` lives: *too wide*, *too narrow / too
   complex*. A refusal is the renderer's diagnostic, which makes it **okuda
   talking** and therefore Moir's line
-- ADR-015 (alert palette role) and BRF-STATE-GLYPH-VOCABULARY — the visual
+- ADR-015 (alert palette role) and BRF-STATE-GLYPH — the visual
   precedent for a **system register that is never the document's**: the
   `recede` / `watch` / `alarm` tiers are already a cue vocabulary in colour
 - `tmp/aunt-interleave.txt` — the specimen: `[[pbas -10]]` is already the
