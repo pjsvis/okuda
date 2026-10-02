@@ -10,6 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-10-03 | DBF-REGISTRY-TRUTH | done | Debrief: Registry truth — the audit that found the paperwork lying | 2026-10-03-debrief-registry-truth.md |
+| 2026-10-02 | DBF-REVIEW-CADENCE | done | Debrief: The review cadence — nine loops, one true thing each, zero escapes | 2026-10-02-debrief-review-cadence.md |
 | 2026-10-02 | DBF-ROOT-CONTAINMENT | done | Debrief: Root containment — existence is not permission, and the test knew it | 2026-10-02-debrief-root-containment.md |
 | 2026-10-02 | DBF-SILCROW-EDGE | done | Debrief: Silcrow edge cases — the guest handback, the self-mint, and the ephemeral queue | 2026-10-02-debrief-silcrow-edge-cases.md |
 | 2026-10-01 | DBF-SILCROW-RING-B | done | Debrief: Ring B and the legibility gate — the silcrow grows a conscience | 2026-10-01-debrief-silcrow-ring-b.md |
