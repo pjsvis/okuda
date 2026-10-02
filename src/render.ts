@@ -715,6 +715,13 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // last column. Every line (the bar form) bounds the reflow.
       const markers = "#".repeat(level);
       const wrapW = width - 1;
+      // Guest paints (silcrows, doc-refs, state glyphs) close with a full
+      // reset; the heading re-opens after each one — the enclosing style
+      // owns the run, the guest borrows and hands it back (td-290433).
+      // Reset-then-reopen keeps the wrap state machine's invariant: runs
+      // open with full resets only, never partial ones.
+      const reopen = styler.roleBoldOpen("heading");
+      const keepHeading = (l: string) => l.replace(/\x1b\[0m/g, `\x1b[0m${reopen}`);
       const lines = wrapANSI(markers + " " + stripHtml(children), { width: wrapW });
       return (
         lines
@@ -723,8 +730,8 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
             const body =
               i === 0
                 ? styler.headingBadge(markers) +
-                  styler.roleBold("heading", l.slice(markers.length))
-                : styler.roleBold("heading", l);
+                  styler.roleBold("heading", keepHeading(l.slice(markers.length)))
+                : styler.roleBold("heading", keepHeading(l));
             return padDisplay(body, wrapW) + styler.headingChip();
           })
           .join("\n") + "\n\n"

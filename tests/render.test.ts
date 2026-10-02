@@ -35,6 +35,23 @@ describe("render — headings", () => {
     const out = await render("# " + "heading ".repeat(12), 30);
     for (const l of lines(out)) expect(displayWidth(l)).toBeLessThanOrEqual(30);
   });
+
+  test("heading style survives an embedded guest paint (td-290433)", async () => {
+    // A silcrow in the H1: the guest paints in the vector role, closes
+    // with a full reset — and the heading re-opens immediately after
+    // it. The enclosing style owns the run; the guest borrows and hands
+    // it back. Without the re-open: white text from the reset to the
+    // wrap (the ADV-THE-PILE edge).
+    const out = await render("# ADV-TEST — a silcrow %okuda-vector:12% and the words that follow it");
+    expect(out).toContain(
+      "\x1b[38;2;251;113;133;1m§12\x1b[0m\x1b[38;2;189;147;249;1m and the words that follow it",
+    );
+  });
+
+  test("NO_COLOR: the guest's weight channel survives and hands back (td-290433)", async () => {
+    const out = await render("# T %okuda-vector:12% rest", 60, "none");
+    expect(out).toContain("\x1b[1m§12\x1b[0m\x1b[1m rest");
+  });
 });
 
 // ── Block terminator (the okudagram's bottom; candidate B of the

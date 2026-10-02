@@ -113,6 +113,10 @@ export interface Styler {
   headingChip(): string;
   /** Open sequence for a role (for state-machine re-emission). */
   open(name: keyof Palette): string;
+  /** Open sequence of roleBold — the enclosing-style re-emission after
+   *  a guest paint's full reset (td-290433: a silcrow in a heading borrows
+   *  the run and hands it back; `open` alone drops the weight). */
+  roleBoldOpen(name: keyof Palette): string;
   /** Reset sequence (empty string under `none`). */
   reset(): string;
 }
@@ -153,6 +157,9 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       headingBadge: (markers) => markers,
       headingChip: () => "█",
       open: () => "",
+      // The weight channel survives NO_COLOR (the roleBold rule) — so
+      // does its re-emission: a heading re-opens as SGR 1 after a guest.
+      roleBoldOpen: () => "\x1b[1m",
       reset: () => "",
     };
   }
@@ -210,6 +217,7 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     // (content), muted RHS+footer (viewer chrome).
     headingChip: () => `${bg(palette.muted)}${fg(palette.muted)}█${RESET}`,
     open: (name) => fg(palette[name]),
+    roleBoldOpen: (name) => sgr(fgParams(palette[name]), "1"),
     reset: () => RESET,
   };
 }
