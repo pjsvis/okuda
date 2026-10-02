@@ -324,12 +324,15 @@ function compactLeft(): string {
   return "? help";
 }
 
-/** Viewport height: total rows minus the footer, minus the hints row
- *  when verbose hints are toggled on — the hints own the last row,
- *  beneath the badge row (identity above, transient affordances below).
- *  Pure. */
-export function contentHeight(rows: number, showHints: boolean): number {
-  return rows - 1 - (showHints ? 1 : 0);
+/** Viewport height: total rows minus the separator row and the badge
+ *  row — CONSTANT, never hints-dependent (BRF-FOOTER-SEPARATOR): the
+ *  badge owns the bottom edge (permanent chrome at the last row), the
+ *  separator row above it is blank by default and carries the
+ *  transient affordances (hints, flash) when shown. Identity at the
+ *  true bottom, transient above it, document above that — toggling
+ *  hints paints one row, never reflows the content. Pure. */
+export function contentHeight(rows: number): number {
+  return rows - 2;
 }
 
 /** The glass geometry as one comparable token. Pure. */
@@ -676,7 +679,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
 
   const paint = (): void => {
     const { rows, cols } = dims();
-    const height = contentHeight(rows, showHints); // footer + optional hints row
+    const height = contentHeight(rows); // separator row + badge row (BRF-FOOTER-SEPARATOR)
     let view = viewport(lines, scroll, height);
     if (scroll > view.maxScroll) {
       scroll = view.maxScroll;
@@ -689,14 +692,20 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     let frame = "\x1b[2J\x1b[H"; // clear + home
     frame += view.visible.join("\n");
     const footer = footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined);
-    frame += `\x1b[${rows - 1};1H`;
+    // Chrome geometry (BRF-FOOTER-SEPARATOR): the badge owns the BOTTOM
+    // edge — the last row, permanent identity under the transient; the
+    // separator row above it is blank by default and carries hints and
+    // flash when shown. The document terminator never touches the
+    // badge; toggling hints paints one row, never reflows the content.
+    frame += `\x1b[${rows};1H`;
     frame += footer;
     if (flashMsg) {
-      // The flash owns the last row while visible — warnings outrank hints.
-      frame += `\x1b[${rows};1H`;
+      // The flash owns the separator row while visible — warnings
+      // outrank hints, both transient chrome above the badge.
+      frame += `\x1b[${rows - 1};1H`;
       frame += styler.roleBold("alert", ` ${flashMsg} `.padEnd(cols).slice(0, cols));
     } else if (showHints) {
-      frame += `\x1b[${rows};1H`;
+      frame += `\x1b[${rows - 1};1H`;
       frame += hintsLine(cols, muted);
     }
     paintedGeometry = geometryOf(rows, cols); // the glass now holds this
@@ -718,7 +727,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // override (keyboard-controls, 2026-09-05). No flag save/restore.
     if (frozen && reason === "watch") return;
     const { rows, cols } = dims();
-    const height = contentHeight(rows, showHints);
+    const height = contentHeight(rows); // constant — separator + badge rows (BRF-FOOTER-SEPARATOR)
     const fetch = await readSource();
     const atMain = backstack.length === 0;
     if (fetch.ok && atMain) {
@@ -872,7 +881,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       return;
     }
     const { rows } = dims();
-    const height = contentHeight(rows, showHints);
+    const height = contentHeight(rows); // constant — separator + badge rows (BRF-FOOTER-SEPARATOR)
     const { maxScroll } = viewport(lines, 0, height);
     const half = Math.max(1, Math.floor(height / 2));
     switch (action) {

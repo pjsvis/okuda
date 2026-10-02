@@ -226,9 +226,9 @@ describe("tui — footerLine (identity left, affordance right)", () => {
     const without = footerLine(72, "Gloam", FILE, muted, badge);
     expect(withSilo).toBe(without);
   });
-  test("contentHeight: hints row reserved when toggled", () => {
-    expect(contentHeight(24, false)).toBe(23); // footer only
-    expect(contentHeight(24, true)).toBe(22);  // badge row + hints row
+  test("contentHeight: constant — the separator + badge rows, never hints-dependent (BRF-FOOTER-SEPARATOR)", () => {
+    expect(contentHeight(24)).toBe(22); // badge owns the bottom edge, separator above it
+    expect(contentHeight(23)).toBe(21); // hints toggling paints one row, never reflows content
   });
   test("hintsLine: right-justified on the last row, corner column blank", () => {
     const plain = (s: string) => s;
