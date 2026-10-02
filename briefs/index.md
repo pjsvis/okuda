@@ -9,7 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
-| 2026-10-02 | BRF-CALLSIGN-CHECKSUM | open | The callsign checksum — citations that resolve nowhere fail the gate | 2026-10-02-brief-callsign-checksum.md |
+| 2026-10-02 | BRF-CALLSIGN-CHECKSUM | done | The callsign checksum — citations that resolve nowhere fail the gate | 2026-10-02-brief-callsign-checksum.md |
 | 2026-10-02 | BRF-DEMO-SANDBOX | open | The public demo room — two access modes, one sandbox grammar | 2026-10-02-brief-demo-sandbox.md |
 | 2026-10-02 | BRF-ROOT-CONTAINMENT | done | Root containment — existence is not permission | 2026-10-02-brief-root-containment.md |
 | 2026-10-02 | BRF-VALVE-LINT | done | The valve lint — td-ID citations in persisted documents fail the gate | 2026-10-02-brief-td-id-lint.md |

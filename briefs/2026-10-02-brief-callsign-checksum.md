@@ -7,7 +7,7 @@ date: 2026-10-02
 # Brief: The callsign checksum — citations that resolve nowhere fail the gate
 
 **Created:** 2026-10-02
-**Status:** Open — shipping same sitting; census, fixes, and gate in one pass
+**Status:** Done — shipped same sitting (861095a + reviewer fix 8ece77a): both surfaces live in `just check`, census residue baselined at 42/18, 17 species-A strings corrected. The review's live catch: stale zero-hit entries were silent and rideable — the shared verdict now reports them as shrink; acceptance criterion 3 holds for full cleanups. Follow-up filed: per-token baselines (the same-edit count-parity swap).
 **Lineage:** the operator, verbatim: *"follow up on the dodgy call sign
 thing — its another useful Shannon style checksum thang."*
 **Extends:** BRF-VALVE-LINT (the td-ID gate — this is its sibling over the
