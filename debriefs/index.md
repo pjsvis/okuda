@@ -11,6 +11,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 |---|---|---|---|---|
 | 2026-10-03 | DBF-REGISTRY-TRUTH | done | Debrief: Registry truth — the audit that found the paperwork lying | 2026-10-03-debrief-registry-truth.md |
 | 2026-10-02 | DBF-ROOT-CONTAINMENT | done | Debrief: Root containment — existence is not permission, and the test knew it | 2026-10-02-debrief-root-containment.md |
+| 2026-10-02 | DBF-SILCROW-EDGE | done | Debrief: Silcrow edge cases — the guest handback, the self-mint, and the ephemeral queue | 2026-10-02-debrief-silcrow-edge-cases.md |
 | 2026-10-01 | DBF-SILCROW-RING-B | done | Debrief: Ring B and the legibility gate — the silcrow grows a conscience | 2026-10-01-debrief-silcrow-ring-b.md |
 | 2026-09-30 | DBF-REFERENCES-SECTION | done | Debrief: The References section — the renderer's receipt for its own map | 2026-09-30-debrief-references-section.md |
 | 2026-09-30 | DBF-ROOT-CLIMB | done | Debrief: The root climb — same-day, one spawn, three seams | 2026-09-30-debrief-root-climb.md |
