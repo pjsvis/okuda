@@ -113,7 +113,9 @@ code, merged branches wearing live-work costumes. The 2026-10-03 audit
 protocol is the fix. A unit of work is not finished when the commit lands.
 Finish it, all in the same sitting, while the facts are still in the head:
 
-1. **Merge/commit** — the change is in `main`, or parked on a branch *deliberately*.
+1. **Merge/commit — and push** — the change is in `origin/main`, or parked on a
+   branch *deliberately*. Unpushed main is a private branch wearing main's costume
+   (the containment session's slip, 2026-10-03: committed, gate green, invisible).
 2. **td** — implemented work: `td review` → `td approve` (independent session where
    practical). Parked work: `td close --reason "parked — <what landed>, <what
    remains>, refile from <brief>"`. Never leave `in_progress` with no session
