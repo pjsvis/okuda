@@ -11,6 +11,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 |---|---|---|---|---|
 | 2026-10-02 | BRF-DEMO-SANDBOX | open | The public demo room — two access modes, one sandbox grammar | 2026-10-02-brief-demo-sandbox.md |
 | 2026-10-02 | BRF-ROOT-CONTAINMENT | done | Root containment — existence is not permission | 2026-10-02-brief-root-containment.md |
+| 2026-10-02 | BRF-VALVE-LINT | open | The valve lint — td-ID citations in persisted documents fail the gate | 2026-10-02-brief-td-id-lint.md |
 | 2026-10-01 | BRF-READING-FRACTION | open | The reading fraction — a meter for the glass, from the state the glass already holds | 2026-10-01-brief-reading-fraction.md |
 | 2026-09-30 | BRF-FENCE-DISCIPLINE | open | One fence rule — five scanners, four disciplines, one of them fixed | 2026-09-30-brief-fence-discipline.md |
 | 2026-09-30 | BRF-ROOT-CLIMB | done | The root climb — the silo is the repo, not the cwd | 2026-09-30-brief-root-climb.md |

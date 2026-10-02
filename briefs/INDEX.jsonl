@@ -91,3 +91,4 @@
 {"file":"2026-10-01-brief-reading-fraction.md","date":"2026-10-01","status":"open","summary":"The reading fraction — a meter for the glass, from the state the glass already holds","meta":{},"callsign":"BRF-READING-FRACTION"}
 {"file":"2026-10-02-brief-demo-sandbox.md","date":"2026-10-02","status":"open","summary":"The public demo room — two access modes, one sandbox grammar","meta":{},"callsign":"BRF-DEMO-SANDBOX"}
 {"file":"2026-10-02-brief-root-containment.md","date":"2026-10-02","status":"done","summary":"Root containment — existence is not permission","meta":{},"callsign":"BRF-ROOT-CONTAINMENT"}
+{"file":"2026-10-02-brief-td-id-lint.md","date":"2026-10-02","status":"open","summary":"The valve lint — td-ID citations in persisted documents fail the gate","meta":{},"callsign":"BRF-VALVE-LINT"}
