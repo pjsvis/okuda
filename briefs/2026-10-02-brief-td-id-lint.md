@@ -6,7 +6,7 @@ callsign: BRF-VALVE-LINT
 # Brief: The valve lint — td-ID citations in persisted documents fail the gate
 
 **Date:** 2026-10-02
-**Status:** Open — shipping same sitting; flips to Done below on ship.
+**Status:** Done — shipped same sitting (3e6887d): the valve is a gate in `just check`, baseline 109 files / 284 citations, bite/revert proven twice (implementer and an independent reviewer each). Reviewed by the valve's author, who re-ran the proof. v2 boundary recorded: src code comments carry 26 td citations outside the scan — documents-only is the right v1.
 
 ---
 
