@@ -7,8 +7,8 @@ date: 2026-09-24
 # Brief: The self-identical link — when the label is the address, say it once
 
 **Created:** 2026-09-24
-**Status:** Open
-**TD:** to create — glyph-lead-shaped: one predicate, one call site, tests; no epic, one task.
+**Status:** Done — shipped 2026-09-26 (565193d, `sameAddress` in `src/ansi.ts:37`): the label-is-the-address case renders once, in the destination paint; the four probe cases verified at the glass. Found done-but-open by the 2026-10-03 registry audit (td-a8f9d9).
+**TD:** none needed — shipped with 565193d before the issue was filed.
 **Lineage:** the operator, verbatim (2026-09-24): *"currently we seem to get the URL as text and destination in two different colours — should we just show the URL if they are the same."* The probe (`tmp/url-dedup-probe.md`, rendered 2026-09-24) confirmed the doubling on the four cases below.
 **Extends:** the Pass C link contract (2026-08-24, `src/ansi.ts` + `src/palette.ts`): rose label + visible cyan-underlined URL, no OSC 8 — the URL *is* displayed. This brief adds one clause to that contract; nothing else in it moves.
 

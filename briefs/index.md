@@ -9,12 +9,14 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-02 | BRF-SEARCH-SURFACE | open | The search surface — the state machine, the array, and the invariant audit | 2026-09-14-brief-search-surface.md |
 | 2026-10-02 | BRF-DEMO-SANDBOX | open | The public demo room — two access modes, one sandbox grammar | 2026-10-02-brief-demo-sandbox.md |
 | 2026-10-02 | BRF-ROOT-CONTAINMENT | open | Root containment — existence is not permission | 2026-10-02-brief-root-containment.md |
 | 2026-10-01 | BRF-READING-FRACTION | open | The reading fraction — a meter for the glass, from the state the glass already holds | 2026-10-01-brief-reading-fraction.md |
 | 2026-09-30 | BRF-FENCE-DISCIPLINE | open | One fence rule — five scanners, four disciplines, one of them fixed | 2026-09-30-brief-fence-discipline.md |
 | 2026-09-30 | BRF-ROOT-CLIMB | open | The root climb — the silo is the repo, not the cwd | 2026-09-30-brief-root-climb.md |
 | 2026-09-30 | BRF-STEP-INVENTORY | open | The stride inventory — what steps, what compounds, what is missing | 2026-09-30-brief-step-inventory.md |
+| 2026-09-30 | BRF-TELEVISION-PREVIEW | open | Television Preview — okuda as the renderer, OKUDA_WIDTH as the width knob | 2026-09-30-brief-television-preview.md |
 | 2026-09-30 | BRF-TERMINAL-CELL-GRID | parked | 2D Terminal Cell Grid Architecture (parked) | 2026-09-30-brief-terminal-cell-grid.md |
 | 2026-09-29 | BRF-CODE-SHELF | open | Code shelf — a dir predicate scopes the tier | 2026-09-29-brief-code-shelf.md |
 | 2026-09-29 | BRF-FENCE-COLOUR | open | Fence colour — chroma at the mermaid seam, the terminal's palette as the theme | 2026-09-29-brief-fence-colour.md |
