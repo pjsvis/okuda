@@ -6,7 +6,7 @@ callsign: BRF-STATE-GLYPH
 # Brief: State-glyph render path — the showcase environment + first cut
 
 **Date:** 2026-08-28
-**Status:** Open (the contract is landed; the application is this brief)
+**Status:** Done — P1+P2 landed (docs/state-colours.md showcase + `styleStateGlyph` in render.ts:91, table cells + list leads, 190/190 at ship). P3 perceptual tuning parked — refile when the perceptual itch fires; the showcase doc is the proof-of-fix, unchanged. Found lying-open by the 2026-10-03 audit (td-af9959).
 **Branch:** feat/gloam-launcher
 **Context:** the state-glyph vocabulary is pinned by contract test
 (`td-28a3e6` landed the palette roles + 6 tests, 190/190 green). But

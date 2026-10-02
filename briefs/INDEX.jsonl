@@ -9,7 +9,7 @@
 {"file":"2026-08-26-brief-ssh-served-markdown.md","date":"2026-08-26","status":"open","summary":"SSH-served markdown — option 1 (OpenSSH ForceCommand)","meta":{},"callsign":"BRF-SSH-SERVED"}
 {"file":"2026-08-26-brief-telemetry-conventions.md","date":"2026-08-26","status":"open","summary":"Telemetry Conventions — Markdown as Message Bus","meta":{},"callsign":"BRF-TELEMETRY-CONVENTIONS"}
 {"file":"2026-08-26-brief-tty-reverse-print.md","date":"2026-08-26","status":"open","summary":"TTY Reverse-Print — Land at the Top","meta":{},"callsign":"BRF-TTY-REVERSE"}
-{"file":"2026-08-26-brief-tui-live-documents.md","date":"2026-08-26","status":"open","summary":"TUI live documents — fs.watch → anchored re-render","meta":{},"callsign":"BRF-TUI-LIVE"}
+{"file":"2026-08-26-brief-tui-live-documents.md","date":"2026-08-26","status":"parked","summary":"TUI live documents — fs.watch → anchored re-render","meta":{},"callsign":"BRF-TUI-LIVE"}
 {"file":"2026-08-27-brief-artpack-aesthetics.md","date":"2026-08-26","status":"open","summary":"Plundered artpack aesthetics & high-SNR dark terminal rendering","meta":{},"callsign":"BRF-ARTPACK-AESTHETICS"}
 {"file":"2026-08-27-brief-dense-dynamic-displays.md","date":"2026-08-26","status":"open","summary":"Dense terminal visual primitives for dynamic telemetry","meta":{},"callsign":"BRF-DENSE-DYNAMIC"}
 {"file":"2026-08-27-brief-fetch-state-stamp.md","date":"2026-08-27","status":"open","summary":"Fetch-state stamp: checked-time + changed/same/failed in footer; fixes the empty-doc-on-fetch-failure lie; LCARS colouring with a new alert palette role; obeys the first temporal directive (fetch-time, not doc-time)","meta":{"depends_on":"2026-08-26-brief-tui-live-documents.md (watch + content gate)","sibling":"2026-08-23-brief-gloam-tui-footer.md","gated_on":"fs.watch in TUI + alert palette-role ADR","td":"td-a27b86","perceptual_property":"permitting, not demanding — the temporal analogue of the loose layout (pull-model attention)"},"callsign":"BRF-FETCH-STATE"}
@@ -23,7 +23,7 @@
 {"file":"2026-08-28-brief-notification-style.md","date":"2026-08-28","status":"open","summary":"011-zero-notification-stillness-and-decoupled-inbox-watchers","meta":{},"callsign":"BRF-NOTIFICATION-STYLE"}
 {"file":"2026-08-28-brief-oklch-tuning.md","date":"2026-08-28","status":"open","summary":"OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling","meta":{},"callsign":"BRF-OKLCH-TUNING"}
 {"file":"2026-08-28-brief-ssh-served-dynamic-markdown-portal.md","date":"2026-08-28","status":"parked","summary":"2026-08-28-brief-ssh-served-dynamic-markdown-portal","meta":{},"callsign":"BRF-SSH-SERVED-2"}
-{"file":"2026-08-28-brief-state-glyph-render-path.md","date":"2026-08-28","status":"open","summary":"State-glyph render path — the showcase environment + first cut","meta":{},"callsign":"BRF-STATE-GLYPH"}
+{"file":"2026-08-28-brief-state-glyph-render-path.md","date":"2026-08-28","status":"done","summary":"State-glyph render path — the showcase environment + first cut","meta":{},"callsign":"BRF-STATE-GLYPH"}
 {"file":"2026-08-28-brief-state-glyph-vocabulary.md","date":"2026-08-28","status":"open","summary":"State-glyph vocabulary — colour + bold, the closed lexicon","meta":{},"callsign":"BRF-STATE-GLYPH-2"}
 {"file":"2026-08-28-silo-mnemonics.md","date":"2026-08-28","status":"open","summary":"Rooted Gloam — silo badge and document callsigns","meta":{},"callsign":"BRF-SILO-MNEMONICS"}
 {"file":"2026-08-29-audio-style-guide.md","date":"2026-08-29","status":"open","summary":"Audio-First Style Guide and Linting Heuristics","meta":{},"callsign":"BRF-AUDIO-STYLE"}
@@ -74,7 +74,7 @@
 {"file":"2026-09-19-brief-capabilities-doc.md","date":"2026-09-19","status":"open","summary":"The capabilities doc — a snapshot inventory, not a changelog","meta":{},"callsign":"BRF-CAPABILITIES-DOC"}
 {"file":"2026-09-19-brief-gloam-owns-the-loop.md","date":"2026-09-19","status":"open","summary":"GLoam owns the search TUI — the fzf dependency retires","meta":{},"callsign":"BRF-GLOAM-OWNS-LOOP"}
 {"file":"2026-09-19-brief-palette-audit.md","date":"2026-09-19","status":"open","summary":"The palette audit — review the colours before the brightness controller scales them","meta":{},"callsign":"BRF-PALETTE-AUDIT"}
-{"file":"2026-09-19-brief-remote-speech-seam.md","date":"2026-09-19","status":"open","summary":"The remote speech seam — a question to settle before anything builds","meta":{},"callsign":"BRF-REMOTE-SPEECH-SEAM"}
+{"file":"2026-09-19-brief-remote-speech-seam.md","date":"2026-09-19","status":"done","summary":"The remote speech seam — a question to settle before anything builds","meta":{},"callsign":"BRF-REMOTE-SPEECH-SEAM"}
 {"file":"2026-09-24-brief-self-identical-link.md","date":"2026-09-24","status":"done","summary":"The self-identical link — when the label is the address, say it once","meta":{},"callsign":"BRF-SELF-IDENTICAL-LINK"}
 {"file":"2026-09-24-brief-source-line-ledger.md","date":"2026-09-24","status":"open","summary":"The source-line ledger — `10` edit lands the editor at the eye","meta":{},"callsign":"BRF-SRC-LINE-LEDGER"}
 {"file":"2026-09-24-brief-validated-silcrows.md","date":"2026-09-24","status":"done","summary":"Validated silcrows — the shape scan consults the registry it stands on","meta":{},"callsign":"BRF-VALIDATED-SILCROWS"}

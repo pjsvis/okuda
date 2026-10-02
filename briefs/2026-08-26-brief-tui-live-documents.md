@@ -6,7 +6,7 @@ callsign: BRF-TUI-LIVE
 # Brief: TUI live documents — fs.watch → anchored re-render
 
 **Date:** 2026-08-26
-**Status:** Open
+**Status:** Parked — step 0 shipped (r reload re-anchors via `reanchoredScroll`, 50b0e0e; dogfooded "rock solid, almost missed it"); steps 1–5 (directory watch, debounce, content gate) never started. Refile from this brief when scheduled. Parked by the 2026-10-03 audit (td-450944).
 **Branch:** brief/tui-live-documents
 **Context:** the okuda-stack riff (`docs/2026-08-26-the-okuda-stack-a-web-without-the-web.md`)
 made live documents load-bearing: a producer writes markdown on a cadence,

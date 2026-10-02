@@ -7,7 +7,7 @@ date: 2026-09-19
 # Brief: The remote speech seam — a question to settle before anything builds
 
 **Created:** 2026-09-19
-**Status:** Proposal — a seam decision, not a build brief. No TD epic until the verdict; nothing below is committed to.
+**Status:** Done — decided by ADR-036 (no-speech-code, accepted 2026-09-13): the cue is okuda's, the voice is the environment's; duty ends at the plain-text channel. The proposal had its verdict before it was written; closed by the 2026-10-03 audit (td-9dac3b).
 **Lineage:** the reader's 2026-09-19 action list — *"remote speech and various remote ops"* — triaged: the *ops* half has prior art; the *speech* half has a boundary question that must be answered before a brief can honestly name a build.
 **Extends:** ADR-PERIMETER-039 (the speech work leaves okuda; the tuning loop is `../speak-md/`'s) and the three-concerns test (compositing = environment, windowing = host, rendering = okuda).
 

@@ -28,7 +28,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-19 | BRF-CAPABILITIES-DOC | open | The capabilities doc — a snapshot inventory, not a changelog | 2026-09-19-brief-capabilities-doc.md |
 | 2026-09-19 | BRF-GLOAM-OWNS-LOOP | open | GLoam owns the search TUI — the fzf dependency retires | 2026-09-19-brief-gloam-owns-the-loop.md |
 | 2026-09-19 | BRF-PALETTE-AUDIT | open | The palette audit — review the colours before the brightness controller scales them | 2026-09-19-brief-palette-audit.md |
-| 2026-09-19 | BRF-REMOTE-SPEECH-SEAM | open | The remote speech seam — a question to settle before anything builds | 2026-09-19-brief-remote-speech-seam.md |
+| 2026-09-19 | BRF-REMOTE-SPEECH-SEAM | done | The remote speech seam — a question to settle before anything builds | 2026-09-19-brief-remote-speech-seam.md |
 | 2026-09-18 | BRF-GLYPH-LEAD | open | The state glyph is emitted twice on a list lead | 2026-09-18-brief-glyph-lead.md |
 | 2026-09-18 | BRF-PERIMETER-GATE | open | The perimeter gate — the moira group holds only recipes that invoke okuda | 2026-09-18-brief-perimeter-gate.md |
 | 2026-09-18 | BRF-PERIMETER-RUNNER | open | The perimeter runner — the tuning recipes and their artifacts leave the task runner | 2026-09-18-brief-perimeter-runner.md |
@@ -82,7 +82,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-28 | BRF-NOTIFICATION-STYLE | open | 011-zero-notification-stillness-and-decoupled-inbox-watchers | 2026-08-28-brief-notification-style.md |
 | 2026-08-28 | BRF-OKLCH-TUNING | open | OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling | 2026-08-28-brief-oklch-tuning.md |
 | 2026-08-28 | BRF-SSH-SERVED-2 | parked | 2026-08-28-brief-ssh-served-dynamic-markdown-portal | 2026-08-28-brief-ssh-served-dynamic-markdown-portal.md |
-| 2026-08-28 | BRF-STATE-GLYPH | open | State-glyph render path — the showcase environment + first cut | 2026-08-28-brief-state-glyph-render-path.md |
+| 2026-08-28 | BRF-STATE-GLYPH | done | State-glyph render path — the showcase environment + first cut | 2026-08-28-brief-state-glyph-render-path.md |
 | 2026-08-28 | BRF-STATE-GLYPH-2 | open | State-glyph vocabulary — colour + bold, the closed lexicon | 2026-08-28-brief-state-glyph-vocabulary.md |
 | 2026-08-28 | BRF-SILO-MNEMONICS | open | Rooted Gloam — silo badge and document callsigns | 2026-08-28-silo-mnemonics.md |
 | 2026-08-27 | BRF-FETCH-STATE | open | Fetch-state stamp: checked-time + changed/same/failed in footer; fixes the empty-doc-on-fetch-failure lie; LCARS colouring with a new alert palette role; obeys the first temporal directive (fetch-time, not doc-time) | 2026-08-27-brief-fetch-state-stamp.md |
@@ -95,7 +95,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-26 | BRF-SSH-SERVED | open | SSH-served markdown — option 1 (OpenSSH ForceCommand) | 2026-08-26-brief-ssh-served-markdown.md |
 | 2026-08-26 | BRF-TELEMETRY-CONVENTIONS | open | Telemetry Conventions — Markdown as Message Bus | 2026-08-26-brief-telemetry-conventions.md |
 | 2026-08-26 | BRF-TTY-REVERSE | open | TTY Reverse-Print — Land at the Top | 2026-08-26-brief-tty-reverse-print.md |
-| 2026-08-26 | BRF-TUI-LIVE | open | TUI live documents — fs.watch → anchored re-render | 2026-08-26-brief-tui-live-documents.md |
+| 2026-08-26 | BRF-TUI-LIVE | parked | TUI live documents — fs.watch → anchored re-render | 2026-08-26-brief-tui-live-documents.md |
 | 2026-08-26 | BRF-ARTPACK-AESTHETICS | open | Plundered artpack aesthetics & high-SNR dark terminal rendering | 2026-08-27-brief-artpack-aesthetics.md |
 | 2026-08-26 | BRF-DENSE-DYNAMIC | open | Dense terminal visual primitives for dynamic telemetry | 2026-08-27-brief-dense-dynamic-displays.md |
 | 2026-08-26 | BRF-SSH-TUI | open | Modern terminal escape protocol integration for SSH TUI delivery | 2026-08-27-brief-ssh-tui-integration.md |
