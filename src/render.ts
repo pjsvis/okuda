@@ -292,8 +292,9 @@ export async function renderDocument(
   const ctx: Ctx = {
     // Content width reserves a 2-char left + 2-char right margin (Glow
     // Document margin). Wrap, hr, and table-fit all respect this;
-    // raw blocks (code/diagrams) bypass it and may overflow the right
-    // gutter — art is art.
+    // raw blocks (code/diagrams) elide to the same right edge rather
+    // than wrap (ADR-UNIVERSAL-ELISION-050 — the "art is art" gutter
+    // exemption repealed).
     width: Math.max(10, opts.width - 4),
     fullWidth: opts.width,
     styler,
@@ -968,10 +969,26 @@ function stripHtml(s: string): string {
  *  ("elided into a further question"). (brief: mermaid-source-omitted.) */
 function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   const open = tagRawOpen("diagram");
+  // Art elides at the code-fence right edge (ADR-UNIVERSAL-ELISION-050):
+  // budget + the finalize margin 2 = the terminal width. The "art is
+  // art" gutter exemption repeals — a wrapped diagram is a diagram
+  // pretending to be a taller diagram, and the terminal never
+  // soft-wraps what okuda emits. classifyDiagramLine FIRST (border /
+  // arrow detection needs the glyphs intact), then the composed line
+  // elides — elideToWidth walks ANSI runs and closes open SGR at the
+  // cut. Under NO_COLOR the art is the binary's bytes until over
+  // budget — parity holds where it always did, the cut is new honesty.
+  const budget = ctx.width + 2;
+  let elided = 0;
   const lines = art.split("\n").map((l) => {
     if (l === "") return "";
-    if (ctx.color === "none") return l; // byte-identical to the binary's output
-    return classifyDiagramLine(l, ctx.palette, ctx.color) + "\x1b[0m";
+    const painted =
+      ctx.color === "none"
+        ? l
+        : classifyDiagramLine(l, ctx.palette, ctx.color) + "\x1b[0m";
+    if (displayWidth(painted) <= budget) return painted;
+    elided++;
+    return elideToWidth(painted, budget);
   });
   // Indicator line: the diagram's caption. A leading `title: <caption>`
   // in the mermaid fence (extracted pre-pipe by interceptMermaid) lands
@@ -979,21 +996,31 @@ function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   // caption follows in the muted register. Every fence states the elision
   // (BRF-PROJECTION-LOSSES): the notice used to ride only the untitled
   // branch, so 22 of the silo's 58 fences never said the source is not
-  // shown. The titled branch appends the SHORTER clause, and the reason
-  // is measured — this line is RAW-protected and never wrapped, and the
-  // silo's longest title (51 columns) plus `· mermaid source elided`
-  // measures 79 against a 78-column budget at width 80. `source elided`
-  // measures 71. The untitled branch keeps its exact bytes: 36 fences
-  // already read `mermaid source elided` and nothing here changes them.
-  // The glyph keeps its weight under NO_COLOR (roleBold emits SGR 1 —
-  // colour drops, attributes survive); the `⋮` reads as a control among
-  // the art.
+  // shown. The titled branch appends the SHORTER clause; the
+  // hand-measured arithmetic (longest title + `· source elided` = 79
+  // against a 78-column budget) is now guarded rather than load-bearing
+  // — the indicator itself elides to the same budget, RAW-protected from
+  // wrapping, cut by the same primitive as the art. A cut in the art is
+  // a second loss and gets said: `· art elided` rides the same muted
+  // clause. The glyph keeps its weight under NO_COLOR (roleBold emits
+  // SGR 1 — colour drops, attributes survive); the `⋮` reads as a
+  // control among the art.
   const glyph = ctx.styler.roleBold("state-parked", "⋮");
-  const stmt = title
-    ? ctx.styler.role("muted", " " + title + " · source elided")
-    : ctx.styler.role("muted", " mermaid source elided");
+  const note = elided > 0 ? " · art elided" : "";
+  const base = title ? " " + title + " · source elided" : " mermaid source elided";
+  const fits = (s: string) => displayWidth(glyph + ctx.styler.role("muted", s)) <= budget;
+  // Fit ladder: the receipt's claims outrank the caption — the title is
+  // first to go, then the standing source clause; the art loss is the
+  // NEW fact and holds to the last rung. At comfortable widths every
+  // rung fits and the branch bytes are unchanged (the 36-fence
+  // byte-stability claim holds where it always applied).
+  let text = base + note;
+  if (!fits(text) && title) text = " source elided" + note;
+  if (!fits(text) && note) text = note;
+  const stmt = ctx.styler.role("muted", text);
   const indOpen = tagRawOpen("diagramsrc");
-  return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n${indOpen}${glyph}${stmt}${TAG_RAW_CLOSE}\n\n`;
+  const indicator = elideToWidth(`${glyph}${stmt}`, budget);
+  return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n${indOpen}${indicator}${TAG_RAW_CLOSE}\n\n`;
 }
 
 /** Blockquote: single-level pipe prefix, muted, re-wrapped at width-2. */

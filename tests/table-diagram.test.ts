@@ -295,6 +295,37 @@ describe("render — mermaid pipe + colour classification", () => {
     for (const l of art) expect(l.endsWith("\x1b[0m")).toBe(true);
   });
 
+  test("art elides at the fence budget — never wraps (ADR-UNIVERSAL-ELISION-050)", async () => {
+    // Narrow glass, real pipe: the art is wider than the budget, every
+    // line must still fit whole — the cut is ours (…) never the
+    // terminal's (soft-wrap). A cut in the art is a loss the indicator
+    // states (projection-losses, extended to the art itself).
+    const out = await renderDocument("```mermaid\n" + MERMAID_SRC + "```\n", {
+      width: 20,
+      palette: DRACULA_PALETTE,
+    });
+    for (const l of out.split("\n")) {
+      expect(displayWidth(l)).toBeLessThanOrEqual(20);
+    }
+    expect(out).toContain("…");
+    // The fit ladder: at 20 columns the caption and the source clause
+    // cannot fit, but the art loss is the new fact and holds the last
+    // rung — the receipt never elides the very thing it exists to say.
+    expect(out).toContain("art elided");
+  });
+
+  test("a cut coloured line closes its SGR before the marker — hygiene holds at the cut", async () => {
+    const out = await renderDocument("```mermaid\n" + MERMAID_SRC + "```\n", {
+      width: 20,
+      palette: DRACULA_PALETTE,
+    });
+    const cut = out.split("\n").filter((l) => l.includes("38;2;") && l.endsWith("…"));
+    expect(cut.length).toBeGreaterThan(0);
+    // elideToWidth closes the open SGR, THEN the marker: no dangling
+    // style — the cut line's last SGR bytes precede the ….
+    for (const l of cut) expect(l).toMatch(/\x1b\[0m…$/);
+  });
+
   test("the elision notice reaches a titled fence too (BRF-PROJECTION-LOSSES)", async () => {
     // The caption used to be a ternary: a title OR the notice. So the 22
     // titled fences in the silo never said the source is not shown. The
@@ -374,7 +405,7 @@ describe("render — mermaid pipe + colour classification", () => {
     }
   });
 
-  test("diagram never wraps even when wider than terminal", async () => {
+  test("diagram elides when wider than terminal — never wraps (ADR-UNIVERSAL-ELISION-050)", async () => {
     // A naturally-wide LR flowchart whose ASCII art is one long line.
     const wide =
       "flowchart LR\n  A[Alpha] --> B[Beta] --> C[Gamma] --> B[Delta] --> E[Epsilon] --> F[Zeta] --> G[Eta]";
@@ -382,9 +413,14 @@ describe("render — mermaid pipe + colour classification", () => {
       width: 30,
       palette: DRACULA_PALETTE,
     });
-    // The widest art line must exceed the terminal width — okuda did not wrap it.
-    const widest = Math.max(...out.split("\n").map((l) => displayWidth(l)));
-    expect(widest).toBeGreaterThan(30);
+    // The old policy let art overflow ("art is art") and the terminal
+    // soft-wrapped it — the lie the ADR repeals. Now: every line fits
+    // whole, the cut is okuda's (…), and the receipt says so.
+    for (const l of out.split("\n")) {
+      expect(displayWidth(l)).toBeLessThanOrEqual(30);
+    }
+    expect(out).toContain("…");
+    expect(out).toContain("art elided");
   });
 
   test("missing binary: fence dropped silently, document renders", async () => {
