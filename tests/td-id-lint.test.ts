@@ -22,9 +22,11 @@ describe("td-id lint — the pattern (BRF-VALVE-LINT)", () => {
 });
 
 describe("td-id lint — the verdict against baseline", () => {
-  test("clean is ok, with or without a baseline entry", () => {
+  test("clean is ok without an entry; a clean file WITH an entry is the loudest shrink", () => {
     expect(verdict(0, undefined)).toBe("ok");
-    expect(verdict(0, 5)).toBe("ok");
+    // Stale entry on a cleaned file: report it, prune it — never leave a
+    // count allowance behind (the checksum review's live demonstration).
+    expect(verdict(0, 5)).toBe("shrink");
   });
 
   test("at baseline grandfathers; below suggests the shrink", () => {

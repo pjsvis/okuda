@@ -64,8 +64,10 @@ function checkCorpus(baseline: Record<string, number>): Verdict[] {
     const hits = extractCallsigns(text).filter(
       (t) => resolveByCallsign(t, REPO_ROOT) === null,
     );
-    if (hits.length === 0) continue;
-    next[f] = hits.length;
+    // verdict for EVERY file — a zero-hit file with a baseline entry is
+    // a stale entry, reported as shrink, never silently skipped (a
+    // skipped stale count is an allowance: a new citation rides it).
+    if (hits.length > 0) next[f] = hits.length;
     const v = verdict(hits.length, baseline[f]);
     if (v === "violation") {
       const shown = [...new Set(hits)].slice(0, 4).join(", ");

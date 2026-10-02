@@ -45,10 +45,12 @@ export function countIds(text: string): number {
 
 export type Verdict = "ok" | "shrink" | "violation";
 
-/** ok: at baseline (or clean). shrink: below — drop the baseline entry.
- *  violation: over baseline, or any hit with no baseline entry at all. */
+/** ok: at baseline. shrink: below — drop the baseline entry; a CLEAN file
+ *  with an entry is the loudest shrink (stale count = silent allowance,
+ *  demonstrated live in the checksum review, 2026-10-02). violation: over
+ *  baseline, or any hit with no baseline entry at all. */
 export function verdict(hits: number, baseline: number | undefined): Verdict {
-  if (hits === 0) return "ok";
+  if (hits === 0) return baseline !== undefined && baseline > 0 ? "shrink" : "ok";
   if (baseline === undefined) return "violation";
   if (hits > baseline) return "violation";
   return hits < baseline ? "shrink" : "ok";
