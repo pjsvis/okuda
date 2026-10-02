@@ -1,0 +1,20 @@
+{
+  "briefs/2026-09-24-brief-source-line-ledger.md": 3,
+  "briefs/2026-09-24-brief-validated-silcrows.md": 9,
+  "briefs/2026-10-02-brief-callsign-checksum.md": 10,
+  "briefs/2026-08-29-brief-terminal-speech.md": 2,
+  "decisions/TEMPLATE.md": 1,
+  "decisions/024-callsigns-are-data.md": 1,
+  "decisions/044-validated-silcrows.md": 1,
+  "decisions/022-right-anchored-role-layout.md": 1,
+  "debriefs/2026-09-30-debrief-references-section.md": 1,
+  "debriefs/2026-09-02-debrief-ssh-bringup.md": 1,
+  "advisories/AI-HR-MANUAL.md": 5,
+  "docs/2026-09-16-gloam-use-cases.md": 1,
+  "docs/2026-09-19-the-tidy-has-no-criterion.md": 1,
+  "docs/2026-09-10-use-vs-mention.md": 1,
+  "docs/2026-09-02-i811-glyph-stress-test.md": 1,
+  "docs/2026-08-31-vector-resource-locators.md": 1,
+  "docs/2026-08-30-voice-actuator-testing.md": 1,
+  "docs/2026-09-14-position-ventilator-proof.md": 1
+}

@@ -156,6 +156,25 @@ machine can resolve):
   playbook, and commit history is never force-pushed for hygiene. The rule
   governs everything written from codification forward.
 
+### The Callsign Checksum — the valve's sibling over the citation namespace
+
+Callsigns are the persistent identity, so they get the persistent gate
+(BRF-CALLSIGN-CHECKSUM, sibling of the td-ID lint above, sharing its scan
+set and verdicts):
+
+- **Every callsign cited in a persisted document resolves** — through the
+  product's own resolver (`resolveByCallsign`: exact-or-ordinal,
+  unique-match-or-null), never a second semantics. A lint stricter than the
+  product would flag working jumps.
+- **The unpushed message range is checked too** (`origin/main..HEAD`):
+  both td IDs and unresolvable callsigns in commit messages fail `just
+  check` — the range is exactly where amending is still cheap. Three
+  self-caught strikes on one day built this.
+- **The baseline grandfathers the census residue** (placeholders, dead
+  names, documented forward references) and may only shrink: under-count
+  prints the prune remedy (`--write-baseline`). A forward reference
+  self-heals when its document lands — the ratchet, not an allowance.
+
 ## Review Workflow
 
 **td enforces separation: the session that implemented cannot approve its own work.** This is the audit trail's spine — don't defeat it by spinning up a new session merely to look independent; use an genuinely separate context or acknowledge a trusted self-review.

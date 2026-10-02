@@ -17,8 +17,10 @@ export const TD_ID = /\btd-[a-f0-9]{6,8}\b/gi;
 /** The td manual documents the ephemeral layer's own command syntax. */
 export const EXEMPT_FILES = new Set(["playbooks/td-playbook.md"]);
 
-/** Registry dirs + docs/ + root files; *.jsonl registries included. */
-function scannedFiles(): string[] {
+/** Registry dirs + docs/ + root files; *.jsonl registries included.
+ *  Exported: one scan set, two gates (this lint + the callsign
+ *  checksum) — no drift between what each gate sees. */
+export function scannedFiles(): string[] {
   const out: string[] = [];
   const mdDirs = ["briefs", "decisions", "debriefs", "playbooks", "advisories", "docs"];
   for (const d of mdDirs) {
