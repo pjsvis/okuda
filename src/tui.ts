@@ -355,9 +355,10 @@ export function needsRepaint(
   return contentChanged || geometry !== paintedGeometry;
 }
 
-/** The verbose hints line, right-justified on the last row with the
- *  corner column reserved. If it can't fit, it wraps — a legible
- *  'you are too narrow' rather than silent truncation. Pure. */
+/** The verbose hints line, right-justified on the separator row — the
+ *  row ABOVE the badge (the badge owns the last row) — with the corner
+ *  column reserved. If it can't fit, it wraps — a legible 'you are too
+ *  narrow' rather than silent truncation. Pure. */
 export function hintsLine(width: number, muted: (s: string) => string): string {
   return muted(padStartDisplay(HINTS, width - 1)) + " ";
 }
@@ -462,8 +463,8 @@ export function resolveJumpTarget(
 /**
  * Compose the footer: badge + silo? + callsign? + folder/filename left
  * (identity leads — the glance position), `? help` right (affordance
- * trails). Always compact — verbose hints live on the last row (see
- * hintsLine).
+ * trails). Always compact — verbose hints live on the separator row
+ * above the badge (see hintsLine).
  *
  * The identity run is `silo · callsign · filename` (ADR-020): silo and
  * callsign both muted (provenance, not alarm), passed in by the launcher
