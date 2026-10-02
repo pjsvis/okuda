@@ -46,3 +46,4 @@
 {"file":"047-references-section.md","date":"2026-09-30","status":"Accepted","summary":"The References section — the renderer emits a receipt for its own map","meta":{},"callsign":"ADR-REFERENCES-SECTION-047"}
 {"file":"048-silo-root-git-toplevel.md","date":"2026-09-30","status":"Accepted","summary":"The silo root is the git toplevel","meta":{},"callsign":"ADR-SILO-ROOT-048"}
 {"file":"049-legibility-gate.md","date":"2026-10-01","status":"Accepted","summary":"The legibility gate — existence is necessary, legibility is the promise","meta":{},"callsign":"ADR-LEGIBILITY-GATE-049"}
+{"file":"050-universal-elision.md","date":"2026-10-02","status":"Accepted","summary":"Elision is the universal overflow policy — the terminal never soft-wraps what okuda emits","meta":{},"callsign":"ADR-UNIVERSAL-ELISION-050"}
