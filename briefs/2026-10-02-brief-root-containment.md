@@ -7,7 +7,10 @@ date: 2026-10-02
 # Brief: Root containment — existence is not permission
 
 **Created:** 2026-10-02
-**Status:** Open — brief only; tasks written when the work starts
+**Status:** Done — shipped 2026-10-02 (f7dd2d8, main): the predicate, the
+four seams, and read-only mode landed the same sitting the brief was
+filed. The two test-caught lies (resolve is lexical; join is
+segment-wise) are the lesson record: DBF-ROOT-CONTAINMENT.
 **Lineage:** the operator, verbatim: *"check the Gloam source files at
 @src/ for the paths outside the root issue"* — the audit that found the
 gap, then: *"lets file briefs for both."*
