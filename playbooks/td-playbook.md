@@ -122,11 +122,39 @@ Finish it, all in the same sitting, while the facts are still in the head:
    behind it — that state is a lie.
 3. **Brief** — flip Status to match reality: `Done — shipped <date> (<sha> …)` or
    `Parked — gated on <gate>`. A brief that lies about its own state is decorated
-   Stuff.
+   Stuff. Cite callsigns and SHAs here, never td IDs — see The One-Way Valve below.
 4. **Branch** — merged into main? Prune it, local *and* remote. Parked work keeps
    its branch and says so in the brief.
 5. **Debrief** when the work was significant — the debrief is where "this is the
    current state" gets said out loud.
+
+## The One-Way Valve — td is local; callsigns are the citation
+
+td's database (`.todos/`, gitignored as *runtime state*) never leaves this
+machine. Everything it holds is ephemeral: today's IDs, this terminal's
+sessions, the work-in-flight ledger. The silo's persistent identity lives in
+callsigns (`BRF-*`, `DBF-*`, `ADR-*`, `ADV-*`) and commit SHAs — both resolve
+from the repo itself, for any clone, any session, any year. Two identity
+systems, two buses, one rule (codified 2026-10-02, after an audit found 61
+commit messages and ~30 documents citing IDs that nothing outside this
+machine can resolve):
+
+> **The ephemeral may cite the persistent; the persistent never cites the
+> ephemeral.**
+
+- **td IDs never appear in persisted documents** — briefs, debriefs, ADRs,
+  advisories, playbooks, registry entries. A td reference there is a dangling
+  pointer for every reader who is not this machine, this week. Cite the
+  callsign; if there is no callsign, there is nothing to cite.
+- **Commit messages carry callsigns, not td IDs.** Commits are pushed; a
+  `(td-XXXXXX)` suffix resolves to nothing on GitHub. `(BRF-DEMO-SANDBOX)` carries
+  the same lineage and resolves forever.
+- **The valve's direction:** a td issue's body pointing at a brief is correct
+  and encouraged — the disposable layer references the durable one freely.
+  The reverse is the violation.
+- **The residue is inert, not rewritten.** Debriefs are frozen by their own
+  playbook, and commit history is never force-pushed for hygiene. The rule
+  governs everything written from codification forward.
 
 ## Review Workflow
 
