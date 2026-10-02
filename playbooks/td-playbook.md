@@ -188,6 +188,18 @@ td context td-abc123                # read the handoff and full issue state
 td files td-abc123                  # files linked to the issue + change status
 ```
 
+**Prove every acceptance criterion at the bite — the negative ones
+first.** A claim true of the design can be false of the code path, and the
+box gets checked anyway (2026-10-02, three in one day: a parent ADR
+teaching repealed law, a comment claiming a handback only headings
+implement, an acceptance box saying the shrink note fires while an
+early-`continue` skipped it — *asserted, not enacted*). Violations get
+proved by everyone; silence, decay, and absence get proved by no one
+unless the reviewer does. Reproduce the failure mode, watch the gate
+catch it, watch it pass when the condition clears — the day's every
+review found one true thing, and each one was found at the glass, not in
+the handoff.
+
 ### Approve (close) or reject
 
 ```bash
