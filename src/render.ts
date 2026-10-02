@@ -88,8 +88,10 @@ const STATE_GLYPH_ROLE: Record<string, keyof Palette> = {
  *  Detects the glyph after any leading ANSI SGR runs (inline-styled
  *  cells may carry SGR before the visible char) and splices the styled
  *  glyph over exactly the glyph — the leading runs are kept (they may
- *  be the enclosing style; roleBold's reset is the guest's, handed
- *  back like the heading's). Byte-idempotent: text already painted in
+ *  be the enclosing style). The glyph's reset does NOT hand the
+ *  enclosing style back for the tail: only the heading handler
+ *  re-opens (keepHeading); the list-lead/table-cell tail is a
+ *  recorded follow-up. Byte-idempotent: text already painted in
  *  this role (the inline paint got here first) returns unchanged.
  *  Pure; in none mode the colour drops but the weight survives
  *  (roleBold emits SGR 1). */
