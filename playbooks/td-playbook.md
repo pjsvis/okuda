@@ -104,6 +104,28 @@ td review td-abc123      # status -> in_review; records this session as review-r
 
 `td review` auto-creates a minimal handoff if you didn't — but a real handoff is better documentation. For epics/parent issues, review cascades to open/in_progress descendants automatically.
 
+## The Wrap-Up Protocol — the merge ritual ends at closure, not commit
+
+Moving fast makes the tidy-up **more** important, not less: velocity without
+closure manufactures false state — done-but-open issues, Open briefs for shipped
+code, merged branches wearing live-work costumes. The 2026-10-03 audit
+(`debriefs/2026-10-03-debrief-registry-truth.md`) found all three species; this
+protocol is the fix. A unit of work is not finished when the commit lands.
+Finish it, all in the same sitting, while the facts are still in the head:
+
+1. **Merge/commit** — the change is in `main`, or parked on a branch *deliberately*.
+2. **td** — implemented work: `td review` → `td approve` (independent session where
+   practical). Parked work: `td close --reason "parked — <what landed>, <what
+   remains>, refile from <brief>"`. Never leave `in_progress` with no session
+   behind it — that state is a lie.
+3. **Brief** — flip Status to match reality: `Done — shipped <date> (<sha> …)` or
+   `Parked — gated on <gate>`. A brief that lies about its own state is decorated
+   Stuff.
+4. **Branch** — merged into main? Prune it, local *and* remote. Parked work keeps
+   its branch and says so in the brief.
+5. **Debrief** when the work was significant — the debrief is where "this is the
+   current state" gets said out loud.
+
 ## Review Workflow
 
 **td enforces separation: the session that implemented cannot approve its own work.** This is the audit trail's spine — don't defeat it by spinning up a new session merely to look independent; use an genuinely separate context or acknowledge a trusted self-review.
