@@ -895,15 +895,21 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   };
 
   /** Reduce ONE key event to its effect. The reducer is pure up to the
-   *  verb handlers; onKey feeds it every event in the read. */
-  const applyKey = (bytes: Uint8Array): void => {
+   *  verb handlers; onKey feeds it every event in the read. Returns
+   *  TRUE when this event ended the session (q/Esc/Ctrl-C, `00` exit):
+   *  the caller stops feeding — a digit pair arriving in the same read
+   *  as the exit key must never be reduced against a terminal that
+   *  has already been restored (`0012` would jumpTo after cleanup;
+   *  BRF-PROLONGED-PRESS layer 2, load-bearing independently of the
+   *  burst). */
+  const applyKey = (bytes: Uint8Array): boolean => {
     // A lone ESC (keyboard-controls: "ESC cancels partial vector") —
     // the user's escape from a half-typed sequence. Arrow sequences
     // arrive as multi-byte events (the lexer keeps them whole), so a
     // single-byte ESC is genuinely alone: stand the buffer down.
     if (bytes.length === 1 && bytes[0] === ESC) {
       if (numBuffer !== null) numBuffer = advanceNumBuffer(numBuffer, null).buffer;
-      return;
+      return false;
     }
     // Numeric jump buffer: two digits → token → verb. Any non-digit
     // (motion, escape sequence, letters) cancels a pending buffer.
@@ -917,17 +923,20 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       } else {
         verbHandlers[verb]?.();
       }
-      return;
+      return cleaned; // the exit verb ended the session — report it
     }
-    if (digit !== null) return; // first digit only — buffer pending
+    if (digit !== null) return false; // first digit only — buffer pending
     const action = decodeKey(bytes);
-    if (action === null) return;
-    if (action === "quit") return cleanup();
-    if (action === "back") { void back(); return; }
+    if (action === null) return false;
+    if (action === "quit") {
+      cleanup();
+      return true;
+    }
+    if (action === "back") { void back(); return false; }
     if (action === "help") {
       showHints = !showHints;
       paint();
-      return;
+      return false;
     }
     const { rows } = dims();
     const height = contentHeight(rows); // constant — separator + badge rows (BRF-FOOTER-SEPARATOR)
@@ -984,24 +993,26 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       case "half-up": scroll -= half; break;
       case "top": scroll = 0; break;
       case "bottom": scroll = maxScroll; break;
-      case "reload": void reload(); return;
+      case "reload": void reload(); return false;
     }
     scroll = Math.min(Math.max(0, scroll), maxScroll);
     paint();
+    return false;
   };
 
   /** The reader's entry point: split the read into key events, reduce
-   *  each. (The reducer is `applyKey`; the lexer is `splitKeyEvents`.) */
+   *  each — and STOP at the first event that ended the session. The
+   *  reducer is `applyKey`; the lexer is `splitKeyEvents`. (BRF-
+   *  PROLONGED-PRESS layer 2: the loop is the bug's other half — the
+   *  run buffer swallows a run's tail, but a token resolving in the
+   *  same read as an exit used to be reduced against a restored
+   *  terminal.) */
   const onKey = (data: Buffer): void => {
-    for (const event of splitKeyEvents(new Uint8Array(data))) applyKey(event);
+    for (const event of splitKeyEvents(new Uint8Array(data))) {
+      if (applyKey(event)) break;
+    }
   };
 
-  // runTui blocks until the reader session ends. The `done` promise is
-  // resolved by cleanup — `q`/Esc/Ctrl-C (in raw mode, all decoded to
-  // `quit`) restore the terminal and *return* to the caller, so the
-  // launcher's browse → read → browse loop resumes the picker rather
-  // than dying (the bug that dropped the reader straight to the shell).
-  // External SIGINT/SIGTERM (kill from another process) still hard-exit.
   let cleaned = false;
   let resolveDone: () => void = () => {};
   const done = new Promise<void>((resolve) => { resolveDone = resolve; });
