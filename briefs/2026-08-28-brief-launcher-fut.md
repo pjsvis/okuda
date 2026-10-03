@@ -6,7 +6,12 @@ callsign: BRF-LAUNCHER-FUT
 # Brief: Launcher FUT — session-scoped alt-screen
 
 **Date:** 2026-08-28
-**Status:** Open (the ordering half is landed; this is the scoping half)
+**Status:** Done — closed 2026-10-03, both edges fixed by ORDERING, the scoping
+half rejected on landing (see Why, revised). The coda landed 2026-10-03:
+the drain window gave the return edge its beat (ADR-EXIT-FERMATA-051) — the
+frozen frame holds through the window, the restore is the reader's last
+byte, the launcher's re-enter follows within a sub-frame. No primary-screen
+airing in either direction.
 **Branch:** feat/gloam-launcher
 **Context:** dogfood finding during the gloam browse → read → browse loop.
 Between the fzf picker and the okuda reader there is a flash of unstyled
