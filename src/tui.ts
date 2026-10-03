@@ -1013,20 +1013,66 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     }
   };
 
+  // runTui blocks until the reader session ends. The `done` promise is
+  // resolved by cleanup — AFTER the drain window (below) — `q`/Esc/Ctrl-C
+  // (in raw mode, all decoded to `quit`) and `00` restore the terminal
+  // and *return* to the caller, so the launcher's browse → read → browse
+  // loop resumes the picker rather than dying (the bug that dropped the
+  // reader straight to the shell). The launcher is in-process, so the
+  // resolve is the query box's gate: it resumes only when the drain has
+  // had its window. External SIGINT/SIGTERM (kill from another process)
+  // still hard-exit.
   let cleaned = false;
   let resolveDone: () => void = () => {};
   const done = new Promise<void>((resolve) => { resolveDone = resolve; });
+  /** The drain window (BRF-PROLONGED-PRESS layer 3). The bound is
+   *  argued, then dogfooded — a heuristic on a queue, not a property
+   *  of the grammar. Lower bound: the reader who exited by holding a
+   *  key sees the restore, then lifts — a human planning+motor
+   *  reaction, ~250 ms — and one further repeat interval (~33 ms at
+   *  30 Hz) must still land inside the window. Upper bound: whatever
+   *  the window eats is a keystroke typed at a query box that is not
+   *  yet drawn, so the cost of too long is exit latency, never lost
+   *  input — while too short is the original report, the spray.
+   *  300 ms, with margin. */
+  const DRAIN_WINDOW_MS = 300;
   const cleanup = (): void => {
     if (cleaned) return;
     cleaned = true;
+    // The flash's 2500 ms clear-timer is a LIVE-session affordance —
+    // at session end it is void: an exit taken inside a flash's
+    // lifetime (a clone, then `q` within the breath) left the timer
+    // pending past the restore, and its repaint painted a FULL
+    // document into whatever holds the tty next — against a pty that
+    // is no longer being read, that paint blocks the process in
+    // write forever. Found live by the dogfood probe (the second
+    // session hung deterministically; the first survived by luck —
+    // its flash had already cleared). Nothing paints after cleanup;
+    // the drain owns the exit's every byte.
+    if (flashTimer) {
+      clearTimeout(flashTimer);
+      flashTimer = null;
+    }
+    // The drain: a discarding listener, installed BEFORE onKey's
+    // removal — order matters, because bytes already buffered inside
+    // the Node stream (not merely the tty queue) are delivered to
+    // whoever attaches next, and the launcher's picker is the next
+    // attacher. Raw mode holds for the window so the discarded tail
+    // never echoes; the restore is written now so the exit reads as
+    // instant, while the launcher resumes only after the window.
+    const drain = (): void => {}; // consume — never echo, never queue
+    process.stdin.on("data", drain);
     process.stdin.removeListener("data", onKey);
-    process.stdin.setRawMode?.(false);
-    process.stdin.pause?.();
     process.stdout.write(SHOW_CURSOR + "\x1b[?1007l" + EXIT_ALT);
     process.removeListener("SIGWINCH", onWinch);
     process.removeListener("SIGINT", onSignal);
     process.removeListener("SIGTERM", onSignal);
-    resolveDone();
+    setTimeout(() => {
+      process.stdin.removeListener("data", drain);
+      process.stdin.setRawMode?.(false);
+      process.stdin.pause?.();
+      resolveDone(); // the launcher resumes here — after the drain
+    }, DRAIN_WINDOW_MS);
   };
 
   // Enter (raw mode + listener only — the alt-screen switch happened
