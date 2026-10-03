@@ -7,8 +7,11 @@ date: 2026-10-03
 # Brief: The archive resolution tier — citations must survive the archive move
 
 **Date:** 2026-10-03
-**Status:** In Progress — started same sitting as the sweep it unblocks
-(the 19-brief archive sweep, `feat/archive-sweep`).
+**Status:** Done — shipped same sitting as the sweep it unblocks (commit
+982056a on `feat/archive-sweep`): all five acceptance criteria green,
+`just check` + 582 tests, the debrief (DBF-ARCHIVE-SWEEP) written; the
+operator amended the sweep commit's message in the same sitting — the
+valve caught the td-ID and the unresolvable ordinal in it before push.
 **Lineage:** the 19-brief archive sweep (`feat/archive-sweep`) tripped the callsign
 checksum: eleven live documents — six debriefs, a playbook, DEPENDENCIES.md,
 three docs — cite callsigns whose briefs had just been archived, and

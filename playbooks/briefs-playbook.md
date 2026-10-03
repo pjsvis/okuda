@@ -104,9 +104,15 @@ right tool. See `td-playbook.md`.
 
 Completed briefs move to `.archive/briefs/` — same filename,
 checked in to git, excluded from Gloam search (`.archive` is
-dot-prefixed; `walkMarkdown` and `fd` both skip it). The INDEX entry
-is removed on move (`just reg-sync-fix`). A completed brief is work
-that shipped; keeping it in `briefs/` makes the open list a graveyard.
+dot-prefixed; `rg`/`walkMarkdown` and `fd` both skip it). The INDEX entry
+is removed on move (`just reg-sync-fix`) **and the archive tier keeps
+its own** (ADR-ARCHIVE-RESOLUTION): `.archive/briefs/INDEX.jsonl`, reg-sync maintained,
+feeds the resolver — `loadCallsigns` reads live + archive registries so
+citations to completed work keep resolving after the move. Search and
+silcrow discovery read live registries only; `EXCLUSIONS` states
+`-g !.archive/**` so no future no-ignore switch silently un-hides the
+permanent record into the work queue. A completed brief is work that
+shipped; keeping it in `briefs/` makes the open list a graveyard.
 The archive is the permanent record; the live list is the work queue.
 
 **What does not go in `briefs/` (ADR-017):**

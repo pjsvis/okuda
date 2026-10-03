@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-03 | DBF-ARCHIVE-SWEEP | done | Debrief: The archive sweep — closing the loop the procedure left open | 2026-10-03-debrief-archive-sweep.md |
 | 2026-10-03 | DBF-REGISTRY-TRUTH | done | Debrief: Registry truth — the audit that found the paperwork lying | 2026-10-03-debrief-registry-truth.md |
 | 2026-10-02 | DBF-REVIEW-CADENCE | done | Debrief: The review cadence — nine loops, one true thing each, zero escapes | 2026-10-02-debrief-review-cadence.md |
 | 2026-10-02 | DBF-ROOT-CONTAINMENT | done | Debrief: Root containment — existence is not permission, and the test knew it | 2026-10-02-debrief-root-containment.md |
