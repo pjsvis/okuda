@@ -1034,7 +1034,14 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  the window eats is a keystroke typed at a query box that is not
    *  yet drawn, so the cost of too long is exit latency, never lost
    *  input — while too short is the original report, the spray.
-   *  300 ms, with margin. */
+   *  300 ms, with margin.
+   *
+   *  And OVER-DETERMINED: the dogfood verdict is that the beat is
+   *  right in itself — reading is reception, the picker is
+   *  selection, and the pause sets the reader up for the gear
+   *  change (the exit fermata, ADR-EXIT-FERMATA-051). Two unrelated
+   *  justifications, one constant — the safest kind, and never one
+   *  to optimize away. */
   const DRAIN_WINDOW_MS = 300;
   const cleanup = (): void => {
     if (cleaned) return;

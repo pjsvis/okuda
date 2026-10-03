@@ -47,3 +47,4 @@
 {"file":"048-silo-root-git-toplevel.md","date":"2026-09-30","status":"Accepted","summary":"The silo root is the git toplevel","meta":{},"callsign":"ADR-SILO-ROOT-048"}
 {"file":"049-legibility-gate.md","date":"2026-10-01","status":"Accepted","summary":"The legibility gate — existence is necessary, legibility is the promise","meta":{},"callsign":"ADR-LEGIBILITY-GATE-049"}
 {"file":"050-universal-elision.md","date":"2026-10-02","status":"Accepted","summary":"Elision is the universal overflow policy — the terminal never soft-wraps what okuda emits","meta":{},"callsign":"ADR-UNIVERSAL-ELISION-050"}
+{"file":"051-exit-fermata.md","date":"2026-10-03","status":"Accepted","summary":"The exit fermata — the drain window is over-determined","meta":{},"callsign":"ADR-EXIT-FERMATA-051"}
