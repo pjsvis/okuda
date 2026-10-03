@@ -545,6 +545,11 @@ reg-decisions:
 reg-playbooks:
     @bun scripts/reg-list.ts playbooks
 
+# Search archive
+[group('registries')]
+archive-search PATTERN:
+    @rg --line-number --no-heading -g '*.md' -g '!index.md' -g '!INDEX.jsonl' '{{PATTERN}}' .archive
+
 # ── SSH serving (sandboxed ForceCommand) ─────────────────────
 
 [group('ssh')]
