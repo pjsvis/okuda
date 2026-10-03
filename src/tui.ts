@@ -1058,12 +1058,24 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // the Node stream (not merely the tty queue) are delivered to
     // whoever attaches next, and the launcher's picker is the next
     // attacher. Raw mode holds for the window so the discarded tail
-    // never echoes; the restore is written now so the exit reads as
-    // instant, while the launcher resumes only after the window.
+    // never echoes.
+    //
+    // The EXIT ORDER (the FOUT fix): the alt-screen is left as the
+    // LAST byte, after the window — not at cleanup's entry. Writing
+    // the restore at entry handed the primary screen the whole window
+    // as stage time (300 ms of raw terminal between leave and the
+    // launcher's re-enter — the operator's report: a flash of the raw
+    // terminal before the search pane). The launcher-fut brief's own
+    // entry-side lesson, applied to the exit: the content of the
+    // transitional frame beats its duration — a frozen document frame
+    // for the window reads as a hold, an empty primary screen reads
+    // as a glitch. And the direct-CLI path gets honesty for free: the
+    // shell prompt now appears at +300 ms WHEN it is typeable (the
+    // drain holds raw stdin until then) — later, but no longer a
+    // lying prompt that eats keystrokes.
     const drain = (): void => {}; // consume — never echo, never queue
     process.stdin.on("data", drain);
     process.stdin.removeListener("data", onKey);
-    process.stdout.write(SHOW_CURSOR + "\x1b[?1007l" + EXIT_ALT);
     process.removeListener("SIGWINCH", onWinch);
     process.removeListener("SIGINT", onSignal);
     process.removeListener("SIGTERM", onSignal);
@@ -1071,6 +1083,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       process.stdin.removeListener("data", drain);
       process.stdin.setRawMode?.(false);
       process.stdin.pause?.();
+      process.stdout.write(SHOW_CURSOR + "\x1b[?1007l" + EXIT_ALT); // last byte
       resolveDone(); // the launcher resumes here — after the drain
     }, DRAIN_WINDOW_MS);
   };
