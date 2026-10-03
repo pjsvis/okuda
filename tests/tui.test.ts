@@ -561,24 +561,39 @@ describe("tui — extractJumps (scan source for %%okuda-rhs:NN%% + path.md)", ()
   });
 });
 
-describe("tui — advanceNumBuffer (the two-digit jump state machine)", () => {
-  test("first digit → buffer holds it, no token yet", () => {
-    expect(advanceNumBuffer(null, "0")).toEqual({ buffer: "0", token: null });
-    expect(advanceNumBuffer(null, "5")).toEqual({ buffer: "5", token: null });
+describe("tui — advanceNumBuffer (the digit-run state machine, BRF-PROLONGED-PRESS)", () => {
+  // The CONTRACT lives in tests/gesture.test.ts (three gestures, one
+  // token, driven opaquely). This block asserts the MECHANISM's shapes:
+  // three states — empty, held, spent (the latch) — and every edge.
+  const held = (d: string) => ({ keys: d, spent: false });
+  const spent = (dd: string) => ({ keys: dd, spent: true });
+
+  test("empty + digit → held: the run's first tap, no token yet", () => {
+    expect(advanceNumBuffer(null, "0")).toEqual({ buffer: held("0"), token: null });
+    expect(advanceNumBuffer(null, "5")).toEqual({ buffer: held("5"), token: null });
   });
-  test("second digit → token resolves, buffer resets to empty", () => {
-    expect(advanceNumBuffer("0", "5")).toEqual({ buffer: null, token: 5 });
-    expect(advanceNumBuffer("1", "0")).toEqual({ buffer: null, token: 10 });
-    expect(advanceNumBuffer("9", "9")).toEqual({ buffer: null, token: 99 });
+  test("held + same digit → the doubled pair resolves and the run stays held, spent — the latch", () => {
+    expect(advanceNumBuffer(held("9"), "9")).toEqual({ buffer: spent("99"), token: 99 });
   });
-  test("zero-pads: '0' then '1' → token 1 (not 10)", () => {
+  test("held + different digit → the mixed pair resolves (a vector) and the buffer EMPTIES — never latched", () => {
+    expect(advanceNumBuffer(held("0"), "5")).toEqual({ buffer: null, token: 5 });
+    expect(advanceNumBuffer(held("1"), "0")).toEqual({ buffer: null, token: 10 });
+  });
+  test("spent + same digit → swallowed: the run is returned untouched, nothing fires", () => {
+    const latch = spent("99");
+    expect(advanceNumBuffer(latch, "9")).toEqual({ buffer: latch, token: null });
+  });
+  test("spent + different digit → a new run begins (the gesture is over)", () => {
+    expect(advanceNumBuffer(spent("99"), "1")).toEqual({ buffer: held("1"), token: null });
+  });
+  test("zero-pads: '0' then '5' → token 5 (not 50)", () => {
     // The compositor zero-pads; [05] is token 5. Two-digit entry '0'+'5'
     // must resolve to 5, matching extractJumps(…).get(5).
-    expect(advanceNumBuffer("0", "5").token).toBe(5);
+    expect(advanceNumBuffer(held("0"), "5").token).toBe(5);
   });
-  test("non-digit after one digit → buffer cancelled, no token", () => {
-    // A stray j or u must not ambush a half-typed token.
-    expect(advanceNumBuffer("0", null)).toEqual({ buffer: null, token: null });
+  test("non-digit clears any state — the abort: a stray keystroke never ambushes a half-typed token", () => {
+    expect(advanceNumBuffer(held("0"), null)).toEqual({ buffer: null, token: null });
+    expect(advanceNumBuffer(spent("99"), null)).toEqual({ buffer: null, token: null });
   });
   test("non-digit on empty buffer → still empty, no token", () => {
     expect(advanceNumBuffer(null, null)).toEqual({ buffer: null, token: null });
@@ -591,8 +606,8 @@ describe("tui — advanceNumBuffer (the two-digit jump state machine)", () => {
     expect(step.token).not.toBeNull();
     expect(jumps.get(step.token!)).toBe("docs/target.md");
   });
-  test("typing '0'+'0' → token 0 (matches [00] if the compositor emits it)", () => {
-    expect(advanceNumBuffer("0", "0").token).toBe(0);
+  test("typing '0'+'0' → token 0, the run held spent (matches [00] if the compositor emits it)", () => {
+    expect(advanceNumBuffer(held("0"), "0")).toEqual({ buffer: spent("00"), token: 0 });
   });
 });
 

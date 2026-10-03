@@ -15,11 +15,11 @@ import { advanceNumBuffer, digitOf } from "../src/tui";
  * shape, so the run buffer (the mechanism, the next layer) may change
  * it underneath without rewriting these tests.
  *
- * The cases today's buffer FAILS are test.todo — the contract on the
- * record, red until the run buffer lands, at which point they flip
- * live. A held key today fires its actuator once per pair; the
- * contract says once per gesture. The todo block is that sentence,
- * made checkable, waiting for its mechanism.
+ * The cases the pre-run-buffer mechanism failed were test.todo —
+ * the contract on the record, red until the run buffer landed, then
+ * flipped live without touching the harness or the bodies. A held
+ * key used to fire its actuator once per pair; the contract says
+ * once per gesture, and the run buffer is what makes it so.
  *
  * NO CLOCK, ANYWHERE. A pending digit waits forever because TIME IS
  * NOT AN INPUT: the buffer sees only (digit | non-digit), the gap
@@ -75,12 +75,12 @@ describe("gesture matrix — green today, green under the run buffer", () => {
     }
   });
 
-  test("a run of three fires once — the pair resolves at two and the tail is the next gesture's problem, never a second token", () => {
-    // Green today, and honestly so on the token count: the third
-    // digit re-arms a pending digit rather than being swallowed
-    // (the stale state the one-shot probe below catches). Green
-    // under the run buffer because the tail is swallowed instead.
-    // Either mechanism, one token — the observable is the contract.
+  test("a run of three fires once — the pair resolves at two and the tail is swallowed, never a second token", () => {
+    // Under the pre-run-buffer mechanism this also fired once — but by
+    // re-arming a stale pending digit, the ambush the one-shot probe
+    // below catches. The run buffer swallows the tail instead: same
+    // observable, honest reason now. Either mechanism, one token —
+    // the observable is the contract.
     for (let d = 0; d <= 9; d++) {
       expect(feed([`${d}${d}${d}`])).toEqual([pair(d)]);
     }
@@ -142,20 +142,20 @@ describe("gesture matrix — green today, green under the run buffer", () => {
   });
 });
 
-describe("gesture matrix — the contract, red until the run buffer (BRF-PROLONGED-PRESS layer 1)", () => {
-  // These are the cases today's buffer fails — a held key fires
-  // once per PAIR, the contract says once per GESTURE. Flip each
-  // todo to test when the run buffer lands; the bodies are already
-  // written, against the same opaque harness, so flipping is the
+describe("gesture matrix — the contract, red until the run buffer, live since it landed (BRF-PROLONGED-PRESS layer 1)", () => {
+  // These were the cases the pre-run-buffer mechanism failed — a held
+  // key fired once per PAIR, the contract says once per GESTURE —
+  // written first, verified red, then flipped live the day the run
+  // buffer landed. Same opaque harness, same bodies: flipping was the
   // whole change.
 
-  test.todo("a prolonged hold fires once: ten repeats, one token, the same token as the taps — every digit 0–9 (today ⌈N/2⌉ fire)", () => {
+  test("a prolonged hold fires once: ten repeats, one token, the same token as the taps — every digit 0–9 (pre-run-buffer: ⌈N/2⌉ fired)", () => {
     for (let d = 0; d <= 9; d++) {
       expect(feed([`${d}`.repeat(10)])).toEqual([pair(d)]);
     }
   });
 
-  test.todo("the hold is delivery-proof: one read of ten bytes and ten reads of one byte fire the same one token (the shape that defeats a read-scoped fix)", () => {
+  test("the hold is delivery-proof: one read of ten bytes and ten reads of one byte fire the same one token (the shape that defeats a read-scoped fix)", () => {
     for (let d = 0; d <= 9; d++) {
       const oneRead = [`${d}`.repeat(10)];
       const tenReads = Array.from({ length: 10 }, () => `${d}`);
@@ -164,19 +164,19 @@ describe("gesture matrix — the contract, red until the run buffer (BRF-PROLONG
     }
   });
 
-  test.todo("a run of four fires once (today two) — the run's remainder is swallowed, not re-armed", () => {
+  test("a run of four fires once (was two before the run buffer) — the run's remainder is swallowed, not re-armed", () => {
     for (let d = 0; d <= 9; d++) {
       expect(feed([`${d}`.repeat(4)])).toEqual([pair(d)]);
     }
   });
 
-  test.todo("a run of ten fires once (today five)", () => {
+  test("a run of ten fires once (was five before the run buffer)", () => {
     for (let d = 0; d <= 9; d++) {
       expect(feed([`${d}`.repeat(10)])).toEqual([pair(d)]);
     }
   });
 
-  test.todo("99 then 99 with no intervening key fires ONE clone, not two — the one-shot slot: no key-up, no clock, so a repeat of a doubled pair is a hold by any other name", () => {
+  test("99 then 99 with no intervening key fires ONE clone, not two — the one-shot slot: no key-up, no clock, so a repeat of a doubled pair is a hold by any other name", () => {
     // Two deliberate double-taps in separate reads. The equivalence
     // cuts both ways and the contract honours it in both directions:
     // a doubled pair cannot be fired twice in a row without an
@@ -184,13 +184,13 @@ describe("gesture matrix — the contract, red until the run buffer (BRF-PROLONG
     expect(feed(["99", "99"])).toEqual([99]);
   });
 
-  test.todo("no pending digit survives a gesture: after a hold, a fresh keystroke starts fresh — never fused with stale state (any digit 0–9)", () => {
-    // Today the third digit re-arms a pending digit, and the next
-    // keystroke ambushes into a fused token — for d=9 a fresh 0
-    // jumps to silcrow 90; for d=0 a fresh 1 resolves token 1. Under
-    // the run buffer the tail is swallowed and the probe digit is a
-    // new first tap: [pair(d)], nothing else, nothing left pending
-    // from the gesture.
+  test("no pending digit survives a gesture: after a hold, a fresh keystroke starts fresh — never fused with stale state (any digit 0–9)", () => {
+    // Under the pre-run-buffer mechanism the third digit re-armed a
+    // pending digit, and the next keystroke ambushed into a fused
+    // token — for d=9 a fresh 0 jumped to silcrow 90; for d=0 a fresh
+    // 1 resolved token 1. The run buffer swallows the tail and the
+    // probe digit is a new first tap: [pair(d)], nothing else,
+    // nothing left pending from the gesture.
     for (let d = 0; d <= 9; d++) {
       const e = (d + 1) % 10; // differs from d — never the swallowed digit
       expect(feed([`${d}`.repeat(3), `${e}`])).toEqual([pair(d)]);

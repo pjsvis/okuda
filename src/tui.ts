@@ -387,28 +387,76 @@ export interface JumpEntry {
   path: string;
 }
 
-/** The result of advancing the two-digit numeric buffer one keystroke.
- *  `buffer` is the new pending state (null = empty); `token` is the
- *  resolved two-digit number when the buffer completed, else null.
- *  Pure. */
+/** The numeric jump buffer's state (BRF-PROLONGED-PRESS): a digit
+ *  run, held. `null` = empty; `{ keys, spent: false }` = one digit
+ *  held, awaiting its pair; `{ keys, spent: true }` = the run's pair
+ *  has resolved and the LATCH is set — the run is still held so its
+ *  remainder can be swallowed. `keys` is the run's own digits: one
+ *  held digit, or the resolved doubled pair. */
+export type NumBuffer = { keys: string; spent: boolean } | null;
+
+/** The result of advancing the numeric jump buffer one keystroke.
+ *  `buffer` is the new state (null = empty); `token` is the resolved
+ *  two-digit number when a pair completed, else null. Pure. */
 export interface NumBufferStep {
-  buffer: string | null;
+  buffer: NumBuffer;
   token: number | null;
 }
 
-/** Advance the numeric jump buffer: a digit accumulates; at two digits
- *  the token resolves and the buffer resets to empty. A null digit (any
- *  non-digit key — motion, escape, letters) cancels a pending buffer so
- *  a stray keystroke never ambushes a half-typed token. Pure — the
- *  caller performs the IO (jumpTo/back) the resolved token implies. */
+/** Advance the numeric jump buffer (BRF-PROLONGED-PRESS): the buffer
+ *  knows a digit run is a run. Three states — empty, held (one digit
+ *  pending), spent (the pair fired, the latch set):
+ *
+ *  - empty + digit → held: the run's first tap.
+ *  - held + same digit → the doubled pair resolves; the run stays
+ *    held, spent — the latch that swallows the tail.
+ *  - held + different digit → the mixed pair resolves (a vector) and
+ *    the buffer empties — a vector is never latched, which is why
+ *    `12` `12` fires two jumps back to back while `9` `9` `9` `9`
+ *    fires one clone.
+ *  - spent + same digit → swallowed. Nothing fires, the latch holds.
+ *  - spent + different digit → a new run begins (the reader has moved
+ *    on; the gesture is over).
+ *  - any state + non-digit (motion, escape, letters) → empty. The
+ *    abort: a stray keystroke never ambushes a half-typed token, and
+ *    a lone ESC stands a pending digit down.
+ *
+ *  Grab the actuator pair and swallow the rest of the keystrokes —
+ *  the reader's phrasing, given state. A prolonged hold is one
+ *  actuation, not a stream of them: a run of identical digits can
+ *  only ever be a doubled pair, which by ADR-032's canon is an
+ *  actuator and never a jump, so the swallow is safe by
+ *  construction — no legitimate jump exists in a run.
+ *
+ *  The swallow is LATCHED, not read-scoped: at the terminal's repeat
+ *  rate each repeat byte lands in its own read, so a swallow scoped
+ *  to the current read would re-grab the pair at byte 4, 6, 8, 10 —
+ *  five clones, the reported bug. Only a different byte or the
+ *  abort ends the latch.
+ *
+ *  NO CLOCK. No expiry, no deadline, anywhere in the input path: the
+ *  reader's tempo is not an input. The parked quiet period (the
+ *  latch's eventual expiry) is IO and lives in the caller when it
+ *  lands, clearing the latch only — never a pending digit. And this
+ *  is NOT the lexer's job: `]]` is one key spelled in two bytes,
+ *  `99` is one key spelled nine times — the lexer undoes the
+ *  terminal's spellings, and a run is not a spelling.
+ *  Pure — the caller performs the IO (jumpTo/back) the resolved
+ *  token implies. */
 export function advanceNumBuffer(
-  prev: string | null,
+  prev: NumBuffer,
   digit: string | null,
 ): NumBufferStep {
-  if (digit === null) return { buffer: null, token: null };
-  const next = (prev ?? "") + digit;
-  if (next.length >= 2) return { buffer: null, token: Number(next) };
-  return { buffer: next, token: null };
+  if (digit === null) return { buffer: null, token: null }; // the abort
+  if (prev === null) return { buffer: { keys: digit, spent: false }, token: null };
+  const run = prev.keys[0]!; // the run's digit, held or spent
+  if (prev.spent) {
+    if (digit === run) return { buffer: prev, token: null }; // swallowed — one gesture
+    return { buffer: { keys: digit, spent: false }, token: null }; // a new run begins
+  }
+  const pair = prev.keys + digit;
+  if (digit === run) return { buffer: { keys: pair, spent: true }, token: Number(pair) };
+  return { buffer: null, token: Number(pair) }; // mixed pair — a vector, never latched
 }
 
 /** Scan markdown source for jump wiring — a `%%okuda-rhs:NN%%` token
@@ -564,7 +612,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   let mainText = "";
   let mainJumps: Map<number, string> = new Map();
   let backstack: { file: string; scroll: number }[] = [];
-  let numBuffer: string | null = null;
+  let numBuffer: NumBuffer = null; // the digit-run state (BRF-PROLONGED-PRESS)
 
   // Initial fetch through the gate: prev=null is the initial-load sentinel,
   // so a successful first read is `changed` (content arrived) and a failed
