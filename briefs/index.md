@@ -9,7 +9,6 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
-| 2026-10-03 | BRF-ARCHIVE-RESOLUTION | open | The archive resolution tier — citations must survive the archive move | 2026-10-03-brief-archive-resolution-tier.md |
 | 2026-10-02 | BRF-DEMO-SANDBOX | open | The public demo room — two access modes, one sandbox grammar | 2026-10-02-brief-demo-sandbox.md |
 | 2026-10-01 | BRF-READING-FRACTION | open | The reading fraction — a meter for the glass, from the state the glass already holds | 2026-10-01-brief-reading-fraction.md |
 | 2026-09-30 | BRF-FENCE-DISCIPLINE | open | One fence rule — five scanners, four disciplines, one of them fixed | 2026-09-30-brief-fence-discipline.md |

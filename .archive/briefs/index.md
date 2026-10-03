@@ -13,6 +13,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-10-03 | BRF-SESSION-HANDOFF-2 | done | Session Handoff — 2026-08-24 (late): tweak phase, table audit, the moat | 2026-08-24-session-handoff-late.md |
 | 2026-10-03 | BRF-SESSION-HANDOFF-3 | done | Session Handoff — 2026-08-24 | 2026-08-24-session-handoff.md |
 | 2026-10-03 | BRF-NECKBEARD-FZF | done | gloam-finder: Wrapper to launch fzf with hardened interactive semantics | 2026-08-27-brief-neckbeard-fzf-assimilation.md |
+| 2026-10-03 | BRF-ARCHIVE-RESOLUTION | done | The archive resolution tier — citations must survive the archive move | 2026-10-03-brief-archive-resolution-tier.md |
 | 2026-10-02 | BRF-OKF-CALLSIGN | done | OKF conformance migration and the callsign layer | 2026-08-29-brief-okf-callsign-migration.md |
 | 2026-10-02 | BRF-TABLE-WIDTH | done | The cut cell — the renderer breaks words the glass had room for | 2026-09-14-brief-table-width.md |
 | 2026-10-02 | BRF-CALLSIGN-CHECKSUM | done | The callsign checksum — citations that resolve nowhere fail the gate | 2026-10-02-brief-callsign-checksum.md |

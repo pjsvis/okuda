@@ -34,3 +34,4 @@
 {"file":"2026-10-02-brief-callsign-checksum.md","date":"2026-10-02","status":"done","summary":"The callsign checksum — citations that resolve nowhere fail the gate","meta":{},"callsign":"BRF-CALLSIGN-CHECKSUM"}
 {"file":"2026-10-02-brief-root-containment.md","date":"2026-10-02","status":"done","summary":"Root containment — existence is not permission","meta":{},"callsign":"BRF-ROOT-CONTAINMENT"}
 {"file":"2026-10-02-brief-td-id-lint.md","date":"2026-10-02","status":"done","summary":"The valve lint — td-ID citations in persisted documents fail the gate","meta":{},"callsign":"BRF-VALVE-LINT"}
+{"file":"2026-10-03-brief-archive-resolution-tier.md","date":"2026-10-03","status":"done","summary":"The archive resolution tier — citations must survive the archive move","meta":{},"callsign":"BRF-ARCHIVE-RESOLUTION"}
