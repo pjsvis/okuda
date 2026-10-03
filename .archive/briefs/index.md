@@ -28,6 +28,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-19 | BRF-REMOTE-SPEECH-SEAM | done | The remote speech seam — a question to settle before anything builds | 2026-09-19-brief-remote-speech-seam.md |
 | 2026-09-13 | BRF-REFERENCES-SECTION | done | The References section — the renderer emits its own map | 2026-09-13-brief-references-section.md |
 | 2026-09-13 | BRF-TIDY-FIRST | done | Tidy-first — the path to a good place | 2026-09-13-brief-tidy-first.md |
+| 2026-09-07 | BRF-OKUDAGRAM-STEP | done | The okudagram step — no gaps in coverage | 2026-09-07-brief-okudagram-step.md |
 | 2026-09-07 | BRF-ONION-SEARCH-GRAMMAR | done | The onion search grammar — staged filtering, path/content separation | 2026-09-07-brief-onion-search-grammar.md |
 | 2026-08-30 | BRF-INDEX-JUMP | done | Ephemeral Index Generation and Numeric Jump Navigation | 2026-08-28-brief-index-and-jump.md |
 | 2026-08-28 | BRF-ELISION-PRIMITIVE | done | Elision primitive — close ADR-014, fix the code-fence soft-wrap lie | 2026-08-28-brief-elision-primitive.md |

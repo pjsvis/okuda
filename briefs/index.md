@@ -40,7 +40,6 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-10 | BRF-TTS-STEPPER | open | The TTS stepper — frame-as-para, prosody-as-colour | 2026-09-10-brief-tts-stepper.md |
 | 2026-09-09 | BRF-TTS-TEMPORAL | open | Temporal punctuation — markdown prosody for say (the boundary-to-pause extractor) | 2026-09-09-brief-tts-temporal-punctuation.md |
 | 2026-09-07 | BRF-DIAGRAM-INGESTION | open | The diagram ingestion pipeline — mermaid-to-md as the show/elide/hide gate | 2026-09-07-brief-diagram-ingestion.md |
-| 2026-09-07 | BRF-OKUDAGRAM-STEP | done | The okudagram step — no gaps in coverage | 2026-09-07-brief-okudagram-step.md |
 | 2026-09-06 | BRF-CONCORDANCE-PREFILTER | open | The concordance pre-filter — `\|`, `!`, and case at the silo's seam | 2026-09-06-brief-concordance-prefilter.md |
 | 2026-09-06 | BRF-TTS-DOGFOOD | open | Coupled-frame TTS dogfood (mac `say`) | 2026-09-06-brief-tts-dogfood.md |
 | 2026-09-05 | BRF-STREAM-IDENTITY-HEADER | open | Stream identity header — name the document for the unknown destination | 2026-09-05-brief-stream-identity-header.md |

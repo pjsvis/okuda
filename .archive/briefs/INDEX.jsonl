@@ -20,6 +20,7 @@
 {"file":"2026-08-28-brief-launcher-fut.md","date":"2026-08-28","status":"done","summary":"Launcher FUT — session-scoped alt-screen","meta":{},"callsign":"BRF-LAUNCHER-FUT"}
 {"file":"2026-08-28-brief-state-glyph-render-path.md","date":"2026-08-28","status":"done","summary":"State-glyph render path — the showcase environment + first cut","meta":{},"callsign":"BRF-STATE-GLYPH"}
 {"file":"2026-08-29-brief-okf-callsign-migration.md","date":"2026-10-02","status":"done","summary":"OKF conformance migration and the callsign layer","meta":{},"callsign":"BRF-OKF-CALLSIGN"}
+{"file":"2026-09-07-brief-okudagram-step.md","date":"2026-09-07","status":"done","summary":"The okudagram step — no gaps in coverage","meta":{},"callsign":"BRF-OKUDAGRAM-STEP"}
 {"file":"2026-09-07-brief-onion-search-grammar.md","date":"2026-09-07","status":"done","summary":"The onion search grammar — staged filtering, path/content separation","meta":{},"callsign":"BRF-ONION-SEARCH-GRAMMAR"}
 {"file":"2026-09-13-brief-references-section.md","date":"2026-09-13","status":"done","summary":"The References section — the renderer emits its own map","meta":{},"callsign":"BRF-REFERENCES-SECTION"}
 {"file":"2026-09-13-brief-tidy-first.md","date":"2026-09-13","status":"done","summary":"Tidy-first — the path to a good place","meta":{},"callsign":"BRF-TIDY-FIRST"}
