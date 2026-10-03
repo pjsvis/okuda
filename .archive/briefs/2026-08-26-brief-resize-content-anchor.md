@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-RESIZE-CONTENT
+---
+
 # Brief: Resize content-anchor — keep the line under the eye
 
 **Date:** 2026-08-26

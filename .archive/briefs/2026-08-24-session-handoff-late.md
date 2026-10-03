@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-SESSION-HANDOFF-2
+---
+
 # Session Handoff — 2026-08-24 (late): tweak phase, table audit, the moat
 
 **Branch:** `feat/tui-control-plane`

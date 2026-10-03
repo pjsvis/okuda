@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-NECKBEARD-FZF
+---
+
 ### Playbook: Hardening `fzf` for Gloam
 
 > **Superseded** by `playbooks/gloam-launcher-playbook.md` (2026-08-27):

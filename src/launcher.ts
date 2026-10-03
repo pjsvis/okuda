@@ -370,6 +370,11 @@ export const EXCLUSIONS = [
   "-g", "!**/index.md",
   "-g", "!**/INDEX.jsonl",
   "-g", "!**/REGISTRY.jsonl",
+  // ADR-052: the archive is stated as excluded, not skipped-by-default.
+  // rg hides dot-directories unless told otherwise; stating the glob
+  // means the parked no-ignore switch (rg -uu / --hidden) cannot
+  // silently un-hide the permanent record into the search corpus.
+  "-g", "!.archive/**",
 ];
 
 /** Match highlighting: the query's matched substrings render in the

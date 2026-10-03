@@ -10,6 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-10-03 | ADR-EXIT-FERMATA-051 | Accepted | The exit fermata — the drain window is over-determined | 051-exit-fermata.md |
+| 2026-10-03 | ADR-ARCHIVE-RESOLUTION | Accepted | The archive resolves — resolution and search diverge at the archive boundary | 052-archive-resolution-tier.md |
 | 2026-10-02 | ADR-UNIVERSAL-ELISION-050 | Accepted | Elision is the universal overflow policy — the terminal never soft-wraps what okuda emits | 050-universal-elision.md |
 | 2026-10-01 | ADR-LEGIBILITY-GATE-049 | Accepted | The legibility gate — existence is necessary, legibility is the promise | 049-legibility-gate.md |
 | 2026-09-30 | ADR-RESIZE-GEOMETRY-046 | Accepted | The repaint decision — the gate reads the content, the glass is a second input | 046-resize-geometry.md |

@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-FIX-TESTS
+---
+
 # Brief: Fix tests after default-palette flip (Dracula → Okuda)
 
 **Date:** 2026-08-25

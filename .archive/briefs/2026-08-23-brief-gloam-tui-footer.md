@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-GLOAM-TUI
+---
+
 # Brief: Gloam — the TUI Footer Signature
 
 **Date:** 2026-08-23

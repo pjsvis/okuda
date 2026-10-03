@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-RIGHT-EDGE
+---
+
 # Brief: Right-edge LCARS tab on headers — the visible right bound
 
 **Date:** 2026-08-25

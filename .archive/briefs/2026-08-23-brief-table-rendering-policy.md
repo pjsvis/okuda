@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-TABLE-RENDERING
+---
+
 # Brief: Table Rendering Policy — Uniform Presentation, Authored Conventions
 
 **Date:** 2026-08-23

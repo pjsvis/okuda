@@ -9,28 +9,19 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
-| 2026-10-02 | BRF-CALLSIGN-CHECKSUM | done | The callsign checksum — citations that resolve nowhere fail the gate | 2026-10-02-brief-callsign-checksum.md |
+| 2026-10-03 | BRF-ARCHIVE-RESOLUTION | open | The archive resolution tier — citations must survive the archive move | 2026-10-03-brief-archive-resolution-tier.md |
 | 2026-10-02 | BRF-DEMO-SANDBOX | open | The public demo room — two access modes, one sandbox grammar | 2026-10-02-brief-demo-sandbox.md |
-| 2026-10-02 | BRF-ROOT-CONTAINMENT | done | Root containment — existence is not permission | 2026-10-02-brief-root-containment.md |
-| 2026-10-02 | BRF-VALVE-LINT | done | The valve lint — td-ID citations in persisted documents fail the gate | 2026-10-02-brief-td-id-lint.md |
 | 2026-10-01 | BRF-READING-FRACTION | open | The reading fraction — a meter for the glass, from the state the glass already holds | 2026-10-01-brief-reading-fraction.md |
 | 2026-09-30 | BRF-FENCE-DISCIPLINE | open | One fence rule — five scanners, four disciplines, one of them fixed | 2026-09-30-brief-fence-discipline.md |
-| 2026-09-30 | BRF-ROOT-CLIMB | done | The root climb — the silo is the repo, not the cwd | 2026-09-30-brief-root-climb.md |
 | 2026-09-30 | BRF-STEP-INVENTORY | open | The stride inventory — what steps, what compounds, what is missing | 2026-09-30-brief-step-inventory.md |
 | 2026-09-30 | BRF-TELEVISION-PREVIEW | parked | Television Preview — okuda as the renderer, OKUDA_WIDTH as the width knob | 2026-09-30-brief-television-preview.md |
 | 2026-09-30 | BRF-TERMINAL-CELL-GRID | parked | 2D Terminal Cell Grid Architecture (parked) | 2026-09-30-brief-terminal-cell-grid.md |
-| 2026-09-29 | BRF-CODE-SHELF | done | Code shelf — a dir predicate scopes the tier | 2026-09-29-brief-code-shelf.md |
-| 2026-09-29 | BRF-FENCE-COLOUR | done | Fence colour — chroma at the mermaid seam, the terminal's palette as the theme | 2026-09-29-brief-fence-colour.md |
-| 2026-09-29 | BRF-PROJECTION-LOSSES | done | Projection losses — two surfaces that drop content they mean to keep | 2026-09-29-brief-projection-losses.md |
 | 2026-09-29 | BRF-SILCROW-PATHS | open | Silcrow paths — the gate grows a second substrate | 2026-09-29-brief-silcrow-paths.md |
 | 2026-09-29 | BRF-SSH-HOST | open | SSH host — landing the ADR-013 reading room where SSH gives a shell | 2026-09-29-brief-ssh-host.md |
-| 2026-09-24 | BRF-SELF-IDENTICAL-LINK | done | The self-identical link — when the label is the address, say it once | 2026-09-24-brief-self-identical-link.md |
 | 2026-09-24 | BRF-SRC-LINE-LEDGER | open | The source-line ledger — `10` edit lands the editor at the eye | 2026-09-24-brief-source-line-ledger.md |
-| 2026-09-24 | BRF-VALIDATED-SILCROWS | done | Validated silcrows — the shape scan consults the registry it stands on | 2026-09-24-brief-validated-silcrows.md |
 | 2026-09-19 | BRF-CAPABILITIES-DOC | open | The capabilities doc — a snapshot inventory, not a changelog | 2026-09-19-brief-capabilities-doc.md |
 | 2026-09-19 | BRF-GLOAM-OWNS-LOOP | open | GLoam owns the search TUI — the fzf dependency retires | 2026-09-19-brief-gloam-owns-the-loop.md |
 | 2026-09-19 | BRF-PALETTE-AUDIT | open | The palette audit — review the colours before the brightness controller scales them | 2026-09-19-brief-palette-audit.md |
-| 2026-09-19 | BRF-REMOTE-SPEECH-SEAM | done | The remote speech seam — a question to settle before anything builds | 2026-09-19-brief-remote-speech-seam.md |
 | 2026-09-18 | BRF-GLYPH-LEAD | open | The state glyph is emitted twice on a list lead | 2026-09-18-brief-glyph-lead.md |
 | 2026-09-18 | BRF-PERIMETER-GATE | open | The perimeter gate — the moira group holds only recipes that invoke okuda | 2026-09-18-brief-perimeter-gate.md |
 | 2026-09-18 | BRF-PERIMETER-RUNNER | open | The perimeter runner — the tuning recipes and their artifacts leave the task runner | 2026-09-18-brief-perimeter-runner.md |
@@ -44,17 +35,13 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-14 | BRF-JUMP-LIST | open | The jump list — the search screen as its projection | 2026-09-14-brief-jump-list.md |
 | 2026-09-14 | BRF-SEARCH-SURFACE | parked | The search surface — the state machine, the array, and the invariant audit | 2026-09-14-brief-search-surface.md |
 | 2026-09-14 | BRF-SPEECH-STRIDE | open | The speech stride — the arrows given to the ear, the unit heard | 2026-09-14-brief-speech-stride.md |
-| 2026-09-14 | BRF-TABLE-WIDTH | done | The cut cell — the renderer breaks words the glass had room for | 2026-09-14-brief-table-width.md |
 | 2026-09-13 | BRF-AUDIO-DISCOVERY | open | Audio discovery — the actuator grammar, heard | 2026-09-13-brief-audio-discovery.md |
 | 2026-09-13 | BRF-PROLONGED-PRESS | open | The prolonged press — three gestures, one actuation, no leak | 2026-09-13-brief-prolonged-press.md |
-| 2026-09-13 | BRF-REFERENCES-SECTION | done | The References section — the renderer emits its own map | 2026-09-13-brief-references-section.md |
-| 2026-09-13 | BRF-TIDY-FIRST | done | Tidy-first — the path to a good place | 2026-09-13-brief-tidy-first.md |
 | 2026-09-12 | BRF-CENSUS-MODE | open | Census mode — the mentions-inclusive map, as a reader's opt-in | 2026-09-12-brief-census-mode.md |
 | 2026-09-10 | BRF-TTS-STEPPER | open | The TTS stepper — frame-as-para, prosody-as-colour | 2026-09-10-brief-tts-stepper.md |
 | 2026-09-09 | BRF-TTS-TEMPORAL | open | Temporal punctuation — markdown prosody for say (the boundary-to-pause extractor) | 2026-09-09-brief-tts-temporal-punctuation.md |
 | 2026-09-07 | BRF-DIAGRAM-INGESTION | open | The diagram ingestion pipeline — mermaid-to-md as the show/elide/hide gate | 2026-09-07-brief-diagram-ingestion.md |
 | 2026-09-07 | BRF-OKUDAGRAM-STEP | done | The okudagram step — no gaps in coverage | 2026-09-07-brief-okudagram-step.md |
-| 2026-09-07 | BRF-ONION-SEARCH-GRAMMAR | done | The onion search grammar — staged filtering, path/content separation | 2026-09-07-brief-onion-search-grammar.md |
 | 2026-09-06 | BRF-CONCORDANCE-PREFILTER | open | The concordance pre-filter — `\|`, `!`, and case at the silo's seam | 2026-09-06-brief-concordance-prefilter.md |
 | 2026-09-06 | BRF-TTS-DOGFOOD | open | Coupled-frame TTS dogfood (mac `say`) | 2026-09-06-brief-tts-dogfood.md |
 | 2026-09-05 | BRF-STREAM-IDENTITY-HEADER | open | Stream identity header — name the document for the unknown destination | 2026-09-05-brief-stream-identity-header.md |
@@ -71,20 +58,15 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-29 | BRF-AUDIO-STYLE | open | Audio-First Style Guide and Linting Heuristics | 2026-08-29-audio-style-guide.md |
 | 2026-08-29 | BRF-FZF-OWNS-LOOP | rejected | fzf owns the loop (cursor-preserve experiment) | 2026-08-29-brief-fzf-owns-the-loop.md |
 | 2026-08-29 | BRF-MENU-TEMPLATES | parked | Menu templates (deferred — fires on the second menu kind) | 2026-08-29-brief-menu-templates-deferred.md |
-| 2026-08-29 | BRF-OKF-CALLSIGN | done | OKF conformance migration and the callsign layer | 2026-08-29-brief-okf-callsign-migration.md |
 | 2026-08-29 | BRF-PAGED-OKUDAGRAM | open | The okudagram frame — a portioning rule | 2026-08-29-brief-okudagram-frame.md |
 | 2026-08-29 | BRF-RESTICTED-GRAMMAR | open | Okuda Markdown AST to W3C SSML Mapping Investigation | 2026-08-29-brief-resticted-grammar-speech.md |
 | 2026-08-29 | BRF-TERMINAL-SPEECH | open | Terminal Speech Pipeline Easter Egg | 2026-08-29-brief-terminal-speech.md |
 | 2026-08-29 | BRF-MERMAID-HARD | open | Mermaid Rendering Hard Boundary State Machine (CSN Diagnostics) | 2026-08-29-mermaid-hard-boundary-CSN.md |
 | 2026-08-28 | BRF-AI-DOC | parked | Inline Ask-the-Doc and Local SSH Transport | 2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md |
-| 2026-08-28 | BRF-ELISION-PRIMITIVE | done | Elision primitive — close ADR-014, fix the code-fence soft-wrap lie | 2026-08-28-brief-elision-primitive.md |
-| 2026-08-28 | BRF-INDEX-JUMP | done | Ephemeral Index Generation and Numeric Jump Navigation | 2026-08-28-brief-index-and-jump.md |
 | 2026-08-28 | BRF-JUMP-DEMO | open | jump-demo honesty — slug derivation + state-glyph signal | 2026-08-28-brief-jump-demo-honesty.md |
-| 2026-08-28 | BRF-LAUNCHER-FUT | done | Launcher FUT — session-scoped alt-screen | 2026-08-28-brief-launcher-fut.md |
 | 2026-08-28 | BRF-NOTIFICATION-STYLE | open | 011-zero-notification-stillness-and-decoupled-inbox-watchers | 2026-08-28-brief-notification-style.md |
 | 2026-08-28 | BRF-OKLCH-TUNING | open | OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling | 2026-08-28-brief-oklch-tuning.md |
 | 2026-08-28 | BRF-SSH-SERVED-2 | parked | 2026-08-28-brief-ssh-served-dynamic-markdown-portal | 2026-08-28-brief-ssh-served-dynamic-markdown-portal.md |
-| 2026-08-28 | BRF-STATE-GLYPH | done | State-glyph render path — the showcase environment + first cut | 2026-08-28-brief-state-glyph-render-path.md |
 | 2026-08-28 | BRF-STATE-GLYPH-2 | open | State-glyph vocabulary — colour + bold, the closed lexicon | 2026-08-28-brief-state-glyph-vocabulary.md |
 | 2026-08-28 | BRF-SILO-MNEMONICS | open | Rooted Gloam — silo badge and document callsigns | 2026-08-28-silo-mnemonics.md |
 | 2026-08-27 | BRF-FETCH-STATE | open | Fetch-state stamp: checked-time + changed/same/failed in footer; fixes the empty-doc-on-fetch-failure lie; LCARS colouring with a new alert palette role; obeys the first temporal directive (fetch-time, not doc-time) | 2026-08-27-brief-fetch-state-stamp.md |

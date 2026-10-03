@@ -34,6 +34,18 @@ export const TIER_REGISTRIES: Array<[dir: string, file: string]> = [
   ["advisories", "INDEX.jsonl"],
 ];
 
+/** The archive registries (ADR-052): resolution-only tiers — settled
+ *  work, checked in to git, excluded from search. The live list is the
+ *  work queue; the archive list is the permanent record the resolver
+ *  reads so a citation to completed work keeps resolving after the
+ *  archiving move. Structure-identical to TIER_REGISTRIES; consumer
+ *  divergence is the whole point — the launcher channel and silcrow
+ *  discovery read TIER_REGISTRIES only (never here), and loadCallsigns
+ *  reads both lists. One maintenance mechanism (reg-sync), two scopes. */
+export const ARCHIVE_REGISTRIES: Array<[dir: string, file: string]> = [
+  [".archive/briefs", "INDEX.jsonl"],
+];
+
 /** Rooted detection result. `badge` is the silo name the renderer paints
  *  (muted, provenance register). */
 export interface RootInfo {
@@ -163,7 +175,7 @@ export interface CallsignRecord {
  *  Malformed lines are skipped, not fatal. Pure-ish (reads fs). */
 export function loadCallsigns(cwd: string = process.cwd()): CallsignRecord[] {
   const out: CallsignRecord[] = [];
-  for (const [dir, index] of TIER_REGISTRIES) {
+  for (const [dir, index] of [...TIER_REGISTRIES, ...ARCHIVE_REGISTRIES]) {
     let raw: string;
     try {
       raw = readFileSync(join(cwd, dir, index), "utf8");

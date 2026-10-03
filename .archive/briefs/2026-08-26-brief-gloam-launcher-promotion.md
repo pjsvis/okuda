@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-GLOAM-LAUNCHER
+---
+
 # Brief: Gloam Launcher Promotion — argv[0] No-Arg Mode (parked)
 
 **Date:** 2026-08-26

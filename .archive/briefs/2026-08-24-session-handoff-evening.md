@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-SESSION-HANDOFF
+---
+
 # Session Handoff — 2026-08-24 (evening): Glow convergence + Gloam footer
 
 **Branch:** `feat/tui-control-plane`

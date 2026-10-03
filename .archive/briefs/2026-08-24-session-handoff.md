@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-SESSION-HANDOFF-3
+---
+
 # Session Handoff — 2026-08-24
 
 **Branch:** `feat/tui-control-plane`

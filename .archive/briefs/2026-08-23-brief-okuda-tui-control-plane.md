@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-OKUDA-TUI
+---
+
 # Brief: Okuda TUI — the Control Plane (parked)
 
 **Date:** 2026-08-23

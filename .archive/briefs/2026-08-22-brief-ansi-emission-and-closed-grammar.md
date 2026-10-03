@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-ANSI-EMISSION
+---
+
 # Brief: ANSI Emission Engine & Closed Grammar Contract
 
 **Date:** 2026-08-22

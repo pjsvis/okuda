@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-IMPLEMENTATION-RENDERER
+---
+
 # Brief: Implementation — the Renderer, Compiled
 
 **Date:** 2026-08-22

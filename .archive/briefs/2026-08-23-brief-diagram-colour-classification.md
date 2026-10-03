@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-DIAGRAM-COLOUR
+---
+
 # Brief: Diagram Colour Classification for Mermaid ASCII Blocks
 
 **Date:** 2026-08-23

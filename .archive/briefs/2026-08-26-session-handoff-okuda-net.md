@@ -1,4 +1,6 @@
 ---
+type: Brief
+callsign: BRF-SESSION-HANDOFF-4
 date: 2026-08-26
 kind: session handoff
 session: ses_b30685 → ses_c5de27

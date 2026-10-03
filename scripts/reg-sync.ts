@@ -28,6 +28,10 @@ interface RegistryDef {
   /** OKF frontmatter `type` value and callsign prefix for this tier. */
   fmType: string;
   csPrefix: string;
+  /** Resolution-only tier (ADR-052): archived work — the resolver
+   *  reads it, the launcher's search channel never does. The drift
+   *  test pins each list against its own consumer. */
+  archive?: boolean;
 }
 
 // Exported for the drift test (BRF-VALIDATED-SILCROWS P-0): root.ts's
@@ -44,6 +48,10 @@ export const REGISTRIES: Record<string, RegistryDef> = {
   // The manual (AI-HR-MANUAL.md) is the tier's constitution, excluded
   // from the dispatch index like TEMPLATE.md is excluded from decisions.
   advisories: { dir: "advisories", index: "INDEX.jsonl", defaultStatus: "open", exclude: ["index.md", "AI-HR-MANUAL.md"], fmType: "Advisory", csPrefix: "ADV" },
+  // .archive/briefs (ADR-052): the permanent record — settled briefs,
+  // reg-sync maintained, resolver-read. Search stays the work queue;
+  // resolution becomes the whole citable silo, live and settled.
+  ".archive/briefs": { dir: ".archive/briefs", index: "INDEX.jsonl", defaultStatus: "done", exclude: ["index.md"], fmType: "Brief", csPrefix: "BRF", archive: true },
 };
 
 interface Entry {

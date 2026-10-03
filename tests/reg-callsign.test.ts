@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { REGISTRIES } from "../scripts/reg-sync";
-import { TIER_REGISTRIES } from "../src/root";
+import { TIER_REGISTRIES, ARCHIVE_REGISTRIES } from "../src/root";
 import {
   avoidingCollisions,
   bootstrapCallsign,
@@ -12,17 +12,30 @@ import {
   splitFrontmatter,
 } from "../scripts/reg-sync";
 
-describe("tier drift (BRF-VALIDATED-SILCROWS P-0)", () => {
-  test("TIER_REGISTRIES is 1:1 with reg-sync's REGISTRIES — the two lists cannot drift again", () => {
+describe("tier drift (BRF-VALIDATED-SILCROWS P-0, ADR-052)", () => {
+  test("TIER_REGISTRIES is 1:1 with reg-sync's LIVE entries — the live lists cannot drift again", () => {
     // The advisories tier drifted between the two lists for weeks
     // (69122be added it to reg-sync, never to root.ts — 51 corpus
     // references painted dead silcrows). Both directions are checked:
     // a registry the resolver can't see, and a resolver entry with the
     // wrong index filename.
-    const regDirs = new Set(Object.keys(REGISTRIES));
+    const liveDirs = new Set(Object.entries(REGISTRIES).filter(([, d]) => !d.archive).map(([k]) => k));
     const tierDirs = new Set(TIER_REGISTRIES.map(([dir]) => dir));
-    expect(tierDirs).toEqual(regDirs); // 1:1 — every tier resolves, none dangles
+    expect(tierDirs).toEqual(liveDirs); // 1:1 — every live tier resolves, none dangles
     for (const [dir, file] of TIER_REGISTRIES) {
+      expect(REGISTRIES[dir]!.index).toBe(file); // the same index file
+    }
+  });
+
+  test("ARCHIVE_REGISTRIES is 1:1 with reg-sync's archive entries — resolution and search cannot drift again", () => {
+    // ADR-052: the two consumers genuinely diverge here — the resolver
+    // reads the archive, the launcher never does. Pin both directions:
+    // an archived tier reg-sync maintains but the resolver can't see,
+    // and a resolver entry with the wrong index filename.
+    const archiveDirs = new Set(Object.entries(REGISTRIES).filter(([, d]) => d.archive).map(([k]) => k));
+    const resolvedDirs = new Set(ARCHIVE_REGISTRIES.map(([dir]) => dir));
+    expect(resolvedDirs).toEqual(archiveDirs);
+    for (const [dir, file] of ARCHIVE_REGISTRIES) {
       expect(REGISTRIES[dir]!.index).toBe(file); // the same index file
     }
   });

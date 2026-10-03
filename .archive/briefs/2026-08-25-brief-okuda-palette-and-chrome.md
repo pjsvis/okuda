@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-OKUDA-PALETTE
+---
+
 # Brief: Okuda palette preset + code-panel chrome
 
 **Date:** 2026-08-25

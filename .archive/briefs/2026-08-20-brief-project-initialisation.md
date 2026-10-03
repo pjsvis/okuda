@@ -1,3 +1,8 @@
+---
+type: Brief
+callsign: BRF-PROJECT-INITIALISATION
+---
+
 # Brief: Provision the okuda Silo
 
 **Date:** 2026-08-20
