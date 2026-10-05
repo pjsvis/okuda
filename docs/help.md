@@ -21,6 +21,7 @@ Work cycle: **brief → branch → implement → check → review → debrief**
 - `just fresh` — is the binary on PATH this checkout's HEAD? (stale-binary gate)
 - `just search-smoke` — proves the gloam `-g` content search end to end, no TTY: freshness → merge → fzf. Custom scenario: `bash scripts/search-smoke.sh <query> <expected-path>`
 - `just search-replay` — opens the exact picker instance standalone: prints the entry stream + argv, then runs interactive fzf with nothing between you and it. Custom query: `just search-replay load bearing`
+- `just scan` — search the silo with the dialect **and** the coverage pinned: ripgrep by absolute path, ERE, `-uu` so gitignored `tmp/` is searched, `node_modules/` excluded and stated on stderr. Prefer it to a bare `grep` — the shell's `grep` is a shimmed toybox where `\|` is a literal, so a pattern legal in both dialects returns a plausible `0`. Custom paths: `just scan 'it\(|describe\(' src/ tests/`
 - `just check` — registry sync gate; fails (exit 1) on MISSING or STALE entries. Run before every commit.
 - `just reg-sync` — check registries for drift
 - `just reg-sync-fix` — regenerate indexes from filesystem

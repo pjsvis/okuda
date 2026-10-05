@@ -339,6 +339,13 @@ search-ours query:
     @echo "OURS (gloam --entries — the dive): ranked, deduped, evidence"
     @./okuda gloam --entries '{{query}}' | awk -F'\t' 'NF>1 && $2 != ""'
 
+# ── Pinned search ────────────────────────────────────────────
+
+# Pinned-dialect search
+[group('search')]
+scan *args:
+    @bash scripts/scan.sh "$@"
+
 # ── Dogfood sessions ──────────────────────────────────────
 
 # Decision table
