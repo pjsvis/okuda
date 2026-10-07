@@ -725,10 +725,16 @@ async function interceptCode(
 /** The coloured fence block: chroma's lines with `code()`'s RAW
  * protection, indent, and elision — but no `codeLine` wrap. chroma's
  * class codes ARE the styling; layering the palette's code colour over
- * them would fight the terminal's palette for the same bytes. */
+ * them would fight the terminal's palette for the same bytes.
+ *
+ * The budget is `ctx.width - 2`, not `ctx.width`: this function adds a
+ * 2-column indent and `finalize` adds a 2-column document margin, so eliding at
+ * the content width puts the line at `ctx.width + 4` — the terminal's LAST
+ * column, holding the `…`, where the terminal soft-wraps what okuda emits (the
+ * one thing it must never do). Prose stops at `width - 2`; so does this. */
 function codeBlockLines(lines: string[], ctx: Ctx): string {
   const open = tagRawOpen("code");
-  const body = lines.map((l) => (l === "" ? "" : "  " + elideToWidth(l, ctx.width)));
+  const body = lines.map((l) => (l === "" ? "" : "  " + elideToWidth(l, ctx.width - 2)));
   return `${open}${body.join("\n")}${TAG_RAW_CLOSE}\n\n`;
 }
 
@@ -960,15 +966,25 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // wrapped — elided (td-b81597, closing ADR-004's fence exception:
       // "overflow ugly by design" was the lesser evil when wrapping was
       // the only alternative; elision is crueler and more useful). Each
-      // line is hard-truncated to the content width with `…` at the cut
-      // — the terminal never soft-wraps what okuda emits (a wrapped code
-      // line is one line pretending to be two). Budget: handler margin 2
-      // + finalize margin 2 + ctx.width = exactly the terminal width.
+      // line is hard-truncated with `…` at the cut — the terminal never
+      // soft-wraps what okuda emits (a wrapped code line is one line
+      // pretending to be two).
+      //
+      // Budget: `width - 2`. The arithmetic this line used to carry —
+      // handler indent 2 + finalize margin 2 + ctx.width — resolves to
+      // exactly the terminal width, which is not a budget but the boundary:
+      // the last column then holds the `…`, and the terminal wraps it onto
+      // the next line. The old comment stated that result as the intent.
+      // Eliding two columns short of it stops the fence where prose stops,
+      // at `width - 2`, `…` at the cut and the glass untouched. (Dogfood
+      // find, 2026-10-07: the showcase's fences wrapped their marker at 60
+      // columns and nowhere else, because elision fires only on a line that
+      // exceeds the budget.)
       const body = children.replace(/\n$/, "");
       const open = tagRawOpen("code");
       const lines = body
         .split("\n")
-        .map((l) => (l === "" ? "" : styler.codeLine("  " + elideToWidth(l, width))));
+        .map((l) => (l === "" ? "" : styler.codeLine("  " + elideToWidth(l, width - 2))));
       return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n\n`;
     },
 
@@ -1226,15 +1242,20 @@ function describedBlock(
 function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   const open = tagRawOpen("diagram");
   // Art elides at the code-fence right edge (ADR-UNIVERSAL-ELISION-050):
-  // budget + the finalize margin 2 = the terminal width. The "art is
-  // art" gutter exemption repeals — a wrapped diagram is a diagram
-  // pretending to be a taller diagram, and the terminal never
-  // soft-wraps what okuda emits. classifyDiagramLine FIRST (border /
-  // arrow detection needs the glyphs intact), then the composed line
-  // elides — elideToWidth walks ANSI runs and closes open SGR at the
-  // cut. Under NO_COLOR the art is the binary's bytes until over
-  // budget — parity holds where it always did, the cut is new honesty.
-  const budget = ctx.width + 2;
+  // budget + the finalize margin 2 = `width - 2`, where prose stops. The
+  // arithmetic here used to be `ctx.width + 2`, which resolves to exactly the
+  // terminal width — the last column then holds the glyph the cut lands on, and
+  // the terminal soft-wraps it onto the next line. The comment stated that
+  // result as the intent; it is the defect. The "art is art" gutter exemption
+  // repeals — a wrapped diagram is a diagram pretending to be a taller diagram,
+  // and the terminal never soft-wraps what okuda emits. classifyDiagramLine
+  // FIRST (border / arrow detection needs the glyphs intact), then the composed
+  // line elides — elideToWidth walks ANSI runs and closes open SGR at the cut.
+  // Under NO_COLOR the art is the binary's bytes until over budget — parity
+  // holds where it always did, the cut is new honesty. (Dogfood find,
+  // 2026-10-07: diagram art and elided fences were the two witnesses, because
+  // they are the lines that reach the content width.)
+  const budget = ctx.width;
   let elided = 0;
   const lines = art.split("\n").map((l) => {
     if (l === "") return "";

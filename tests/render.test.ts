@@ -411,7 +411,7 @@ describe("render — blockquote", () => {
 });
 
 describe("render — code fences", () => {
-  test("2-space indent, code colours, elided at the content width (td-b81597)", async () => {
+  test("2-space indent, code colours, elided inside the content width (td-b81597)", async () => {
     const long = "x".repeat(70);
     // Untagged by intent (BRF-FENCE-COLOUR): this test pins the codeLine
     // palette path and the elision primitive — a tagged fence now goes
@@ -420,12 +420,14 @@ describe("render — code fences", () => {
     const codeLine = lines(out).find((l) => l.includes("const line"));
     expect(codeLine).toBeDefined();
     expect(stripANSI(codeLine!)).toStartWith("  ");
-    // ADR-004's invariant restored for fences: the emitted line is never
-    // wider than the terminal (margin 2+2 + ctx.width = 40), so the
-    // terminal never soft-wraps it. The overflow ends with the `…`
-    // elision marker — the fence exception ("overflow ugly by design")
-    // closed by eliding, not wrapping.
-    expect(displayWidth(codeLine!)).toBe(40);
+    // The emitted line stops at `width - 2` — the fence indent 2 + the budget
+    // (ctx.width - 2) + the document margin 2. This assertion used to be
+    // `toBe(40)`, i.e. the terminal's own width, on the reasoning that
+    // "margin 2+2 + ctx.width = 40" keeps the terminal from wrapping. It does
+    // the opposite: a line that reaches the last column puts the `…` there,
+    // and the terminal wraps it. The invariant is that the glass is never
+    // touched — the `…` marks the cut, one column clear of the edge.
+    expect(displayWidth(codeLine!)).toBe(38);
     expect(stripANSI(codeLine!).endsWith("…")).toBe(true);
   });
 
