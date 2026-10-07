@@ -10,7 +10,8 @@ bottom).
 Built 2026-08-30; amended 2026-09-04 (the wiring retired — references
 are text; the shortlist landed; the porch and working-copy rows added);
 amended 2026-09-30 (the step-inventory row — assessed `· open`, the
-epic's logs are empty).
+epic's logs are empty); amended 2026-10-04 (the diagram-describe row —
+assessed `· open`, its render-path design refused).
 Editorial surface; `just amp` checks the drift against the registry.
 
 ## Landed — debrief on file
@@ -34,6 +35,7 @@ Editorial surface; `just amp` checks the drift against the registry.
 | Brief | State | Note | |
 |---|---|---|---|
 | BRF-PORCH-MATRIX | · open | click a URL, land in a terminal; per-glass matrix | — |
+| BRF-DIAGRAM-DESCRIBE | · open | prose descriptions of mermaid diagrams — the render-path design refused 2026-10-04; the residue is the lint | — |
 | BRF-STEP-INVENTORY | · open | the stride inventory — the stepper shipped, the record drifted, one unit missing (landed 2026-09-30; epic td-91bf51) | — |
 
 ## Closed by other means — registry status is stale on all three

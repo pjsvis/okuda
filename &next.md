@@ -9,38 +9,71 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 
 ## Landed today — the debt this table was tracking
 
-- **BRF-CONTENT-SHORTLIST** — the discovery gap, the oldest standing
-  complaint: closed. The live search shipped as the default (ADR-030),
-  ranked and evidence-carrying; the picker is the index now.
-- **The keyboard grammar** — 00-10 verbs and modes, 12-98 addresses, 99
-  promotion: the two-digit space is a language with a bindings table
-  (src/keygrammar.ts); renumbering is a one-line edit. **Amended
-  2026-09-06 (ADR-032):** repeated-digit actuators {00,11,22,…,99} — one
-  class, never jumps — reserved; shape rule (repeated = actuator, mixed =
-  address) supersedes the range split. **Corrected 2026-09-13:** the
-  vectors are 12–98 *minus* the doubled-pair class = **80 addresses**, not
-  88 (and not the 83 this line said in between, which predates 11 joining
-  the pocket). Canon: `src/vectors.ts` `MAX_REFS`, ADR-032:81.
-- **Frame mode (BRF-PAGED-OKUDAGRAM, v1)** — `01` actuates: a frame is
-  a header and its content to the next header; j/k step frames, arrows
-  slippy within, ␣/b page. The brief's EC walk remains.
-- **Protocol-free TTS identity** (2026-09-06) — the dunt demolition's
-  positive form: gloam is a text receiver and a restricted-grammar text
-  emitter, protocol-free on both ends (`docs/2026-09-06-protocol-free-text-identity.md`).
-  The dogfood (`just tts`) runs; Run 1 found the `--no-color` escape leak.
-  ADR-032 reserved the actuator pocket. Debrief:
-  `debriefs/2026-09-06-debrief-protocol-free-tts.md`.
+- **BRF-KINDLE-PORCH** (2026-10-06) — the silo on an e-ink glass. Device
+  known: **Paperwhite 11th gen (PW5)**. The next move is five minutes and
+  cannot wait: **Airplane Mode on, then read the firmware version** — the
+  community jailbreak for this generation (Nosebleed) covers 5.16.4–5.18.6,
+  and 5.18.1.1.1 / 5.19.x are closed, with the patch arriving as an ordinary
+  update. Then it is host-driven: `okuda <file> --no-color` paginated on the
+  host, painted by FBInk over ssh, nothing of ours on the device. Assessment:
+  `docs/2026-10-06-the-eink-frame-is-a-second-host.md` — the reading path
+  emits **zero bytes of cursor control across 427 documents**.
+- **BRF-DIAGRAM-DESCRIBE** (2026-10-03) — the `diagram-describe` binary reads
+  mermaid source on stdin and writes prose markdown on stdout via the local
+  LLM (ollama + gemma4). okuda's ` ```mermaid describe ` fence tag routes to
+  it; the prose renders as a muted panel with a left border.
+- **Ghostty clone/edit integration** — the `99` (clone) and `88` (edit)
+  verbs spawn fresh Ghostty windows with the full interactive
+  environment (zsh -i -c). Seven iterations to get the spawn boundary
+  right. Lesson persisted in `src/clone.ts`.
+- **The edit verb is 88, and the editor is Zed** — `09` (a blank note)
+  and the never-wired `10` retired; `88` binds the *current document* to
+  the editor, the doubled pair beside `99` clone (ADR-032 amended,
+  keymap page moved with the table). The editor is a declaration:
+  `OKUDA_EDITOR`, then `EDITOR`, then the first of `zed`, `code`,
+  `cursor`, `subl` on PATH, then `vi`. A GUI editor is spawned
+  directly — no terminal spun up to host it; a terminal editor rides
+  `ghostty-edit`, where a login shell can find it. Cue seam speaks
+  "edit" automatically (it speaks as it binds).
+- **BRF-MATH-GLYPHS** — `$\Delta t$` renders as `Δt`. A closed
+  vocabulary of 17 entries, an all-or-nothing gate, and a source-level
+  pass with structural fence and code-span exemption (the brief's
+  handler-level placement failed a probe — fences *do* reach the `text`
+  handler on bun 1.4.0). Brief carries the landing record and both
+  deviations.
+- **BRF-HEADING-ANSI-STRIP** (2026-10-03) — heading colour leak fixed: inline
+  `**strong**` inside a heading no longer bleeds gold into blue. **Done**.
+- **BRF-DOC-SEARCH-FERMATA** (2026-10-03) — brief written for the doc→search
+  held-frame pause. Open. · **S**
+- **Dogfood crashes fixed** — Bun.spawn stdio compat, appleScript arg
+  count, path doubling in resolve(cwd,doc).
+- **reg-sync reconciles derived fields** — a brief flipped to Done used
+  to keep its stale row forever: membership was checked, the derived
+  fields were not, and the map was only consulted when an entry was
+  rebuilt. Check mode now compares status, an *authored* date and the
+  callsign (never the summary — the playbooks carry hand-written ones),
+  reports a status word outside the tier vocabulary loudly instead of
+  mapping it to `open`, and refuses the lossy traps the first run
+  exposed: `parked`/`rejected`/`draft`/`proposed` are now declared
+  words, the archive's statuses are fixed by *location* (ADR-052), and
+  an mtime is not a date claim. It found and repaired ADR-023's row
+  (`Accepted` → `Aborted`) on its first real run.
+- **The dogfood ritual is complete** — the scripted six-case probe
+  (`tmp/dogfood-probe.py`) ran green twice, and the operator's by-hand
+  pass covered the physical holds, the one-shot slot, the abort, and
+  the exit fermata; by-hand findings #1 and #2 (the FOUT, and the beat's
+  positive verdict) shipped inside it. It fed `td-51d5f4` (pending digit
+  indicator) and `td-e81b92` (grammar ADR), both still open.
+- **TD hygiene** — closed stale td-fa0454 (quiet period, design went
+  clock-free), reviewed td-3da242 (archive sweep).
 
 ## Recommended — start these next
 
-- **The wire fix** (td-1c8fca, pre-existing) — `&speak.md` rows don't
-  jump: the okuda-rhs wiring to `../speak-md` targets fails resolve,
-  found during the [11] reservation smoke. The severed rail under every
-  navigational ambition — fix it before anything strides over it · **S**
-- **BRF-MATH-GLYPHS** (2026-09-16, Draft) — `$...$` spans render as their
-  raw LaTeX source today; the closed-vocabulary Unicode pass is fully
-  specified and corpus-gated. The smallest well-specified ship on the
-  list · **S**
+- **BRF-AST-PROSODY** (2026-10-05) — intermediate representation for speech
+  rendering. Open, awaiting the perimeter verdict and the seam decision.
+  · **S**
+- **BRF-STICKY-HEADING-STEPPER** (2026-10-04) — step through a document
+  section by section, heading as anchor, never truncate. Open. · **S**
 - **The cut cell** (BRF-TABLE-WIDTH, td-b78642) — 104 tables in the
   corpus, 106 cuts, 97 with room already on the glass; the allocator
   spends the columns wrong. Highest dogfood leverage per hour · **M**
@@ -83,6 +116,10 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
   audio path skips okuda. The clean audio input today is `cat doc.md`.
   Routed 2026-09-19: the `--plain` dial is the one okuda-side artifact
   of **BRF-REMOTE-SPEECH-SEAM** — build it when the verdict confirms.
+  **Second consumer named 2026-10-05 (BRF-KINDLE-PORCH):** an e-ink sink
+  painting with FBInk renders `\x1b[1m` as literal characters, so the panel
+  wants the same "no escapes at all" dial the voice wants. Two consumers,
+  one artefact — read that gate again with both in hand.
   · **S**
 
 - **BRF-REFRESH-OFF-DISK** — real bugs in the repaint path: the resize
@@ -96,6 +133,19 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 
 ## Exploration — read-and-think, no code
 
+- **CALL Scotland — the outreach option, reserved** (2026-10-05). The
+  University of Edinburgh's assistive-technology service (Books for All,
+  Adapted Digital Exams, Communication Passports, Symbols for All, WordTalk,
+  The Scottish Voice) — the one outside body whose remit overlaps this
+  project's *purpose* rather than its mechanism. Their published stance is
+  ours one layer upstream: *making the original accessible reduces the need
+  to produce accessible formats*. The drafted piece is
+  `docs/2026-10-06-the-shared-artifact.md` — shared cognition, the artifact
+  discipline, the method stated as it is, limits first. **Reserved, not
+  sent:** their public guidance is reference material now; contact is the
+  operator's call, and the trigger is a re-read in a week. The two questions
+  worth their time: does the unreachable-address idea help a tremor or switch
+  user, and what does a shared artifact owe a partner who arrives cold? · **S**
 - **BRF-REMOTE-SPEECH-SEAM** (td-9dac3b, proposal) — the verdict before
   any build: confirm okuda's duty ends at a `--plain` dial (the
   perimeter already carries the transport), or veto with the property
@@ -106,6 +156,16 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 
 ## Hygiene — small, owed
 
+- **reg-sync does not propagate a brief's status** — *landed 2026-10-05*
+  (see the landed list above): check mode now compares the derived
+  fields, so this entry is the tombstone.
+- **The brief status vocabulary is incomplete** (found 2026-10-05 by the
+  new reg-sync drift check, which found it by *refusing* to guess) — ten
+  briefs declare statuses the registry map does not know: `ready` (×6),
+  `accepted`, `pending`, `aborted`, `rule`. They are reported loudly and
+  never silently mapped to `open`, but which words the registry
+  *stores* is a corpus decision, not a sync repair: settle it, then
+  either widen the map or normalise the documents · **S**
 - **The amp-check backlog** (pre-existing, measured during td-1c8fca)
   — `just amp-check` is red with 29 items: 28 registry briefs absent
   from the `&briefs.md` state table (the facade stopped updating 28
@@ -119,6 +179,16 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
   handlers and the per-glass verdicts. The table's newest resident · **M**
 
 ## Not next — deliberately
+
+- **The single binary** (2026-10-05) — a vendor proposal to compile the
+  helpers to Wasm and ship one artifact, answered and shelved:
+  `docs/2026-10-05-the-single-binary-is-a-provisioning-question.md`.
+  The measured maximum win is 60 ms on the heaviest document in the
+  corpus (four mermaid fences) and 15.0 ms per fence end to end, of
+  which the Rust engine is 0.5 ms — the rest is a bash wrapper. Three
+  named revival triggers: a host with no provisioning path, a consumer
+  wanting the engine as a library, or the per-fence number going
+  material (re-run the probe in §5 if a forty-diagram document arrives).
 
 - **BRF-FLOW-WRAP** (fresh) · **BRF-MERMAID-HARD** (waits on a
   paged-view world) · **the search-area redesign session** (td-3ac46b,

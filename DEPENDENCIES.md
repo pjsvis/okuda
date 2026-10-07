@@ -12,6 +12,7 @@ an assumption.
 | `git` | 2.54.0 | Version control; launcher runtime (ADR-048 — the root climb) | 2026-08-20 |
 | `td` | 0.61.0 | Task management | 2026-08-27 |
 | `mermaid-to-md` | 0.1.0* | Mermaid → ASCII | 2026-09-02 |
+| `diagram-describe` | — | Mermaid → prose via local LLM (BRF-DIAGRAM-DESCRIBE) | 2026-10-03 |
 | `chroma` | 2.27.0 | Code-fence colour — 16-colour class codes (BRF-FENCE-COLOUR) | 2026-09-29 |
 | `fzf` | 0.73.1 | Fuzzy picker — runtime dep of the `gloam` launcher (both modes) | 2026-08-27 |
 | `rg` | 15.1.0 | Source for both `gloam` picker modes — file list, body shortlist, registry prefilter | 2026-09-04 |
@@ -76,8 +77,10 @@ accident.
 
 The compiled okuda binary has zero external npm runtime dependencies;
 `mermaid-to-md` is its one runtime dependency — invoked per `mermaid`
-fence via `Bun.spawn`, never parsed in-process. The gloam launcher adds
-three more, all spawned, never parsed in-process: `rg` and `fzf` (the
+fence via `Bun.spawn`, never parsed in-process. `diagram-describe` is
+an optional runtime dependency — invoked per `mermaid describe` fence
+(BRF-DIAGRAM-DESCRIBE); absent → graceful degradation to the ASCII path.
+The gloam launcher adds three more, all spawned, never parsed in-process: `rg` and `fzf` (the
 search surfaces) and `git` (ADR-048 — the silo root is the git toplevel,
 resolved once per process and cached; absent git, the cwd stands).
 

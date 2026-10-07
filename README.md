@@ -8,7 +8,9 @@ A terminal markdown viewer built on `Bun.markdown` and compiled to a single bina
 
 ## Why
 
-Glow enforces CommonMark tight-list rules that collapse list items, ignores soft returns, renders Mermaid diagrams as raw code fences, and draws cramped tables. In an agentic paired-terminal workflow (agent on the left, live preview on the right), list-heavy execution plans and markdown state diagrams need legible, immediate ASCII rendering.
+Glow enforces CommonMark tight-list rules that collapse list items, ignores soft returns, renders Mermaid diagrams as raw code fences, and draws cramped tables. 
+
+In an agentic paired-terminal workflow (agent on the left, live preview on the right), list-heavy execution plans and markdown state diagrams need legible, immediate ASCII rendering.
 
 `okuda` renders what your workflow actually generates:
 
