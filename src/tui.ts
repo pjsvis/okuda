@@ -846,7 +846,12 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // The whole point of the trace is this line beside the rerender's `skip`: a
     // pane narrower than `render` is the frame the terminal wraps, and a `skip`
     // whose cols equal the painted cols is a resize we were right to ignore.
-    frameTrace(`paint cols=${cols} rows=${rows} render=${renderCols} scroll=${scroll}`);
+    // `tty` is the terminal's OWN report beside our resolved width — when they
+    // disagree, the fallback path is in play (the compiled-binary columns=0 bug
+    // goes through `tput`), and a one-column disagreement is a jolt.
+    frameTrace(
+      `paint cols=${cols} rows=${rows} tty=${process.stdout.columns ?? "-"}x${process.stdout.rows ?? "-"} render=${renderCols} scroll=${scroll}`,
+    );
     process.stdout.write(syncWrap(frame));
   };
 
