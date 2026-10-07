@@ -101,9 +101,20 @@ W[k] = longest word in column k        // the elision floor
 2. Σfloor > B          → IRREDUCIBLE. No allocation holds every word; the
                          document is at fault, not the allocator.
 3. Complete columns, cheapest first: by needs[k] = N[k] − W[k] ascending; pay in
-   full where the budget allows; otherwise the column keeps its floor and elides.
-4. Stop. Never widen past N; the rule spans the table's natural width.
+   full where the budget allows; otherwise the column keeps its floor.
+4. Share what is left over proportionally to each column's remaining need, then
+   hand the rounding residue to the largest need.
+5. Never widen past N; the rule spans the table's own width.
 ```
+
+**Step 4 was written wrong, and is recorded as wrong** (increment 2, 2026-10-07).
+As first drafted it said *stop, leave the remainder unspent*. The arithmetic said
+otherwise: on the pilot at 80 that leaves sixteen characters on the floor while
+the prose column sits at its ten-character word floor — strictly *less*
+informative than the proportional allocator the ladder replaces, because a
+partial gift to the widest column is still more content shown. Completion orders
+the spending; the ratio decides the remainder. The floor is the protection, and
+it is the only thing that changes.
 
 **Ours, not lipgloss's.** Glamour's ladder stops at the median and grows the
 narrowest column first, because glamour balances columns: it wraps, so a wider
@@ -206,8 +217,12 @@ index tables (a `reg-sync` change, tracked as its own issue).
        widths (371 columns at 200 versus 320 at 120) until it read the band.
        Noted cost, pending the wrap: past 120 columns a table with a natural
        width between 116 and the glass now elides where it used to sprawl.
-2. [ ] Rewrite the ladder — the `matrix` path and every narrow glass. Reading
-       taken before and after in the same session, so the claim is a number.
+2. [x] **Landed 2026-10-07.** The ladder is in, and the objective change is
+       measured: starved columns at 80 went **489 → 192** (−61%, elided cells
+       3053 → 1812), and at 120 **320 → 111** (−65%, 1889 → 1045). The pilot that
+       started this — `Element │ Channel │ Role │ Hex` squeezed to `Eleme… │
+       struct… │ purple b… │ #bd9…` — now renders every key column whole at 80,
+       and the whole table at 120. One deviation from the design, above.
 3. [ ] The row block: headers first (O(1) lines, and it is the same mechanic),
        then the prose column. Check the classifier now reads data naturals.
 4. [ ] Tests: one unit vector per branch (design / matrix / irreducible / prose)

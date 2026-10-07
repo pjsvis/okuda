@@ -1474,11 +1474,19 @@ function renderTable(t: TableState, ctx: Ctx): string {
     return renderMenuTable(t, ctx);
   }
 
-  // Natural column widths from cell display width.
+  // Natural column widths from cell display width, and each column's longest
+  // word — the floor of the ladder. At or above it, a cell's leading word
+  // survives the cut whole; below it, that word is itself cut. Elision cuts at
+  // a character, not at a space, so this is the guarantee the floor buys
+  // (BRF-TABLE-LADDER) — not the stronger one of cutting at word boundaries.
   const colWidth = new Array<number>(cols).fill(0);
+  const wordWidth = new Array<number>(cols).fill(0);
   const measure = (cell: Cell | undefined, i: number): void => {
-    const w = cell ? displayWidth(cell.text) : 0;
-    colWidth[i] = Math.max(colWidth[i]!, w);
+    const text = cell?.text ?? "";
+    colWidth[i] = Math.max(colWidth[i]!, displayWidth(text));
+    for (const word of stripANSI(text).split(/\s+/)) {
+      wordWidth[i] = Math.max(wordWidth[i]!, displayWidth(word));
+    }
   };
   header.forEach(measure);
   for (const r of rows) r.forEach(measure);
@@ -1490,22 +1498,80 @@ function renderTable(t: TableState, ctx: Ctx): string {
   // the glass offers (BRF-TABLE-LADDER).
   const target = Math.min(width, BAND_CONTENT);
 
-  // Fit the target — never overflow. Wide tables shrink by proportional
-  // budget; cells over budget ELIDE, never wrap (ADR-UNIVERSAL-ELISION-050).
-  // The ladder replaces this arithmetic in the next increment; the band lands
-  // first because it is the cheaper half of the same decision.
+  // Fit the target — never overflow; cells over budget ELIDE, never wrap
+  // (ADR-UNIVERSAL-ELISION-050). The allocation is the ladder (BRF-TABLE-LADDER):
+  //
+  //   floor[k] = longest word    at or above it the leading word survives whole;
+  //                              below it that word is cut too
+  //   complete cheapest-first    a column paid in full renders whole; a partial
+  //                              gift still elides, so nothing is spent on one
+  //   remainder above the floor  the proportional sharing survives — the floor
+  //                              is the protection, the ratio is what to do with
+  //                              what is left
+  //
+  // Glamour's ladder stops at the median and grows the narrowest column first,
+  // because glamour wraps and a wider column is always an improvement. Under
+  // elision an uncompleted column gains nothing from a partial gift, so the
+  // objective is completion. Same staging, different objective function.
   if (total > target && cols > 0) {
     const budget = target - gutter * (cols - 1);
-    const sum = colWidth.reduce((a, b) => a + b, 0);
-    const floors = colWidth.map(() => 3);
-    const floorSum = floors.reduce((a, b) => a + b, 0);
-    if (budget >= floorSum) {
-      colWidth.forEach((w, i) => {
-        const natural = Math.max(0, w - 3);
-        const share =
-          floors[i]! +
-          Math.floor(((budget - floorSum) * natural) / Math.max(1, sum - floorSum));
-        colWidth[i] = Math.min(w, share);
+    const natural = colWidth.slice();
+    const floor = natural.map((n, i) => Math.min(n, wordWidth[i]!));
+    const floorSum = floor.reduce((a, b) => a + b, 0);
+
+    if (floorSum > budget) {
+      // Irreducible: no allocation holds every word, so the document is at fault
+      // rather than the allocator. Fall back to the 3-character floor and
+      // proportional sharing — the behaviour this ladder replaces — and let the
+      // instrument's `irreducible` reading name the table.
+      const sum = natural.reduce((a, b) => a + b, 0);
+      const baseSum = 3 * cols;
+      if (budget >= baseSum) {
+        colWidth.forEach((w, i) => {
+          const above = Math.max(0, w - 3);
+          colWidth[i] = Math.min(
+            w,
+            3 + Math.floor(((budget - baseSum) * above) / Math.max(1, sum - baseSum)),
+          );
+        });
+      }
+    } else {
+      const slot = floor.slice();
+      // Ascending need: the cheapest completion first buys the most whole
+      // columns for the budget, and a partial buys nothing legible.
+      const order = natural
+        .map((_, i) => i)
+        .sort((a, b) => (natural[a]! - slot[a]!) - (natural[b]! - slot[b]!));
+      let spent = floorSum;
+      for (const i of order) {
+        const need = natural[i]! - slot[i]!;
+        if (need > 0 && spent + need <= budget) {
+          slot[i] = natural[i]!;
+          spent += need;
+        }
+      }
+      // The remainder above the floor, shared proportionally to what each column
+      // still needs — then the rounding residue handed to the largest need,
+      // because a character left unspent is one the table lost for nothing.
+      const rem = budget - spent;
+      const needSum = natural.reduce((a, n, i) => a + Math.max(0, n - slot[i]!), 0);
+      if (rem > 0 && needSum > 0) {
+        natural.forEach((n, i) => {
+          const need = Math.max(0, n - slot[i]!);
+          if (need > 0) slot[i] = slot[i]! + Math.floor((rem * need) / needSum);
+        });
+        let residue = budget - slot.reduce((a, b) => a + b, 0);
+        for (const i of [...order].reverse()) {
+          if (residue <= 0) break;
+          const need = natural[i]! - slot[i]!;
+          if (need <= 0) continue;
+          const give = Math.min(need, residue);
+          slot[i] = slot[i]! + give;
+          residue -= give;
+        }
+      }
+      colWidth.forEach((_, i) => {
+        colWidth[i] = Math.min(natural[i]!, slot[i]!);
       });
     }
     total = colWidth.reduce((a, b) => a + b, 0) + gutter * (cols - 1);
