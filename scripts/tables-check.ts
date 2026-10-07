@@ -38,11 +38,50 @@
  * whose columns could each hold their longest word is an ALLOCATOR fault, and
  * a table that cannot is a document (or generator) fault.
  *
- * Usage:
- *   bun scripts/tables-check.ts [--width N] [--strict] [--json] [--top N] [files...]
+ * The word budget measures the CUT. It cannot see the second fault, because
+ * elision is normal here (ADR-UNIVERSAL-ELISION-050: cells elide, they do not
+ * wrap) — a prose cell wider than its slot is *meant* to elide, and it elides
+ * with a marker, so nothing is cut and this script reports 0. The fault that
+ * hides behind that 0 is STARVATION: a column elided while the budget had room
+ * to render it whole.
  *
- * Exit 0 = no cut at the target width (or a report, without --strict);
- * exit 1 = a cut, under --strict.
+ * STARVED, per column k, is a predicate over the source plus one observation:
+ *
+ *   nat[k] + 3 * (cols - 1) <= CONTENT      -- k fits whole alongside every
+ *                                              other column's floor
+ *   && the render shows an elision in k    -- and the allocator elided it anyway
+ *
+ * The floor is the allocator's own (`floors = colWidth.map(() => 3)`, src/
+ * render.ts) — the predicate asks whether a better allocation existed, so it
+ * uses the current allocation's minimum as the promise to the other columns.
+ * A starved column is not a fault of the document; it is characters the
+ * allocator had and handed to a wider column. `--strict-starved` gates on it.
+ *
+ * Bracket slack is the third reading, and it is not a fault — it is the open
+ * question (should rows fill the glass, or should the rule shrink to the
+ * cells?). `slack = CONTENT - natural` for a table that fits: the rule spans
+ * CONTENT, the cells stop at natural, and everything between the two is air
+ * under the bar.
+ *
+ * Traps, the third one:
+ *   - elision is read as `endsWith('…')`, not `includes('…')` — a cell is
+ *     elided at its tail, and prose that merely mentions an ellipsis mid-
+ *     sentence is not the allocator's doing;
+ *   - a cell whose SOURCE ends in `…` also ends in `…` when rendered, and the
+ *     allocator did nothing — the column's source is checked before its
+ *     elisions are counted;
+ *   - the band boundary is fuzzy by a few characters: `plain()` estimates markup
+ *     stripping, `Bun.markdown` does it for real, and a table measured at 115
+ *     can land at 117 in the renderer. Expect a residue of a handful of
+ *     boundary tables at any width; do not chase it.
+ *
+ * Usage:
+ *   bun scripts/tables-check.ts [--width N] [--strict] [--strict-starved]
+ *                               [--json] [--top N] [files...]
+ *
+ * Exit 0 = no cut (and no starved column, under --strict-starved) at the target
+ * width; a report, without the strict flags. Exit 1 when the gate it was given
+ * fails.
  */
 
 import { renderDocument } from "../src/render";
@@ -74,9 +113,35 @@ const flag = (name: string, fallback: number): number => {
 const width = flag("--width", 80);
 const top = flag("--top", 20);
 const strict = argv.includes("--strict");
+const strictStarved = argv.includes("--strict-starved");
 const json = argv.includes("--json");
 const positional = argv.filter((a) => !a.startsWith("--"));
 const CONTENT = width - 4;
+/** The authoring contract (this brief's design, BRF-TABLE-LADDER): tables are
+ *  written to fit 80 columns, and 120 is the degradation threshold — a table
+ *  that fits the band is drawn whole at its natural width, single-line, and is
+ *  never elided. Absolute, not relative to `--width`: the band is a property of
+ *  the corpus, and a run at 60 columns must not move it. */
+const DESIGN_CONTENT = 76;
+const BAND_CONTENT = 116;
+
+/** The four shapes the band makes of the corpus (BRF-TABLE-LADDER). Geometric,
+ *  measured off the source naturals, no roles and no semantics: the renderer
+ *  never has to ask what the table is *for*.
+ *
+ *  design — natural ≤ 76. Authored to the 80-col contract; draws whole.
+ *  band   — 76 < natural ≤ 116. Draws whole on any glass of that width.
+ *  matrix — natural > 116 with every column ≤ 116. Many short columns; the
+ *           sum overflows, so keys elide on a narrow glass (ADR-TABLE-ELISION-014:
+ *           the scan is the table, and a matrix is all scan).
+ *  prose  — natural > 116 with a column past 116. One cell that no allowed
+ *           width can hold — the only shape where elide-vs-wrap is a real
+ *           choice rather than a policy. */
+type Shape = "design" | "band" | "matrix" | "prose";
+const shapeOf = (natural: number, nat: number[]): Shape =>
+  natural <= DESIGN_CONTENT ? "design"
+    : natural <= BAND_CONTENT ? "band"
+      : Math.max(...nat) > BAND_CONTENT ? "prose" : "matrix";
 
 // ── the silo ─────────────────────────────────────────────────────────
 
@@ -126,6 +191,16 @@ interface Table {
   /** Word budget: longest WORD per column, plus the gutters. The width a
    *  word-aware allocation needs. */
   wordBudget: number;
+  /** Per-column natural width (longest cell) — the whole-column test. */
+  nat: number[];
+  /** Per-column longest word — the cut test's unit. */
+  word: number[];
+  /** Per-column natural width of the HEADER row alone. */
+  headNat: number[];
+  /** Per-column longest word IN the header — what a multiline header needs. */
+  headWord: number[];
+  /** Per-column natural width of the body alone. */
+  bodyNat: number[];
 }
 
 function findTables(text: string): Table[] {
@@ -151,12 +226,25 @@ function findTables(text: string): Table[] {
     const cols = Math.max(...rows.map((r) => r.length));
     const nat = new Array<number>(cols).fill(0);
     const word = new Array<number>(cols).fill(0);
+    const headNat = new Array<number>(cols).fill(0);
+    const headWord = new Array<number>(cols).fill(0);
+    const bodyNat = new Array<number>(cols).fill(0);
     for (const r of rows) {
       for (let k = 0; k < cols; k++) {
         const cell = plain(r[k] ?? "");
         nat[k] = Math.max(nat[k]!, displayWidth(cell));
         for (const w of cell.split(/\s+/)) word[k] = Math.max(word[k]!, displayWidth(w));
       }
+    }
+    // The header row is rows[0] (findTables pushes it first). A multiline header
+    // needs only its longest word — the label is allowed to be three lines tall.
+    for (let k = 0; k < cols; k++) {
+      const h = plain(rows[0]?.[k] ?? "");
+      headNat[k] = displayWidth(h);
+      for (const w of h.split(/\s+/)) headWord[k] = Math.max(headWord[k]!, displayWidth(w));
+      let b = 0;
+      for (const r of rows.slice(1)) b = Math.max(b, displayWidth(plain(r[k] ?? "")));
+      bodyNat[k] = b;
     }
     out.push({
       line: i + 1,
@@ -165,6 +253,11 @@ function findTables(text: string): Table[] {
       src: [l, next, ...lines.slice(i + 2, j)].join("\n") + "\n",
       natural: nat.reduce((a, b) => a + b, 0) + GUTTER * (cols - 1),
       wordBudget: word.reduce((a, b) => a + b, 0) + GUTTER * (cols - 1),
+      nat,
+      word,
+      headNat,
+      headWord,
+      bodyNat,
     });
     i = j - 1;
   }
@@ -182,6 +275,12 @@ interface Reading {
   slots: number[];
   /** Cut fragments, `prefix|suffix`. */
   cuts: string[];
+  /** Observed elisions per column — cells whose rendered tail is `…`. */
+  elided: number[];
+  /** The column's HEADER cell was cut — the label lost, the data kept. */
+  headerCut: boolean[];
+  /** First elided fragment per column, `""` when the column is whole. */
+  samples: string[];
 }
 
 async function read(t: Table, source: string): Promise<Reading> {
@@ -193,7 +292,7 @@ async function read(t: Table, source: string): Promise<Reading> {
     if (RULE.test(l)) rules.push(i);
   });
   const rows = t.body.length;
-  if (rules.length < 2) return { lines: -1, rows, slots: [], cuts: [] };
+  if (rules.length < 2) return { lines: -1, rows, slots: [], cuts: [], elided: [], samples: [], headerCut: [] };
 
   const start = lines.findIndex((l) => l.trim().length > 0);
   const head = lines.slice(start, rules[0]!);
@@ -207,7 +306,7 @@ async function read(t: Table, source: string): Promise<Reading> {
   if (seps.length === 0) {
     // A single-column table carries no separator. Nothing to slice; reflow is
     // all it can do, so report the count and stop.
-    return { lines: bodyAll.filter((l) => l.trim().length > 0).length, rows, slots: [], cuts: [] };
+    return { lines: bodyAll.filter((l) => l.trim().length > 0).length, rows, slots: [], cuts: [], elided: [], samples: [], headerCut: [] };
   }
 
   const starts = [h0.search(/\S/), ...seps.map((s) => s + 2)];
@@ -229,6 +328,20 @@ async function read(t: Table, source: string): Promise<Reading> {
   const frag = (line: string, k: number) =>
     line.slice(starts[k]!, ends[k]! === 10 ** 6 ? undefined : ends[k]!).trim();
   const run = [...head, ...bodyAll];
+  // Elision, observed: a cell is elided at its tail (never wrapped — ADR-050),
+  // so `endsWith`, not `includes`. A column whose SOURCE ends in `…` renders one
+  // too, with the allocator blameless — skip those columns outright.
+  const elided = starts.map((_, k) => {
+    if (plain(columnText[k] ?? "").endsWith("…")) return 0;
+    return run.filter((l) => frag(l, k).endsWith("…")).length;
+  });
+  const samples = starts.map((_, k) => run.map((l) => frag(l, k)).find((c) => c.endsWith("…")) ?? "");
+  // The inversion: the header is the column's decode key, and it is usually the
+  // widest cell in its column — so under squeeze it is the FIRST thing cut,
+  // while the data it labels survives. Cheap to fix (a header is one block, so
+  // wrapping it costs O(1) table lines, not O(rows)) and therefore worth
+  // counting separately from starvation.
+  const headerCut = starts.map((_, k) => frag(h0, k).endsWith("…"));
   for (let k = 0; k < starts.length; k++) {
     const hay = " " + columnText[k]! + " ";
     for (let i = 0; i + 1 < run.length; i++) {
@@ -240,7 +353,7 @@ async function read(t: Table, source: string): Promise<Reading> {
       if (!hay.includes(" " + a + " ") || !hay.includes(" " + b + " ")) cuts.push(a + "|" + b);
     }
   }
-  return { lines: bodyAll.filter((l) => l.trim().length > 0).length, rows, slots, cuts };
+  return { lines: bodyAll.filter((l) => l.trim().length > 0).length, rows, slots, cuts, elided, samples, headerCut };
 }
 
 // ── the pass ─────────────────────────────────────────────────────────
@@ -255,10 +368,37 @@ interface Finding {
   /** True when the columns could each hold their longest word. */
   allocatorFault: boolean;
   wordBudget: number;
+  /** Columns elided although the budget had room to render them whole. */
+  starved: number;
+  /** How much elision the allocator observed, starved or not. */
+  elided: number;
+  /** An elided fragment from a starved column — the evidence, not the count. */
+  starvedSample: string;
+  /** Air between the rule's CONTENT span and the cells' natural width. */
+  slack: number;
+  /** The table's natural width — the design width the author implied. */
+  natural: number;
+  /** Natural width exceeds the band max: degradation is forced, not chosen. */
+  forced: boolean;
+  /** Which of the four shapes the band makes of this table. */
+  shape: Shape;
+  /** Per-column natural widths — the outlier tests read these. */
+  nat: number[];
+  /** Outside the band by construction: a word no band width holds, or a
+   *  second un-holdable column. Rethink the authoring, not the allocation. */
+  outlier: "word" | "giants" | null;
+  /** The source says it is machine-written (`Generated from the registry`),
+   *  so the rethink belongs to the compositor, not to a person. */
+  generated: boolean;
+  /** Columns whose label is wider than every body cell — a multiline header
+   *  would recover the surplus. */
+  headerDominated: number;
+  /** Columns whose label was cut in the render while its data was whole. */
+  headerCut: number;
 }
 
 const files = positional.length > 0 ? positional : siloFiles();
-const findings: Finding[] = [];
+const rowsRead: Finding[] = [];
 let scanned = 0;
 let docsWithTables = 0;
 let tables = 0;
@@ -278,54 +418,152 @@ for (const file of files) {
   for (const t of found) {
     tables++;
     const r = await read(t, source);
-    if (r.cuts.length === 0) {
-      if (r.lines !== r.rows && r.lines >= 0) reflow++;
-      continue;
-    }
-    findings.push({
+    const cols = t.nat.length;
+    // A column is starved when it fits whole alongside every other column's
+    // floor, and the render shows the allocator eliding it anyway. The floor is
+    // the allocator's own (3, src/render.ts) — the promise it makes each
+    // column the moment it starts handing out shares.
+    const floorOthers = 3 * Math.max(0, cols - 1);
+    const budget = CONTENT - GUTTER * Math.max(0, cols - 1);
+    const starvedCols = t.nat
+      .map((n, k) => (n + floorOthers <= budget && (r.elided[k] ?? 0) > 0 ? k : -1))
+      .filter((k) => k >= 0);
+    if (r.cuts.length === 0 && r.lines !== r.rows && r.lines >= 0) reflow++;
+    // The last slot is inferred from the header geometry as whatever is left to
+    // CONTENT (the header's first line is the title when the table is not
+    // isolated). When the table is NOT shrunk that remainder is air, not cell —
+    // and the air is already reported as `slack`, so clamping the slot to the
+    // column's natural width keeps the two readings from double-counting it.
+    const slots = r.slots.length === cols
+      ? r.slots.map((s, k) => (k === cols - 1 ? Math.min(s, t.nat[k] ?? s) : s))
+      : r.slots;
+    rowsRead.push({
       file,
       line: t.line,
       cols: r.slots.length,
-      slots: r.slots,
+      slots,
       cuts: r.cuts.length,
-      sample: r.cuts[0]!,
+      sample: r.cuts[0] ?? starvedCols.map((k) => r.samples[k]).find((s) => s) ?? "",
       allocatorFault: t.wordBudget <= CONTENT,
       wordBudget: t.wordBudget,
+      starved: starvedCols.length,
+      elided: r.elided.reduce((a, b) => a + b, 0),
+      starvedSample: starvedCols.map((k) => r.samples[k]).find((s) => s && s.length > 0) ?? "",
+      slack: Math.max(0, CONTENT - t.natural),
+      natural: t.natural,
+      forced: t.natural > BAND_CONTENT,
+      shape: shapeOf(t.natural, t.nat),
+      nat: t.nat,
+      // Two ways to leave the band, and both are the document's problem:
+      // a longest word the band cannot hold at all, or a second column past
+      // the band (a prose matrix — two notes pretending to be a table).
+      outlier: t.wordBudget > BAND_CONTENT
+        ? "word"
+        : t.nat.filter((n) => n > BAND_CONTENT).length > 1 ? "giants" : null,
+      generated: source.includes("Generated from the registry"),
+      headerDominated: t.headNat.filter((h, k) => h > (t.bodyNat[k] ?? 0)).length,
+      headerCut: r.headerCut.filter(Boolean).length,
     });
   }
 }
 
+const findings = rowsRead.filter((f) => f.cuts > 0);
+const starvedRows = rowsRead.filter((f) => f.starved > 0);
 findings.sort((a, b) => b.cuts - a.cuts || a.file.localeCompare(b.file));
+starvedRows.sort((a, b) => b.starved - a.starved || a.file.localeCompare(b.file));
 const allocator = findings.filter((f) => f.allocatorFault);
 const irreducible = findings.filter((f) => !f.allocatorFault);
 const docs = new Set(findings.map((f) => f.file)).size;
 const cutPoints = findings.reduce((a, f) => a + f.cuts, 0);
+const starvedDocs = new Set(starvedRows.map((f) => f.file)).size;
+const starvedCells = starvedRows.reduce((a, f) => a + f.starved, 0);
+const elidedCells = starvedRows.reduce((a, f) => a + f.elided, 0);
+const slackRows = rowsRead.filter((f) => f.slack > 0);
+const maxSlack = slackRows.reduce((a, f) => Math.max(a, f.slack), 0);
+// The band split: a starved table whose natural width fits 116 could have been
+// drawn whole, so the degradation was chosen. One over 116 was forced by the
+// author and no allocation or glass can draw it whole.
+const starvedUnforced = starvedRows.filter((f) => !f.forced).length;
+const overDesign = rowsRead.filter((f) => f.natural > DESIGN_CONTENT).length;
+const forcedRows = rowsRead.filter((f) => f.forced);
+const outliers = rowsRead.filter((f) => f.outlier !== null);
+const headerCols = rowsRead.reduce((a, f) => a + f.nat.length, 0);
+const headerDominated = rowsRead.reduce((a, f) => a + f.headerDominated, 0);
+const headerCut = rowsRead.reduce((a, f) => a + f.headerCut, 0);
+const headerCutRows = rowsRead.filter((f) => f.headerCut > 0);
+const shapes = (["design", "band", "matrix", "prose"] as Shape[]).map(
+  (s) => [s, rowsRead.filter((f) => f.shape === s).length] as const,
+);
+// Worst first: a starved column is the allocator's choice, a cut is a document
+// fault, and both are worse than air under the bar.
+const worst = [...rowsRead]
+  .filter((f) => f.starved > 0 || f.cuts > 0)
+  .sort((a, b) => b.starved - a.starved || b.cuts - a.cuts || b.slack - a.slack || a.file.localeCompare(b.file));
 
 if (json) {
-  console.log(JSON.stringify({ width, scanned, docsWithTables, tables, reflow, findings }, null, 2));
+  console.log(JSON.stringify({
+    width,
+    scanned,
+    docsWithTables,
+    tables,
+    reflow,
+    cuts: { tables: findings.length, docs, points: cutPoints },
+    starved: { tables: starvedRows.length, docs: starvedDocs, columns: starvedCells, elidedCells, unforced: starvedUnforced },
+    slack: { tables: slackRows.length, max: maxSlack, content: CONTENT },
+    headers: { columns: headerCols, dominated: headerDominated, cut: headerCut, tables: headerCutRows.length },
+    band: {
+      design: DESIGN_CONTENT,
+      max: BAND_CONTENT,
+      overDesign,
+      forced: forcedRows.length,
+      shapes: Object.fromEntries(shapes),
+      outliers: outliers.length,
+    },
+    findings: rowsRead,
+  }, null, 2));
 } else {
   const head = (s: string) => console.log(`\n${s}`);
-  head(`tables-check — the cut at ${width} columns`);
+  head(`tables-check — the table at ${width} columns`);
   console.log(`  scanned           ${scanned} files`);
   console.log(`  with tables       ${docsWithTables} files, ${tables} tables`);
   console.log(`  reflow only       ${reflow}  (wrapped on word boundaries — intended)`);
   console.log(`  CUT               ${findings.length} tables in ${docs} files, ${cutPoints} cut points`);
   console.log(`    allocator fault ${allocator.length}  (the columns could hold every word)`);
   console.log(`    irreducible     ${irreducible.length}  (a longest word exceeds the whole width)`);
+  console.log(`  STARVED           ${starvedRows.length} tables in ${starvedDocs} files, ${starvedCells} columns`);
+  console.log(`                    (elided while the budget had room to render them whole;`);
+  console.log(`                     ${elidedCells} elided cells in those tables, ${starvedUnforced} tables within the band)`);
+  console.log(`  bracket slack     ${slackRows.length} tables, up to ${maxSlack} cols of air under the rule`);
+  console.log(`  design width      ${overDesign} of ${tables} tables exceed ${DESIGN_CONTENT} (the 80-col design width)`);
+  console.log(`  shape             ${shapes.map(([s, n]) => `${n} ${s}`).join(", ")}`);
+  console.log(`  outliers          ${outliers.length} tables leave the band by construction`);
+  console.log(`  headers           ${headerDominated} of ${headerCols} columns sized by the label, ${headerCut} labels cut`);
 
-  if (findings.length > 0 && top > 0) {
-    head(`worst ${Math.min(top, findings.length)} — cuts  file:line  slots  sample`);
-    for (const f of findings.slice(0, top)) {
-      const kind = f.allocatorFault ? " " : "!";
+  if (worst.length > 0 && top > 0) {
+    head(`worst ${Math.min(top, worst.length)} — starved  cuts  file:line  slots  evidence`);
+    for (const f of worst.slice(0, top)) {
+      const kind = f.cuts > 0 && !f.allocatorFault ? "!" : " ";
       console.log(
-        `${kind} ${String(f.cuts).padStart(4)}  ${f.file}:${f.line}  [${f.slots.join(",")}]  ${f.sample}`,
+        `${kind} ${String(f.starved).padStart(4)}  ${String(f.cuts).padStart(4)}  ${f.file}:${f.line}  ` +
+          `[${f.slots.join(",")}]  ${f.starvedSample || f.sample}`,
       );
+    }
+    if (outliers.length > 0) {
+      head(`outliers — a word no band width holds, or a second un-holdable column`);
+      const why = (f: Finding) =>
+        f.outlier === "word" ? `word budget ${String(f.wordBudget).padStart(3)}` : `${f.nat.filter((n) => n > BAND_CONTENT).length} columns past ${BAND_CONTENT}`;
+      for (const f of outliers) {
+        console.log(
+          `  ${f.generated ? "generated" : "authored "}  ${why(f)}  ${f.file}:${f.line}`,
+        );
+      }
+      console.log(`  the rethink is the document's (or the compositor's), not the allocator's`);
     }
     if (irreducible.length > 0) {
       head(`irreducible — no allocation holds these (needs > ${CONTENT})`);
       for (const f of irreducible) console.log(`  need ${String(f.wordBudget).padStart(3)}  ${f.file}:${f.line}`);
     }
-    console.log(`\n! = irreducible; the rest are the allocator (brief: BRF-TABLE-WIDTH)`);
+    console.log(`\nstarved = columns the allocator starved; ! = a cut with no allocation to blame`);
   }
 }
 
@@ -333,4 +571,14 @@ if (strict && findings.length > 0) {
   console.error(`\ntables-check: FAIL — ${findings.length} table(s) cut a word at ${width} columns`);
   process.exit(1);
 }
-if (!json) console.log(`\ntables-check: ${findings.length === 0 ? "OK" : "REPORT"} — ${findings.length} cut`);
+if (strictStarved && starvedRows.length > 0) {
+  console.error(
+    `\ntables-check: FAIL — ${starvedRows.length} table(s) starved a column at ${width} columns ` +
+      `(${starvedCells} columns elided with room to be whole)`,
+  );
+  process.exit(1);
+}
+if (!json) {
+  const parts = [`${findings.length} cut`, `${starvedRows.length} starved`];
+  console.log(`\ntables-check: ${findings.length + starvedRows.length === 0 ? "OK" : "REPORT"} — ${parts.join(", ")}`);
+}

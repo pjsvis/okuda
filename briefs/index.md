@@ -9,6 +9,13 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-07 | BRF-TABLE-LADDER | open | The band and the ladder — the table fit, from a design width of 80 | 2026-10-07-brief-table-allocator-ladder.md |
+| 2026-10-06 | BRF-KINDLE-PORCH | open | The Kindle porch — the silo on an e-ink glass, over ssh, nothing on the device | 2026-10-06-brief-kindle-porch.md |
+| 2026-10-05 | BRF-AST-PROSODY | open | AST-to-Prosody Intermediate Representation for Speech Rendering | 2026-10-05-brief-ast-to-prosody-unsloth.md |
+| 2026-10-04 | BRF-STICKY-HEADING-STEPPER | open | The sticky-heading pager — step through a document section by section, heading as anchor, never truncate (BRF-STICKY-HEADING-STEPPER) | 2026-10-04-brief-sticky-heading-stepper.md |
+| 2026-10-03 | BRF-DIAGRAM-DESCRIBE | open | Prose descriptions of mermaid diagrams via an external binary — diagram source in, markdown prose out (BRF-DIAGRAM-DESCRIBE) | 2026-10-03-brief-diagram-describe.md |
+| 2026-10-03 | BRF-DOC-SEARCH-FERMATA | open | The doc→search fermata — a held frame at the reading/searching boundary (BRF-DOC-SEARCH-FERMATA) | 2026-10-03-brief-doc-search-fermata.md |
+| 2026-10-03 | BRF-HEADING-ANSI-STRIP | done | Strip ANSI from heading children — the heading role owns every byte of colour | 2026-10-03-brief-heading-ansi-strip.md |
 | 2026-10-02 | BRF-DEMO-SANDBOX | open | The public demo room — two access modes, one sandbox grammar | 2026-10-02-brief-demo-sandbox.md |
 | 2026-10-01 | BRF-READING-FRACTION | open | The reading fraction — a meter for the glass, from the state the glass already holds | 2026-10-01-brief-reading-fraction.md |
 | 2026-09-30 | BRF-FENCE-DISCIPLINE | open | One fence rule — five scanners, four disciplines, one of them fixed | 2026-09-30-brief-fence-discipline.md |
@@ -26,7 +33,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-18 | BRF-PERIMETER-RUNNER | open | The perimeter runner — the tuning recipes and their artifacts leave the task runner | 2026-09-18-brief-perimeter-runner.md |
 | 2026-09-18 | BRF-PERIMETER-SILO | open | The perimeter silo — the speech doctrine and its records leave okuda | 2026-09-18-brief-perimeter-silo.md |
 | 2026-09-17 | BRF-BM25-EVALUATION | open | Benchmark Local BM25 Against Ripgrep and AST Traversal Over Markdown SSOT | 2026-09-17-brief-bm25-evaluation.md |
-| 2026-09-16 | BRF-MATH-GLYPHS | open | The Math Glyph Pass — inline LaTeX to Unicode, closed vocabulary, corpus-gated | 2026-09-16-brief-math-glyphs.md |
+| 2026-09-16 | BRF-MATH-GLYPHS | done | The Math Glyph Pass — inline LaTeX to Unicode, closed vocabulary, corpus-gated | 2026-09-16-brief-math-glyphs.md |
 | 2026-09-15 | BRF-CALLSIGN-EVERY-DOC | open | A callsign for every document — the name and the address are orthogonal | 2026-09-15-brief-callsign-every-document.md |
 | 2026-09-15 | BRF-SPOKEN-BLOCK-GRAMMAR | open | The spoken block grammar — announce the kind, enumerate the elements, never elide silently | 2026-09-15-brief-spoken-block-grammar.md |
 | 2026-09-14 | BRF-ADDRESS-CAP | open | The address cap — the invariant is the destination | 2026-09-14-brief-address-cap.md |

@@ -55,7 +55,7 @@
 {"file":"2026-09-14-brief-speech-stride.md","date":"2026-09-14","status":"open","summary":"The speech stride — the arrows given to the ear, the unit heard","meta":{},"callsign":"BRF-SPEECH-STRIDE"}
 {"file":"2026-09-15-brief-callsign-every-document.md","date":"2026-09-15","status":"open","summary":"A callsign for every document — the name and the address are orthogonal","meta":{},"callsign":"BRF-CALLSIGN-EVERY-DOC"}
 {"file":"2026-09-15-brief-spoken-block-grammar.md","date":"2026-09-15","status":"open","summary":"The spoken block grammar — announce the kind, enumerate the elements, never elide silently","meta":{},"callsign":"BRF-SPOKEN-BLOCK-GRAMMAR"}
-{"file":"2026-09-16-brief-math-glyphs.md","date":"2026-09-16","status":"open","summary":"The Math Glyph Pass — inline LaTeX to Unicode, closed vocabulary, corpus-gated","meta":{},"callsign":"BRF-MATH-GLYPHS"}
+{"file":"2026-09-16-brief-math-glyphs.md","date":"2026-09-16","status":"done","summary":"The Math Glyph Pass — inline LaTeX to Unicode, closed vocabulary, corpus-gated","meta":{},"callsign":"BRF-MATH-GLYPHS"}
 {"file":"2026-09-17-brief-bm25-evaluation.md","date":"2026-09-17","status":"open","summary":"Benchmark Local BM25 Against Ripgrep and AST Traversal Over Markdown SSOT","meta":{},"callsign":"BRF-BM25-EVALUATION"}
 {"file":"2026-09-18-brief-glyph-lead.md","date":"2026-09-18","status":"open","summary":"The state glyph is emitted twice on a list lead","meta":{},"callsign":"BRF-GLYPH-LEAD"}
 {"file":"2026-09-18-brief-perimeter-gate.md","date":"2026-09-18","status":"open","summary":"The perimeter gate — the moira group holds only recipes that invoke okuda","meta":{},"callsign":"BRF-PERIMETER-GATE"}
@@ -73,3 +73,10 @@
 {"file":"2026-09-30-brief-terminal-cell-grid.md","date":"2026-09-30","status":"parked","summary":"2D Terminal Cell Grid Architecture (parked)","meta":{},"callsign":"BRF-TERMINAL-CELL-GRID"}
 {"file":"2026-10-01-brief-reading-fraction.md","date":"2026-10-01","status":"open","summary":"The reading fraction — a meter for the glass, from the state the glass already holds","meta":{},"callsign":"BRF-READING-FRACTION"}
 {"file":"2026-10-02-brief-demo-sandbox.md","date":"2026-10-02","status":"open","summary":"The public demo room — two access modes, one sandbox grammar","meta":{},"callsign":"BRF-DEMO-SANDBOX"}
+{"file":"2026-10-03-brief-diagram-describe.md","date":"2026-10-03","status":"open","summary":"Prose descriptions of mermaid diagrams via an external binary — diagram source in, markdown prose out (BRF-DIAGRAM-DESCRIBE)","meta":{},"callsign":"BRF-DIAGRAM-DESCRIBE"}
+{"file":"2026-10-03-brief-doc-search-fermata.md","date":"2026-10-03","status":"open","summary":"The doc→search fermata — a held frame at the reading/searching boundary (BRF-DOC-SEARCH-FERMATA)","meta":{},"callsign":"BRF-DOC-SEARCH-FERMATA"}
+{"file":"2026-10-03-brief-heading-ansi-strip.md","date":"2026-10-03","status":"done","summary":"Strip ANSI from heading children — the heading role owns every byte of colour","meta":{},"callsign":"BRF-HEADING-ANSI-STRIP"}
+{"file":"2026-10-04-brief-sticky-heading-stepper.md","date":"2026-10-04","status":"open","summary":"The sticky-heading pager — step through a document section by section, heading as anchor, never truncate (BRF-STICKY-HEADING-STEPPER)","meta":{},"callsign":"BRF-STICKY-HEADING-STEPPER"}
+{"file":"2026-10-05-brief-ast-to-prosody-unsloth.md","date":"2026-10-05","status":"open","summary":"AST-to-Prosody Intermediate Representation for Speech Rendering","meta":{},"callsign":"BRF-AST-PROSODY"}
+{"file":"2026-10-06-brief-kindle-porch.md","date":"2026-10-06","status":"open","summary":"The Kindle porch — the silo on an e-ink glass, over ssh, nothing on the device","meta":{},"callsign":"BRF-KINDLE-PORCH"}
+{"file":"2026-10-07-brief-table-allocator-ladder.md","date":"2026-10-07","status":"open","summary":"The band and the ladder — the table fit, from a design width of 80","meta":{},"callsign":"BRF-TABLE-LADDER"}
