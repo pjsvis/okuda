@@ -725,4 +725,19 @@ describe("tui — resolveJumpTarget containment (BRF-ROOT-CONTAINMENT)", () => {
       cleanup();
     }
   });
+
+  test("the first frame renders at the live glass, not the exec-time fallback", async () => {
+    // Regression guard for a dogfood find (2026-10-07): the initial frame was
+    // rendered at `opts.width` — the non-TTY fallback, sampled once at exec —
+    // while every repaint used `dims().cols`. A pane sized after launch therefore
+    // opened a column wide and the TERMINAL soft-wrapped the elided code fences,
+    // pushing their `…` onto the next line until a SIGWINCH re-rendered at the
+    // true width. The fix is one width source; this asserts there is still one,
+    // because the bug is invisible from a pipe and only a later frame shows it.
+    const src = await Bun.file(new URL("../src/tui.ts", import.meta.url)).text();
+    const first = src.slice(src.indexOf("const initialRender"), src.indexOf("gateFetch(null"));
+    expect(first).toContain("dims().cols");
+    expect(first).not.toContain("opts.width");
+    expect(src.match(/const dims = \(\) => \(\{/g)?.length ?? 0).toBe(1);
+  });
 });

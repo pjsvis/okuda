@@ -595,6 +595,21 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     return out.split("\n");
   };
 
+  /** The glass's live geometry — the ONE width source. The initial frame reads
+   *  this as well as every repaint. A first frame rendered at a width sampled at
+   *  exec is a frame the terminal soft-wraps, which is the one thing okuda never
+   *  does to itself (ADR-004, ADR-UNIVERSAL-ELISION-050). Found by dogfood: the
+   *  showcase's elided code fences wrapped their markers onto the next line
+   *  until a SIGWINCH re-rendered at the true width, because this function was
+   *  defined after the first render and that render used `opts.width` — the
+   *  non-TTY fallback — in a TTY. */
+  const dims = () => ({
+    // terminalCols/Rows handle the Bun --compile columns=0 bug (tput fallback);
+    // opts.width/rows are the caller's fallbacks for the non-TTY case.
+    rows: terminalRows(opts.rows || 24),
+    cols: terminalCols(opts.width || 80),
+  });
+
   // Enter the alt-screen *before* the first read+render: the file fetch and
   // the markdown render are async, and doing them in the primary screen
   // flashes the user's shell scrollback for a frame (the FUT — flash of
@@ -635,7 +650,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   const initialRender = initialFetch.ok
     ? await renderLines(
         appendReferences(annotateSource(initialFetch.text, mainJumps), mainJumps),
-        opts.width,
+        dims().cols,
       )
     : [];
   const init = gateFetch(null, initialFetch, initialRender);
@@ -735,13 +750,6 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     Bun.spawn([spec.cmd, ...spec.args], { stdin: "ignore", stdout: "ignore", stderr: "ignore" });
     flash(`cloned: ${basename(doc)}`, "state-ok");
   };
-
-  const dims = () => ({
-    // terminalCols/Rows handle the Bun --compile columns=0 bug (tput fallback);
-    // opts.width/rows are the caller's fallbacks for the non-TTY case.
-    rows: terminalRows(opts.rows || 24),
-    cols: terminalCols(opts.width || 80),
-  });
 
   const paint = (): void => {
     const { rows, cols } = dims();
