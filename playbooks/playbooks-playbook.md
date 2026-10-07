@@ -44,12 +44,23 @@ they run in, who owns each step, and what goes wrong at it.
   written: the brief becomes a post-hoc rationalisation of code that exists.
 - **Decide** — `playbooks/decisions-playbook.md`. **Written at the end, from
   memory.** The failure that makes a record stale, and the one that happens.
-- **Build** — two logical changes in one commit.
+- **Build** — two logical changes in one commit, or one that lands at the end:
+  a tidy accumulated across a session is a tidy whose diff nobody reads.
 - **Verify** — the instrument that measures the claim. A claim verified by
   reading the code back is not verified.
 - **Close** — `playbooks/debriefs-playbook.md`, then
   `playbooks/registry-playbook.md`. The brief stays in `briefs/` after it lands,
   and the open list becomes a graveyard.
+
+**Tidy first, in prose.** Separate the structural change from the behavioural one
+and land it first — the tier table hoisted to one owner changes no rule, the
+evidence rule adds one. But the correspondence with code is loose, and it is
+looser in one direction that matters: a refactor in code is proved
+behaviour-preserving by a passing test, while a playbook has no oracle at all,
+so its structural claim rests on a reader. A 200-line move buries the next
+sentence that actually changes how someone works. Commit the structural step as
+it lands — do not accumulate, because the diff is the only review a document
+ever gets.
 
 A list rather than a table on purpose: a path is 25 columns where a basename was
 15, and at 80 columns the table's failure column — the only column carrying new
