@@ -1501,117 +1501,40 @@ function renderTable(t: TableState, ctx: Ctx): string {
   // reference ruler" must not hold thirty-five columns open for three characters
   // of data. 143 of the corpus's 1038 columns were sized by their label.
   const bodyNat = new Array<number>(cols).fill(0);
-  const headNat = new Array<number>(cols).fill(0);
   const headWord = new Array<number>(cols).fill(0);
-  const wordWidth = new Array<number>(cols).fill(0);
   const longestWord = (text: string, into: number[], i: number): void => {
     for (const word of stripANSI(text).split(/\s+/)) {
       into[i] = Math.max(into[i]!, displayWidth(word));
     }
   };
-  header.forEach((cell, i) => {
-    const text = cell?.text ?? "";
-    headNat[i] = displayWidth(text);
-    longestWord(text, headWord, i);
-    longestWord(text, wordWidth, i);
-  });
+  header.forEach((cell, i) => longestWord(cell?.text ?? "", headWord, i));
   for (const r of rows) {
     r.forEach((cell, i) => {
-      const text = cell?.text ?? "";
-      bodyNat[i] = Math.max(bodyNat[i]!, displayWidth(text));
-      longestWord(text, wordWidth, i);
+      bodyNat[i] = Math.max(bodyNat[i]!, displayWidth(cell?.text ?? ""));
     });
   }
-  // The width a column is allocated against. `wordWidth` is the elision floor
-  // (see the ladder below); it is never above this, because a body cell that is
-  // one long word sets both.
+  // The AUTHOR's column widths, and nothing below adjusts them. A column is as wide
+  // as its body needs, with the header contributing only its longest word — a header
+  // may be three lines tall, so a label like "lines over 80 by the reference ruler"
+  // must not hold thirty-five columns open for three characters of data.
   const colWidth = bodyNat.map((n, i) => Math.max(n, headWord[i]!));
 
   const gutter = 3;
-  let total = colWidth.reduce((a, b) => a + b, 0) + gutter * (cols - 1);
 
-  // The band's cap — a table is never drawn wider than 120 columns, whatever
-  // the glass offers (BRF-TABLE-LADDER).
+  // The band's cap: a table is never drawn wider than 120 columns, whatever the
+  // glass offers (BRF-TABLE-LADDER), and this is the width the drawn lines are cut
+  // to.
   const target = Math.min(width, BAND_CONTENT);
 
-  // Fit the target — never overflow; cells over budget ELIDE, never wrap
-  // (ADR-UNIVERSAL-ELISION-050). The allocation is the ladder (BRF-TABLE-LADDER):
-  //
-  //   floor[k] = longest word    at or above it the leading word survives whole;
-  //                              below it that word is cut too
-  //   complete cheapest-first    a column paid in full renders whole; a partial
-  //                              gift still elides, so nothing is spent on one
-  //   remainder above the floor  the proportional sharing survives — the floor
-  //                              is the protection, the ratio is what to do with
-  //                              what is left
-  //
-  // Glamour's ladder stops at the median and grows the narrowest column first,
-  // because glamour wraps and a wider column is always an improvement. Under
-  // elision an uncompleted column gains nothing from a partial gift, so the
-  // objective is completion. Same staging, different objective function.
-  if (total > target && cols > 0) {
-    const budget = target - gutter * (cols - 1);
-    const natural = colWidth.slice();
-    const floor = natural.map((n, i) => Math.min(n, wordWidth[i]!));
-    const floorSum = floor.reduce((a, b) => a + b, 0);
-
-    if (floorSum > budget) {
-      // Irreducible: no allocation holds every word, so the document is at fault
-      // rather than the allocator. Fall back to the 3-character floor and
-      // proportional sharing — the behaviour this ladder replaces — and let the
-      // instrument's `irreducible` reading name the table.
-      const sum = natural.reduce((a, b) => a + b, 0);
-      const baseSum = 3 * cols;
-      if (budget >= baseSum) {
-        colWidth.forEach((w, i) => {
-          const above = Math.max(0, w - 3);
-          colWidth[i] = Math.min(
-            w,
-            3 + Math.floor(((budget - baseSum) * above) / Math.max(1, sum - baseSum)),
-          );
-        });
-      }
-    } else {
-      const slot = floor.slice();
-      // Ascending need: the cheapest completion first buys the most whole
-      // columns for the budget, and a partial buys nothing legible.
-      const order = natural
-        .map((_, i) => i)
-        .sort((a, b) => (natural[a]! - slot[a]!) - (natural[b]! - slot[b]!));
-      let spent = floorSum;
-      for (const i of order) {
-        const need = natural[i]! - slot[i]!;
-        if (need > 0 && spent + need <= budget) {
-          slot[i] = natural[i]!;
-          spent += need;
-        }
-      }
-      // The remainder above the floor, shared proportionally to what each column
-      // still needs — then the rounding residue handed to the largest need,
-      // because a character left unspent is one the table lost for nothing.
-      const rem = budget - spent;
-      const needSum = natural.reduce((a, n, i) => a + Math.max(0, n - slot[i]!), 0);
-      if (rem > 0 && needSum > 0) {
-        natural.forEach((n, i) => {
-          const need = Math.max(0, n - slot[i]!);
-          if (need > 0) slot[i] = slot[i]! + Math.floor((rem * need) / needSum);
-        });
-        let residue = budget - slot.reduce((a, b) => a + b, 0);
-        for (const i of [...order].reverse()) {
-          if (residue <= 0) break;
-          const need = natural[i]! - slot[i]!;
-          if (need <= 0) continue;
-          const give = Math.min(need, residue);
-          slot[i] = slot[i]! + give;
-          residue -= give;
-        }
-      }
-      colWidth.forEach((_, i) => {
-        colWidth[i] = Math.min(natural[i]!, slot[i]!);
-      });
-    }
-    total = colWidth.reduce((a, b) => a + b, 0) + gutter * (cols - 1);
-  }
+  // The EDGE CUT (ADR-TABLE-EDGE-CUT-055). The table renders at the author's widths
+  // and is never squeezed: when the glass is narrower than the table, the composed
+  // LINE is elided at the content budget with `…` at the cut — the same policy a
+  // diagram line gets, so the visible prefix stays a proper table with aligned
+  // columns and the tail falls off one edge. This replaced the ladder, which asked
+  // "how do I make this fit" of an artefact that was written down and cannot be
+  // elided; the ladder's own measurements are the evidence for its removal.
+  const cut = (line: string): string =>
+    displayWidth(line) > target ? elideToWidth(line, target) : line;
 
   const sep = ` ${styler.tablePipe()} `;
   const bodySep = " ".repeat(gutter);
@@ -1631,16 +1554,17 @@ function renderTable(t: TableState, ctx: Ctx): string {
       const wrapped = slot > 0 && displayWidth(c.text) > slot
         ? wrapANSI(text, { width: slot })
         : [text];
-      // A word longer than the slot cannot be wrapped, so padCell elides it —
-      // that is the irreducible case, and the instrument names it.
-      return wrapped.map((l) => padCell({ text: l, align: c.align }, 0, [slot]));
+      // The slot is at least the column's longest word, so a wrapped line always
+      // fits it: a header pads, never cuts.
+      return wrapped.map((l) => padNatural({ text: l, align: c.align }, 0, [slot]));
     });
     headHeight = Math.max(1, ...headLines.map((l) => l.length));
     for (let k = 0; k < headHeight; k++) {
       // Every line of the header block carries the column separators, so the grid
-      // survives a label three lines tall.
+      // survives a label three lines tall — and the composed line is then cut at
+      // the glass like every other line in the table.
       drawn.push(
-        headLines.map((l, i) => l[k] ?? " ".repeat(colWidth[i]!)).join(sep),
+        cut(headLines.map((l, i) => l[k] ?? " ".repeat(colWidth[i]!)).join(sep).replace(/[ ]+$/, "")),
       );
     }
   }
@@ -1657,9 +1581,13 @@ function renderTable(t: TableState, ctx: Ctx): string {
       const cell: Cell = i === 0
         ? { text: styler.roleBold("table-key", r[0]?.text ?? ""), align: r[0]?.align }
         : { text: styled, align: r[i]?.align };
-      cells.push(padCell(cell, i, colWidth));
+      cells.push(padNatural(cell, i, colWidth));
     }
-    drawn.push(cells.join(bodySep));
+    // The row is composed at the author's widths and cut at the glass — never
+    // squeezed, so the cells that fit are whole. Trailing pad is trimmed FIRST: a
+    // cut that lands in a row's own padding would put a `…` on the glass claiming a
+    // loss that did not happen.
+    drawn.push(cut(cells.join(bodySep).replace(/[ ]+$/, "")));
   }
   // Trailing pad spaces are ours, not content — trim per line BEFORE measuring,
   // so the rule brackets what is actually drawn and not what was padded.
@@ -1787,22 +1715,19 @@ function renderMenuTable(t: TableState, ctx: Ctx): string {
   return trimmed.join("\n\n") + "\n\n";
 }
 
-/** Pad a cell to its column width — one line, elided at the budget
- *  when over (ADR-UNIVERSAL-ELISION-050): the in-cell wrap is
- *  abolished, rows are single-line by construction. Colour is applied
- *  by the caller; elideToWidth is ANSI-run-aware and closes open
- *  styles before the marker, so coloured-then-cut cells stay honest at
- *  the cut. */
-function padCell(c: Cell, i: number, colWidth: number[]): string {
+/** Pad or align a cell to its column width. It never elides: under
+ *  ADR-TABLE-EDGE-CUT-055 a table is composed at the author's widths and the
+ *  composed LINE is cut at the glass, so a cell is only ever padded. Colour is
+ *  applied by the caller; elision is `cut`'s job, at the edge. */
+function padNatural(c: Cell, i: number, colWidth: number[]): string {
   const w = colWidth[i]!;
-  const raw = displayWidth(c.text) > w ? elideToWidth(c.text, w) : c.text;
   switch (c.align) {
     case "right":
-      return padStartDisplay(raw, w);
+      return padStartDisplay(c.text, w);
     case "center":
-      return padCenterDisplay(raw, w);
+      return padCenterDisplay(c.text, w);
     default:
-      return padDisplay(raw, w);
+      return padDisplay(c.text, w);
   }
 }
 

@@ -217,12 +217,18 @@ index tables (a `reg-sync` change, tracked as its own issue).
        widths (371 columns at 200 versus 320 at 120) until it read the band.
        Noted cost, pending the wrap: past 120 columns a table with a natural
        width between 116 and the glass now elides where it used to sprawl.
-2. [x] **Landed 2026-10-07.** The ladder is in, and the objective change is
-       measured: starved columns at 80 went **489 → 192** (−61%, elided cells
-       3053 → 1812), and at 120 **320 → 111** (−65%, 1889 → 1045). The pilot that
-       started this — `Element │ Channel │ Role │ Hex` squeezed to `Eleme… │
-       struct… │ purple b… │ #bd9…` — now renders every key column whole at 80,
-       and the whole table at 120. One deviation from the design, above.
+2. [x] **Landed 2026-10-07 — then retired the same day.** The ladder is in, and the
+       objective change is measured: starved columns at 80 went **489 → 192** (−61%,
+       elided cells 3053 → 1812), and at 120 **320 → 111** (−65%, 1889 → 1045). The
+       pilot that started this — `Element │ Channel │ Role │ Hex` squeezed to `Eleme…
+       │ struct… │ purple b… │ #bd9…` — rendered every key column whole at 80. One
+       deviation from the design, above.
+       **Retired the same day by ADR-TABLE-EDGE-CUT-055:** the ladder answered *how do
+       I make this table fit* for an artefact that was written down and cannot be
+       elided. The edge cut reaches the same visible table without the arithmetic —
+       639 tests passed unchanged through the removal, which is the measurement
+       confirming itself — and these figures are now the evidence for retiring it,
+       not the case for keeping it.
 3. [x] **Headers landed 2026-10-07.** Labels cut went **129 → 0** at 80 columns and
        53 → 0 at 120. Starved columns 192 → 172, elided cells 1812 → 1483. The
        classifier now reads the body with the header floored at its longest word,
@@ -232,7 +238,11 @@ index tables (a `reg-sync` change, tracked as its own issue).
        header's consecutive lines as a cut: four tables with no allocator fault
        were reported as cut until the detector learned that a header is a block.
        The prose column is what remains.
-4. [ ] Tests: one unit vector per branch (design / matrix / irreducible / prose)
+4. [ ] ~~Tests: one unit vector per branch (design / matrix / irreducible / prose)~~
+       **Cancelled by ADR-TABLE-EDGE-CUT-055.** The branches do not exist any more:
+       with one overflow policy there is nothing to branch on. What the edge cut owes
+       instead is the cut's own vector — the row line elided at the budget, the marker
+       only where content was lost — which is one test, not four.
        and the shape classifier. The instrument is the integration test.
 5. [ ] Dogfood `just tables` at 80 and 120, and `just tables-monster`, against
        `docs/tables.md` and `&briefs.md`.
