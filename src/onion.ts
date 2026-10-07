@@ -115,13 +115,43 @@ export function routeQuery(query: string): RoutedQuery {
 
 /** Match one predicate against one path. `date` matches the FILENAME
  *  (docs/2026-08-26-…md carries its date in the slug); `dir` is a
- *  path prefix (briefs/ owns briefs/*). Pure. */
+ *  path prefix (briefs/ owns briefs/*). **Dir matching is
+ *  case-insensitive** (2026-10-05): the content channels have always
+ *  been (`rg -i`), the path layer was not, so `tradingagents/` missed
+ *  `TradingAgents/` while `trading agents` found it in the body — one
+ *  search, two answers. A directory's casing is not the reader's
+ *  business. On a case-sensitive filesystem two directories differing
+ *  only in case both match, which is the honest reading of a search.
+ *  Pure. */
 export function matchPathPredicate(pred: PathPredicate, path: string): boolean {
   if (pred.kind === "date") {
     const name = path.slice(path.lastIndexOf("/") + 1);
     return name.includes(pred.date);
   }
-  return path.startsWith(`${pred.dir}/`);
+  return path.toLowerCase().startsWith(`${pred.dir.toLowerCase()}/`);
+}
+
+/** The date a path carries in its basename (`YYYY-MM` or `YYYY-MM-DD`),
+ *  or null. ISO prefixes compare correctly as strings, so a day beats
+ *  its month (`2026-10-05` > `2026-09`) and no date parsing is needed.
+ *  Pure. */
+export function pathDate(path: string): string | null {
+  const base = path.slice(path.lastIndexOf("/") + 1);
+  return base.match(/\d{4}-\d{2}(?:-\d{2})?/)?.[0] ?? null;
+}
+
+/** Recency order within a channel (ADR-SEARCH-RECENCY-053): rows whose
+ *  basename carries a date come first, newest first; undated rows
+ *  follow in the order the channel produced them — the canonical ASCII
+ *  collation, unchanged, which is why `AGENTS.md` still leads the file
+ *  list. Stable, so equal dates keep their channel order: this refines
+ *  the rank, it never re-derives it. Pure. */
+export function orderByRecency(hits: ChannelHit[]): ChannelHit[] {
+  const dateOf = (h: ChannelHit): string => pathDate(h.path) ?? "";
+  const dated = hits.filter((h) => dateOf(h) !== "");
+  const undated = hits.filter((h) => dateOf(h) === "");
+  dated.sort((a, b) => (dateOf(a) < dateOf(b) ? 1 : dateOf(a) > dateOf(b) ? -1 : 0));
+  return [...dated, ...undated];
 }
 
 /** Layer 1 — narrow the candidate set in memory. Dates AND globally
@@ -140,7 +170,8 @@ export function applyPathPredicates(
   const dateOk = (p: string): boolean => dates.every((d) => basename(p).includes(d));
   const negated = (p: string): boolean => negations.some((n) => matchPathPredicate(n, p));
   const dirOk = (p: string): boolean =>
-    clauses.length === 0 || clauses.some((c) => c.dirs.every((d) => p.startsWith(`${d}/`)));
+    clauses.length === 0 ||
+    clauses.some((c) => c.dirs.every((d) => p.toLowerCase().startsWith(`${d.toLowerCase()}/`)));
   return candidates.filter((p) => dateOk(p) && !negated(p) && dirOk(p));
 }
 
@@ -171,8 +202,12 @@ export interface OnionDeps {
 /** Layers 2-4: the ranked merge over the survivors. Registry before
  *  body before remainder; the first channel to find a path carries
  *  its evidence; the dive suppresses root files (the shelf owns them);
- *  content negations remove a path from every channel. Pure given
- *  deps — the ranking is the composition, the deps are the edges. */
+ *  content negations remove a path from every channel. The rank is
+ *  authoritative (BRF-JUMP-LIST, defect 2) and recency orders *within*
+ *  each channel without touching the channel order itself — newest
+ *  first among dated rows, canonical collation for the rest
+ *  (ADR-SEARCH-RECENCY-053). Pure given deps — the ranking is the
+ *  composition, the deps are the edges. */
 export function onionMerge(candidates: string[], routed: RoutedQuery, deps: OnionDeps): ChannelHit[] {
   const survivors = applyPathPredicates(candidates, routed.clauses, routed.dates, routed.pathNegations);
   const survivorSet = new Set(survivors);
@@ -201,5 +236,9 @@ export function onionMerge(candidates: string[], routed: RoutedQuery, deps: Onio
   const remainder: ChannelHit[] = survivors
     .filter((p) => !isRoot(p) && !excluded.has(p) && !seen.has(p))
     .map((p) => ({ path: p, evidence: "" }));
-  return [...registry, ...body, ...remainder];
+  return [
+    ...orderByRecency(registry),
+    ...orderByRecency(body),
+    ...orderByRecency(remainder),
+  ];
 }

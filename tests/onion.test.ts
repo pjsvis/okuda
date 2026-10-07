@@ -3,11 +3,18 @@ import {
   applyPathPredicates,
   matchPathPredicate,
   onionMerge,
+  orderByRecency,
+  pathDate,
   routeQuery,
   type ChannelHit,
   type OnionDeps,
   type PathPredicate,
 } from "../src/onion";
+
+/** Layer-0/no-channel deps: every survivor lands in the remainder. */
+function emptyDeps(): OnionDeps {
+  return { registryHitsFor: () => [], bodyHitsFor: () => [], contentMentions: () => [] };
+}
 
 /** The synthetic corpus — every layer property is testable without
  *  rg, fs, or the real silo. Dates in slugs, five tiers, one root. */
@@ -228,8 +235,16 @@ describe("onion — onionMerge (Layers 2-4: channels over survivors only)", () =
       body: ["docs/2026-08-20-doc-alpha.md", "playbooks/authoring-playbook.md"],
     });
     const out = onionMerge(CORPUS, routeQuery("alpha"), deps);
-    const paths = out.map((h) => h.path);
-    expect(paths.indexOf("decisions/001-adr-alpha.md")).toBeLessThan(paths.indexOf("docs/2026-08-20-doc-alpha.md"));
+    // The invariant is the CHANNEL BLOCKS, in order — asserted as blocks,
+    // not as index arithmetic between two rows, because recency orders
+    // *within* a block (ADR-SEARCH-RECENCY-053) and the old index
+    // comparison silently depended on the input order inside it.
+    const blockOf = (e: string): number => (e.startsWith("reg(") ? 1 : e.startsWith("body(") ? 2 : 3);
+    const blocks = out.map((h) => blockOf(h.evidence));
+    expect(blocks).toEqual([...blocks].sort((a, b) => a - b)); // never out of order
+    expect(blocks).toContain(1);
+    expect(blocks).toContain(2);
+    expect(blocks).toContain(3);
     // A doc found by both channels: one row, the registry's evidence.
     const twice = out.filter((h) => h.path === "docs/2026-08-20-doc-alpha.md");
     expect(twice.length).toBe(1);
@@ -291,6 +306,96 @@ describe("onion — onionMerge (Layers 2-4: channels over survivors only)", () =
 });
 
 /** ChannelHit re-exported shape sanity (the entries contract). */
+describe("onion — the two 2026-10-05 refinements (ADR-SEARCH-RECENCY-053)", () => {
+  const corpus = [
+    "TradingAgents/README.md",
+    "TradingAgents/src/deep.md",
+    "briefs/2026-08-20-brief-old.md",
+    "briefs/2026-10-05-brief-new.md",
+    "briefs/2026-09-16-brief-mid.md",
+    "docs/2026-10-05-a-note.md",
+    "AGENTS.md",
+    "README.md",
+  ];
+
+  test("dir predicates are case-insensitive — the casing is not the reader's business", () => {
+    const lower = matchPathPredicate({ kind: "dir", dir: "tradingagents" }, "TradingAgents/README.md");
+    expect(lower).toBe(true);
+    expect(matchPathPredicate({ kind: "dir", dir: "TRADINGAGENTS" }, "TradingAgents/README.md")).toBe(true);
+    expect(matchPathPredicate({ kind: "dir", dir: "TradingAgents" }, "TradingAgents/README.md")).toBe(true);
+    // Not a prefix match either way — the boundary is still a path segment.
+    expect(matchPathPredicate({ kind: "dir", dir: "trading" }, "TradingAgents/README.md")).toBe(false);
+  });
+
+  test("the clause filter agrees with the predicate — one rule, both call sites", () => {
+    const out = applyPathPredicates(corpus, [{ dirs: ["tradingagents"] }], [], []);
+    expect(out).toEqual(["TradingAgents/README.md", "TradingAgents/src/deep.md"]);
+    const routed = routeQuery("tradingagents/");
+    expect(applyPathPredicates(corpus, routed.clauses, routed.dates, routed.pathNegations)).toEqual(out);
+  });
+
+  test("a negated dir is case-insensitive too — exclusion is exclusion", () => {
+    const out = applyPathPredicates(corpus, [], [], [{ kind: "dir", dir: "tradingagents" }]);
+    expect(out).not.toContain("TradingAgents/README.md");
+    expect(out).toContain("briefs/2026-08-20-brief-old.md");
+  });
+
+  test("dated rows come first, newest first; undated rows keep canonical order", () => {
+    const merged = onionMerge(corpus, routeQuery("briefs/"), emptyDeps());
+    expect(merged.map((h) => h.path)).toEqual([
+      "briefs/2026-10-05-brief-new.md",
+      "briefs/2026-09-16-brief-mid.md",
+      "briefs/2026-08-20-brief-old.md",
+    ]);
+    // Undated, unfiltered: the collation is untouched, and equal dates keep
+    // their input order (the sort is stable).
+    const all = onionMerge(corpus, routeQuery("nothing-matches"), emptyDeps());
+    expect(all.map((h) => h.path)).toEqual([
+      "briefs/2026-10-05-brief-new.md",
+      "docs/2026-10-05-a-note.md",
+      "briefs/2026-09-16-brief-mid.md",
+      "briefs/2026-08-20-brief-old.md",
+      "TradingAgents/README.md",
+      "TradingAgents/src/deep.md",
+    ]);
+  });
+
+  test("recency orders WITHIN a channel; the channel rank is authoritative", () => {
+    // A registry hit older than a body hit still leads: rank first, recency second.
+    const deps: OnionDeps = {
+      registryHitsFor: () => [{ path: "briefs/2026-08-20-brief-old.md", evidence: "BRF-OLD — x" }],
+      bodyHitsFor: () => [
+        { path: "briefs/2026-10-05-brief-new.md", evidence: "new line" },
+        { path: "briefs/2026-09-16-brief-mid.md", evidence: "mid line" },
+      ],
+      contentMentions: () => [],
+    };
+    const merged = onionMerge(corpus, routeQuery("briefs/ x"), deps);
+    expect(merged.map((h) => h.path)).toEqual([
+      "briefs/2026-08-20-brief-old.md", // channel 1, however old
+      "briefs/2026-10-05-brief-new.md", // channel 2, newest first
+      "briefs/2026-09-16-brief-mid.md",
+    ]);
+  });
+
+  test("pathDate: ISO prefixes compare correctly, day over month, else null", () => {
+    expect(pathDate("briefs/2026-10-05-brief-x.md")).toBe("2026-10-05");
+    expect(pathDate("docs/2026-09-note.md")).toBe("2026-09");
+    expect(pathDate("src/onion.ts")).toBeNull();
+    expect(orderByRecency([
+      { path: "a/2026-09-note.md", evidence: "" },
+      { path: "a/2026-10-05-x.md", evidence: "" },
+      { path: "a/2026-08-20-y.md", evidence: "" },
+      { path: "a/AGENTS.md", evidence: "" },
+    ]).map((h) => h.path)).toEqual([
+      "a/2026-10-05-x.md",
+      "a/2026-09-note.md",
+      "a/2026-08-20-y.md",
+      "a/AGENTS.md",
+    ]);
+  });
+});
+
 describe("onion — ChannelHit shape", () => {
   test("evidence is a plain string field (launcher clips at the edge)", () => {
     const hit: ChannelHit = { path: "x.md", evidence: "" };
