@@ -5,12 +5,58 @@ callsign: BRF-MATH-GLYPHS
 
 # Brief: The Math Glyph Pass — inline LaTeX to Unicode, closed vocabulary, corpus-gated
 
-**Status:** Draft
+**Status:** Done
+**Landed:** 2026-10-05, with two deviations from the spec — both forced by
+measurement, both recorded in the landing record below.
 **Date:** 2026-09-16
+**TD:** the math-glyph task — filed and closed 2026-10-05 (IDs stay in the
+ephemeral ledger; the callsign is the citation, per the td playbook)
 **Origin:** Operator observation — `$\Delta t$` and friends render as
 literal LaTeX source in the terminal. All examples were recognised on
 sight: the corpus has been speaking math okuda never listened to.
 **Predecessor:** none
+
+---
+
+## Landing record (2026-10-05)
+
+**What landed.** `mathGlyphs` + `applyMathGlyphs` in `src/render.ts`: the
+closed vocabulary of 17 entries, the all-or-nothing gate, the currency
+guard, and 14 tests (`tests/math-glyphs.test.ts`). Corpus-verified
+against `docs/2026-09-08-actuator-noise.md` (`$5 \rightarrow 5 \rightarrow 5$`
+→ `5 → 5 → 5`, `$120\text{ ms}$` → `120 ms`) and
+`docs/2026-08-29-tfs-exclusion-principle.md` (`$\rightarrow$` → `→`).
+
+**Deviation 1 — the pass runs on the source, not in the `text` handler.**
+The brief's placement rested on a premise that is false on bun 1.4.0:
+*"Code fences and code spans route through their own handlers and never
+see it."* A probe (`tmp/probe5.ts`) shows the opposite — fenced content
+is delivered to `text` (`text: "$\Delta t$ fence"`) and then to `code`,
+and codespan content likewise reaches `text` before `codespan`. A
+handler-level pass therefore translates inside code no matter where it
+is placed, and the acceptance criterion that code stays untouched cannot
+be met from there. The pass now runs as **pre-pass 2.5** on the source,
+with a fence state machine and a backtick split for the two exemptions —
+structural rather than hopeful. One function, one call site, and the
+`text` handler is left exactly as it was.
+
+**Deviation 2 — the terminator space.** The brief's first acceptance
+example (`$\Delta t$` → `Δt`) and another (`$\le 10$` → `≤ 10`) encode a
+distinction the brief does not name: in LaTeX the space after a command
+name is a *terminator* and is swallowed by the compiler, so `\Delta t`
+is Δ·t (two glyphs, no space), while `\le 10` reads as a relation with
+its space. A uniform rule produces either `Δ t` (the first naive
+implementation) or `≤10`. The vocabulary therefore carries a `spaced`
+property: relations and operators (`\le`, `\ge`, `\neq`, `\in`, `\to`,
+`\rightarrow`, `\times`) keep their trailing space; every other command
+is a glyph and its trailing space is dropped when an operand character
+follows. Both examples pass, and so do the corpus's
+`$W \times H$` → `W × H` and `$\alpha \in [0.2, 1.2]$` → `α ∈ [0.2, 1.2]`.
+
+**Not done, deliberately.** Display math, superscripts, and any LaTeX
+engine — as scoped. `$\zeta$` (two corpus uses) stays literal by the
+gate, which is the gate working.
+
 
 ---
 

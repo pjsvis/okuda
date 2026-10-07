@@ -1,5 +1,16 @@
 ### GLoam Architecture & Accessibility Master Summary
 
+> **Correction, 2026-10-05.** This summary claims that screen readers and
+> braille displays "ingest pure serial data directly from the terminal
+> buffer". That holds for the **streaming** path — measured across 427
+> tracked documents: 5,420,614 bytes, 149,123 SGR sequences, **zero non-SGR
+> CSI, zero OSC**, i.e. nothing positional at all. It does **not** hold for
+> the **interactive** mode, which enters the alternate screen, repaints a
+> whole frame per keystroke, and hides a half-typed digit from the reader.
+> No assistive-technology testing has been done in either direction; this
+> file is a design argument, not evidence. See
+> `docs/2026-10-06-the-shared-artifact.md` (limits, and the open question).
+
 ---
 
 #### 1. Core Transport & Display Substrate

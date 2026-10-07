@@ -56,7 +56,8 @@ registry-validated at render time.
   document of that instance — and therefore renders annotated. 99 is
   not a vector; it is the clone verb, available on main and on a
   dereference alike (why hobble main by withholding what referenced
-  documents have?).
+  documents have?). Its pair `88` edits this document in place — see
+  the ADR-032 amendment of 2026-10-05.
 - **One destination, one silcrow**: a document cited repeatedly reuses
   its number at every mention — the citation convention (IEEE reprints,
   legal §-cross-references). The number identifies the destination; the
@@ -70,10 +71,13 @@ registry-validated at render time.
 ## The numbering contract
 
 - Vectors run **12–98**. The two-digit space is 00–99; **reserved:
-  00–09** (unreachable padding), **10** (numeric sanity — the floor
-  stays 12), and **99** (the clone verb). The buffer closes the space;
-  no leading-zero ambiguity; silcrow 12 is always the first vector
-  (12 since 2026-09-12 — [11] joined the ADR-032 actuator pocket).
+  00–10** (unreachable padding and numeric sanity — the floor stays
+  12), the **doubled pairs** (00/88/99 bound: exit, edit, clone), and
+  nothing else. The buffer closes the space; no leading-zero
+  ambiguity; silcrow 12 is always the first vector (12 since
+  2026-09-12 — [11] joined the ADR-032 actuator pocket, and the
+  padding widened to 10 on 2026-10-05 when [09] was freed and [88]
+  bound to the edit verb).
 - **Overflow stops**: past 98 references, the map simply ends. The
   remedy is editorial — make the document smaller, or clone and search.
 - **Always two digits** in the painted form, led by the section sign:

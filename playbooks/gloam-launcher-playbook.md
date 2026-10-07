@@ -74,6 +74,14 @@ gloam() {
   for filenames — and a `toggle-exact` bind is the escape hatch if the
   itch ever arrives. Verified on fzf 0.73.1: `2026-08-2` → strict
   chronology.
+  **Superseded in part, 2026-10-05 (ADR-SEARCH-RECENCY-053):** the
+  stream no longer runs oldest-first. Within each channel of the dive,
+  rows whose basename carries a date come **newest first**, and undated
+  rows follow in the canonical collation — so the collation above still
+  governs the undated file list (and the shelf, unchanged), while a
+  date-prefixed corpus now leads with today. The reversal is recorded
+  in that ADR; this entry keeps both rules visible on purpose. The
+  chronology claim above was true when written and is false now.
 - The `while` loop — browse→read→back, the one gap composition had.
   Quit Gloam (`q`) and the picker is back, query intact. Esc in the
   picker ends the session.
@@ -89,7 +97,14 @@ gloam() {
   scroll turns the wheel into a burst of line-events that flies the list.
   `wheel-up` is not a bindable key (fzf 0.73.1: "unsupported key"), so
   mouse is all-or-nothing; all-off is right for a picker.
-- `--bind 'ctrl-d:page-down,ctrl-u:page-up,esc:cancel'` — **verb-grammar
+- **Path predicates ignore case** (2026-10-05, same ADR). The content
+  channels have always ignored it (`rg -i`, registry and body alike); the
+  `dir/` predicate did not — so `tradingagents/` was silent while
+  `TradingAgents` matched inside file bodies. One search, two answers.
+  Both directions (`dir/`, `!dir/`) and both call sites now compare
+  lowercased. Cost, stated: on a case-sensitive filesystem two
+  directories differing only in case both match — which is the honest
+  reading of a search.- `--bind 'ctrl-d:page-down,ctrl-u:page-up,esc:cancel'` — **verb-grammar
   parity with Gloam, the picker is a guest of the reader's key set.**
   fzf's readline defaults contradict the reader on the two half-page
   keys: `Ctrl-U` is *clear query* in fzf (destroys input) but
