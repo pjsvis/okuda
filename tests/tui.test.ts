@@ -24,7 +24,9 @@ import {
   renderEqual,
   type Fetch,
   type FetchState,
+  frameStale,
   frameTrace,
+  CHROME_JITTER,
 } from "../src/tui";
 import { makeStyler } from "../src/ansi";
 import { DRACULA_PALETTE } from "../src/palette";
@@ -749,6 +751,17 @@ describe("tui — resolveJumpTarget containment (BRF-ROOT-CONTAINMENT)", () => {
     //     stale frame becomes self-correcting and unpinnable.
     expect(src).toContain("paintedGeometry = renderCols > 0");
     expect(src).not.toContain("paintedGeometry = geometryOf(rows, cols)");
+  });
+
+  test("frameStale: a small widening is chrome, everything else is real", () => {
+    const J = CHROME_JITTER;
+    // The asymmetry the policy rests on: narrower is a margin, wider is a wrap.
+    expect(frameStale("32x75", "32x74", J)).toBe(false); // +1: chrome — hold
+    expect(frameStale("32x74", "32x74", J)).toBe(false); // unchanged
+    expect(frameStale("32x74", "32x75", J)).toBe(true); // narrowing: adopt now
+    expect(frameStale("32x80", "32x74", J)).toBe(true); // a real drag
+    expect(frameStale("33x74", "32x74", J)).toBe(true); // height: re-lay the viewport
+    expect(frameStale("32x74", "", J)).toBe(true); // nothing rendered yet
   });
 
   test("the frame trace writes to a file, never the tty, and never throws", async () => {

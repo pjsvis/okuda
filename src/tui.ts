@@ -369,6 +369,31 @@ export function contentHeight(rows: number): number {
 /** The glass geometry as one comparable token. Pure. */
 export const geometryOf = (rows: number, cols: number): string => `${rows}x${cols}`;
 
+/** Chrome jitter: a pane that WIDENS by a column or two without the reader
+ *  touching it. A focus outline can change the pane's pixel box, and the
+ *  terminal's `pixels ÷ cell_width` moves the column count with it — measured at
+ *  one column on focus-out (2026-10-07), which reflowed the densest paragraph in
+ *  the showcase, 423 lines to 422. The threshold is the measured jitter plus one,
+ *  so a deliberate drag is never mistaken for chrome. */
+export const CHROME_JITTER = 2;
+
+/** Whether the frame on the glass is stale for a live geometry. A difference is
+ *  real except for a small WIDENING, which is chrome — and that exception is not
+ *  a convenience, it is the asymmetry: a frame WIDER than the pane is soft-wrapped
+ *  by the terminal (a lie), while a frame NARROWER than the pane merely has a
+ *  margin. So narrowing is adopted at once, a height change always re-lays, and a
+ *  small widening is taken on the next render that happens for another reason
+ *  (ADR-WIDENING-LAG-054). Pure. */
+export function frameStale(live: string, frame: string, jitter: number): boolean {
+  if (frame === "") return true; // nothing rendered yet
+  if (live === frame) return false;
+  const [lr, lc] = live.split("x").map(Number);
+  const [fr, fc] = frame.split("x").map(Number);
+  if (lr !== fr) return true; // the viewport must re-lay
+  if (!(lc! > fc!)) return true; // narrowing, or any drop: adopt immediately
+  return lc! - fc! >= jitter;
+}
+
 /** The repaint rule: repaint when the content changed, **or** when the glass
  *  was last painted at a different geometry. The content gate reads the
  *  CONTENT — it cannot see the glass. A height-only resize re-renders
@@ -892,8 +917,19 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // first; the glass answers the second — a height-only resize re-renders
     // identical lines, so the gate reads `same` and the frame still needs
     // laying out (ADR-RESIZE-GEOMETRY-046).
-    if (!needsRepaint(decision.repaint, geometryOf(rows, cols), paintedGeometry)) {
-      frameTrace(`skip cols=${cols} rows=${rows} painted=${paintedGeometry} content=${decision.repaint}`);
+    const live = geometryOf(rows, cols);
+    // A resize that only WIDENS the pane a little is chrome, not the reader: hold
+    // the frame and take the column on the next render that happens for any other
+    // reason. Everything else — a narrowing, a height change, a content change —
+    // repaints as before (ADR-WIDENING-LAG-054).
+    const chrome = reason === "resize" && !decision.repaint &&
+      !frameStale(live, paintedGeometry, CHROME_JITTER);
+    if (chrome || !needsRepaint(decision.repaint, live, paintedGeometry)) {
+      frameTrace(
+        chrome
+          ? `hold cols=${cols} render=${renderCols} (chrome jitter: widening lagged)`
+          : `skip cols=${cols} rows=${rows} painted=${paintedGeometry} content=${decision.repaint}`,
+      );
       return;
     }
     const oldLines = lines;
