@@ -39,7 +39,12 @@ widening turns out not to be the same as the response to a resize.
 
 **A resize that only widens the pane by less than `CHROME_JITTER` (2) columns is
 held: the frame stays as it is and the extra column is taken on the next render
-that happens for any other reason.** Narrowing is adopted immediately, height
+that happens for any other reason.** The hold is taken *before* the fetch and the
+render, which the first implementation got wrong: a re-render at a new width
+produces different lines, the content gate compares rendered lines, and so the
+"content changed" verdict was caused by the hold's own re-render — the guard could
+never fire. A resize is therefore a geometry signal only; content belongs to the
+watcher and to `r`. Narrowing is adopted immediately, height
 changes always re-lay, and a widening of 2 or more columns is adopted at once.
 
 The exception rests on an asymmetry, not on a preference:
@@ -84,6 +89,12 @@ rendering at, so the guard answers `skip`.
 **Constraints this imposes:**
 - The lag applies only to `resize`. A content change, a reload or a dereference
   renders at the live width, so the lag is bounded by the reader's next action.
+- The geometry decision must precede the render. Taking it after is not a
+  preference but a bug: the content gate reads frame difference, so the re-render
+  the hold would have performed is itself the "content change" that overrides it.
+- A resize no longer doubles as a content refresh. The watcher is the content
+  channel and `r` is the manual override; a geometry event that changes no geometry
+  now costs nothing rather than a full render thrown away.
 - `frameStale` is pure and unit-tested, because a policy about *when* to lie (even
   in the harmless direction) should be provable rather than argued.
 

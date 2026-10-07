@@ -895,6 +895,28 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // override (keyboard-controls, 2026-09-05). No flag save/restore.
     if (frozen && reason === "watch") return;
     const { rows, cols } = dims();
+    const live = geometryOf(rows, cols);
+    // Geometry decisions happen BEFORE the fetch and the render, and they have to.
+    // A re-render at a new width produces different lines, and the content gate
+    // compares rendered LINES — it cannot tell that difference from a document
+    // edit. So a hold taken after the render is always overridden by a "content
+    // change" the hold itself caused, which is exactly how the first version of
+    // ADR-WIDENING-LAG-054 failed: the pty run showed `render width=81` and a
+    // repaint where it should have shown `hold`. Two things fall out of the same
+    // move: a resize is a GEOMETRY signal and no longer doubles as a content
+    // refresh (the watcher owns content; `r` is the manual override), and a
+    // SIGWINCH whose geometry did not move costs nothing at all instead of a
+    // 400-line render thrown away.
+    if (reason === "resize") {
+      if (live === paintedGeometry) {
+        frameTrace(`skip cols=${cols} rows=${rows} (geometry unchanged)`);
+        return;
+      }
+      if (!frameStale(live, paintedGeometry, CHROME_JITTER)) {
+        frameTrace(`hold cols=${cols} render=${renderCols} (chrome jitter: widening lagged)`);
+        return;
+      }
+    }
     const height = contentHeight(rows); // constant — separator + badge rows (BRF-FOOTER-SEPARATOR)
     const fetch = await readSource();
     const atMain = backstack.length === 0;
@@ -917,19 +939,8 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // first; the glass answers the second — a height-only resize re-renders
     // identical lines, so the gate reads `same` and the frame still needs
     // laying out (ADR-RESIZE-GEOMETRY-046).
-    const live = geometryOf(rows, cols);
-    // A resize that only WIDENS the pane a little is chrome, not the reader: hold
-    // the frame and take the column on the next render that happens for any other
-    // reason. Everything else — a narrowing, a height change, a content change —
-    // repaints as before (ADR-WIDENING-LAG-054).
-    const chrome = reason === "resize" && !decision.repaint &&
-      !frameStale(live, paintedGeometry, CHROME_JITTER);
-    if (chrome || !needsRepaint(decision.repaint, live, paintedGeometry)) {
-      frameTrace(
-        chrome
-          ? `hold cols=${cols} render=${renderCols} (chrome jitter: widening lagged)`
-          : `skip cols=${cols} rows=${rows} painted=${paintedGeometry} content=${decision.repaint}`,
-      );
+    if (!needsRepaint(decision.repaint, live, paintedGeometry)) {
+      frameTrace(`skip cols=${cols} rows=${rows} painted=${paintedGeometry} content=${decision.repaint}`);
       return;
     }
     const oldLines = lines;
