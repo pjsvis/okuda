@@ -12,6 +12,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-10-07 | ADR-SEARCH-RECENCY-053 | Accepted | Recency first in the picker — newest at the top, and case-insensitive directories | 053-search-recency.md |
 | 2026-10-07 | ADR-WIDENING-LAG-054 | Accepted | Lag the widening direction — a frame narrower than the pane is a margin, a frame wider is a lie | 054-widening-lag.md |
 | 2026-10-07 | ADR-TABLE-EDGE-CUT-055 | Accepted | A table is an artefact — render it whole, cut the edge, never squeeze it | 055-table-edge-cut.md |
+| 2026-10-07 | ADR-PROSE-BREAKS-056 | Accepted | Prose whitespace is inert — the only break signal is a visible backslash | 056-prose-breaks.md |
 | 2026-10-03 | ADR-EXIT-FERMATA-051 | Accepted | The exit fermata — the drain window is over-determined | 051-exit-fermata.md |
 | 2026-10-03 | ADR-ARCHIVE-RESOLUTION | Accepted | The archive resolves — resolution and search diverge at the archive boundary | 052-archive-resolution-tier.md |
 | 2026-10-02 | ADR-UNIVERSAL-ELISION-050 | Accepted | Elision is the universal overflow policy — the terminal never soft-wraps what okuda emits | 050-universal-elision.md |
