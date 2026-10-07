@@ -36,6 +36,8 @@ interface Args {
   palette: string | null;
   grep: string | null;
   entries: string | null;
+  /** Declared glass width (`--width`), null = ask the terminal. */
+  width: number | null;
   extra: string[];
 }
 
@@ -56,14 +58,32 @@ export function versionLine(sha?: string): string {
   return `okuda ${pkg.version}${sha ? ` (${sha})` : " (dev)"}`;
 }
 
+/** The width the reading path renders to: the declared `--width` when
+ *  given, else the terminal's. A panel is not a terminal — no columns, no
+ *  tput, no winsize — so a sink with a known cell grid (an e-ink frame, a
+ *  PNG pipeline, a pager writing a fixed-width page) declares its glass
+ *  instead of hoping the environment guesses right. `--no-color` says
+ *  "no SGR"; `--width` says "here is the glass". Pure. */
+function readingWidth(declared: number | null): number {
+  return declared ?? terminalCols(80);
+}
+
 function parseArgs(argv: string[]): Args {
-  const args: Args = { file: null, watch: false, noColor: false, tui: false, palette: null, grep: null, entries: null, extra: [] };
+  const args: Args = { file: null, watch: false, noColor: false, tui: false, palette: null, grep: null, entries: null, width: null, extra: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
     if (a === "--watch" || a === "-w") args.watch = true;
     else if (a === "--no-color") args.noColor = true;
     else if (a === "--tui" || a === "-t") args.tui = true;
-    else if (a === "--palette") {
+    else if (a === "--width") {
+      const raw = argv[++i] ?? "";
+      const n = parseInt(raw, 10);
+      if (!Number.isFinite(n) || n < 20) {
+        process.stderr.write(`okuda: --width wants a column count of 20 or more, got ${raw === "" ? "nothing" : `'${raw}'`}\n`);
+        process.exit(1);
+      }
+      args.width = n;
+    } else if (a === "--palette") {
       args.palette = argv[++i] ?? null;
       if (!args.palette) {
         process.stderr.write("okuda: --palette requires a name (e.g. dracula)\n");
@@ -81,7 +101,7 @@ function parseArgs(argv: string[]): Args {
       args.entries = argv.slice(i + 1).join(" ");
       break;
     } else if (a === "--help" || a === "-h") {
-      process.stdout.write("usage: okuda <file> [--watch] [--tui] [--no-color] [--palette <name>]\n");
+      process.stdout.write("usage: okuda <file> [--watch] [--tui] [--no-color] [--palette <name>] [--width <cols>]\n");
       process.stdout.write("       gloam [<query words>] [-g <query>] [--entries <query>]  (live search → read → loop)\n");
       process.exit(0);
     } else if (a === "--version") {
@@ -218,7 +238,7 @@ async function main(): Promise<void> {
 
   const draw = async (): Promise<void> => {
     const source = await readSource(args.file);
-    const width = terminalCols(80);
+    const width = readingWidth(args.width);
     // A streaming render to a TTY is a main document too (ADR-031): it
     // gets its silcrows. Piped output stays clean — the paint is for
     // glass, not for downstream tools. The map is built ALWAYS (ADR-047):
