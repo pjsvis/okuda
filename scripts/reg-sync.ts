@@ -54,7 +54,7 @@ export const REGISTRIES: Record<string, RegistryDef> = {
   ".archive/briefs": { dir: ".archive/briefs", index: "INDEX.jsonl", defaultStatus: "done", exclude: ["index.md"], fmType: "Brief", csPrefix: "BRF", archive: true },
 };
 
-interface Entry {
+export interface Entry {
   file: string;
   date: string;
   status: string;
@@ -65,11 +65,65 @@ interface Entry {
   callsign?: string;
 }
 
+/** The brief vocabulary as the registry stores it. Wider than
+ *  {open, in progress, done} since 2026-10-05: `parked` and `rejected`
+ *  are words the brief playbook itself uses (`Parked — gated on <gate>`),
+ *  `landed` is the archive's word for done, and `draft`/`proposed` are the
+ *  corpus's words for a brief not yet started — both already recorded as
+ *  `open`, so the entry documents behaviour rather than changing it. A map
+ *  narrower than the vocabulary silently reported every parked brief as
+ *  `open` — the defect that let a stale index row sit unnoticed. */
 const BRIEF_STATUS: Record<string, string> = {
   open: "open",
   "in progress": "in_progress",
   done: "done",
+  landed: "done",
+  parked: "parked",
+  rejected: "rejected",
+  draft: "open",
+  proposed: "open",
 };
+
+/** The decisions vocabulary (ADR-025's lifecycle plus the abort). */
+const DECISION_STATUS: Record<string, string> = {
+  proposed: "Proposed",
+  accepted: "Accepted",
+  superseded: "Superseded",
+  aborted: "Aborted",
+};
+
+/** The declared status word: the FIRST word of the `**Status:**` line,
+ *  lowercased — so `Done — shipped 2026-10-05 (abc123)`,
+ *  `Aborted (2026-08-30)` and `Parked (Pi-side spike)` all resolve to
+ *  their word. `in progress` is the one two-word entry, so it is matched
+ *  before the split — a vocabulary key the parser cannot produce is a trap,
+ *  not a status. Empty when the document declares none. Pure. */
+export function statusWord(content: string): string {
+  const raw = content.match(/\*\*Status:\*\*\s*(.+)/)?.[1]?.trim() ?? "";
+  if (raw.toLowerCase().startsWith("in progress")) return "in progress";
+  return raw.split(/[\s—–(\[]/)[0]!.toLowerCase();
+}
+
+/** A tier's status vocabulary, or null when the tier's statuses are
+ *  fixed by definition. The archive is fixed by LOCATION, not by the
+ *  body's word: a brief in `.archive/briefs` is settled (ADR-052), so
+ *  five archived briefs whose bodies still say `Open`/`Draft` are not
+ *  drift — the archive is the truth about them. A debrief is done and a
+ *  playbook canonical, likewise. Pure. */
+export function statusVocabulary(registry: string): Record<string, string> | null {
+  if (registry === "briefs") return BRIEF_STATUS;
+  if (registry === "decisions") return DECISION_STATUS;
+  return null;
+}
+
+/** A status word → the value the registry stores, or null when the word
+ *  is not in the tier's vocabulary. Null is a finding, not a fallback:
+ *  an unrecognised status must be reported, because silently storing
+ *  `open` for it is how a row drifts out of agreement without anyone
+ *  noticing. Pure. */
+export function statusFor(word: string, registry: string): string | null {
+  return statusVocabulary(registry)?.[word] ?? null;
+}
 
 // ── Frontmatter (pure) ────────────────────────────────────────────────
 
@@ -199,6 +253,17 @@ function listDocs(dir: string, exclude: string[] = []): string[] {
 }
 
 /** Pull `date:` frontmatter or a `**Date:**` line; fall back to file mtime. */
+/** The date the document DECLARES (frontmatter `date:` or a `**Date:**`
+ *  line), or null when it declares none. Pure. Distinct from
+ *  `deriveDate`, which falls back to mtime — and an mtime is not a claim
+ *  the document makes, so it must not be compared as one. */
+export function authoredDate(content: string): string | null {
+  const fm = content.match(/^---\n[\s\S]*?date:\s*(\d{4}-\d{2}-\d{2})/m);
+  if (fm) return fm[1]!;
+  const bold = content.match(/\*\*Date:\*\*\s*(\d{4}-\d{2}-\d{2})/);
+  return bold ? bold[1]! : null;
+}
+
 function deriveDate(content: string, path: string): string {
   const fm = content.match(/^---\n[\s\S]*?date:\s*(\d{4}-\d{2}-\d{2})/m);
   if (fm) return fm[1]!;
@@ -212,17 +277,7 @@ function deriveDate(content: string, path: string): string {
 }
 
 function deriveStatus(content: string, def: RegistryDef, registry: string): string {
-  if (registry === "briefs") {
-    const m = content.match(/\*\*Status:\*\*\s*(.+)/);
-    if (m) return BRIEF_STATUS[m[1].trim().toLowerCase()] ?? "open";
-    return "open";
-  }
-  if (registry === "decisions") {
-    const m = content.match(/\*\*Status:\*\*\s*(Proposed|Accepted|Superseded)/i);
-    if (m) return m[1]![0].toUpperCase() + m[1]!.slice(1).toLowerCase();
-    return def.defaultStatus;
-  }
-  return def.defaultStatus;
+  return statusFor(statusWord(content), registry) ?? def.defaultStatus;
 }
 
 function deriveSummary(content: string, file: string): string {
@@ -295,7 +350,10 @@ function migrateCorpus(fix: boolean): MigrationResult {
           cs = docCallsign(content) ?? cs;
         }
       }
-      if (fix) map.set(file, cs);
+      // Built in BOTH modes: check mode needs the map to compare the
+      // registry's callsign against frontmatter, and a map that exists only
+      // while fixing cannot report drift — the 2026-10-05 finding.
+      map.set(file, cs);
     }
     perRegistry.set(name, map);
   }
@@ -316,9 +374,14 @@ function migrateCorpus(fix: boolean): MigrationResult {
 
 // ── Index sync (membership + callsign lift) ────────────────────────────
 
-function deriveEntry(dir: string, file: string, def: RegistryDef, registry: string, callsign?: string): Entry {
-  const path = join(dir, file);
-  const content = readFileSync(path, "utf8");
+function entryFrom(
+  file: string,
+  def: RegistryDef,
+  registry: string,
+  content: string,
+  path: string,
+  callsign?: string,
+): Entry {
   const entry: Entry = {
     file,
     date: deriveDate(content, path),
@@ -330,7 +393,50 @@ function deriveEntry(dir: string, file: string, def: RegistryDef, registry: stri
   return entry;
 }
 
-function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { missing: number; stale: number; csDrift: number; indexDoc: number; collisions: number } {
+function deriveEntry(dir: string, file: string, def: RegistryDef, registry: string, callsign?: string): Entry {
+  const path = join(dir, file);
+  return entryFrom(file, def, registry, readFileSync(path, "utf8"), path, callsign);
+}
+
+/** The fields the registry MIRRORS from the document, compared. Membership
+ *  alone is not sync: a brief flipped to Done keeps its old row forever if
+ *  only the file list is checked (found 2026-10-05 — BRF-MATH-GLYPHS read
+ *  `done` on disk and `open` in the index while reg-sync said "All
+ *  registries in sync"). Returns one human-readable diff per field, empty
+ *  when the row matches. Pure — the caller re-derives `truth` and applies
+ *  the result.
+ *
+ *  Two refusals, both learned by running it:
+ *  - `haveCallsign: false` means frontmatter carries none (the document is
+ *    already counted as frontmatter drift), so the registry's copy is left
+ *    alone rather than cleared.
+ *  - `dateAuthored: false` means the date came from the mtime fallback, and
+ *    every edit would read as drift — 52 such "drifts" appeared the first
+ *    time this check ran. An authored date is a claim; an mtime is not.
+ *
+ *  Summary is deliberately NOT compared: it is derived from the H1 at
+ *  add-time, but the playbooks registry carries hand-written summaries and
+ *  the briefs mix both, so comparing it would rewrite authored prose
+ *  rather than mirror a claim. Same for `status` when the document's word
+ *  is outside the tier's vocabulary — that is reported as UNKNOWN by the
+ *  caller, not silently corrected. */
+export function derivedDrift(
+  stored: Entry,
+  truth: Entry,
+  opts: { haveCallsign: boolean; dateAuthored: boolean },
+): string[] {
+  const diffs: string[] = [];
+  if (stored.status !== truth.status) diffs.push(`status ${stored.status} → ${truth.status}`);
+  if (opts.dateAuthored && stored.date !== truth.date) {
+    diffs.push(`date ${stored.date} → ${truth.date}`);
+  }
+  if (opts.haveCallsign && (stored.callsign ?? null) !== (truth.callsign ?? null)) {
+    diffs.push(`callsign ${stored.callsign ?? "—"} → ${truth.callsign ?? "—"}`);
+  }
+  return diffs;
+}
+
+function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { missing: number; stale: number; fieldDrift: number; unknown: number; indexDoc: number; collisions: number } {
   const def = REGISTRIES[name]!;
   const dir = join(ROOT, def.dir);
   const indexPath = join(dir, def.index);
@@ -362,37 +468,59 @@ function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { miss
     console.log(`  ${name}: STALE ${e.file}${fix ? " → removed" : ""}`);
   }
 
-  // Callsign lift: frontmatter is truth; the registry mirrors it.
-  let csDrift = 0;
+  // Derived-field reconciliation: the document is truth and the registry
+  // mirrors it — status, date, summary and callsign all derive from the
+  // file. Membership is checked above; this is the half that was missing.
+  let fieldDrift = 0;
+  // An unrecognised status word is reported, never mapped: storing `open`
+  // for a word the map does not know is exactly how the row drifted. It is
+  // a lint rather than drift, though — the gap is the vocabulary's, not the
+  // document's, and failing the gate on it would force either a silent map
+  // entry or ten content edits. Loud, counted, separate.
+  let unknown = 0;
   for (const e of entries) {
     if (staleFiles.has(e.file)) continue;
     const cs = csMap.get(e.file);
-    if (cs && e.callsign !== cs) {
-      csDrift++;
-      if (fix) e.callsign = cs;
+    const content = readFileSync(join(dir, e.file), "utf8");
+    const truth = entryFrom(e.file, def, name, content, join(dir, e.file), cs);
+    const word = statusWord(content);
+    if (statusVocabulary(name) !== null && word !== "" && statusFor(word, name) === null) {
+      unknown++;
+      console.log(`  ${name}: UNKNOWN STATUS ${e.file} — "${word}" is not in the tier vocabulary`);
+      continue;
     }
-  }
-  if (csDrift > 0) {
-    console.log(`  ${name}: ${csDrift} callsign(s) ${fix ? "lifted" : "drifting"} (frontmatter → registry)`);
+    const opts = { haveCallsign: cs !== undefined, dateAuthored: authoredDate(content) !== null };
+    const diffs = derivedDrift(e, truth, opts);
+    if (diffs.length === 0) continue;
+    fieldDrift++;
+    if (fix) {
+      // Only the fields that actually drifted are written. `summary` is
+      // absent by design: it is never compared, so repairing a status must
+      // not quietly replace a hand-written summary with the H1.
+      if (e.status !== truth.status) e.status = truth.status;
+      if (opts.dateAuthored && e.date !== truth.date) e.date = truth.date;
+      if (opts.haveCallsign && e.callsign !== cs) e.callsign = cs;
+    }
+    console.log(`  ${name}: DRIFT ${e.file} — ${diffs.join(", ")}${fix ? " → corrected" : ""}`);
   }
 
   const kept = entries.filter((e) => !staleFiles.has(e.file));
   if (fix) {
-    if (missing.length || stale.length || csDrift > 0) {
+    if (missing.length || stale.length || fieldDrift > 0) {
       kept.sort((a, b) => a.file.localeCompare(b.file));
       writeFileSync(indexPath, kept.map((e) => JSON.stringify(e)).join("\n") + "\n");
       console.log(`  ${name}: index rewritten (${kept.length} entries)`);
     } else {
       console.log(`  ${name}: OK (0 missing, 0 stale)`);
     }
-  } else if (missing.length || stale.length || csDrift > 0) {
-    console.log(`  ${name}: ${missing.length} MISSING, ${stale.length} STALE`);
+  } else if (missing.length || stale.length || fieldDrift > 0) {
+    console.log(`  ${name}: ${missing.length} MISSING, ${stale.length} STALE, ${fieldDrift} DRIFTED`);
   } else {
     console.log(`  ${name}: OK (0 missing, 0 stale)`);
   }
 
   const indexDoc = syncIndexDoc(name, def, kept, fix);
-  return { missing: missing.length, stale: stale.length, csDrift, indexDoc, collisions: collisions.length };
+  return { missing: missing.length, stale: stale.length, fieldDrift, unknown, indexDoc, collisions: collisions.length };
 }
 
 // ── Tier index.md export (ADR-019: generated, never hand-edited) ───────
@@ -455,10 +583,18 @@ if (import.meta.main) {
   const { perRegistry, fmDrift } = migrateCorpus(fix);
   let drift = fmDrift;
   let collisions = 0;
+  let unknown = 0;
   for (const n of names) {
-    const { missing, stale, csDrift, indexDoc, collisions: c } = syncOne(n, fix, perRegistry.get(n) ?? new Map());
-    drift += missing + stale + csDrift + indexDoc;
-    collisions += c;
+    const r = syncOne(n, fix, perRegistry.get(n) ?? new Map());
+    drift += r.missing + r.stale + r.fieldDrift + r.indexDoc;
+    collisions += r.collisions;
+    unknown += r.unknown;
+  }
+  if (unknown > 0) {
+    // Loud, not fatal: the documents are legible, the vocabulary is short.
+    // Settling which words the registry stores is a corpus decision, not a
+    // sync repair — named here, absorbed nowhere.
+    console.log(`${unknown} unrecognised status word(s) — the tier vocabulary is incomplete (settle it, do not absorb it)`);
   }
   if (collisions > 0) {
     console.log(`${collisions} callsign collision(s) — unfiixable; rename a document's callsign (ADR-025 clause 4)`);
