@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { KEYBINDINGS, verbFor } from "../src/keygrammar";
-import { VECTOR_MIN, VECTOR_MAX, MAX_REFS } from "../src/vectors";
+import { RESERVED_VECTORS, VECTOR_MIN, VECTOR_MAX, MAX_REFS } from "../src/vectors";
 
 const DOC = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -51,7 +51,11 @@ describe("keymap doc — the map is refereed against the territory", () => {
         expect(t in KEYBINDINGS).toBe(false);
       } else {
         expect(KEYBINDINGS[t]).toBe(v as never);
-        expect(t < VECTOR_MIN || t > VECTOR_MAX).toBe(true);
+        // A bound token is never an allocatable address: outside the
+        // range, or a doubled pair the allocator skips (88 edit, 99
+        // clone — ADR-032's actuator class, bound 2026-10-05).
+        const allocatable = t >= VECTOR_MIN && t <= VECTOR_MAX && !RESERVED_VECTORS.has(t);
+        expect(allocatable).toBe(false);
       }
     }
   });

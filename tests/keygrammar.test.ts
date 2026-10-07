@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { KEYBINDINGS, readOnlyActive, verbFor, splitKeyEvents } from "../src/keygrammar";
-import { CLONE_TOKEN, VECTOR_MIN, VECTOR_MAX } from "../src/vectors";
+import { CLONE_TOKEN, RESERVED_VECTORS, VECTOR_MIN, VECTOR_MAX } from "../src/vectors";
 
 describe("keygrammar — read-only mode (BRF-ROOT-CONTAINMENT: the spawn verbs retire)", () => {
   test("OKUDA_READONLY=1 declares retirement; anything else does not", () => {
@@ -25,11 +25,10 @@ describe("keygrammar — the two-digit language as data", () => {
     expect(verbFor(1)).toBe("frame");
     expect(verbFor(2)).toBe("slide");
     expect(verbFor(3)).toBe("freeze");
-    expect(verbFor(9)).toBe("editNew");
-    expect(verbFor(10)).toBe("edit");
   });
 
-  test("99 is the clone verb, reserved", () => {
+  test("88 is the edit verb and 99 the clone verb — the spawn pair, doubled", () => {
+    expect(verbFor(88)).toBe("edit");
     expect(verbFor(99)).toBe("clone");
     expect(CLONE_TOKEN).toBe(99);
   });
@@ -40,20 +39,25 @@ describe("keygrammar — the two-digit language as data", () => {
   });
 
   test("reserved-unassigned tokens are silent, not missing", () => {
-    for (const t of [4, 5, 6, 7, 8]) expect(verbFor(t)).toBeNull();
+    // 09 and 10 joined the pocket 2026-10-05, when the edit verb moved
+    // to the doubled pair (88) beside clone.
+    for (const t of [4, 5, 6, 7, 8, 9, 10]) expect(verbFor(t)).toBeNull();
   });
 
-  test("repeated-digit actuators are reserved (ADR-032 canonized 2026-09-12 — one class, never vectors)", () => {
-    for (const t of [11, 22, 33, 44, 55, 66, 77, 88]) expect(verbFor(t)).toBeNull();
+  test("repeated-digit actuators are reserved (ADR-032 — one class, never vectors)", () => {
+    // The class is bound at 00 (exit), 88 (edit) and 99 (clone); the
+    // rest of the pocket stays silent.
+    for (const t of [11, 22, 33, 44, 55, 66, 77]) expect(verbFor(t)).toBeNull();
   });
 
   test("the bindings are a table — renumbering is data, not code", () => {
-    // Every binding key is outside the address range: verbs and modes
-    // never collide with silcrow addresses, and renumbering is a one-
-    // line table edit.
+    // A binding key is never an ALLOCATABLE address: it is either
+    // outside the vector range, or a doubled pair the allocator skips
+    // (ADR-032 — 88 and 99 are bound verbs, not addresses).
     for (const key of Object.keys(KEYBINDINGS)) {
       const n = Number(key);
-      expect(n < VECTOR_MIN || n > VECTOR_MAX).toBe(true);
+      const allocatable = n >= VECTOR_MIN && n <= VECTOR_MAX && !RESERVED_VECTORS.has(n);
+      expect(allocatable).toBe(false);
     }
   });
 });

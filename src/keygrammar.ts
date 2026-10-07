@@ -9,17 +9,17 @@
  * which live in the actuators, at the edge, visibly.
  *
  * The two-digit space has three zones, one per actuator type (the
- *   canon, 2026-09-12):
+ *   canon, 2026-09-12; 88 bound 2026-10-05):
  *   01-10  verbs and modes — what the instance DOES
  *   00,11,22,…,99  the doubled pairs — one actuator class (00 exit,
- *          99 clone bound; the rest the pocket); never jumps
+ *          88 edit and 99 clone bound; the rest the pocket); never jumps
  *   mixed digits 12-98 — what the instance SHOWS (the silcrows)
  *
  * The bindings are a TABLE, not code: the numbers may move as the
  * fingers learn them, and moving one is a one-line edit here — never a
- * change to the dispatch. Unassigned reserved tokens (`04`–`08`, `10`
- * if freed) resolve to null and flash nothing; they are reserved, not
- * missing.
+ * change to the dispatch. Unassigned reserved tokens (`04`-`10`, freed
+ * 2026-10-05 when the edit verb moved to 88) resolve to null and flash
+ * nothing; they are reserved, not missing.
  */
 
 import { RESERVED_VECTORS, VECTOR_MIN, VECTOR_MAX } from "./vectors";
@@ -29,7 +29,6 @@ export type Verb =
   | "frame"
   | "slide"
   | "freeze"
-  | "editNew"
   | "edit"
   | "clone"
   | "vector";
@@ -40,13 +39,12 @@ export const KEYBINDINGS: Record<number, Verb> = {
   1: "frame", // 01 — frame/okudagram mode (needs BRF-PAGED-OKUDAGRAM)
   2: "slide", // 02 — sliding mode (today's default, named)
   3: "freeze", // 03 — the document stays still (auto-re-render off)
-  9: "editNew", // 09 — a blank document, passed the current cwd
-  10: "edit", // 10 — edit the current document
-  99: "clone", // promotion (ADR-031)
+  88: "edit", // 88 — THIS document, in the editor (the pair to 99)
+  99: "clone", // 99 — THIS document, made main of a new instance
 };
 
 /** Read-only mode (BRF-ROOT-CONTAINMENT): `OKUDA_READONLY=1` retires
- *  the spawn verbs — `09`/`99` flash instead of spawning or computing
+ *  the spawn verbs — `88`/`99` flash instead of spawning or computing
  *  a write path. A declaration, like the bindings: the demo wrapper
  *  sets it, the actuators obey it. Pure-ish (reads env). */
 export function readOnlyActive(): boolean {
@@ -57,10 +55,10 @@ export function readOnlyActive(): boolean {
  *  for the address range, `null` for reserved-unassigned tokens (the
  *  press is acknowledged and does nothing — reserved, not missing).
  *  The doubled pairs (ADR-032, canonized 2026-09-12 — one actuator
- *  class, never jumps) all resolve to null: 11 by range (below the
- *  floor), {22,…,88} via the pocket Set, 00 and 99 via their bound
- *  verbs in the table. The boundaries are read from the constants,
- *  never retyped here. Pure. */
+ *  class, never jumps) all resolve to null unless bound: 11 by range
+ *  (below the floor), {22,…,77} via the pocket Set, 00/88/99 via their
+ *  bound verbs in the table. The boundaries are read from the
+ *  constants, never retyped here. Pure. */
 export function verbFor(token: number): Verb | "vector" | null {
   const verb = KEYBINDINGS[token];
   if (verb) return verb;

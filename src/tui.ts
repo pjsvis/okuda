@@ -17,7 +17,7 @@
 
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
 import { annotateSource, appendReferences, jumpMapFor, CLONE_TOKEN } from "./vectors";
-import { cloneArgs } from "./clone";
+import { cloneArgs, editArgs, resolveEditor } from "./clone";
 import { frameBounds, headingLines, pageStep, paragraphStarts, snapFrame } from "./frames";
 import { readOnlyActive, splitKeyEvents, verbFor, type Verb } from "./keygrammar";
 import { loadPalette, type Palette } from "./palette";
@@ -228,7 +228,13 @@ export function viewport(
   return { visible: lines.slice(s, s + height), maxScroll, scroll: s };
 }
 
-const HINTS = "00 off · j/k ␣/b · }/{ para · ]]/[[ frame · g/G · r · NN · 99 clone · u";
+/** The hints row. Budget-bound: it must fit 80 columns and still
+ *  right-justify (the `hintsLine` test referees both), so adding the
+ *  second spawn verb (88 edit) cost the address hint — two digits are
+ *  self-advertising (every reference wears its rose §NN on the glass),
+ *  whereas `g/G` is invisible until told. The exit leads, always: a help
+ *  row owes the reader the way out before anything else. */
+const HINTS = "00 off · j/k ␣/b · }/{ para · ]]/[[ frame · g/G · r · 88 edit · 99 clone · u";
 
 /** Display path: folder/basename (Glow convention). Pure. */
 /** ADR-010 re-anchor as a pure function: given the pre- and post-re-render
@@ -677,27 +683,29 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  across clones. */
   let renderMode: "slide" | "frame" = "slide";
 
-  /** Edit a blank document (`09`): a new note in the CURRENT
-   *  document's directory, opened in the declared editor inside a
-   *  separate terminal (the clone grammar's own spin-up). The file is
-   *  the contract — the silo picks it up by search; nothing mutates. */
-  const editNew = (): void => {
+  /** Edit the current document (`88`, the pair to `99` clone): the same
+   *  document, in the declared editor. A GUI editor (zed, code, …) is
+   *  spawned DIRECTLY — it hands the file to a running app and returns,
+   *  so spinning up a terminal to host it would be pure overhead; a
+   *  terminal editor rides the clone grammar's terminal integration,
+   *  where the login shell can find it (the spawn-boundary lesson,
+   *  clone.ts). The file is the contract: nothing mutates here, the
+   *  editor owns the write. */
+  const edit = (): void => {
     if (readOnlyActive()) {
       flash("read-only: edit disabled");
       return;
     }
-    const dir = dirname(currentFile);
-    const stamp = new Date().toISOString().replace(/[-:T]/g, "").slice(0, 12);
-    const note = join(dir, `note-${stamp}.md`);
-    const editor = process.env.OKUDA_EDITOR ?? process.env.EDITOR ?? "vi";
-    const integration = process.env.OKUDA_CLONE ?? "edit-terminal";
-    const spec = cloneArgs(integration, note, process.platform, dir, editor);
+    const doc = currentFile;
+    const editor = resolveEditor();
+    const integration = process.env.OKUDA_CLONE ?? "ghostty-edit";
+    const spec = editArgs(doc, integration, editor);
     if ("error" in spec) {
       flash(`edit: ${spec.error}`);
       return;
     }
-    Bun.spawn([spec.cmd, ...spec.args], { stdio: "ignore" });
-    flash(`editing: ${basename(note)}`, "state-ok");
+    Bun.spawn([spec.cmd, ...spec.args], { stdin: "ignore", stdout: "ignore", stderr: "ignore" });
+    flash(`editing: ${basename(doc)} (${editor.name})`, "state-ok");
   };
 
   const clone = (): void => {
@@ -706,17 +714,26 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       return;
     }
     const doc = currentFile;
-    if (process.env.TMUX) {
-      const r = Bun.spawnSync(["tmux", "new-window", "-c", process.cwd(), "gloam", doc]);
-      if (r.exitCode === 0) flash(`cloned: ${doc}`, "state-ok");
-      else flash(`clone failed (tmux new-window exit ${r.exitCode})`);
-    } else if (process.env.OKUDA_CLONE_CMD) {
-      const r = Bun.spawnSync(["sh", "-c", process.env.OKUDA_CLONE_CMD, "okuda-clone", doc]);
-      if (r.exitCode === 0) flash(`cloned: ${doc}`, "state-ok");
-      else flash(`clone failed (OKUDA_CLONE_CMD exit ${r.exitCode})`);
-    } else {
-      flash("no clone host: run inside tmux or set OKUDA_CLONE_CMD");
+    const integration = process.env.OKUDA_CLONE ?? "ghostty";
+    const spec = cloneArgs(integration, doc);
+    if ("error" in spec) {
+      // Fall back to the inline tmux / OKUDA_CLONE_CMD paths for
+      // integrations cloneArgs doesn't know (legacy compat).
+      if (process.env.TMUX) {
+        const r = Bun.spawnSync(["tmux", "new-window", "-c", process.cwd(), "gloam", doc]);
+        if (r.exitCode === 0) flash(`cloned: ${doc}`, "state-ok");
+        else flash(`clone failed (tmux new-window exit ${r.exitCode})`);
+      } else if (process.env.OKUDA_CLONE_CMD) {
+        const r = Bun.spawnSync(["sh", "-c", process.env.OKUDA_CLONE_CMD, "okuda-clone", doc]);
+        if (r.exitCode === 0) flash(`cloned: ${doc}`, "state-ok");
+        else flash(`clone failed (OKUDA_CLONE_CMD exit ${r.exitCode})`);
+      } else {
+        flash(`clone: ${spec.error}`);
+      }
+      return;
     }
+    Bun.spawn([spec.cmd, ...spec.args], { stdin: "ignore", stdout: "ignore", stderr: "ignore" });
+    flash(`cloned: ${basename(doc)}`, "state-ok");
   };
 
   const dims = () => ({
@@ -889,8 +906,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       frozen = true;
       flash("frozen — the document stays still (r re-renders)");
     },
-    editNew: () => editNew(),
-    edit: () => flash("edit current — the edit brief is not wired yet"),
+    edit: () => edit(),
     clone: () => clone(),
   };
 

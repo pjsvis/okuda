@@ -36,11 +36,12 @@ describe("cue — the pending class names the digit, never the actuator", () => 
 describe("cue — the canon split: doubled speaks, mixed is silent (ADR-032)", () => {
   test("the bound doubled pairs speak, naming the actuator exactly", () => {
     expect(cueFor({ kind: "token", token: 0 })).toEqual({ cueClass: "identity", text: "exit" });
+    expect(cueFor({ kind: "token", token: 88 })).toEqual({ cueClass: "identity", text: "edit" });
     expect(cueFor({ kind: "token", token: 99 })).toEqual({ cueClass: "identity", text: "clone" });
   });
 
   test("the pocket is silent — reserved, not missing; it speaks as it binds", () => {
-    for (const t of [11, 22, 33, 44, 55, 66, 77, 88]) {
+    for (const t of [11, 22, 33, 44, 55, 66, 77]) {
       expect(cueFor({ kind: "token", token: t })).toBeNull();
     }
   });

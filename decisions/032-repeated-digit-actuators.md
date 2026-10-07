@@ -6,6 +6,7 @@ callsign: ADR-REPEATED-DIGIT-ACTUATORS-032
 # Decision: Repeated-digit actuators — [44,55,66,77,88] reserved
 
 **Date:** 2026-09-06 · **amended 2026-09-12** ([11] joins the pocket)
+· **amended 2026-10-05** ([88] is bound — edit joins the class)
 **Status:** Accepted
 
 ## Amendment (2026-09-12): the doubled pairs are one actuator class
@@ -85,8 +86,10 @@ exception. The grammar is cleaner, not weaker.
   `src/vectors.ts:buildJumpMap`). The gap is invisible because numbers
   are dynamic, never authored.
 - `MAX_REFS` is 80 (`VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size`).
-- `verbFor` resolves the class {11,22,33,44,55,66,77,88} to `null`
-  (reserved-unassigned), not `"vector"` (`src/keygrammar.ts`).
+- `verbFor` resolves the pocket {11,22,33,44,55,66,77} to `null`
+  (reserved-unassigned) and the bound doubles {00,88,99} to their verbs,
+  never to `"vector"` (`src/keygrammar.ts`). A bound token is never an
+  allocatable address: outside the range, or a pair the allocator skips.
 
 ## Discipline — non-negotiable
 
@@ -98,6 +101,39 @@ reserved token back into the silcrow pool is a **design-time** decision
 recycling creates ambiguity: is [55] a verb or an address *right now*?
 That is entropy. Global reservation is a property of the grammar, not a
 state of the document.
+
+## Amendment (2026-10-05): [88] binds — the spawn pair is doubled
+
+`[88]` leaves the pocket and becomes the **edit verb**: this document,
+in the editor. It is the pair to `[99]` clone — `99` promotes this
+document to main of a new instance, `88` opens this document in the
+editor — and it arrives from the other direction: the edit verb was
+`[09]`, a single-key verb doing a spawn's job.
+
+That was the shape rule's own argument applied to itself. `09` split
+the spawn pair across two zones (a single-key verb at one end, a
+doubled pair at the other), and it made the *fingers* learn an
+exception: `[09]` is easy to mistype and sits below the floor for no
+reason. Two spawns, one class, one shape: doubled.
+
+Keyed to the class, `[88]` costs nothing. It was already reserved and
+already skipped by the allocator, so no address moves and no document
+is invalidated — the pocket loses a member, the address space does not
+change. `MAX_REFS` stays 80.
+
+What `[88]` opens the document in is a **declaration**, not a
+discovery: `OKUDA_EDITOR`, then `EDITOR`, then the first of `zed`,
+`code`, `cursor`, `subl` on PATH, then `vi`. A GUI editor is spawned
+directly — it hands the file to a running app and returns, so no
+terminal is spun up to host it — while a terminal editor rides the
+`ghostty-edit` integration, where a login shell can find it (the
+spawn-boundary lesson, `src/clone.ts`).
+
+`[09]` and `[10]` are freed. `[10]` never had an actuator (it flashed
+honestly and did nothing); `[09]`'s blank-note behaviour retires with
+it, because the editor owns file creation and the edit verb now edits
+the document the reader is looking at — the same intent, no copy, no
+generated filename in the silo.
 
 ## The actuator pocket
 
@@ -112,11 +148,12 @@ in `src/keygrammar.ts`):
 - `[55]` — *unassigned* (the class)
 - `[66]` — *unassigned* (the class)
 - `[77]` — *unassigned* (the class)
-- `[88]` — *unassigned* (the class)
-- `[99]` — clone (bound, ADR-031)
+- `[88]` — edit (bound, 2026-10-05) — this document, in the editor
+- `[99]` — clone (bound, ADR-031) — this document, in a new instance
 
-The unassigned `[04]`–`[08]` pocket remains (single-key reserved
-verbs). This ADR adds the repeated-digit pocket alongside it.
+The unassigned `[04]`–`[10]` pocket remains (single-key reserved
+verbs; `[09]` and `[10]` joined it on 2026-10-05). This ADR adds the
+repeated-digit pocket alongside it.
 
 ## Related
 
@@ -126,3 +163,5 @@ verbs). This ADR adds the repeated-digit pocket alongside it.
   the actuator need (audio toggle, clutter-strip)
 - `docs/2026-09-06-protocol-free-text-identity.md` — the protocol-free
   identity the dogfood demonstrates
+- `src/clone.ts` — the editor declaration chain and the spawn-boundary
+  lesson the edit verb rides (amendment 2026-10-05)

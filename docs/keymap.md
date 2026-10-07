@@ -42,15 +42,25 @@ the two words in this heading.
 | **01** | frame | frame mode — j/k and space/b step one glass page |
 | **02** | slide | sliding mode — the continuous surface, the default |
 | **03** | freeze | the document stays still; r re-renders on demand |
-| **09** | editNew | a blank note in the editor, a second terminal |
-| **10** | edit | edit the current document — not wired yet, flashes honestly |
+| **88** | edit | this document, in the editor |
 | **99** | clone | this document becomes main of a new instance, via the host |
 | **00** | exit | quit the control plane — the screen releases — the last press |
 
+`88` and `99` are the spawn pair, and they are doubled pairs on
+purpose: `00` exits, `88` edits this document, `99` clones it. The
+edit verb moved here from `09` on 2026-10-05 — `09` was a single-key
+verb doing a spawn's job, and the two-key double is the lowest-effort
+input on the number row (ADR-032). What `88` opens it in is a
+*declaration*: `OKUDA_EDITOR`, then `EDITOR`, then the first of
+`zed`, `code`, `cursor`, `subl` on PATH. A GUI editor is spawned
+directly — it hands the file to a running app and returns, so no
+terminal is spun up for it; a terminal editor (vi and friends) rides
+the `ghostty-edit` integration, where a login shell can find it.
+
 ### The reserved pockets
 
-The same zones, held unbound. Two pockets by key shape: 04–08, the
-single-key verbs; 11 and 22–88, the doubled pairs — the lowest-effort
+The same zones, held unbound. Two pockets by key shape: 04–10, the
+single-key verbs; 11 and 22–77, the doubled pairs — the lowest-effort
 inputs on the number row, reserved precisely because they are easy
 (ADR-032). A doubled pair is never an address; a mixed-digit pair is
 never a verb.
@@ -62,6 +72,8 @@ never a verb.
 | **06** | reserved | unassigned single-key verb |
 | **07** | reserved | unassigned single-key verb |
 | **08** | reserved | unassigned single-key verb |
+| **09** | reserved | freed 2026-10-05 — the edit verb is the doubled pair `88` |
+| **10** | reserved | freed 2026-10-05 — it never had an actuator to speak of |
 | **11** | reserved | doubled pair — the actuator pocket, never a jump |
 | **22** | reserved | doubled pair — the actuator pocket, never a jump |
 | **33** | reserved | doubled pair — the actuator pocket, never a jump |
@@ -69,7 +81,6 @@ never a verb.
 | **55** | reserved | doubled pair — the actuator pocket, never a jump |
 | **66** | reserved | doubled pair — the actuator pocket, never a jump |
 | **77** | reserved | doubled pair — the actuator pocket, never a jump |
-| **88** | reserved | doubled pair — the actuator pocket, never a jump |
 
 Reserved means the press is acknowledged and does nothing —
 reserved, not missing.

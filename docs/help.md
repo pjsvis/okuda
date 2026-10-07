@@ -14,6 +14,17 @@ Work cycle: **brief → branch → implement → check → review → debrief**
 - `okuda <file.md> --watch` — re-render on change + resize (streaming canvas)
 - `okuda <file.md> --tui` — control plane: alternate screen, viewport scroll, Gloam footer. Falls back to streaming under `NO_COLOR` / `TERM=dumb` / non-TTY.
 - `cat doc.md | okuda` — stdin piping
+- `okuda <file> --no-color --width <cols>` — the **sink payload**: every hue dropped,
+  the glass width declared. For anything that is not a terminal — an e-ink panel, a
+  pager writing a fixed page, a pipe with no tty. (Bold and italic survive
+  `--no-color` by design; strip SGR host-side if the sink paints escapes literally.)
+
+**Leaving the control plane** — `q`, `Esc`, or double-tap `00`. The hints
+row leads with `00 off`: the exit is the first thing a help surface owes a
+reader, not the last. Single keys are motions (`j/k`, `␣/b`, `g/G`), two
+digits are tokens (`88` edit this document in the editor, `99` clone it
+into a new instance, `12`–`98` jump to a reference). The whole grammar is
+`docs/keymap.md`.
 
 ## Operator commands
 

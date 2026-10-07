@@ -16,8 +16,9 @@
  *
  * THE CANON SPLIT LIVES HERE, IN THE SEAM'S COMMENT, NOT IN DISCIPLINE
  * (ADR-032): doubled = the system talks, mixed = the document moves.
- * Only doubled pairs produce an identity cue — `00` exit, `99` clone,
- * and the pocket {11,…,88} as they bind. The vector space is silent:
+ * Only doubled pairs produce an identity cue — `00` exit, `88` edit,
+ * `99` clone, and the pocket {11,…,77} as they bind. The vector space
+ * is silent:
  * mixed pairs move the document, which the document itself already
  * shows, and voicing them would chatter the channel — and chatter does
  * not merely annoy, it drowns the alerts (a voice that speaks seldom
