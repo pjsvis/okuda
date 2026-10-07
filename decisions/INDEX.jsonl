@@ -51,3 +51,4 @@
 {"file":"052-archive-resolution-tier.md","date":"2026-10-03","status":"Accepted","summary":"The archive resolves — resolution and search diverge at the archive boundary","meta":{},"callsign":"ADR-ARCHIVE-RESOLUTION"}
 {"file":"053-search-recency.md","date":"2026-10-07","status":"Accepted","summary":"Recency first in the picker — newest at the top, and case-insensitive directories","meta":{},"callsign":"ADR-SEARCH-RECENCY-053"}
 {"file":"054-widening-lag.md","date":"2026-10-07","status":"Accepted","summary":"Lag the widening direction — a frame narrower than the pane is a margin, a frame wider is a lie","meta":{},"callsign":"ADR-WIDENING-LAG-054"}
+{"file":"055-table-edge-cut.md","date":"2026-10-07","status":"Accepted","summary":"A table is an artefact — render it whole, cut the edge, never squeeze it","meta":{},"callsign":"ADR-TABLE-EDGE-CUT-055"}
