@@ -94,6 +94,14 @@ export function mermaidToken(id: string): string {
 }
 export const RE_MERMAID_TOKEN = /%%okuda-mmd-([a-z0-9]+)%%/;
 
+/** Described diagram placeholder — survives markdown parsing.
+ *  The `describe` tag on a mermaid fence routes to diagram-describe
+ *  instead of mermaid-to-md (BRF-DIAGRAM-DESCRIBE). */
+export function describedToken(id: string): string {
+  return `%%okuda-dsc-${id}%%`;
+}
+export const RE_DESCRIBED_TOKEN = /%%okuda-dsc-([a-z0-9]+)%%/;
+
 /** Coloured code-fence placeholder paragraph token — survives markdown
  * parsing, resolves to the chroma-painted fence (BRF-FENCE-COLOUR). */
 export function codeToken(id: string): string {

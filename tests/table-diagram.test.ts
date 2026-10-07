@@ -448,6 +448,40 @@ describe("render — mermaid pipe + colour classification", () => {
   });
 });
 
+// ── Described diagram (BRF-DIAGRAM-DESCRIBE) ──────────────────────────
+
+describe("render — described mermaid diagrams", () => {
+  test("mermaid describe fence degrades gracefully when binary is absent", async () => {
+    // When diagram-describe binary is absent or returns empty, the token
+    // is dropped cleanly — no crash, no raw token leakage, no mermaid
+    // source bleeding into the render. The LLM call is tested by hand;
+    // a test that calls ollama is slow and environment-dependent.
+    //
+    // Hermetic by declaration (2026-10-05): this test used to rely on the
+    // binary not being installed, so on a machine where it IS installed
+    // the "absent" case called ollama and hung past the 5s budget. The
+    // binary path is now injected — a name that cannot exist — so the
+    // case under test is always the case that runs.
+    const out = await renderDocument("```mermaid describe\ngraph TD\n    A --> B\n```\n", {
+      width: W,
+      palette: DRACULA_PALETTE,
+      describeBin: "/nonexistent/diagram-describe",
+    });
+    expect(out).not.toContain("okuda-dsc");
+    expect(out).not.toContain("graph TD");
+  });
+
+  test("mermaid fence WITHOUT describe tag still routes to ASCII art", async () => {
+    const out = await renderDocument("```mermaid\n" + MERMAID_SRC + "```\n", {
+      width: W,
+      palette: DRACULA_PALETTE,
+    });
+    // ASCII path unaffected — describe is a separate token.
+    expect(out).toContain("mermaid source elided");
+    expect(out).toContain("Input v2.0");
+  });
+});
+
 // ── Classification unit tests ─────────────────────────────────────────
 
 import { classifyChar } from "../src/render";

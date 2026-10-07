@@ -557,7 +557,13 @@ reg-playbooks:
 archive-search PATTERN:
     @rg --line-number --no-heading -g '*.md' -g '!index.md' -g '!INDEX.jsonl' '{{PATTERN}}' .archive
 
-# ── SSH serving (sandboxed ForceCommand) ─────────────────────
+# ── Diagram describe smoke (BRF-DIAGRAM-DESCRIBE) ─────────
+
+describe-diagram file:
+    @bash scripts/describe.sh {{file}}
+
+described file:
+    @bash scripts/read-diagram.sh {{file}}
 
 [group('ssh')]
 ssh-test doc:

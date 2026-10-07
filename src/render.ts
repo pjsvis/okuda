@@ -20,6 +20,7 @@ import { type ColorMode, makeStyler, unwrapStrongSpan } from "./ansi";
 import {
   PARSER_OPTIONS,
   RE_CODE_TOKEN,
+  RE_DESCRIBED_TOKEN,
   RE_INLINE_HTML,
   RE_MERMAID_TOKEN,
   RE_PB_TAG,
@@ -31,6 +32,7 @@ import {
   TAG_RAW_CLOSE,
   TAG_RHS_WIRE,
   codeToken,
+  describedToken,
   mermaidToken,
   stripTags,
   tagNestedOpen,
@@ -130,6 +132,10 @@ export interface RenderOptions {
   mermaidBin?: string;
   /** Override chroma binary path (default: $PATH lookup). */
   chromaBin?: string;
+  /** Override diagram-describe binary path (default: $PATH lookup) —
+   *  the seam a hermetic test needs: with the real binary on PATH the
+   *  "absent binary" case would call a local model and hang. */
+  describeBin?: string;
 }
 
 // ── Mermaid pipe ─────────────────────────────────────────────────────
@@ -159,6 +165,28 @@ async function spawnMermaid(source: string, opts: RenderOptions): Promise<string
     } catch {
       // try next candidate
     }
+  }
+  return "";
+}
+
+/** Pipe mermaid source to diagram-describe for a prose description
+ *  (BRF-DIAGRAM-DESCRIBE). Same contract as spawnMermaid: source in,
+ *  text out. Falls back to empty on missing binary or failure. */
+async function spawnDescribe(source: string, opts: RenderOptions): Promise<string> {
+  const bin = opts.describeBin ?? "diagram-describe";
+  try {
+    const proc = Bun.spawn([bin], {
+      stdin: "pipe",
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    proc.stdin.write(source);
+    proc.stdin.end();
+    const out = await new Response(proc.stdout).text();
+    const code = await proc.exited;
+    if (code === 0 && out.trim().length > 0) return out.trim();
+  } catch {
+    // binary absent or failed — graceful degradation
   }
   return "";
 }
@@ -269,6 +297,8 @@ interface Ctx {
   palette: Palette;
   table: TableState | null;
   mermaid: Map<string, { art: string; title?: string | null }>;
+  /** Described diagrams — prose from diagram-describe (BRF-DIAGRAM-DESCRIBE). */
+  described: Map<string, { prose: string; title?: string | null }>;
   /** Coloured fence lines keyed by token id (BRF-FENCE-COLOUR). */
   code: Map<string, string[]>;
   /** When set, `list` handlers record structure instead of rendering
@@ -301,6 +331,7 @@ export async function renderDocument(
     palette,
     table: null,
     mermaid: new Map(),
+    described: new Map(),
     code: new Map(),
     listSeq: 0,
   };
@@ -317,8 +348,17 @@ export async function renderDocument(
   // a blank line before the rule so Bun.markdown sees a paragraph + hr.
   const source2 = neutraliseSetext(source1);
 
+  // Pre-pass 2.5: inline math glyphs (BRF-MATH-GLYPHS). It runs on the
+  // SOURCE, not in the `text` handler the brief named: a probe on bun
+  // 1.4.0 shows fenced and codespan content is delivered to `text`
+  // BEFORE its own handler sees it (`text: "$\\Delta t$ fence"` then
+  // `code: …`), so a handler-level pass would translate inside code
+  // however it was placed. Scanning fences and code spans here makes
+  // the exemption structural instead of hopeful.
+  const source2a = applyMathGlyphs(source2);
+
   // Pre-pass 3: intercept mermaid fences → pipe to binary → placeholder tokens.
-  const source3 = await interceptMermaid(source2, opts, ctx);
+  const source3 = await interceptMermaid(source2a, opts, ctx);
 
   // Pre-pass 3.5: intercept tagged code fences → chroma → placeholder
   // tokens (BRF-FENCE-COLOUR). Runs after mermaid so its fences are already
@@ -483,22 +523,24 @@ function neutraliseSetext(source: string): string {
   return lines.join("\n");
 }
 
-/** Replace mermaid fences with placeholder tokens; stash classified art. */
+/** Replace mermaid fences with placeholder tokens; stash classified art
+ *  or prose descriptions. The `describe` tag routes to diagram-describe
+ *  instead of mermaid-to-md (BRF-DIAGRAM-DESCRIBE). */
 async function interceptMermaid(
   source: string,
   opts: RenderOptions,
   ctx: Ctx,
 ): Promise<string> {
-  const fences: { code: string; title: string | null }[] = [];
+  interface FenceEntry {
+    code: string;
+    title: string | null;
+    described: boolean;
+  }
+  const fences: FenceEntry[] = [];
   const src = source.replace(
-    /(^|\n)```mermaid\n([\s\S]*?)\n?```/g,
-    (_m, lead: string, code: string) => {
-      // Extract a leading `title: <caption>` line (mermaid-native) before
-      // piping — the binary doesn't parse the directive and would dump it
-      // as a literal box. okuda renders the title at the diagram's
-      // indicator line (diagramBlock), where the `⋮ mermaid source elided`
-      // statement sat. Only a title at the very first line is honoured —
-      // mid-fence `title:` is mermaid syntax we don't own.
+    /(^|\n)```mermaid( describe)?\n([\s\S]*?)\n?```/g,
+    (_m, lead: string, tag: string | undefined, code: string) => {
+      const described = tag != null; // " describe" → true
       let title: string | null = null;
       const firstNl = code.indexOf("\n");
       const firstLine = firstNl === -1 ? code : code.slice(0, firstNl);
@@ -507,22 +549,35 @@ async function interceptMermaid(
         title = tm[1]!;
         code = firstNl === -1 ? "" : code.slice(firstNl + 1);
       }
-      fences.push({ code, title });
-      return `${lead}${mermaidToken(String(fences.length - 1))}`;
+      fences.push({ code, title, described });
+      // described diagrams use a different token type so the paragraph
+      // handler can route them to the prose renderer.
+      const id = String(fences.length - 1);
+      return `${lead}${described ? describedToken(id) : mermaidToken(id)}`;
     },
   );
   if (fences.length === 0) return src;
 
-  const arts = await Promise.all(
+  // Run all pipes in parallel — mermaid-to-md and diagram-describe.
+  const results = await Promise.all(
     fences.map(async (f) => {
+      if (f.described) {
+        const prose = await spawnDescribe(f.code, opts);
+        if (prose === "") return null;
+        return { described: true, prose, title: f.title };
+      }
       const out = await spawnMermaid(f.code, opts);
       if (out === "") return null;
-      return { art: extractDiagramArt(out), title: f.title };
+      return { described: false, art: extractDiagramArt(out), title: f.title };
     }),
   );
-  for (const [i, entry] of arts.entries()) {
+  for (const [i, entry] of results.entries()) {
     if (entry === null) continue;
-    ctx.mermaid.set(String(i), entry);
+    if (entry.described) {
+      ctx.described.set(String(i), { prose: entry.prose!, title: entry.title });
+    } else {
+      ctx.mermaid.set(String(i), { art: entry.art!, title: entry.title });
+    }
   }
   return src;
 }
@@ -722,7 +777,23 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // open with full resets only, never partial ones.
       const reopen = styler.roleBoldOpen("heading");
       const keepHeading = (l: string) => l.replace(/\x1b\[0m/g, `\x1b[0m${reopen}`);
-      const lines = wrapANSI(markers + " " + stripHtml(children), { width: wrapW });
+      // Bun pre-renders inline formatting (e.g. `**text**`) into
+      // ANSI-coloured children — strong/emphasis colours leak into the
+      // heading. stripANSI removes all of it, then we re-apply guest
+      // paint colours for the known guest types (vectors, state glyphs)
+      // so they survive. The heading role owns the run; guests borrow
+      // and hand back via keepHeading (td-290433 / BRF-HEADING-ANSI-STRIP).
+      let clean = stripANSI(stripHtml(children));
+      // Re-apply vector paint: §NN → vector-coloured §NN
+      clean = clean.replace(/§(\d+)/g, (_m, n: string) =>
+        styler.roleBold("vector", `\u00a7${n}`));
+      // Re-apply state-glyph paint: standalone state glyphs
+      clean = clean.replace(
+        /(^|\s)([\u2713\u2610\u22ee\u2717])(?=\s|$)/g,
+        (_whole, pre: string, g: string) =>
+          pre + styler.roleBold(STATE_GLYPH_ROLE[g]!, g),
+      );
+      const lines = wrapANSI(markers + " " + clean, { width: wrapW });
       return (
         lines
           .map((l, i) => {
@@ -753,6 +824,13 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         const entry = ctx.mermaid.get(m[1]!);
         if (entry !== undefined) return diagramBlock(entry.art, ctx, entry.title);
         return ""; // pipe failed → drop the placeholder silently
+      }
+      // Described diagram placeholder → prose block (BRF-DIAGRAM-DESCRIBE).
+      const d = children.trim().match(RE_DESCRIBED_TOKEN);
+      if (d) {
+        const entry = ctx.described.get(d[1]!);
+        if (entry !== undefined) return describedBlock(entry.prose, ctx, entry.title);
+        return "";
       }
       // Inline vector paint: strip the token; live vectors paint a
       // bracketed badge in the reserved vector role, right after the
@@ -958,6 +1036,177 @@ function ensureTable(ctx: Ctx): TableState {
 
 function stripHtml(s: string): string {
   return s.replace(RE_INLINE_HTML, "");
+}
+
+// ── Inline math glyphs (BRF-MATH-GLYPHS) ─────────────────────────────
+
+/** The closed vocabulary: LaTeX token → Unicode. Corpus-derived and
+ *  append-only, like the conceptual lexicon — an entry arrives with grep
+ *  evidence, never with anticipation. `\ge` is the one deliberate mirror
+ *  (`\le` is evidenced; symmetry, not scope creep). `\text{X}` and
+ *  `\frac{X}{Y}` are rewrites rather than glyphs: syntax dropped, not a
+ *  character substituted. */
+const MATH_GLYPHS: ReadonlyArray<readonly [string, string]> = [
+  ["\\alpha", "α"],
+  ["\\Delta", "Δ"],
+  ["\\epsilon", "ε"],
+  ["\\in", "∈"],
+  ["\\le", "≤"],
+  ["\\ge", "≥"],
+  ["\\neq", "≠"],
+  ["\\to", "→"],
+  ["\\rightarrow", "→"],
+  ["\\times", "×"],
+  ["\\S", "§"],
+  ["\\dots", "…"],
+  ["\\text", ""], // \text{X} → X (the braces go with the rewrite)
+  ["\\frac", ""], // \frac{X}{Y} → X/Y
+  ["{,}", ","],
+  ["--", "–"],
+  ["\\_", "_"],
+];
+
+const MATH_LOOKUP = new Map(MATH_GLYPHS);
+/** The two entries whose command must not survive the rewrite pass. */
+const MATH_REWRITE_ONLY = new Set(["\\text", "\\frac"]);
+/** Commands whose trailing space is a space the eye wants: a relation or
+ *  an operator reads wrong welded to its operand (`\le 10` → `≤ 10`,
+ *  `W \times H` → `W × H`). Every other command is a *glyph*, and the
+ *  space after it is the terminator that ends the command name — LaTeX's
+ *  own rule, and the whole difference between `Δt` and the `Δ t` this
+ *  pass first emitted. */
+const MATH_SPACED = new Set([
+  "\\le",
+  "\\ge",
+  "\\neq",
+  "\\in",
+  "\\to",
+  "\\rightarrow",
+  "\\times",
+]);
+/** Any backslash token: a command (`\alpha`) or an escape (`\_`). */
+const RE_MATH_ESCAPE = /\\[A-Za-z]+|\\[^A-Za-z]/g;
+const RE_HAS_ESCAPE = /\\[A-Za-z]|\\[^A-Za-z]/;
+/** A command name, an optional single space, and the operand character
+ *  that space was terminating — the one place a terminator space can be
+ *  removed. The substitution happens in this same pass: removing the
+ *  space first re-forms the command (`\Delta t` → `\Deltat`, a command
+ *  nobody wrote), which is how this pass first shipped wrong. */
+const RE_MATH_TERMINATED = /(\\[A-Za-z]+)( ?)(?=[A-Za-z0-9])/g;
+/** The remaining substitutable tokens — `[A-Za-z]+` is greedy, so
+ *  `\times` cannot be pre-empted by a shorter sibling, and `\to` cannot
+ *  be either. */
+const RE_MATH_TOKEN = /\\[A-Za-z]+|\\_|\{,\}|--/g;
+const RE_MATH_FRAC = /\\frac\{([^{}]*)\}\{([^{}]*)\}/g;
+const RE_MATH_TEXT = /\\text\{([^{}]*)\}/g;
+/** An inline span: no `$` inside, no newline (display math is out of
+ *  scope, and a multi-line pair is a table or a currency accident). */
+const RE_MATH_SPAN = /\$([^$\n]+)\$/g;
+
+/** Translate one span body, or `null` if it must stay literal. The
+ *  gate is all-or-nothing, and it runs twice: once on the source, and
+ *  again after the rewrites — so a malformed `\frac{F}` (braces absent,
+ *  command recognised) fails the second gate instead of half-
+ *  translating into `{F}`. */
+function mathSpanBody(body: string): string | null {
+  for (const m of body.matchAll(RE_MATH_ESCAPE)) {
+    if (!MATH_LOOKUP.has(m[0])) return null;
+  }
+  const out = body.replace(RE_MATH_FRAC, "$1/$2").replace(RE_MATH_TEXT, "$1");
+  for (const m of out.matchAll(RE_MATH_ESCAPE)) {
+    if (!MATH_LOOKUP.has(m[0]) || MATH_REWRITE_ONLY.has(m[0])) return null;
+  }
+  const spaced = out.replace(RE_MATH_TERMINATED, (_m, cmd: string, space: string) =>
+    (MATH_LOOKUP.get(cmd) ?? cmd) + (MATH_SPACED.has(cmd) ? space : ""),
+  );
+  return spaced.replace(RE_MATH_TOKEN, (t) => MATH_LOOKUP.get(t) ?? t);
+}
+
+/** Replace inline math spans with the Unicode they denote
+ *  (`$\Delta t$` → `Δt`). A span with no backslash command is left
+ *  exactly as authored — which is the currency guard, not a gap: `costs
+ *  $5 and $10` pairs into a span with nothing to translate and stays
+ *  literal. A span holding an unknown command (`$\zeta$`) stays literal
+ *  whole — visible degradation, never partial mangling. Fenced code and
+ *  code spans route through their own handlers and never reach here. */
+export function mathGlyphs(s: string): string {
+  if (!s.includes("$")) return s; // the common case costs a scan
+  return s.replace(RE_MATH_SPAN, (whole, body: string) => {
+    if (!RE_HAS_ESCAPE.test(body)) return whole;
+    return mathSpanBody(body) ?? whole;
+  });
+}
+
+// ── The source pass: math outside code ───────────────────────────────
+
+/** A fence marker at the left margin (``` or ~~~, up to three spaces of
+ *  indent — CommonMark's own allowance). */
+const RE_FENCE_OPEN = /^\s{0,3}(`{3,}|~{3,})/;
+
+/** Is this line the closing marker of `fence`? Same character, at least
+ *  as long, nothing else on the line. */
+function closesFence(line: string, fence: string): boolean {
+  const m = /^\s{0,3}(`{3,}|~{3,})\s*$/.exec(line);
+  return m !== null && m[1]![0] === fence[0] && m[1]!.length >= fence.length;
+}
+
+/** Apply the math pass to the segments of a line outside code spans. */
+function mathOutsideCodeSpans(line: string): string {
+  let out = "";
+  let last = 0;
+  for (const m of line.matchAll(/`+[^`]*`+/g)) {
+    const at = m.index ?? 0;
+    out += mathGlyphs(line.slice(last, at)) + m[0];
+    last = at + m[0].length;
+  }
+  return out + mathGlyphs(line.slice(last));
+}
+
+/** The math pass over a whole source. Fenced blocks and code spans are
+ *  skipped, everything else is offered to the span translator. Both
+ *  exemptions are structural — a fence state machine and a backtick
+ *  split — because the parser will not say which `text` events are code
+ *  (see pre-pass 2.5 in `renderDocument`). */
+export function applyMathGlyphs(source: string): string {
+  if (!source.includes("$")) return source;
+  const lines = source.split("\n");
+  let fence: string | null = null;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!;
+    if (fence === null) {
+      const open = RE_FENCE_OPEN.exec(line);
+      if (open) {
+        fence = open[1]!;
+        continue;
+      }
+      lines[i] = mathOutsideCodeSpans(line);
+    } else if (closesFence(line, fence)) {
+      fence = null;
+    }
+  }
+  return lines.join("\n");
+}
+
+/** Described diagram block — prose from diagram-describe, rendered as a
+ *  muted panel with a left border. The title (if present) sits above the
+ *  prose in the diagram-text colour. (BRF-DIAGRAM-DESCRIBE.) */
+function describedBlock(
+  prose: string,
+  ctx: Ctx,
+  title?: string | null,
+): string {
+  const { styler, width } = ctx;
+  const indent = "  ";
+  const pipe = styler.quotePipe();
+  const wrapped = wrapANSI(prose, { width: width - 2, indent, firstIndent: "" });
+  const lines = wrapped.map((l) => `${pipe}${l}`);
+  let out = lines.join("\n");
+  if (title) {
+    // Title in the diagram-text role, indented to match the left border.
+    const titleLine = styler.role("diagram-text", title);
+    out = `${indent}${titleLine}\n${out}`;
+  }
+  return out + "\n\n";
 }
 
 /** Mermaid ASCII block: classified, coloured, never wrapped. Beneath
