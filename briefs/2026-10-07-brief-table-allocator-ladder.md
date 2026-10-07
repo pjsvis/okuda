@@ -236,7 +236,12 @@ index tables (a `reg-sync` change, tracked as its own issue).
        and the shape classifier. The instrument is the integration test.
 5. [ ] Dogfood `just tables` at 80 and 120, and `just tables-monster`, against
        `docs/tables.md` and `&briefs.md`.
-6. [ ] The records: two ADR-050 amendments and the ADR-014 palimpsest.
+6. [x] **Landed 2026-10-07.** ADR-UNIVERSAL-ELISION-050's certification of the
+       arithmetic is withdrawn in place, with the measurements that withdrew it and
+       the list of what replaced it; ADR-TABLE-ELISION-014's supersession record is
+       corrected — it taught in-cell wrapping (repealed by 050) and called the
+       proportional shrink deliberate (replaced by the ladder). One part of the
+       narrowing is still owed and is said so there: the prose column's wrap.
 7. [ ] The gate enters `just check` at the commit that lands the work, never
        before — `just check` must pass on every commit. If it cannot reach zero
        in one sitting, the house ratchet pattern (`scripts/callsign-baseline.json`:

@@ -100,3 +100,37 @@ need for it arrives.
 - ADR-022 — suppression in place; the patterned-surface precedent, now the law for all tables
 - ADV-THE-PILE — the stratum this deletes
 - BRF-TABLE-WIDTH — the open brief this closes (the cut cell)
+
+## Annotation (2026-10-07) — the certification is withdrawn
+
+**"The proportional budget computation is VALID … and stands unchanged" was
+written without a measurement, and it was wrong on both counts.** It answered *how
+wide is each column* with a share proportional to natural width, so the widest
+column set the scale and every other column was squeezed toward the 3-character
+floor whether or not the budget ever needed those characters. Measured at last, at
+80 columns: **191 of 332 tables starved at least one column, 457 columns in all,
+2887 elided cells** — columns elided while the budget had room to render them
+whole (`scripts/tables-check.ts`, the `STARVED` reading).
+
+What replaced it, all in BRF-TABLE-LADDER and its ADRs:
+
+- **The ladder** (ADR-WIDENING-LAG-054 is unrelated; the ladder landed in
+  `src/render.ts` the same day): a column's floor is its longest word, columns are
+  completed cheapest-first, and the remainder is shared proportionally above the
+  floor. Starved columns at 80: 457 → 192. At 120: 320 → 111.
+- **The band.** A table is never drawn wider than 120 columns, and a 200-column
+  glass renders identically to a 120-column one.
+- **The rule brackets the table**, not the glass. Taking the bar from the pane put
+  up to 103 columns of air under it; the rule is now measured off the lines
+  actually drawn.
+- **Headers wrap and never elide.** 129 of the starved columns at 80 were the
+  column's LABEL losing to its own data. Now zero. That is this ADR's elision law
+  narrowed already: a header is a block, so its cost is O(1) lines where a body
+  cell's is O(rows).
+- **The elision law narrows further when the prose column wraps** — the one column
+  in a prose-shaped table that no allowed width can hold. Not yet landed.
+
+The lesson this ADR now carries is not about tables. It is the evidence rule the
+process playbook states: **a claimed fact names its instrument.** This one named
+none, stood for five days, reached the source as a comment, and cost a session to
+withdraw.

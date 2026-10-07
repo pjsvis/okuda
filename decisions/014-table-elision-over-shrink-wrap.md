@@ -87,3 +87,21 @@ before it was ever implemented. What shipped:
 The showcase and style-guide teachings that cited this ADR for generic
 table elision are corrected in the same change. An ADR the code
 contradicted was entropy; the map and the territory now agree.
+## Correction (2026-10-07)
+
+The supersession record above is itself stale, twice.
+
+- *"Prose tables … wrap in-cell and the operator widens"* — the in-cell wrap was
+  repealed by ADR-UNIVERSAL-ELISION-050, which is why this record's own
+  second-thought ("a truncated reason loses the point, a wrapped one keeps it") no
+  longer describes the renderer. Where prose goes instead is the prose column's
+  wrap, the one part of that decision still owed.
+- *"The proportional shrink-wrap this ADR reversed remains the generic path's fit,
+  deliberately"* — it did not remain. The proportional share starved columns that
+  could have been rendered whole (191 of 332 tables at 80 columns) and was replaced
+  by the ladder; ADR-UNIVERSAL-ELISION-050's annotation carries the measurements.
+
+What this ADR's own doctrine still holds, and held all along: **a shrink-wrapped
+table is a broken table pretending to be whole.** The repeal of the wrap did not
+discharge that; it moved the damage from wrapping to elision, and the ladder is what
+finally fixed the allocation underneath both.

@@ -29,3 +29,6 @@ tmp/
 
 # todo app trialled and retired 2026-09-26 — its artifact rode in on 49eefe5
 todo.txt
+
+# Bun compile temp (left behind by an interrupted or re-run build)
+*.bun-build
