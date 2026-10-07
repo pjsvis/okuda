@@ -197,9 +197,15 @@ index tables (a `reg-sync` change, tracked as its own issue).
 
 ## Work Plan
 
-1. [ ] Set the target: `target = min(glass, 116)`, and the rule spans the table's
-       natural width. This alone draws every `design` and `band` table whole and
-       takes bracket slack to zero.
+1. [x] **Landed 2026-10-07.** `target = min(glass, 116)`, and the rule spans the
+       table's own width, measured off the lines actually drawn. Bracket slack
+       went 128 tables / 63 columns → **0** at 80, and 208 / 103 → **0** at 120,
+       and a 120-column glass now renders identically to a 200-column one. The
+       instrument was taught the same target in the same commit: its starved
+       predicate judged against the glass, and briefly over-reported at wide
+       widths (371 columns at 200 versus 320 at 120) until it read the band.
+       Noted cost, pending the wrap: past 120 columns a table with a natural
+       width between 116 and the glass now elides where it used to sprawl.
 2. [ ] Rewrite the ladder — the `matrix` path and every narrow glass. Reading
        taken before and after in the same session, so the claim is a number.
 3. [ ] The row block: headers first (O(1) lines, and it is the same mechanic),

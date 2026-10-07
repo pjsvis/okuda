@@ -267,6 +267,14 @@ function colorFg(hex: string, text: string): string {
 
 // ── Table machinery (brief: table-rendering-policy) ──────────────────
 
+/** The band's cap (BRF-TABLE-LADDER): a table is authored to fit 80 columns
+ *  (content 76) and is never drawn wider than 120 (content 116). Past the cap a
+ *  table gains air between its columns rather than information, and the eye
+ *  crosses more gap to compare two cells. The menu pattern is exempt — its
+ *  number is the strong-stop at the visual right edge, which the cap would park
+ *  mid-glass (ADR-ROLE-LAYOUT-022). */
+const BAND_CONTENT = 116;
+
 interface Cell {
   text: string; // may contain inline ANSI
   align?: "left" | "center" | "right";
@@ -1478,11 +1486,16 @@ function renderTable(t: TableState, ctx: Ctx): string {
   const gutter = 3;
   let total = colWidth.reduce((a, b) => a + b, 0) + gutter * (cols - 1);
 
-  // Fit the terminal width — never overflow. Wide tables shrink by
-  // proportional budget; cells over budget ELIDE, never wrap
-  // (ADR-UNIVERSAL-ELISION-050 — the wrap policy's repeal).
-  if (total > width && cols > 0) {
-    const budget = width - gutter * (cols - 1);
+  // The band's cap — a table is never drawn wider than 120 columns, whatever
+  // the glass offers (BRF-TABLE-LADDER).
+  const target = Math.min(width, BAND_CONTENT);
+
+  // Fit the target — never overflow. Wide tables shrink by proportional
+  // budget; cells over budget ELIDE, never wrap (ADR-UNIVERSAL-ELISION-050).
+  // The ladder replaces this arithmetic in the next increment; the band lands
+  // first because it is the cheaper half of the same decision.
+  if (total > target && cols > 0) {
+    const budget = target - gutter * (cols - 1);
     const sum = colWidth.reduce((a, b) => a + b, 0);
     const floors = colWidth.map(() => 3);
     const floorSum = floors.reduce((a, b) => a + b, 0);
@@ -1498,17 +1511,9 @@ function renderTable(t: TableState, ctx: Ctx): string {
     total = colWidth.reduce((a, b) => a + b, 0) + gutter * (cols - 1);
   }
 
-  const out: string[] = [];
-  // Header row: purple bold + `│` separators (grid cue); header rule +
-  // closing rule span the FULL content width (glow parity — the bar is
-  // the table-scan signal, not the table's natural width). Body rows
-  // keep a 3-space gutter so columns align with the header separators.
-  // Cells elide at their column budget: rows are single-line by
-  // construction and columns hold trivially — the wrap/zip stratum
-  // (and the word-salad fault it patched) is deleted with the policy
-  // it served (ADR-UNIVERSAL-ELISION-050).
   const sep = ` ${styler.tablePipe()} `;
   const bodySep = " ".repeat(gutter);
+  const drawn: string[] = [];
   if (header.length > 0) {
     const cells = header.map((c, i) =>
       padCell(
@@ -1516,8 +1521,7 @@ function renderTable(t: TableState, ctx: Ctx): string {
         i, colWidth,
       ),
     );
-    out.push(cells.join(sep));
-    out.push(styler.rule(width));
+    drawn.push(cells.join(sep));
   }
   for (const r of rows) {
     const cells: string[] = [];
@@ -1534,13 +1538,28 @@ function renderTable(t: TableState, ctx: Ctx): string {
         : { text: styled, align: r[i]?.align };
       cells.push(padCell(cell, i, colWidth));
     }
-    out.push(cells.join(bodySep));
+    drawn.push(cells.join(bodySep));
   }
-  // Closing rule under the table (Glow parity: tables are bracketed,
-  // full content width).
-  if (header.length > 0 || rows.length > 0) {
-    out.push(styler.rule(width));
-  }
+  // Trailing pad spaces are ours, not content — trim per line BEFORE measuring,
+  // so the rule brackets what is actually drawn and not what was padded.
+  const lines = drawn.map((l) => l.replace(/[ ]+$/, ""));
+
+  // The rule is the TABLE's width, not the glass's (BRF-TABLE-LADDER): a bracket
+  // wider than its contents is a promise the table does not keep, and it was up
+  // to 103 columns of air under the bar. Measured off the lines actually
+  // emitted, so the bar cannot disagree with the cells it brackets.
+  const tableWidth = lines.reduce((a, l) => Math.max(a, displayWidth(l)), 0);
+  const rule = styler.rule(tableWidth);
+
+  // Header row + its rule (the rule belongs to the header, not the rows); body
+  // rows keep a 3-space gutter so columns align with the header separators.
+  const out: string[] = [];
+  const body = header.length > 0 ? lines.slice(1) : lines;
+  if (header.length > 0) out.push(lines[0]!, rule);
+  out.push(...body);
+  // Closing rule under the table (tables are bracketed).
+  out.push(rule);
+
   // Loose rows: blank line between rows. The header rule sits directly
   // under the header — it belongs to the header, not the rows. Trailing
   // pad spaces are ours, not content — trim them per line (a wrapped row

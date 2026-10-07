@@ -281,6 +281,10 @@ interface Reading {
   headerCut: boolean[];
   /** First elided fragment per column, `""` when the column is whole. */
   samples: string[];
+  /** The gap between the rule and the widest row, measured on the render.
+   *  Structurally 0 since BRF-TABLE-LADDER made the rule the table's own
+   *  width — so any non-zero reading is a regression, not a finding. */
+  ruleSlack: number;
 }
 
 async function read(t: Table, source: string): Promise<Reading> {
@@ -292,7 +296,7 @@ async function read(t: Table, source: string): Promise<Reading> {
     if (RULE.test(l)) rules.push(i);
   });
   const rows = t.body.length;
-  if (rules.length < 2) return { lines: -1, rows, slots: [], cuts: [], elided: [], samples: [], headerCut: [] };
+  if (rules.length < 2) return { lines: -1, rows, slots: [], cuts: [], elided: [], samples: [], headerCut: [], ruleSlack: 0 };
 
   const start = lines.findIndex((l) => l.trim().length > 0);
   const head = lines.slice(start, rules[0]!);
@@ -306,7 +310,7 @@ async function read(t: Table, source: string): Promise<Reading> {
   if (seps.length === 0) {
     // A single-column table carries no separator. Nothing to slice; reflow is
     // all it can do, so report the count and stop.
-    return { lines: bodyAll.filter((l) => l.trim().length > 0).length, rows, slots: [], cuts: [], elided: [], samples: [], headerCut: [] };
+    return { lines: bodyAll.filter((l) => l.trim().length > 0).length, rows, slots: [], cuts: [], elided: [], samples: [], headerCut: [], ruleSlack: 0 };
   }
 
   const starts = [h0.search(/\S/), ...seps.map((s) => s + 2)];
@@ -342,6 +346,14 @@ async function read(t: Table, source: string): Promise<Reading> {
   // wrapping it costs O(1) table lines, not O(rows)) and therefore worth
   // counting separately from starvation.
   const headerCut = starts.map((_, k) => frag(h0, k).endsWith("…"));
+  // The rule against the widest row it brackets. Before BRF-TABLE-LADDER this
+  // was a source-side guess (CONTENT − natural) that assumed the rule spanned
+  // the glass; now it is measured off the render, and it should be 0.
+  const ruleSlack = Math.max(
+    0,
+    Math.max(displayWidth(lines[rules[0]!]!), displayWidth(lines[rules[1]!]!)) -
+      Math.max(0, ...[...head, ...bodyAll].map((l) => displayWidth(l.trimEnd()))),
+  );
   for (let k = 0; k < starts.length; k++) {
     const hay = " " + columnText[k]! + " ";
     for (let i = 0; i + 1 < run.length; i++) {
@@ -353,7 +365,7 @@ async function read(t: Table, source: string): Promise<Reading> {
       if (!hay.includes(" " + a + " ") || !hay.includes(" " + b + " ")) cuts.push(a + "|" + b);
     }
   }
-  return { lines: bodyAll.filter((l) => l.trim().length > 0).length, rows, slots, cuts, elided, samples, headerCut };
+  return { lines: bodyAll.filter((l) => l.trim().length > 0).length, rows, slots, cuts, elided, samples, headerCut, ruleSlack };
 }
 
 // ── the pass ─────────────────────────────────────────────────────────
@@ -422,9 +434,12 @@ for (const file of files) {
     // A column is starved when it fits whole alongside every other column's
     // floor, and the render shows the allocator eliding it anyway. The floor is
     // the allocator's own (3, src/render.ts) — the promise it makes each
-    // column the moment it starts handing out shares.
+    // column the moment it starts handing out shares. The budget is the
+    // renderer's TARGET, not the glass: since BRF-TABLE-LADDER a table is never
+    // drawn wider than the band's cap, so judging starvation against a wider
+    // glass counts elisions the renderer was right to make.
     const floorOthers = 3 * Math.max(0, cols - 1);
-    const budget = CONTENT - GUTTER * Math.max(0, cols - 1);
+    const budget = Math.min(CONTENT, BAND_CONTENT) - GUTTER * Math.max(0, cols - 1);
     const starvedCols = t.nat
       .map((n, k) => (n + floorOthers <= budget && (r.elided[k] ?? 0) > 0 ? k : -1))
       .filter((k) => k >= 0);
@@ -444,12 +459,12 @@ for (const file of files) {
       slots,
       cuts: r.cuts.length,
       sample: r.cuts[0] ?? starvedCols.map((k) => r.samples[k]).find((s) => s) ?? "",
-      allocatorFault: t.wordBudget <= CONTENT,
+      allocatorFault: t.wordBudget <= Math.min(CONTENT, BAND_CONTENT),
       wordBudget: t.wordBudget,
       starved: starvedCols.length,
       elided: r.elided.reduce((a, b) => a + b, 0),
       starvedSample: starvedCols.map((k) => r.samples[k]).find((s) => s && s.length > 0) ?? "",
-      slack: Math.max(0, CONTENT - t.natural),
+      slack: r.ruleSlack,
       natural: t.natural,
       forced: t.natural > BAND_CONTENT,
       shape: shapeOf(t.natural, t.nat),

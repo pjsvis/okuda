@@ -42,7 +42,7 @@ describe("render — tables (uniform presentation policy)", () => {
     expect(stripANSI(headerLine!)).toMatch(/L\s*│\s*C\s*│\s*R/);
   });
 
-  test("header grid: │ separators between header cells, full-width rules", async () => {
+  test("header grid: │ separators between header cells, rules bracket the table", async () => {
     const out = await renderDocument(
       "| Name | Qty |\n|---|---|\n| x | 1 |\n",
       { width: W, palette: DRACULA_PALETTE },
@@ -54,17 +54,24 @@ describe("render — tables (uniform presentation policy)", () => {
     // body rows do NOT have │ (loose body, gutter only)
     const bodyLine = ls.find((l) => stripANSI(l).includes("x"))!;
     expect(stripANSI(bodyLine)).not.toMatch(/│/);
-    // header rule + closing rule span the full content width (W - 4 margin).
+    // The header rule and the closing rule bracket the TABLE, not the glass
+    // (BRF-TABLE-LADDER): a bracket wider than its contents is a promise the
+    // table does not keep — it was up to 103 columns of air under the bar.
+    // Each rule is exactly as wide as the widest line drawn.
     // The block terminator also draws a muted rail (same channel) — exclude
     // it: it ends in the chip, table rules do not.
     const ruleLines = ls.filter(
       (l) => /^\s*\x1b\[38;2;88;88;88m─+/.test(l) && !stripANSI(l).endsWith("█"),
     );
     expect(ruleLines.length).toBe(2);
-    for (const r of ruleLines) {
-      // 2-char left margin + full content-width rule = W - 2
-      expect(displayWidth(r)).toBeGreaterThanOrEqual(W - 4);
-    }
+    const widest = Math.max(
+      ...ls
+        .filter((l) => l !== "" && !ruleLines.includes(l) && !stripANSI(l).endsWith("█"))
+        .map((l) => displayWidth(l)),
+    );
+    for (const r of ruleLines) expect(displayWidth(r)).toBe(widest);
+    // and a narrow table's rule is emphatically NOT the content width
+    expect(displayWidth(ruleLines[0]!)).toBeLessThan(W - 4);
   });
 
   test("cells elide at their column budget — rows stay single-line (ADR-UNIVERSAL-ELISION-050)", async () => {
@@ -114,8 +121,8 @@ describe("render — tables (uniform presentation policy)", () => {
 
   test("no artificial floor — narrow table content stays narrow", async () => {
     const out = await renderDocument("| a | b |\n|--|--|\n| 1 | 2 |\n", { width: W });
-    // Data rows stay narrow (no padding to 40); only the rule lines span
-    // the full content width (glow parity — the bar is the scan cue).
+    // Data rows stay narrow (no padding to 40), and since BRF-TABLE-LADDER the
+    // rules match them — a narrow table carries a narrow bar.
     const dataRows = out.split("\n").filter((l) =>
       stripANSI(l).includes("a") || stripANSI(l).includes("1"),
     );
