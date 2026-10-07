@@ -72,13 +72,18 @@ or by a mark the author can see.
   occasionally refuse a habit.
 
 **Constraints this imposes:**
-- The break marker must be **consumed before wrapping** — a control-character token in
-  the source, split in the paragraph handler and turned into real line breaks between
-  wrapped segments — because a marker that reaches the wrapper is a marker that
-  occupies width. The implementation is the next increment; this ADR fixes the design
-  so it is not improvised, and names the paths that must consume it (the paragraph
-  handler's plain, vector, mermaid and described exits, plus a sweep at finalize for
-  any path that forgets).
+- **The backslash marker is deferred, not scheduled** (operator, 2026-10-07: *"we do
+  not need to implement the backslash break, yet, if ever"*). The rule above stands on
+  its own — prose whitespace is inert and no invisible mark carries meaning — and the
+  edit-safety invariant does not depend on the marker at all. Not building it makes the
+  invariant **absolute**: with no character-level channel in prose whatever, *a text
+  edit changes only what it changes* holds without exception, which is a stronger
+  property than the one this ADR was written to protect. If it is ever built, the
+  design is fixed here: the break must be consumed **before wrapping**, as a
+  control-character token split in the paragraph handler and turned into real line
+  breaks between wrapped segments — and the paths that must consume it are named, so
+  the next reader does not have to find them (the paragraph handler's plain, vector,
+  mermaid and described exits, plus a sweep at finalize for any path that forgets).
 - A hard break is not a paragraph break: it stays inside one block, so it does not
   earn the blank line that separates paragraphs.
 

@@ -14,11 +14,12 @@ import { stripANSI } from "../src/width";
  *  spec expects a `<br>` here; the divergence is stated in the ADR and pinned here so
  *  that nobody "fixes" it back into a bug.
  *
- *  OWED, and it belongs in this file when the marker lands: a trailing backslash is
- *  the one break signal we DO honour, and there is no test for it because there is no
- *  implementation yet (ADR-PROSE-BREAKS-056, "Constraints this imposes"). Add it here
- *  — a break between wrapped segments, consumed before the wrapper sees it — rather
- *  than in the render suite, because it is this invariant's exception. */
+ *  DEFERRED, not owed: a trailing backslash would be the one break signal worth
+ *  honouring, and the operator's decision (2026-10-07) is not to build it yet, if ever.
+ *  That makes this invariant ABSOLUTE rather than qualified — with no character-level
+ *  channel in prose at all, there is no exception to state and no case to add. If it is
+ *  ever built, its test belongs here (a break between wrapped segments, consumed before
+ *  the wrapper sees it), not in the render suite. */
 
 const visible = (out: string) =>
   stripANSI(out)
