@@ -24,10 +24,12 @@ import {
   renderEqual,
   type Fetch,
   type FetchState,
+  frameTrace,
 } from "../src/tui";
 import { makeStyler } from "../src/ansi";
 import { DRACULA_PALETTE } from "../src/palette";
 import { displayWidth, stripANSI } from "../src/width";
+import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -747,5 +749,27 @@ describe("tui — resolveJumpTarget containment (BRF-ROOT-CONTAINMENT)", () => {
     //     stale frame becomes self-correcting and unpinnable.
     expect(src).toContain("paintedGeometry = renderCols > 0");
     expect(src).not.toContain("paintedGeometry = geometryOf(rows, cols)");
+  });
+
+  test("the frame trace writes to a file, never the tty, and never throws", async () => {
+    // The instrument for the pane-boundary glitches: a width change that moves a
+    // couple of words, self-corrects, and cannot be caught by eye. One read of
+    // this file settles the direction of the change — and the direction decides
+    // whether an honest fix exists (narrowing must be adopted; widening may lag).
+    const path = join(tmpdir(), `okuda-frames-${Date.now()}.log`);
+    process.env.OKUDA_FRAME_LOG = path;
+    try {
+      frameTrace("resize cols=80 rows=24");
+      frameTrace("paint cols=80 rows=24 render=79 scroll=0");
+      const text = await Bun.file(path).text();
+      expect(text).toContain("resize cols=80 rows=24");
+      expect(text).toContain("render=79");
+      // A path that cannot be written must not break the frame it traces.
+      process.env.OKUDA_FRAME_LOG = join(tmpdir(), "okuda-no-such-dir", "x.log");
+      expect(() => frameTrace("paint cols=1")).not.toThrow();
+    } finally {
+      delete process.env.OKUDA_FRAME_LOG;
+      rmSync(path, { force: true });
+    }
   });
 });

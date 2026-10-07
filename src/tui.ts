@@ -24,8 +24,33 @@ import { loadPalette, type Palette } from "./palette";
 import { renderDocument, wrapWholeFile } from "./render";
 import { isWithinRoot } from "./root";
 import { basename, dirname, isAbsolute, join, resolve } from "node:path";
-import { existsSync } from "node:fs";
-import { padStartDisplay, terminalCols, terminalRows } from "./width";
+import { appendFileSync, existsSync } from "node:fs";
+import { displayWidth, padStartDisplay, terminalCols, terminalRows } from "./width";
+
+/** The frame trace — one line per resize, render and paint, appended to the file
+ *  `OKUDA_FRAME_LOG` names. A FILE, never the tty: a debug line on stdout would
+ *  corrupt the very frame it is tracing. Silent unless the variable is set, and
+ *  it never throws — a trace that can break the frame it traces is worse than no
+ *  trace.
+ *
+ *  Why it exists: the visual glitches of 2026-10-06/07 were all races at a pane
+ *  boundary — a couple of words moving as focus leaves, self-correcting, over in
+ *  a frame, and unpinnable by looking at it. `resize cols=.. rows=..` next to
+ *  `paint cols=.. render=..` settles in one read whether a `cols` change is real,
+ *  which DIRECTION it goes, and whether the frame we painted was rendered at the
+ *  width we now hold. The direction decides whether an honest fix exists at all:
+ *  narrowing must be adopted immediately (a frame wider than the pane wraps),
+ *  widening may be adopted lazily (a frame narrower than the pane merely has a
+ *  margin). Nothing here is inferred from the glass. */
+export const frameTrace = (line: string): void => {
+  const path = process.env.OKUDA_FRAME_LOG;
+  if (!path) return;
+  try {
+    appendFileSync(path, `${new Date().toISOString()} ${line}\n`);
+  } catch {
+    // Silence on purpose: the trace must never break the frame it traces.
+  }
+};
 
 export interface TuiOptions {
   file: string;
@@ -599,8 +624,16 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   let renderCols = 0;
   const renderLines = async (source: string, width: number): Promise<string[]> => {
     const out = await renderDocument(source, { width, palette, color });
+    const lines = out.split("\n");
     renderCols = width;
-    return out.split("\n");
+    if (process.env.OKUDA_FRAME_LOG) {
+      const maxline = lines.reduce((a, l) => Math.max(a, displayWidth(l)), 0);
+      // maxline is the number that must not exceed the pane: everything at the
+      // content width (an elided fence, diagram art, the chip-padded heading) is
+      // what the terminal soft-wraps when it does.
+      frameTrace(`render width=${width} maxline=${maxline} lines=${lines.length}`);
+    }
+    return lines;
   };
 
   /** The glass's live geometry — the ONE width source. The initial frame reads
@@ -810,6 +843,10 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // from the pane asserts that the glass holds a frame it does not hold, and
     // the next event at that width then compares equal and skips the repair.
     paintedGeometry = renderCols > 0 ? geometryOf(rows, renderCols) : "";
+    // The whole point of the trace is this line beside the rerender's `skip`: a
+    // pane narrower than `render` is the frame the terminal wraps, and a `skip`
+    // whose cols equal the painted cols is a resize we were right to ignore.
+    frameTrace(`paint cols=${cols} rows=${rows} render=${renderCols} scroll=${scroll}`);
     process.stdout.write(syncWrap(frame));
   };
 
@@ -850,7 +887,10 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // first; the glass answers the second — a height-only resize re-renders
     // identical lines, so the gate reads `same` and the frame still needs
     // laying out (ADR-RESIZE-GEOMETRY-046).
-    if (!needsRepaint(decision.repaint, geometryOf(rows, cols), paintedGeometry)) return;
+    if (!needsRepaint(decision.repaint, geometryOf(rows, cols), paintedGeometry)) {
+      frameTrace(`skip cols=${cols} rows=${rows} painted=${paintedGeometry} content=${decision.repaint}`);
+      return;
+    }
     const oldLines = lines;
     lines = decision.lines;
     scroll = reanchoredScroll(oldLines, lines, scroll, height);
@@ -1163,7 +1203,11 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   // gate; trusting the gate alone left the newly uncovered rows blank and a
   // shrink's footer addressing a row that no longer existed
   // (ADR-RESIZE-GEOMETRY-046). (brief: resize-content-anchor)
-  const onWinch = (): void => { void rerenderAnchored("resize"); };
+  const onWinch = (): void => {
+    const d = dims();
+    frameTrace(`resize cols=${d.cols} rows=${d.rows}`);
+    void rerenderAnchored("resize");
+  };
   process.on("SIGWINCH", onWinch);
 
   // Clean exit on signal: restore the terminal, then hard-exit. A signal
