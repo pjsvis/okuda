@@ -1210,7 +1210,13 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   // (ADR-RESIZE-GEOMETRY-046). (brief: resize-content-anchor)
   const onWinch = (): void => {
     const d = dims();
-    frameTrace(`resize cols=${d.cols} rows=${d.rows}`);
+    // The event line carries the terminal's own report beside our resolved
+    // width: a SIGWINCH that arrives with the two in disagreement is the
+    // fallback path answering, and a SIGWINCH that changes neither is an event
+    // we are right to ignore.
+    frameTrace(
+      `resize cols=${d.cols} rows=${d.rows} tty=${process.stdout.columns ?? "-"}x${process.stdout.rows ?? "-"}`,
+    );
     void rerenderAnchored("resize");
   };
   process.on("SIGWINCH", onWinch);
