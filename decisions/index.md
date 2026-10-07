@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-07 | ADR-SEARCH-RECENCY-053 | Accepted | Recency first in the picker — newest at the top, and case-insensitive directories | 053-search-recency.md |
 | 2026-10-03 | ADR-EXIT-FERMATA-051 | Accepted | The exit fermata — the drain window is over-determined | 051-exit-fermata.md |
 | 2026-10-03 | ADR-ARCHIVE-RESOLUTION | Accepted | The archive resolves — resolution and search diverge at the archive boundary | 052-archive-resolution-tier.md |
 | 2026-10-02 | ADR-UNIVERSAL-ELISION-050 | Accepted | Elision is the universal overflow policy — the terminal never soft-wraps what okuda emits | 050-universal-elision.md |
@@ -38,7 +39,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-30 | ADR-CALLSIGN-DATA-024 | Accepted | Callsigns are data, not machinery | 024-callsigns-are-data.md |
 | 2026-08-30 | ADR-MNEMONIC-MODEL-025 | Accepted | The mnemonic namespace model | 025-mnemonic-namespace-model.md |
 | 2026-08-29 | ADR-ROLE-LAYOUT-022 | Accepted | Right-anchored role layout for patterned surfaces | 022-right-anchored-role-layout.md |
-| 2026-08-29 | ADR-TTY-ACTIVE-INPUT-023 | Accepted | /dev/tty active-poll reader for the TUI (bypass Bun's broken passive stdin) | 023-tty-active-input-reader.md |
+| 2026-08-29 | ADR-TTY-ACTIVE-INPUT-023 | Aborted | /dev/tty active-poll reader for the TUI (bypass Bun's broken passive stdin) | 023-tty-active-input-reader.md |
 | 2026-08-28 | ADR-RETIRE-OKW-018 | Accepted | Retire the "OKW" term | 018-retire-the-okw-term.md |
 | 2026-08-28 | ADR-OKF-V02-019 | Accepted | Adopt OKF v0.2 conformance for the document tree | 019-okf-v02-conformance.md |
 | 2026-08-28 | ADR-ZERO-NOTIFICATION-020 | Accepted | Zero-notification stillness — identity lives on the status line | 020-zero-notification-stillness.md |

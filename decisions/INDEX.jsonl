@@ -20,7 +20,7 @@
 {"file":"020-zero-notification-stillness.md","date":"2026-08-28","status":"Accepted","summary":"Zero-notification stillness — identity lives on the status line","meta":{},"callsign":"ADR-ZERO-NOTIFICATION-020"}
 {"file":"021-jump-token-numbering-offset.md","date":"2026-08-28","status":"Accepted","summary":"Jump tokens number from 11, not 01 — the ergonomic offset","meta":{},"callsign":"ADR-JUMP-TOKEN-021"}
 {"file":"022-right-anchored-role-layout.md","date":"2026-08-29","status":"Accepted","summary":"Right-anchored role layout for patterned surfaces","meta":{},"callsign":"ADR-ROLE-LAYOUT-022"}
-{"file":"023-tty-active-input-reader.md","date":"2026-08-29","status":"Accepted","summary":"/dev/tty active-poll reader for the TUI (bypass Bun's broken passive stdin)","meta":{},"callsign":"ADR-TTY-ACTIVE-INPUT-023"}
+{"file":"023-tty-active-input-reader.md","date":"2026-08-29","status":"Aborted","summary":"/dev/tty active-poll reader for the TUI (bypass Bun's broken passive stdin)","meta":{},"callsign":"ADR-TTY-ACTIVE-INPUT-023"}
 {"file":"024-callsigns-are-data.md","date":"2026-08-30","status":"Accepted","summary":"Callsigns are data, not machinery","meta":{},"callsign":"ADR-CALLSIGN-DATA-024"}
 {"file":"025-mnemonic-namespace-model.md","date":"2026-08-30","status":"Accepted","summary":"The mnemonic namespace model","meta":{},"callsign":"ADR-MNEMONIC-MODEL-025"}
 {"file":"026-wire-format.md","date":"2026-08-31","status":"Accepted","summary":"The wire format — one grammar, two forms, paint decoupled","meta":{},"callsign":"ADR-WIRE-FORMAT-026"}
@@ -49,3 +49,4 @@
 {"file":"050-universal-elision.md","date":"2026-10-02","status":"Accepted","summary":"Elision is the universal overflow policy — the terminal never soft-wraps what okuda emits","meta":{},"callsign":"ADR-UNIVERSAL-ELISION-050"}
 {"file":"051-exit-fermata.md","date":"2026-10-03","status":"Accepted","summary":"The exit fermata — the drain window is over-determined","meta":{},"callsign":"ADR-EXIT-FERMATA-051"}
 {"file":"052-archive-resolution-tier.md","date":"2026-10-03","status":"Accepted","summary":"The archive resolves — resolution and search diverge at the archive boundary","meta":{},"callsign":"ADR-ARCHIVE-RESOLUTION"}
+{"file":"053-search-recency.md","date":"2026-10-07","status":"Accepted","summary":"Recency first in the picker — newest at the top, and case-insensitive directories","meta":{},"callsign":"ADR-SEARCH-RECENCY-053"}
