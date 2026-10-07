@@ -9,7 +9,9 @@ callsign: PLY-DEBRIEFS
 
 A debrief is a retrospective written after completing significant work. It captures what was built, what went wrong, and what was learned — so the next session starts from evidence, not folklore.
 
-**Debriefs are required for significant work** (AGENTS.md rule 8). A debrief documents what *actually happened*, not what the brief planned. Discrepancies between plan and reality are the interesting part — record them, don't smooth them over.
+**Debriefs are required for significant work** (AGENTS.md rule 8). A debrief documents what *actually happened*, not what the brief planned. Discrepancies between plan and reality are the **content**, not the garnish — record them, don't smooth them over.
+
+The trigger is *significant*, not *surprising*, and that was tested rather than assumed (2026-10-07): the registry's summaries are already near-uniformly surprise reports, and a threshold of "debrief when it surprised you" cannot be gated at all — the surprise is the thing the debrief discovers. Keep the trigger you can answer before the fact.
 
 **Frozen on completion.** A debrief is a record, not a living document. Once written it is never edited for content; corrections or later insights go in a new debrief or an ADR, not retroactive edits to the frozen record.
 

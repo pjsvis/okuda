@@ -104,3 +104,28 @@ Four sub-rulings, each load-bearing:
   gains the generated section
 - scripts/references-demo.ts, tmp/section-diff.ts — the fixture and the
   diff instrument that measured the omission
+
+## Annotation (2026-10-07)
+
+**The section can omit, in one case — and it is the case the cap creates.** The
+claim above, *"written by hand omits by omission; generation cannot"*, holds
+until the address cap binds. The original instrument (`tmp/section-diff.ts`)
+asked whether the generated section omits; at the current corpus size it does.
+
+Measured with the full gate (callsign ‖ path, as `src/cli.ts` composes it):
+`briefs/index.md` at 82 rows yields 80 occurrences — `scanReferences` slices at
+`MAX_REFS` — and 77 addresses, because `buildJumpMap` dedupes by target (three
+briefs appear a second time inside another row's summary). Six rows render with
+no silcrow and the receipt lists 77 of 82 destinations **while reading as
+complete**. Highest address assigned: 95 of 98, so discovery binds before the
+address space does.
+
+What survives is the distinction the argument was made on: generation cannot
+omit *at the author's discretion*. What dies is the absolute. The loss falls on
+the oldest rows by construction — the view is recency-first
+(`playbooks/registry-playbook.md`, "Ordering") — and that is the accepted trade.
+
+The honest remedy is a **boundary mark, not a warning**: an alarm that fires on
+every render of a growing view is an alarm that is off. The receipt should say
+where it stops, the way `…` says where a cell stops. The mark is not built; the
+measurement above is the case for it.

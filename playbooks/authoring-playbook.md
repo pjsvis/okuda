@@ -280,6 +280,23 @@ new documents; the existing hand-written sections stay as history.
 **Write the reference; the number takes care of itself.** The rules
 that survive:
 
+**Three forms, three behaviours.** Measured 2026-10-07 by running `jumpMapFor`
+over the corpus's own shapes, in prose, in a list and in a table cell:
+
+| form | in the jump map | piped text |
+|---|---|---|
+| `` `playbooks/td-playbook.md` `` — a path | yes | clean |
+| `[text](playbooks/td-playbook.md)` — a link | yes | `text playbooks/td-playbook.md` — doubles |
+| `` `td-playbook.md` `` — a bare basename | **no** | clean, and inert |
+
+**Write the path.** A link buys nothing the path does not already mint, and it
+prints its target twice. A basename is the one form that mints nothing at all —
+Ring C is parked by decision (no slash, no intent; resolution-is-search, not
+lookup), and **281 backticked basenames** sit silently in the corpus (measured
+2026-10-07, generated `index.md` views and naming patterns excluded). Root-level
+files (`AGENTS.md`, `DEPENDENCIES.md`, `system.md`) are silent for a different
+reason: the ring needs a slash and they have nowhere to put one.
+
 - **References are plain text.** A callsign in prose, a link to a local
   document. No wiring, no tokens, no HTML comments.
 - **Numbering is structural, not authored.** Reading order, unique by

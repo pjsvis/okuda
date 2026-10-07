@@ -4,6 +4,7 @@
 {"file":"chrome-playbook.md","date":"2026-08-25","status":"canonical","summary":"Chrome Playbook","meta":{},"callsign":"PLY-CHROME"}
 {"file":"debriefs-playbook.md","date":"2026-08-20","status":"canonical","summary":"Debrief format for retrospectives after completing a brief","meta":{"source":"blog-posts"},"callsign":"PLY-DEBRIEFS"}
 {"file":"decisions-playbook.md","date":"2026-08-20","status":"canonical","summary":"ADR format, lifecycle, and the palimpsest mitigation protocol","meta":{"source":"blog-posts"},"callsign":"PLY-DECISIONS"}
+{"file":"defect-playbook.md","date":"2026-10-07","status":"canonical","summary":"defect discipline: symptom before cause, fix or defer by kind, instrument the deferral, keep the museum","meta":{},"callsign":"PLY-DEFECT"}
 {"file":"ear-playbook.md","date":"2026-09-14","status":"canonical","summary":"Ear Playbook — getting a document spoken","meta":{},"callsign":"PLY-EAR"}
 {"file":"gloam-launcher-playbook.md","date":"2026-08-26","status":"canonical","summary":"Gloam Launcher Playbook","meta":{},"callsign":"PLY-GLOAM-LAUNCHER"}
 {"file":"gloam-preview-playbook.md","date":"2026-09-27","status":"canonical","summary":"Gloam Preview Playbook","meta":{},"callsign":"PLY-GLOAM-PREVIEW"}
@@ -11,7 +12,7 @@
 {"file":"herdr-cast-playbook.md","date":"2026-08-31","status":"canonical","summary":"Herdr cast playbook — casting documents to panes, scripting the host","meta":{},"callsign":"PLY-HERDR-CAST"}
 {"file":"justfile-playbook.md","date":"2026-09-14","status":"canonical","summary":"Justfile facade: house style (noun-phrase comments, comment-attribute-recipe order, groups, @-silencing), tricky parts, revit protocol","meta":{"source":"observed","origin":"feat/help-recipe session, Aug 2026"},"callsign":"PLY-JUSTFILE"}
 {"file":"mermaid-diagrams-playbook.md","date":"2026-09-01","status":"canonical","summary":"Mermaid diagrams playbook — authoring for the SpaceXAi renderer","meta":{},"callsign":"PLY-MERMAID-DIAGRAMS"}
-{"file":"playbooks-playbook.md","date":"2026-08-20","status":"canonical","summary":"When and how to write playbooks; the four-tier knowledge system","meta":{"source":"blog-posts"},"callsign":"PLY-DOC"}
+{"file":"playbooks-playbook.md","date":"2026-08-20","status":"canonical","summary":"The Process Playbook — the knowledge system (tiers, answers, lifetimes), the route through it, and how to write a playbook","meta":{"source":"blog-posts"},"callsign":"PLY-DOC"}
 {"file":"registry-playbook.md","date":"2026-09-14","status":"canonical","summary":"Document index system: JSONL schema, reg-sync workflow, status conventions","meta":{"source":"blog-posts"},"callsign":"PLY-REGISTRY"}
 {"file":"silo-playbook.md","date":"2026-08-20","status":"canonical","summary":"Minimum viable silo: playbooks-first structure, on-demand folders, justfile lexicon, system.md constitution, .archive scaling","meta":{"source":"blog-posts","adapted":"2026-08-20 generalised from blog-specific import"},"callsign":"PLY-SILO"}
 {"file":"td-playbook.md","date":"2026-08-20","status":"canonical","summary":"td task management: session startup, claiming work, pre-commit gate, branch hygiene","meta":{"source":"blog-posts"},"callsign":"PLY-TD"}

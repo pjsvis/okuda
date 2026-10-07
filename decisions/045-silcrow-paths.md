@@ -6,7 +6,7 @@ callsign: ADR-SILCROW-PATHS-045
 # Decision: Silcrow paths — the gate's second substrate is the filesystem
 
 **Date:** 2026-09-29
-**Status:** Accepted
+**Status:** Accepted (**annotated 2026-10-07** — Ring B landed 2026-10-01)
 **Extends:** ADR-044 (the gate on inferred references — this hands the
 gate a second substrate); ADR-020 (the render-path boundary holds by
 parameter, as before); ADR-024's principle read backwards (callsigns are
@@ -48,7 +48,8 @@ reference invisible to the resolver, hiding for weeks).
 2. **Discovery admits the code-file ring**: `dir/name.ext`, at least one
    slash, non-md extension, gated by the same `resolves` parameter.
    `.md`-shaped mentions stay out of this ring — named md paths are
-   their own step (Ring B), not yet wired. Bare basenames stay out
+   their own step (Ring B — **landed 2026-10-01**, see the annotation
+   below). Bare basenames stay out
    entirely (Ring C, parked): no slash, no intent; resolution-is-search,
    not lookup.
 
@@ -79,3 +80,26 @@ reference invisible to the resolver, hiding for weeks).
   day the file lands (`palettes/okuda.json` has a ready-made welcome).
 - The probe stays as the drift detector — a suppressed typo is quieter
   than a flashing silcrow; `tmp/silcrow-ext-probe.ts` is the list.
+
+## Annotation (2026-10-07)
+
+**Ring B landed 2026-10-01** (DBF-SILCROW-RING-B). The parenthetical
+in point 2 — *"not yet wired"* — had been false for six days, and the decision
+text is annotated in place rather than left to teach a state of the world that
+had changed. Ring C (bare basenames) remains parked by decision, and its
+reasoning still holds: no slash, no intent, resolution-is-search.
+
+Verified by `jumpMapFor` on 2026-10-07: a backticked path mints in prose, in a
+list item and in a table cell, and a bare basename mints nothing. A local `.md`
+link also mints, but renders its target a second time as text — so the path is
+the form to write (`playbooks/authoring-playbook.md`, "References are text").
+
+**Cap re-measurement (the one the Consequences section asked for).** "0 of 344
+documents over" held when written. With the whole gate composed — callsign ‖ path,
+as `src/cli.ts` composes it — `briefs/index.md` mints **77 of 80** addresses on 82
+rows, and the other index views sit at 53, 32 and 18. The briefs index grows one
+row per brief, and the cap fails silently (`hits.slice(0, MAX_REFS)` in
+`src/vectors.ts`, no indicator, and `annotateSource` simply skips unpainted
+targets), so the oldest rows lose their references without a mark. The index is
+an artifact by the launcher's own Layer-0 exclusion — the case for not minting in
+it at all is now the stronger one.

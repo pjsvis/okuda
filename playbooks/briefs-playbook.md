@@ -7,7 +7,7 @@ callsign: PLY-BRIEFS
 
 ## What a Brief Is
 
-A brief is the **record of intent** for a piece of work: what we will do, why, what "done" means, and what to watch out for. It is written before the work; the work is the execution of the brief. Everything else in the silo (decisions, debriefs) derives from and references briefs — never the reverse.
+A brief is the **record of intent** for a piece of work: what we will do, why, what "done" means, and what to watch out for. It is written before the work; the work is the execution of the brief. ADRs and debriefs on the same subject **reference** it — they do not derive from it. An ADR records a choice made *during* the work, a debrief records what happened *after* it, and neither follows from the brief's intent. The difference matters: a decision is a judgement made under what you knew at the time, not a consequence of the plan.
 
 Every brief is a single `.md` file in `briefs/`.
 
@@ -59,7 +59,7 @@ One sentence. What are we doing and why?
 
 Constraints, risks, known pitfalls, barnacles — anything the executor
 needs in order to avoid known issues. Decisions made *during* execution
-do not belong here; they go to ADRs (`decisions-playbook.md`).
+do not belong here; they go to ADRs (`playbooks/decisions-playbook.md`).
 ```
 
 ## Writing Rules
@@ -78,7 +78,7 @@ do not belong here; they go to ADRs (`decisions-playbook.md`).
 3. **Check off** plan items as they complete.
 4. **Record** significant choices made during execution as ADRs (`decisions/NNN-*.md`).
 5. **Update** Status to `Done` only when all acceptance criteria hold.
-6. **Sync** the registry: the `briefs/INDEX.jsonl` entry follows `open` → `in_progress` → `done` (see `registry-playbook.md`).
+6. **Sync** the registry: the `briefs/INDEX.jsonl` entry follows `open` → `in_progress` → `done` (see `playbooks/registry-playbook.md`).
 
 ## Phased Work
 
@@ -98,7 +98,7 @@ files. td offers two distinct constructs — pick by what you need:
 td is the continuity system — it tracks implementation state (claimed,
 in progress, handed off with remaining work) across sessions, which a
 static document cannot. For most phased brief work, `td ws` is the
-right tool. See `td-playbook.md`.
+right tool. See `playbooks/td-playbook.md`.
 
 ## Archiving
 

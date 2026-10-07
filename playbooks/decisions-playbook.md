@@ -85,13 +85,10 @@ All ADRs reside in `decisions/`.
 
 ## Differences from Briefs and Debriefs
 
-| | Brief | ADR | Debrief |
-|---|-------|-----|---------|
-| **When** | Before | During | After |
-| **Answers** | "What will we build?" | "Why did we choose X?" | "What happened?" |
-| **Audience** | Implementer | Future maintainer | Future agent |
-| **Lifespan** | Becomes irrelevant after completion | Retains value indefinitely | Historical reference |
-| **Updates** | Status only (Open → Done) | Status only (Proposed → Accepted → Superseded) | Never (frozen on completion) |
+The tiers, what each answers and how long each lives are owned in one place —
+`playbooks/playbooks-playbook.md`. The ADR's distinguishing property: it is written
+*during* execution, at the moment of decision, and it is never deleted —
+superseded and annotated in place, per the Palimpsest Protocol above.
 
 ## Review Checklist
 
@@ -101,6 +98,10 @@ Before committing an ADR:
 - [ ] Consequences include both "easier" and "harder"
 - [ ] Constraints are specific and actionable
 - [ ] Related links are correct and files exist
+- [ ] **Every claimed fact names its instrument.** An assertion that something is
+  sound, valid or unchanged carries the command, measurement or test behind it —
+  or the word *unverified*. (The rule, and the ADR-UNIVERSAL-ELISION-050 example
+  that earned it: `playbooks/playbooks-playbook.md`.)
 - [ ] **Amends a parent ADR? The parent carries the in-place annotation** (status
   line + the amended body passage). A citation in the child is not enough: without
   the annotation the parent keeps teaching repealed law to every reader who

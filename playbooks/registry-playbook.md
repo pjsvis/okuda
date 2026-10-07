@@ -113,6 +113,29 @@ bun scripts/reg-list.ts playbooks
 | decisions | `Proposed`, `Accepted`, `Superseded` |
 | playbooks | `canonical`, `project` |
 
+### Ordering — the view is recency-first, the store is append-order
+
+`renderIndexDoc` sorts `b.date.localeCompare(a.date)`, so **the generated
+`index.md` views are newest-first** and the oldest row sits at the bottom.
+`INDEX.jsonl` is the opposite — append order, chronological ascending. Do not
+"align" them: the store has no reading order, the view does.
+
+This is not cosmetic. Reading order is what assigns silcrow numbers (ADR-031),
+so it decides which pointers the address cap truncates, and **it is what makes
+the loss acceptable**: measured 2026-10-07, `briefs/index.md` at 82 rows
+assigns 77 addresses and the six rows left without one are exactly the six
+oldest (2026-08-25 and 2026-08-27). Newest-first is a guarantee about *which*
+pointers die first — never reorder a view without knowing that.
+
+### Silcrow address pressure
+
+The cap applies twice, and discovery binds first. `scanReferences` slices its
+hits at `MAX_REFS` (80), then `buildJumpMap` dedupes by target (three briefs
+appear a second time inside another row's summary, so 80 occurrences become 77
+addresses). The address space — 12–98 minus the reserved repeated-digit class,
+80 addresses — is not the binding limit yet (highest assigned: 95). Both will
+bind within a handful of documents at the current rate.
+
 ### No parallel stores
 
 The index is the single source of truth for directory contents. Do not maintain a separate spreadsheet, Notion doc, or other parallel tracking system. If the index is stale, fix the index — don't create a shadow tracker.
