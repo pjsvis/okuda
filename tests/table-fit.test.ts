@@ -48,6 +48,29 @@ describe("the table ladder", () => {
     for (const l of lines) expect(displayWidth(l)).toBeLessThanOrEqual(24);
   });
 
+  test("headers wrap and never elide", async () => {
+    const src =
+      "| lines over 80 by the reference ruler | Superseded by |\n|---|---|\n" +
+      "| 1024 | 1 |\n";
+    const lines = visible(await renderDocument(src, { width: 80, color: "none" }));
+    // no elision anywhere: the label wraps rather than losing its tail
+    expect(lines.every((l) => !l.includes("…"))).toBe(true);
+    // and it is still there, whole, across its lines
+    for (const word of ["lines", "reference", "ruler", "Superseded"]) {
+      expect(lines.some((l) => l.includes(word))).toBe(true);
+    }
+  });
+
+  test("a label does not hold a column open for its own length", async () => {
+    const src = "| lines over 80 by the reference ruler | x |\n|---|---|\n| 1 | 2 |\n";
+    const lines = visible(await renderDocument(src, { width: 120, color: "none" }))
+      .filter((l) => !l.trimEnd().endsWith("█"));
+    const widest = Math.max(...lines.map(displayWidth));
+    // The label is 35 columns; the column is floored at its longest word (9)
+    // plus the 3-column gutter and the 2-column document margin.
+    expect(widest).toBeLessThan(20);
+  });
+
   test("the band cap: never wider than 120 columns, whatever the glass", async () => {
     const wide =
       "| a | b | c | d | e | f |\n|---|---|---|---|---|---|\n" +

@@ -223,8 +223,15 @@ index tables (a `reg-sync` change, tracked as its own issue).
        started this — `Element │ Channel │ Role │ Hex` squeezed to `Eleme… │
        struct… │ purple b… │ #bd9…` — now renders every key column whole at 80,
        and the whole table at 120. One deviation from the design, above.
-3. [ ] The row block: headers first (O(1) lines, and it is the same mechanic),
-       then the prose column. Check the classifier now reads data naturals.
+3. [x] **Headers landed 2026-10-07.** Labels cut went **129 → 0** at 80 columns and
+       53 → 0 at 120. Starved columns 192 → 172, elided cells 1812 → 1483. The
+       classifier now reads the body with the header floored at its longest word,
+       and two tables migrated into `design`. The instrument needed the same
+       correction in the same commit — and so did its cut detector, which pairs
+       adjacent rendered lines to catch a broken word and therefore read a wrapped
+       header's consecutive lines as a cut: four tables with no allocator fault
+       were reported as cut until the detector learned that a header is a block.
+       The prose column is what remains.
 4. [ ] Tests: one unit vector per branch (design / matrix / irreducible / prose)
        and the shape classifier. The instrument is the integration test.
 5. [ ] Dogfood `just tables` at 80 and 120, and `just tables-monster`, against

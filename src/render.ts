@@ -1474,22 +1474,37 @@ function renderTable(t: TableState, ctx: Ctx): string {
     return renderMenuTable(t, ctx);
   }
 
-  // Natural column widths from cell display width, and each column's longest
-  // word — the floor of the ladder. At or above it, a cell's leading word
-  // survives the cut whole; below it, that word is itself cut. Elision cuts at
-  // a character, not at a space, so this is the guarantee the floor buys
-  // (BRF-TABLE-LADDER) — not the stronger one of cutting at word boundaries.
-  const colWidth = new Array<number>(cols).fill(0);
+  // Column measurement (BRF-TABLE-LADDER). A column's width is what its BODY
+  // needs, with the header contributing only its LONGEST WORD: a header is
+  // allowed to be three lines tall, so a label like "lines over 80 by the
+  // reference ruler" must not hold thirty-five columns open for three characters
+  // of data. 143 of the corpus's 1038 columns were sized by their label.
+  const bodyNat = new Array<number>(cols).fill(0);
+  const headNat = new Array<number>(cols).fill(0);
+  const headWord = new Array<number>(cols).fill(0);
   const wordWidth = new Array<number>(cols).fill(0);
-  const measure = (cell: Cell | undefined, i: number): void => {
-    const text = cell?.text ?? "";
-    colWidth[i] = Math.max(colWidth[i]!, displayWidth(text));
+  const longestWord = (text: string, into: number[], i: number): void => {
     for (const word of stripANSI(text).split(/\s+/)) {
-      wordWidth[i] = Math.max(wordWidth[i]!, displayWidth(word));
+      into[i] = Math.max(into[i]!, displayWidth(word));
     }
   };
-  header.forEach(measure);
-  for (const r of rows) r.forEach(measure);
+  header.forEach((cell, i) => {
+    const text = cell?.text ?? "";
+    headNat[i] = displayWidth(text);
+    longestWord(text, headWord, i);
+    longestWord(text, wordWidth, i);
+  });
+  for (const r of rows) {
+    r.forEach((cell, i) => {
+      const text = cell?.text ?? "";
+      bodyNat[i] = Math.max(bodyNat[i]!, displayWidth(text));
+      longestWord(text, wordWidth, i);
+    });
+  }
+  // The width a column is allocated against. `wordWidth` is the elision floor
+  // (see the ladder below); it is never above this, because a body cell that is
+  // one long word sets both.
+  const colWidth = bodyNat.map((n, i) => Math.max(n, headWord[i]!));
 
   const gutter = 3;
   let total = colWidth.reduce((a, b) => a + b, 0) + gutter * (cols - 1);
@@ -1580,14 +1595,33 @@ function renderTable(t: TableState, ctx: Ctx): string {
   const sep = ` ${styler.tablePipe()} `;
   const bodySep = " ".repeat(gutter);
   const drawn: string[] = [];
+  let headHeight = 0;
   if (header.length > 0) {
-    const cells = header.map((c, i) =>
-      padCell(
-        { text: styler.roleBold("table-header", c.text), align: c.align },
-        i, colWidth,
-      ),
-    );
-    drawn.push(cells.join(sep));
+    // Headers wrap and never elide (BRF-TABLE-LADDER). A header is one block, so
+    // its cost is O(1) table lines where a body cell's is O(rows) — and the label
+    // is the column's decode key, so it is the last thing that should be cut.
+    // 129 of the 457 starved columns at 80 columns were the label losing to its
+    // own data.
+    const headLines: string[][] = Array.from({ length: cols }, (_, i) => {
+      const c = header[i];
+      if (!c) return [" ".repeat(colWidth[i]!)];
+      const slot = colWidth[i]!;
+      const text = styler.roleBold("table-header", c.text);
+      const wrapped = slot > 0 && displayWidth(c.text) > slot
+        ? wrapANSI(text, { width: slot })
+        : [text];
+      // A word longer than the slot cannot be wrapped, so padCell elides it —
+      // that is the irreducible case, and the instrument names it.
+      return wrapped.map((l) => padCell({ text: l, align: c.align }, 0, [slot]));
+    });
+    headHeight = Math.max(1, ...headLines.map((l) => l.length));
+    for (let k = 0; k < headHeight; k++) {
+      // Every line of the header block carries the column separators, so the grid
+      // survives a label three lines tall.
+      drawn.push(
+        headLines.map((l, i) => l[k] ?? " ".repeat(colWidth[i]!)).join(sep),
+      );
+    }
   }
   for (const r of rows) {
     const cells: string[] = [];
@@ -1617,12 +1651,15 @@ function renderTable(t: TableState, ctx: Ctx): string {
   const tableWidth = lines.reduce((a, l) => Math.max(a, displayWidth(l)), 0);
   const rule = styler.rule(tableWidth);
 
-  // Header row + its rule (the rule belongs to the header, not the rows); body
+  // Header block + its rule (the rule belongs to the header, not the rows); body
   // rows keep a 3-space gutter so columns align with the header separators.
   const out: string[] = [];
-  const body = header.length > 0 ? lines.slice(1) : lines;
-  if (header.length > 0) out.push(lines[0]!, rule);
-  out.push(...body);
+  const headBlock = header.length > 0 ? headHeight + 1 : 0;
+  if (headBlock > 0) {
+    out.push(...lines.slice(0, headHeight));
+    out.push(rule);
+  }
+  out.push(...lines.slice(headHeight));
   // Closing rule under the table (tables are bracketed).
   out.push(rule);
 
@@ -1634,8 +1671,9 @@ function renderTable(t: TableState, ctx: Ctx): string {
     block.split("\n").map((l) => l.replace(/[ ]+$/, "")).join("\n"),
   );
   if (header.length > 0) {
-    return trimmed.slice(0, 2).join("\n") + "\n\n" +
-      trimmed.slice(2).join("\n\n") + "\n\n";
+    // The header block may be several lines tall, and its rule belongs to it.
+    return trimmed.slice(0, headBlock).join("\n") + "\n\n" +
+      trimmed.slice(headBlock).join("\n\n") + "\n\n";
   }
   return trimmed.join("\n\n") + "\n\n";
 }

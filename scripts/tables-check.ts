@@ -332,6 +332,14 @@ async function read(t: Table, source: string): Promise<Reading> {
   const frag = (line: string, k: number) =>
     line.slice(starts[k]!, ends[k]! === 10 ** 6 ? undefined : ends[k]!).trim();
   const run = [...head, ...bodyAll];
+  /** The header is a BLOCK of lines since BRF-TABLE-LADDER (it wraps), so two
+   *  adjacent lines inside it are a wrap, and the pair straddling its last line
+   *  is a row boundary. Neither is a broken word: pairing across them reads a
+   *  legitimate wrap as a cut, which is how four tables with no allocator fault
+   *  were reported as cut. Body rows are still single-line by construction
+   *  (ADR-UNIVERSAL-ELISION-050), so the pairing still catches what it was
+   *  built for. */
+  const headEnd = head.length;
   // Elision, observed: a cell is elided at its tail (never wrapped — ADR-050),
   // so `endsWith`, not `includes`. A column whose SOURCE ends in `…` renders one
   // too, with the allocator blameless — skip those columns outright.
@@ -357,6 +365,7 @@ async function read(t: Table, source: string): Promise<Reading> {
   for (let k = 0; k < starts.length; k++) {
     const hay = " " + columnText[k]! + " ";
     for (let i = 0; i + 1 < run.length; i++) {
+      if (i < headEnd) continue;
       const a = frag(run[i]!, k);
       const b = frag(run[i + 1]!, k);
       if (!a || !b) continue;
@@ -431,6 +440,11 @@ for (const file of files) {
     tables++;
     const r = await read(t, source);
     const cols = t.nat.length;
+    // The column the RENDERER allocates: the body's need with the header floor at
+    // its longest word, because headers wrap (BRF-TABLE-LADDER). Reading the
+    // label's full width here would measure a column the renderer never makes.
+    const colNat = t.nat.map((n, k) => Math.max(t.bodyNat[k] ?? 0, t.headWord[k] ?? 0, 0));
+    const natural = colNat.reduce((a, b) => a + b, 0) + GUTTER * Math.max(0, cols - 1);
     // A column is starved when it fits whole alongside every other column's
     // floor, and the render shows the allocator eliding it anyway. The floor is
     // the allocator's own (3, src/render.ts) — the promise it makes each
@@ -440,7 +454,7 @@ for (const file of files) {
     // glass counts elisions the renderer was right to make.
     const floorOthers = 3 * Math.max(0, cols - 1);
     const budget = Math.min(CONTENT, BAND_CONTENT) - GUTTER * Math.max(0, cols - 1);
-    const starvedCols = t.nat
+    const starvedCols = colNat
       .map((n, k) => (n + floorOthers <= budget && (r.elided[k] ?? 0) > 0 ? k : -1))
       .filter((k) => k >= 0);
     if (r.cuts.length === 0 && r.lines !== r.rows && r.lines >= 0) reflow++;
@@ -450,7 +464,7 @@ for (const file of files) {
     // and the air is already reported as `slack`, so clamping the slot to the
     // column's natural width keeps the two readings from double-counting it.
     const slots = r.slots.length === cols
-      ? r.slots.map((s, k) => (k === cols - 1 ? Math.min(s, t.nat[k] ?? s) : s))
+      ? r.slots.map((s, k) => (k === cols - 1 ? Math.min(s, colNat[k] ?? s) : s))
       : r.slots;
     rowsRead.push({
       file,
@@ -465,16 +479,16 @@ for (const file of files) {
       elided: r.elided.reduce((a, b) => a + b, 0),
       starvedSample: starvedCols.map((k) => r.samples[k]).find((s) => s && s.length > 0) ?? "",
       slack: r.ruleSlack,
-      natural: t.natural,
-      forced: t.natural > BAND_CONTENT,
-      shape: shapeOf(t.natural, t.nat),
-      nat: t.nat,
+      natural,
+      forced: natural > BAND_CONTENT,
+      shape: shapeOf(natural, colNat),
+      nat: colNat,
       // Two ways to leave the band, and both are the document's problem:
       // a longest word the band cannot hold at all, or a second column past
       // the band (a prose matrix — two notes pretending to be a table).
       outlier: t.wordBudget > BAND_CONTENT
         ? "word"
-        : t.nat.filter((n) => n > BAND_CONTENT).length > 1 ? "giants" : null,
+        : colNat.filter((n) => n > BAND_CONTENT).length > 1 ? "giants" : null,
       generated: source.includes("Generated from the registry"),
       headerDominated: t.headNat.filter((h, k) => h > (t.bodyNat[k] ?? 0)).length,
       headerCut: r.headerCut.filter(Boolean).length,
