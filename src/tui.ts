@@ -889,7 +889,33 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  see, so the repaint decision is `needsRepaint`: a resize that changes
    *  only the height repaints on geometry, not on content
    *  (ADR-RESIZE-GEOMETRY-046). */
-  const rerenderAnchored = async (reason: "watch" | "resize" | "reload"): Promise<void> => {
+  /** One render in flight at a time, and the rest coalesce into it. A drag emits
+   *  SIGWINCHes far faster than a render completes, and each one used to start its
+   *  own: fifteen rapid resizes produced **39 renders and 1.15 s of CPU** on a
+   *  400-line document (~77 ms per event), which is the load the perf meter shows
+   *  while a pane is dragged. A resize arriving mid-render sets a flag and ONE more
+   *  pass runs when the current lands. Latest-wins by construction: the pass reads
+   *  the geometry live (`dims()`) rather than the queued value, so the last event
+   *  wins without being queued. (Dogfood find, 2026-10-07.) */
+  let rendering = false;
+  let renderAgain = false;
+  const rerenderAnchored = (reason: "watch" | "resize" | "reload"): void => {
+    if (rendering) {
+      renderAgain = true;
+      frameTrace(`coalesce ${reason} (a render is in flight)`);
+      return;
+    }
+    rendering = true;
+    void renderOnce(reason).finally(() => {
+      rendering = false;
+      if (renderAgain) {
+        renderAgain = false;
+        rerenderAnchored("resize");
+      }
+    });
+  };
+
+  const renderOnce = async (reason: "watch" | "resize" | "reload"): Promise<void> => {
     // Frozen gates only the WATCHER — the document stays still while an
     // agent edits; resize follows the glass and `r` is the manual
     // override (keyboard-controls, 2026-09-05). No flag save/restore.
@@ -928,9 +954,15 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // References section (ADR-047 — the map's receipt, downstream of the
     // paint so its callsigns never re-enter the map); dereferenced renders
     // are clean — no section, the two-render contract.
+    // One render at the live width, not `renderAtGlass`'s retry loop: that loop
+    // exists for the INITIAL frame, where no handler is installed yet and the glass
+    // may still be settling. Here a moving width is already coalesced — the event
+    // that moved it set `renderAgain`, so the follow-up pass renders at the width it
+    // settled on. Keeping the loop here is what multiplied a drag's events by three.
     const next = fetch.ok
-      ? await renderAtGlass(
+      ? await renderLines(
         atMain ? appendReferences(annotateSource(fetch.text, mainJumps), mainJumps) : fetch.text,
+        cols,
       )
       : [];
     const decision = gateFetch(lines, fetch, next);
