@@ -107,7 +107,7 @@ That is the viewer's own path, top to bottom: markdown in, coloured ASCII out. A
 
 And beneath each diagram, one muted indicator line: `⋮ mermaid source elided`. The source is not rendered — it is tautological in a single-render seam (the art and the source come from one binary run; they cannot disagree, and `mermaid-to-md --verify` is the drift check, reading the `.md`, not the render). The indicator is a renderer statement — it names what the renderer did (elided the source), not where the source hides. Art in the foreground, the statement honest underneath.
 
-A fence may carry its own caption — a leading `title:` line in the mermaid source — and the caption joins the notice on the same line: `⋮ The cycle · source elided`. The clause is shorter there because this line is never wrapped, so the title's length is the notice's budget: `mermaid source elided` fits beneath an untitled diagram, and beneath the silo's longest caption it would measure 79 columns against the body's 78. Every diagram states the elision either way.
+A fence may carry its own caption — a leading `title:` line in the mermaid source — and the caption joins the notice on the same line: `⋮ The cycle · source elided`. The clause is shorter there because this line is never wrapped, so the title's length is the notice's budget: `mermaid source elided` fits beneath an untitled diagram, and beneath the silo's longest caption the notice elides at the body's own budget — a long caption is cut with `…`, never allowed to push the line past the glass. Every diagram states the elision either way.
 
 ---
 
