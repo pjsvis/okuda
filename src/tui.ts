@@ -590,8 +590,16 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     }
   };
 
+  /** The width the lines currently on screen were rendered at — the frame's stamp
+   *  is THIS, not the live glass. See `paint`: a stamp taken from the pane asserts
+   *  that the glass holds a frame it does not hold, and a later event at that same
+   *  width then compares equal and skips the repair. Set inside `renderLines`, the
+   *  one choke point every render passes through, so it cannot drift from the
+   *  content it describes. 0 until something is rendered. */
+  let renderCols = 0;
   const renderLines = async (source: string, width: number): Promise<string[]> => {
     const out = await renderDocument(source, { width, palette, color });
+    renderCols = width;
     return out.split("\n");
   };
 
@@ -609,6 +617,22 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     rows: terminalRows(opts.rows || 24),
     cols: terminalCols(opts.width || 80),
   });
+
+  /** Render at the size the glass has NOW, re-taking if it moves underneath the
+   *  render. The glass settles after exec — a host opens a pane and then sizes it
+   *  — so a single render is a snapshot of a width that may already be gone, and
+   *  the terminal then soft-wraps whatever filled the old one: an elided code
+   *  fence, diagram art, or the chip-padded heading line, whose `…` lands on the
+   *  next line until a SIGWINCH re-renders. Bounded to three takes; if the glass
+   *  is still moving, paint what we have and let the resize handler finish.
+   *  (Dogfood find, 2026-10-07.) */
+  const renderAtGlass = async (source: string): Promise<string[]> => {
+    let out = await renderLines(source, dims().cols);
+    for (let take = 0; take < 2 && renderCols !== dims().cols; take++) {
+      out = await renderLines(source, dims().cols);
+    }
+    return out;
+  };
 
   // Enter the alt-screen *before* the first read+render: the file fetch and
   // the markdown render are async, and doing them in the primary screen
@@ -648,9 +672,8 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     mainJumps = deriveMain(mainText);
   }
   const initialRender = initialFetch.ok
-    ? await renderLines(
+    ? await renderAtGlass(
         appendReferences(annotateSource(initialFetch.text, mainJumps), mainJumps),
-        dims().cols,
       )
     : [];
   const init = gateFetch(null, initialFetch, initialRender);
@@ -782,7 +805,11 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       frame += `\x1b[${rows - 1};1H`;
       frame += hintsLine(cols, muted);
     }
-    paintedGeometry = geometryOf(rows, cols); // the glass now holds this
+    // The stamp describes the frame the glass HOLDS, which is the geometry its
+    // lines were RENDERED at — not the pane's geometry at paint time. Taking it
+    // from the pane asserts that the glass holds a frame it does not hold, and
+    // the next event at that width then compares equal and skips the repair.
+    paintedGeometry = renderCols > 0 ? geometryOf(rows, renderCols) : "";
     process.stdout.write(syncWrap(frame));
   };
 
@@ -813,9 +840,8 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // paint so its callsigns never re-enter the map); dereferenced renders
     // are clean — no section, the two-render contract.
     const next = fetch.ok
-      ? await renderLines(
+      ? await renderAtGlass(
         atMain ? appendReferences(annotateSource(fetch.text, mainJumps), mainJumps) : fetch.text,
-        cols,
       )
       : [];
     const decision = gateFetch(lines, fetch, next);

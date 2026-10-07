@@ -735,9 +735,17 @@ describe("tui — resolveJumpTarget containment (BRF-ROOT-CONTAINMENT)", () => {
     // true width. The fix is one width source; this asserts there is still one,
     // because the bug is invisible from a pipe and only a later frame shows it.
     const src = await Bun.file(new URL("../src/tui.ts", import.meta.url)).text();
+    // (1) The first frame takes its width from the live glass, through the one
+    //     function that re-takes it if the pane moves underneath the render.
     const first = src.slice(src.indexOf("const initialRender"), src.indexOf("gateFetch(null"));
-    expect(first).toContain("dims().cols");
+    expect(first).toContain("renderAtGlass(");
     expect(first).not.toContain("opts.width");
     expect(src.match(/const dims = \(\) => \(\{/g)?.length ?? 0).toBe(1);
+    // (2) The frame's stamp describes the RENDER, not the pane. A stamp taken
+    //     from the pane claims a frame the glass does not hold, so the next event
+    //     at that same width compares equal and skips the repair — which is how a
+    //     stale frame becomes self-correcting and unpinnable.
+    expect(src).toContain("paintedGeometry = renderCols > 0");
+    expect(src).not.toContain("paintedGeometry = geometryOf(rows, cols)");
   });
 });
