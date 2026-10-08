@@ -6,7 +6,8 @@ date: 2026-10-08
 
 # Decision: The document lifecycle — ephemeral, record, addressed, retired
 
-**Date:** 2026-10-08
+**Date:** 2026-10-08 · **amended 2026-10-08** (the built class, and the warrant
+as a claim — the dispositions the prune batches produced)
 **Status:** Accepted
 **Answers:** `BRF-DOCUMENT-LIFECYCLE`
 
@@ -56,13 +57,77 @@ decision, not by clock.**
 **The keep-class — never deleted.** Rejections and reversals: what was tried and
 refused, what was decided and undone. The expensive failure of a knowledge silo
 is re-deciding.
-
 **The operation is a move, not a deletion.** Extract-then-delete: a discussion
 whose verdict landed is retired only once the Thing it fed carries the decisive
 warrant, not merely the alternative's name.
 
 **The oracle is the citation graph.** Code deletion has a compiler. Document
 deletion has citations, and nothing else screams.
+
+## Amendment (2026-10-08): the built class, and the warrant as a claim
+
+Five prune batches produced two tests this ADR does not contain — containment
+(one document's prose inside another's) and the disposition question — and the
+fifth met a document class the question has no slot for. The question, from
+`DBF-PRUNE-BATCH-4`: *is the design here the one the system built, the one it
+refused, or one it never noticed? Only the third is disposable.*
+
+`DBF-PRUNE-BATCH-5` met the missing case and left the finding as a **standing
+doctrine candidate** — "*built* as a missing class; *noticed-but-uncarried* as
+the honest sub-case". A candidate becomes policy here, because the alternative
+is that a disposition applied four times stays in four debriefs and nowhere the
+next pruner reads.
+
+The hole is **built**. A document stating a design the system *built* is not a
+refusal (the keep-class is absolute) and not a never-noticed one (which the line
+above makes disposable) — so a deletion of that class rests on a different
+ground, and an unexamined disposition is taste. The ground was named in batch 5
+(`4d5efb2`) and is now the doctrine.
+
+**The dispositions, complete:**
+
+| disposition | test | outcome |
+|---|---|---|
+| **refused / reversed** | the document records a decision the system made *against* a design | keep-class — absolute, no further test |
+| **never noticed** | no Thing carries it, no citation names it, nothing was built | disposable |
+| **built, statement carried** | the design is live *and* an addressed Thing states it | disposable on the **derivative ground** |
+| **built, statement uncarried** | the design is live but only this document *states* it | disposable only if the **practice is live**; else it is the only record, and it stays |
+
+The fourth line is the addition. Its test is not textual — nothing will contain
+it — so it must be answered by reading, and the answer is about *practice*: the
+silo continues to do the thing even after the sentence describing it is gone.
+Where the practice is live, the framing retires and the work continues; where it
+is not, deleting the only statement is how a silo forgets a capability it once
+had.
+
+**The derivative ground, stated.** A built design whose statement is carried by
+an addressed Thing is disposable *because the Thing carries the warrant*, not
+because the document was uninteresting. This is the same predicate as the
+keep-class, read forwards: the keep-class protects a decided-against design
+because nothing else will record it; the derivative ground releases a
+built-and-carried one because something else already did.
+
+**The warrant must be a claim, not a name.** This ADR already says a document is
+retired only once the Thing it fed carries the decisive warrant "not merely the
+alternative's name". That sentence turned out to govern the *carriers* too: in
+batch 5 a carrier cited by name passed the check while stating a different
+design — two unrelated claims share the token *Janeway*, one a viewport
+assertion, one a command topology with retained root access. A citation that
+resolves is not yet a citation that **means**. The carriers are read, and what
+they say is stated alongside what they are.
+
+**Register is not a disposition.** A narrative that carries no claim, cites
+nothing, and records no refusal is not a fifth kind of keep — rhetoric is not a
+disposition, whatever its quality. Batch 5 waived extraction for one such story
+on a **reproducibility** call rather than a doctrinal one (*we can always
+rewrite a blog post*). That is a judgement available case by case; it is not a
+general licence to delete prose, and it does not make the register disposable.
+
+**A reading's limits are part of its record.** `DBF-PRUNE-BATCH-4` requires that
+every deletion past the duplicates rests on a reading, and that the reading be
+recorded. Record its reach as well: which elements of the retired document had
+no carrier, and why that was admissible under the fourth line above. A warrant
+recorded without its limits is read by the next batch as coverage.
 
 ## Alternatives Considered
 
@@ -95,6 +160,14 @@ deletion has citations, and nothing else screams.
 ## Related
 
 - `BRF-DOCUMENT-LIFECYCLE` — the brief this answers
+- `DBF-PRUNE-BATCH-2`, `DBF-PRUNE-BATCH-3` — containment, the test that carries
+  no reading: a document inside another is a duplicate, and the reading
+  instrument is not needed
+- `DBF-PRUNE-BATCH-4` — the disposition question (*built, refused, or never
+  noticed*) and the rule that every deletion past the duplicates rests on a
+  reading that must be recorded
+- `DBF-PRUNE-BATCH-5` — the built class met, the Janeway conflation, and the
+  *noticed-but-uncarried* name this amendment settles (`4d5efb2`)
 - `docs/2026-10-08-time-is-a-claim.md` — git as a cache; the date as a claim
 - `docs/2026-10-08-the-filename-is-a-record.md` — the register framing
 - `ADR-ARCHIVE-RESOLUTION` — the archive as a resolution scope
