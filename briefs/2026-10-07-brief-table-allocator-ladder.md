@@ -7,13 +7,10 @@ callsign: BRF-TABLE-LADDER
 
 **Date:** 2026-10-07
 **Status:** Open
-**Context:** ADR-UNIVERSAL-ELISION-050 repealed the in-cell wrap and, in the same
-ruling, certified the arithmetic that remained: *"The proportional budget
-computation is VALID … and stands unchanged."* It answers the question. It
-answers it badly, and nobody had measured it. The instrument now has, and the
-operator's framing supplies the missing invariant: **authors write to 80 columns,
-120 is elbow room, below the design width we elide, and outside the band is an
-authoring problem.**
+
+## Context
+
+ADR-UNIVERSAL-ELISION-050 repealed the in-cell wrap and, in the same ruling, certified the arithmetic that remained: *"The proportional budget computation is VALID … and stands unchanged."* It answers the question. It answers it badly, and nobody had measured it. The instrument now has, and the operator's framing supplies the missing invariant: **authors write to 80 columns, 120 is elbow room, below the design width we elide, and outside the band is an authoring problem.**
 
 ## Objective
 

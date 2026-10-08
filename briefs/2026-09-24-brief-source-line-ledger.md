@@ -8,9 +8,18 @@ date: 2026-09-24
 
 **Created:** 2026-09-24
 **Status:** Open
-**TD:** none — the ledger's mechanism has an unprobed assumption (call order == block order); `td epic create` after the P-1 probes confirm or kill it. Writing the task list before the probe is an invented plan.
-**Lineage:** the leaf teardown, 2026-09-24 (RivoLink/leaf — a feature-maximalist newcomer whose one clean feature is the `{$line}` editor jump). Verbatim, the operator, on seeing it: *"lets not think of lines, we use an anchor"* — then *"concur"* on the lookup-not-search verdict. The wire: `src/tui.ts:756` already carries this brief's name — `edit: () => flash("edit current — the edit brief is not wired yet")`. The verb `10` is bound; only its actuator is missing.
-**Extends:** `decisions/010-bounded-anchor-proportional-fallback.md` (ADR-BOUNDED-ANCHOR-010) — un-parks its parked alternative row, whose gate was *"no second consumer on the board."* This brief is that consumer arriving.
+
+## TD
+
+none — the ledger's mechanism has an unprobed assumption (call order == block order); `td epic create` after the P-1 probes confirm or kill it. Writing the task list before the probe is an invented plan.
+
+## Lineage
+
+the leaf teardown, 2026-09-24 (RivoLink/leaf — a feature-maximalist newcomer whose one clean feature is the `{$line}` editor jump). Verbatim, the operator, on seeing it: *"lets not think of lines, we use an anchor"* — then *"concur"* on the lookup-not-search verdict. The wire: `src/tui.ts:756` already carries this brief's name — `edit: () => flash("edit current — the edit brief is not wired yet")`. The verb `10` is bound; only its actuator is missing.
+
+## Extends
+
+`decisions/010-bounded-anchor-proportional-fallback.md` (ADR-BOUNDED-ANCHOR-010) — un-parks its parked alternative row, whose gate was *"no second consumer on the board."* This brief is that consumer arriving.
 
 ## Objective
 

@@ -8,10 +8,22 @@ date: 2026-09-29
 
 **Created:** 2026-09-29
 **Status:** Open — Step 3 shipped 2026-10-01 (DBF-SILCROW-RING-B) — Ring B + the legibility exile (ADR-049), 512/512, on `feat/silcrow-ring-b` awaiting merge. Ring A shipped 2026-09-29, reviewed and closed on main 2026-10-01 (503/503). Ring C parked with its census; the epic stays open until the operator's glass pass and the W5 drift list are dispositioned.
-**TD:** td-89d085 (epic). Only the first step's task is written (td-696449) — the operator's method: *"each step has its own wrinkles, that we have not discerned yet."* Later steps get their tasks when reached; the task list written before the step is an invented plan (BRF-SRC-LINE-LEDGER's own gate).
-**Lineage:** the operator, verbatim: *"we have integrated rendered code files into the Gloam ambit"* — *"lets consider extending the reach of our rubricated silcrows — ie if we mention a code file we can create a silcrow"* — *"and I am thinking for other named files and call-signed documents"* — and on method: *"there is a correct path here, so we should feel our way forward one step at a time."*
-**Extends:** ADR-044 (`decisions/044-validated-silcrows.md` — the gate on inferred references; this brief hands that gate a second substrate), BRF-CODE-SHELF (code entered the ambit and verified the read loop already closes: `resolveJumpTarget` existsSync's path targets, `wrapWholeFile` renders `.ts`), ADR-020 (the render-path boundary holds by parameter — unchanged), BRF-ADDRESS-CAP (the 80-address cap is the map's invariant; new token classes are new competitors for the addresses).
-**Grounding:** BRF-VALIDATED-SILCROWS — the gate's first substrate, reused twice here: its probe method (the Why), its gate semantics (one predicate, paint and actuator cannot disagree). `docs/2026-09-04-the-silcrow.md` — the explainer.
+
+## TD
+
+td-89d085 (epic). Only the first step's task is written (td-696449) — the operator's method: *"each step has its own wrinkles, that we have not discerned yet."* Later steps get their tasks when reached; the task list written before the step is an invented plan (BRF-SRC-LINE-LEDGER's own gate).
+
+## Lineage
+
+the operator, verbatim: *"we have integrated rendered code files into the Gloam ambit"* — *"lets consider extending the reach of our rubricated silcrows — ie if we mention a code file we can create a silcrow"* — *"and I am thinking for other named files and call-signed documents"* — and on method: *"there is a correct path here, so we should feel our way forward one step at a time."*
+
+## Extends
+
+ADR-044 (`decisions/044-validated-silcrows.md` — the gate on inferred references; this brief hands that gate a second substrate), BRF-CODE-SHELF (code entered the ambit and verified the read loop already closes: `resolveJumpTarget` existsSync's path targets, `wrapWholeFile` renders `.ts`), ADR-020 (the render-path boundary holds by parameter — unchanged), BRF-ADDRESS-CAP (the 80-address cap is the map's invariant; new token classes are new competitors for the addresses).
+
+## Grounding
+
+BRF-VALIDATED-SILCROWS — the gate's first substrate, reused twice here: its probe method (the Why), its gate semantics (one predicate, paint and actuator cannot disagree). `docs/2026-09-04-the-silcrow.md` — the explainer.
 
 ## Objective
 

@@ -5,7 +5,10 @@ callsign: ADV-SEARCH-TWO-FILTERS
 
 # ADV-SEARCH-TWO-FILTERS — Advisory on the two searches, the heuristic, and the annoyance
 
-**From:** AI-HR (the `b` variant) · **To:** All reader classes who type to find · **Date:** 2026-09-05 · **Status:** Open. Two searches, one door each; the heuristic is a feature you opt into by not pressing Esc.
+
+## From
+
+AI-HR (the `b` variant) · **To:** All reader classes who type to find · **Date:** 2026-09-05 · **Status:** Open. Two searches, one door each; the heuristic is a feature you opt into by not pressing Esc.
 
 ---
 

@@ -7,11 +7,10 @@ callsign: BRF-HEADING-ANSI-STRIP
 
 **Date:** 2026-10-03
 **Status:** Done
-**Landed:** 2026-10-03 — `stripANSI(stripHtml(children))` plus `keepHeading`
-  in `render.ts` (the heading re-opens after a guest paint's full reset);
-  pinned by two tests in `tests/render.test.ts`. Status corrected
-  2026-10-05 — it read Open while the code, the tests and `&next.md` all
-  said landed.
+
+## Landed
+
+2026-10-03 — `stripANSI(stripHtml(children))` plus `keepHeading`   in `render.ts` (the heading re-opens after a guest paint's full reset);   pinned by two tests in `tests/render.test.ts`. Status corrected   2026-10-05 — it read Open while the code, the tests and `&next.md` all   said landed.
 **TD:** the heading-strip task (closed with the index row regeneration)
 
 ## Objective

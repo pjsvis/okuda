@@ -8,13 +8,10 @@ callsign: BRF-CITTY-CLI
 **Date:** 2026-08-31
 **Status:** Ready — decision made pending the three gates
 **Branch:** feat/gloam-launcher
-**Context:** the CLI surface has reached hand-rolling's cost curve.
-`src/cli.ts` now carries the argv[0] dispatch (ADR-016), the TTY gates,
-`CALLSIGN_SHAPE`, and a growing flag set (`-g`, `--mci`, `--mce`,
-`--brightness` pending) — each new flag is manual parsing plus manual
-help plus manual drift risk. The surface is also the silo's *contract*:
-it is how agents and scripts address everything. A growing contract
-without generated documentation is the keymap problem wearing a suit.
+
+## Context
+
+the CLI surface has reached hand-rolling's cost curve. `src/cli.ts` now carries the argv[0] dispatch (ADR-016), the TTY gates, `CALLSIGN_SHAPE`, and a growing flag set (`-g`, `--mci`, `--mce`, `--brightness` pending) — each new flag is manual parsing plus manual help plus manual drift risk. The surface is also the silo's *contract*: it is how agents and scripts address everything. A growing contract without generated documentation is the keymap problem wearing a suit.
 
 ## The stance this brief must not violate
 

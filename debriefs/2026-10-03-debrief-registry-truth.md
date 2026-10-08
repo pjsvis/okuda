@@ -6,8 +6,7 @@ callsign: DBF-REGISTRY-TRUTH
 # Debrief: Registry truth — the audit that found the paperwork lying
 
 **Date:** 2026-10-03
-**Status:** Done — main = f7dd2d8 pushed; review queue empty; zero `in_progress`;
-19 brief entries match reality; the wrap-up protocol is in the playbook.
+**Status:** Done — main = f7dd2d8 pushed; review queue empty; zero `in_progress`; 19 brief entries match reality; the wrap-up protocol is in the playbook.
 
 ## What happened
 

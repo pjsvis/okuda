@@ -8,18 +8,18 @@ date: 2026-10-02
 
 **Created:** 2026-10-02
 **Status:** Open — brief only; tasks written when the work starts
-**Lineage:** the operator, verbatim: *"lets say we want to host a range
-of silos, a bit like our dev/github folder"* — *"we want a service where
-the user can SSH to the server and Gloam will run there"* — *"and we
-want Gloam as a client calling the server"* — *"so we demo two
-approaches"* — *"all we need is a security grammar."*
-**Extends:** BRF-SSH-HOST (P2 host trial, hardened: one corpus → a silo
-range, one `reader` → two account shapes), ADR-013 (ForceCommand,
-adopted), BRF-SSH-BLOG (the serve loop this demo's wrapper reuses).
-**Grounding:** the silo-audit of 2026-10-02 (this brief's sibling,
-BRF-ROOT-CONTAINMENT) — Gloam's reads are contained; its jump
-resolution and spawn verbs are not, so the *host* carries the boundary
-until the product does.
+
+## Lineage
+
+the operator, verbatim: *"lets say we want to host a range of silos, a bit like our dev/github folder"* — *"we want a service where the user can SSH to the server and Gloam will run there"* — *"and we want Gloam as a client calling the server"* — *"so we demo two approaches"* — *"all we need is a security grammar."*
+
+## Extends
+
+BRF-SSH-HOST (P2 host trial, hardened: one corpus → a silo range, one `reader` → two account shapes), ADR-013 (ForceCommand, adopted), BRF-SSH-BLOG (the serve loop this demo's wrapper reuses).
+
+## Grounding
+
+the silo-audit of 2026-10-02 (this brief's sibling, BRF-ROOT-CONTAINMENT) — Gloam's reads are contained; its jump resolution and spawn verbs are not, so the *host* carries the boundary until the product does.
 
 ## What
 

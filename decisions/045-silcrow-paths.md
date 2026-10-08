@@ -7,11 +7,10 @@ callsign: ADR-SILCROW-PATHS-045
 
 **Date:** 2026-09-29
 **Status:** Accepted (**annotated 2026-10-07** — Ring B landed 2026-10-01)
-**Extends:** ADR-044 (the gate on inferred references — this hands the
-gate a second substrate); ADR-020 (the render-path boundary holds by
-parameter, as before); ADR-024's principle read backwards (callsigns are
-data *because a registry holds them* — paths need no registry, the
-filesystem is already the index).
+
+## Extends
+
+ADR-044 (the gate on inferred references — this hands the gate a second substrate); ADR-020 (the render-path boundary holds by parameter, as before); ADR-024's principle read backwards (callsigns are data *because a registry holds them* — paths need no registry, the filesystem is already the index).
 
 ## Context
 

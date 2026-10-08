@@ -6,9 +6,10 @@ callsign: DBR-SSH-BRINGUP
 # Debrief: the SSH bring-up — glyph probes to a tear-free frame
 
 **Date:** 2026-09-02
-**Scope:** Probes 8–9 (BRF-GLYPH-STRESS), the Linux/Omarchy bring-up,
-the flicker diagnosis and fix (BRF-SYNC-OUTPUT), the v0.1.0 trifecta.
-One arc, one session-pair, closed with a tagged build.
+
+## Scope
+
+Probes 8–9 (BRF-GLYPH-STRESS), the Linux/Omarchy bring-up, the flicker diagnosis and fix (BRF-SYNC-OUTPUT), the v0.1.0 trifecta. One arc, one session-pair, closed with a tagged build.
 
 ## What happened, in the order it taught anything
 

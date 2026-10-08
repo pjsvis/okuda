@@ -9,8 +9,14 @@ date: 2026-09-18
 **Created:** 2026-09-18
 **Status:** Open
 **TD:** td-1bb4c4 (epic) — td-9997dc the check and the report
-**Lineage:** ADR-PERIMETER-039, *the voice reads okuda and does not live in it*, resting on the measurement in `docs/2026-09-18-a-perimeter-not-a-project.md` — 22 of the 28 `[moira]` recipes touch nothing of okuda's
-**Extends:** nothing. This is the enforcement half of a perimeter that has been stated three times and tested none.
+
+## Lineage
+
+ADR-PERIMETER-039, *the voice reads okuda and does not live in it*, resting on the measurement in `docs/2026-09-18-a-perimeter-not-a-project.md` — 22 of the 28 `[moira]` recipes touch nothing of okuda's
+
+## Extends
+
+nothing. This is the enforcement half of a perimeter that has been stated three times and tested none.
 
 ## Objective
 

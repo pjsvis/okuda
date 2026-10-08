@@ -9,29 +9,14 @@ date: 2026-09-15
 **Created:** 2026-09-15
 **Status:** Open
 **TD:** td-fb5059 (stream A — the silo's flattener) · td-615253 (stream B — the surface's cursor)
-**Lineage:** the reader's 2026-09-15 session, in moves. The fit — *right now
-it sounds like Moira is having a fit*. The instinct under it — *prefix each
-line with "line" or something; maybe read out the column header so that the
-table sounds like a collection of key value pairs*. The deepening — *we need
-indicators so that tables can be navigable; either that or we rerender the
-table for speech; we need to dogfood some options*. The spread to siblings —
-*list items should be prefixed with item; the list should announce the number
-of items at the top; sub-lists get a sub-item prefix; we prefer shallow lists
-with no nesting*. The mechanism — *a modifier key that works inside the table:
-hold it down and the key value pairs are spoken, lift and the values only are
-spoken; that along with an up down and maybe left right navigation grammar
-should be sufficient*. The closure — *are we, in effect, arguing for two
-renders of the table for speech: a fast and a slow reading available behind
-some keys* — answered here: **one structure, two registers**. The field
-evidence and the filter — `docs/2026-09-15-tables-for-unsighted-listeners.md`:
-*flatten, read row by row, name the columns*, vendor guidelines out, the blind
-users' statements in — *labels spoken with the value* (Taylor), *it counts on
-you remembering which row you're in* (Watson).
-**Extends:** **BRF-SPEECH-STRIDE** owns the arrows and the position event —
-inside a table, this brief seizes them: a rebind by context, not a fork in the
-keymap. The research note owns the survey and its filter. **ADR-036** owns the
-division of labour — the cue is okuda's, the voice is the silo's — and nothing
-below crosses it. **ADR-037** records the cursor decision this brief needs.
+
+## Lineage
+
+the reader's 2026-09-15 session, in moves. The fit — *right now it sounds like Moira is having a fit*. The instinct under it — *prefix each line with "line" or something; maybe read out the column header so that the table sounds like a collection of key value pairs*. The deepening — *we need indicators so that tables can be navigable; either that or we rerender the table for speech; we need to dogfood some options*. The spread to siblings — *list items should be prefixed with item; the list should announce the number of items at the top; sub-lists get a sub-item prefix; we prefer shallow lists with no nesting*. The mechanism — *a modifier key that works inside the table: hold it down and the key value pairs are spoken, lift and the values only are spoken; that along with an up down and maybe left right navigation grammar should be sufficient*. The closure — *are we, in effect, arguing for two renders of the table for speech: a fast and a slow reading available behind some keys* — answered here: **one structure, two registers**. The field evidence and the filter — `docs/2026-09-15-tables-for-unsighted-listeners.md`: *flatten, read row by row, name the columns*, vendor guidelines out, the blind users' statements in — *labels spoken with the value* (Taylor), *it counts on you remembering which row you're in* (Watson).
+
+## Extends
+
+**BRF-SPEECH-STRIDE** owns the arrows and the position event — inside a table, this brief seizes them: a rebind by context, not a fork in the keymap. The research note owns the survey and its filter. **ADR-036** owns the division of labour — the cue is okuda's, the voice is the silo's — and nothing below crosses it. **ADR-037** records the cursor decision this brief needs.
 
 ## Objective
 

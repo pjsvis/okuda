@@ -29,10 +29,20 @@ Example: `briefs/2026-08-20-brief-project-initialisation.md`
 
 **Date:** YYYY-MM-DD
 **Status:** [Open | In Progress | Done]
-**Context:** At most three sentences — what we assumed, what is wrong, what it
-costs. The warrant, not the argument; the argument is the body.
 
 ---
+
+## Context
+
+At most three sentences — what we assumed, what is wrong, what it costs. The
+warrant, not the argument; the argument is the body.
+
+**The header keeps the single-line identity fields only.** A field whose value
+needs more than one line — a long `TD`, a `Lineage`, a `Grounding` — is a `##`
+section, because consecutive field lines render as ONE paragraph: the header
+absorbs every value that follows it and the whole block becomes a wall the
+reader cannot step over. Measured 2026-10-08: the header pattern alone was
+four of the five tallest walls in the corpus.
 
 ## Objective
 

@@ -6,8 +6,7 @@ callsign: DBF-SILCROW-EDGE
 # Debrief: Silcrow edge cases — the guest handback, the self-mint, and the ephemeral queue
 
 **Date:** 2026-10-02
-**Status:** Done — both fixes on main (c9b6da4); td-181911 resolved; the
-protocol ran its second and third end-to-end passes.
+**Status:** Done — both fixes on main (c9b6da4); td-181911 resolved; the protocol ran its second and third end-to-end passes.
 
 ## What shipped
 

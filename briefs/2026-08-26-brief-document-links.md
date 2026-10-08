@@ -7,9 +7,10 @@ callsign: BRF-DOCUMENT-LINKS
 
 **Date:** 2026-08-26
 **Status:** Ready (small-medium; reader surface, src work)
-**Depends on:** render engine link handling (`src/wrap.ts` OSC 8 path);
-follows `2026-08-26-brief-ssh-blog-feed.md` (v1) — links are what turn
-the feed into a *site*.
+
+## Depends on
+
+render engine link handling (`src/wrap.ts` OSC 8 path); follows `2026-08-26-brief-ssh-blog-feed.md` (v1) — links are what turn the feed into a *site*.
 
 ## What
 

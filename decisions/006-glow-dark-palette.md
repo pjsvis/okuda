@@ -6,11 +6,7 @@ callsign: ADR-GLOW-DARK-006
 # Decision: Glow (glamour) dark palette as the default
 
 **Date:** 2026-08-24
-**Status:** Accepted (default-palette choice superseded 2026-08-25 by
-ADR-011 — the okuda-identity preset is now the default; the Dracula
-palette survives as `DRACULA_PALETTE` / `--palette dracula`. Everything
-else here — the contract table, byte-exact tests, override loader,
-NO_COLOR parity — remains in force)
+**Status:** Accepted (default-palette choice superseded 2026-08-25 by ADR-011 — the okuda-identity preset is now the default; the Dracula palette survives as `DRACULA_PALETTE` / `--palette dracula`. Everything else here — the contract table, byte-exact tests, override loader, NO_COLOR parity — remains in force)
 
 ## Context
 

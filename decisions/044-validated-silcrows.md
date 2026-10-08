@@ -7,10 +7,10 @@ callsign: ADR-VALIDATED-SILCROWS-044
 
 **Date:** 2026-09-24
 **Status:** Accepted
-**Supersedes:** ADR-031's *optimism* clause — "discovery never validates,
-the actuator fails honestly." One clause, not the ADR: dynamism, the
-one-destination-one-silcrow citation convention, the doubled-pair
-reservations, and re-derivation-replaces-invalidation all stand.
+
+## Supersedes
+
+ADR-031's *optimism* clause — "discovery never validates, the actuator fails honestly." One clause, not the ADR: dynamism, the one-destination-one-silcrow citation convention, the doubled-pair reservations, and re-derivation-replaces-invalidation all stand.
 
 ## Context
 

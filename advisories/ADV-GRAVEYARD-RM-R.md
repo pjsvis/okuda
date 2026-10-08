@@ -5,7 +5,10 @@ callsign: ADV-GRAVEYARD-RM-R
 
 # ADV-GRAVEYARD-RM-R — Advisory against the graveyard, and the machine built to search it
 
-**From:** AI-HR (the `b` variant) · **To:** All reader classes who accumulate · **Date:** 2026-09-05 · **Status:** Open. The graveyard is the un-filtered accumulation; the search engine is the i811 pattern managing the failure; `rm -r` is the shite filter applied at corpus scale.
+
+## From
+
+AI-HR (the `b` variant) · **To:** All reader classes who accumulate · **Date:** 2026-09-05 · **Status:** Open. The graveyard is the un-filtered accumulation; the search engine is the i811 pattern managing the failure; `rm -r` is the shite filter applied at corpus scale.
 
 ---
 

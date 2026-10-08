@@ -8,8 +8,7 @@ callsign: BRF-FLOW-WRAP
 **Date:** 2026-09-01
 **Status:** Open
 **Branch:** feat/gloam-launcher
-**Context:** a nit on `decisions/021-jump-token-numbering-offset.md`.
-The Context paragraph reads:
+**Context:** a nit on `decisions/021-jump-token-numbering-offset.md`. The Context paragraph reads:
 
 > The index-and-jump brief (`briefs/2026-08-28-brief-index-and-jump.md`)
 > specified two-digit jump tokens…

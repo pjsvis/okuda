@@ -7,8 +7,10 @@ callsign: BRF-DATE-INVARIANT
 
 **Date:** 2026-10-08
 **Status:** Done
-**Context:** The filename's ISO date is the only date that survives a copy:
-`mtime` is host-local and lost on transport, and frontmatter is invisible to `ls`.
+
+## Context
+
+The filename's ISO date is the only date that survives a copy: `mtime` is host-local and lost on transport, and frontmatter is invisible to `ls`.
 
 But an unverified assertion can lie. Nothing in the repo reconciled the name's
 date with the document's or the registry's, and `reg-sync` fell back to `mtime`

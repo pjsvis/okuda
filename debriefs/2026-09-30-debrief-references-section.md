@@ -6,14 +6,7 @@ callsign: DBF-REFERENCES-SECTION
 # Debrief: The References section — the renderer's receipt for its own map
 
 **Date:** 2026-09-30
-**Status:** Shipped — five commits on `feat/references-section` (`3889a6f..cc88556`):
-ADR-047 + the ADR-031 pointer, the generator with seven unit tests, the
-stream path, the TUI's three main-render sites, deprecations + dogfood.
-498 tests pass / 0 fail (490 at the day's open — the chroma-remap review
-session's baseline); `just check` green; smoke-test green; binary fresh at
-HEAD (`f65a800`). td ledger: td-e45bda + its five buildable children
-shipped (td-45f5d1, td-5e51ec, td-e473c2, td-eab6c6, td-3562fe); the URL
-channel (td-9eb7a4) stays open, out of scope by the brief's own non-goals.
+**Status:** Shipped — five commits on `feat/references-section` (`3889a6f..cc88556`): ADR-047 + the ADR-031 pointer, the generator with seven unit tests, the stream path, the TUI's three main-render sites, deprecations + dogfood. 498 tests pass / 0 fail (490 at the day's open — the chroma-remap review session's baseline); `just check` green; smoke-test green; binary fresh at HEAD (`f65a800`). td ledger: td-e45bda + its five buildable children shipped (td-45f5d1, td-5e51ec, td-e473c2, td-eab6c6, td-3562fe); the URL channel (td-9eb7a4) stays open, out of scope by the brief's own non-goals.
 
 The thesis: the brief was right where it mattered, and wrong in two
 measurable ways that the work itself corrected — both worth keeping.

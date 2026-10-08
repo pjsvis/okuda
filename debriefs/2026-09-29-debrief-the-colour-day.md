@@ -6,14 +6,7 @@ callsign: DBF-COLOUR-DAY
 # Debrief: The colour day — chroma, the shelf, and the curiosity that became a must-have
 
 **Date:** 2026-09-29
-**Status:** Shipped — five merges to `main`, `a3e53ff..790a7c6`:
-projection-losses (`f056dc2`), the SSH-host brief (`2ee1ab7`), fence-colour
-(`85da30c`), the onion grammar (`dcbb3d0`), the code shelf (`790a7c6`).
-472 tests pass / 0 fail (435 at the day's open); `just check` green;
-colour-smoke and search-smoke green; binary fresh at HEAD. td ledger:
-td-4e1aa2, td-d95cf3, td-dfa601, td-169fc4 closed; td-ab533c in review
-(&alpha docs, rode the grammar branch); td-83cc47 open (SSH host — P1
-build target and the trial remain).
+**Status:** Shipped — five merges to `main`, `a3e53ff..790a7c6`: projection-losses (`f056dc2`), the SSH-host brief (`2ee1ab7`), fence-colour (`85da30c`), the onion grammar (`dcbb3d0`), the code shelf (`790a7c6`). 472 tests pass / 0 fail (435 at the day's open); `just check` green; colour-smoke and search-smoke green; binary fresh at HEAD. td ledger: td-4e1aa2, td-d95cf3, td-dfa601, td-169fc4 closed; td-ab533c in review (&alpha docs, rode the grammar branch); td-83cc47 open (SSH host — P1 build target and the trial remain).
 
 The operator's line, on seeing the day assembled: *"we have just gone
 from curiosity to must-have."* The thesis of this debrief is that the

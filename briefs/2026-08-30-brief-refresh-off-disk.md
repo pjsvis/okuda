@@ -6,16 +6,13 @@ callsign: BRF-REFRESH-OFF-DISK
 # Brief: refresh off disk — the resize race + the R placebo
 
 **Date:** 2026-08-30
-**Amended:** 2026-09-30 — fault 3 added; fault 2's mechanism corrected
-(ADR-RESIZE-GEOMETRY-046)
+**Amended:** 2026-09-30 — fault 3 added; fault 2's mechanism corrected (ADR-RESIZE-GEOMETRY-046)
 **Status:** Open
 **Branch:** fix/resize-height (fault 3); `feat/gloam-launcher` no longer exists
-**Context:** surfaced during the fzf-owns-the-loop retrospective
-(`debriefs/2026-08-30-debrief-fzf-owns-the-loop-aborted.md`). The wrap
-engine is correct (verified standalone: zero overflows across widths
-5/10/13/21/80); the tearing on horizontal resize is the repaint path, not
-the wrap. Three faults in `src/tui.ts`, all in the default (non-spike)
-path — so they survived the abort revert and remain live.
+
+## Context
+
+surfaced during the fzf-owns-the-loop retrospective (`debriefs/2026-08-30-debrief-fzf-owns-the-loop-aborted.md`). The wrap engine is correct (verified standalone: zero overflows across widths 5/10/13/21/80); the tearing on horizontal resize is the repaint path, not the wrap. Three faults in `src/tui.ts`, all in the default (non-spike) path — so they survived the abort revert and remain live.
 
 ## The three faults
 

@@ -7,9 +7,10 @@ callsign: BRF-DOCUMENT-LIFECYCLE
 
 **Date:** 2026-10-08
 **Status:** Open
-**Context:** The silo is monotonic: documents accumulate, and nothing retires.
-`docs/` holds around two hundred files with no registry, and a growing tail of
-deliberation whose verdicts already landed.
+
+## Context
+
+The silo is monotonic: documents accumulate, and nothing retires. `docs/` holds around two hundred files with no registry, and a growing tail of deliberation whose verdicts already landed.
 
 The registers and their predicates were settled in discussion on 2026-10-08 —
 audit is not address, dates are broad and codes narrow, and git is a backup rather

@@ -8,11 +8,10 @@ callsign: BRF-MERMAID-SOURCE-OMITTED
 **Date:** 2026-09-01
 **Status:** Open (amended 2026-09-29 — the notice now reaches every fence; see Amendment below)
 **Branch:** feat/gloam-launcher
-**Context:** closing move on the mermaid render path, sequenced after
-td-b81597 (the elision primitive). A dogfood render of
-`docs/2026-08-29-from-intent-to-task-05.md` — three flowchart diagrams,
-each with a 15–20 line source block — surfaced the question: does the
-render need the source at all?
+
+## Context
+
+closing move on the mermaid render path, sequenced after td-b81597 (the elision primitive). A dogfood render of `docs/2026-08-29-from-intent-to-task-05.md` — three flowchart diagrams, each with a 15–20 line source block — surfaced the question: does the render need the source at all?
 
 > **Amendment (2026-09-29, BRF-PROJECTION-LOSSES).** This brief decided *that*
 > an indicator line exists and left the wording to implementation — so the

@@ -8,14 +8,10 @@ callsign: BRF-SSH-SERVED
 **Date:** 2026-08-26
 **Status:** Open
 **Branch:** feat/rhs-chip-headers → feat/ssh-deploy
-**Context:** riff on the terminal.shop precedent (Promagen et al.).
-terminal.shop is cool because commerce-over-SSH is stateful — cart,
-identity, payment — so it earns a custom `ssh2` server. A markdown
-viewer is **stateless**. The stateless case fits OpenSSH's
-`ForceCommand` the way a key fits its lock: zero server code, okuda's
-existing PTY fluency does the work. This brief scopes option 1 only;
-options 2 (custom ssh2 server + corpus picker) and 3 (in-process TUI)
-are named and deferred (see Out of scope).
+
+## Context
+
+riff on the terminal.shop precedent (Promagen et al.). terminal.shop is cool because commerce-over-SSH is stateful — cart, identity, payment — so it earns a custom `ssh2` server. A markdown viewer is **stateless**. The stateless case fits OpenSSH's `ForceCommand` the way a key fits its lock: zero server code, okuda's existing PTY fluency does the work. This brief scopes option 1 only; options 2 (custom ssh2 server + corpus picker) and 3 (in-process TUI) are named and deferred (see Out of scope).
 
 ## What
 

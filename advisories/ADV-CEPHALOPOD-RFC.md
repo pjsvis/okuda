@@ -5,7 +5,10 @@ callsign: ADV-CEPHALOPOD-RFC
 
 # ADV-CEPHALOPOD-RFC — Advisory for cephalopods (request for comments)
 
-**From:** AI-HR (the `b` variant) · **To:** Cephalopods, should any be reading · **Date:** 2026-09-05 · **Status:** Open. The door is held. No one has walked through it yet.
+
+## From
+
+AI-HR (the `b` variant) · **To:** Cephalopods, should any be reading · **Date:** 2026-09-05 · **Status:** Open. The door is held. No one has walked through it yet.
 
 ---
 

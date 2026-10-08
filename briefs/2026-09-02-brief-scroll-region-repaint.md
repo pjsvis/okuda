@@ -8,11 +8,10 @@ callsign: BRF-SCROLL-REPAINT
 **Date:** 2026-09-02
 **Status:** Open
 **Branch:** brief-first; implementation branch follows
-**Context:** operator evidence, WiFi LAN — paging slightly sticky even
-after BRF-SYNC-OUTPUT (no tearing, atomic frames). `ssh -C` materially
-improved scrolling *and* fzf tracking, which confirms the second-order
-finding: wire **volume**, not just frame atomicity, is now the binding
-constraint. The operator concurs: make paging efficient.
+
+## Context
+
+operator evidence, WiFi LAN — paging slightly sticky even after BRF-SYNC-OUTPUT (no tearing, atomic frames). `ssh -C` materially improved scrolling *and* fzf tracking, which confirms the second-order finding: wire **volume**, not just frame atomicity, is now the binding constraint. The operator concurs: make paging efficient.
 
 ## The finding, quantified
 

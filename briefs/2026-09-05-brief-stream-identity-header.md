@@ -8,7 +8,10 @@ callsign: BRF-STREAM-IDENTITY-HEADER
 **Date:** 2026-09-05
 **Status:** Open
 **Branch:** TBD
-**Context:** dogfood finding on the egress routes (print/braille/pipe). The streaming path (`okuda doc.md`, no `--tui`) emits the document body with no identity — no silo, no callsign, no filename. A reader holding the paper or the braille pins, or a process capturing the stream to an unknown target, has a document they cannot name.
+
+## Context
+
+dogfood finding on the egress routes (print/braille/pipe). The streaming path (`okuda doc.md`, no `--tui`) emits the document body with no identity — no silo, no callsign, no filename. A reader holding the paper or the braille pins, or a process capturing the stream to an unknown target, has a document they cannot name.
 
 ## The finding
 

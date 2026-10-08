@@ -8,9 +8,10 @@ callsign: BRF-SYNC-OUTPUT
 **Date:** 2026-09-02
 **Status:** Open
 **Branch:** feat/sync-output-frame
-**Context:** SSH dogfood, Mac → Omarchy (the Linux bring-up): visible
-flicker on the gloam TUI, on text content and diagrams alike. The
-trigger was latency; the cause was already in the renderer.
+
+## Context
+
+SSH dogfood, Mac → Omarchy (the Linux bring-up): visible flicker on the gloam TUI, on text content and diagrams alike. The trigger was latency; the cause was already in the renderer.
 
 ## The finding
 

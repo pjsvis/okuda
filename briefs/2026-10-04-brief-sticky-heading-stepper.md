@@ -8,12 +8,10 @@ callsign: BRF-STICKY-HEADING-STEPPER
 **Date:** 2026-10-04
 **Status:** Open
 **TD:** (to create)
-**Lineage:** frame mode (BRF-PAGED-OKUDAGRAM, `01` actuator) — the existing
-heading-to-heading stepper; the okudagram step (BRF-OKUDAGRAM-STEP) — the
-one-contiguous-page contract; the reader's report — "stepping through a
-document header by header"; the scroll-vs-frame distinction — a document on
-a computer is a scroll, and scrolls scroll at the wrong time; an okudagram
-is a frame on a wall, stable and discussable.
+
+## Lineage
+
+frame mode (BRF-PAGED-OKUDAGRAM, `01` actuator) — the existing heading-to-heading stepper; the okudagram step (BRF-OKUDAGRAM-STEP) — the one-contiguous-page contract; the reader's report — "stepping through a document header by header"; the scroll-vs-frame distinction — a document on a computer is a scroll, and scrolls scroll at the wrong time; an okudagram is a frame on a wall, stable and discussable.
 
 ## Objective
 

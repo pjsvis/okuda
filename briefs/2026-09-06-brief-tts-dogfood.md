@@ -7,10 +7,10 @@ callsign: BRF-TTS-DOGFOOD
 
 **Date:** 2026-09-06
 **Status:** Open
-**Lineage:** dialog session (dunt demolition → protocol-free identity,
-`docs/2026-09-06-protocol-free-text-identity.md`). Replaces the
-outbound-markup core of `BRF-AUDIO-STYLE` (amplitude/pause lookup,
-`SRSN:` protocol) — those were the `--dunt` error pointing outbound.
+
+## Lineage
+
+dialog session (dunt demolition → protocol-free identity, `docs/2026-09-06-protocol-free-text-identity.md`). Replaces the outbound-markup core of `BRF-AUDIO-STYLE` (amplitude/pause lookup, `SRSN:` protocol) — those were the `--dunt` error pointing outbound.
 
 ## Objective
 

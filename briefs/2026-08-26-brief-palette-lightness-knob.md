@@ -7,10 +7,10 @@ callsign: BRF-PALETTE-LIGHTNESS
 
 **Date:** 2026-08-26
 **Status:** Parked — gated on a real cross-terminal brightness itch
-**Gate:** the same document rendering pleasantly on one terminal and too
-bright (or too dim) on another, in regular use — e.g. the iPad's OLED
-against the Mac's LCD, or day/night ambient shifts. If per-role hex
-tweaks keep satisfying every complaint, this brief stays parked.
+
+## Gate
+
+the same document rendering pleasantly on one terminal and too bright (or too dim) on another, in regular use — e.g. the iPad's OLED against the Mac's LCD, or day/night ambient shifts. If per-role hex tweaks keep satisfying every complaint, this brief stays parked.
 
 ## What (when unparked)
 

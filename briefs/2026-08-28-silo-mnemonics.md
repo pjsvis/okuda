@@ -5,8 +5,7 @@ callsign: BRF-SILO-MNEMONICS
 
 # Brief: Rooted Gloam — silo badge and document callsigns
 
-**Created:** 2026-08-28 (rewritten from the first draft: badge placement,
-callsign ownership, and the rooted/unrooted axis revised after review)
+**Created:** 2026-08-28 (rewritten from the first draft: badge placement, callsign ownership, and the rooted/unrooted axis revised after review)
 **TD:** td-okuda-silo-mnemonics
 **Status:** open (amended 2026-08-30 — see Amendment below, ADR-024)
 

@@ -7,20 +7,14 @@ callsign: BRF-AUDIO-DISCOVERY
 
 **Date:** 2026-09-13
 **Status:** Open
-**TD:** td-d9e3fb (epic) — td-49bd49 cue seam, td-9f0ee6 patience contract,
-td-f0ff06 the cast principle, td-ec7f7f CSN is Moir's line, td-a42095 environment
-binding, td-e29b31 mode cue, td-fc17e9 the mis-numbered citation (resolved — ADR-036
-written), td-08ee48 dogfood by ear
-**Lineage:** the reader's proposal — *hit a `9` and a TTS unit alerts the reader
-that the CLONE actuator is pending* — and its second half, which is the better
-half: *spin up Moira and tell her to wait five seconds before speaking; if
-another key is pressed inside Moira's pause she abandons the recital.* Then a
-third: *the recital could be done in a lower register — not quite a whisper, more
-of an aside*, which resolved into a cast rather than a pitch (see Register). Also
-the visibility gap BRF-PROLONGED-PRESS found and parked (td-51d5f4 — a pending
-digit is never painted), and ADR-032's own sentence, *doubled = the system talks,
-mixed = the document moves*, which turns out to describe an audio channel as well
-as a grammar.
+
+## TD
+
+td-d9e3fb (epic) — td-49bd49 cue seam, td-9f0ee6 patience contract, td-f0ff06 the cast principle, td-ec7f7f CSN is Moir's line, td-a42095 environment binding, td-e29b31 mode cue, td-fc17e9 the mis-numbered citation (resolved — ADR-036 written), td-08ee48 dogfood by ear
+
+## Lineage
+
+the reader's proposal — *hit a `9` and a TTS unit alerts the reader that the CLONE actuator is pending* — and its second half, which is the better half: *spin up Moira and tell her to wait five seconds before speaking; if another key is pressed inside Moira's pause she abandons the recital.* Then a third: *the recital could be done in a lower register — not quite a whisper, more of an aside*, which resolved into a cast rather than a pitch (see Register). Also the visibility gap BRF-PROLONGED-PRESS found and parked (td-51d5f4 — a pending digit is never painted), and ADR-032's own sentence, *doubled = the system talks, mixed = the document moves*, which turns out to describe an audio channel as well as a grammar.
 
 ## Objective
 

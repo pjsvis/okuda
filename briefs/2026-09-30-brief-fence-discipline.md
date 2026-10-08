@@ -10,19 +10,18 @@ date: 2026-09-30
 **Status:** Open
 **TD:** td-da237f (epic) — td-a9de44 the scanner, td-81faf8 the seams, td-1b2d25 the tests and records
 **Branch:** feat/fence-discipline
-**Lineage:** a question to the renderer's owner — *are there trusted sources for
-regexes for parsing markdown* — asked on 2026-09-30, after the Warp assessment.
-The answer for markdown itself is no, and it is a theorem rather than a gap:
-the language is not regular (`spec.txt:9689`, the delimiter stack). So the
-question moved to the regexes okuda owns, and the fence scan is the largest
-of them. A probe then found a line going missing.
-**Extends:** `BRF-FENCE-COLOUR` — its `interceptCode` close discipline is the
-rule this brief generalises to every seam. The chroma spawn, the lexer-alias
-map, the pinned monokai style, the elision interaction and P2's whole-file
-path all stay that brief's.
-**Grounding:** `src/render.ts`, `src/vectors.ts`, CommonMark §4.5 (fenced code
-blocks), `briefs/2026-08-28-brief-elision-primitive.md` (the one-primitive
-precedent), `docs/2026-09-19-the-tag-the-renderer-eats.md`
+
+## Lineage
+
+a question to the renderer's owner — *are there trusted sources for regexes for parsing markdown* — asked on 2026-09-30, after the Warp assessment. The answer for markdown itself is no, and it is a theorem rather than a gap: the language is not regular (`spec.txt:9689`, the delimiter stack). So the question moved to the regexes okuda owns, and the fence scan is the largest of them. A probe then found a line going missing.
+
+## Extends
+
+`BRF-FENCE-COLOUR` — its `interceptCode` close discipline is the rule this brief generalises to every seam. The chroma spawn, the lexer-alias map, the pinned monokai style, the elision interaction and P2's whole-file path all stay that brief's.
+
+## Grounding
+
+`src/render.ts`, `src/vectors.ts`, CommonMark §4.5 (fenced code blocks), `briefs/2026-08-28-brief-elision-primitive.md` (the one-primitive precedent), `docs/2026-09-19-the-tag-the-renderer-eats.md`
 
 ## Objective
 

@@ -6,12 +6,7 @@ callsign: DBF-ORNAMENT
 # Debrief: The ornament that pays rent — the branch landed, and a close-out found unclosed
 
 **Date:** 2026-09-22
-**Status:** Shipped — `docs/ornament-that-pays-rent` merged to `main` at `1da8ac4`
-(`--no-ff`, 106 files, +12,691/−58), pushed to `origin/main`, seven merged local branches
-pruned, `just check` green, `bun test` 421 pass / 7 skip / 0 fail across 17 files.
-The branch's own debrief, `DBF-OS-UPGRADE`, was frozen mid-flight and is **corrected
-here rather than edited** (`playbooks/debriefs-playbook.md`: *"Once written it is never
-edited for content"*). Open: `src/render.ts:149-160`, and `td-8969cf`.
+**Status:** Shipped — `docs/ornament-that-pays-rent` merged to `main` at `1da8ac4` (`--no-ff`, 106 files, +12,691/−58), pushed to `origin/main`, seven merged local branches pruned, `just check` green, `bun test` 421 pass / 7 skip / 0 fail across 17 files. The branch's own debrief, `DBF-OS-UPGRADE`, was frozen mid-flight and is **corrected here rather than edited** (`playbooks/debriefs-playbook.md`: *"Once written it is never edited for content"*). Open: `src/render.ts:149-160`, and `td-8969cf`.
 
 ## Accomplishments
 

@@ -6,8 +6,7 @@ callsign: DBF-REVIEW-CADENCE
 # Debrief: The review cadence — nine loops, one true thing each, zero escapes
 
 **Date:** 2026-10-02
-**Status:** Done — the day's collaboration pattern, its measured yield,
-and the defect species it caught, recorded before the clone forgets them.
+**Status:** Done — the day's collaboration pattern, its measured yield, and the defect species it caught, recorded before the clone forgets them.
 
 ## What happened
 

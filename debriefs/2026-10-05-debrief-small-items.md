@@ -8,11 +8,14 @@ date: 2026-10-05
 
 **Date:** 2026-10-05
 **Status:** Done
-**Briefs:** BRF-MATH-GLYPHS (`briefs/2026-09-16-brief-math-glyphs.md`, now Done);
-`docs/2026-10-05-the-single-binary-is-a-provisioning-question.md` (a response, not a brief)
-**TD:** two tasks filed and closed 2026-10-05 (the edit verb, the math
-  pass), one opened (the reg-sync status finding), and the dogfood task
-  closed — IDs live in the ephemeral ledger, per the td playbook
+
+## Briefs
+
+BRF-MATH-GLYPHS (`briefs/2026-09-16-brief-math-glyphs.md`, now Done); `docs/2026-10-05-the-single-binary-is-a-provisioning-question.md` (a response, not a brief)
+
+## TD
+
+two tasks filed and closed 2026-10-05 (the edit verb, the math   pass), one opened (the reg-sync status finding), and the dogfood task   closed — IDs live in the ephemeral ledger, per the td playbook
 
 ## What happened
 

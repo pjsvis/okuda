@@ -8,16 +8,16 @@ date: 2026-09-29
 
 **Created:** 2026-09-29
 **Status:** Proposed — awaiting operator review
-**TD:** td-83cc47 (epic; P1 is the only in-silo code, P0/P2/P3 are ops
-tracked here for lineage)
+**TD:** td-83cc47 (epic; P1 is the only in-silo code, P0/P2/P3 are ops tracked here for lineage)
 **Branch:** feat/ssh-reading-room
-**Lineage:** the operator, verbatim: *"we should get our ssh game sorted
-on the Ionos end point, then we should look for a host that will support
-ssh serving — is hostinger the answer here?"*
-**Grounding:** ADR-013 (ForceCommand adopted, localhost-proven),
-BRF-SSH-BLOG (v1 consumer, ready), BRF-SSH-SERVED-2 (Option-2 gate,
-parked — untouched by this brief), and the polyvis.net spike of
-2026-09-29 (pv-gloam, askpass helper, authorized_keys upload).
+
+## Lineage
+
+the operator, verbatim: *"we should get our ssh game sorted on the Ionos end point, then we should look for a host that will support ssh serving — is hostinger the answer here?"*
+
+## Grounding
+
+ADR-013 (ForceCommand adopted, localhost-proven), BRF-SSH-BLOG (v1 consumer, ready), BRF-SSH-SERVED-2 (Option-2 gate, parked — untouched by this brief), and the polyvis.net spike of 2026-09-29 (pv-gloam, askpass helper, authorized_keys upload).
 
 ## What
 

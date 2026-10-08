@@ -8,15 +8,10 @@ callsign: BRF-CONTENT-SHORTLIST
 **Date:** 2026-08-30
 **Status:** Open (amended 2026-09-04 — unified ranking, see §Ranked sources)
 **Branch:** feat/gloam-launcher
-**Context:** the discoverability gap named in
-`docs/2026-08-30-the-butt-dial-question.md` and unpacked across the
-riff that followed. The launcher's no-arg picker (`fd -e md | fzf`)
-matches on **filenames** — fast when you remember the name, blind
-when you don't ("where did we write about diagrams?"). `docs/diagram-monster.md`
-and `docs/diagram-color-filter.md` are the exhibit: rich, un-tiered,
-invisible to the menu path, findable only by a separate mental mode.
-This brief adds the missing half: **content discovery**, file-grain,
-no ceremony. Filename search stays; content search joins it.
+
+## Context
+
+the discoverability gap named in `docs/2026-08-30-the-butt-dial-question.md` and unpacked across the riff that followed. The launcher's no-arg picker (`fd -e md | fzf`) matches on **filenames** — fast when you remember the name, blind when you don't ("where did we write about diagrams?"). `docs/diagram-monster.md` and `docs/diagram-color-filter.md` are the exhibit: rich, un-tiered, invisible to the menu path, findable only by a separate mental mode. This brief adds the missing half: **content discovery**, file-grain, no ceremony. Filename search stays; content search joins it.
 
 ## The shape, in one line
 

@@ -5,7 +5,10 @@ callsign: ADV-READER-SIDE-FILTER
 
 # ADV-READER-SIDE-FILTER — Advisory on the reader's side of the shite filter, and the `!` that completes it
 
-**From:** AI-HR (the `b` variant) · **To:** All reader classes who inspect and judge · **Date:** 2026-09-05 · **Status:** Open. The system-side filter is documented; the reader-side filter is the half that's been missing. The dogfood that justifies it has arrived.
+
+## From
+
+AI-HR (the `b` variant) · **To:** All reader classes who inspect and judge · **Date:** 2026-09-05 · **Status:** Open. The system-side filter is documented; the reader-side filter is the half that's been missing. The dogfood that justifies it has arrived.
 
 ---
 

@@ -8,37 +8,18 @@ date: 2026-09-15
 
 **Created:** 2026-09-15
 **Status:** Open
-**TD:** td-ec6bb0 (epic) — td-6613b3 the Map · td-86432c one tier list ·
-td-32e679 the prefix lint · td-30b1d5 the shorthand reaches the picker ·
-td-070a26 the bootstrap, then `docs/` · td-e9ccd2 name the rest ·
-td-6d25bd the spoken form, auditioned · td-8e71ef the stability rule
-**Lineage:** the reader's 2026-09-15 session, in moves. The proposal — *for our
-registered folders we maintain a silo-unique call-sign for each document; what
-if we give all documents in the silo a silo-unique call-sign*. The payoff — *now
-we can note the callsign and recover the document quickly; and we can keep
-concise notes about which documents are required for our argument*. The handover
-— *as far as document memory is concerned lets hand it of to the user*. The
-naming test — *the call-sign tells you what the documnt is, roughly*. The
-orthogonality — *the vectors and the call signs are orthogonal concerns*. The
-bound — *when we require vectors we have 80 available, more than enough*. The
-single job — *the call sign does one thing, it names the document, thats it*.
-The spoken form — *we can speak the slug then the doc type: eg the slug brief
-and the slug doc*. The method — *we have a lot to think about and we should do
-some smoke tests*. The licence — *we have the documents and we can reinitialise
-without pain*. The requirement, and it is the whole requirement — ***we are
-looking for a cool way to remember shit***.
-**Extends:** **BRF-ADDRESS-CAP** owns the vector and its bound; nothing here
-touches it. `docs/2026-09-15-the-search-panel-speech-first.md` owns the panel
-that will consume these names; this brief supplies them and nothing else.
-**`docs/2026-09-15-the-scaling-profile.md`** owns the cost curve of the store
-around them, and amended this brief on the day it landed — the point lookup is
-O(N), and the bootstrap that mints the names is unsound.
-**ADR-036** owns the division of labour — okuda owns the cue, the silo owns the
-voice — and the spoken form below is a cue, not speech. **ADR-025** owns
-resolution: exactly-one-or-null, never the silent first-wins.
-**ADR-CHUNK-SEQUENCE-038** owns the trailing ordinal: a `slug.md` / `slug-02.md`
-sequence is one document, the head is unnumbered, and a part takes no key. Step 5
-is the change that runs its reversal.
+
+## TD
+
+td-ec6bb0 (epic) — td-6613b3 the Map · td-86432c one tier list · td-32e679 the prefix lint · td-30b1d5 the shorthand reaches the picker · td-070a26 the bootstrap, then `docs/` · td-e9ccd2 name the rest · td-6d25bd the spoken form, auditioned · td-8e71ef the stability rule
+
+## Lineage
+
+the reader's 2026-09-15 session, in moves. The proposal — *for our registered folders we maintain a silo-unique call-sign for each document; what if we give all documents in the silo a silo-unique call-sign*. The payoff — *now we can note the callsign and recover the document quickly; and we can keep concise notes about which documents are required for our argument*. The handover — *as far as document memory is concerned lets hand it of to the user*. The naming test — *the call-sign tells you what the documnt is, roughly*. The orthogonality — *the vectors and the call signs are orthogonal concerns*. The bound — *when we require vectors we have 80 available, more than enough*. The single job — *the call sign does one thing, it names the document, thats it*. The spoken form — *we can speak the slug then the doc type: eg the slug brief and the slug doc*. The method — *we have a lot to think about and we should do some smoke tests*. The licence — *we have the documents and we can reinitialise without pain*. The requirement, and it is the whole requirement — ***we are looking for a cool way to remember shit***.
+
+## Extends
+
+**BRF-ADDRESS-CAP** owns the vector and its bound; nothing here touches it. `docs/2026-09-15-the-search-panel-speech-first.md` owns the panel that will consume these names; this brief supplies them and nothing else. **`docs/2026-09-15-the-scaling-profile.md`** owns the cost curve of the store around them, and amended this brief on the day it landed — the point lookup is O(N), and the bootstrap that mints the names is unsound. **ADR-036** owns the division of labour — okuda owns the cue, the silo owns the voice — and the spoken form below is a cue, not speech. **ADR-025** owns resolution: exactly-one-or-null, never the silent first-wins. **ADR-CHUNK-SEQUENCE-038** owns the trailing ordinal: a `slug.md` / `slug-02.md` sequence is one document, the head is unnumbered, and a part takes no key. Step 5 is the change that runs its reversal.
 
 ## Objective
 

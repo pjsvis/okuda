@@ -6,17 +6,11 @@ callsign: BRF-WRAP-AT-CAP
 # Brief: Wrap at the cap — the third branch
 
 **Date:** 2026-10-08
-**Status:** Done (2026-10-08) — one measured correction: the irreducible set is
-six, not four, because the instrument had stripped the link URLs the renderer
-draws. Recorded in ADR-TABLE-EDGE-CUT-055.
-**Context:** ADR-TABLE-EDGE-CUT-055 removed the squeeze: a table renders at the author's
-widths and is cut at the glass, so nothing is reflowed to fit. That holds *below* the
-cap, where the reader's lever is widen and the cut is recoverable — widen and the bytes
-come back. Above the cap there is **no lever at all**: 120 and 200 columns render
-identically, so the cut *hides* content, and hiding is the one thing the table model
-refuses. The operator's own principle, from the model's first statement: *we never hide
-table content, we only truncate the RHS when the window is too narrow.* Past the cap the
-window is not too narrow. We are.
+**Status:** Done (2026-10-08) — one measured correction: the irreducible set is six, not four, because the instrument had stripped the link URLs the renderer draws. Recorded in ADR-TABLE-EDGE-CUT-055.
+
+## Context
+
+ADR-TABLE-EDGE-CUT-055 removed the squeeze: a table renders at the author's widths and is cut at the glass, so nothing is reflowed to fit. That holds *below* the cap, where the reader's lever is widen and the cut is recoverable — widen and the bytes come back. Above the cap there is **no lever at all**: 120 and 200 columns render identically, so the cut *hides* content, and hiding is the one thing the table model refuses. The operator's own principle, from the model's first statement: *we never hide table content, we only truncate the RHS when the window is too narrow.* Past the cap the window is not too narrow. We are.
 
 Surfaced by a real table in `docs/2026-08-30-naming-like-nasa.md`, section *Lessons,
 attributed* — four columns, naturals `[51, 62, 55, 45]`, total **222** against a cap of

@@ -5,8 +5,7 @@ callsign: ADR-REPEATED-DIGIT-ACTUATORS-032
 
 # Decision: Repeated-digit actuators — [44,55,66,77,88] reserved
 
-**Date:** 2026-09-06 · **amended 2026-09-12** ([11] joins the pocket)
-· **amended 2026-10-05** ([88] is bound — edit joins the class)
+**Date:** 2026-09-06 · **amended 2026-09-12** ([11] joins the pocket) · **amended 2026-10-05** ([88] is bound — edit joins the class)
 **Status:** Accepted
 
 ## Amendment (2026-09-12): the doubled pairs are one actuator class

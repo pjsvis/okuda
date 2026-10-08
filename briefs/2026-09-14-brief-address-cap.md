@@ -8,16 +8,18 @@ date: 2026-09-14
 
 **Created:** 2026-09-14
 **Status:** Open
-**TD:** td-26b140 (epic) — td-7517cc the cap, td-a9822c the name,
-td-ca8c1f the spec correction, td-66deec the drift, td-0545b2 the gates
-**Lineage:** found while reading `src/vectors.ts` for a bounded-context review
-(2026-09-14). The reader's words: *"the invariant is the destination, and we have
-messed with an invariant."* The probes are `tmp/cap-probe.ts` (the defect) and
-`tmp/corpus-cap-probe.ts` (its reach in this silo).
-**Extends:** **BRF-WORKING-COPY** owns the vector system — discovery, the map, the
-paint, the actuator, the depth-one stack, the `99` clone. This brief changes one
-constant's *meaning* and corrects that brief's criterion, which specifies the
-defect. It forks neither the paint nor the actuator.
+
+## TD
+
+td-26b140 (epic) — td-7517cc the cap, td-a9822c the name, td-ca8c1f the spec correction, td-66deec the drift, td-0545b2 the gates
+
+## Lineage
+
+found while reading `src/vectors.ts` for a bounded-context review (2026-09-14). The reader's words: *"the invariant is the destination, and we have messed with an invariant."* The probes are `tmp/cap-probe.ts` (the defect) and `tmp/corpus-cap-probe.ts` (its reach in this silo).
+
+## Extends
+
+**BRF-WORKING-COPY** owns the vector system — discovery, the map, the paint, the actuator, the depth-one stack, the `99` clone. This brief changes one constant's *meaning* and corrects that brief's criterion, which specifies the defect. It forks neither the paint nor the actuator.
 
 ## Objective
 

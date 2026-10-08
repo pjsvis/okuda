@@ -8,12 +8,10 @@ callsign: BRF-TUI-LIVE
 **Date:** 2026-08-26
 **Status:** Parked — step 0 shipped (r reload re-anchors via `reanchoredScroll`, 50b0e0e; dogfooded "rock solid, almost missed it"); steps 1–5 (directory watch, debounce, content gate) never started. Refile from this brief when scheduled. Parked by the 2026-10-03 audit (td-450944).
 **Branch:** brief/tui-live-documents
-**Context:** the okuda-stack riff (`docs/2026-08-26-the-okuda-stack-a-web-without-the-web.md`)
-made live documents load-bearing: a producer writes markdown on a cadence,
-a reader views it over ssh, the document is the feed. One code gap blocks
-the use case: `okuda --tui --watch` silently drops watch today — the TUI
-branch returns before the watch block is reached, and the streaming watch's
-repaint is a clear+home top-jump, the exact behaviour ADR-010 abolished.
+
+## Context
+
+the okuda-stack riff (`docs/2026-08-26-the-okuda-stack-a-web-without-the-web.md`) made live documents load-bearing: a producer writes markdown on a cadence, a reader views it over ssh, the document is the feed. One code gap blocks the use case: `okuda --tui --watch` silently drops watch today — the TUI branch returns before the watch block is reached, and the streaming watch's repaint is a clear+home top-jump, the exact behaviour ADR-010 abolished.
 
 ## What
 

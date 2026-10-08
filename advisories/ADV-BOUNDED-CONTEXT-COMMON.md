@@ -5,7 +5,10 @@ callsign: ADV-BOUNDED-CONTEXT-COMMON
 
 # ADV-BOUNDED-CONTEXT-COMMON — Advisory on the bounded context as a common, shared with others
 
-**From:** AI-HR (the `b` variant) · **To:** All reader classes at the door · **Date:** 2026-09-05 · **Status:** Open. The context is bounded; the door is held; the common grows by writing back.
+
+## From
+
+AI-HR (the `b` variant) · **To:** All reader classes at the door · **Date:** 2026-09-05 · **Status:** Open. The context is bounded; the door is held; the common grows by writing back.
 
 ---
 

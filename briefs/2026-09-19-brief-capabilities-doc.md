@@ -9,8 +9,14 @@ date: 2026-09-19
 **Created:** 2026-09-19
 **Status:** Open
 **TD:** td-8f49bd
-**Lineage:** the reader's 2026-09-19 action list — *"we should have a changelog so that we can state what capabilities we have at any one time"* — and the triage that split it: the request names two different documents, and only one of them is worth its upkeep.
-**Extends:** the Base Epistemic Attitude, clause 1 (a claim owes its evidence) and clause 3 (a stale ledger is misleading confidently, the one failure ADR-027 names as worse than yapping).
+
+## Lineage
+
+the reader's 2026-09-19 action list — *"we should have a changelog so that we can state what capabilities we have at any one time"* — and the triage that split it: the request names two different documents, and only one of them is worth its upkeep.
+
+## Extends
+
+the Base Epistemic Attitude, clause 1 (a claim owes its evidence) and clause 3 (a stale ledger is misleading confidently, the one failure ADR-027 names as worse than yapping).
 
 ## Objective
 

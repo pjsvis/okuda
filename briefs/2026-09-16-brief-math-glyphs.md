@@ -6,14 +6,19 @@ callsign: BRF-MATH-GLYPHS
 # Brief: The Math Glyph Pass — inline LaTeX to Unicode, closed vocabulary, corpus-gated
 
 **Status:** Done
-**Landed:** 2026-10-05, with two deviations from the spec — both forced by
-measurement, both recorded in the landing record below.
+
+## Landed
+
+2026-10-05, with two deviations from the spec — both forced by measurement, both recorded in the landing record below.
 **Date:** 2026-09-16
-**TD:** the math-glyph task — filed and closed 2026-10-05 (IDs stay in the
-ephemeral ledger; the callsign is the citation, per the td playbook)
-**Origin:** Operator observation — `$\Delta t$` and friends render as
-literal LaTeX source in the terminal. All examples were recognised on
-sight: the corpus has been speaking math okuda never listened to.
+
+## TD
+
+the math-glyph task — filed and closed 2026-10-05 (IDs stay in the ephemeral ledger; the callsign is the citation, per the td playbook)
+
+## Origin
+
+Operator observation — `$\Delta t$` and friends render as literal LaTeX source in the terminal. All examples were recognised on sight: the corpus has been speaking math okuda never listened to.
 **Predecessor:** none
 
 ---

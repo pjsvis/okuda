@@ -7,12 +7,10 @@ callsign: BRF-DIAGRAM-INGESTION
 
 **Date:** 2026-09-07
 **Status:** Open
-**Lineage:** dogfood (the onion brief's four mermaid blocks, 2026-09-07).
-One block fell back to a source-echo box; bisecting it surfaced three
-distinct engine defects, only one of which was the fallback. This brief
-gathers them as one piece of work: the ingestion pipeline is where the
-choice is made to show, elide, or hide a diagram, and that choice is
-not yet the one we want.
+
+## Lineage
+
+dogfood (the onion brief's four mermaid blocks, 2026-09-07). One block fell back to a source-echo box; bisecting it surfaced three distinct engine defects, only one of which was the fallback. This brief gathers them as one piece of work: the ingestion pipeline is where the choice is made to show, elide, or hide a diagram, and that choice is not yet the one we want.
 
 ## The three findings
 

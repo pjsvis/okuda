@@ -12,8 +12,10 @@ callsign: BRF-PI-MARKDOWN
 
 **Date:** 2026-08-25
 **Status:** Parked (Pi-side spike; okuda stays clean standalone)
-**Context:** blue-sky riff during td-96c759 review wait. Captured before
-the ideas disappear "like tears in the rain."
+
+## Context
+
+blue-sky riff during td-96c759 review wait. Captured before the ideas disappear "like tears in the rain."
 
 ## What
 

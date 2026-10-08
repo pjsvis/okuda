@@ -6,8 +6,7 @@ callsign: ADR-LEGIBILITY-GATE-049
 # Decision: The legibility gate — existence is necessary, legibility is the promise
 
 **Date:** 2026-10-01
-**Status:** Accepted (amends ADR-045 — the gate grows a criterion, not a
-substrate; rides the same commit as Ring B, BRF-SILCROW-PATHS step 3)
+**Status:** Accepted (amends ADR-045 — the gate grows a criterion, not a substrate; rides the same commit as Ring B, BRF-SILCROW-PATHS step 3)
 
 ## Context
 

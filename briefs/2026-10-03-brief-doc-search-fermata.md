@@ -8,11 +8,10 @@ callsign: BRF-DOC-SEARCH-FERMATA
 **Date:** 2026-10-03
 **Status:** Open
 **TD:** (to create)
-**Lineage:** ADR-EXIT-FERMATA-051 (the exit fermata — frozen document frame, 300ms,
-over-determined: leak bound + gear-change beat); the operator's dogfood report
-(the doc→search transition needs a beat); Mercury tempo (the protocol
-registry — throughput beyond intake reads as urgency, not speed; fermatas are
-breath built into the exchange).
+
+## Lineage
+
+ADR-EXIT-FERMATA-051 (the exit fermata — frozen document frame, 300ms, over-determined: leak bound + gear-change beat); the operator's dogfood report (the doc→search transition needs a beat); Mercury tempo (the protocol registry — throughput beyond intake reads as urgency, not speed; fermatas are breath built into the exchange).
 
 ## Objective
 

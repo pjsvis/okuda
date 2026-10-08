@@ -7,19 +7,18 @@ callsign: BRF-JUMP-LIST
 
 **Created:** 2026-09-14
 **Status:** Open
-**TD:** td-34479f (epic) — td-c43257 the remainder filter, td-975a6e the rank,
-td-191918 the extraction, td-9617f1 the address space, td-b276c4 the render,
-td-747ca0 the focus machine, td-cb8be0 the return-protocol, td-5114f6 the dogfood
-**Lineage:** the reader's 2026-09-14 session — *"we own the render of the search
-screen · we have the technology of the rubricated silcrows · take over the render
-of the text input box and the tabulated results"* — and the four riff rounds that
-followed: the fzf inventory, the unsighted machine, the TAB focus model, and the
-jump list.
-**Extends:** **BRF-SEARCH-SURFACE** owns the surface — the `Row[]` array with its
-channel, the register reader, the invariant audit, the state machine. It measures
-the **voice width** and scopes it out. **BRF-AUDIO-DISCOVERY** owns the cue seam —
-the classes, the patience, the abandonment handle, the binding, the cast. This
-brief owns the **jump list** and the **render**, and forks neither.
+
+## TD
+
+td-34479f (epic) — td-c43257 the remainder filter, td-975a6e the rank, td-191918 the extraction, td-9617f1 the address space, td-b276c4 the render, td-747ca0 the focus machine, td-cb8be0 the return-protocol, td-5114f6 the dogfood
+
+## Lineage
+
+the reader's 2026-09-14 session — *"we own the render of the search screen · we have the technology of the rubricated silcrows · take over the render of the text input box and the tabulated results"* — and the four riff rounds that followed: the fzf inventory, the unsighted machine, the TAB focus model, and the jump list.
+
+## Extends
+
+**BRF-SEARCH-SURFACE** owns the surface — the `Row[]` array with its channel, the register reader, the invariant audit, the state machine. It measures the **voice width** and scopes it out. **BRF-AUDIO-DISCOVERY** owns the cue seam — the classes, the patience, the abandonment handle, the binding, the cast. This brief owns the **jump list** and the **render**, and forks neither.
 
 ## Objective
 

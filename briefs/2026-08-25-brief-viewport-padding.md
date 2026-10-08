@@ -8,12 +8,10 @@ callsign: BRF-VIEWPORT-PADDING
 **Date:** 2026-08-25
 **Status:** Rejected (2026-08-25, same day — operator call: "doing less to get more")
 **Branch:** feat/rhs-chip-headers → feat/tui-control-plane
-**Context:** follows the RHS chip work (td-9fdca0). The chip established
-the panel frame on the LHS (heading badge) and RHS (muted chip). The
-horizontal margins (2-char LHS, implicit RHS) already exist in `finalize`.
-The document reads as a panel, but the top and bottom are flush — the
-frame is missing its fourth side. Dogfood finding: an empty line at the
-top and at the bottom would make the whole thing look like a PAD.
+
+## Context
+
+follows the RHS chip work (td-9fdca0). The chip established the panel frame on the LHS (heading badge) and RHS (muted chip). The horizontal margins (2-char LHS, implicit RHS) already exist in `finalize`. The document reads as a panel, but the top and bottom are flush — the frame is missing its fourth side. Dogfood finding: an empty line at the top and at the bottom would make the whole thing look like a PAD.
 
 ## What
 

@@ -6,8 +6,7 @@ callsign: ADR-UNIVERSAL-ELISION-050
 # Decision: Elision is the universal overflow policy — the terminal never soft-wraps what okuda emits
 
 **Date:** 2026-10-02
-**Status:** Accepted (amends ADR-004 — its last exception, the raw-block
-gutter, closes; rides the same sitting as its two new consumers)
+**Status:** Accepted (amends ADR-004 — its last exception, the raw-block gutter, closes; rides the same sitting as its two new consumers)
 
 ## Context
 

@@ -8,9 +8,18 @@ date: 2026-09-19
 
 **Created:** 2026-09-19
 **Status:** Open
-**TD:** none — no epic created. The direction has no settled scope, and a task list written now would be an invented plan. Scope it, then `td epic create`.
-**Lineage:** the reader, 2026-09-19, verbatim: *"note we intend to remove the fzf dependency and build our own search TUI in GLoam"* — said the morning after reading `github.com/jarun/nnn`, a picker that owns its own screen and hands off to `$NNN_OPENER` (`docs/2026-09-18-nnn-the-sibling-outside-the-boundary.md`).
-**Extends:** `BRF-FZF-OWNS-LOOP` (Aborted 2026-08-30). That brief tried to keep the picker's cursor by *rearranging* the fzf boundary; this one deletes the boundary, and the cursor problem with it.
+
+## TD
+
+none — no epic created. The direction has no settled scope, and a task list written now would be an invented plan. Scope it, then `td epic create`.
+
+## Lineage
+
+the reader, 2026-09-19, verbatim: *"note we intend to remove the fzf dependency and build our own search TUI in GLoam"* — said the morning after reading `github.com/jarun/nnn`, a picker that owns its own screen and hands off to `$NNN_OPENER` (`docs/2026-09-18-nnn-the-sibling-outside-the-boundary.md`).
+
+## Extends
+
+`BRF-FZF-OWNS-LOOP` (Aborted 2026-08-30). That brief tried to keep the picker's cursor by *rearranging* the fzf boundary; this one deletes the boundary, and the cursor problem with it.
 
 ## Objective
 

@@ -7,9 +7,10 @@ callsign: BRF-REGISTRY-DISCOVERY
 
 **Date:** 2026-10-08
 **Status:** Open
-**Context:** Seven places hardcode the tier folder names, and one drift test keeps
-two of the seven in step. That test is a map↔map checksum: the repo paying interest
-to keep two copies of one map agreeing.
+
+## Context
+
+Seven places hardcode the tier folder names, and one drift test keeps two of the seven in step. That test is a map↔map checksum: the repo paying interest to keep two copies of one map agreeing.
 
 Two of the copies are already stale. Map↔territory checksums are assurance; map↔map
 checksums are debt. The repo's own rule — derivation replaces invalidation — says

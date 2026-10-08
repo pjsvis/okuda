@@ -8,12 +8,14 @@ date: 2026-10-07
 
 **Date:** 2026-10-07
 **Status:** Accepted
-**Amended:** 2026-10-08 — the third branch (BRF-WRAP-AT-CAP): past the cap the
-columns wrap; the edge cut stands below the cap and for the irreducible set. See
-*The third branch* below.
-**Amends:** ADR-UNIVERSAL-ELISION-050 (which repealed the wrap and certified the
-squeeze); completes the doctrine ADR-TABLE-ELISION-014 stated and ADR-022 narrowed
-to menus.
+
+## Amended
+
+2026-10-08 — the third branch (BRF-WRAP-AT-CAP): past the cap the columns wrap; the edge cut stands below the cap and for the irreducible set. See *The third branch* below.
+
+## Amends
+
+ADR-UNIVERSAL-ELISION-050 (which repealed the wrap and certified the squeeze); completes the doctrine ADR-TABLE-ELISION-014 stated and ADR-022 narrowed to menus.
 
 ## Context
 

@@ -9,27 +9,14 @@ date: 2026-09-14
 **Created:** 2026-09-14
 **Status:** Open
 **TD:** td-2ba093
-**Lineage:** the reader's 2026-09-14 session, in four moves. The skip — *when
-they leave one para we stop the speech and start at the next para*. The
-direction — *forwards and backwards*, and the second round's verdict: *the
-navigation back is cool*. The arrows — *up and down are for paras and items,
-left and right are for sections*. And the gap — *all it needs is a gap, like a
-speaker stopping and then picking up at the next para helpfully rather than
-rushed*. The skim rode in from the first round: *first sentence and last
-sentence — a bit dodgy, but if the doc is rubbish it's a quick scan*. The
-third round found the reverse channel: *cast onto the projector and start
-speaking, and we see the okudagram framing the text that is being read —
-the voice can drive the UI* — and the pair it is for: *one sighted and
-another unsighted user, both with navigation actuators, and they can talk
-about a document; the spoken okudagram takes longer to speak than to read,
-so there is no rushing.*
-**Extends:** **BRF-OKUDAGRAM-STEP** owns the strides and their units — this
-brief rebinds keys, it does not invent units. **BRF-AUDIO-DISCOVERY** owns the
-cue seam — the handle, the patience, the abandonment; this brief consumes it
-and adds one event, the position. **BRF-JUMP-LIST** owns the stream-settle
-regime; the gap is its recital twin. **BRF-PAGED-OKUDAGRAM** owns the
-okudaframe — this brief drives it with a voice. Nothing here forks any of
-the four.
+
+## Lineage
+
+the reader's 2026-09-14 session, in four moves. The skip — *when they leave one para we stop the speech and start at the next para*. The direction — *forwards and backwards*, and the second round's verdict: *the navigation back is cool*. The arrows — *up and down are for paras and items, left and right are for sections*. And the gap — *all it needs is a gap, like a speaker stopping and then picking up at the next para helpfully rather than rushed*. The skim rode in from the first round: *first sentence and last sentence — a bit dodgy, but if the doc is rubbish it's a quick scan*. The third round found the reverse channel: *cast onto the projector and start speaking, and we see the okudagram framing the text that is being read — the voice can drive the UI* — and the pair it is for: *one sighted and another unsighted user, both with navigation actuators, and they can talk about a document; the spoken okudagram takes longer to speak than to read, so there is no rushing.*
+
+## Extends
+
+**BRF-OKUDAGRAM-STEP** owns the strides and their units — this brief rebinds keys, it does not invent units. **BRF-AUDIO-DISCOVERY** owns the cue seam — the handle, the patience, the abandonment; this brief consumes it and adds one event, the position. **BRF-JUMP-LIST** owns the stream-settle regime; the gap is its recital twin. **BRF-PAGED-OKUDAGRAM** owns the okudaframe — this brief drives it with a voice. Nothing here forks any of the four.
 
 ## Objective
 

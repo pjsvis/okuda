@@ -5,13 +5,8 @@ callsign: BRF-PAGED-OKUDAGRAM
 
 # Brief: The okudagram frame — a portioning rule
 
-**Date:** 2026-08-29 (rewritten 2026-09-03 — the rule, superseding the
-constraint-space exploration and its fold-in clauses)
-**Status:** Rule fully specified; v1 LANDED 2026-09-05 as the
-**okudaframe** (keyboard-controls `01`) — pending walk validation
-against EC1–EC9 (confirmation, not exploration). Named per the
-attribution badge: okudaframe = the design language applied to reading
-pagination; okudagram stays the diagrams' name.
+**Date:** 2026-08-29 (rewritten 2026-09-03 — the rule, superseding the constraint-space exploration and its fold-in clauses)
+**Status:** Rule fully specified; v1 LANDED 2026-09-05 as the **okudaframe** (keyboard-controls `01`) — pending walk validation against EC1–EC9 (confirmation, not exploration). Named per the attribution badge: okudaframe = the design language applied to reading pagination; okudagram stays the diagrams' name.
 **Branch:** feat/gloam-launcher (parked; no code yet)
 
 > **Rewrite (2026-09-03).** The brief was an aspiration with a mapped

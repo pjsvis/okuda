@@ -7,18 +7,18 @@ callsign: BRF-SEARCH-SURFACE
 
 **Created:** 2026-09-14
 **Status:** Parked — code landed on `feat/search-surface` (cc3c0f9) 2026-09-15 and was never merged; the branch is three weeks behind main and a naive merge would revert newer work. Gate: rebase-and-merge while the rebase is cheaper than the rewrite — unpark is an operator call, and every day parked raises the cost. The TD set below closed as parked 2026-10-03; refile from this brief on unpark.
-**TD:** td-a7e532 (epic) — td-9e8ac8 the array, td-92b11c the register reader,
-td-22dfef the row seam, td-e3fbbf the state machine, td-a5a89a the golden,
-td-c23b66 the dogfood
-**Lineage:** the reader's two sessions of 2026-09-14 — *"how are we going
-to provision listeners with audio descriptions of the search screen in
-GLoam"* and *"lets take a step back and think of the broad accessibility
-pattern… the search screen is the most complex interaction… we have found
-that we were a bit quick to throw away information in building the search
-screen."*
-**Extends:** BRF-AUDIO-DISCOVERY. That brief owns the cue **seam** — the
-classes, the patience, the abandonment handle, the cast. This brief owns the
-**surface** and does not fork the seam.
+
+## TD
+
+td-a7e532 (epic) — td-9e8ac8 the array, td-92b11c the register reader, td-22dfef the row seam, td-e3fbbf the state machine, td-a5a89a the golden, td-c23b66 the dogfood
+
+## Lineage
+
+the reader's two sessions of 2026-09-14 — *"how are we going to provision listeners with audio descriptions of the search screen in GLoam"* and *"lets take a step back and think of the broad accessibility pattern… the search screen is the most complex interaction… we have found that we were a bit quick to throw away information in building the search screen."*
+
+## Extends
+
+BRF-AUDIO-DISCOVERY. That brief owns the cue **seam** — the classes, the patience, the abandonment handle, the cast. This brief owns the **surface** and does not fork the seam.
 
 ## Objective
 

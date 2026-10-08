@@ -7,12 +7,10 @@ callsign: BRF-KINDLE-PORCH
 
 **Date:** 2026-10-06
 **Status:** Open
-**Context:** the operator has a Kindle and named it the first glass:
-*"we have a Kindle so that would be a good place to start, then we could look
-at an art frame."* The assessment that precedes this — why e-ink fits the
-reading path and not the TUI, and why okuda cannot run on the device — is
-`docs/2026-10-06-the-eink-frame-is-a-second-host.md`. This brief is the
-landing.
+
+## Context
+
+the operator has a Kindle and named it the first glass: *"we have a Kindle so that would be a good place to start, then we could look at an art frame."* The assessment that precedes this — why e-ink fits the reading path and not the TUI, and why okuda cannot run on the device — is `docs/2026-10-06-the-eink-frame-is-a-second-host.md`. This brief is the landing.
 
 ## Objective
 

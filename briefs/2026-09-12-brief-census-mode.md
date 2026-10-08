@@ -8,11 +8,10 @@ callsign: BRF-CENSUS-MODE
 **Date:** 2026-09-12
 **Status:** Open
 **TD:** td-39ce31
-**Lineage:** the doc-ref gold dogfood (td-38bec6) surfaced the
-actability asymmetry — a decision cited as a filename gets no
-silcrow, cited by callsign it does; use-vs-mention
-(`docs/2026-09-10-use-vs-mention.md`) adjudicated the default;
-this brief proposes the opt-in that doctrine left room for.
+
+## Lineage
+
+the doc-ref gold dogfood (td-38bec6) surfaced the actability asymmetry — a decision cited as a filename gets no silcrow, cited by callsign it does; use-vs-mention (`docs/2026-09-10-use-vs-mention.md`) adjudicated the default; this brief proposes the opt-in that doctrine left room for.
 
 ## Objective
 

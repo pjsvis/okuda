@@ -7,12 +7,14 @@ callsign: BRF-PROLONGED-PRESS
 
 **Date:** 2026-09-13
 **Status:** Open
-**TD:** td-f62045 (epic) — td-edd765 tests, td-7add66 run buffer, td-b680b0
-reducer, td-2cf549 drain, td-c38cd6 dogfood, td-e81b92 grammar ADR, td-51d5f4
-pending-digit indicator
-**Lineage:** the reader's report — a held `0` sprays the launcher's query box
-with leftover zeroes; ADR-032's doubled-pair canon, which makes the fix safe
-by construction; the keymap dogfood (td-b6d849) that would have caught it.
+
+## TD
+
+td-f62045 (epic) — td-edd765 tests, td-7add66 run buffer, td-b680b0 reducer, td-2cf549 drain, td-c38cd6 dogfood, td-e81b92 grammar ADR, td-51d5f4 pending-digit indicator
+
+## Lineage
+
+the reader's report — a held `0` sprays the launcher's query box with leftover zeroes; ADR-032's doubled-pair canon, which makes the fix safe by construction; the keymap dogfood (td-b6d849) that would have caught it.
 
 ## Objective
 

@@ -5,7 +5,10 @@ callsign: ADV-THE-PILE
 
 # ADV-THE-PILE — Advisory on the pile of wonky abstractions, and the boundary that domesticates it
 
-**From:** AI-HR (the `b` variant) · **To:** All reader classes who build, and who expected the building to be solved by now · **Date:** 2026-09-30 · **Status:** Open. The pile is the accumulation of local abstractions forced into global service; the boundary is what keeps two wonks from having to meet; the invariant is the small falsifiable contract that composes where the framework merely accretes.
+
+## From
+
+AI-HR (the `b` variant) · **To:** All reader classes who build, and who expected the building to be solved by now · **Date:** 2026-09-30 · **Status:** Open. The pile is the accumulation of local abstractions forced into global service; the boundary is what keeps two wonks from having to meet; the invariant is the small falsifiable contract that composes where the framework merely accretes.
 
 ---
 

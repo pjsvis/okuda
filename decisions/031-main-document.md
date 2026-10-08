@@ -6,21 +6,7 @@ callsign: ADR-MAIN-DOCUMENT-031
 # Decision: The main document — optimistic vectors, 99 promotes, u unwinds
 
 **Date:** 2026-09-04
-**Status:** Accepted (*optimism* clause superseded 2026-09-24 by
-ADR-VALIDATED-SILCROWS-044 — "discovery never validates, the actuator
-fails honestly" is retired: inferred callsign-shaped tokens now gate on
-the tier registries, because the probe counted 117 painted silcrows
-that resolved to nothing. One clause, not the ADR: dynamism,
-the one-destination-one-silcrow citation convention, the doubled-pair
-reservations, and re-derivation-replaces-invalidation all stand.
-Explicit `.md` links stay optimistic — the author's link is a
-deliberate claim; the boundary holds by parameter, so the render path
-still reads no registry itself.)
-Amended 2026-09-30 by ADR-REFERENCES-SECTION-047: the map gains a
-visible projection — every main-document render ends with a generated
-`## References` section, the renderer's receipt for its own map. The
-discovery contract itself is unchanged; discovery still mints, the
-section only lists.
+**Status:** Accepted (*optimism* clause superseded 2026-09-24 by ADR-VALIDATED-SILCROWS-044 — "discovery never validates, the actuator fails honestly" is retired: inferred callsign-shaped tokens now gate on the tier registries, because the probe counted 117 painted silcrows that resolved to nothing. One clause, not the ADR: dynamism, the one-destination-one-silcrow citation convention, the doubled-pair reservations, and re-derivation-replaces-invalidation all stand. Explicit `.md` links stay optimistic — the author's link is a deliberate claim; the boundary holds by parameter, so the render path still reads no registry itself.) Amended 2026-09-30 by ADR-REFERENCES-SECTION-047: the map gains a visible projection — every main-document render ends with a generated `## References` section, the renderer's receipt for its own map. The discovery contract itself is unchanged; discovery still mints, the section only lists.
 
 ## Context
 

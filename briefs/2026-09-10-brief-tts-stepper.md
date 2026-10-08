@@ -7,19 +7,10 @@ callsign: BRF-TTS-STEPPER
 
 **Date:** 2026-09-10
 **Status:** Open
-**Lineage:** dialog session (TTS voice riff → comma-as-prosody →
-render-time injection → the stepper question → the pipeline correction).
-Three prior briefs establish the ground: `BRF-TTS-TEMPORAL` (the
-extractor — the comma-injection transform), `BRF-TTS-DOGFOOD` (the
-degraded preview — `okuda --no-color | tee /dev/tty | say`, the desync
-measurement), and `BRF-OKUDAGRAM-STEP` (the no-gaps stepping invariant
-and the declared header-jump primitive). An earlier draft of this brief
-specced a frame list, a stateful iterator, and a separate TTS key
-grammar — a second pipeline bolted alongside the first. That draft was
-the `--dunt` error at the design level: building outbound where none is
-needed. The correction: the TTS channel is a *configuration* of the
-existing render/egress pipeline, not a new pipeline. This brief is the
-thin version.
+
+## Lineage
+
+dialog session (TTS voice riff → comma-as-prosody → render-time injection → the stepper question → the pipeline correction). Three prior briefs establish the ground: `BRF-TTS-TEMPORAL` (the extractor — the comma-injection transform), `BRF-TTS-DOGFOOD` (the degraded preview — `okuda --no-color | tee /dev/tty | say`, the desync measurement), and `BRF-OKUDAGRAM-STEP` (the no-gaps stepping invariant and the declared header-jump primitive). An earlier draft of this brief specced a frame list, a stateful iterator, and a separate TTS key grammar — a second pipeline bolted alongside the first. That draft was the `--dunt` error at the design level: building outbound where none is needed. The correction: the TTS channel is a *configuration* of the existing render/egress pipeline, not a new pipeline. This brief is the thin version.
 
 ---
 

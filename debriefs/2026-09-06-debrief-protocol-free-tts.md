@@ -6,8 +6,7 @@ callsign: DBF-PROTOCOL-FREE-TTS
 # Debrief: the protocol-free TTS day — a dunt demolished, a moat proven
 
 **Date:** 2026-09-06
-**Status:** Shipped (identity doc + dogfood brief + ADR-032 + actuator
-reservation; `just check` green, 385 tests pass)
+**Status:** Shipped (identity doc + dogfood brief + ADR-032 + actuator reservation; `just check` green, 385 tests pass)
 
 ## What was built
 

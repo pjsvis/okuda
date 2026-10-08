@@ -6,9 +6,7 @@ callsign: DBF-TIDY-FIRST
 # Debrief: Tidy-first — the path to a good place
 
 **Date:** 2026-09-13
-**Status:** Shipped — all eight merge targets in `main`, 30 local branches
-pruned to `main` only, registry reconciled, `just check` green, 416 tests
-pass. `origin/main` at `d54f668`.
+**Status:** Shipped — all eight merge targets in `main`, 30 local branches pruned to `main` only, registry reconciled, `just check` green, 416 tests pass. `origin/main` at `d54f668`.
 
 ## Accomplishments
 

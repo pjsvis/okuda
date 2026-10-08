@@ -6,8 +6,7 @@ callsign: ADR-DEFAULT-PALETTE-011
 # Decision: The default palette is the okuda preset — identity over parity
 
 **Date:** 2026-08-25
-**Status:** Accepted (recorded retrospectively 2026-08-25; the flip landed
-unrecorded and was surfaced by the `DRACULA_PALETTE` rename)
+**Status:** Accepted (recorded retrospectively 2026-08-25; the flip landed unrecorded and was surfaced by the `DRACULA_PALETTE` rename)
 
 ## Context
 

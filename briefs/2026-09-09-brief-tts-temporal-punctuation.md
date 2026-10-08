@@ -7,13 +7,10 @@ callsign: BRF-TTS-TEMPORAL
 
 **Date:** 2026-09-09
 **Status:** Open
-**Lineage:** the GLoam positioning session (2026-09-08) identified the
-`say` TTS path as a real consumer of the same markdown okuda renders.
-The source article (`docs/2026-09-09-say-tts-tips-and-tricks.md`)
-exposed the problem: manual comma-injection in the markdown is a
-visual defect in the render and a ventilator in the source. The
-extractor is the right pipeline; this brief defines it so it can be
-dogfooded and tuned.
+
+## Lineage
+
+the GLoam positioning session (2026-09-08) identified the `say` TTS path as a real consumer of the same markdown okuda renders. The source article (`docs/2026-09-09-say-tts-tips-and-tricks.md`) exposed the problem: manual comma-injection in the markdown is a visual defect in the render and a ventilator in the source. The extractor is the right pipeline; this brief defines it so it can be dogfooded and tuned.
 
 ---
 

@@ -7,7 +7,10 @@ callsign: BRF-SSH-BLOG
 
 **Date:** 2026-08-26
 **Status:** Ready (small; config-not-code)
-**Depends on:** `feat/ssh-forcecommand` branch (sshd sandbox, `scripts/sshd-test.sh`); `playbooks/gloam-launcher-playbook.md` (the loop)
+
+## Depends on
+
+`feat/ssh-forcecommand` branch (sshd sandbox, `scripts/sshd-test.sh`); `playbooks/gloam-launcher-playbook.md` (the loop)
 
 ## What
 

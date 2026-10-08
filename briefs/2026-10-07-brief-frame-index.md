@@ -7,13 +7,10 @@ callsign: BRF-FRAME-INDEX
 
 **Date:** 2026-10-07
 **Status:** Open
-**Context:** the frame *rule* is settled and implemented (a frame is a header and its
-content, to the next header or EOF; `src/frames.ts`, BRF-OKUDAGRAM-STEP), and the
-shared-artefact specification is written (`docs/2026-10-06-the-shared-artifact.md`).
-The stepping okudagram is the next thing; what it lacks is not a rule but an
-**address**. Documents are addressable in this silo — callsigns, § vectors, actable
-paths — and *parts* of documents are not. Two parties cannot point at the same thing
-until a part has a name.
+
+## Context
+
+the frame *rule* is settled and implemented (a frame is a header and its content, to the next header or EOF; `src/frames.ts`, BRF-OKUDAGRAM-STEP), and the shared-artefact specification is written (`docs/2026-10-06-the-shared-artifact.md`). The stepping okudagram is the next thing; what it lacks is not a rule but an **address**. Documents are addressable in this silo — callsigns, § vectors, actable paths — and *parts* of documents are not. Two parties cannot point at the same thing until a part has a name.
 
 ## Objective
 

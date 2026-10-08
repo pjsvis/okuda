@@ -7,7 +7,10 @@ callsign: DBF-OKUDA-PI
 
 **Date:** 2026-08-27
 **Status:** done
-**Theme:** `~/.pi/agent/themes/okuda.json` (LCARS identity, same palette lineage as the viewer's ADR-011 divergence)
+
+## Theme
+
+`~/.pi/agent/themes/okuda.json` (LCARS identity, same palette lineage as the viewer's ADR-011 divergence)
 **Session:** pi, blog-posts cwd, live visual probe — no brief; this debrief founds the pi-theme thread.
 
 ## What happened

@@ -7,10 +7,10 @@ callsign: BRF-TERMINAL-CELL-GRID
 
 **Date:** 2026-09-30
 **Status:** Parked — gated on a real per-cell consumer
-**Gate:** a TUI feature that claims one cell for two producers (overlap /
-z-order — a dialog floating over scrolled content), a structural non-string
-callback contract from Bun.markdown, or a measured byte-budget ceiling on a
-slow link. None exists today; see *Why parked* below.
+
+## Gate
+
+a TUI feature that claims one cell for two producers (overlap / z-order — a dialog floating over scrolled content), a structural non-string callback contract from Bun.markdown, or a measured byte-budget ceiling on a slow link. None exists today; see *Why parked* below.
 
 ---
 

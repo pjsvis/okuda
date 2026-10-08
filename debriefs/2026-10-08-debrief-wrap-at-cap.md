@@ -10,8 +10,10 @@ date: 2026-10-08
 **Status:** Done
 **Briefs:** BRF-WRAP-AT-CAP (`briefs/2026-10-08-brief-wrap-at-cap.md`, now Done)
 **ADR:** ADR-TABLE-EDGE-CUT-055 amended in place (*The third branch*)
-**TD:** the BRF-WRAP-AT-CAP epic (the ID lives in the ephemeral ledger, per the
-  td playbook — persisted docs cite the callsign, never the ID)
+
+## TD
+
+the BRF-WRAP-AT-CAP epic (the ID lives in the ephemeral ledger, per the   td playbook — persisted docs cite the callsign, never the ID)
 
 ## What happened
 

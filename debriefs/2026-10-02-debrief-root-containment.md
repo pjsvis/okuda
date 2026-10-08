@@ -6,11 +6,7 @@ callsign: DBF-ROOT-CONTAINMENT
 # Debrief: Root containment — existence is not permission, and the test knew it
 
 **Date:** 2026-10-02
-**Status:** Done — BRF-ROOT-CONTAINMENT shipped (f7dd2d8, main, the same
-sitting the brief was filed); td-623d89 closed by the registry-truth
-audit; BRF-DEMO-SANDBOX (td-662690) stays open — its sandbox is now
-defence-in-depth, not load-bearing. The disposition row lives in
-DBF-REGISTRY-TRUTH; this debrief is the lesson record beneath it.
+**Status:** Done — BRF-ROOT-CONTAINMENT shipped (f7dd2d8, main, the same sitting the brief was filed); td-623d89 closed by the registry-truth audit; BRF-DEMO-SANDBOX (td-662690) stays open — its sandbox is now defence-in-depth, not load-bearing. The disposition row lives in DBF-REGISTRY-TRUTH; this debrief is the lesson record beneath it.
 
 ## What happened
 

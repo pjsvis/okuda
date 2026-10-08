@@ -9,8 +9,14 @@ date: 2026-09-19
 **Created:** 2026-09-19
 **Status:** Open
 **TD:** td-bb44ca
-**Lineage:** the reader's 2026-09-19 action list — *"we should review our colour choices and ensure they are ready for the brightness controller"* — sequenced as a **precondition**, not a follow-up: the scalar should scale a reviewed thing, not an assumed one.
-**Extends:** **BRF-OKLCH-TUNING** (2026-08-28, pending) — the brightness design this audit gates. The scalar α ∈ [0.2, 1.2] multiplies lightness over fixed OKLCH triples; whether the *current* triples survive that range is unexamined.
+
+## Lineage
+
+the reader's 2026-09-19 action list — *"we should review our colour choices and ensure they are ready for the brightness controller"* — sequenced as a **precondition**, not a follow-up: the scalar should scale a reviewed thing, not an assumed one.
+
+## Extends
+
+**BRF-OKLCH-TUNING** (2026-08-28, pending) — the brightness design this audit gates. The scalar α ∈ [0.2, 1.2] multiplies lightness over fixed OKLCH triples; whether the *current* triples survive that range is unexamined.
 
 ## Objective
 

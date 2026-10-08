@@ -7,14 +7,10 @@ callsign: BRF-PORCH-MATRIX
 
 **Date:** 2026-09-04
 **Status:** Open
-**Context:** the operator's goal, stated plainly: *"give users a URL that
-they can click; when they click, we want to be in a terminal, rendering
-markdown — that is what we do; over ssh if it must be; we do not want to
-send the data back to be rendered in the web page — no point."*
-`ssh://pjs@omarchy` already opens the porch from the Mac. What's missing
-is the rest of the matrix — iPhone, iPad mini, an Android device inside
-the projector — and the link-carrying schemes that land directly on a
-document instead of on a shell prompt.
+
+## Context
+
+the operator's goal, stated plainly: *"give users a URL that they can click; when they click, we want to be in a terminal, rendering markdown — that is what we do; over ssh if it must be; we do not want to send the data back to be rendered in the web page — no point."* `ssh://pjs@omarchy` already opens the porch from the Mac. What's missing is the rest of the matrix — iPhone, iPad mini, an Android device inside the projector — and the link-carrying schemes that land directly on a document instead of on a shell prompt.
 
 This brief is a **test brief**: its deliverable is a verified matrix,
 the handler scripts that make it true, and an honest record of what each

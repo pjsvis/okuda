@@ -8,8 +8,14 @@ callsign: BRF-FETCH-STATE
 **Date:** 2026-08-27
 **Status:** draft
 **TD:** td-a27b86
-**Branch:** feat/tui-live-documents (same branch as the watch brief — this is the chrome that lands once watch is wired)
-**Context:** follows `briefs/2026-08-26-brief-tui-live-documents.md` (the watch plumbing), and `briefs/2026-08-23-brief-gloam-tui-footer.md` (the Gloam signature). The live-documents brief put "footer changes (live indicator, mtime display)" in *out of scope* with the note "the document carries its own 'as of'; chrome can come later if dogfood demands." The dogfood has now demanded — not an mtime, not a live indicator, but a *fetch-state stamp*. This brief scopes what that actually is, and the bug it forces us to fix on the way.
+
+## Branch
+
+feat/tui-live-documents (same branch as the watch brief — this is the chrome that lands once watch is wired)
+
+## Context
+
+follows `briefs/2026-08-26-brief-tui-live-documents.md` (the watch plumbing), and `briefs/2026-08-23-brief-gloam-tui-footer.md` (the Gloam signature). The live-documents brief put "footer changes (live indicator, mtime display)" in *out of scope* with the note "the document carries its own 'as of'; chrome can come later if dogfood demands." The dogfood has now demanded — not an mtime, not a live indicator, but a *fetch-state stamp*. This brief scopes what that actually is, and the bug it forces us to fix on the way.
 
 ## The first temporal directive (load-bearing — do not violate)
 

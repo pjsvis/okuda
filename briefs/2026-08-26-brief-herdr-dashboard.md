@@ -7,9 +7,10 @@ callsign: BRF-HERDR-DASHBOARD
 
 **Date:** 2026-08-26
 **Status:** Ready (v0 config-not-code; premium path gated)
-**Depends on:** `2026-08-26-brief-telemetry-conventions.md` (the files);
-`briefs/…-brief-tui-live-documents.md` (parked — **this brief is its
-unpark trigger**); `2026-08-26-brief-document-links.md` (index pane)
+
+## Depends on
+
+`2026-08-26-brief-telemetry-conventions.md` (the files); `briefs/…-brief-tui-live-documents.md` (parked — **this brief is its unpark trigger**); `2026-08-26-brief-document-links.md` (index pane)
 
 ## What
 

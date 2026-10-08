@@ -7,9 +7,10 @@ callsign: BRF-CONCORDANCE-PREFILTER
 
 **Date:** 2026-09-06
 **Status:** Open
-**Lineage:** dialog session (concordance case finding → fzf #412 dogfood →
-ADV-READER-SIDE-FILTER re-confirmed). The advisory identified the seam;
-this brief implements it.
+
+## Lineage
+
+dialog session (concordance case finding → fzf #412 dogfood → ADV-READER-SIDE-FILTER re-confirmed). The advisory identified the seam; this brief implements it.
 
 ## Objective
 

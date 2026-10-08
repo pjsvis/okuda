@@ -6,8 +6,7 @@ callsign: ADR-REFERENCES-SECTION-047
 # Decision: The References section — the renderer emits a receipt for its own map
 
 **Date:** 2026-09-30
-**Status:** Accepted (amends ADR-MAIN-DOCUMENT-031 — the discovery contract is
-unchanged; this adds its projection. Brief BRF-REFERENCES-SECTION.)
+**Status:** Accepted (amends ADR-MAIN-DOCUMENT-031 — the discovery contract is unchanged; this adds its projection. Brief BRF-REFERENCES-SECTION.)
 
 ## Context
 

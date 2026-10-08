@@ -8,15 +8,10 @@ callsign: BRF-STATE-GLYPH-2
 **Date:** 2026-08-28
 **Status:** Open (dogfood-fired; the glyphs are plain text today, colourless)
 **Branch:** feat/gloam-launcher
-**Context:** the state glyphs (`☐ ✓ ✗ ⋮ ◆`) are in use across the
-showcase, the monster docs, and the lexicon — but they render as plain
-document-coloured text. At glyph size they're hard to scan at distance;
-the showcase's own claim ("each row is assessed before it is read")
-overstates what a colourless `✓` delivers. The dogfood finding: a
-traffic-lamp colour mapping (green/yellow/orange/red) + bold would
-give the glyphs the impact their job demands. The lexicon is the moat,
-but only if the glyphs *read* at a glance — otherwise they're a
-vocabulary list, not a moat.
+
+## Context
+
+the state glyphs (`☐ ✓ ✗ ⋮ ◆`) are in use across the showcase, the monster docs, and the lexicon — but they render as plain document-coloured text. At glyph size they're hard to scan at distance; the showcase's own claim ("each row is assessed before it is read") overstates what a colourless `✓` delivers. The dogfood finding: a traffic-lamp colour mapping (green/yellow/orange/red) + bold would give the glyphs the impact their job demands. The lexicon is the moat, but only if the glyphs *read* at a glance — otherwise they're a vocabulary list, not a moat.
 
 ## What
 

@@ -7,23 +7,19 @@ date: 2026-10-01
 # Brief: The reading fraction — a meter for the glass, from the state the glass already holds
 
 **Created:** 2026-10-01
-**Status:** Open — brief only; the task is written when the work starts
-(the operator's method, unchanged from BRF-SILCROW-PATHS: *"each step has
-its own wrinkles, that we have not discerned yet"*).
-**Lineage:** the operator, verbatim: *"now that we have code files in our
-render, and looking gorgeous, I might add, we should maybe give people a
-percentage meter to show how much more gorgeouseness there is"* — *"this
-is a moment where we figured we needed an indicator"* — *"and the shape
-emerged from the stuff we already have"* — *"thus justifying the one step
-at a time, bearing in mind the one after that, principle."*
-**Extends:** ADR-007 (Glow is the visual reference — this time it
-diverges not at all), BRF-CODE-SHELF (the code renders that made lengths
-worth measuring), ADR-047 (the receipt that ends every main render),
-ADR-049/BRF-SILCROW-PATHS (Ring B — the step that doubled the documents
-worth diving into).
-**Grounding:** `docs/2026-09-04-the-silcrow.md` — the main document is
-*the expedition instrument*; the meter is the instrument's compass
-reading, the last element of the two-render contract's instrument set.
+**Status:** Open — brief only; the task is written when the work starts (the operator's method, unchanged from BRF-SILCROW-PATHS: *"each step has its own wrinkles, that we have not discerned yet"*).
+
+## Lineage
+
+the operator, verbatim: *"now that we have code files in our render, and looking gorgeous, I might add, we should maybe give people a percentage meter to show how much more gorgeouseness there is"* — *"this is a moment where we figured we needed an indicator"* — *"and the shape emerged from the stuff we already have"* — *"thus justifying the one step at a time, bearing in mind the one after that, principle."*
+
+## Extends
+
+ADR-007 (Glow is the visual reference — this time it diverges not at all), BRF-CODE-SHELF (the code renders that made lengths worth measuring), ADR-047 (the receipt that ends every main render), ADR-049/BRF-SILCROW-PATHS (Ring B — the step that doubled the documents worth diving into).
+
+## Grounding
+
+`docs/2026-09-04-the-silcrow.md` — the main document is *the expedition instrument*; the meter is the instrument's compass reading, the last element of the two-render contract's instrument set.
 
 ## Objective
 

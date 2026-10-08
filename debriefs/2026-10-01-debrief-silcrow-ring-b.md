@@ -6,15 +6,7 @@ callsign: DBF-SILCROW-RING-B
 # Debrief: Ring B and the legibility gate — the silcrow grows a conscience
 
 **Date:** 2026-10-01
-**Status:** Shipped — three commits on `feat/silcrow-ring-b` (`8ef9f24`,
-the W3/brief commit; then the Ring B implementation): the brief unblocked
-(P-4 satisfied, W3 probe passed), `RE_MD_PATH` + `EXILED_EXTS` in
-`src/vectors.ts` with nine tests, ADR-049, the explainer's legibility
-paragraph, registries in sync. 512/512 pass (503 at the day's open, 512
-after — 9 new tests, one rewritten contract); `just check` green; binary
-fresh at HEAD. td ledger: td-696449 (Ring A) reviewed and closed on main;
-td-02e4a3 (Ring B) shipped. The epic td-89d085 stays open — Ring C parked
-with its census, W5's authoring drift list out of scope.
+**Status:** Shipped — three commits on `feat/silcrow-ring-b` (`8ef9f24`, the W3/brief commit; then the Ring B implementation): the brief unblocked (P-4 satisfied, W3 probe passed), `RE_MD_PATH` + `EXILED_EXTS` in `src/vectors.ts` with nine tests, ADR-049, the explainer's legibility paragraph, registries in sync. 512/512 pass (503 at the day's open, 512 after — 9 new tests, one rewritten contract); `just check` green; binary fresh at HEAD. td ledger: td-696449 (Ring A) reviewed and closed on main; td-02e4a3 (Ring B) shipped. The epic td-89d085 stays open — Ring C parked with its census, W5's authoring drift list out of scope.
 
 The thesis: the step the brief parked was the step the operator's own
 notes demanded — and the parking is what made the landing clean.

@@ -7,8 +7,7 @@ callsign: BRF-REGISTRY-MARKDOWN
 
 **Date:** 2026-08-25
 **Status:** Open (the next moat move; not started)
-**Context:** blue-sky riff during td-96c759 review wait. The strongest
-moat extension on the table.
+**Context:** blue-sky riff during td-96c759 review wait. The strongest moat extension on the table.
 
 ## What
 

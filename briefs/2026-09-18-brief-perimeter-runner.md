@@ -9,8 +9,14 @@ date: 2026-09-18
 **Created:** 2026-09-18
 **Status:** Open
 **TD:** td-1bb4c4 (epic) — td-db45e2 the move
-**Lineage:** ADR-PERIMETER-039 and the measurement in `docs/2026-09-18-a-perimeter-not-a-project.md` — `[moira]` is the largest group in okuda's task runner at 28 recipes, and 22 of them touch nothing of okuda's
-**Extends:** `BRF-PERIMETER-GATE` — that brief ships the report; this one drives its count to zero and flips it.
+
+## Lineage
+
+ADR-PERIMETER-039 and the measurement in `docs/2026-09-18-a-perimeter-not-a-project.md` — `[moira]` is the largest group in okuda's task runner at 28 recipes, and 22 of them touch nothing of okuda's
+
+## Extends
+
+`BRF-PERIMETER-GATE` — that brief ships the report; this one drives its count to zero and flips it.
 
 ## Objective
 

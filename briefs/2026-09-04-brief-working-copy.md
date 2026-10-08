@@ -7,14 +7,10 @@ callsign: BRF-WORKING-COPY
 
 **Date:** 2026-09-04
 **Status:** Open
-**Context:** ADR-031 is the decision; this brief is the build. The
-model: the main document renders with its references annotated as
-optimistic vectors `[12]–[98]`; actuating one renders the target clean
-in the same instance; `u` unwinds; `99` clones the current render into
-a new terminal via the host, where it becomes main — annotated. The
-jump map is in-memory, derived from the main source per render; the
-paint is illustrative; the source is never mutated; legacy wiring
-(`okuda-rhs`, authored numbering) is retired, not honored.
+
+## Context
+
+ADR-031 is the decision; this brief is the build. The model: the main document renders with its references annotated as optimistic vectors `[12]–[98]`; actuating one renders the target clean in the same instance; `u` unwinds; `99` clones the current render into a new terminal via the host, where it becomes main — annotated. The jump map is in-memory, derived from the main source per render; the paint is illustrative; the source is never mutated; legacy wiring (`okuda-rhs`, authored numbering) is retired, not honored.
 
 ## What
 

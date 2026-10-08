@@ -2,8 +2,7 @@
 
 **Date:** 2026-09-05
 **Type:** advisory tier constitution
-**Status:** The standing authority for the `advisories/` tier. Every
-dispatch cites this manual.
+**Status:** The standing authority for the `advisories/` tier. Every dispatch cites this manual.
 
 ## The existential constraint
 

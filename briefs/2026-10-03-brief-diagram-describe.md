@@ -6,17 +6,20 @@ callsign: BRF-DIAGRAM-DESCRIBE
 # Brief: Prose descriptions of mermaid diagrams via an external binary
 
 **Date:** 2026-10-03
-**Amended:** 2026-10-04 — the render-path design is refused; the description
-belongs to authoring, and the accessibility half to the flattener (§Finding)
+
+## Amended
+
+2026-10-04 — the render-path design is refused; the description belongs to authoring, and the accessibility half to the flattener (§Finding)
 **Status:** Open — the residue is the lint and the flattener's fence policy
 **TD:** (to create — the lint; the flattener half is `BRF-SPOKEN-BLOCK-GRAMMAR`)
-**Lineage:** `mermaid-to-md` (the existing external binary — mermaid fence → ASCII
-art, classified and coloured by okuda); the three-concerns principle
-(compositing belongs to the environment, not the viewer); the process-boundary
-crossing lesson (external binaries carry their own environment).
-**Extends:** `BRF-SPOKEN-BLOCK-GRAMMAR` (the flattener's fence policy, A3) ·
-`ADR-PERIMETER-039` (flattening is not okuda's work) ·
-`docs/2026-09-21-the-model-beside-the-loop.md` (the clock rule)
+
+## Lineage
+
+`mermaid-to-md` (the existing external binary — mermaid fence → ASCII art, classified and coloured by okuda); the three-concerns principle (compositing belongs to the environment, not the viewer); the process-boundary crossing lesson (external binaries carry their own environment).
+
+## Extends
+
+`BRF-SPOKEN-BLOCK-GRAMMAR` (the flattener's fence policy, A3) · `ADR-PERIMETER-039` (flattening is not okuda's work) · `docs/2026-09-21-the-model-beside-the-loop.md` (the clock rule)
 
 > **Amendment (2026-10-04).** The design below is **refused**. A model in the
 > render path shares the reader's clock, and the accessibility work this brief

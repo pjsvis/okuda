@@ -6,11 +6,7 @@ callsign: DBF-OS-UPGRADE
 # Debrief: The OS upgrade — one stale page hash, and two lessons the silo already held
 
 **Date:** 2026-09-21
-**Status:** Shipped for the signature — `ADR-BUILD-SIGNS-040` landed, `build` compiles
-then re-signs then verifies, `check` verifies, `scripts/signature-check.sh` is the
-instrument. Open: two further defects reported and not fixed (the diagram-swallow at
-`src/render.ts:155-160`; `facade-lint.sh`'s silent exit 1), and nothing is committed —
-the branch is `docs/ornament-that-pays-rent`, `main..HEAD` is 42 commits.
+**Status:** Shipped for the signature — `ADR-BUILD-SIGNS-040` landed, `build` compiles then re-signs then verifies, `check` verifies, `scripts/signature-check.sh` is the instrument. Open: two further defects reported and not fixed (the diagram-swallow at `src/render.ts:155-160`; `facade-lint.sh`'s silent exit 1), and nothing is committed — the branch is `docs/ornament-that-pays-rent`, `main..HEAD` is 42 commits.
 
 ## Accomplishments
 
