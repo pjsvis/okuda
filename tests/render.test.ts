@@ -42,7 +42,13 @@ describe("render — headings", () => {
     // it. The enclosing style owns the run; the guest borrows and hands
     // it back. Without the re-open: white text from the reset to the
     // wrap (the ADV-THE-PILE edge).
-    const out = await render("# ADV-TEST — a silcrow %okuda-vector:12% and the words that follow it");
+    // width 70: the heading fits on one line (the gap column narrowed the
+    // budget by one, so 60 now wraps this heading mid-assertion). The
+    // subject is the guest-paint handoff, not the wrap point.
+    const out = await render(
+      "# ADV-TEST — a silcrow %okuda-vector:12% and the words that follow it",
+      70,
+    );
     expect(out).toContain(
       "\x1b[38;2;251;113;133;1m§12\x1b[0m\x1b[38;2;189;147;249;1m and the words that follow it",
     );
@@ -160,6 +166,37 @@ describe("render — heading RHS chip (right-edge tab)", () => {
     const nextChipLines = lines(next).filter((l) => l.endsWith(CHIP)).length;
     expect(nextChipLines).toBeGreaterThan(prevChipLines);
     for (const l of lines(next)) if (l.includes(CHIP)) expect(l.endsWith(CHIP)).toBe(true);
+  });
+
+  test("wrapped continuation lines repaint the badge (the LHS rail)", async () => {
+    const out = await render("# " + "heading word ".repeat(6), 26);
+    const hdr = lines(out)
+      .map(stripANSI)
+      .filter((l) => l !== "" && l.includes("█") && !l.includes("─"));
+    expect(hdr.length).toBeGreaterThan(1); // wrapped → multiple
+    for (const l of hdr) {
+      // margin (2) + badged hash + space — the rail runs the full height.
+      expect(l.startsWith("  # ")).toBe(true);
+      // and the column before the chip is always the reserved gap.
+      expect(l[l.length - 2]).toBe(" ");
+    }
+  });
+
+  test("NO_COLOR: the repainted badge is the literal hash", async () => {
+    const out = await render("# " + "heading word ".repeat(6), 26, "none");
+    // exclude the block terminator (it carries chips but is not a heading).
+    const hdr = lines(out)
+      .map(stripANSI)
+      .filter((l) => l.includes("█") && !l.includes("─"));
+    expect(hdr.length).toBeGreaterThan(1);
+    for (const l of hdr) expect(l.startsWith("  # ")).toBe(true);
+  });
+
+  test("a heading line always leaves a space before the chip (even when full)", async () => {
+    const out = await render("# " + "x".repeat(60), 24); // forces full/hard-split lines
+    const chipLines = lines(out).map(stripANSI).filter((l) => l.endsWith("█") && !l.includes("─"));
+    expect(chipLines.length).toBeGreaterThan(1);
+    for (const l of chipLines) expect(l[l.length - 2]).toBe(" ");
   });
 
   test("chip is constant 1 cell (the H1 unit) regardless of level", async () => {

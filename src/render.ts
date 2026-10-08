@@ -779,11 +779,19 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // the H1 unit — a fixed reference the LHS badge is measured against
       // (LHS encodes depth by growing; RHS references it by staying
       // constant). Same visual language as the H1 LHS badge. bg=fg-on-glyph
-      // renders reliably (the badge proves it). Headers wrap at `width-1`
-      // (reserving 1 column); each line padded to `width-1`, chip fills the
-      // last column. Every line (the bar form) bounds the reflow.
+      // renders reliably (the badge proves it). Headers wrap at `width-2`:
+      // one column reserved for the gap that keeps the text off the chip, one
+      // for the chip itself. Every line (the bar form) bounds the reflow.
+      //
+      // The wrapped continuation lines REPAINT the badge rather than sitting
+      // in blank indent, so the LHS rail runs the full height of a wrapped
+      // heading and matches the RHS chip's bar. A renderer-layer choice: the
+      // source is one heading; the continuous rail is what the glass shows.
+      // Under NO_COLOR the repaint is the literal `#` — mode parity holds.
       const markers = "#".repeat(level);
-      const wrapW = width - 1;
+      const badgeW = markers.length + 1; // badge + the space after it
+      const indent = " ".repeat(badgeW);
+      const wrapW = width - 2;
       // Guest paints (silcrows, doc-refs, state glyphs) close with a full
       // reset; the heading re-opens after each one — the enclosing style
       // owns the run, the guest borrows and hands it back (td-290433).
@@ -807,17 +815,20 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         (_whole, pre: string, g: string) =>
           pre + styler.roleBold(STATE_GLYPH_ROLE[g]!, g),
       );
-      const lines = wrapANSI(markers + " " + clean, { width: wrapW });
+      const lines = wrapANSI(markers + " " + clean, { width: wrapW, indent });
       return (
         lines
           .map((l, i) => {
             if (l === "") return "";
-            const body =
-              i === 0
-                ? styler.headingBadge(markers) +
-                  styler.roleBold("heading", keepHeading(l.slice(markers.length)))
-                : styler.roleBold("heading", keepHeading(l));
-            return padDisplay(body, wrapW) + styler.headingChip();
+            // Line 0 carries the marker glyphs literally in the wrapped
+            // string; continuation lines carry blank indent instead, so the
+            // badge is repainted here at the same column and width (badgeW).
+            const text = i === 0 ? l.slice(markers.length) : " " + l.slice(badgeW);
+            const body = styler.headingBadge(markers) +
+              styler.roleBold("heading", keepHeading(text));
+            // wrapW + the gap column + the chip = `width`; the gap guarantees
+            // the text never butts against the chip on a full line.
+            return padDisplay(body, wrapW) + " " + styler.headingChip();
           })
           .join("\n") + "\n\n"
       );

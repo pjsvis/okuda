@@ -60,6 +60,16 @@ structural (same characters), not handled.
    at `content_width`. A 1-column header/body inconsistency — likely
    invisible on short headers, worth noting.
 
+   **Amended 2026-10-08** (operator call, a renderer tweak): header text now
+   wraps at `content_width - 2` — the tab takes the last column and one
+   column is reserved as a gap, so a full line never butts against the tab.
+   The header/body inconsistency is therefore 2 columns now, not 1. And the
+   wrapped continuation lines **repaint the heading badge** rather than
+   sitting in blank indent: the LHS rail runs the full height of a wrapped
+   heading, matching the RHS bar. A renderer-layer choice — the source is
+   one heading; the rail is what the glass shows. See `tests/render.test.ts`,
+   the heading-chip block.
+
 ## Divergence from glow
 
 Glow has no right-edge marker — the text ends where it ends, and the
