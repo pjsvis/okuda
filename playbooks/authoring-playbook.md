@@ -323,6 +323,12 @@ Add here as they surface from dogfooding. Each entry: the pattern, why it earns 
   inside this one. Adopted 2026-10-08; the argument is in
   `docs/2026-10-08-the-filename-is-a-record.md`. Leading (the record's date is the
   date the record was made here).
+- **The rule is conditional, not recommended.** A document that has a date carries
+  it in the name, and the name agrees with the declared `date:`/`**Date:**`; a
+  document with no date carries no prefix, and the absence is honest. "Recommended"
+  is a third state that only hides a forgotten date. Enforced by
+  `scripts/date-lint.ts` in `just check`; the warrant (four clocks, four invariance
+  domains) is `docs/2026-10-08-time-is-a-claim.md`.
 - **Loose lists.** Discrete blocks, reduced scan tension. Calming.
 - **Hash headers only.** Unambiguous structure, LCARS-tab rendering. Calming.
 - **Front matter elided.** Provenance is not content. Calming.

@@ -1,6 +1,7 @@
 **Title:** Why YYYY-MM-DD works — zero-cost information density
 **Source:** cool-pi-extensions silo — `ai-development-workflow-01` (the ancestor corpus)
-**Written:** 2026-08-03 · **Landed:** 2026-10-08 (landing date is the record's date; the source date is provenance)
+**Date:** 2026-10-08
+**Written:** 2026-08-03 (the source date; the record's date is the landing date)
 **Response:** `docs/2026-10-08-the-filename-is-a-record.md`
 
 Prefixing filenames with an ISO 8601 date string (`YYYY-MM-DD-title.md`) is one of the highest-leverage, lowest-overhead conventions you can introduce into a time-bound workflow.

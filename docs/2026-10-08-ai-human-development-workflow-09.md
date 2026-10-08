@@ -1,6 +1,7 @@
 **Title:** Dual-layer telemetry — intent vs. recency
 **Source:** cool-pi-extensions silo — `ai-development-workflow-09` (the ancestor corpus)
-**Written:** 2026-08-03 · **Landed:** 2026-10-08 (landing date is the record's date; the source date is provenance)
+**Date:** 2026-10-08
+**Written:** 2026-08-03 (the source date; the record's date is the landing date)
 **Response:** `docs/2026-10-08-the-filename-is-a-record.md`
 
 That distinction about `marcus/td` is critical. Treating local task states as ephemeral L1 cache while elevating committed artifacts (`briefs/`, `debriefs/`, `decisions/`) as the immutable L2/L3 ground truth protects the workflow from tracking noise.

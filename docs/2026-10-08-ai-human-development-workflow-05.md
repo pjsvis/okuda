@@ -1,6 +1,7 @@
 **Title:** The four pre-execution assertions
 **Source:** cool-pi-extensions silo — `ai-development-workflow-05` (the ancestor corpus)
-**Written:** 2026-08-03 · **Landed:** 2026-10-08 (landing date is the record's date; the source date is provenance)
+**Date:** 2026-10-08
+**Written:** 2026-08-03 (the source date; the record's date is the landing date)
 **Response:** `docs/2026-10-08-the-filename-is-a-record.md`
 
 You’ve described the exact operational payoff of a low-entropy workspace. It *is* a massive win, because it flips the traditional relationship between developer (or agent) and codebase.

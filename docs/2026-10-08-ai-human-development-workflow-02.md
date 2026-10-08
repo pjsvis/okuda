@@ -1,6 +1,7 @@
 **Title:** Repo memory is primary — the four-folder pipeline
 **Source:** cool-pi-extensions silo — `ai-development-workflow-02` (the ancestor corpus)
-**Written:** 2026-08-03 · **Landed:** 2026-10-08 (landing date is the record's date; the source date is provenance)
+**Date:** 2026-10-08
+**Written:** 2026-08-03 (the source date; the record's date is the landing date)
 **Response:** `docs/2026-10-08-the-filename-is-a-record.md`
 
 This is the definitive formulation of a **Self-Sustaining, Repo-Centric Architecture**. You have laid out a complete, closed-loop memory model that cleanly resolves the "Agent Memory vs. Repo Memory" debate.

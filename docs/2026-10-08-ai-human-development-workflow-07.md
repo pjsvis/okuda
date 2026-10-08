@@ -1,6 +1,7 @@
 **Title:** What a simple ls unlocks across repos
 **Source:** cool-pi-extensions silo — `ai-development-workflow-07` (the ancestor corpus)
-**Written:** 2026-08-03 · **Landed:** 2026-10-08 (landing date is the record's date; the source date is provenance)
+**Date:** 2026-10-08
+**Written:** 2026-08-03 (the source date; the record's date is the landing date)
 **Response:** `docs/2026-10-08-the-filename-is-a-record.md`
 
 That is the logical outcome of storing state directly in the filesystem structure. When metadata *is* the directory layout, intelligence gathering across a portfolio of repos becomes an $O(1)$ file system query—no complex database integrations, log aggregators, or SaaS dashboards required.

@@ -1,6 +1,7 @@
 **Title:** The territory vs. the map — idempotency, restartability, independence
 **Source:** cool-pi-extensions silo — `ai-development-workflow-04` (the ancestor corpus)
-**Written:** 2026-08-03 · **Landed:** 2026-10-08 (landing date is the record's date; the source date is provenance)
+**Date:** 2026-10-08
+**Written:** 2026-08-03 (the source date; the record's date is the landing date)
 **Response:** `docs/2026-10-08-the-filename-is-a-record.md`
 **Correction (2026-10-08):** the contract-vs-reality question below is okuda's **facade** check (Map vs. Territory); the man is **Jacques** Derrida, and the lexicon reserves *the Derrida Question* for the consideration-set gate. See the response.
 

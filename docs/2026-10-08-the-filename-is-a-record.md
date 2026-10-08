@@ -109,8 +109,11 @@ okuda renders documents, it does not roam a filesystem counting commits. The
 checksum that survived is narrower than the essays hoped and sharper than they
 imagined — `scripts/callsign-lint.ts` takes a Shannon checksum over the citation
 namespace, so a pointer to a document that no longer resolves fails the gate. And
-the naming rule gained the clause the essays could not have written, because they
-had no imports: **landing date for imports** (`playbooks/authoring-playbook.md`).
+the naming rule gained two clauses the essays could not have written, because
+they had no imports and no distributed copies: **landing date for imports**
+(`playbooks/authoring-playbook.md`), and a grade — not *recommended* but
+**conditional**: a document that has a date carries it in the name, and the name
+agrees with the content (`docs/2026-10-08-time-is-a-claim.md`).
 
 ## What this does not fix
 
@@ -126,5 +129,6 @@ are as good a first tenant for that index as any.
 - `ADR-SESSION-HANDOFFS-017` — handoffs live in `td`, never in a brief
 - `system.md` — the Edinburgh Protocol and its lexicon (Map vs. Territory; the Derrida Question)
 - `docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md` — the Derrida gate and the Foxtrot Oscar
+- `docs/2026-10-08-time-is-a-claim.md` — the time taxonomy and the conditional rule
 - `scripts/callsign-lint.ts`, `scripts/facade-lint.sh` — the drift detectors that replaced the README checksum
 - `playbooks/authoring-playbook.md` — where the landing-date rule lives
