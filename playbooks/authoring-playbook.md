@@ -331,59 +331,61 @@ Add here as they surface from dogfooding. Each entry: the pattern, why it earns 
   domains) is `docs/2026-10-08-time-is-a-claim.md`.
 - **A preface is three sentences; the evidence is a block.** A `Context` (or any
   lead paragraph) states the warrant — what we assumed, what is wrong, what it
-  costs — and stops. The argument belongs in the body and the measurement belongs
-  in its own list or table, because a paragraph carrying three jobs is a wall *by
-  definition* and a wall denies the reader an informed verdict (see the
-  short-paragraphs entry). Measured 2026-10-08: five of six documents written that
-  day opened with a Context of six to nine rendered lines. Calming + leading.
-- **Render the document before shipping it.** The code is dogfooded; the prose was
-  not, and two defects went out in one brief on 2026-10-08 because nobody opened
-  it — a hard-wrapped `Context` that rendered as an eight-line wall (soft breaks
-  are inert, `ADR-PROSE-BREAKS-056`) and strong spans that failed to parse
-  (`**Date:**/frontmatter` renders its own asterisks, because the closing `**` sat
-  against punctuation). Open every document once before it lands; the render is the
-  only reading that counts. Leading.
+  costs — and stops. The argument is the body; the measurement is its own list or
+  table. A paragraph carrying three jobs is a wall by definition. Measured
+  2026-10-08: five of six documents opened with a Context of six to nine rendered
+  lines. Calming + leading.
+- **Render the document before shipping it.** Code is dogfooded; prose was not,
+  and two defects shipped in one brief on 2026-10-08 because nobody opened it — a
+  hard-wrapped `Context` that rendered as an eight-line wall, and strong spans that
+  failed to parse (`**Date:**/frontmatter` prints its asterisks). Open every
+  document once before it lands. Leading.
 - **Loose lists.** Discrete blocks, reduced scan tension. Calming.
 - **Hash headers only.** Unambiguous structure, LCARS-tab rendering. Calming.
 - **Front matter elided.** Provenance is not content. Calming.
 - **Vertical-pipe blockquote.** Pull-aside signal — worth remembering, not in the flow. Leading (sets the block apart).
 - **Short paragraphs — no walls of text.** One move of the argument per
-  paragraph, split at the natural seams. The justification is procedural,
-  not cosmetic: **the FO verdict must be informed, and a wall makes an
-  informed verdict impossible.** A wall forces a blind exit; a blind exit
-  is a surrender, not a judgement. The paragraph is the unit of inspection,
-  and an uninspectable unit denies the verdict its evidence. The target is
-  *excessive* length in the house register: walls get FO'd on presentation,
-  which is legitimate — it's our silo, and the door is held open for
-  readers, not for walls. Confirmed by dogfood: the 2026-09-10 readability
-  pass on the use-vs-mention note split its walls and the doc gained the
-  scan. Calming + leading.
-  - **The split caveat.** Bunging in breaks can do more harm than good,
-    three ways: the *severed argument* (fragments read as separate claims;
-    the seam destroys the inferential chain), the *false topic sentence*
-    (a break says "a new move starts here" — arbitrary breaks manufacture
-    fake topic sentences, and the scanned document lies), and the *staccato
-    chop* (split to list-granularity and you've built a worse list instead
-    of a better paragraph). Where to split is editorial judgement, not a
-    measurable — the reflow rule is the precedent.
-  - **The boundary.** The gate is on the house register: documents written
-    to be consulted. Clips are preserved as-clipped, and literature is
-    exempt — we FO walls we wrote; we do not reformat the world.
-  - **The Saramago Barrier.** The exemption is a gate, not a loophole. A
-    slab is admissible only if its author clears the barrier: demonstrated
-    mastery where the wall is the instrument, not the failure (in
-    *Blindness* the unpunctuated flow enacts its subject; every harm-mode
-    bounces). The burden of proof sits with the proposer of the slabby
-    document — if you think you're up to José's level, try it on. Below
-    the barrier, a slab is decorated Stuff; above it, the slab is the
-    Thing.
-  - **In reserve, not decided.** A hard para-length rule. The only
-    threshold that would carry a perceptual justification is glass-bound:
-    a paragraph taller than the glass breaks the glance-confirm, because
-    start and end cannot be seen together. Hold until the dogfood shows
-    it; a line-count threshold would be benchmaxxing prose (the measurable
-    proxy over the real property).
-- **Colons over em-dashes.** Prefer the colon; it is the house's native connective and it declares the relationship: *this, and here is what it means* — the reader predicts expansion before reading it. The em-dash is context-dependent punctuation (parenthetical? connective? a break?) and context-dependence is stress, by the hash-header rule's own logic. The boundary, learned the day the rule was written: the colon misreads in exactly two shapes — paired parentheticals (*the prose tier — design notes, clips — and…*) and before conjunctions (*history — but it converges*) — where the dash is doing connective work a colon cannot. There the dash survives. Found in the 2026-09-10 mechanical dash-to-colon sweep on the use-vs-mention note: four misreads, four dashes restored, the rest of the conversions kept. Calming.
+  paragraph, split at the natural seams. The justification is procedural: the FO
+  verdict must be informed, and a wall forces a blind exit — a surrender, not a
+  judgement. Calming + leading. Dogfooded 2026-09-10: splitting the walls in the
+  use-vs-mention note gained the scan.
+  - **The split caveat.** Breaks can harm three ways: the *severed argument* (the
+    seam destroys the inferential chain), the *false topic sentence* (an arbitrary
+    break manufactures a fake one, and the scanned document lies), and the
+    *staccato chop* (split to list-granularity and you've built a worse list).
+    Where to split is editorial judgement, not a measurable.
+  - **The boundary.** The gate is on the house register — documents written to be
+    consulted. Clips are preserved as-clipped and literature is exempt: we FO
+    walls we wrote; we do not reformat the world.
+  - **The Saramago Barrier.** A gate, not a loophole: a slab is admissible only on
+    demonstrated mastery, where the wall is the instrument rather than the
+    failure. The burden sits with the proposer — below the barrier a slab is
+    decorated Stuff, above it the slab is the Thing.
+  - **In reserve, not decided.** A hard para-length rule. The only threshold with
+    a perceptual warrant is glass-bound: a paragraph taller than the glass breaks
+    the glance-confirm. Hold until the dogfood shows it; a line-count threshold
+    would be benchmaxxing prose.
+- **Colons over em-dashes.** Prefer the colon; it is the house's native connective
+  and it declares the relationship: *this, and here is what it means* — the reader
+  predicts expansion before reading it. The em-dash is context-dependent
+  punctuation (parenthetical? connective? a break?) and context-dependence is
+  stress, by the hash-header rule's own logic.
+  - **The boundary.** The colon misreads in exactly two shapes — paired
+    parentheticals (*the prose tier — design notes, clips — and…*) and before
+    conjunctions (*history — but it converges*) — where the dash is doing
+    connective work a colon cannot. There the dash survives. Found in the
+    2026-09-10 dash-to-colon sweep on the use-vs-mention note: four misreads, four
+    dashes restored, the rest of the conversions kept. Calming.
 - **Mermaid diagrams must fit the medium.** The binary renders ASCII art into a character grid; a wide `flowchart LR` with long labels overflows and degrades to a "too wide" notice plus source. Prefer `flowchart TD`, short node labels, short edge labels — the diagram earns its place only as art, not as a fenced slab of source. (Found persisting the okuda-stack riff doc: the LR version degraded; the TD version rendered.)
-- **Reflow prose, never fences.** When reflowing soft returns in a doc (joining single `\n` to spaces so prose wraps to width), **skip fenced code blocks** — ``` ... ``` and mermaid fences are verbatim, load-bearing input. The renderer already treats fences as verbatim (`src/wrap.ts`, commit 24c50ff), but a *manual* doc-edit that reflows the whole file sweeps the fence into the reflow and collapses multi-line source onto one line. The signature failure: a mermaid `flowchart` with each edge on its own line becomes one space-joined line, `mermaid-to-md` can't parse it, and the ASCII diagram degrades to a boxed echo of the source. Found in `docs/showcase.md`: commit 24c50ff's "reflowed soft returns in showcase.md" collapsed the six-line mermaid fence; the diagram silently disappeared and was only noticed when someone ran `just showcase` weeks later. **The fence is not prose. Reflow stops at ``` .**
+- **Reflow prose, never fences.** When reflowing soft returns in a doc (joining
+  single `\n` to spaces so prose wraps to width), **skip fenced code blocks** —
+  fences and mermaid blocks are verbatim, load-bearing input. The renderer already
+  treats fences as verbatim (`src/wrap.ts`); a *manual* doc-edit that reflows the
+  whole file sweeps the fence into the reflow.
+  - **The signature failure.** A mermaid `flowchart` with each edge on its own line
+    becomes one space-joined line, `mermaid-to-md` cannot parse it, and the ASCII
+    diagram degrades to a boxed echo of the source. Found in `docs/showcase.md`: a
+    "reflowed soft returns" sweep collapsed the six-line mermaid fence; the diagram
+    silently disappeared, and it was only noticed weeks later when someone ran
+    `just showcase`. **The fence is not prose.**
 - **Jump-token spacing — RETIRED 2026-09-12.** The spaced double-tap form (`11, 22, 33`) is dead: [11] joined the ADR-032 actuator pocket and 44–88 were already reserved, so the pattern cannot express even a three-item menu (ADR-021 amendment). Sequential numbering from 12 is the one form — machine-generated menus renumber automatically, and the anti-precedence motive survives as top-to-bottom order, which is structural, not semantic.
