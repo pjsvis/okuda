@@ -115,6 +115,32 @@ Fourth batch, fourth correction in the *reading*, never the artifact:
 - Standing doctrine candidates: *built* as a missing class; *noticed-but-uncarried*
   as the honest sub-case.
 
+## Addendum (2026-10-08, on peer review)
+
+The standing candidates above are **settled, not standing**: `ADR-DOCUMENT-LIFECYCLE-057`
+now carries the completed dispositions table and the *built* class, and the
+*noticed-but-uncarried* line, in its 2026-10-08 amendment (`8448cdc`), hardened the
+same day on review (`ea96fb6`) so that the fourth line's test — *is the practice
+live?* — is met by **naming an instance in the record**, never by the pruner's
+confidence. This batch met it that way: the elicit-before-deciding pattern was
+evidenced by the review request that produced the finding.
+
+**The count is historical; the behaviour is not.** A read of the surviving two
+would treat the first bullet above too broadly. I ran the mechanism: on `docs/`
+registration, `bootstrapCallsign` maps **both** `-05` and `-06` to
+`DOC-INTENT-TASK`, and `avoidingCollisions` hands the second `DOC-INTENT-TASK-2` —
+so `the-scaling-profile:78` and the callsign brief `:219/:323` remain **valid
+demonstrations** of the collapse, and must not be "fixed" away. Only
+`ADR-038:158`'s inspection detail is purely historical.
+
+**The one load-bearing fact, for the next registration — not an annotation.**
+`-05` is *cited* and `-06` is *keep-class*: two documents with two dispositions,
+**not a sequence**. If `docs/` registration runs on them, the mechanism above
+papers the pile over with a collision suffix — precisely what `ADR-038`'s Note
+exists to forbid ("No document may end in `-NN` for any reason but being part
+N"). `ADR-038`'s *fix or grandfather* question is therefore **still owed** for
+these two. The count never was.
+
 ## Related
 
 - `ADR-DOCUMENT-LIFECYCLE-057` — the policy, and the keep-class
