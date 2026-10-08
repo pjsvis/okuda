@@ -11,7 +11,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 |---|---|---|---|---|
 | 2026-10-08 | BRF-DATE-INVARIANT | done | The date is a claim — the invariant, the lint, and the time document | 2026-10-08-brief-date-invariant.md |
 | 2026-10-08 | BRF-REGISTRY-DISCOVERY | open | One map from the territory — the registry discovers its own tiers | 2026-10-08-brief-registry-discovery.md |
-| 2026-10-08 | BRF-WRAP-AT-CAP | open | Wrap at the cap — the third branch | 2026-10-08-brief-wrap-at-cap.md |
+| 2026-10-08 | BRF-WRAP-AT-CAP | done | Wrap at the cap — the third branch | 2026-10-08-brief-wrap-at-cap.md |
 | 2026-10-07 | BRF-FRAME-INDEX | open | The frame index — an address two parties can both name | 2026-10-07-brief-frame-index.md |
 | 2026-10-07 | BRF-TABLE-LADDER | open | The band and the ladder — the table fit, from a design width of 80 | 2026-10-07-brief-table-allocator-ladder.md |
 | 2026-10-06 | BRF-KINDLE-PORCH | open | The Kindle porch — the silo on an e-ink glass, over ssh, nothing on the device | 2026-10-06-brief-kindle-porch.md |

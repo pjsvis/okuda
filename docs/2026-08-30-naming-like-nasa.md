@@ -11,8 +11,7 @@
 The callsign discussion (cool · short · unique) reached for a NASA analogy,
 and the analogy was correct enough to deserve verification. This document
 records what NASA actually does, with sources, so the lessons survive the
-conversation that produced them. An unattributed lesson decays into anecdote;
-an attributed one is a citation away from re-verification.
+conversation that produced them. 
 
 ## The four-part machine
 

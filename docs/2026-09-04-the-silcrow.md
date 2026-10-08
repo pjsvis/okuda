@@ -3,58 +3,36 @@
 **Date:** 2026-09-04
 **Type:** explainer
 
-Every document in the silo is rendered twice: once as it is, and — when
-it is the main document of a Gloam instance — once with its references
-annotated. The annotation is the **silcrow**: `§`, the section sign,
-followed by two digits. Rose, after the reference it points at — the rubricator's ink (`rubric` = *ruber*, red): the medieval navigation marks were red for the same reason we are.
+The **silcrow**: `§`, the section sign,
+followed by two digits like ADR-045 and ADR-049
 
-```text
-ADR-030 §12
-BRF-PORCH-MATRIX §13
-[the constitution](system.md) §14
-```
+Rose is the medieval rubricator's ink (`rubric` = *ruber*, red): for navigation marks.
+
+Press the number keys to view the reference.
 
 ## The glyph
 
 `§` is the section sign — also the section mark, or, in the trades, the
 **silcrow**. Medieval scribes drew it (`signum sectionis`) at the start
 of a passage to say *this section*; the common explanation is a
-ligature of two overlapping S's. For a thousand years it has had
-exactly one job: point at a thing inside a document. *See § 12* is how
-statutes and scholarship cross-reference. We did not invent its
-meaning; we inherited it, intact.
+ligature of two overlapping S's. 
 
-## The notation
-
-`§NN`, two digits, `12` through `98` (the floor moved from 11 to 12
-when [11] joined the doubled-pair actuator class, 2026-09-12; the
-canon: doubled = the system talks, mixed = the document moves). The
-number is an **address in the
-main document's jump map** — an in-memory structure derived from the
-document's own text at render time: callsign-shaped tokens, local
-`.md` links, and the file paths the corpus cites in prose — code
-files and named documents (Ring B, 2026-10-01), all gated on
-existence and legibility — in reading order, unique, capped. The paint is
-**illustrative**: the source document is never modified, the map is
-rebuilt on every render, and the numbers are deterministic — `§12`
-means the same thing on every glass, until the document changes, at
-which point the map re-derives and the numbers follow. Derivation
-replaces invalidation.
-
-The paint is **reserved**: the rose is a palette slot the markdown
-grammar cannot address, and prose never types `§`. A user who writes
-`[14]` in their document produces text; our numbers are visibly ours.
-(Occam's addendum: don't use too many links.)
+For a thousand years it has had
+exactly one job: point at a thing inside a document. *See §12* is how
+statutes and scholarship cross-reference. 
 
 ## The two-render contract
 
-The **main document** renders annotated — it is the map, the index,
-the expedition instrument. A **dereferenced** document renders clean —
-its references are not shown, so the tour cannot proceed from here by
-accident. `u` unwinds to the main. `99` promotes: the document you are
-reading becomes the main document of a fresh, stateless instance,
-where its own references gain their silcrows. Depth of traversal is
-opt-in, and each level costs a deliberate keystroke.
+The **main document** renders with silcrows: it is the map, the index,
+the expedition instrument. 
+
+A **de-referenced** document renders clean: without silcrows
+
+Keying `99` clones the current document into a fresh, stateless render,
+with silcrows. 
+
+Depth of traversal is
+opt-in, and each level costs a deliberate choice.
 
 ## Why rose *and* bold
 

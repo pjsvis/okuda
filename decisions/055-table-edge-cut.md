@@ -8,6 +8,9 @@ date: 2026-10-07
 
 **Date:** 2026-10-07
 **Status:** Accepted
+**Amended:** 2026-10-08 — the third branch (BRF-WRAP-AT-CAP): past the cap the
+columns wrap; the edge cut stands below the cap and for the irreducible set. See
+*The third branch* below.
 **Amends:** ADR-UNIVERSAL-ELISION-050 (which repealed the wrap and certified the
 squeeze); completes the doctrine ADR-TABLE-ELISION-014 stated and ADR-022 narrowed
 to menus.
@@ -40,6 +43,66 @@ the band's 120 columns. When the glass is narrower than the table, the composed 
 line is elided at the content width with `…` at the cut, exactly as a diagram line
 is. Body columns are never squeezed: the visible prefix is a proper table with
 aligned columns, and the tail falls off one edge.**
+
+Below the cap this is the whole model. Past the cap the cut hides content with
+no lever to recover it, so the third branch wraps the columns instead — added in
+place, 2026-10-08, because the grammar is one decision and a second ADR for its
+third branch would split the law.
+
+## The third branch — wrap at the cap (2026-10-08)
+
+Below the cap the edge cut is recoverable: the reader's lever is widen, and
+widening brings the bytes back. Past the cap there is no lever — 120 and 200
+columns render identically — so the cut no longer truncates, it **hides**, and
+hiding is the one thing the table model refuses. The grammar is three branches,
+one decision:
+
+```
+natural ≤ cap            draw whole; a narrow glass cuts the composed line
+natural > cap,
+  every word fits        WRAP the columns to the cap: rows become blocks
+a word fails its share   irreducible: draw and cut; the instrument names the
+                         document
+```
+
+**The word-floor test, at the cap.** A column's floor is its longest word (header
+or body; a word cannot break). If the floors' sum exceeds the cap, no allocation
+holds every word and the table is irreducible. Otherwise every column takes its
+floor and the slack is **split evenly** — no per-column need, no completion
+order, no proportional budget. The arithmetic the ladder used to reach a fit is
+deliberately absent: the floor test is a *predicate at the cap*, never an
+allocator across columns.
+
+A wrapped row is a **block**: each cell composes to lines, the tallest cell sets
+the block height, the shorter cells pad, and the rule brackets what is drawn.
+There is **no marker** on a wrapped table, because nothing is missing — `…`
+appears only where a word cannot fit, which is the irreducible case.
+
+**Measured** (`bun scripts/tables-check.ts --width 120`, 2026-10-08, 352 tables
+across 211 files): 135 tables wrap; 6 still hide content at the cap — the
+irreducible set, named by file and line. Before the branch, every one of the 135
+was cut at the cap with no lever; the cut reading at the cap falls from 135 to the
+irreducible set. Each of the six carries a word the cap cannot hold: a 60-column
+generated filename, a visible link URL, or a prose matrix (two un-holdable
+columns, `docs/2026-09-17-knowledge-work.md`).
+
+**A correction the work found.** The brief expected four irreducible tables;
+render parity gives **six**. okuda prints a link's URL inline (Pass C,
+`link: text + " " + url`), so the URL is visible content and its long unbroken
+token is a word no wrapper can break. The instrument had been stripping link
+URLs (`plain()`), which made two editorial tables in `&briefs.md` look wrappable
+when the renderer could not wrap them. `plain()` now mirrors the renderer and the
+two tables join the named set; the source-side four was a measurement artifact,
+not the model. The same `plain()` pass learned to preserve intra-word underscores
+(`NO_COLOR`, `RE_MD_LINK`) and to unescape backslash escapes, both of which had
+made the retired cut detector disagree with the render.
+
+**What was deliberately not done.** No threshold on wrap height: a table needing
+twenty lines a row renders as twenty, and the instrument says so by name. No wrap
+to the *glass*: the floor test only matters where the reader has no lever, so the
+wrap targets the cap and a narrower glass still cuts recoverably (widen and the
+bytes return). No wrapping of the irreducible set: a long filename or URL is the
+document's problem, or the compositor's.
 
 - **The contract:** authors write tables to 80 columns; 120 is headroom. Enforceable
   and enforced by the instrument, which already reports every table exceeding the
@@ -79,6 +142,8 @@ right ones off-screen" — the principle, stated as a measurement.
 | Keep the ladder (per-column completion) | It answers "how do I make this fit" for an artefact that does not need to fit. It costs the grid, and it carried four defects in a single day — all of them arithmetic about budgets, margins and formats that the edge cut does not have. |
 | Ladder when it can, edge cut when it cannot | Two policies for one surface, and the reader cannot tell which they are looking at. The ladder's convergence with the edge cut in the median case means the second policy buys almost nothing for a second set of rules. |
 | Wrap the prose column (the brief's increment 4) | It exists to hold a wrapped cell, i.e. to answer a question the squeeze created. Remove the squeeze and the question dissolves; the row block, the zip stratum and their defects go with it. |
+| Wrap at the glass, any width | The floor test then runs below the cap, where the reader has a lever; it also reflows on every resize and asks the words a question only the cap needs asked. The wrap targets the cap; a narrower glass cuts recoverably. |
+| Leave the cap cut (no third branch) | Past the cap the cut hides content with no remedy — the one case the model cannot justify. |
 | Squeeze only the widest column | Still a squeeze, still per-column arithmetic, still hides content inside a cell rather than at one honest edge. |
 | Raise the cap past 120 | Beyond 120 columns a table gains air between its columns rather than information (BRF-TABLE-LADDER). The cap is a legibility boundary, not a budget limit. |
 
@@ -87,16 +152,22 @@ right ones off-screen" — the principle, stated as a measurement.
 **What became easier:**
 - One overflow policy for every raw block — table, fence, diagram — and it is the
   one already proven on two of the three.
+- Past the cap the table now fits by wrapping, so the reader no longer meets a
+  content cut that widening cannot undo: 135 over-cap tables render whole where
+  they used to hide their tails.
 - The renderer loses arithmetic: no shares, no floors, no completion order, no
-  per-cell elision, no row block. The lines that remain are "compose the row, elide
-  the line", the same two lines a diagram uses.
+  per-cell elision — except the wrap's one floor (a column's longest word) and an
+  even slack split. Two equalizing moves, not a per-column budget.
 - The visible prefix of a cut table is a *correct* table: aligned columns, and one
   edge that says what happened.
 
 **What became harder:**
-- The corpus owes an authoring pass. 213 of 348 tables exceed the 80-column design
+- The corpus owes an authoring pass. 215 of 352 tables exceed the 80-column design
   width today, so at a typical pane the cut is the common case rather than a rare
   fallback — which is acceptable only because the median cut costs one column.
+- A wrapped table is taller, and reflow on resize is now part of the table's
+  behaviour above the cap. Height stability is a property the tests pin (two
+  renders at one width are identical).
 - A reader who cannot widen (a split pane below the design width) sees a prefix and
   has no remedy but tucking the pane away. The model presupposes a pane at or above
   the authoring width; the compositor cannot supply one, and telling it the width is
@@ -108,9 +179,15 @@ right ones off-screen" — the principle, stated as a measurement.
   is replaced by the cut: how deep, how many columns, and by name for the outliers
   past the cap.
 - The cap must stand. Past it, widening cannot restore, so the remedy moves to the
-  document — and the instrument has to say so rather than let a reader discover it.
+  document — but only for a word the cap cannot hold; a table whose words fit wraps
+  instead, and the instrument reports the hidden set by file and line.
+- The instrument must measure what the renderer DRAWS. A link's URL is visible
+  inline; a source-side model that strips it will call a table wrappable that the
+  renderer cannot wrap.
 
 ## Related
+- BRF-WRAP-AT-CAP — the brief that added the third branch, and the measurements
+  (`scripts/tables-check.ts`) that gate it
 - ADR-TABLE-ELISION-014 — the doctrine, stated first, that a shrink-wrapped table is
   a broken table pretending to be whole
 - ADR-UNIVERSAL-ELISION-050 — the elision law this extends to the table's own line,
