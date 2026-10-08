@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { countSentences, height, plain, units } from "../scripts/prose-check";
+import { countSentences, height, leaks, plain, units } from "../scripts/prose-check";
 
 describe("prose-check — the wall meter", () => {
   test("markup is stripped to what the reader sees", () => {
@@ -49,5 +49,18 @@ describe("prose-check — the wall meter", () => {
     // ICU splits "Dr." and "Mr."; the guard merges them back. Two sentences.
     expect(countSentences("Dr. Smith met Mr. Jones at 3 p.m. Then he left.")).toBe(2);
     expect(countSentences("One. Two. Three.")).toBe(3);
+  });
+
+  test("a leak is markdown emphasis that reached the reader", async () => {
+    expect(await leaks("A **good** span.\n")).toEqual([]);
+    // the closing `**` landed inside the code span, so nothing paired
+    expect((await leaks("* x: **Pipe to `less -R**` or not.\n")).length).toBe(1);
+  });
+
+  test("non-prose carriers are not leaks: a displayed span, a glob", async () => {
+    // a code span that DISPLAYS the field syntax is the point of the span
+    expect(await leaks("The field `**Date:**` is declared.\n")).toEqual([]);
+    // literal `**` in a glob is content, and the render is right to print it
+    expect(await leaks("A glob: -g !.archive/** stays.\n")).toEqual([]);
   });
 });

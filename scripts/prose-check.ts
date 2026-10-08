@@ -52,6 +52,11 @@ const minLines = flag("--min-lines", 6);
 const top = flag("--top", 25);
 const json = argv.includes("--json");
 const leaksOnly = argv.includes("--leaks");
+/** A gate, not a meter: any leak fails the run. The leak class is a render
+ *  failure rather than a taste — a raw `**` reached the reader — so it is the
+ *  one reading that earns a gate. The corpus reads zero, so there is no
+ *  baseline to grandfather. */
+const strictLeaks = argv.includes("--strict-leaks");
 const positional = argv.filter((a) => !a.startsWith("--"));
 
 /** LIST_INDENT (src/render.ts) — a list item's marker column. */
@@ -263,6 +268,9 @@ async function main(): Promise<void> {
 
   if (json) {
     console.log(JSON.stringify({ width, minLines, scanned, totalUnits, walls, tallest, rows, leaks: leakRows }, null, 2));
+  } else if (strictLeaks) {
+    console.log(`prose-check — leaks: ${leakRows.length} across ${scanned} files`);
+    for (const r of leakRows) console.log(`  ${r.file}  ${r.text.length > 90 ? r.text.slice(0, 89) + "…" : r.text}`);
   } else {
     console.log(`\nprose-check — the wall meter at ${width} columns`);
     console.log(`  scanned        ${scanned} files, ${totalUnits} prose units`);
@@ -281,6 +289,12 @@ async function main(): Promise<void> {
         console.log(`  ${r.file}  ${r.text.length > 80 ? r.text.slice(0, 79) + "…" : r.text}`);
       }
     }
+  }
+  if (strictLeaks && leakRows.length > 0) {
+    console.error(
+      `prose-check: FAIL — ${leakRows.length} line(s) printed markdown emphasis instead of formatting it.`,
+    );
+    process.exitCode = 1;
   }
 }
 

@@ -367,7 +367,10 @@ Add here as they surface from dogfooding. Each entry: the pattern, why it earns 
     would be benchmaxxing prose. The meter that would show it exists:
     `just prose-check` reports the tallest units by rendered height (the
     renderer's own wrapper, so the number is the render's) and any markdown
-    emphasis that survived the render. It never gates.
+    emphasis that survived the render. The **wall** reading never gates —
+    paragraph length is editorial. The **leak** reading does: a raw `**` reaching
+    the reader is a failure, not a taste, so `--strict-leaks` runs in `just check`
+    as a ratchet at zero.
 - **Colons over em-dashes.** Prefer the colon; it is the house's native connective
   and it declares the relationship: *this, and here is what it means* — the reader
   predicts expansion before reading it. The em-dash is context-dependent
