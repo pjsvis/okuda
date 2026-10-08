@@ -18,9 +18,10 @@ date: 2026-10-08
 The edge cut (ADR-TABLE-EDGE-CUT-055) stopped squeezing tables, which is right
 below the cap: the reader's lever is widen, and widening brings the bytes back.
 Past the cap there is no lever — 120 and 200 columns render identically — so the
-cut *hides* content, and hiding is the one thing the table model refuses. This
-sitting added the third branch: above the cap, wrap the columns until the table
-fits; nothing is hidden.
+cut *hides* content, and hiding is the one thing the table model refuses.
+
+This sitting added the third branch: above the cap, wrap the columns until the
+table fits; nothing is hidden.
 
 The work was small and the measurement was not. The renderer change is a branch
 and a row block. The sitting's real content is what the instrument turned out to
@@ -72,10 +73,11 @@ okuda draws a link as `text url` (Pass C, the URL visible inline by the
 operator's own request). So a link's URL is table content, and its long unbroken
 token is a word no wrapper can break. The instrument's `plain()` had been
 stripping `[text](url)` to `text`, so two editorial tables in `&briefs.md`
-looked wrappable when the renderer could not wrap them. The same pass also
-stripped intra-word underscores (`NO_COLOR`, `RE_MD_LINK`) and did not unescape
-backslash escapes (`\-`), which had made the retired cut detector disagree with
-the render in a second way.
+looked wrappable when the renderer could not wrap them.
+
+The same pass also stripped intra-word underscores (`NO_COLOR`, `RE_MD_LINK`) and
+did not unescape backslash escapes (`\-`), which had made the retired cut
+detector disagree with the render in a second way.
 
 Two instrument bugs, one root: the instrument was measuring a text the renderer
 does not draw. Fixed: `plain()` now mirrors the renderer. The irreducible set is
@@ -87,7 +89,9 @@ six at 74, 80 and 120.
 The old CUT detector paired adjacent rendered lines and asked whether each
 fragment was a whitespace run of the source. Once a body row is a block, every
 legitimate wrap is an adjacent pair, and the pairing read 18–22 phantom cuts. It
-is retired. CUT now means content hidden at the cap, observed from the render: a
+is retired.
+
+CUT now means content hidden at the cap, observed from the render: a
 table is hidden iff it is over the cap by source, did **not** wrap, and shows
 `…`. That reading is 6, and it equals the outlier list by construction.
 

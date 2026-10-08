@@ -329,6 +329,20 @@ Add here as they surface from dogfooding. Each entry: the pattern, why it earns 
   is a third state that only hides a forgotten date. Enforced by
   `scripts/date-lint.ts` in `just check`; the warrant (four clocks, four invariance
   domains) is `docs/2026-10-08-time-is-a-claim.md`.
+- **A preface is three sentences; the evidence is a block.** A `Context` (or any
+  lead paragraph) states the warrant — what we assumed, what is wrong, what it
+  costs — and stops. The argument belongs in the body and the measurement belongs
+  in its own list or table, because a paragraph carrying three jobs is a wall *by
+  definition* and a wall denies the reader an informed verdict (see the
+  short-paragraphs entry). Measured 2026-10-08: five of six documents written that
+  day opened with a Context of six to nine rendered lines. Calming + leading.
+- **Render the document before shipping it.** The code is dogfooded; the prose was
+  not, and two defects went out in one brief on 2026-10-08 because nobody opened
+  it — a hard-wrapped `Context` that rendered as an eight-line wall (soft breaks
+  are inert, `ADR-PROSE-BREAKS-056`) and strong spans that failed to parse
+  (`**Date:**/frontmatter` renders its own asterisks, because the closing `**` sat
+  against punctuation). Open every document once before it lands; the render is the
+  only reading that counts. Leading.
 - **Loose lists.** Discrete blocks, reduced scan tension. Calming.
 - **Hash headers only.** Unambiguous structure, LCARS-tab rendering. Calming.
 - **Front matter elided.** Provenance is not content. Calming.

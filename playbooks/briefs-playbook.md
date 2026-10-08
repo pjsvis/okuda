@@ -29,12 +29,19 @@ Example: `briefs/2026-08-20-brief-project-initialisation.md`
 
 **Date:** YYYY-MM-DD
 **Status:** [Open | In Progress | Done]
+**Context:** At most three sentences — what we assumed, what is wrong, what it
+costs. The warrant, not the argument; the argument is the body.
 
 ---
 
 ## Objective
 
 One sentence. What are we doing and why?
+
+## Evidence
+
+The measurement that gates the work — a table or a list, never a paragraph. If
+nothing was measured, say so.
 
 ## Scope
 

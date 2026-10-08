@@ -73,10 +73,12 @@ The rule is not a ban, and pretending it is would be its own kind of lie:
 
 "Recommended" is deliberately not the grade. A recommendation is skipped exactly
 when someone is busy — which is exactly when the date is forgotten, and exactly
-when the information is lost. But "mandatory for everything" is also wrong: a
-playbook, a reference, a template has no date and should not fake one. The rule
-is therefore *conditional and decidable*: does this document have a date? Then
-the name carries it, and the content agrees.
+when the information is lost.
+
+But "mandatory for everything" is also wrong: a playbook, a reference, a template
+has no date and should not fake one. The rule is therefore *conditional and
+decidable*: does this document have a date? Then the name carries it, and the
+content agrees.
 
 And the loss is asymmetric. Keeping the prefix costs eleven characters and one
 learned habit. Losing the date costs the event itself: you cannot reconstruct

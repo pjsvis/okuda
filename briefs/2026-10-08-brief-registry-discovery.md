@@ -7,15 +7,27 @@ callsign: BRF-REGISTRY-DISCOVERY
 
 **Date:** 2026-10-08
 **Status:** Open
-**Context:** Seven places hardcode the tier folder names. Two are already stale
-(`scripts/reg-list.ts`, `scripts/reg-menu.ts` never learned about advisories or
-the archive). One drift test (`tests/reg-callsign.test.ts`, from
-`ADR-VALIDATED-SILCROWS-044`'s P-0) keeps two of the seven in step — a
-map↔map checksum, and the loudest evidence that the arrangement is wrong: the
-repo pays interest to keep copies of one map agreeing. Map↔territory checksums
-are assurance (`docs/2026-10-08-time-is-a-claim.md`); map↔map checksums are debt.
-This is debt. The repo's own rule — derivation replaces invalidation — says the
-territory should be read, not copied.
+**Context:** Seven places hardcode the tier folder names, and one drift test keeps
+two of the seven in step. That test is a map↔map checksum: the repo paying interest
+to keep two copies of one map agreeing.
+
+Two of the copies are already stale. Map↔territory checksums are assurance; map↔map
+checksums are debt. The repo's own rule — derivation replaces invalidation — says
+the territory should be read, not copied.
+
+## Evidence — measured 2026-10-08
+
+| site | holds | state |
+|---|---|---|
+| `scripts/reg-sync.ts` | the registries + the archive | the real definition |
+| `src/root.ts` | `TIER_REGISTRIES` + `ARCHIVE_REGISTRIES` | the resolver's copy |
+| `scripts/reg-list.ts` | four tiers | **stale** — no advisories, no archive |
+| `scripts/reg-menu.ts` | four tiers | **stale** — the same four |
+| `scripts/td-id-lint.ts` | six document roots | one is `docs/`, not a tier |
+| `scripts/date-lint.ts` | five tiers | the index set |
+| `scripts/jump-demo.ts` | `briefs/` | recents |
+
+Seven sites; two already wrong; one drift test guarding two of the six pairs.
 
 ## Objective
 
@@ -39,10 +51,8 @@ not do it); a persisted census of discovered tiers (see Notes).
 
 - [ ] `ADR-ARCHIVE-RESOLUTION` read. The archive is a *lifecycle state*, not a
       name — the live/archive scope split must survive discovery.
-- [ ] Every consumer enumerated: `scripts/reg-sync.ts`, `scripts/reg-list.ts`,
-      `scripts/reg-menu.ts`, `scripts/td-id-lint.ts` (scan set),
-      `scripts/date-lint.ts` (index set), `scripts/jump-demo.ts` (`briefs/`),
-      `src/root.ts` (`TIER_REGISTRIES` + `ARCHIVE_REGISTRIES`).
+- [ ] Every consumer in the Evidence table accounted for — the seven sites are
+      the whole list.
 - [ ] The manifest shape agreed, and it covers what `REGISTRIES` holds today:
       index filename, `fmType`, `csPrefix`, default status, status vocabulary,
       archive flag, exclusions.

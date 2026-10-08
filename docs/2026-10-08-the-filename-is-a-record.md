@@ -41,10 +41,12 @@ The objection is that the prefix makes a list hard to read, because you must
 "figure out when, then what". Half true, and misdiagnosed. An ISO date is
 fixed-width: the eye does not decode it, it skips eleven characters, and the
 *what* begins at a predictable column. That scans **better** than a free-form
-list, not worse, once the convention is learned. What actually hurts is that the
-prefix makes **time the primary key** — and time is the least useful dimension
-for *lookup*. A filename carries one axis. Deleting the date fixes the lookup
-and breaks the timeline; that is a bad trade, and an unnecessary one.
+list, not worse, once the convention is learned.
+
+What actually hurts is that the prefix makes **time the primary key** — and time
+is the least useful dimension for *lookup*. A filename carries one axis. Deleting
+the date fixes the lookup and breaks the timeline; that is a bad trade, and an
+unnecessary one.
 
 The remedy for lookup is not a rename. It is an index. This repo's own rule is
 already explicit: a directory that accumulates documents gets a registry. `docs/`
@@ -79,41 +81,50 @@ correcting:
 Meanwhile this project's **Derrida Question** means something else entirely:
 *should this even be in our consideration set?* — the gate asked before the
 eval, paired with the Foxtrot Oscar that ejects what fails
-(`docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md`). One token, two
-meanings is the entropy the lexicon exists to prevent. So the lexicon keeps its
-meaning: the essays' question is the **facade** check, and the name is spelled
-correctly or not used.
+(`docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md`).
+
+One token, two meanings is the entropy the lexicon exists to prevent. So the
+lexicon keeps its meaning: the essays' question is the **facade** check, and the
+name is spelled correctly or not used.
 
 ## The ledger, two months on
 
-**Adopted.** The four-folder pipeline — briefs (intent), debriefs (reality),
-decisions (rationale), playbooks (heuristics) — is the repo's spine. Repo memory
-over agent memory is how continuity works here: a session starts by reading
-files, not by trusting a context window. "Artifact as proof" is the gate on every
-claim in `docs/`, `decisions/` and `debriefs/`. `.archive/` keeps the active view
-fast. The pre-execution assertions survive as the orient step: a date-sorted
-listing gives the tempo, the task board gives the focus, the decisions say what
-not to re-litigate.
+**Adopted.**
 
-**Refused.** The co-located `README.md` as a continuous checksum against
-implementation drift. A good idea this repo did not take: drift here is caught by
-the registries and the lints (`reg-sync`, `facade-lint`, `callsign-lint`,
-`signature-check`), which run in `just check` and either pass or fail. The
-essays' checksum asks a human to notice a divergence; the repo's asks a command.
-Also refused: the branding. "Sovereign agentic workspace" and "zero-effort OKF"
-name a feeling, not a mechanism. This repo has OKF, and it means frontmatter type
-plus a JSONL registry — not a vibe.
+- The four-folder pipeline — briefs (intent), debriefs (reality), decisions
+  (rationale), playbooks (heuristics) — is the repo's spine.
+- Repo memory over agent memory: a session starts by reading files, not by
+  trusting a context window.
+- "Artifact as proof" is the gate on every claim in `docs/`, `decisions/` and
+  `debriefs/`; `.archive/` keeps the active view fast.
+- The pre-execution assertions survive as the orient step: a date-sorted listing
+  gives the tempo, the task board gives the focus, the decisions say what not to
+  re-litigate.
 
-**Changed.** The essays' "portfolio telemetry across repos" stayed out of scope:
-okuda renders documents, it does not roam a filesystem counting commits. The
-checksum that survived is narrower than the essays hoped and sharper than they
-imagined — `scripts/callsign-lint.ts` takes a Shannon checksum over the citation
-namespace, so a pointer to a document that no longer resolves fails the gate. And
-the naming rule gained two clauses the essays could not have written, because
-they had no imports and no distributed copies: **landing date for imports**
-(`playbooks/authoring-playbook.md`), and a grade — not *recommended* but
-**conditional**: a document that has a date carries it in the name, and the name
-agrees with the content (`docs/2026-10-08-time-is-a-claim.md`).
+**Refused.**
+
+- The co-located `README.md` as a continuous checksum against implementation
+  drift. Drift here is caught by the registries and the lints (`reg-sync`,
+  `facade-lint`, `callsign-lint`, `signature-check`), which run in `just check`
+  and either pass or fail. The essays' checksum asks a human to notice a
+  divergence; the repo's asks a command.
+- The branding. "Sovereign agentic workspace" and "zero-effort OKF" name a
+  feeling, not a mechanism. This repo has OKF, and it means frontmatter type plus
+  a JSONL registry — not a vibe.
+
+**Changed.**
+
+- "Portfolio telemetry across repos" stayed out of scope: okuda renders
+  documents, it does not roam a filesystem counting commits.
+- The checksum that survived is narrower than the essays hoped and sharper than
+  they imagined — `scripts/callsign-lint.ts` takes a Shannon checksum over the
+  citation namespace, so a pointer to a document that no longer resolves fails the
+  gate.
+- The naming rule gained two clauses the essays could not have written, because
+  they had no imports and no distributed copies: **landing date for imports**
+  (`playbooks/authoring-playbook.md`), and a grade — not *recommended* but
+  **conditional**: a document that has a date carries it in the name, and the name
+  agrees with the content (`docs/2026-10-08-time-is-a-claim.md`).
 
 ## What this does not fix
 
