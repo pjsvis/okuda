@@ -151,6 +151,67 @@ shadow store and the knowledge belongs in a document.
 
 ---
 
+## The lifecycle — the exit
+
+The registers, their obligations and the predicates are owned by
+`ADR-DOCUMENT-LIFECYCLE-057`. This is the operational how. A silo without it is
+monotonic: documents accumulate, and nothing retires.
+
+### Classifying a document
+
+| register | recognised by | owes |
+|---|---|---|
+| **ephemeral** | lives in `tmp/` (gitignored) | nothing — un-audited by design |
+| **record** | committed, dated, no callsign | the date prefix; auditable by path and date |
+| **addressed** | a callsign, or a tier's unit | citable, movable, resolvable |
+| **retired** | the archive scope (`.archive/…`) | still resolves; out of the work queue |
+
+Zero-effort metadata, curated codes: a script may date a document; only a
+decision may name it.
+
+### The retirement checklist
+
+A document is retired only when all four hold:
+
+1. It is **addressed** — it has a callsign, or it is a tier's unit.
+2. It is **settled** — the status is done or frozen; the work landed or was refused.
+3. Its **warrant is carried** — the Thing it fed states the decisive reasoning,
+   not merely the alternative's name.
+4. It is **named by the graph** — something cites it, or the keep-class protects it.
+
+Then move it into the archive scope. Do not rename it (a move changes the path,
+not the address) and let the resolver find it. A document with no address is never
+"archived": it is deleted, or left as a record.
+
+### The keep-class — check it first
+
+Rejections and reversals are never deleted. Before any batch, list the documents
+that carry a refusal — `Reverted`, `Rejected`, `Abandoned`, `Superseded`, a park
+with a gate — and remove them from the queue. This is not style: the expensive
+failure of a knowledge silo is re-deciding.
+
+### Order of operations
+
+1. **Enumerate.** You cannot prune what you cannot list. (`docs/` has no registry
+   yet; the uncorroborated names `date-lint` reports are the standing count.)
+2. **Derive the reference graph** — which documents are cited by addressed
+   documents, and which by nothing. Derived, never judged.
+3. **Classify** each record: derivative · rationale-bearing · superseded ·
+   imported · scratch.
+4. **Retire in batches**, smallest and most obviously derivative first;
+   extract-then-delete; a debrief per batch.
+
+### The teeth, and their order
+
+- `scripts/date-lint.ts` — the name's date and the declared date agree (built).
+- **Archive-scope consistency** — folder ↔ the registry `archive` flag ↔ the
+  status. One authority: the status is the claim, the move is the action, the
+  flag is derived (owed; `BRF-DOCUMENT-LIFECYCLE`).
+- **Citation census** — a minted callsign that nothing cites and no tier relation
+  explains is a demotion candidate (owed; derived from the graph).
+
+---
+
 ## Traps
 
 Five ways this machinery misleads. All verified against `scripts/reg-sync.ts`.

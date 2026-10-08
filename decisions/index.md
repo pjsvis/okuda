@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-08 | ADR-DOCUMENT-LIFECYCLE-057 | Accepted | The document lifecycle — ephemeral, record, addressed, retired | 057-document-lifecycle.md |
 | 2026-10-07 | ADR-SEARCH-RECENCY-053 | Accepted | Recency first in the picker — newest at the top, and case-insensitive directories | 053-search-recency.md |
 | 2026-10-07 | ADR-WIDENING-LAG-054 | Accepted | Lag the widening direction — a frame narrower than the pane is a margin, a frame wider is a lie | 054-widening-lag.md |
 | 2026-10-07 | ADR-TABLE-EDGE-CUT-055 | Accepted | A table is an artefact — render it whole, cut the edge, never squeeze it | 055-table-edge-cut.md |

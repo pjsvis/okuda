@@ -26,6 +26,12 @@ One table, one owner. Anything else that needs it cites this.
 | **Debrief** | `debriefs/` | What happened, and why? | after | Historical reference; frozen on completion |
 | **Session handoff** | `td handoff`, or `docs/` when it must persist | Where was I? | at a session boundary | Ephemeral. Never a brief (ADR-SESSION-HANDOFFS-017) |
 
+The **Lifetime** column is the tier view. The **register** view — what a document
+owes before it is a tier at all (ephemeral, record, addressed, retired), when a
+callsign is earned, and what may never be deleted — is
+`ADR-DOCUMENT-LIFECYCLE-057`, with the operational how in
+`playbooks/registry-playbook.md`.
+
 Two columns carry the weight. **Answers** tells you which artefact you are
 writing — if the sentence in your head is "what will we build", it is a brief, and
 no amount of being *about* a decision makes it an ADR. **Lifetime** tells you what

@@ -84,10 +84,12 @@ the tier mechanics (`BRF-REGISTRY-DISCOVERY`).
 
 **Phase 1 — the policy.**
 
-1. [ ] Record the lifecycle as an ADR (registers, obligations, predicates,
+1. [x] Record the lifecycle as an ADR (registers, obligations, predicates,
        keep-class). The operational how goes in `playbooks/registry-playbook.md`
        (it owns date semantics, status, ordering, and no-parallel-stores already),
-       with a pointer from `playbooks/playbooks-playbook.md`.
+       with a pointer from `playbooks/playbooks-playbook.md`. —
+       `ADR-DOCUMENT-LIFECYCLE-057`; the playbook carries *The lifecycle — the
+       exit*; the pointer sits under the tier table.
 
 **Phase 2 — the census and the classification.**
 
