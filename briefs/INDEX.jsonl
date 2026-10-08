@@ -80,4 +80,5 @@
 {"file":"2026-10-07-brief-frame-index.md","date":"2026-10-07","status":"open","summary":"The frame index — an address two parties can both name","meta":{},"callsign":"BRF-FRAME-INDEX"}
 {"file":"2026-10-07-brief-table-allocator-ladder.md","date":"2026-10-07","status":"open","summary":"The band and the ladder — the table fit, from a design width of 80","meta":{},"callsign":"BRF-TABLE-LADDER"}
 {"file":"2026-10-08-brief-document-lifecycle.md","date":"2026-10-08","status":"open","summary":"The document lifecycle — ephemeral, record, addressed, retired","meta":{},"callsign":"BRF-DOCUMENT-LIFECYCLE"}
+{"file":"2026-10-08-brief-reg-cli.md","date":"2026-10-08","status":"open","summary":"`reg` — the silo maintenance CLI, one entry point, one artifact","meta":{},"callsign":"BRF-REG-CLI"}
 {"file":"2026-10-08-brief-registry-discovery.md","date":"2026-10-08","status":"open","summary":"One map from the territory — the registry discovers its own tiers","meta":{},"callsign":"BRF-REGISTRY-DISCOVERY"}

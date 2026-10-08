@@ -62,3 +62,36 @@ Evaluate whether an embedded BM25 index provides sufficient precision and token-
 - **The Lexical Fallacy:** Avoid penalizing `ripgrep` for exact-match limits; evaluate how well boolean flags (`--all-match`, regex unions) close the gap.
 - **Index Staleness Risk:** If Harness 2 or 3 is adopted, every document update in the SSOT introduces index synchronization debt. Measure the pain of rebuilding the index from scratch.
 - **Surface Simplicity:** Output from all harnesses must write directly to stdout or a flat `.jsonl` scratchpad—no intermediate network services or browser consumption layers.
+
+## Note (2026-10-08) — bm25s is the instrument; adoption is a scaling option
+
+Added on the operator's question (`bm25s` — *enhancement or a step too far?*).
+This brief stays **Open**; the note records the decision so the question is not
+re-decided from scratch.
+
+- **Harness 2 is now `bm25s`, not Python.** [`oakoliver/bm25s`](https://github.com/oakoliver/bm25s)
+is a **Bun-native, zero-dependency TypeScript** port of Python `bm25s` (parity
+v0.3.11). It supersedes the Python `rank-bm25` / `minisearch` named in the work
+plan: same runtime as the tool, no transitive dependency tree, compiles into the
+binary. Upstream-parity is verified against the five BM25 variants.
+- **Not adopted now — it is a scaling option for *when we get there*.** The
+  corpus is **400 documents / 3.7 MB**; `rg` over it costs ~34 ms, nearly all of
+  it process spawn. BM25's indexing advantage appears at **5,000 documents and
+  up** (upstream benchmarks); at 400 the retrieval-latency argument does not
+  exist. Retrieval speed is not a problem the silo currently has.
+- **The scale trigger, whichever comes first:** (a) the corpus reaches the size
+  where a linear `rg` scan stops being interactive (order 5k documents); or
+  (b) the brief's own acceptance test is run and multi-term **Precision@3**
+  proves insufficient. Adopt only on the criteria above — ≥25 % Precision@3 on
+  multi-term queries **or** ≥30 % token-payload reduction, with <100 ms cold
+  start. Otherwise record the confirming ADR for `rg` + AST, as already required.
+- **If adopted, one admissible shape only.** Build the index **in memory, per
+  session**, and let it die with the process — no `BM25.save()`, no persisted
+  artifact. A saved index is a parallel store (the registry playbook's *No
+  parallel stores*), and every corpus mutation would create sync debt. The
+  in-memory index of 3.7 MB indexes in single-digit milliseconds.
+- **Scope of the change, if it ever lands:** BM25 re-ranks the **content channel
+  only**; filenames and registry fields keep their existing channels, and `fzf`
+  keeps the final narrowing. `okuda`'s search is **addressing** (name the
+  document), not relevance retrieval (answer a question); BM25 must not blur
+  that line.

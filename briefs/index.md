@@ -10,6 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-10-08 | BRF-DOCUMENT-LIFECYCLE | open | The document lifecycle — ephemeral, record, addressed, retired | 2026-10-08-brief-document-lifecycle.md |
+| 2026-10-08 | BRF-REG-CLI | open | `reg` — the silo maintenance CLI, one entry point, one artifact | 2026-10-08-brief-reg-cli.md |
 | 2026-10-08 | BRF-REGISTRY-DISCOVERY | open | One map from the territory — the registry discovers its own tiers | 2026-10-08-brief-registry-discovery.md |
 | 2026-10-07 | BRF-FRAME-INDEX | open | The frame index — an address two parties can both name | 2026-10-07-brief-frame-index.md |
 | 2026-10-07 | BRF-TABLE-LADDER | open | The band and the ladder — the table fit, from a design width of 80 | 2026-10-07-brief-table-allocator-ladder.md |
