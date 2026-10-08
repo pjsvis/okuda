@@ -12,6 +12,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-10-08 | DBF-PRUNE-BATCH-1 | done | Debrief: Prune batch 1 — four settled briefs into the archive scope | 2026-10-08-debrief-prune-batch-1.md |
 | 2026-10-08 | DBF-PRUNE-BATCH-2 | done | Debrief: Prune batch 2 — the first deletion, and a word that must not be borrowed | 2026-10-08-debrief-prune-batch-2.md |
 | 2026-10-08 | DBF-PRUNE-BATCH-3 | done | Debrief: Prune batch 3 — containment, and a grep that cannot read | 2026-10-08-debrief-prune-batch-3.md |
+| 2026-10-08 | DBF-PRUNE-BATCH-4 | done | Debrief: Prune batch 4 — the batch that deleted nothing, and why | 2026-10-08-debrief-prune-batch-4.md |
 | 2026-10-08 | DBF-PROSE-THREAD | done | Debrief: The prose thread — a meter, a gate, and the exit | 2026-10-08-debrief-the-prose-thread.md |
 | 2026-10-08 | DBF-WRAP-AT-CAP | done | Debrief: Wrap at the cap — the third branch, and the count that moved | 2026-10-08-debrief-wrap-at-cap.md |
 | 2026-10-05 | DBF-SMALL-ITEMS | done | Debrief: The batch of small items — one shelved, two landed, one found | 2026-10-05-debrief-small-items.md |
