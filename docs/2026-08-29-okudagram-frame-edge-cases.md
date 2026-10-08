@@ -1,6 +1,5 @@
 ---
 title: Okudagram-frame edge cases — dogfood
-callsign: DOC-FRAME-EDGE-CASES
 brief: briefs/2026-08-29-brief-okudagram-frame.md (BRF-PAGED-OKUDAGRAM)
 ---
 

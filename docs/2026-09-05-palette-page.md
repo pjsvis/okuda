@@ -1,6 +1,5 @@
 ---
 type: Reference
-callsign: REF-PALETTE-PAGE
 ---
 
 # The Palette Page

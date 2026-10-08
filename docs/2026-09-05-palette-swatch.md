@@ -1,6 +1,5 @@
 ---
 type: Reference
-callsign: REF-PALETTE-SWATCH
 ---
 
 # Palette Swatches — the colour in context
