@@ -82,4 +82,5 @@
 {"file":"2026-10-07-brief-frame-index.md","date":"2026-10-07","status":"open","summary":"The frame index — an address two parties can both name","meta":{},"callsign":"BRF-FRAME-INDEX"}
 {"file":"2026-10-07-brief-table-allocator-ladder.md","date":"2026-10-07","status":"open","summary":"The band and the ladder — the table fit, from a design width of 80","meta":{},"callsign":"BRF-TABLE-LADDER"}
 {"file":"2026-10-08-brief-date-invariant.md","date":"2026-10-08","status":"done","summary":"The date is a claim — the invariant, the lint, and the time document","meta":{},"callsign":"BRF-DATE-INVARIANT"}
+{"file":"2026-10-08-brief-registry-discovery.md","date":"2026-10-08","status":"open","summary":"One map from the territory — the registry discovers its own tiers","meta":{},"callsign":"BRF-REGISTRY-DISCOVERY"}
 {"file":"2026-10-08-brief-wrap-at-cap.md","date":"2026-10-08","status":"open","summary":"Wrap at the cap — the third branch","meta":{},"callsign":"BRF-WRAP-AT-CAP"}
