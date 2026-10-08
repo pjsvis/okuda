@@ -64,7 +64,8 @@ warrant, not merely the alternative's name.
 **The oracle is the citation graph.** Code deletion has a compiler. Document
 deletion has citations, and nothing else screams.
 
-## Amendment (2026-10-08): the built class, and the warrant as a claim
+## Amendment (2026-10-08, hardened the same day on review): the built class,
+and the warrant as a claim
 
 Five prune batches produced two tests this ADR does not contain — containment
 (one document's prose inside another's) and the disposition question — and the
@@ -99,6 +100,17 @@ silo continues to do the thing even after the sentence describing it is gone.
 Where the practice is live, the framing retires and the work continues; where it
 is not, deleting the only statement is how a silo forgets a capability it once
 had.
+
+**Liveness is evidenced, never asserted.** *"The practice is live"* is itself a
+claimed fact, and the checklist for a record of this kind requires that a
+claimed fact **names its instrument** (`playbooks/decisions-playbook.md`). So the
+fourth line is met by *naming an instance in the record* — a commit, a ritual, a
+document that does the thing — and never by the pruner's confidence that it
+still does. Batch 5 met it that way: the elicit-before-deciding pattern was
+evidenced by the review request that produced the finding, an artefact anyone
+can read. Asserted liveness would be the hole this amendment exists to close —
+taste re-entering through the one test that cannot be checked mechanically, and
+by the one route the dispositions table leaves open.
 
 **The derivative ground, stated.** A built design whose statement is carried by
 an addressed Thing is disposable *because the Thing carries the warrant*, not
