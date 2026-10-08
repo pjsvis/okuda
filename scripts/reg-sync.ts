@@ -14,8 +14,8 @@
  * Exit code 1 on any drift, 0 when clean.
  */
 
-import { readdirSync, readFileSync, writeFileSync, statSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join, dirname, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -255,7 +255,7 @@ function listDocs(dir: string, exclude: string[] = []): string[] {
 /** Pull `date:` frontmatter or a `**Date:**` line; fall back to file mtime. */
 /** The date the document DECLARES (frontmatter `date:` or a `**Date:**`
  *  line), or null when it declares none. Pure. Distinct from
- *  `deriveDate`, which falls back to mtime — and an mtime is not a claim
+ *  `deriveDate`, which also reads the FILENAME — and an mtime is not a claim
  *  the document makes, so it must not be compared as one. */
 export function authoredDate(content: string): string | null {
   const fm = content.match(/^---\n[\s\S]*?date:\s*(\d{4}-\d{2}-\d{2})/m);
@@ -264,16 +264,19 @@ export function authoredDate(content: string): string | null {
   return bold ? bold[1]! : null;
 }
 
+/** The date the FILENAME claims (`YYYY-MM-DD-…`), or null. Pure. The name is
+ *  a claim the author made, not a measurement about a host: it travels with
+ *  the bytes and is the only date that survives a copy (BRF-DATE-INVARIANT). */
+export function nameDate(path: string): string | null {
+  const m = basename(path).match(/^(\d{4}-\d{2}-\d{2})-/);
+  return m ? m[1]! : null;
+}
+
+/** The document's declared date: content first, then the filename. NEVER the
+ *  mtime — an mtime is a host observation and a persisted index row must not
+ *  depend on where the check ran. `""` when nothing declares a date. */
 function deriveDate(content: string, path: string): string {
-  const fm = content.match(/^---\n[\s\S]*?date:\s*(\d{4}-\d{2}-\d{2})/m);
-  if (fm) return fm[1]!;
-  const bold = content.match(/\*\*Date:\*\*\s*(\d{4}-\d{2}-\d{2})/);
-  if (bold) return bold[1]!;
-  try {
-    return statSync(path).mtime.toISOString().slice(0, 10);
-  } catch {
-    return "1970-01-01";
-  }
+  return authoredDate(content) ?? nameDate(path) ?? "";
 }
 
 function deriveStatus(content: string, def: RegistryDef, registry: string): string {
@@ -410,9 +413,10 @@ function deriveEntry(dir: string, file: string, def: RegistryDef, registry: stri
  *  - `haveCallsign: false` means frontmatter carries none (the document is
  *    already counted as frontmatter drift), so the registry's copy is left
  *    alone rather than cleared.
- *  - `dateAuthored: false` means the date came from the mtime fallback, and
- *    every edit would read as drift — 52 such "drifts" appeared the first
- *    time this check ran. An authored date is a claim; an mtime is not.
+ *  - `dateAuthored: false` means neither the content nor the filename declares
+ *    a date, so the registry's stored value is left alone rather than cleared
+ *    to an empty string. A claim (content or name) is a claim; an mtime is not,
+ *    and is never read.
  *
  *  Summary is deliberately NOT compared: it is derived from the H1 at
  *  add-time, but the playbooks registry carries hand-written summaries and
@@ -478,6 +482,7 @@ function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { miss
   // document's, and failing the gate on it would force either a silent map
   // entry or ten content edits. Loud, counted, separate.
   let unknown = 0;
+  let noDate = 0;
   for (const e of entries) {
     if (staleFiles.has(e.file)) continue;
     const cs = csMap.get(e.file);
@@ -489,7 +494,15 @@ function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { miss
       console.log(`  ${name}: UNKNOWN STATUS ${e.file} — "${word}" is not in the tier vocabulary`);
       continue;
     }
-    const opts = { haveCallsign: cs !== undefined, dateAuthored: authoredDate(content) !== null };
+    // A date is a CLAIM when the content declares it or the filename does.
+    // An mtime is neither, so it is never written and never compared
+    // (BRF-DATE-INVARIANT) — a persisted row must not depend on WHERE the
+    // check ran.
+    const opts = {
+      haveCallsign: cs !== undefined,
+      dateAuthored: authoredDate(content) !== null || nameDate(e.file) !== null,
+    };
+    if (truth.date === "") noDate++;
     const diffs = derivedDrift(e, truth, opts);
     if (diffs.length === 0) continue;
     fieldDrift++;
@@ -502,6 +515,9 @@ function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { miss
       if (opts.haveCallsign && e.callsign !== cs) e.callsign = cs;
     }
     console.log(`  ${name}: DRIFT ${e.file} — ${diffs.join(", ")}${fix ? " → corrected" : ""}`);
+  }
+  if (noDate > 0) {
+    console.log(`  ${name}: ${noDate} doc(s) declare NO DATE — the row keeps its stored value; add a \`**Date:**\` or a date-first filename`);
   }
 
   const kept = entries.filter((e) => !staleFiles.has(e.file));

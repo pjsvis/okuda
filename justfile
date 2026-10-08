@@ -68,7 +68,7 @@ orient:
 # Sync gate
 [group('quality gate')]
 check:
-    @bash scripts/signature-check.sh && bun scripts/reg-sync.ts --all && bash scripts/facade-lint.sh && bun scripts/td-id-lint.ts && bun scripts/callsign-lint.ts
+    @bash scripts/signature-check.sh && bun scripts/reg-sync.ts --all && bash scripts/facade-lint.sh && bun scripts/td-id-lint.ts && bun scripts/callsign-lint.ts && bun scripts/date-lint.ts
 
 # Tests gate build
 [group('quality gate')]

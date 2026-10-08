@@ -5,26 +5,26 @@
 {"file":"2026-08-23-brief-gloam-tui-footer.md","date":"2026-08-23","status":"done","summary":"Gloam — the TUI Footer Signature","meta":{},"callsign":"BRF-GLOAM-TUI"}
 {"file":"2026-08-23-brief-okuda-tui-control-plane.md","date":"2026-08-23","status":"done","summary":"Okuda TUI — the Control Plane (parked)","meta":{},"callsign":"BRF-OKUDA-TUI"}
 {"file":"2026-08-23-brief-table-rendering-policy.md","date":"2026-08-23","status":"done","summary":"Table Rendering Policy — Uniform Presentation, Authored Conventions","meta":{},"callsign":"BRF-TABLE-RENDERING"}
-{"file":"2026-08-24-session-handoff-evening.md","date":"2026-10-03","status":"done","summary":"Session Handoff — 2026-08-24 (evening): Glow convergence + Gloam footer","meta":{},"callsign":"BRF-SESSION-HANDOFF"}
-{"file":"2026-08-24-session-handoff-late.md","date":"2026-10-03","status":"done","summary":"Session Handoff — 2026-08-24 (late): tweak phase, table audit, the moat","meta":{},"callsign":"BRF-SESSION-HANDOFF-2"}
-{"file":"2026-08-24-session-handoff.md","date":"2026-10-03","status":"done","summary":"Session Handoff — 2026-08-24","meta":{},"callsign":"BRF-SESSION-HANDOFF-3"}
+{"file":"2026-08-24-session-handoff-evening.md","date":"2026-08-24","status":"done","summary":"Session Handoff — 2026-08-24 (evening): Glow convergence + Gloam footer","meta":{},"callsign":"BRF-SESSION-HANDOFF"}
+{"file":"2026-08-24-session-handoff-late.md","date":"2026-08-24","status":"done","summary":"Session Handoff — 2026-08-24 (late): tweak phase, table audit, the moat","meta":{},"callsign":"BRF-SESSION-HANDOFF-2"}
+{"file":"2026-08-24-session-handoff.md","date":"2026-08-24","status":"done","summary":"Session Handoff — 2026-08-24","meta":{},"callsign":"BRF-SESSION-HANDOFF-3"}
 {"file":"2026-08-25-brief-fix-tests-after-default-flip.md","date":"2026-08-25","status":"done","summary":"Fix tests after default-palette flip (Dracula → Okuda)","meta":{},"callsign":"BRF-FIX-TESTS"}
 {"file":"2026-08-25-brief-okuda-palette-and-chrome.md","date":"2026-08-25","status":"done","summary":"Okuda palette preset + code-panel chrome","meta":{},"callsign":"BRF-OKUDA-PALETTE"}
 {"file":"2026-08-25-brief-right-edge-lcars-tab.md","date":"2026-08-25","status":"done","summary":"Right-edge LCARS tab on headers — the visible right bound","meta":{},"callsign":"BRF-RIGHT-EDGE"}
 {"file":"2026-08-26-brief-gloam-launcher-promotion.md","date":"2026-08-26","status":"done","summary":"Gloam Launcher Promotion — argv[0] No-Arg Mode (parked)","meta":{},"callsign":"BRF-GLOAM-LAUNCHER"}
 {"file":"2026-08-26-brief-resize-content-anchor.md","date":"2026-08-26","status":"done","summary":"Resize content-anchor — keep the line under the eye","meta":{},"callsign":"BRF-RESIZE-CONTENT"}
 {"file":"2026-08-26-session-handoff-okuda-net.md","date":"2026-08-26","status":"done","summary":"Session handoff — the okuda-net riff epoch","meta":{},"callsign":"BRF-SESSION-HANDOFF-4"}
-{"file":"2026-08-27-brief-neckbeard-fzf-assimilation.md","date":"2026-10-03","status":"done","summary":"gloam-finder: Wrapper to launch fzf with hardened interactive semantics","meta":{},"callsign":"BRF-NECKBEARD-FZF"}
+{"file":"2026-08-27-brief-neckbeard-fzf-assimilation.md","date":"2026-08-27","status":"done","summary":"gloam-finder: Wrapper to launch fzf with hardened interactive semantics","meta":{},"callsign":"BRF-NECKBEARD-FZF"}
 {"file":"2026-08-28-brief-elision-primitive.md","date":"2026-08-28","status":"done","summary":"Elision primitive — close ADR-014, fix the code-fence soft-wrap lie","meta":{},"callsign":"BRF-ELISION-PRIMITIVE"}
-{"file":"2026-08-28-brief-index-and-jump.md","date":"2026-08-30","status":"done","summary":"Ephemeral Index Generation and Numeric Jump Navigation","meta":{},"callsign":"BRF-INDEX-JUMP"}
+{"file":"2026-08-28-brief-index-and-jump.md","date":"2026-08-28","status":"done","summary":"Ephemeral Index Generation and Numeric Jump Navigation","meta":{},"callsign":"BRF-INDEX-JUMP"}
 {"file":"2026-08-28-brief-launcher-fut.md","date":"2026-08-28","status":"done","summary":"Launcher FUT — session-scoped alt-screen","meta":{},"callsign":"BRF-LAUNCHER-FUT"}
 {"file":"2026-08-28-brief-state-glyph-render-path.md","date":"2026-08-28","status":"done","summary":"State-glyph render path — the showcase environment + first cut","meta":{},"callsign":"BRF-STATE-GLYPH"}
-{"file":"2026-08-29-brief-okf-callsign-migration.md","date":"2026-10-02","status":"done","summary":"OKF conformance migration and the callsign layer","meta":{},"callsign":"BRF-OKF-CALLSIGN"}
+{"file":"2026-08-29-brief-okf-callsign-migration.md","date":"2026-08-29","status":"done","summary":"OKF conformance migration and the callsign layer","meta":{},"callsign":"BRF-OKF-CALLSIGN"}
 {"file":"2026-09-07-brief-okudagram-step.md","date":"2026-09-07","status":"done","summary":"The okudagram step — no gaps in coverage","meta":{},"callsign":"BRF-OKUDAGRAM-STEP"}
 {"file":"2026-09-07-brief-onion-search-grammar.md","date":"2026-09-07","status":"done","summary":"The onion search grammar — staged filtering, path/content separation","meta":{},"callsign":"BRF-ONION-SEARCH-GRAMMAR"}
 {"file":"2026-09-13-brief-references-section.md","date":"2026-09-13","status":"done","summary":"The References section — the renderer emits its own map","meta":{},"callsign":"BRF-REFERENCES-SECTION"}
 {"file":"2026-09-13-brief-tidy-first.md","date":"2026-09-13","status":"done","summary":"Tidy-first — the path to a good place","meta":{},"callsign":"BRF-TIDY-FIRST"}
-{"file":"2026-09-14-brief-table-width.md","date":"2026-10-02","status":"done","summary":"The cut cell — the renderer breaks words the glass had room for","meta":{},"callsign":"BRF-TABLE-WIDTH"}
+{"file":"2026-09-14-brief-table-width.md","date":"2026-09-14","status":"done","summary":"The cut cell — the renderer breaks words the glass had room for","meta":{},"callsign":"BRF-TABLE-WIDTH"}
 {"file":"2026-09-19-brief-remote-speech-seam.md","date":"2026-09-19","status":"done","summary":"The remote speech seam — a question to settle before anything builds","meta":{},"callsign":"BRF-REMOTE-SPEECH-SEAM"}
 {"file":"2026-09-24-brief-self-identical-link.md","date":"2026-09-24","status":"done","summary":"The self-identical link — when the label is the address, say it once","meta":{},"callsign":"BRF-SELF-IDENTICAL-LINK"}
 {"file":"2026-09-24-brief-validated-silcrows.md","date":"2026-09-24","status":"done","summary":"Validated silcrows — the shape scan consults the registry it stands on","meta":{},"callsign":"BRF-VALIDATED-SILCROWS"}
