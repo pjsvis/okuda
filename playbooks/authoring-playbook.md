@@ -315,6 +315,14 @@ reason: the ring needs a slash and they have nowhere to put one.
 Add here as they surface from dogfooding. Each entry: the pattern, why it earns its place, the perceptual property it serves.
 
 - **Bold leads in lists.** Table-scan affordance via house style + colour. Calming + leading.
+- **Date-first names carry the record's date, not the source's.** The ISO prefix
+  is provenance that survives the copy — `mtime` does not, and a frontmatter date
+  is invisible to `ls`. So an imported artifact is **landed-dated** (the date it
+  entered the silo) and carries `Source:` in the front matter; a copied file is a
+  copied filename, and a source date would reproduce another context's timeline
+  inside this one. Adopted 2026-10-08; the argument is in
+  `docs/2026-10-08-the-filename-is-a-record.md`. Leading (the record's date is the
+  date the record was made here).
 - **Loose lists.** Discrete blocks, reduced scan tension. Calming.
 - **Hash headers only.** Unambiguous structure, LCARS-tab rendering. Calming.
 - **Front matter elided.** Provenance is not content. Calming.
