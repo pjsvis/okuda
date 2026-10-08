@@ -364,7 +364,10 @@ Add here as they surface from dogfooding. Each entry: the pattern, why it earns 
   - **In reserve, not decided.** A hard para-length rule. The only threshold with
     a perceptual warrant is glass-bound: a paragraph taller than the glass breaks
     the glance-confirm. Hold until the dogfood shows it; a line-count threshold
-    would be benchmaxxing prose.
+    would be benchmaxxing prose. The meter that would show it exists:
+    `just prose-check` reports the tallest units by rendered height (the
+    renderer's own wrapper, so the number is the render's) and any markdown
+    emphasis that survived the render. It never gates.
 - **Colons over em-dashes.** Prefer the colon; it is the house's native connective
   and it declares the relationship: *this, and here is what it means* — the reader
   predicts expansion before reading it. The em-dash is context-dependent

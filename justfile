@@ -103,6 +103,11 @@ search-replay *args:
 tables-check *args:
     @bun scripts/tables-check.ts "$@"
 
+# Prose wall meter
+[group('quality gate')]
+prose-check *args:
+    @bun scripts/prose-check.ts "$@"
+
 # Vector contract dogfood
 [group('quality gate')]
 smoke-test:
