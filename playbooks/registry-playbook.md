@@ -190,6 +190,14 @@ that carry a refusal — `Reverted`, `Rejected`, `Abandoned`, `Superseded`, a pa
 with a gate — and remove them from the queue. This is not style: the expensive
 failure of a knowledge silo is re-deciding.
 
+**Duplicate is not superseded.** A *duplicate*'s content lives verbatim
+elsewhere, so deleting it loses nothing — that is a deletion. A *superseded*
+document records a decision that was undone — that is the keep-class word, and a
+deletion disposition may never borrow it. The vocabulary is closed: the set above
+is the set, and filing a deletion under one of its words licenses deleting a
+genuine refusal. (Learned the hard way: batch 2's disposition was proposed as
+"duplicate/superseded" and refused in review, 2026-10-08.)
+
 ### Order of operations
 
 1. **Enumerate.** You cannot prune what you cannot list. (`docs/` has no registry
