@@ -135,7 +135,7 @@ Push notifications and software badges are cognitive sabotage. A real executive 
 
 Under the Telemetry Pattern, all communication is pull-based. The background fleet works silently. When you want situational awareness, you invoke a mnemonic command:
 
-$$\text{Mnemonic Key} \longrightarrow \text{Dynamic Status Okudagram On-Screen-Now}$$
+Mnemonic Key → Dynamic Status Okudagram On-Screen-Now
 
 An ephemeral terminal window renders the system delta in high-contrast, structured Markdown. You scan the visual frame, resolve your decision cascade in seconds, close the window, and return to deep thought.
 
