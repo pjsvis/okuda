@@ -299,7 +299,7 @@ If you don't want scrollback history, you send the terminal home/clear code (`\x
 
 ### Summary Recommendation
 
-* For reading static files: **Pipe to `less -R**` or invoke it automatically.
+* For reading static files: **Pipe to `less -R`** or invoke it automatically.
 * For agent pairing in a split pane: **Let the viewer emit to stdout with live reload**, and let the terminal pane handle viewport scrolling. This avoids having to write a custom scroll/pager engine inside your script.
 
 ---

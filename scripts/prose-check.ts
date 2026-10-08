@@ -189,38 +189,49 @@ export function height(text: string, kind: Kind, w: number = width): number {
 /** Markdown emphasis that survived the render — the one unambiguous defect
  *  class, because it is a render failure rather than a taste.
  *
- *  One real render, no source surgery: neutralising code before rendering broke
- *  the document's own parsing, which is worse than the false positives it was
- *  meant to prevent. Instead the known non-prose carriers are excluded by name:
- *  a code span that DISPLAYS markup (`` `**Date:**` `` renders as its own text,
- *  and that is the point), a fenced block's content, a URL's `__`, and a
- *  placeholder rule's run of underscores.
- *
- *  The fence exclusion matters more than it looks: a document with an UNCLOSED
- *  fence renders its whole body as code, and its `**` are literal by the
- *  renderer's own judgement — not a leak. */
+ *  One real render, no source surgery: neutralising code before rendering
+ *  cannot be made structure-preserving (removing an inline span breaks the
+ *  emphasis around it; replacing one breaks a table row whose cell holds a
+ *  pipe), so the non-prose carriers are excluded by name instead. */
+/** Emphasis-shaped `**`/`__`: a run at a word boundary followed by a word
+ *  character. A glob (`**.archive/**`), a mention (`(#, **, backticks)`) and a
+ *  URL's `__` are literal content, not failed emphasis — and the render is right
+ *  to show them. */
+const EMPHASIS_SHAPED = /(?:^|[\s(])\*\*(?=[A-Za-z0-9])|(?<!_)__(?!_)/;
+
 export async function leaks(source: string): Promise<string[]> {
   const rendered = stripANSI(await renderDocument(source, { width, color: "none" }));
-  // Non-prose carriers, keyed by a PREFIX: the renderer elides a long code or
-  // fence line at the glass, so the whole line is not a substring of what it
-  // drew. Twenty columns is enough to be distinctive and short enough to
-  // survive elision.
-  const codeText = new Set<string>();
-  const key = (s: string) => s.trim().slice(0, 20);
+  // Code spans, by content. A span that deliberately DISPLAYS markup
+  // (`` `**Date:**` ``) renders its own text and that is the point of the span;
+  // a line is skipped only when EVERY markup token on it is inside a span, so a
+  // real leak beside a code span still reports.
+  const spans = [...source.matchAll(/`([^`\n]*)`/g)].map((m) => m[1]!).filter(Boolean);
+  // Fence content, by KEY at both ends: a long fence line is elided at the
+  // glass, so the whole line is not a substring of what was drawn — and a
+  // document with an UNCLOSED fence renders its whole body as code, whose `**`
+  // are literal by the renderer's own judgement, not leaks.
+  const fenceKeys = new Set<string>();
   const fenced = inFence(source);
   source.split("\n").forEach((l, i) => {
-    if (fenced[i]) { const k = key(l); if (k) codeText.add(k); return; }
-    for (const span of l.matchAll(/`([^`\n]*)`/g)) { const k = key(span[1]!); if (k) codeText.add(k); }
+    if (!fenced[i]) return;
+    const t = l.trim();
+    if (!t) return;
+    fenceKeys.add(t.slice(0, 20));
+    fenceKeys.add(t.slice(-20));
   });
-  return rendered
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(
-      (l) =>
-        /\*\*|(?<!_)__(?!_)/.test(l) &&
-        !l.includes("://") &&
-        ![...codeText].some((c) => l.includes(c)),
-    );
+  const out: string[] = [];
+  for (const line of rendered.split("\n").map((l) => l.trim())) {
+    // `**` anywhere; `__` only as an emphasis PAIR. A run of three or more
+    // underscores is a placeholder rule (`______`), and a double underscore in
+    // a URL (`@__bbak`) is an address — neither is failed emphasis.
+    if (!EMPHASIS_SHAPED.test(line)) continue;
+    if (line.includes("://")) continue;
+    if ([...fenceKeys].some((k) => line.includes(k))) continue;
+    const tokens = line.match(/\*\*[^*\n]{0,60}\*\*|(?<!_)__(?!_)/g) ?? [];
+    if (tokens.length > 0 && tokens.every((t) => spans.some((c) => c.includes(t)))) continue;
+    out.push(line);
+  }
+  return out;
 }
 
 // ── the pass ─────────────────────────────────────────────────────────

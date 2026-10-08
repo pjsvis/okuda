@@ -83,7 +83,7 @@ When run in a graphical workstation environment (e.g., under a tiling window man
 * **`Space`**, **`l`**, **`j`** — Step forward to the next frame.
 * **`b`**, **`h`**, **`k`** — Step backward to the previous frame.
 * **`Ctrl+N`** — Arm two-digit reference selector.
-* **`11`–`99**` — Dereference armed pointer index (immediately spawns target document).
+* **`11`–`99`** — Dereference armed pointer index (immediately spawns target document).
 * **`q`** — Close the active aperture and return control to the parent shell.
 
 ---

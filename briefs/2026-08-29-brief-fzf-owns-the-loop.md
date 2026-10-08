@@ -7,11 +7,11 @@ callsign: BRF-FZF-OWNS-LOOP
 
 **Date:** 2026-08-29
 **Status:** Aborted (2026-08-30) — gate 1 passed, but the fix for the
-**real gate (Bun's passive stdin freeze under fzf `execute`) was heavier
-**than the disease: a `bun:ffi` + `/dev/tty` active-poll reader running in
-**every TUI session for a feature behind an env flag. Reverted; ADR-023
-**marked Aborted; debrief logged. The analysis below stands — spawn-per-round
-**structurally cannot preserve the cursor; only fzf-owns-the-loop can.
+real gate (Bun's passive stdin freeze under fzf `execute`) was heavier
+than the disease: a `bun:ffi` + `/dev/tty` active-poll reader running in
+every TUI session for a feature behind an env flag. Reverted; ADR-023
+marked Aborted; debrief logged. The analysis below stands — spawn-per-round
+structurally cannot preserve the cursor; only fzf-owns-the-loop can.
 **Branch:** feat/gloam-launcher
 **Context:** dogfood nit on the gloam browse → read → browse loop.
 Select a file in fzf → read it in okuda → quit back to fzf: the

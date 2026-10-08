@@ -7,9 +7,9 @@ callsign: ADR-TTY-ACTIVE-INPUT-023
 
 **Date:** 2026-08-29
 **Status:** Aborted (2026-08-30) — the fix landed and verified, but its
-**cost exceeded its benefit. Reverted; passive stdin restored. The
-**findings below stand as knowledge. See
-**`debriefs/2026-08-30-debrief-fzf-owns-the-loop-aborted.md`.
+cost exceeded its benefit. Reverted; passive stdin restored. The
+findings below stand as knowledge. See
+`debriefs/2026-08-30-debrief-fzf-owns-the-loop-aborted.md`.
 
 ## Context
 
