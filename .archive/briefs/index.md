@@ -9,7 +9,10 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-08 | BRF-DATE-INVARIANT | done | The date is a claim — the invariant, the lint, and the time document | 2026-10-08-brief-date-invariant.md |
+| 2026-10-08 | BRF-WRAP-AT-CAP | done | Wrap at the cap — the third branch | 2026-10-08-brief-wrap-at-cap.md |
 | 2026-10-03 | BRF-ARCHIVE-RESOLUTION | done | The archive resolution tier — citations must survive the archive move | 2026-10-03-brief-archive-resolution-tier.md |
+| 2026-10-03 | BRF-HEADING-ANSI-STRIP | done | Strip ANSI from heading children — the heading role owns every byte of colour | 2026-10-03-brief-heading-ansi-strip.md |
 | 2026-10-02 | BRF-CALLSIGN-CHECKSUM | done | The callsign checksum — citations that resolve nowhere fail the gate | 2026-10-02-brief-callsign-checksum.md |
 | 2026-10-02 | BRF-ROOT-CONTAINMENT | done | Root containment — existence is not permission | 2026-10-02-brief-root-containment.md |
 | 2026-10-02 | BRF-VALVE-LINT | done | The valve lint — td-ID citations in persisted documents fail the gate | 2026-10-02-brief-td-id-lint.md |
@@ -20,6 +23,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-24 | BRF-SELF-IDENTICAL-LINK | done | The self-identical link — when the label is the address, say it once | 2026-09-24-brief-self-identical-link.md |
 | 2026-09-24 | BRF-VALIDATED-SILCROWS | done | Validated silcrows — the shape scan consults the registry it stands on | 2026-09-24-brief-validated-silcrows.md |
 | 2026-09-19 | BRF-REMOTE-SPEECH-SEAM | done | The remote speech seam — a question to settle before anything builds | 2026-09-19-brief-remote-speech-seam.md |
+| 2026-09-16 | BRF-MATH-GLYPHS | done | The Math Glyph Pass — inline LaTeX to Unicode, closed vocabulary, corpus-gated | 2026-09-16-brief-math-glyphs.md |
 | 2026-09-14 | BRF-TABLE-WIDTH | done | The cut cell — the renderer breaks words the glass had room for | 2026-09-14-brief-table-width.md |
 | 2026-09-13 | BRF-REFERENCES-SECTION | done | The References section — the renderer emits its own map | 2026-09-13-brief-references-section.md |
 | 2026-09-13 | BRF-TIDY-FIRST | done | Tidy-first — the path to a good place | 2026-09-13-brief-tidy-first.md |
