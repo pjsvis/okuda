@@ -198,6 +198,14 @@ is the set, and filing a deletion under one of its words licenses deleting a
 genuine refusal. (Learned the hard way: batch 2's disposition was proposed as
 "duplicate/superseded" and refused in review, 2026-10-08.)
 
+**The words flag candidates; they do not settle the class.** `grep -i` for the
+set above finds *candidates* for keep-class. It cannot classify a document: a
+rhetorical use of "abandoned" or "refuses" is not a disposition, and both were
+found in review (batches 1 and 3, 2026-10-08). Keep-class is **read for the
+reversal, not matched for the resemblance**, and that needs the sentence around
+the token. A keep-class claim in a batch record that rests on a grep is a claim
+to refuse.
+
 ### Order of operations
 
 1. **Enumerate.** You cannot prune what you cannot list. (`docs/` has no registry
