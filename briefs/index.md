@@ -9,7 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
-| 2026-10-08 | BRF-WRAP-AT-CAP | open | Wrap at the cap — the third branch | 2026-10-08-brief-wrap-at-cap.md |
+| 2026-10-08 | BRF-WRAP-AT-CAP | done | Wrap at the cap — the third branch | 2026-10-08-brief-wrap-at-cap.md |
 | 2026-10-07 | BRF-FRAME-INDEX | open | The frame index — an address two parties can both name | 2026-10-07-brief-frame-index.md |
 | 2026-10-07 | BRF-TABLE-LADDER | open | The band and the ladder — the table fit, from a design width of 80 | 2026-10-07-brief-table-allocator-ladder.md |
 | 2026-10-06 | BRF-KINDLE-PORCH | open | The Kindle porch — the silo on an e-ink glass, over ssh, nothing on the device | 2026-10-06-brief-kindle-porch.md |

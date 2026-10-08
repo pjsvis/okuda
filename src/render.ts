@@ -1501,6 +1501,7 @@ function renderTable(t: TableState, ctx: Ctx): string {
   // reference ruler" must not hold thirty-five columns open for three characters
   // of data. 143 of the corpus's 1038 columns were sized by their label.
   const bodyNat = new Array<number>(cols).fill(0);
+  const bodyWord = new Array<number>(cols).fill(0);
   const headWord = new Array<number>(cols).fill(0);
   const longestWord = (text: string, into: number[], i: number): void => {
     for (const word of stripANSI(text).split(/\s+/)) {
@@ -1510,7 +1511,9 @@ function renderTable(t: TableState, ctx: Ctx): string {
   header.forEach((cell, i) => longestWord(cell?.text ?? "", headWord, i));
   for (const r of rows) {
     r.forEach((cell, i) => {
-      bodyNat[i] = Math.max(bodyNat[i]!, displayWidth(cell?.text ?? ""));
+      const text = cell?.text ?? "";
+      bodyNat[i] = Math.max(bodyNat[i]!, displayWidth(text));
+      longestWord(text, bodyWord, i);
     });
   }
   // The AUTHOR's column widths, and nothing below adjusts them. A column is as wide
@@ -1526,6 +1529,40 @@ function renderTable(t: TableState, ctx: Ctx): string {
   // to.
   const target = Math.min(width, BAND_CONTENT);
 
+  // A column's floor is its longest word, header or body (BRF-WRAP-AT-CAP). A
+  // word cannot be broken, so no share may fall below it; the floor is the
+  // PREDICATE's unit, never an allocation across columns.
+  const wordFloor = colWidth.map((_, i) => Math.max(headWord[i]!, bodyWord[i]!));
+
+  // The three branches, one grammar (BRF-WRAP-AT-CAP). The boundary is the CAP,
+  // not the glass: below it the reader's lever is to widen, so the edge cut is
+  // recoverable and nothing is asked of the words. Past the cap, 120 and 200
+  // columns render identically and the cut HIDES content — the one thing the
+  // table model refuses — so the columns wrap until the table fits the cap, and
+  // only a word that cannot fit falls through to the edge cut.
+  const natural = colWidth.reduce((a, w) => a + w, 0) + gutter * (cols - 1);
+  const wordBudget = wordFloor.reduce((a, w) => a + w, 0) + gutter * (cols - 1);
+  // Two columns no band width can hold are a prose matrix — two notes wearing
+  // pipes. The remedy is the document (ADR-REFERENCES-SECTION-047), not a
+  // taller render, and ADR-TABLE-EDGE-CUT-055 already names them.
+  const giants = colWidth.filter((n) => n > BAND_CONTENT).length > 1;
+  const wrap = natural > BAND_CONTENT && wordBudget <= BAND_CONTENT && !giants;
+
+  // The wrap's allocation, and why it is not the ladder: every column takes its
+  // longest word as a floor (a word cannot break below it) and the SLACK IS SPLIT
+  // EVENLY. There is no per-column need, no completion order and no proportional
+  // budget — the arithmetic that made two models disagree is deliberately absent.
+  // The floor test above is a predicate at the cap, never an allocator across
+  // columns.
+  let slots = colWidth;
+  if (wrap) {
+    const avail = BAND_CONTENT - gutter * (cols - 1);
+    const slack = avail - wordFloor.reduce((a, w) => a + w, 0);
+    const base = Math.floor(slack / cols);
+    const rem = slack % cols;
+    slots = wordFloor.map((w, i) => w + base + (i < rem ? 1 : 0));
+  }
+
   // The EDGE CUT (ADR-TABLE-EDGE-CUT-055). The table renders at the author's widths
   // and is never squeezed: when the glass is narrower than the table, the composed
   // LINE is elided at the content budget with `…` at the cut — the same policy a
@@ -1538,38 +1575,41 @@ function renderTable(t: TableState, ctx: Ctx): string {
 
   const sep = ` ${styler.tablePipe()} `;
   const bodySep = " ".repeat(gutter);
-  const drawn: string[] = [];
+  const headDrawn: string[] = [];
+  const bodyDrawn: string[][] = [];
   let headHeight = 0;
   if (header.length > 0) {
     // Headers wrap and never elide (BRF-TABLE-LADDER). A header is one block, so
     // its cost is O(1) table lines where a body cell's is O(rows) — and the label
     // is the column's decode key, so it is the last thing that should be cut.
-    // 129 of the 457 starved columns at 80 columns were the label losing to its
-    // own data.
     const headLines: string[][] = Array.from({ length: cols }, (_, i) => {
       const c = header[i];
-      if (!c) return [" ".repeat(colWidth[i]!)];
-      const slot = colWidth[i]!;
+      if (!c) return [" ".repeat(slots[i]!)];
+      const slot = slots[i]!;
       const text = styler.roleBold("table-header", c.text);
       const wrapped = slot > 0 && displayWidth(c.text) > slot
         ? wrapANSI(text, { width: slot })
         : [text];
       // The slot is at least the column's longest word, so a wrapped line always
       // fits it: a header pads, never cuts.
-      return wrapped.map((l) => padNatural({ text: l, align: c.align }, 0, [slot]));
+      return wrapped.map((l) => padNatural({ text: l, align: c.align }, i, slots));
     });
     headHeight = Math.max(1, ...headLines.map((l) => l.length));
     for (let k = 0; k < headHeight; k++) {
       // Every line of the header block carries the column separators, so the grid
       // survives a label three lines tall — and the composed line is then cut at
       // the glass like every other line in the table.
-      drawn.push(
-        cut(headLines.map((l, i) => l[k] ?? " ".repeat(colWidth[i]!)).join(sep).replace(/[ ]+$/, "")),
+      headDrawn.push(
+        cut(headLines.map((l, i) => l[k] ?? " ".repeat(slots[i]!)).join(sep).replace(/[ ]+$/, "")),
       );
     }
   }
   for (const r of rows) {
-    const cells: string[] = [];
+    // Compose each cell to lines, then let the tallest cell set the row block's
+    // height: the shorter cells pad with air so the grid survives the wrap. Below
+    // the cap every cell is one line, and the block is one line deep — the shape
+    // the edge cut always drew.
+    const cellLines: string[][] = [];
     for (let i = 0; i < cols; i++) {
       const raw = r[i]?.text ?? "";
       // State-glyph column: colour + bold a leading state glyph via the
@@ -1581,50 +1621,49 @@ function renderTable(t: TableState, ctx: Ctx): string {
       const cell: Cell = i === 0
         ? { text: styler.roleBold("table-key", r[0]?.text ?? ""), align: r[0]?.align }
         : { text: styled, align: r[i]?.align };
-      cells.push(padNatural(cell, i, colWidth));
+      const slot = slots[i]!;
+      const lines = wrap && slot > 0 && displayWidth(cell.text) > slot
+        ? wrapANSI(cell.text, { width: slot })
+        : [cell.text];
+      cellLines.push(lines.map((l) => padNatural({ text: l, align: cell.align }, i, slots)));
     }
-    // The row is composed at the author's widths and cut at the glass — never
-    // squeezed, so the cells that fit are whole. Trailing pad is trimmed FIRST: a
-    // cut that lands in a row's own padding would put a `…` on the glass claiming a
-    // loss that did not happen.
-    drawn.push(cut(cells.join(bodySep).replace(/[ ]+$/, "")));
+    const height = Math.max(1, ...cellLines.map((l) => l.length));
+    const block: string[] = [];
+    for (let k = 0; k < height; k++) {
+      // The row is composed at its slots and cut at the glass — never squeezed,
+      // so the cells that fit are whole. Trailing pad is trimmed FIRST: a cut
+      // that lands in a row's own padding would put a `…` on the glass claiming
+      // a loss that did not happen.
+      block.push(
+        cut(cellLines.map((l, i) => l[k] ?? " ".repeat(slots[i]!)).join(bodySep).replace(/[ ]+$/, "")),
+      );
+    }
+    bodyDrawn.push(block);
   }
+
   // Trailing pad spaces are ours, not content — trim per line BEFORE measuring,
   // so the rule brackets what is actually drawn and not what was padded.
-  const lines = drawn.map((l) => l.replace(/[ ]+$/, ""));
+  const trim = (l: string): string => l.replace(/[ ]+$/, "");
+  const headLines = headDrawn.map(trim);
+  const bodyBlocks = bodyDrawn.map((b) => b.map(trim).join("\n"));
 
   // The rule is the TABLE's width, not the glass's (BRF-TABLE-LADDER): a bracket
   // wider than its contents is a promise the table does not keep, and it was up
   // to 103 columns of air under the bar. Measured off the lines actually
   // emitted, so the bar cannot disagree with the cells it brackets.
-  const tableWidth = lines.reduce((a, l) => Math.max(a, displayWidth(l)), 0);
+  const tableWidth = [...headDrawn, ...bodyDrawn.flat()].reduce(
+    (a, l) => Math.max(a, displayWidth(trim(l))),
+    0,
+  );
   const rule = styler.rule(tableWidth);
 
   // Header block + its rule (the rule belongs to the header, not the rows); body
   // rows keep a 3-space gutter so columns align with the header separators.
-  const out: string[] = [];
-  const headBlock = header.length > 0 ? headHeight + 1 : 0;
-  if (headBlock > 0) {
-    out.push(...lines.slice(0, headHeight));
-    out.push(rule);
-  }
-  out.push(...lines.slice(headHeight));
-  // Closing rule under the table (tables are bracketed).
-  out.push(rule);
-
-  // Loose rows: blank line between rows. The header rule sits directly
-  // under the header — it belongs to the header, not the rows. Trailing
-  // pad spaces are ours, not content — trim them per line (a wrapped row
-  // is a multi-line block — trim each line within it).
-  const trimmed = out.map((block) =>
-    block.split("\n").map((l) => l.replace(/[ ]+$/, "")).join("\n"),
-  );
-  if (header.length > 0) {
-    // The header block may be several lines tall, and its rule belongs to it.
-    return trimmed.slice(0, headBlock).join("\n") + "\n\n" +
-      trimmed.slice(headBlock).join("\n\n") + "\n\n";
-  }
-  return trimmed.join("\n\n") + "\n\n";
+  // Loose rows: a blank line between BLOCKS. A wrapped row is one block — its
+  // lines stay contiguous, or the grid dissolves into single-column stripes.
+  const headPart = headLines.length > 0 ? headLines.join("\n") + "\n" + rule + "\n\n" : "";
+  const bodyPart = bodyBlocks.length > 0 ? bodyBlocks.join("\n\n") + "\n\n" : "";
+  return headPart + bodyPart + rule + "\n\n";
 }
 
 /** Right-anchored role layout for patterned surfaces (ADR-022, td-b81597):

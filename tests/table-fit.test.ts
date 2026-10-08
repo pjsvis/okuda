@@ -2,19 +2,87 @@ import { describe, expect, test } from "bun:test";
 import { renderDocument } from "../src/render";
 import { displayWidth, stripANSI } from "../src/width";
 
-/** The ladder's unit vectors (BRF-TABLE-LADDER, increment 2). Each test aims at
- *  one branch: the band cap, the word floor, the irreducible fallback. The
- *  corpus instrument (`scripts/tables-check.ts`) is the integration test — these
- *  are the branches it cannot isolate. */
+/** Table unit vectors. The ladder is retired (ADR-TABLE-EDGE-CUT-055), so the
+ *  old branches are the below-cap edge cut and the cap; BRF-WRAP-AT-CAP adds the
+ *  third branch. The corpus instrument (`scripts/tables-check.ts`) is the
+ *  integration test — these are the branches it cannot isolate. */
 
 const visible = (out: string) =>
   stripANSI(out).split("\n").filter((l) => l.trim().length > 0);
+
+/** A wrappable over-cap table: naturals [51, 62, 55, 45] = 222 against the
+ *  cap of 116, every column with somewhere to break (the surfaced table in
+ *  docs/2026-08-30-naming-like-nasa.md, *Lessons, attributed*). */
+const SURFACED =
+  "| Lesson | Evidence | Source | okuda mapping |\n" +
+  "|---|---|---|---|\n" +
+  "| Two codes, one referent | MJS77 / Voyager; AS-506 / Apollo; COSPAR IDs | Kohlhase interview (2002); Butrica (1998) | BRF-SILO-MNEMONICS \"two codes\"; ADR-024 |\n" +
+  "| Machine code unique by construction, ugly by design | COSPAR 1977-084A; VGR 77-1 | Butrica (1998); Wikipedia (Voyager program) | filenames + frontmatter |\n";
+
+/** Below-cap goldens, captured before BRF-WRAP-AT-CAP — the fit path and the
+ *  narrow-glass cut must be byte-identical, asserted not assumed. */
+const GOLDEN_A30 =
+  "\n  \u001b[1mElement\u001b[0m  │ \u001b[1mChannel\u001b[0m    │ \u001b[1mR\u001b[0m…\n  ──────────────────────────\n\n  \u001b[1mheading\u001b[0m    structural   p…\n\n  \u001b[1memphasis\u001b[0m   emphasis     y…\n\n  ──────────────────────────\n\n  █ ────────────────────── █\n";
+const GOLDEN_B120 =
+  "\n  \u001b[1ma\u001b[0m       │ \u001b[1mb\u001b[0m\n  ────────────────────\n\n  \u001b[1mone two\u001b[0m   three four\n\n  ────────────────────\n\n  █ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────── █\n";
+const BELOW_A =
+  "| Element | Channel | Role |\n|---|---|---|\n" +
+  "| heading | structural | purple bold |\n| emphasis | emphasis | yellow italic |\n";
+const BELOW_B = "| a | b |\n|---|---|\n| one two | three four |\n";
 
 const PILOT =
   "| Element | Channel | Role | Hex | Notes |\n" +
   "|---|---|---|---|---|\n" +
   "| heading | structural | purple bold | #bd93f9 | the top-level heading in the document, always purple |\n" +
   "| emphasis | emphasis | yellow italic | #f1fa8c | italic |\n";
+
+describe("the table at the cap (BRF-WRAP-AT-CAP)", () => {
+  test("below the cap is byte-identical — the fit path is untouched", async () => {
+    // A table that fits whole at 120, and one cut at a narrow glass: both are
+    // the pre-wrap bytes, so the branch did not disturb the two old ones.
+    expect(await renderDocument(BELOW_B, { width: 120, color: "none" })).toBe(GOLDEN_B120);
+    expect(await renderDocument(BELOW_A, { width: 30, color: "none" })).toBe(GOLDEN_A30);
+  });
+
+  test("above the cap every word fits — the columns wrap; nothing is hidden", async () => {
+    const lines = visible(await renderDocument(SURFACED, { width: 120, color: "none" }));
+    // No `…` anywhere: the cut marker only appears where a word cannot fit.
+    expect(lines.every((l) => !l.includes("…"))).toBe(true);
+    // Evidence and Source are readable, whole, across their wrapped lines.
+    for (const word of ["Lesson", "Evidence", "Source", "okuda", "mapping",
+      "referent", "Voyager", "COSPAR", "Kohlhase", "Butrica", "MNEMONICS",
+      "construction", "frontmatter"]) {
+      expect(lines.some((l) => l.includes(word))).toBe(true);
+    }
+    // Two source rows became blocks: the body is more than one line per row.
+    expect(lines.length).toBeGreaterThan(6);
+  });
+
+  test("a wrapped cell breaks at spaces — no word is broken", async () => {
+    const lines = visible(await renderDocument(SURFACED, { width: 120, color: "none" }));
+    // Each multi-character word survives intact on one line; a hard split would
+    // leave two fragments and neither line carrying the whole word.
+    const words = ["construction", "Voyager", "Kohlhase", "Wikipedia",
+      "filenames", "frontmatter", "referent"];
+    for (const w of words) expect(lines.some((l) => l.includes(w))).toBe(true);
+  });
+
+  test("a word that cannot fit its share stays irreducible — the cut stands", async () => {
+    const token = "unbreakabletoken".repeat(8); // 128 columns, no space
+    const src = `| id | caveat |\n|---|---|\n| 01 | ${token} |\n`;
+    const lines = visible(await renderDocument(src, { width: 120, color: "none" }));
+    // The document is named by the instrument; the render fails honestly.
+    expect(lines.some((l) => l.includes("…"))).toBe(true);
+    expect(lines.some((l) => l.includes(token))).toBe(false);
+    for (const l of lines) expect(displayWidth(l)).toBeLessThanOrEqual(120);
+  });
+
+  test("height is stable: two renders at one width are identical", async () => {
+    const a = await renderDocument(SURFACED, { width: 120, color: "none" });
+    const b = await renderDocument(SURFACED, { width: 120, color: "none" });
+    expect(a).toBe(b);
+  });
+});
 
 describe("the table ladder", () => {
   test("keys render whole and the remainder goes to the prose column", async () => {

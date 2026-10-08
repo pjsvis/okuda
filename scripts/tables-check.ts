@@ -1,49 +1,46 @@
 #!/usr/bin/env bun
 /**
- * tables-check.ts — the table cut, measured (brief: 2026-09-14-brief-table-width).
+ * tables-check.ts — the table fit, measured (brief: 2026-10-08-brief-wrap-at-cap).
  *
- * `renderTable` shrinks an over-wide table by handing every column a floor of
- * three characters plus a share proportional to its content (src/render.ts:
- * 987-1016). The widest column therefore sets the scale and the narrow ones
- * are squeezed toward three. When a squeezed column is narrower than its
- * longest word the wrapper has nowhere to break and CUTS the word — a reader
- * sees `#99ccf` / `f` and `0.82` / `8`.
+ * `renderTable` has three branches (BRF-WRAP-AT-CAP):
  *
- * This reports that cut, per table, as `file:line`. It does not predict
- * widths; it reads the render:
+ *   natural <= cap        draw the author's widths; a narrow GLASS cuts the
+ *                         composed line with `…` (recoverable: widen)
+ *   natural > cap,        WRAP the columns to the cap: rows become multi-line
+ *     every word fits     blocks, nothing hidden
+ *   a word cannot fit     IRREDUCIBLE: draw and cut; the document (or the
+ *                         compositor) is named, because widening cannot help
+ *
+ * This reports the third branch's failure — content HIDDEN at the cap. It does
+ * not predict widths; it reads the render:
  *
  *   1. render the table in isolation at the target width;
  *   2. take the column geometry off the last line before the header rule that
- *      carries a `│` — the body gutter is built to align with those separators
- *      (src/render.ts:1022-1027), so slicing is exact. Taking the FIRST line of
- *      the block instead is the trap: it is the title when not isolated;
- *   3. slice every line per column, collect each cell's fragments;
- *   4. a fragment that is not a whitespace-delimited run of that column's
- *      source text was cut. Fragments pair only across ADJACENT rendered
- *      lines — the blank line between body rows is a row boundary, and pairing
- *      across it invents cuts.
+ *      carries a `│` — the body gutter is built to align with those separators,
+ *      so slicing is exact. Taking the FIRST line of the block instead is the
+ *      trap: it is the title when not isolated;
+ *   3. WRAPPED is observed, not recomputed: a wrapped table renders more body
+ *      lines than it has source rows (a row became a block);
+ *   4. HIDDEN = over the cap by source, NOT wrapped, and showing `…`.
  *
- * Reflow alone is not a fault: the allocator wraps cells on purpose. Only a
- * cut is reported.
+ * The old broken-word detector is RETIRED. It paired adjacent lines and asked
+ * whether each fragment was a whitespace run of the source. Once a body row is
+ * a block, every legitimate wrap is an adjacent pair, and any markup the source
+ * `plain()` did not model exactly (backslash escapes, intra-word underscores,
+ * visible link URLs) read as a cut. The wrap's word floor guarantees no word
+ * ever breaks, so a broken word is no longer the fault this script reports.
  *
  * Traps, all of them found the hard way:
  *   - an ESCAPED pipe (`\|`) is cell content, not a boundary — splitting on it
  *     invents a column and inflates the word budget;
  *   - the header's FIRST line is the title when the table is not isolated, and
- *     carries no `│` — take the geometry off the last line before the rule;
- *   - fragments pair only across ADJACENT lines; the blank line between body
- *     rows is a row boundary, and pairing across it invents cuts.
+ *     carries no `│` — take the geometry off the last line before the rule.
  *
- * The word budget is measured too, because it decides the remedy: a table
- * whose columns could each hold their longest word is an ALLOCATOR fault, and
- * a table that cannot is a document (or generator) fault.
- *
- * The word budget measures the CUT. It cannot see the second fault, because
- * elision is normal here (ADR-UNIVERSAL-ELISION-050: cells elide, they do not
- * wrap) — a prose cell wider than its slot is *meant* to elide, and it elides
- * with a marker, so nothing is cut and this script reports 0. The fault that
- * hides behind that 0 is STARVATION: a column elided while the budget had room
- * to render it whole.
+ * The word budget is measured too, because it decides the remedy: a table whose
+ * columns could each hold their longest word is wrappable (an ALLOCATOR fault
+ * only if it hid content anyway), and a table that cannot is a document (or
+ * generator) fault. It counts what the renderer DRAWS: a link's URL is visible
+ * inline (Pass C), so its long token is a word the wrapper cannot break.
  *
  * STARVED, per column k, is a predicate over the source plus one observation:
  *
@@ -65,11 +62,13 @@
  *
  * Traps, the third one:
  *   - elision is read as `endsWith('…')`, not `includes('…')` — a cell is
- *     elided at its tail, and prose that merely mentions an ellipsis mid-
- *     sentence is not the allocator's doing;
- *   - a cell whose SOURCE ends in `…` also ends in `…` when rendered, and the
- *     allocator did nothing — the column's source is checked before its
- *     elisions are counted;
+ *     elided at its tail;
+ *   - a cell whose SOURCE ends in `…` (or carries a literal one mid-sentence)
+ *     renders one too, with the renderer blameless — the column's source is
+ *     checked, and the hidden reading is gated on the table NOT being wrapped,
+ *     so a literal ellipsis on a wrapped line is not a cut;
+ *   - link URLs are CONTENT: `plain()` mirrors the renderer's `text url`, or
+ *     the instrument calls a table wrappable that the renderer cannot wrap;
  *   - the band boundary is fuzzy by a few characters: `plain()` estimates markup
  *     stripping, `Bun.markdown` does it for real, and a table measured at 115
  *     can land at 117 in the renderer. Expect a residue of a handful of
@@ -91,9 +90,6 @@ import { readFileSync } from "node:fs";
 const RULE = /^\s*─{10,}\s*$/;
 const PIPE = "│";
 const GUTTER = 3;
-/** The state-glyph vocabulary (src/render.ts:77) — a cut involving one of
- *  these is the orphan-escape defect's shadow, not a table fault. */
-const GLYPH = /[✓☐⋮✗]/;
 /** The orphan escape tail `styleStateGlyph` leaves behind (src/render.ts:99-121).
  *  It is four bytes of layout the renderer never counted, so it shifts every
  *  following column. Drop it to restore the intended geometry; a tail the
@@ -161,9 +157,25 @@ function siloFiles(): string[] {
  *  parsed cell Bun.markdown hands `renderTable`). */
 function plain(s: string): string {
   return s
+    // Backslash escapes are markup, not content: `\-` renders as `-`, `\&` as
+    // `&`. The renderer sees the parsed cell, so the hay must unescape first or
+    // the cut detector reads a legitimate wrap as a broken word (BRF-WRAP-AT-CAP
+    // made body rows multi-line, so the detector pairs again).
+    .replace(/\\(.)/g, "$1")
     .replace(/\*\*|__|`/g, "")
-    .replace(/\*|_/g, "")
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    // Emphasis markers only at a word edge: `_` inside a word is content
+    // (`NO_COLOR`, `RE_MD_LINK` render with the underscore intact). Stripping
+    // every underscore shrank those cells and made the cut detector's hay
+    // disagree with the render.
+    .replace(/\*+/g, "")
+    .replace(/(?<![A-Za-z0-9])_+|_+(?![A-Za-z0-9])/g, "")
+    .replace(/\[([^\]]*)\]\(([^)]*)\)/g, (_m: string, text: string, url: string) =>
+      // Render parity: okuda draws a link as `text url` (or the address alone
+      // when it is self-identical, BRF-SELF-IDENTICAL-LINK), so the URL is
+      // VISIBLE content and its long token is a word the wrapper cannot break.
+      // Stripping the URL here made the instrument call a link-bearing table
+      // wrappable when the renderer could not wrap it (BRF-WRAP-AT-CAP).
+      text.trim() === url.trim() ? url : `${text} ${url}`)
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -273,8 +285,6 @@ interface Reading {
   rows: number;
   /** Column widths as rendered — the geometry the allocator chose. */
   slots: number[];
-  /** Cut fragments, `prefix|suffix`. */
-  cuts: string[];
   /** Observed elisions per column — cells whose rendered tail is `…`. */
   elided: number[];
   /** The column's HEADER cell was cut — the label lost, the data kept. */
@@ -296,7 +306,7 @@ async function read(t: Table, source: string): Promise<Reading> {
     if (RULE.test(l)) rules.push(i);
   });
   const rows = t.body.length;
-  if (rules.length < 2) return { lines: -1, rows, slots: [], cuts: [], elided: [], samples: [], headerCut: [], ruleSlack: 0 };
+  if (rules.length < 2) return { lines: -1, rows, slots: [], elided: [], samples: [], headerCut: [], ruleSlack: 0 };
 
   const start = lines.findIndex((l) => l.trim().length > 0);
   const head = lines.slice(start, rules[0]!);
@@ -310,7 +320,7 @@ async function read(t: Table, source: string): Promise<Reading> {
   if (seps.length === 0) {
     // A single-column table carries no separator. Nothing to slice; reflow is
     // all it can do, so report the count and stop.
-    return { lines: bodyAll.filter((l) => l.trim().length > 0).length, rows, slots: [], cuts: [], elided: [], samples: [], headerCut: [], ruleSlack: 0 };
+    return { lines: bodyAll.filter((l) => l.trim().length > 0).length, rows, slots: [], elided: [], samples: [], headerCut: [], ruleSlack: 0 };
   }
 
   const starts = [h0.search(/\S/), ...seps.map((s) => s + 2)];
@@ -328,18 +338,16 @@ async function read(t: Table, source: string): Promise<Reading> {
     plain([t.header[k] ?? "", ...t.body.map((r) => r[k] ?? "")].join(" ")),
   );
 
-  const cuts: string[] = [];
   const frag = (line: string, k: number) =>
     line.slice(starts[k]!, ends[k]! === 10 ** 6 ? undefined : ends[k]!).trim();
   const run = [...head, ...bodyAll];
-  /** The header is a BLOCK of lines since BRF-TABLE-LADDER (it wraps), so two
-   *  adjacent lines inside it are a wrap, and the pair straddling its last line
-   *  is a row boundary. Neither is a broken word: pairing across them reads a
-   *  legitimate wrap as a cut, which is how four tables with no allocator fault
-   *  were reported as cut. Body rows are still single-line by construction
-   *  (ADR-UNIVERSAL-ELISION-050), so the pairing still catches what it was
-   *  built for. */
-  const headEnd = head.length;
+  // The broken-word detector that paired adjacent fragments is RETIRED
+  // (BRF-WRAP-AT-CAP). A body row is a BLOCK now: adjacent lines inside it are a
+  // legitimate wrap, and the old "pair the fragments, compare to the source"
+  // test reads every wrap as a cut. The wrap's floor guarantees no word breaks
+  // (a word never exceeds its share), so the fault this instrument reports is no
+  // longer a broken word but content HIDDEN at the cap — derived from `elided`,
+  // where the table is over the cap and the reader has no lever to widen.
   // Elision, observed: a cell is elided at its tail (never wrapped — ADR-050),
   // so `endsWith`, not `includes`. A column whose SOURCE ends in `…` renders one
   // too, with the allocator blameless — skip those columns outright.
@@ -362,19 +370,7 @@ async function read(t: Table, source: string): Promise<Reading> {
     Math.max(displayWidth(lines[rules[0]!]!), displayWidth(lines[rules[1]!]!)) -
       Math.max(0, ...[...head, ...bodyAll].map((l) => displayWidth(l.trimEnd()))),
   );
-  for (let k = 0; k < starts.length; k++) {
-    const hay = " " + columnText[k]! + " ";
-    for (let i = 0; i + 1 < run.length; i++) {
-      if (i < headEnd) continue;
-      const a = frag(run[i]!, k);
-      const b = frag(run[i + 1]!, k);
-      if (!a || !b) continue;
-      if (a.endsWith("…") || b.startsWith("…")) continue;
-      if (GLYPH.test(a + b)) continue;
-      if (!hay.includes(" " + a + " ") || !hay.includes(" " + b + " ")) cuts.push(a + "|" + b);
-    }
-  }
-  return { lines: bodyAll.filter((l) => l.trim().length > 0).length, rows, slots, cuts, elided, samples, headerCut, ruleSlack };
+  return { lines: bodyAll.filter((l) => l.trim().length > 0).length, rows, slots, elided, samples, headerCut, ruleSlack };
 }
 
 // ── the pass ─────────────────────────────────────────────────────────
@@ -384,10 +380,10 @@ interface Finding {
   line: number;
   cols: number;
   slots: number[];
-  cuts: number;
+  /** Cells hidden at the cap: the table is over the cap and eliding, so the
+   *  reader has no lever to widen and the content is gone. The irreducible set. */
+  hidden: number;
   sample: string;
-  /** True when the columns could each hold their longest word. */
-  allocatorFault: boolean;
   wordBudget: number;
   /** Columns elided although the budget had room to render them whole. */
   starved: number;
@@ -405,6 +401,8 @@ interface Finding {
   shape: Shape;
   /** Per-column natural widths — the outlier tests read these. */
   nat: number[];
+  /** Per-column longest word — the share test reads these. */
+  word: number[];
   /** Outside the band by construction: a word no band width holds, or a
    *  second un-holdable column. Rethink the authoring, not the allocation. */
   outlier: "word" | "giants" | null;
@@ -457,7 +455,15 @@ for (const file of files) {
     const starvedCols = colNat
       .map((n, k) => (n + floorOthers <= budget && (r.elided[k] ?? 0) > 0 ? k : -1))
       .filter((k) => k >= 0);
-    if (r.cuts.length === 0 && r.lines !== r.rows && r.lines >= 0) reflow++;
+    // HIDDEN at the cap: over the cap (no lever) and the render did NOT wrap.
+    // `wrapped` is observed from the render (a body row became a multi-line
+    // block), not recomputed — it is the renderer's own decision, so the reading
+    // cannot drift from it. A forced table that drew whole (measurement fuzz)
+    // produced no marker and is not hidden; the elision gate keeps that honest
+    // where a literal `…` in cell content would otherwise be read as a cut.
+    const wrapped = r.lines > r.rows;
+    const hidden = natural > BAND_CONTENT && !wrapped && r.elided.some((n) => n > 0);
+    if (!hidden && r.lines !== r.rows && r.lines >= 0) reflow++;
     // The last slot is inferred from the header geometry as whatever is left to
     // CONTENT (the header's first line is the title when the table is not
     // isolated). When the table is NOT shrunk that remainder is air, not cell —
@@ -471,9 +477,8 @@ for (const file of files) {
       line: t.line,
       cols: r.slots.length,
       slots,
-      cuts: r.cuts.length,
-      sample: r.cuts[0] ?? starvedCols.map((k) => r.samples[k]).find((s) => s) ?? "",
-      allocatorFault: t.wordBudget <= Math.min(CONTENT, BAND_CONTENT),
+      hidden: hidden ? r.elided.reduce((a, b) => a + b, 0) : 0,
+      sample: r.samples.find((s) => s) ?? starvedCols.map((k) => r.samples[k]).find((s) => s) ?? "",
       wordBudget: t.wordBudget,
       starved: starvedCols.length,
       elided: r.elided.reduce((a, b) => a + b, 0),
@@ -483,6 +488,7 @@ for (const file of files) {
       forced: natural > BAND_CONTENT,
       shape: shapeOf(natural, colNat),
       nat: colNat,
+      word: t.word,
       // Two ways to leave the band, and both are the document's problem:
       // a longest word the band cannot hold at all, or a second column past
       // the band (a prose matrix — two notes pretending to be a table).
@@ -496,14 +502,17 @@ for (const file of files) {
   }
 }
 
-const findings = rowsRead.filter((f) => f.cuts > 0);
+const findings = rowsRead.filter((f) => f.hidden > 0);
 const starvedRows = rowsRead.filter((f) => f.starved > 0);
-findings.sort((a, b) => b.cuts - a.cuts || a.file.localeCompare(b.file));
+findings.sort((a, b) => b.hidden - a.hidden || a.file.localeCompare(b.file));
 starvedRows.sort((a, b) => b.starved - a.starved || a.file.localeCompare(b.file));
-const allocator = findings.filter((f) => f.allocatorFault);
-const irreducible = findings.filter((f) => !f.allocatorFault);
+// Every cut-at-cap table is irreducible: the renderer wraps whatever a word can
+// hold, so what is left hiding is the outlier set. `allocator` is a guard — if
+// it is ever non-zero the renderer failed to wrap a table it should have.
+const allocator = findings.filter((f) => f.outlier === null);
+const irreducible = findings.filter((f) => f.outlier !== null);
 const docs = new Set(findings.map((f) => f.file)).size;
-const cutPoints = findings.reduce((a, f) => a + f.cuts, 0);
+const cutPoints = findings.reduce((a, f) => a + f.hidden, 0);
 const starvedDocs = new Set(starvedRows.map((f) => f.file)).size;
 const starvedCells = starvedRows.reduce((a, f) => a + f.starved, 0);
 const elidedCells = starvedRows.reduce((a, f) => a + f.elided, 0);
@@ -526,8 +535,8 @@ const shapes = (["design", "band", "matrix", "prose"] as Shape[]).map(
 // Worst first: a starved column is the allocator's choice, a cut is a document
 // fault, and both are worse than air under the bar.
 const worst = [...rowsRead]
-  .filter((f) => f.starved > 0 || f.cuts > 0)
-  .sort((a, b) => b.starved - a.starved || b.cuts - a.cuts || b.slack - a.slack || a.file.localeCompare(b.file));
+  .filter((f) => f.starved > 0 || f.hidden > 0)
+  .sort((a, b) => b.starved - a.starved || b.hidden - a.hidden || b.slack - a.slack || a.file.localeCompare(b.file));
 
 if (json) {
   console.log(JSON.stringify({
@@ -536,7 +545,7 @@ if (json) {
     docsWithTables,
     tables,
     reflow,
-    cuts: { tables: findings.length, docs, points: cutPoints },
+    cutAtCap: { tables: findings.length, docs, cells: cutPoints, allocator: allocator.length },
     starved: { tables: starvedRows.length, docs: starvedDocs, columns: starvedCells, elidedCells, unforced: starvedUnforced },
     slack: { tables: slackRows.length, max: maxSlack, content: CONTENT },
     headers: { columns: headerCols, dominated: headerDominated, cut: headerCut, tables: headerCutRows.length },
@@ -556,9 +565,9 @@ if (json) {
   console.log(`  scanned           ${scanned} files`);
   console.log(`  with tables       ${docsWithTables} files, ${tables} tables`);
   console.log(`  reflow only       ${reflow}  (wrapped on word boundaries — intended)`);
-  console.log(`  CUT               ${findings.length} tables in ${docs} files, ${cutPoints} cut points`);
-  console.log(`    allocator fault ${allocator.length}  (the columns could hold every word)`);
-  console.log(`    irreducible     ${irreducible.length}  (a longest word exceeds the whole width)`);
+  console.log(`  CUT AT THE CAP    ${findings.length} tables in ${docs} files, ${cutPoints} hidden cells`);
+  console.log(`    irreducible     ${irreducible.length}  (a word no band width holds, or a prose matrix)`);
+  if (allocator.length > 0) console.log(`    allocator fault ${allocator.length}  (WRAP MISSED — a wrappable table still hid content)`);
   console.log(`  STARVED           ${starvedRows.length} tables in ${starvedDocs} files, ${starvedCells} columns`);
   console.log(`                    (elided while the budget had room to render them whole;`);
   console.log(`                     ${elidedCells} elided cells in those tables, ${starvedUnforced} tables within the band)`);
@@ -569,11 +578,11 @@ if (json) {
   console.log(`  headers           ${headerDominated} of ${headerCols} columns sized by the label, ${headerCut} labels cut`);
 
   if (worst.length > 0 && top > 0) {
-    head(`worst ${Math.min(top, worst.length)} — starved  cuts  file:line  slots  evidence`);
+    head(`worst ${Math.min(top, worst.length)} — starved  hidden  file:line  slots  evidence`);
     for (const f of worst.slice(0, top)) {
-      const kind = f.cuts > 0 && !f.allocatorFault ? "!" : " ";
+      const kind = f.hidden > 0 && f.outlier === null ? "!" : " ";
       console.log(
-        `${kind} ${String(f.starved).padStart(4)}  ${String(f.cuts).padStart(4)}  ${f.file}:${f.line}  ` +
+        `${kind} ${String(f.starved).padStart(4)}  ${String(f.hidden).padStart(6)}  ${f.file}:${f.line}  ` +
           `[${f.slots.join(",")}]  ${f.starvedSample || f.sample}`,
       );
     }
@@ -588,16 +597,16 @@ if (json) {
       }
       console.log(`  the rethink is the document's (or the compositor's), not the allocator's`);
     }
-    if (irreducible.length > 0) {
-      head(`irreducible — no allocation holds these (needs > ${CONTENT})`);
-      for (const f of irreducible) console.log(`  need ${String(f.wordBudget).padStart(3)}  ${f.file}:${f.line}`);
+    if (allocator.length > 0) {
+      head(`allocator fault — a wrappable table still hid content (a regression)`);
+      for (const f of allocator) console.log(`  ${f.file}:${f.line}`);
     }
-    console.log(`\nstarved = columns the allocator starved; ! = a cut with no allocation to blame`);
+    console.log(`\nstarved = columns elided with room to be whole; hidden = content lost at the cap`);
   }
 }
 
 if (strict && findings.length > 0) {
-  console.error(`\ntables-check: FAIL — ${findings.length} table(s) cut a word at ${width} columns`);
+  console.error(`\ntables-check: FAIL — ${findings.length} table(s) hide content at the cap at ${width} columns`);
   process.exit(1);
 }
 if (strictStarved && starvedRows.length > 0) {
@@ -608,6 +617,6 @@ if (strictStarved && starvedRows.length > 0) {
   process.exit(1);
 }
 if (!json) {
-  const parts = [`${findings.length} cut`, `${starvedRows.length} starved`];
+  const parts = [`${findings.length} hidden at the cap`, `${starvedRows.length} starved`];
   console.log(`\ntables-check: ${findings.length + starvedRows.length === 0 ? "OK" : "REPORT"} — ${parts.join(", ")}`);
 }

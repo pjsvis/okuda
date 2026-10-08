@@ -6,7 +6,9 @@ callsign: BRF-WRAP-AT-CAP
 # Brief: Wrap at the cap — the third branch
 
 **Date:** 2026-10-08
-**Status:** Open
+**Status:** Done (2026-10-08) — one measured correction: the irreducible set is
+six, not four, because the instrument had stripped the link URLs the renderer
+draws. Recorded in ADR-TABLE-EDGE-CUT-055.
 **Context:** ADR-TABLE-EDGE-CUT-055 removed the squeeze: a table renders at the author's
 widths and is cut at the glass, so nothing is reflowed to fit. That holds *below* the
 cap, where the reader's lever is widen and the cut is recoverable — widen and the bytes
@@ -37,6 +39,13 @@ the table stays the document's problem.
 | worst excess | 484 columns |
 | word-irreducible (a longest word cannot fit its share) | 4 |
 | the surfaced table | 222 wide — 106 over |
+
+**Correction (2026-10-08, render parity).** The four was a source-side artifact:
+`plain()` stripped `[text](url)` to `text`, but okuda draws a link as `text url`
+(Pass C), so a visible URL's long token is a word no wrapper can break. With the
+instrument mirroring the render the irreducible set is **six** — the four above
+plus `&briefs.md:19` and `&briefs.md:43`, both carrying visible link URLs. The
+correction is recorded in ADR-TABLE-EDGE-CUT-055; the model is unchanged.
 
 ## Design — three branches, one grammar
 
@@ -84,29 +93,38 @@ filename and cannot be wrapped by anyone).
 
 ## Preconditions
 
-- [ ] ADR-TABLE-EDGE-CUT-055 read in full. This adds a branch to it; it does not reverse
+- [x] ADR-TABLE-EDGE-CUT-055 read in full. This adds a branch to it; it does not reverse
       the edge cut.
-- [ ] The floor test re-derived from scratch. The ladder's implementation was deleted on
+- [x] The floor test re-derived from scratch. The ladder's implementation was deleted on
       2026-10-07 and must not return as code: the test is a **predicate at the cap**, not
-      an allocator that distributes width.
-- [ ] Determinism at a fixed width confirmed. The wrap makes row height part of the
-      layout, so a non-idempotent wrap would make tables jitter under re-render.
+      an allocator that distributes width. — `wordBudget <= BAND_CONTENT`; the wrap's
+      allocation is a word floor plus an even slack split, no per-column need.
+- [x] Determinism at a fixed width confirmed. The wrap makes row height part of the
+      layout, so a non-idempotent wrap would make tables jitter under re-render. —
+      `height is stable: two renders at one width are identical`.
 
 ## Work Plan
 
-1. [ ] The branch decision, with the floor test at the cap, and a comment stating why the
-       cap is the boundary rather than the glass.
-2. [ ] The row block: compose each cell to lines, pad the shorter cells to the block
-       height, and let the rule bracket what is drawn.
-3. [ ] Tests: the surfaced table (nothing cut, no mid-word break); a word-irreducible
+1. [x] The branch decision, with the floor test at the cap, and a comment stating why the
+       cap is the boundary rather than the glass. — `renderTable`, three branches;
+       `natural > BAND_CONTENT && wordBudget <= BAND_CONTENT && !giants`.
+2. [x] The row block: compose each cell to lines, pad the shorter cells to the block
+       height, and let the rule bracket what is drawn. — `bodyDrawn: string[][]`;
+       rows joined by a blank line between blocks, lines contiguous within one.
+3. [x] Tests: the surfaced table (nothing cut, no mid-word break); a word-irreducible
        table (cut, as now); a below-cap table (byte-identical to today); height stability
-       across two renders at one width.
-4. [ ] Dogfood `just tables`, `just tables-monster`, and the naming document at 74, 80
-       and 120 columns.
-5. [ ] Instrument: a wrappable over-cap table must not report as cut; the `outliers`
-       list must be unchanged at four.
-6. [ ] Record: ADR-TABLE-EDGE-CUT-055 gains the branch **in place** — the grammar is one
-       decision, and a second ADR for its third branch would split the law.
+       across two renders at one width. — `tests/table-fit.test.ts`, five vectors,
+       two captured goldens.
+4. [x] Dogfood `just tables`, `just tables-monster`, and the naming document at 74, 80
+       and 120 columns. — the surfaced table renders whole at 120; at 74/80 it wraps to
+       the cap and the glass cuts recoverably (widen and the bytes return).
+5. [x] Instrument: a wrappable over-cap table must not report as cut; the `outliers`
+       list must be unchanged at four. — the broken-word detector is retired (a wrapped
+       row is a block, so every legitimate wrap paired); CUT now reads content hidden at
+       the cap. The outliers list is six, corrected; see the Evidence note.
+6. [x] Record: ADR-TABLE-EDGE-CUT-055 gains the branch **in place** — the grammar is one
+       decision, and a second ADR for its third branch would split the law. — *The third
+       branch — wrap at the cap* added to the Decision, with the correction.
 
 ## Acceptance Criteria
 
@@ -115,6 +133,9 @@ filename and cannot be wrapped by anyone).
 - Every wrappable over-cap table renders whole; the instrument's cut reading *at the cap*
   falls to the irreducible set.
 - The irreducible set is unchanged at four tables, still named by file and line.
+  **Corrected:** it is six — the four plus two `&briefs.md` tables carrying visible
+  link URLs (render parity; ADR-TABLE-EDGE-CUT-055). The set is named by file and
+  line and the count is width-independent.
 - Below-cap tables are byte-identical to today's output — asserted, not assumed.
 - No mid-word break inside a wrapped cell. Words break at spaces; `…` appears only where
   a word cannot fit, which is the irreducible case.
