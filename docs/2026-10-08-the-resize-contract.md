@@ -109,6 +109,12 @@ Check this list before adding a block type or changing a wrap behaviour:
 - A frame column that moves with width breaks condition 1, even if the reflow
   itself is otherwise fine.
 
+**The instrument.** `tests/render.test.ts` → *"the resize contract: the frame
+columns survive a width change (fixed edges)"* renders a wrapping heading at
+three widths and asserts the LHS badge column (2), the RHS chip at the line
+edge, and the reserved gap — so a regression in the badge repaint or the gap
+fails loudly rather than being noticed by eye.
+
 ## Related
 
 - `docs/2026-08-25-what-it-feels-like.md` — sub-cortical ETL; the perceptual philosophy

@@ -199,6 +199,26 @@ describe("render — heading RHS chip (right-edge tab)", () => {
     for (const l of chipLines) expect(l[l.length - 2]).toBe(" ");
   });
 
+  test("the resize contract: the frame columns survive a width change (fixed edges)", async () => {
+    // docs/2026-10-08-the-resize-contract.md, condition 1. The LHS badge
+    // column and the RHS chip column are references; they do not move with
+    // width, and the badge is repainted on every wrapped line so the rail
+    // runs the full height of the heading at every width.
+    const src = "# " + "heading word ".repeat(12) + "\n\nbody\n";
+    for (const w of [24, 40, 72]) {
+      const out = await render(src, w);
+      const hdr = lines(out)
+        .map(stripANSI)
+        .filter((l) => l !== "" && l.includes("█") && !l.includes("─"));
+      expect(hdr.length).toBeGreaterThan(1); // wraps at every width tested
+      for (const l of hdr) {
+        expect(l.indexOf("#")).toBe(2); // LHS frame: margin(2) + badge
+        expect(l.endsWith("█")).toBe(true); // RHS frame: chip at the edge
+        expect(l[l.length - 2]).toBe(" "); // reserved gap, never butted
+      }
+    }
+  });
+
   test("chip is constant 1 cell (the H1 unit) regardless of level", async () => {
     const h1 = await render("# One", 40);
     const h2 = await render("## Two", 40);
