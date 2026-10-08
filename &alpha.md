@@ -2,36 +2,25 @@
 
 ## what is this
 
-- **okuda** renders restricted-grammar markdown in the terminal, fast.
+- **Okuda** renders restricted-grammar markdown in the terminal, fast.
 
-- **Gloam** is the search: type to find filenames and content at once;
-  every keystroke re-ranks the silo. Enter reads the document. 
+- **Gloam** is the search: type to find filenames and content; Enter reads the document. 
 
-- **Rooted in a silo** a git repo when launched there. 
+- **Silo** a ailo is a folder or a git repo on your machine
 
-- **Over `ssh://`** when the silo is another machine.
+- **Over `ssh://`** the silo is on another machine
 
 
-## how to move
+## how to operate
 
-- **Type** — the live search is the dereference path. The document's
-  references are plain text; type the callsign and it resolves.
+- **§NN** — rubricated silcrows actuate via [12-98] to render references : the reference renders
+  without silcrows, see [The silcrow explainer](docs/2026-09-04-the-silcrow.md).
 
-- **§NN** — rose vectors after a document's references. The section
-  sign means *reference*: actuate to dereference — the target renders
-  clean, and its references are not shown. The tour cannot run away.
-  [The silcrow explainer](docs/2026-09-04-the-silcrow.md).
+- **BKSP** — unwind: back to the main document, annotated again.
 
-- **u** — unwind: back to the main document, annotated again.
+- **00** — return to he search/filter panel
 
-- **99** — clone: the document you are reading becomes the main
-  document of a new terminal, vectors live. Each level of the tour is
-  a deliberate keystroke and a fresh, stateless instance.
-
-- **q** — quit.
-
-No menus, no state. The map is derived; the paint is illustrative.
-(ADR-031.)
+- **CNTRL+C** — quit
 
 ## the words
 
