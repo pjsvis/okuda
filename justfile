@@ -553,6 +553,13 @@ stamp:
 manifesto:
     @./okuda docs/glow-vs-okuda.md --tui --palette dracula
 
+# ── Print (the paper rung) ───────────────────────────────────
+
+# Render to PDF
+[group('print')]
+pdf *args:
+    @bun scripts/paper.ts {{args}}
+
 # ── Registries ───────────────────────────────────────────────
 
 # Check drift

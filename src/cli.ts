@@ -38,6 +38,9 @@ interface Args {
   entries: string | null;
   /** Declared glass width (`--width`), null = ask the terminal. */
   width: number | null;
+  /** Suppress the receipt — no silcrow paint, no References section
+   *  (the paper rung). */
+  noReferences: boolean;
   extra: string[];
 }
 
@@ -69,11 +72,12 @@ function readingWidth(declared: number | null): number {
 }
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { file: null, watch: false, noColor: false, tui: false, palette: null, grep: null, entries: null, width: null, extra: [] };
+  const args: Args = { file: null, watch: false, noColor: false, tui: false, palette: null, grep: null, entries: null, width: null, noReferences: false, extra: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
     if (a === "--watch" || a === "-w") args.watch = true;
     else if (a === "--no-color") args.noColor = true;
+    else if (a === "--no-references") args.noReferences = true;
     else if (a === "--tui" || a === "-t") args.tui = true;
     else if (a === "--width") {
       const raw = argv[++i] ?? "";
@@ -101,7 +105,7 @@ function parseArgs(argv: string[]): Args {
       args.entries = argv.slice(i + 1).join(" ");
       break;
     } else if (a === "--help" || a === "-h") {
-      process.stdout.write("usage: okuda <file> [--watch] [--tui] [--no-color] [--palette <name>] [--width <cols>]\n");
+      process.stdout.write("usage: okuda <file> [--watch] [--tui] [--no-color] [--palette <name>] [--width <cols>] [--no-references]\n");
       process.stdout.write("       gloam [<query words>] [-g <query>] [--entries <query>]  (live search → read → loop)\n");
       process.exit(0);
     } else if (a === "--version") {
@@ -251,9 +255,19 @@ async function main(): Promise<void> {
     // is present on every rung — glass, pipe, NO_COLOR — while the paint
     // stays TTY-gated. The section joins downstream of the paint; its
     // own callsigns never re-enter the map.
-    const map = jumpMapFor(source, silcrowResolves);
-    const source2 = process.stdout.isTTY ? annotateSource(source, map) : source;
-    const out = await renderDocument(appendReferences(source2, map, process.stdout.isTTY), {
+    //
+    // `--no-references` is the third rung: NO paint and NO receipt. On
+    // paper a silcrow cannot resolve (there is nothing to type `12` into)
+    // and its number is a render-time allocation (ADR-032 — numbers are
+    // dynamic, never authored), so a durable artefact carrying it is
+    // guaranteed to disagree with the next render of the same document.
+    // The receipt is dropped, and the map with it — nothing downstream
+    // needs it.
+    const wantMap = !args.noReferences;
+    const map = wantMap ? jumpMapFor(source, silcrowResolves) : new Map<number, string>();
+    const source2 = process.stdout.isTTY && wantMap ? annotateSource(source, map) : source;
+    const body = wantMap ? appendReferences(source2, map, process.stdout.isTTY) : source2;
+    const out = await renderDocument(body, {
       width,
       palette,
       color,

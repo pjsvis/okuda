@@ -14,6 +14,7 @@ an assumption.
 | `mermaid-to-md` | 0.1.0* | Mermaid → ASCII | 2026-09-02 |
 | `diagram-describe` | — | Mermaid → prose via local LLM (BRF-DIAGRAM-DESCRIBE) | 2026-10-03 |
 | `chroma` | 2.27.0 | Code-fence colour — 16-colour class codes (BRF-FENCE-COLOUR) | 2026-09-29 |
+| `Google Chrome` | 153.0.8010.53 | The paper rung — headless `--print-to-pdf` (`just pdf`) | 2026-10-09 |
 | `fzf` | 0.73.1 | Fuzzy picker — runtime dep of the `gloam` launcher (both modes) | 2026-08-27 |
 | `rg` | 15.1.0 | Source for both `gloam` picker modes — file list, body shortlist, registry prefilter | 2026-09-04 |
 | `fd` | 10.4.2 | ~~File finder — preferred by `gloam`~~ RETIRED from the launcher path (BRF-CONTENT-SHORTLIST) | 2026-08-27 |
@@ -72,6 +73,36 @@ require either. `fd` and the in-process walk fallback retired
 2026-09-04 — rg respects `.gitignore` uniformly, so the
 include/exclude question is a `.gitignore` decision, not a codepath
 accident.
+
+## The paper rung — Chrome as a printer, not a renderer (verified 2026-10-09)
+
+`just pdf <file>` renders the streaming canvas to a colour PDF. The chain is
+`okuda --no-references | ansi→HTML | Chrome --headless --print-to-pdf`, and it
+sits **outside** okuda: the binary neither knows nor cares that a page exists.
+
+The dependency is declared because the recipe is: **Chrome is used as a
+printer, not as a renderer.** okuda decides the layout — width, wrapping,
+colours, elision — and the HTML is a single `pre` with `white-space: pre`, so
+the browser cuts pages and changes nothing else. No reflow, no re-typesetting.
+
+Alternatives measured the same day, and why they are not used:
+
+- **pandoc → PDF is impossible here.** No LaTeX engine is installed
+  (`pdflatex`, `xelatex`, `lualatex`, `tectonic` all absent), so pandoc cannot
+  emit a PDF on this machine. It is also the wrong shape: a re-typeset document
+  is a *different arrangement*, and the arrangement is the content
+  (`docs/2026-09-14-derrida-and-the-decomposed-pdf.md`).
+- **`cupsfilter` cannot do it**: `cupsfilter -m application/pdf file.html` exits
+  1 with *"No filter to convert from text/html to application/pdf"*. There is no
+  zero-dependency system route.
+- **`wkhtmltopdf`, `weasyprint`, `typst`, `aha`, `ansi2html`** are all absent.
+  The ANSI→HTML step is therefore part of the recipe rather than an installed
+  tool; it is ~40 lines in `scripts/paper.ts`.
+
+Requirement: **the compiled `okuda` must be fresh** (`just build`). The script
+falls back to `bun run src/cli.ts` and says so, because a stale binary would
+silently print an old render — the paper rung's own version of the stale-icon
+problem.
 
 ## Runtime dependency note
 
