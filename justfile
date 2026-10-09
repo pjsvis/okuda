@@ -59,6 +59,22 @@ protocol-install:
     @cp system.md "$HOME/.pi/agent/AGENTS.md"
     @echo "protocol installed: system.md -> ~/.pi/agent/AGENTS.md"
 
+# ── td (task identity) ───────────────────────────────────────
+
+# Task last
+[group('td')]
+td-last:
+    @td last
+
+[group('td')]
+td-history n:
+    @td last -n {{n}}
+
+# Task undo
+[group('td')]
+td-undo:
+    @td undo
+
 # AMPER drift
 [group('navigation')]
 amp:

@@ -279,6 +279,23 @@ td blocked              # blocked issues
 td critical-path        # sequence that unblocks the most work
 ```
 
+### What just happened? — the recipes
+
+Three thin wrappers, so a change is checkable in one keystroke rather than a
+remembered incantation:
+
+```bash
+just td-last            # the last action performed
+just td-history 20      # the last 20 actions
+just td-undo            # reverse the last reversible action in this session
+```
+
+**`td undo` is session-scoped.** It reverses the last reversible action
+*performed in the current session* — not globally, and not one done by another
+agent. So it is a safety valve, not a time machine. Every action is also written
+to the store's `action_log` (old state, new state, an `undone` flag), so the
+record is attributable even where undo cannot reach.
+
 ### Multi-issue work sessions
 
 Group related issues under one work session — shared logging, shared handoff, cross-session continuity:
