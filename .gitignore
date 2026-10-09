@@ -2,7 +2,9 @@
 .DS_Store
 
 # Bun / Node
-node_modules/
+# No trailing slash: matches a symlink or a file of that name too, not only
+# a directory (a worktree convenience link committed once, 2026-10-09).
+node_modules
 *.log
 .env
 
