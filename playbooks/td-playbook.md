@@ -93,6 +93,14 @@ Before every commit:
 just check
 ```
 
+`just check` now includes **`tree-lint`** — no tracked symlinks, no
+`node_modules` — because a worktree convenience symlink rode a push to origin on
+2026-10-09. To also catch it at push time, install the hooks once per clone:
+
+```bash
+just hooks-install     # git config core.hooksPath .githooks
+```
+
 ## Ending Work
 
 Capture context, then submit for review:

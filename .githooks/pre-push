@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# pre-push — the tree leaves the machine clean.
+#
+# Install: `just hooks-install` (sets core.hooksPath to .githooks).
+# Why: a worktree convenience symlink rode a push to origin on 2026-10-09
+# (07d3be9, repaired in 97924b0 + 9a85bbf). `just check` catches it at commit
+# time; this catches it at push time, when the check was skipped.
+set -euo pipefail
+
+root="$(git rev-parse --show-toplevel)"
+exec bash "$root/scripts/tree-lint.sh"
