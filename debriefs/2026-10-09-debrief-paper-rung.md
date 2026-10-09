@@ -163,6 +163,22 @@ so it becomes ink for no information. One ink for the frame, colour for the role
 and the two ends of a heading line match by construction — no palette knowledge in
 the transform, no case list: `paperInk(loadPalette().muted)`.
 
+**A renderer finding, from reading paper (operator's report, 2026-10-09).** *"Nested
+blockquotes collapse to a single pipe which should be the same colour as the
+quotes."* The bytes agreed and located it: on the glass the pipe is
+`palette.blockquote` (`#7788aa`) and the quoted text is `palette.emphasis`
+(`#e0b45c`), because the aside *is* an emphasis-italic — its italic is the
+identity, and its hue came along with the role. So the pipe and its own text
+disagreed on **every** rung, not only on paper: the paper read merely made it
+visible.
+
+The fix is where colour lives — the okuda preset sets `blockquote` to the aside's
+ink — so the cue and the content agree on glass, paper and TUI at once, while the
+slant remains the aside's identity. **Not** a print-side remap: a repair in the
+printer would have left the terminal wrong and put the two rungs into the kind of
+disagreement this whole rung exists to avoid. The dracula preset is left alone: it
+mirrors Glow, and Glow's pipe recedes.
+
 ## The habit that earned its keep
 
 Three times in one day, the gate was green while the artefact was wrong: the

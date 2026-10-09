@@ -80,7 +80,11 @@ export type Palette = Record<Role, string>;
  *             (TUI chrome, not markdown; design ref: glow's status badge)
  *   badge-fg #f8f8f2 (Dracula near-white) — Gloam footer badge foreground
  *   muted    #585858  (240, dim gray)     — Glow horizontal rule
- *   blockquote #767676 (243, gray)        — quote pipe, recedes
+ *   blockquote #767676 (243, gray)        — quote pipe, recedes (GLOW PARITY:
+ *             this preset keeps Glow's grey pipe. The okuda preset sets the cue
+ *             to the aside's own ink (#e0b45c) instead, so the pipe and the
+ *             quoted text are one hue — the cue and the content agree, and a
+ *             nested blockquote's single pipe reads as part of the quote.)
  * Diagram roles have no Glow equivalent; they reuse Glow channels:
  *   border = muted, arrow = link green, text = doc near-white.
  * Table roles keep okuda's semantic layer (brief: table policy), tuned

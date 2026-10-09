@@ -19,6 +19,23 @@ That is the design: **one render, two artefacts.** The PDF is the streaming
 canvas with paper under it, not a second layout. okuda keeps deciding width,
 wrapping, colour roles and elision; the chain below only prints.
 
+## What the paper read found in the renderer
+
+The rung is a *reader* of every other decision, and reading the page has twice
+found something that belonged upstream rather than in the printer:
+
+- **The heading badge is emitted, not gated** — it was this transform's own
+  background clamp that lost it (see the debrief; the plausible reason was
+  wrong).
+- **The quote cue did not match its own text.** Read on paper, the pipe was
+  blue-grey and the quoted text gold; on the glass it is the same, because the
+  aside is an **emphasis-italic** (that is its identity) while the pipe takes the
+  `blockquote` role. Fixed where colour lives: the okuda preset's `blockquote` is
+  now the aside's own ink (`#e0b45c`), so the cue and the content are one hue on
+  every rung — glass, paper, TUI — with the slant still the aside's identity. The
+  **dracula preset keeps Glow's grey pipe**: that preset's job is parity, not our
+  taste.
+
 ## The defaults are the printer's, not the terminal's
 
 **80 columns**, and the reason matters more than the number: paper is the one

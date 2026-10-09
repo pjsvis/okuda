@@ -299,3 +299,25 @@ describe("palette — dracula contract + override loader", () => {
     expect(s.role("diagram-arrow", "→")).toContain("38;2;18;52;86");
   });
 });
+
+describe("the quote cue is the aside's own ink (BRF-PAPER-RUNG)", () => {
+  // Surfaced by reading the paper page: the pipe was blue-grey and the quoted
+  // text gold. The aside is an emphasis-italic (that is its identity), so its
+  // ink is the emphasis role; the okuda preset therefore sets `blockquote` — the
+  // pipe's role — to the same value, and the cue and the content are one hue on
+  // every rung (glass, paper, TUI). The dracula preset keeps Glow's grey pipe:
+  // that preset's job is parity, not our taste.
+  test("the okuda preset's pipe and its quoted text are one colour, italic apart", () => {
+    const s = makeStyler(okudaPreset, "truecolor");
+    const ink = (seq: string) => seq.match(/38;2;(\d+;\d+;\d+)/)?.[1];
+    expect(okudaPreset.blockquote).toBe(okudaPreset.emphasis);
+    expect(ink(s.quotePipe())).toBe(ink(s.roleItalic("emphasis", "q")));
+  });
+
+  test("and the pipe is still just a pipe — the italic stays the aside's identity", () => {
+    const s = makeStyler(okudaPreset, "truecolor");
+    // The slant rides inside the colour sequence (…;3m), not a standalone SGR 3.
+    expect(s.quotePipe()).not.toContain(";3m"); // no slant on the cue
+    expect(s.roleItalic("emphasis", "q")).toContain(";3m"); // the aside is italic
+  });
+});
