@@ -82,6 +82,9 @@ work.
   the transform (colour still signals structure).
 - The prose and layout are identical to the piped render; only the receipt and
   the ink polarity differ — pinned by `tests/paper-rung.test.ts`.
+- Marks survive: a fill (a background equal to its foreground — the heading
+  badges, the chips) prints as one solid dark block, so the okudagram identity
+  reads on paper as it does on the glass.
 - No new okuda runtime dependency: the binary does not know the chain exists.
 - No palette file, no light mode: the transform is a function, not a theme.
 - `just check` green; `bun test` passes.

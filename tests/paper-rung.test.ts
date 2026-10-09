@@ -124,3 +124,40 @@ describe("the paper ink — black-ish on white, with no light mode (BRF-PAPER-RU
     }
   });
 });
+
+describe("fills survive the ink transform — a badge is a mark, not a surface", () => {
+  test("a background equal to its foreground stays one solid ink", async () => {
+    const { toHtml } = await import("../scripts/paper");
+    // Exactly what okuda emits for a heading marker: bg and fg the same colour,
+    // the glyph inside, then a reset.
+    const badge = toHtml("\x1b[48;2;153;204;255m\x1b[38;2;153;204;255m#\x1b[0m");
+    const m = badge.match(/color:(#[0-9a-f]{6});background-color:(#[0-9a-f]{6})/);
+    expect(m).not.toBeNull();
+    expect(m![1]).toBe(m![2]); // same ink → the glyph hides inside the block
+  });
+
+  test("a surface behind other text still goes white (paper's rule)", async () => {
+    const { toHtml, relLum } = await import("../scripts/paper");
+    const highlight = toHtml("\x1b[48;2;40;42;54m\x1b[38;2;248;248;242mtext\x1b[0m");
+    const bg = highlight.match(/background-color:(#[0-9a-f]{6})/)![1]!;
+    expect(relLum(bg)).toBeGreaterThan(0.9);
+  });
+
+  test("the corpus's bytes carry fills (the fact I first got wrong)", async () => {
+    const out = Bun.spawnSync(["bun", "run", CLI, DOC, "--no-references"], {
+      stdout: "pipe",
+      env: { ...process.env, FORCE_COLOR: "1" },
+    }).stdout.toString();
+    const fills = [...out.matchAll(/\x1b\[48;2;(\d+;\d+;\d+)m\x1b\[38;2;(\d+;\d+;\d+)m/g)].filter(
+      (m) => m[1] === m[2],
+    );
+    expect(fills.length).toBeGreaterThan(10); // badges and chips, piped and all
+  });
+
+  test("a fill is a visible mark: it clears 3:1 on white", async () => {
+    const { paperInk, contrastWhite } = await import("../scripts/paper");
+    for (const mark of ["#99ccff", "#445566"]) {
+      expect(contrastWhite(paperInk(mark))).toBeGreaterThanOrEqual(3);
+    }
+  });
+});

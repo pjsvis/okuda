@@ -136,6 +136,70 @@ export function paperFontPt(cols: number): number {
 
 // ── Args ─────────────────────────────────────────────────────────────
 
+const esc = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const hex = (n: string) => Number(n).toString(16).padStart(2, "0");
+
+/** The ANSI→HTML pass. Exported for its own test: the fill rule is a decision,
+ *  not an implementation detail. */
+export function toHtml(src: string): string {
+  let out = "";
+  let last = 0;
+  let open = false;
+  let attrs: string[] = [];
+  let fg: string | undefined;
+  let bg: string | undefined;
+
+  /** The run's CSS. A background EQUAL to its foreground is a **fill**, not a
+   *  surface: the glyph is meant to vanish inside it — the heading badge
+   *  (`48;2;c` + `38;2;c` + `#`) and the chips. Both sides therefore take the
+   *  same paper ink and the mark survives as a solid block. A background behind
+   *  differently-coloured text is a *surface*, and paper's surfaces are white.
+   *  (Inverse is emitted nowhere in the corpus, so there is no case for it.) */
+  const style = (): string => {
+    const parts = [...attrs];
+    if (fg !== undefined && fg === bg) {
+      const ink = paperInk(fg);
+      parts.push(`color:${ink}`, `background-color:${ink}`);
+    } else {
+      if (fg !== undefined) parts.push(`color:${paperInk(fg)}`);
+      if (bg !== undefined) parts.push(`background-color:${paperInk(bg, true)}`);
+    }
+    return parts.join(";");
+  };
+
+  for (const m of src.matchAll(/\x1b\[([0-9;]*)m/g)) {
+    out += esc(src.slice(last, m.index));
+    last = (m.index ?? 0) + m[0].length;
+    const p = (m[1] ?? "").split(";");
+    for (let i = 0; i < p.length; i++) {
+      const code = p[i]!;
+      if (code === "0") {
+        attrs = [];
+        fg = undefined;
+        bg = undefined;
+      } else if (code === "1") attrs.push("font-weight:700");
+      else if (code === "3") attrs.push("font-style:italic");
+      else if (code === "4") attrs.push("text-decoration:underline");
+      else if (code === "9") attrs.push("text-decoration:line-through");
+      else if ((code === "38" || code === "48") && p[i + 1] === "2") {
+        const rgb = `#${hex(p[i + 2]!)}${hex(p[i + 3]!)}${hex(p[i + 4]!)}`;
+        if (code === "38") fg = rgb;
+        else bg = rgb;
+        i += 4;
+      }
+    }
+    if (open) out += "</span>";
+    const css = style();
+    if (css) {
+      out += `<span style="${css}">`;
+      open = true;
+    } else open = false;
+  }
+  out += esc(src.slice(last));
+  return open ? out + "</span>" : out;
+}
+
 if (import.meta.main) {
 const argv = process.argv.slice(2);
 let file = "";
@@ -184,43 +248,6 @@ const ansi = rendered.stdout.toString();
 
 // ── 2. ANSI → HTML (the only transform) ──────────────────────────────
 
-const esc = (s: string) =>
-  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-const hex = (n: string) => Number(n).toString(16).padStart(2, "0");
-
-function toHtml(src: string): string {
-  let out = "";
-  let last = 0;
-  let open = false;
-  let styles: string[] = [];
-  for (const m of src.matchAll(/\x1b\[([0-9;]*)m/g)) {
-    out += esc(src.slice(last, m.index));
-    last = (m.index ?? 0) + m[0].length;
-    const p = (m[1] ?? "").split(";");
-    for (let i = 0; i < p.length; i++) {
-      const code = p[i]!;
-      if (code === "0") styles = [];
-      else if (code === "1") styles.push("font-weight:700");
-      else if (code === "3") styles.push("font-style:italic");
-      else if (code === "4") styles.push("text-decoration:underline");
-      else if (code === "9") styles.push("text-decoration:line-through");
-      else if (code === "7") styles.push("filter:invert(1)");
-      else if ((code === "38" || code === "48") && p[i + 1] === "2") {
-        const rgb = `#${hex(p[i + 2]!)}${hex(p[i + 3]!)}${hex(p[i + 4]!)}`;
-        const ink = paperInk(rgb, code === "48");
-        styles.push(`${code === "38" ? "color" : "background-color"}:${ink}`);
-        i += 4;
-      }
-    }
-    if (open) out += "</span>";
-    if (styles.length) {
-      out += `<span style="${styles.join(";")}">`;
-      open = true;
-    } else open = false;
-  }
-  out += esc(src.slice(last));
-  return open ? out + "</span>" : out;
-}
 
 const commit = spawnSync("git", ["rev-parse", "--short=7", "HEAD"], { cwd: ROOT })
   .stdout.toString()

@@ -111,6 +111,24 @@ backgrounds, and a dropped background turns a dark-theme PDF into light-grey
 text on white: a document that is barely there. Cheap and robust happen to be
 the same fix.
 
+**Fills — a badge is a mark, not a surface.** A background *equal* to its
+foreground is not a surface behind text: it is a **fill**, and the glyph is meant
+to vanish inside it. okuda emits exactly that for the heading badge
+(`48;2;c` + `38;2;c` + `#`) and for the right-edge chips. Both sides of a fill
+therefore take the *same* paper ink, so the mark prints as one solid dark block
+and the okudagram identity reads on paper as it does on the glass. Only a
+background behind *differently* coloured text is a surface, and surfaces are
+white.
+
+That was a correction to the *reason* before it was a correction to the code: the
+first printable draft showed plain `##` markers and the plausible explanation was
+"paint is TTY-gated, so paper never gets badges". The bytes say otherwise —
+`\x1b[48;2;153;204;255m\x1b[38;2;153;204;255m#` is right there in the piped
+render — and what actually lost the badge was this transform's own background
+clamp, turning the fill white while the glyph stayed dark. The silcrow paint *is*
+gated off-glass; the heading badge never was. **The wrong reason was the
+plausible one, which is why the byte check came before the fix.**
+
 ## The habit that earned its keep
 
 Three times in one day, the gate was green while the artefact was wrong: the
