@@ -825,3 +825,38 @@ describe("render — the GLöam wordmark (render-time metal umlaut)", () => {
     expect(displayWidth("GL\u00f6am")).toBe(5);
   });
 });
+
+// ── Stream identity header (BRF-STREAM-IDENTITY-HEADER). The streaming path
+//    names the document for an unknown destination: one muted line, a blank,
+//    the body. Absent segments collapse; nothing → no header at all.
+describe("render — stream identity header (BRF-STREAM-IDENTITY-HEADER)", () => {
+  const ID = { silo: "okuda", callsign: "ADR-031", file: "decisions/031-main-document.md" };
+  const run = (extra: object, color: "truecolor" | "none" = "truecolor") =>
+    renderDocument("# Title\n\nBody\n", { width: 60, color, palette: DRACULA_PALETTE, ...extra });
+
+  test("full identity: muted line, blank, then the body", async () => {
+    const out = await run(ID);
+    const l = lines(out);
+    expect(stripANSI(l[0]!)).toBe("  okuda · ADR-031 · decisions/031-main-document.md");
+    expect(l[0]).toContain("\x1b[38;2;"); // muted on the glass
+    expect(l[1]).toBe(""); // the separator that survives every medium
+    expect(stripANSI(l[2]!)).toContain("Title");
+  });
+
+  test("absent segments collapse — only what is available is shown", async () => {
+    const out = await run({ silo: "okuda", file: "docs/note-20260905.md" });
+    expect(stripANSI(lines(out)[0]!)).toBe("  okuda · docs/note-20260905.md");
+  });
+
+  test("no identity at all → no header, never a placeholder", async () => {
+    const out = await run({});
+    expect(lines(out)[0]).toBe(""); // the usual leading blank stands
+    expect(out).not.toContain("·");
+  });
+
+  test("NO_COLOR: the header is plain — no escape, identical line breaks", async () => {
+    const out = await run(ID, "none");
+    expect(lines(out)[0]).toBe("  okuda · ADR-031 · decisions/031-main-document.md");
+    expect(lines(out)[1]).toBe("");
+  });
+});

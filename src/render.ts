@@ -136,6 +136,14 @@ export interface RenderOptions {
    *  the seam a hermetic test needs: with the real binary on PATH the
    *  "absent binary" case would call a local model and hang. */
   describeBin?: string;
+  /** Identity header — `silo · callsign · filename` — for the streaming
+   *  path, where the destination is unknown and the content must name
+   *  itself (BRF-STREAM-IDENTITY-HEADER). Absent segments collapse; none
+   *  present → no header, never a placeholder (stdin is anonymous). The
+   *  TUI passes nothing: it carries identity in the footer (ADR-020). */
+  silo?: string;
+  callsign?: string;
+  file?: string;
 }
 
 // ── Mermaid pipe ─────────────────────────────────────────────────────
@@ -409,7 +417,19 @@ export async function renderDocument(
     const rail = ctx.width - 4; // chip + space + rail + space + chip = width
     out = rendered + styler.headingChip() + " " + styler.rule(rail) + " " + styler.headingChip() + "\n";
   }
-  return finalize(out);
+  const body = finalize(out);
+  // Identity header (BRF-STREAM-IDENTITY-HEADER): where the destination is
+  // unknown — a pipe, a page, a pin array, an agent's context — the content
+  // names itself. One line, a blank, the body: the blank is the separator
+  // that survives every medium, and the muted colour (provenance, not alarm)
+  // is a bonus on the glass. Absent segments collapse; none present → no
+  // header at all, never a placeholder. Emitted downstream of the caller's
+  // `scanReferences`, so the header's own callsign never re-enters the map.
+  const identity = [opts.silo, opts.callsign, opts.file].filter(
+    (s): s is string => typeof s === "string" && s !== "",
+  );
+  if (identity.length === 0) return body;
+  return "  " + styler.role("muted", identity.join(" \u00b7 ")) + "\n" + body;
 }
 
 /**

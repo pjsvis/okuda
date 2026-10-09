@@ -14,7 +14,7 @@
 import { detectColorMode } from "./ansi";
 import { loadPalette } from "./palette";
 import { renderDocument, wrapWholeFile } from "./render";
-import { runTui } from "./tui";
+import { runTui, displayPath } from "./tui";
 import { runLauncher, invokedAsGloam, rankedShortlistEntries } from "./launcher";
 import {
   detectRoot,
@@ -235,6 +235,11 @@ async function main(): Promise<void> {
     process.exit(1);
   }
   const palette = loadPalette(args.palette ? { name: args.palette } : undefined);
+  // Identity resolvers (BRF-STREAM-IDENTITY-HEADER): the streaming render
+  // names itself, because its destination is unknown. Resolved once per
+  // process; the header is added downstream of `scanReferences`, so its
+  // callsign never re-enters the map.
+  const callsignFor = makeCallsignResolver(cwd);
 
   const draw = async (): Promise<void> => {
     const source = await readSource(args.file);
@@ -252,6 +257,14 @@ async function main(): Promise<void> {
       width,
       palette,
       color,
+      // stdin (no file argument) is anonymous: no name, no header.
+      ...(args.file
+        ? {
+            silo: root?.badge,
+            callsign: callsignFor(args.file) ?? undefined,
+            file: displayPath(args.file),
+          }
+        : {}),
     });
     if (args.watch) {
       process.stdout.write("\x1b[2J\x1b[3J\x1b[H"); // clear + home

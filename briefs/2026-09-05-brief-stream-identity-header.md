@@ -6,8 +6,8 @@ callsign: BRF-STREAM-IDENTITY-HEADER
 # Brief: Stream identity header — name the document for the unknown destination
 
 **Date:** 2026-09-05
-**Status:** Open
-**Branch:** TBD
+**Status:** Done — landed 2026-10-09 (the streaming render names itself: `silo · callsign · filename`; the TUI passes no identity, keeping it in the footer per ADR-020)
+**Branch:** feat/stream-identity-header
 
 ## Context
 
