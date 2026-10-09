@@ -153,6 +153,16 @@ Two things follow, and neither is code in okuda:
   backend this rung refuses, so it stays a *printer-layout* question rather than
   becoming a document-structure one.
 
+**The diagonal collapses on paper (operator's call, 2026-10-09).** Asked for the
+LHS badge to take the RHS chip's colour, the rule is stated rather than the case
+patched: *on paper every fill takes the chrome ink* — the palette's `muted`, which
+is what the chip is painted in. The glass spends two hues on a heading line
+deliberately (`heading blue on top+LHS (content), muted on RHS+footer (chrome)`);
+on paper the badge's hue is redundant with the title text sitting right beside it,
+so it becomes ink for no information. One ink for the frame, colour for the roles,
+and the two ends of a heading line match by construction — no palette knowledge in
+the transform, no case list: `paperInk(loadPalette().muted)`.
+
 ## The habit that earned its keep
 
 Three times in one day, the gate was green while the artefact was wrong: the

@@ -100,6 +100,12 @@ work.
 - Marks survive: a fill (a background equal to its foreground — the heading
   badges, the chips) prints as one solid dark block, so the okudagram identity
   reads on paper as it does on the glass.
+- **One ink for the frame**: on paper every fill takes the palette's `muted` (the
+  RHS chip's ink), so the LHS badge matches the RHS chip. The glass deliberately
+  colours the badge with the heading role — *heading blue on top+LHS (content),
+  muted on RHS+footer (chrome)* — and on paper that diagonal collapses, because
+  the heading's hue is already carried by its own title text. Colour for the
+  roles; one ink for the frame.
 - No new okuda runtime dependency: the binary does not know the chain exists.
 - No palette file, no light mode: the transform is a function, not a theme.
 - `just check` green; `bun test` passes.

@@ -184,3 +184,30 @@ describe("paper's defaults are the printer's, not the terminal's (BRF-PAPER-RUNG
     expect(lines).toBe(paperLinesPerPage(10));
   });
 });
+
+describe("one ink for the frame — the badge matches the chip (BRF-PAPER-RUNG)", () => {
+  test("a heading badge and a chip land in the SAME ink, whatever their colours", async () => {
+    const { toHtml, paperInk, DEFAULT_MUTED } = await import("../scripts/paper");
+    const ink = paperInk(DEFAULT_MUTED);
+    const badge = toHtml("\x1b[48;2;153;204;255m\x1b[38;2;153;204;255m#\x1b[0m"); // heading role
+    const chip = toHtml("\x1b[48;2;68;85;102m\x1b[38;2;68;85;102m█\x1b[0m"); // muted role
+    expect(badge).toContain(`color:${ink};background-color:${ink}`);
+    expect(chip).toContain(`color:${ink};background-color:${ink}`);
+    expect(ink).not.toBe(paperInk("#99ccff")); // not the heading's mirrored hue
+  });
+
+  test("the whole page agrees: every fill is that one ink", async () => {
+    const { paperInk, DEFAULT_MUTED } = await import("../scripts/paper");
+    const { stdout } = Bun.spawnSync(["bun", "run", CLI, DOC, "--no-references"], {
+      stdout: "pipe",
+      env: { ...process.env, FORCE_COLOR: "1" },
+    });
+    const { toHtml } = await import("../scripts/paper");
+    const html = toHtml(stdout.toString(), paperInk(DEFAULT_MUTED));
+    const inks = new Set(
+      [...html.matchAll(/color:(#[0-9a-f]{6});background-color:#[0-9a-f]{6}/g)].map((m) => m[1]),
+    );
+    expect(inks.size).toBe(1);
+    expect([...inks][0]).toBe(paperInk(DEFAULT_MUTED));
+  });
+});

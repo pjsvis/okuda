@@ -22,6 +22,7 @@
 import { spawnSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
+import { loadPalette } from "../src/palette";
 
 const ROOT = resolve(dirname(Bun.file(import.meta.path).name ?? import.meta.path), "..");
 const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
@@ -32,6 +33,13 @@ export const PAGE_MM = { width: 210, margin: 8 };
 export const ADVANCE_EM = 0.61;
 /** The largest type the paper rung will use, in points. */
 export const MAX_FONT_PT = 10;
+
+/** The okuda preset's `muted` — the CHIP's colour (`src/palettes/okuda.json`,
+ *  via `headingChip`), and therefore the paper rung's mark ink. The CLI passes
+ *  the live palette's instead (so a `--palette` render keeps the relationship);
+ *  this default exists so the transform is testable without the machine's
+ *  palette file. */
+export const DEFAULT_MUTED = "#445566";
 
 /** WCAG relative luminance of an `#rrggbb` string, 0 (black) to 1 (white). */
 export function relLum(hex: string): number {
@@ -163,7 +171,7 @@ const hex = (n: string) => Number(n).toString(16).padStart(2, "0");
 
 /** The ANSI→HTML pass. Exported for its own test: the fill rule is a decision,
  *  not an implementation detail. */
-export function toHtml(src: string): string {
+export function toHtml(src: string, markInk: string = paperInk(DEFAULT_MUTED)): string {
   let out = "";
   let last = 0;
   let open = false;
@@ -173,15 +181,22 @@ export function toHtml(src: string): string {
 
   /** The run's CSS. A background EQUAL to its foreground is a **fill**, not a
    *  surface: the glyph is meant to vanish inside it — the heading badge
-   *  (`48;2;c` + `38;2;c` + `#`) and the chips. Both sides therefore take the
-   *  same paper ink and the mark survives as a solid block. A background behind
-   *  differently-coloured text is a *surface*, and paper's surfaces are white.
-   *  (Inverse is emitted nowhere in the corpus, so there is no case for it.) */
+   *  (`48;2;c` + `38;2;c` + `#`) and the chips.
+   *
+   *  On paper EVERY fill takes the chrome ink — the palette's `muted`, which is
+   *  what the RHS chip is painted in. The glass deliberately colours the LHS
+   *  badge with the heading role (*heading blue on top+LHS (content), muted on
+   *  RHS+footer (chrome)*), and on paper that diagonal collapses: the heading's
+   *  colour is already carried by its own title text, so spending a second hue
+   *  on the marker is ink for no information. One ink for the frame, colour for
+   *  the roles, and the two ends of a heading line match by construction.
+   *
+   *  A background behind differently-coloured text is a *surface*, and paper's
+   *  surfaces are white. (Inverse is emitted nowhere in the corpus.) */
   const style = (): string => {
     const parts = [...attrs];
     if (fg !== undefined && fg === bg) {
-      const ink = paperInk(fg);
-      parts.push(`color:${ink}`, `background-color:${ink}`);
+      parts.push(`color:${markInk}`, `background-color:${markInk}`);
     } else {
       if (fg !== undefined) parts.push(`color:${paperInk(fg)}`);
       if (bg !== undefined) parts.push(`background-color:${paperInk(bg, true)}`);
@@ -275,6 +290,9 @@ const commit = spawnSync("git", ["rev-parse", "--short=7", "HEAD"], { cwd: ROOT 
   .trim();
 const fontPt = paperFontPt(width);
 const linesPerPage = paperLinesPerPage(fontPt);
+// The palette the render used (loadPalette reads the machine's override, as
+// okuda does), so the mark ink follows a --palette render.
+const markInk = paperInk(loadPalette().muted);
 const html = `<!doctype html>
 <meta charset="utf-8">
 <title>${esc(basename(file))}</title>
@@ -288,7 +306,7 @@ const html = `<!doctype html>
           color: #6b7280; margin-top: 6mm; -webkit-print-color-adjust: exact;
           print-color-adjust: exact; }
 </style>
-<pre>${toHtml(ansi)}</pre>
+<pre>${toHtml(ansi, markInk)}</pre>
 <div class="prov">rendered projection · okuda&nbsp;${esc(commit)} · ${esc(file)} · ${width} cols at ${fontPt}pt · ${new Date().toISOString().slice(0, 10)} · no silcrows (they cannot resolve on paper) · ink mirrored for paper</div>
 `;
 
