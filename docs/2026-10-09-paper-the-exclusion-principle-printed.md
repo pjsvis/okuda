@@ -97,7 +97,8 @@ look at it" is a milestone, not a nicety.
 of them in the *measuring apparatus*: a census used as an enumeration, a lint
 invocation, a claim about paint gating, a regex that matched `color:#…` inside
 `background-color:#…`. When a test fails and the artefact has already been looked
-at, read the assertion before the code.
+at, read the assertion before the code. The reader's apparatus is an instrument of
+  the same kind, and it drifts silently — see **L11**.
 
 **L6 — A default is a statement about the medium.** 100 columns packed more text
 per sheet and read *worse* (9pt, tighter margins); 80 columns is the printer's
@@ -130,6 +131,40 @@ do it.
 The page's claims are perceptual and testable: it scans, it lands, it holds.
 Worth being blunt about: **"professional" is the shite register** — it optimises
 for how the artefact is read *socially* rather than how it is read *by an eye*.
+
+**L11 — The reader's apparatus is in the system.** The operator, reading the
+printed document on glass: *"all of a sudden the whiteness seemed less white and
+more light sepia … the whole page seemed to have changed its relative brightness
+and become more comfortable and subdued and still very legible."* **The file had
+not changed** — the page's white is `#ffffff` and has been since the ink transform
+— so the change was in the apparatus: the display's own colour management (True
+Tone and Night Shift move the white point continuously, by design
+imperceptibly), or the eye's adaptation (light adaptation dims a bright field over
+minutes; chromatic adaptation to a blue-biased field walks the internal white
+point down the colour temperature, so the same pixels later *read* warm).
+
+Two consequences, pointing in opposite directions:
+
+- **Suspect the apparatus before the file.** A change with no corresponding change
+  in the artefact is an instrument fault — the sixth of the day, and the least
+  inspected instrument we own. The discriminators are cheap: the display settings;
+  a screenshot, which captures the framebuffer, so a warm screen against a cool
+  capture convicts the display pipeline; or a sheet of real paper held beside the
+  glass.
+- **Do not compensate for it inside the artefact.** A warm off-white page would
+  start the screen reader where their eye ends up — and it would be *ink on
+  paper*: a tint that fights real stock, and that makes the page's white something
+  *we* rendered rather than something the paper supplies. **The white belongs to
+  the medium**, the same principle as the ink mirror.
+
+Hutchins' frame is the right one, and this silo already keeps it
+(`docs/cognition-in-the-wild.md`): the unit of analysis is representational state
+*propagating between media*, not the page and not the reader. The relay here runs
+render → PDF page → display pipeline → retina → comprehension, and the silo owns
+the first two links only. **The observation is evidence that the other three are
+in the system** — a display's white is an emissive, blue-biased stand-in for
+paper's reflected, warm one, which is why an eye left alone walks it toward sepia,
+and why that felt *restful* rather than wrong.
 
 ## The 290 sorts — the flush edge, bought, and given away
 
@@ -234,4 +269,6 @@ invisible given — a grid — is what makes it free.
 - `docs/2026-09-05-frame-as-shite-filter.md` — the posture, at two scales; this is the third
 - `docs/2026-10-06-the-eink-frame-is-a-second-host.md` — the sibling rung, and the same portability discovery
 - `docs/2026-09-14-derrida-and-the-decomposed-pdf.md` — a derived artefact declares itself derived; a pointer resolves
+- `docs/cognition-in-the-wild.md` — Hutchins' frame: the unit of analysis is the
+  relay between media. L11 is its instance at the reading surface
 - `ADR-DOCUMENT-LIFECYCLE-057` — the ephemeral register, where the PDF is written

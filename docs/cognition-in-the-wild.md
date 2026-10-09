@@ -170,6 +170,7 @@ That is the shelf this summary sits on. Two notes on the join, kept short:
 
 - **The fix cycle is a discovery contract.** Bearings are taken, reduced to lines of position, resolved into one fix — a compact answer assembled from redundant sources, each capable of being wrong, with the instrument honest about its own bounds. The dive is the same shape, one scale down.
 - **Propagation is the thing to watch.** Hutchins' unit is neither the chart nor the navigator; it is representational state *moving between* them. Any change that adds a representation without adding a propagation path — a badge nobody reads, a chip nobody glances at — is spending without a return.
+- **The apparatus is a medium too, and the eye is one of the links.** The paper rung's perceptual notes are its instance: a reader watched a printed page's white drift toward sepia mid-document with no change in the file — the shift was in the display's colour management and the eye's own adaptation, two links in the relay the silo neither owns nor can see. Worth holding: we design the first two links (render, page) and *infer* the rest from a reader's report, which is the only instrument we have for them. (`docs/2026-10-09-paper-the-exclusion-principle-printed.md`, L11.)
 
 ## The one line
 
