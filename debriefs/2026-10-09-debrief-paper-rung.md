@@ -179,6 +179,34 @@ printer would have left the terminal wrong and put the two rungs into the kind o
 disagreement this whole rung exists to avoid. The dracula preset is left alone: it
 mirrors Glow, and Glow's pipe recedes.
 
+**The third finding from reading paper, and the one with the cleanest moral
+(operator's question, 2026-10-09):** *"we do not have chroma rendered code fences
+— is this by design, as Microsoft used to say…?"* It was not by design. It was a
+**silence.**
+
+chroma emits *class codes* — `\x1b[94m`, `\x1b[93m`, `\x1b[96m` — and delegates the
+hues to the terminal, deliberately and correctly. okuda carries them through raw
+and owns no 16-colour table. The transform understood only truecolour, so it
+skipped the family it did not recognise and every fence printed in one ink: **130
+class codes dropped per showcase render**, with a page that still looked
+plausible. The fix is the printer playing the terminal (`XTERM16`, the standard
+sixteen, then the same ink transform), and the general rule it exposes:
+
+> **A delegated decision needs an owner in every medium.** chroma reaches the
+> glass by delegation, so paper must become a terminal, or it gets nothing.
+
+**And the trace found a fifth instrument at fault in one day.** The failing test
+was mine: its regex matched `color:#…` *inside* `background-color:#…`, so it
+reported a near-white "ink" that was really a surface. Meanwhile the same trace
+exposed real noise — zero-length `<span>`s carrying only a background, one per
+heading — and `toHtml` now opens spans lazily, so a style with no bytes in it
+emits nothing. Two fixes, neither in the thing everyone suspected.
+
+The score for the day: five corrections, four of them in the *measuring
+apparatus* — a census used as an enumeration, an archive-lint invocation, a claim
+about paint gating, this regex. **When a test fails, check the test first**; the
+artefact has usually already been looked at.
+
 ## The habit that earned its keep
 
 Three times in one day, the gate was green while the artefact was wrong: the

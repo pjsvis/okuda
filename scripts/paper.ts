@@ -34,6 +34,33 @@ export const ADVANCE_EM = 0.61;
 /** The largest type the paper rung will use, in points. */
 export const MAX_FONT_PT = 10;
 
+/** ── The printer's terminal palette ──────────────────────────────────
+ *
+ *  okuda pipes tagged fences through chroma with `--formatter terminal16`, on
+ *  purpose: "16-colour class codes, the terminal's palette supplies the hues"
+ *  (`src/render.ts`, BRF-FENCE-COLOUR). The tool classifies; the terminal themes.
+ *
+ *  **On paper there is no terminal**, so the printer plays that role — otherwise
+ *  chroma's 130 class codes per showcase render are silently dropped and every
+ *  fence prints in one ink. These are the standard xterm-16 values, because the
+ *  alternative (the reader's own theme) is unknowable from a pipe: the workspace
+ *  declares a terminal, and the ink transform then mirrors whatever it emits.
+ *  A metric: three families arrive — truecolour 356, 16-colour 130, no 256.
+ */
+export const XTERM16: readonly string[] = [
+  "#000000", "#cd0000", "#00cd00", "#cdcd00",
+  "#0000ee", "#cd00cd", "#00cdcd", "#e5e5e5",
+  "#7f7f7f", "#ff0000", "#00ff00", "#ffff00",
+  "#5c5cff", "#ff00ff", "#00ffff", "#ffffff",
+];
+
+/** A 16-colour SGR code (30-37, 90-97 fg; 40-47, 100-107 bg) → its hex, or null. */
+export function sgr16Hex(code: string): string | null {
+  if (/^3[0-7]$/.test(code)) return XTERM16[Number(code) - 30]!;
+  if (/^9[0-7]$/.test(code)) return XTERM16[Number(code) - 90 + 8]!;
+  return null;
+}
+
 /** The okuda preset's `muted` — the CHIP's colour (`src/palettes/okuda.json`,
  *  via `headingChip`), and therefore the paper rung's mark ink. The CLI passes
  *  the live palette's instead (so a `--palette` render keeps the relationship);
@@ -174,7 +201,11 @@ const hex = (n: string) => Number(n).toString(16).padStart(2, "0");
 export function toHtml(src: string, markInk: string = paperInk(DEFAULT_MUTED)): string {
   let out = "";
   let last = 0;
-  let open = false;
+  /** The style of the span currently open, or null. Spans are opened LAZILY, on
+   *  the first byte that needs them: an SGR run with nothing inside it (a
+   *  surface background ahead of a fill, as a badge arrives `48;2;c` then
+   *  `38;2;c`) would otherwise emit an empty `<span>` carrying only a colour. */
+  let open: string | null = null;
   let attrs: string[] = [];
   let fg: string | undefined;
   let bg: string | undefined;
@@ -204,8 +235,20 @@ export function toHtml(src: string, markInk: string = paperInk(DEFAULT_MUTED)): 
     return parts.join(";");
   };
 
+  /** Emit text in the current style, opening or switching the span if needed. */
+  const emit = (text: string): void => {
+    if (text === "") return;
+    const want = style();
+    if (open !== want) {
+      if (open !== null) out += "</span>";
+      if (want !== "") out += `<span style="${want}">`;
+      open = want === "" ? null : want;
+    }
+    out += esc(text);
+  };
+
   for (const m of src.matchAll(/\x1b\[([0-9;]*)m/g)) {
-    out += esc(src.slice(last, m.index));
+    emit(src.slice(last, m.index));
     last = (m.index ?? 0) + m[0].length;
     const p = (m[1] ?? "").split(";");
     for (let i = 0; i < p.length; i++) {
@@ -223,17 +266,15 @@ export function toHtml(src: string, markInk: string = paperInk(DEFAULT_MUTED)): 
         if (code === "38") fg = rgb;
         else bg = rgb;
         i += 4;
+      } else if (/^(3[0-7]|9[0-7])$/.test(code)) {
+        fg = sgr16Hex(code)!; // chroma's class codes — the printer is the terminal
+      } else if (/^(4[0-7]|10[0-7])$/.test(code)) {
+        bg = XTERM16[(/^10/.test(code) ? Number(code) - 100 : Number(code) - 40) + 8]!;
       }
     }
-    if (open) out += "</span>";
-    const css = style();
-    if (css) {
-      out += `<span style="${css}">`;
-      open = true;
-    } else open = false;
   }
-  out += esc(src.slice(last));
-  return open ? out + "</span>" : out;
+  emit(src.slice(last));
+  return open !== null ? out + "</span>" : out;
 }
 
 if (import.meta.main) {

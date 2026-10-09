@@ -36,6 +36,32 @@ found something that belonged upstream rather than in the printer:
   **dracula preset keeps Glow's grey pipe**: that preset's job is parity, not our
   taste.
 
+## The printer is the terminal (chroma's class codes)
+
+A tagged fence is piped through `chroma --formatter terminal16` **on purpose**:
+"16-colour class codes, the terminal's palette supplies the hues" (`src/render.ts`,
+BRF-FENCE-COLOUR). The tool classifies; the terminal themes. okuda owns no
+16-colour table at all (`src/ansi.ts`: *"No 256/16-colour fallback logic"*).
+
+**On paper there is no terminal.** The first version of this transform understood
+only truecolour, so it silently dropped every class code — **130 of them per
+showcase render**, leaving each fence in one ink. Not by design; by omission: a
+converter that skips what it does not recognise, which is this silo's signature
+defect wearing a new hat.
+
+The printer therefore plays the terminal: `XTERM16`, the standard sixteen, mapped
+to hex and passed through the same ink transform as everything else. A tagged
+fence prints colour-classed again — comments, keywords, identifiers and strings
+distinguishable — and every one of those inks clears the contrast floor.
+
+**A declared divergence:** on the glass those hues are the *reader's terminal
+theme*, unknowable from a pipe. Paper supplies the standard sixteen instead. If
+exactness ever matters, that is a palette question (a 16-colour table in the
+palette file), not a printer one.
+
+Measured, for the record: three SGR families reach the converter — truecolour 356,
+16-colour 130, and no 256-colour at all.
+
 ## The defaults are the printer's, not the terminal's
 
 **80 columns**, and the reason matters more than the number: paper is the one

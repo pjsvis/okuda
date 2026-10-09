@@ -131,7 +131,7 @@ describe("fills survive the ink transform — a badge is a mark, not a surface",
     // Exactly what okuda emits for a heading marker: bg and fg the same colour,
     // the glyph inside, then a reset.
     const badge = toHtml("\x1b[48;2;153;204;255m\x1b[38;2;153;204;255m#\x1b[0m");
-    const m = badge.match(/color:(#[0-9a-f]{6});background-color:(#[0-9a-f]{6})/);
+    const m = badge.match(/(?<![a-z-])color:(#[0-9a-f]{6});background-color:(#[0-9a-f]{6})/);
     expect(m).not.toBeNull();
     expect(m![1]).toBe(m![2]); // same ink → the glyph hides inside the block
   });
@@ -205,9 +205,39 @@ describe("one ink for the frame — the badge matches the chip (BRF-PAPER-RUNG)"
     const { toHtml } = await import("../scripts/paper");
     const html = toHtml(stdout.toString(), paperInk(DEFAULT_MUTED));
     const inks = new Set(
-      [...html.matchAll(/color:(#[0-9a-f]{6});background-color:#[0-9a-f]{6}/g)].map((m) => m[1]),
+      [...html.matchAll(/(?<![a-z-])color:(#[0-9a-f]{6});background-color:#[0-9a-f]{6}/g)].map((m) => m[1]),
     );
     expect(inks.size).toBe(1);
     expect([...inks][0]).toBe(paperInk(DEFAULT_MUTED));
+  });
+});
+
+describe("the printer is the terminal — chroma's 16-colour class codes (BRF-PAPER-RUNG)", () => {
+  test("the 16-colour family maps to hexes, both halves", async () => {
+    const { sgr16Hex, XTERM16 } = await import("../scripts/paper");
+    expect(sgr16Hex("30")).toBe(XTERM16[0]);
+    expect(sgr16Hex("37")).toBe(XTERM16[7]);
+    expect(sgr16Hex("94")).toBe(XTERM16[12]); // bright blue, what chroma emits
+    expect(sgr16Hex("97")).toBe(XTERM16[15]);
+    expect(sgr16Hex("38;2;1;2;3")).toBeNull(); // not this family
+  });
+
+  test("a fence keeps its classes: three codes, three distinct inks", async () => {
+    const { toHtml } = await import("../scripts/paper");
+    const fence = toHtml("\x1b[94m// comment\x1b[0m \x1b[96mdef\x1b[0m \x1b[93mstr\x1b[0m");
+    const inks = new Set([...fence.matchAll(/(?<![a-z-])color:(#[0-9a-f]{6})/g)].map((m) => m[1]));
+    expect(inks.size).toBe(3);
+  });
+
+  test("EVERY ink on the page clears the floor — both families, after the transform", async () => {
+    const { toHtml, paperInk, contrastWhite, CONTRAST_FLOOR, DEFAULT_MUTED } = await import("../scripts/paper");
+    const out = Bun.spawnSync(["bun", "run", CLI, DOC, "--no-references"], {
+      stdout: "pipe",
+      env: { ...process.env, FORCE_COLOR: "1" },
+    }).stdout.toString();
+    const html = toHtml(out.toString(), paperInk(DEFAULT_MUTED));
+    const inks = new Set([...html.matchAll(/(?<![a-z-])color:(#[0-9a-f]{6})/g)].map((m) => m[1]!));
+    expect(inks.size).toBeGreaterThan(6); // truecolour roles AND chroma classes
+    for (const ink of inks) expect(contrastWhite(ink)).toBeGreaterThanOrEqual(CONTRAST_FLOOR);
   });
 });
