@@ -131,6 +131,63 @@ The page's claims are perceptual and testable: it scans, it lands, it holds.
 Worth being blunt about: **"professional" is the shite register** — it optimises
 for how the artefact is read *socially* rather than how it is read *by an eye*.
 
+## The 290 sorts — the flush edge, bought, and given away
+
+Gutenberg's 42-line Bible is the first great piece of typographic *machinery* in
+the West, and the property it was built to buy is one sentence long: **a column
+flush on both sides, with even grey between the words.** He bought it in metal.
+The B42's case held **around 290 separate sorts** — Bechtel's inventory counts 53
+capitals, 158 lowercase (many carrying an abbreviation mark), **79 ligatures**, 4
+abbreviations and 5 punctuation marks, ≈299 in all; Columbia says "nearly three
+hundred". Zapf's estimate is the one that prices the purchase: **about 60 sorts
+would have sufficed** to set the same text without caring about the right edge.
+
+The mechanism was not glyph-stretching — that is Adobe's descendant, and
+typographers argue it degrades the page. It was **narrower variants** of letters,
+cast with their corners trimmed so they could tuck against a neighbour's serif and
+recover fractions of an em; plus the 79 ligatures; plus manuscript abbreviations;
+plus punctuation hanging into the margin; plus, by the tradition's account, a
+single space of one width (Eng's measurements dispute that the spaces were in fact
+uniform — the point holds either way). Many mechanisms, one property, a fivefold
+surcharge on type. And part of the motive was **market**: a new technology had to
+match high-grade manuscript to be accepted at all.
+
+**We get that property for nothing.** A monospace grid quantises the ragged right
+edge into single-character nicks — measured above at a mean of 2.4 characters
+against the measure, with only each block's last line visibly short — which the
+eye fuses into a boundary. Flush body, short final line: the signature of
+justification, produced without stretching a space, a glyph, or a sort.
+
+|  | Gutenberg, 1455 | okuda, 2026 |
+|---|---|---|
+| the property | a flush column, even grey | the same |
+| the given | proportional metal | a monospace grid |
+| the cost | ~230 extra sorts | none |
+| the temptation | — | glyph scaling |
+
+*(The cells are deliberately short: at 80 columns the table allocator suppresses
+the widest column, and a table whose third column is the point has to fit the
+measure or lose it.)*
+
+**The rule the curve gives: machinery buys what the medium will not give.** And
+because the work is *invisible* when it is done well — a grid, a flush edge, even
+grey — a market can see and price only the **visible additions**. That is where
+the churn comes from: not villainy and not stupidity, but **an incentive that can
+only pay for what shows.** Gutenberg's 290 sorts were partly necessity and partly
+a sales argument; the web's stack is the same argument at a higher frequency.
+
+The test to apply to any machinery, ours included: **does it replace a given with
+a negotiation?** If the medium hands the property over, the machinery that
+re-derives it is the surcharge.
+
+*Sources consulted 2026-10-09; the primary texts were not read. **290 / ~60:**
+Hermann Zapf, "About micro-typography and the hz-program", Electronic Publishing
+6(3), 1993, as quoted by Torbjørn Eng. **The inventory:** Guy Bechtel, Gutenberg
+(Fayard, 1992), pp. 331, 442, via the BnF's Gallica note on the B42. **"Nearly
+three hundred":** Columbia University Libraries, "Type to Print". **The narrower
+variants, the hanging punctuation, and the objection to glyph scaling:** Eng,
+"InDesign, the hz-program and Gutenberg's secret".*
+
 ## The register: professional, or shite
 
 The house already has the word. `docs/2026-08-29-tfs-exclusion-principle.md`
@@ -151,7 +208,9 @@ that the professional apparatus was not merely unnecessary but **destructive**:
   hierarchy.
 
 So the guard is three refusals, and it is deliberately a list of *what not to do*
-rather than a style guide.
+rather than a style guide. The curve above is the same argument with a 570-year
+tail: the flush edge has always been the visible quality worth buying, and the
+invisible given — a grid — is what makes it free.
 
 ## What is not built, and why that is deliberate
 
