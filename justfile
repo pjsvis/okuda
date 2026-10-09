@@ -53,6 +53,12 @@ info:
     @echo "Origin and design: docs/2026-08-20-origin-doc.md"
     @echo "Dependencies:       DEPENDENCIES.md"
 
+# Protocol install
+[group('navigation')]
+protocol-install:
+    @cp system.md "$${OKUDA_AGENTS:-$$HOME/.pi/agent/AGENTS.md}"
+    @echo "protocol installed: system.md -> $${OKUDA_AGENTS:-$$HOME/.pi/agent/AGENTS.md}"
+
 # AMPER drift
 [group('navigation')]
 amp:
