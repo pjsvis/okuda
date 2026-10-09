@@ -6,7 +6,7 @@ callsign: BRF-BM25-EVALUATION
 # Brief: Benchmark Local BM25 Against Ripgrep and AST Traversal Over Markdown SSOT
 
 **Date:** 2026-09-17
-**Status:** Open
+**Status:** Parked (operator call, 2026-10-09) — on hold, gated on the scale trigger: the corpus reaching the size where a linear scan stops being interactive, or multi-term Precision@3 measured insufficient. Not adopted now; the acceptance criteria below still govern any adoption, and the harness-2 instrument is `bm25s` (see the note at the foot).
 
 ---
 
