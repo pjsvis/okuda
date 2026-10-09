@@ -387,6 +387,23 @@ describe("render — lists (loose, markers, continuation)", () => {
     expect(out2).not.toContain("\u0000");
   });
 
+  test("a sub-list's first item is spaced from its parent like its siblings", async () => {
+    // The parent→first-child seam is the one pair that lacks the blank
+    // line `itemBlocks.join("\n\n")` gives every other pair. Source blank
+    // lines cannot fix it: the list parser normalises them away.
+    const out = await render("- parent\n  - first child\n  - second child", 40);
+    const raw = lines(out);
+    const at = (needle: string) =>
+      raw.findIndex((l) => stripANSI(l).includes(needle));
+    const p = at("parent");
+    const c1 = at("first child");
+    const c2 = at("second child");
+    expect(raw[p + 1]).toBe(""); // parent → first child
+    expect(c1).toBe(p + 2);
+    expect(raw[c1 + 1]).toBe(""); // first child → second child
+    expect(c2).toBe(c1 + 2); // both seams loose, consistently
+  });
+
   // ADR-004 invariant: okuda owns every \n — no emitted line exceeds the
   // terminal width. Composition shifts nested blocks +4 per level AFTER
   // wrapping (item continuation + LIST_INDENT); the wrap must budget it.

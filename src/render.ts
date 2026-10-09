@@ -1438,6 +1438,15 @@ function renderList(
         const block = part.level >= 1
           ? flattenNested(part.nested) // beyond cap: continuation text
           : part.nested.split("\n").map((l) => (l === "" ? "" : "  " + l)).join("\n");
+        // Loose fit at the parent→first-child seam. Every other pair of
+        // blocks in a list gets the blank line from `itemBlocks.join("\n\n")`;
+        // the nested block was the exception, so the first child butted
+        // against its parent while its siblings were spaced — an
+        // inconsistency source blank lines cannot fix, because the list
+        // parser normalises them away before the renderer sees them.
+        // Only when the item has text of its own: a sub-list that *starts*
+        // an item needs no lead.
+        if (lines.length > 0) lines.push("");
         lines.push(...block.split("\n"));
         firstLine = false;
         continue;
