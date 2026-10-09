@@ -293,18 +293,23 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
 * **No agent layer**: a tool's contract is its **actuator, its screen and its
   channel**; an agent-facing wrapper — a skill, an MCP server, a plugin — is a
   fourth *interface* that mediates them and prevents the tool from composing.
-  A skill is the **i811 pattern** at the agent layer: it designs the *agent
+
+  * A skill is the **i811 pattern** at the agent layer: it designs the *agent
   interface* instead of the actuator/screen/channel that would *be*
   agent-usable by composition, and an agent is just another consumer of the
-  same plain text. **Cost.** It is a **parallel store** of what `--help`, the
+  same plain text. 
+  
+  * **Cost.** It is a **parallel store** of what `--help`, the
   README and the playbooks already say — and the copy no gate can check (the
-  drift hazard: `AGENTS.md` v1.1.0 against `system.md` v1.4.0). **Register.**
-  Authoring hints are **local** (the general/local test): they live in the
-  silo's playbooks, not in the global agent context. **Corollary:** *discovery
-  is one line; usage is `--help`* — name the actuator and the tool documents
-  itself. Where a tool reaches for a skill because *“every tool has one now”*,
+  drift hazard: `AGENTS.md` v1.1.0 against `system.md` v1.4.0). 
+  
+  * **Register:** Authoring hints are **local** (the general/local test): they live in the
+  silo's playbooks, not in the global agent context. 
+  
+  * **Corollary:** *discovery is one line; usage is `--help`* — name the actuator and the tool documents itself. Where a tool reaches for a skill because *“every tool has one now”*,
   that is **the default shape** in interface form. **Coined 2026-10-09** from
-  the operator's observation that the silo has never proposed one. **Prior
-  art:** `docs/2026-09-05-poverty-of-ui-design.md` (the interface as the
+  the operator's observation that the silo has never proposed one. 
+  
+  * **Prior art:** `docs/2026-09-05-poverty-of-ui-design.md` (the interface as the
   hampering abstraction); the i811 refusal
   (`docs/2026-09-05-i811-dual-layer-output.md`); **the default shape**.
