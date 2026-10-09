@@ -1,7 +1,7 @@
 ---
 date: 2026-10-06
 kind: position and outreach draft — what this silo is for, stated for a reader outside it. Doubles as the internal statement of purpose the repo has never written down
-lineage: the operator's question, 2026-10-05 — *"the shared cognition thing is where my thoughts have led"* — and the two documents it rests on: `docs/cognition-in-the-wild.md` (the Hutchins summary) and `docs/2026-09-08-accessibility-audit.md` (the a11y claims, self-assessed). Candidate audience: CALL Scotland (University of Edinburgh) — see the reserve at the foot of this file. **Drafted, not sent.**
+lineage: the operator's question, 2026-10-05 — *"the shared cognition thing is where my thoughts have led"* — and the two documents it rests on: `docs/cognition-in-the-wild.md` (the Hutchins summary) and `docs/2026-09-08-accessibility-audit.md` (the a11y claims, self-assessed). Candidate audience: CALL Scotland (University of Edinburgh) — see the reserve at the foot of this file. **Drafted, not sent.** **Extended 2026-10-09:** the *document contract* section — stable · addressable · inspectable · shared · purposive — from the operator's question *"am I just repeating myself, or is there something here that IT/the market/devs has missed in the current AI age"*.
 status: open — the draft stands; whether it is sent, published, or left as an internal statement is the operator's call.
 ---
 
@@ -16,6 +16,42 @@ Two things at once, deliberately in one place.
 **Externally:** the draft we would take to a practitioner audience — assistive technology, accessible formats, supported communication — if we ever decide the finding is worth the asking. It is not a product announcement; there is no product to announce. It is a practice, offered for criticism.
 
 **The naming.** The tool is `okuda`; the reader's own word for it is **Gloam** (a Scots word for the half-light, and the name the launcher answers to).
+
+## The document contract — what a document is, for the purpose of this practice
+
+The statement of purpose, in one table. A document is held to five properties
+here — a specification, not a set of inventions — and each one is the answer to
+a specific failure, most of which the current fashion has stopped worrying about.
+
+| property | what it means here | the failure it answers |
+|---|---|---|
+| **stable** | a change is a *new version with a new address*, never a silent mutation under the reader's eye | the chat interface's *regenerate*: asking again overwrites the answer the two parties had settled on, and there is no address for "the one we decided" |
+| **addressable** | every document, and every claim inside it, has a name that resolves to the thing | retrieval by embedding: a passage returned with no durable address — a derived, unanchored, uninspectable stand-in for the source |
+| **inspectable** | the reader can check it rather than trust it; the address resolves to a body | the context window as memory — a larger whiteboard, not a filing cabinet; a model that re-reads a file beats one that remembers a conversation |
+| **shared** | it carries what two parties must both see — including the one who arrives cold | the transcript as the record: mutable, unsearchable, unversioned, and gone when the window closes |
+| **purposive** | it exists to change a decision, not to be produced | content metrics — tokens generated rather than decisions changed, which is how decoration gets rewarded |
+
+**The word is not immutability.** Documents must change; a practice that froze
+them would be useless. The property is **referential stability**: what changes is
+*versioned and addressed*, so a reference the reader holds still points at the
+thing it pointed at. A change that cannot be attributed makes every reference
+suspect.
+
+The same rule appears in the render, one layer down — a transformation is
+trustworthy when the reader can attribute it (`docs/2026-10-08-the-resize-contract.md`;
+**attributable structure** in `system.md`). A document that moves underneath the
+reader is a transformation with no attribution, which is why the second property
+in the practice note below — *references must survive editing* — is harder than
+it looks.
+
+**What this is not.** Not a claim that the field has missed these ideas.
+Archives, records management, libraries and docs-as-code hold every one of them,
+and hypertext's founding intention was stable addresses and non-destructive
+editing. The claim is narrower and less flattering: the **consumer layer of the
+AI age has stopped holding them**, because the default product shape — the chat
+window — does not need them. That answers the moat question honestly. None of
+this is secret; what is not public is the practice, the refusals, and the record
+of why.
 
 ---
 
