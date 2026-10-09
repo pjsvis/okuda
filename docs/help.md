@@ -30,7 +30,8 @@ into a new instance, `12`–`98` jump to a reference). The whole grammar is
 
 - `just ship` — the full gate: tests → check → build → install → fresh. Run before push.
 - `just pdf <file.md>` — the **paper rung**: the same render, printed. Colour PDF
-  with no silcrows (on paper they cannot resolve), written to `tmp/paper/`.
+  with no silcrows (on paper they cannot resolve) and the ink mirrored dark on
+  white (paper is charged by the page), written to `tmp/paper/`.
   `--width <cols>` and `-o <out.pdf>` pass through: `just pdf docs/showcase.md`
 - `just fresh` — is the binary on PATH this checkout's HEAD? (stale-binary gate)
 - `just search-smoke` — proves the gloam `-g` content search end to end, no TTY: freshness → merge → fzf. Custom scenario: `bash scripts/search-smoke.sh <query> <expected-path>`

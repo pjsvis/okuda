@@ -72,3 +72,55 @@ describe("the paper geometry — never clipped (BRF-PAPER-RUNG)", () => {
     }
   });
 });
+
+describe("the paper ink — black-ish on white, with no light mode (BRF-PAPER-RUNG)", () => {
+  const hue = (hex: string) => {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255) as [number, number, number];
+    const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+    if (d === 0) return 0;
+    const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    return ((h * 60) % 360 + 360) % 360;
+  };
+
+  test("it is a transform, not a palette: no file, just a function", async () => {
+    const { paperInk } = await import("../scripts/paper");
+    expect(typeof paperInk).toBe("function");
+  });
+
+  test("body text lands near-black — 'black(ish) text on white'", async () => {
+    const { paperInk, relLum } = await import("../scripts/paper");
+    expect(relLum(paperInk("#f8f8f2"))).toBeLessThan(0.05); // Dracula foreground
+    expect(relLum(paperInk("#ffffff"))).toBeLessThan(0.05);
+  });
+
+  test("hue survives — the colour still signals structure, only polarity moves", async () => {
+    const { paperInk } = await import("../scripts/paper");
+    for (const c of ["#bd93f9", "#ff79c6", "#8be9fd", "#50fa7b"]) {
+      expect(Math.abs(hue(paperInk(c)) - hue(c))).toBeLessThan(2);
+    }
+  });
+
+  test("EVERY colour okuda emits clears the contrast floor on paper", async () => {
+    const { paperInk, contrastWhite, CONTRAST_FLOOR } = await import("../scripts/paper");
+    const out = Bun.spawnSync(["bun", "run", CLI, DOC, "--no-references"], {
+      stdout: "pipe",
+      env: { ...process.env, FORCE_COLOR: "1" },
+    }).stdout.toString();
+    const emitted = new Set(
+      [...out.matchAll(/\x1b\[38;2;(\d+);(\d+);(\d+)m/g)].map(
+        (m) => "#" + [m[1], m[2], m[3]].map((n) => Number(n).toString(16).padStart(2, "0")).join(""),
+      ),
+    );
+    expect(emitted.size).toBeGreaterThan(3); // the corpus really does emit colour
+    for (const hex of emitted) {
+      expect(contrastWhite(paperInk(hex))).toBeGreaterThanOrEqual(CONTRAST_FLOOR);
+    }
+  });
+
+  test("backgrounds are white-clamped — a page of toner cannot happen", async () => {
+    const { paperInk, relLum } = await import("../scripts/paper");
+    for (const bg of ["#282a36", "#000000", "#101010", "#f3f5f7"]) {
+      expect(relLum(paperInk(bg, true))).toBeGreaterThan(0.9);
+    }
+  });
+});

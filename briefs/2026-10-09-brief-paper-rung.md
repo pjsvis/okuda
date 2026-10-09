@@ -76,12 +76,14 @@ work.
 
 ## Acceptance criteria
 
-- `just pdf <file>` writes a colour PDF to `tmp/paper/`, and prints the path.
+- `just pdf <file>` writes a PDF to `tmp/paper/`, and prints the path.
 - No silcrow appears anywhere in the printed artefact.
-- Colour is present and exact (truecolour fg and bg both emitted).
-- The prose and layout are identical to the piped render; only the receipt
-  differs — pinned by `tests/paper-rung.test.ts`.
+- The page is white and every foreground clears 4.5:1 against it; hue survives
+  the transform (colour still signals structure).
+- The prose and layout are identical to the piped render; only the receipt and
+  the ink polarity differ — pinned by `tests/paper-rung.test.ts`.
 - No new okuda runtime dependency: the binary does not know the chain exists.
+- No palette file, no light mode: the transform is a function, not a theme.
 - `just check` green; `bun test` passes.
 
 ## Open questions, deliberately not answered here
@@ -97,10 +99,17 @@ work.
   agreement — the anti-drift rule — and the recovery route on paper is the
   source file, which the artefact names. Revisit only if a printed elision is
   ever mistaken for the document's own text.
-- **Light paper.** The rung is dark because the palette is dark; a white-paper
-  print needs a *light palette* (a different artefact), which is a palette
-  question, not a print one. `showcase.md` already records the position: *dark
-  is the only mode; the override is the light mode, if someone wants it.*
+- **Light paper — resolved 2026-10-09 by the ink transform.** `paperInk` mirrors
+  the lightness of every emitted colour (hue and saturation kept) and clamps
+  backgrounds light, so the page is white and the body text lands near-black.
+  There is **no light mode and no palette file** — it is a transform of the
+  bytes on the way to the printer, applied by the printer's own script. Two
+  facts forced the shape: paper is charged by the page (a page-wide tint is a
+  page of toner), and a print driver that drops backgrounds would turn
+  light-on-dark text into light-on-white — invisible. A mid-lightness saturated
+  colour also mirrors to *itself* (amber at L 50% stays amber: ~2:1 on white), so
+  foregrounds are darkened until they clear a **4.5:1 contrast floor** against
+  white; the tests assert that for every colour the corpus emits.
 - **The receipt's durable half.** The dropped section also carried the cites'
   *durable* addresses (`ADR-007`, `src/render.ts`). A paper "documents cited"
   appendix — addresses without numbers — would keep the half that survives

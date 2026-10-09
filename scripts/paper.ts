@@ -30,6 +30,95 @@ const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 export const PAGE_MM = { width: 210, margin: 8 };
 /** Monospace advance, in em. Menlo 0.6023, SF Mono 0.600 — 0.61 leaves slack. */
 export const ADVANCE_EM = 0.61;
+
+/** WCAG relative luminance of an `#rrggbb` string, 0 (black) to 1 (white). */
+export function relLum(hex: string): number {
+  const ch = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+  const f = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const [r, g, b] = ch.map(f) as [number, number, number];
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/** Contrast ratio against white — what paper gives a foreground. */
+export function contrastWhite(hex: string): number {
+  return 1.05 / (relLum(hex) + 0.05);
+}
+
+/** The floor the paper rung guarantees for any foreground: WCAG AA for small
+ *  text, which is what a 9pt monospace page is. */
+export const CONTRAST_FLOOR = 4.5;
+
+/** hsl → `#rrggbb`, the inverse of the parse in `paperInk`. */
+function hslHex(h: number, s: number, l: number): string {
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  const seg = Math.floor(h / 60) % 6;
+  const [r1, g1, b1] = (
+    [
+      [c, x, 0],
+      [x, c, 0],
+      [0, c, x],
+      [0, x, c],
+      [x, 0, c],
+      [c, 0, x],
+    ] as const
+  )[seg]!;
+  const to255 = (v: number) => Math.round((v + m) * 255);
+  return `#${[to255(r1), to255(g1), to255(b1)].map((n) => n.toString(16).padStart(2, "0")).join("")}`;
+}
+
+/** Lower `l` until the colour clears CONTRAST_FLOOR against white, or the floor
+ *  of lightness is reached. Hue and saturation never change. */
+function darkenToContrast(h: number, s: number, l: number): number {
+  let v = l;
+  while (v > 0.02 && contrastWhite(hslHex(h, s, v)) < CONTRAST_FLOOR) v -= 0.01;
+  return v;
+}
+/**
+ *  Paper is opaque, white, and charged by the page. The render is dark because
+ *  the terminal is; so the print rung **mirrors the lightness of every colour**
+ *  rather than shipping a second palette. There is no light mode here and no
+ *  palette file: the transform is applied to the emitted bytes, per colour, on
+ *  the way to the printer.
+ *
+ *    - **foreground**: L → 1 − L, hue and saturation kept. Body text (near-white
+ *      on the glass) lands near-black on paper; the role hues survive, so the
+ *      colour still signals structure — only its polarity moves.
+ *    - **background**: the same mirror, then clamped light. A page-wide tint is a
+ *      page of toner, and worse, a print driver that drops backgrounds would
+ *      turn light-on-dark into light-on-white: invisible. Paper gets white.
+ *
+ *  Colour PAIRS both pass through, so a light-on-dark span becomes dark-on-light
+ *  with no special case. A chip (`48;2;c` + `38;2;c` over a `█` glyph) keeps its
+ *  block because the glyph carries the foreground. Pure. */
+export function paperInk(hex: string, background = false): string {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l0 = (max + min) / 2;
+  const d = max - min;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l0 - 1));
+  let h = 0;
+  if (d !== 0) {
+    if (max === r) h = ((g - b) / d) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h = ((h * 60) % 360 + 360) % 360;
+  }
+  // The mirror. Backgrounds are then clamped light: paper is white.
+  let l = 1 - l0;
+  if (background) l = Math.max(l, 0.96);
+  // A mid-lightness saturated colour mirrors to itself (amber at L 50% stays
+  // amber) — legible on the glass, ~2:1 on white. So a foreground is then
+  // DARKENED until it clears the contrast floor: hue and saturation are kept,
+  // only lightness gives way, and the guarantee is legibility rather than a
+  // coincidence of the palette.
+  else l = darkenToContrast(h, s, l);
+  return hslHex(h, s, l);
+}
 /** The largest type the paper rung will use, in points. */
 export const MAX_FONT_PT = 10;
 
@@ -118,7 +207,8 @@ function toHtml(src: string): string {
       else if (code === "7") styles.push("filter:invert(1)");
       else if ((code === "38" || code === "48") && p[i + 1] === "2") {
         const rgb = `#${hex(p[i + 2]!)}${hex(p[i + 3]!)}${hex(p[i + 4]!)}`;
-        styles.push(`${code === "38" ? "color" : "background-color"}:${rgb}`);
+        const ink = paperInk(rgb, code === "48");
+        styles.push(`${code === "38" ? "color" : "background-color"}:${ink}`);
         i += 4;
       }
     }
@@ -141,16 +231,16 @@ const html = `<!doctype html>
 <title>${esc(basename(file))}</title>
 <style>
   @page { size: A4 portrait; margin: ${PAGE_MM.margin}mm ${PAGE_MM.margin}mm 12mm; }
-  html, body { background: #1e1f29; }
+  html, body { background: #ffffff; }
   pre { white-space: pre; font-family: "SF Mono", Menlo, monospace;
-        font-size: ${fontPt}pt; line-height: 1.18; color: #f8f8f2; margin: 0;
+        font-size: ${fontPt}pt; line-height: 1.18; color: #101014; margin: 0;
         -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .prov { font-family: "SF Mono", Menlo, monospace; font-size: 6pt;
-          color: #6272a4; margin-top: 6mm; -webkit-print-color-adjust: exact;
+          color: #6b7280; margin-top: 6mm; -webkit-print-color-adjust: exact;
           print-color-adjust: exact; }
 </style>
 <pre>${toHtml(ansi)}</pre>
-<div class="prov">rendered projection · okuda&nbsp;${esc(commit)} · ${esc(file)} · ${width} cols at ${fontPt}pt · ${new Date().toISOString().slice(0, 10)} · no silcrows (they cannot resolve on paper)</div>
+<div class="prov">rendered projection · okuda&nbsp;${esc(commit)} · ${esc(file)} · ${width} cols at ${fontPt}pt · ${new Date().toISOString().slice(0, 10)} · no silcrows (they cannot resolve on paper) · ink mirrored for paper</div>
 `;
 
 // ── 3. print it ──────────────────────────────────────────────────────

@@ -76,6 +76,41 @@ Everything else is the ordinary render, byte-for-byte: the tests pin colour
 (truecolour fg *and* bg), prose and layout unchanged, and a document with no
 references untouched by the flag.
 
+## The ink transform — dark on white, without a light mode
+
+Asked for a printable page, the answer was *not* a light palette. system.md is
+explicit that dark is the only mode and that a light mode would be a palette
+file nobody ships; the operator's instruction was the same (*"I do not want to
+create a light mode … black(ish) text on a white background … minimal tweak"*).
+So the difference is made **where the difference belongs — in the printer**,
+not in the renderer:
+
+```
+paperInk(hex, background?):
+  L → 1 − L            (mirror lightness; hue and saturation untouched)
+  backgrounds          → clamped light (paper is white, not tinted)
+  foregrounds          → darkened until 4.5:1 against white
+```
+
+One pure function, no theme, no file. Body text (near-white on the glass) lands
+near-black; the role hues survive as dark versions, so colour still signals
+structure — only its polarity moves.
+
+**What the probe caught, and why the plain mirror was not enough.** A
+mid-lightness saturated colour mirrors to *itself*: amber at L 50% stays amber,
+legible on a dark page and **~2:1 on white**. And some marks are painted in
+colours that blend with the dark page (`#f3f5f7` as a foreground), which mirror
+to near-*white* — invisible on paper. So legibility is a **guarantee** (a
+contrast floor applied per colour) rather than a coincidence of the palette, and
+the test asserts it for every colour the corpus actually emits.
+
+The operator also named the reason the dark artefact had to go, and it is worth
+recording because it is not only cost: *"it would be expensive to actually
+print"* — and worse, **fragile**. Most print drivers default to dropping page
+backgrounds, and a dropped background turns a dark-theme PDF into light-grey
+text on white: a document that is barely there. Cheap and robust happen to be
+the same fix.
+
 ## The habit that earned its keep
 
 Three times in one day, the gate was green while the artefact was wrong: the
