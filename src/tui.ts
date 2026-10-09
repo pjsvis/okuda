@@ -731,7 +731,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   }
   const initialRender = initialFetch.ok
     ? await renderAtGlass(
-        appendReferences(annotateSource(initialFetch.text, mainJumps), mainJumps),
+        appendReferences(annotateSource(initialFetch.text, mainJumps), mainJumps, true),
       )
     : [];
   const init = gateFetch(null, initialFetch, initialRender);
@@ -961,7 +961,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // settled on. Keeping the loop here is what multiplied a drag's events by three.
     const next = fetch.ok
       ? await renderLines(
-        atMain ? appendReferences(annotateSource(fetch.text, mainJumps), mainJumps) : fetch.text,
+        atMain ? appendReferences(annotateSource(fetch.text, mainJumps), mainJumps, true) : fetch.text,
         cols,
       )
       : [];
@@ -1036,7 +1036,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // Back is a MAIN render: annotated, and it ends with the map's
     // receipt (ADR-047) — the same foot the initial render carries.
     const next = await renderLines(
-      appendReferences(annotateSource(fetch.text, mainJumps), mainJumps),
+      appendReferences(annotateSource(fetch.text, mainJumps), mainJumps, true),
       dims().cols,
     );
     present(fetch, next, prev.scroll);

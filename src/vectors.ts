@@ -279,15 +279,78 @@ export function referencesSection(map: Map<number, string>): string {
   return ["## References", "", entries.join("\n\n")].join("\n");
 }
 
-/** The section's junction (ADR-047): append the generated section to a
- *  render INPUT — never the source. The join normalises trailing
- *  whitespace to exactly one blank line so the header lands as a header
- *  whatever the document ends with. Call sites sit downstream of
- *  `annotateSource` (the section's own callsigns are never re-scanned,
- *  never double-marked — the loop's only guard, held by construction).
- *  Empty map: the source passes through untouched. Pure. */
-export function appendReferences(source: string, map: Map<number, string>): string {
+/** The start offset of a source's final section: the last heading outside
+ *  a fence, or 0 when the source has none. Used by `referencesCovered`.
+ *  Pure. */
+function finalSectionStart(source: string): number {
+  const fences = fenceRanges(source);
+  let start = 0;
+  for (const m of source.matchAll(/^#{1,6}[ \t].*$/gm)) {
+    const i = m.index!;
+    if (!inFence(i, fences)) start = i;
+  }
+  return start;
+}
+
+/** Does the document already carry its own address table? True when every
+ *  destination in the map occurs inside a **list item** in the final
+ *  section — the shape a hand-written `## Related` takes, and the shape the
+ *  renderer's own decoration of one takes (the paths are scanned, the
+ *  silcrows appended). Then the generated receipt would only repeat it.
+ *
+ *  The condition is **coverage, never "a list exists"** (BRF-REFERENCES-
+ *  SECTION, the second): ADR-047 exists because a hand list *omits* —
+ *  measured, nine destinations in the map against six in the polished
+ *  section. A **partial** list therefore keeps its receipt, and the omission
+ *  stays visible: the legend appearing is the signal that the hand list was
+ *  incomplete. Suppressing on presence alone would re-instate the omission
+ *  the generated section was written to catch.
+ *
+ *  Cost, named: the receipt's presence becomes a function of the author's
+ *  prose shape as well as the map. The trade is recorded in ADR-047's
+ *  annotation. Pure. */
+export function referencesCovered(source: string, map: Map<number, string>): boolean {
+  if (map.size === 0) return false;
+  const start = finalSectionStart(source);
+  const covered = new Set<string>();
+  for (const o of scanReferences(source)) {
+    if (o.pos < start) continue;
+    const lineStart = source.lastIndexOf("\n", o.pos) + 1;
+    const lineEnd = source.indexOf("\n", o.pos);
+    const line = source.slice(lineStart, lineEnd === -1 ? undefined : lineEnd);
+    if (/^\s*(?:[-*+]|\d+\.)[ \t]/.test(line)) covered.add(o.target);
+  }
+  for (const target of map.values()) if (!covered.has(target)) return false;
+  return true;
+}
+
+/** The section's junction (ADR-047, amended 2026-10-09): append the
+ *  generated section to a render INPUT — never the source. The join
+ *  normalises trailing whitespace to exactly one blank line so the header
+ *  lands as a header whatever the document ends with. Call sites sit
+ *  downstream of `annotateSource` (the section's own callsigns are never
+ *  re-scanned, never double-marked — the loop's only guard, held by
+ *  construction). Empty map: the source passes through untouched.
+ *
+ *  **Suppressed when the document is self-tabling AND annotated** — see
+ *  `referencesCovered`. The layout must not prompt a question it cannot
+ *  answer: Related-then-References both listing the same paths invites
+ *  "why this duplication?", and nothing on the page answers it. A partial
+ *  list keeps the receipt, and the reader who asks "why is this here?"
+ *  finds the answer by comparison — *Related was incomplete* — which
+ *  reassures rather than leaves doubt. Pure. */
+export function appendReferences(
+  source: string,
+  map: Map<number, string>,
+  annotated = false,
+): string {
   const section = referencesSection(map);
   if (!section) return source;
+  // Suppress only where the addresses are already ON the page: `annotated`
+  // is the caller's statement that the silcrows are present (cli gates it on
+  // `process.stdout.isTTY`; the TUI always annotates). On the plain/piped
+  // rung the receipt IS the address table — ADR-047, "painted silcrows on
+  // the glass, plain numbers elsewhere" — so it is never suppressed there.
+  if (annotated && referencesCovered(source, map)) return source;
   return source.replace(/\s*$/, "\n\n") + section + "\n";
 }

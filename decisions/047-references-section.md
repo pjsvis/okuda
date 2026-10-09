@@ -6,7 +6,7 @@ callsign: ADR-REFERENCES-SECTION-047
 # Decision: The References section — the renderer emits a receipt for its own map
 
 **Date:** 2026-09-30
-**Status:** Accepted (amends ADR-MAIN-DOCUMENT-031 — the discovery contract is unchanged; this adds its projection. Brief BRF-REFERENCES-SECTION.)
+**Status:** Accepted (amends ADR-MAIN-DOCUMENT-031 — the discovery contract is unchanged; this adds its projection. Brief BRF-REFERENCES-SECTION.) · **amended 2026-10-09** — suppressed where the page already carries the table; see the annotation at the foot.
 
 ## Context
 
@@ -128,3 +128,45 @@ The honest remedy is a **boundary mark, not a warning**: an alarm that fires on
 every render of a growing view is an alarm that is off. The receipt should say
 where it stops, the way `…` says where a cell stops. The mark is not built; the
 measurement above is the case for it.
+
+## Annotation (2026-10-09) — suppressed where it would only repeat the page
+
+Amended on the operator's reading of the heuristics index in the glass: Related
+then References listed the same paths, and the reader is asked *"why this
+duplication?"* — a question the page cannot answer. **A prompted question left
+unanswered is the defect** (not the duplication itself): the layout implies the
+document knows what it is doing, and an element it cannot explain costs the
+reader's trust in the whole frame.
+
+**Ruling.** `appendReferences` suppresses the generated section when the
+document is **self-tabling** — every destination in the map occurs inside a
+**list item in the final section** (`referencesCovered`). The reader then sees
+the table once, annotated, where the author put it.
+
+**The condition is coverage, never "a list exists."** This ADR exists because a
+hand list *omits* (measured: nine in the map, six in the polished section). A
+**partial** list therefore keeps its receipt — and that is the *signal*: a list
+followed by an unexpected receipt tells the reader to investigate, and the
+investigation finds the omission (*Related was incomplete*). That is the
+reassuring case, not the doubtful one. Suppressing on presence alone would
+re-instate exactly the omission this section was written to catch.
+
+**The annotated gate, and why it is load-bearing.** Suppression applies only
+where the addresses are already on the page — the caller states this (`cli.ts`
+passes `process.stdout.isTTY`; the TUI always annotates). On the plain/piped
+rung `annotateSource` is skipped, so the receipt *is* the address table
+("painted silcrows on the glass, plain numbers elsewhere"). Suppressing it
+there would lose the addresses entirely — the opposite of the intent.
+
+**The cost, named.** The section's *presence* is now a function of the author's
+prose shape as well as the map — the determinism this ADR's sub-ruling
+protected. The *information* is present on every rung either way (inline on the
+glass, the receipt when plain); what moves is where it lives. Accepted on the
+operator's argument above.
+
+**Constraints this imposes.**
+- `referencesCovered` is the condition's only home; changing what counts as
+  "self-tabling" means changing this annotation.
+- The guard is the test trio: a complete final list → suppressed (annotated
+  rung) and kept (plain rung); a partial list → kept; a body-only citation →
+  kept.

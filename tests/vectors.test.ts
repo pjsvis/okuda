@@ -10,6 +10,7 @@ import {
   jumpMapFor,
   annotateSource,
   referencesSection,
+  referencesCovered,
   appendReferences,
 } from "../src/vectors";
 import { buildFixture } from "../scripts/references-demo";
@@ -312,6 +313,47 @@ describe("vectors — the generated References section (ADR-047, BRF-REFERENCES-
     expect(appendReferences("body", map)).toBe(
       "body\n\n## References\n\n%okuda-vector:12% ADR-030\n",
     );
+  });
+
+  test("suppressed when the final section is a list covering the map (self-tabling)", () => {
+    const src = [
+      "# T",
+      "",
+      "## Related",
+      "",
+      "- `docs/a.md` — one",
+      "- `docs/b.md` — two",
+      "",
+    ].join("\n");
+    const map = jumpMapFor(src);
+    expect(map.size).toBe(2);
+    expect(referencesCovered(src, map)).toBe(true);
+    expect(appendReferences(src, map, true)).toBe(src); // annotated rung: suppressed
+    expect(appendReferences(src, map)).toContain("## References"); // plain rung: kept
+  });
+
+  test("kept when the final list is PARTIAL — the omission stays visible", () => {
+    const src = [
+      "# T",
+      "",
+      "See `docs/a.md` and `docs/b.md`.",
+      "",
+      "## Related",
+      "",
+      "- `docs/a.md` — one",
+      "",
+    ].join("\n");
+    const map = jumpMapFor(src);
+    expect(map.size).toBe(2);
+    expect(referencesCovered(src, map)).toBe(false);
+    expect(appendReferences(src, map, true)).toContain("## References");
+  });
+
+  test("kept when the references are cited only in the body", () => {
+    const src = "# T\n\nSee `docs/a.md` for the rest.\n";
+    const map = jumpMapFor(src);
+    expect(referencesCovered(src, map)).toBe(false);
+    expect(appendReferences(src, map)).toContain("## References");
   });
 
   test("appendReferences: empty map passes the source through untouched", () => {

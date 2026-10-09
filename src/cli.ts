@@ -248,7 +248,7 @@ async function main(): Promise<void> {
     // own callsigns never re-enter the map.
     const map = jumpMapFor(source, silcrowResolves);
     const source2 = process.stdout.isTTY ? annotateSource(source, map) : source;
-    const out = await renderDocument(appendReferences(source2, map), {
+    const out = await renderDocument(appendReferences(source2, map, process.stdout.isTTY), {
       width,
       palette,
       color,
