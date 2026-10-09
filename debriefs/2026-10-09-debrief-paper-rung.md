@@ -129,6 +129,30 @@ clamp, turning the fill white while the glyph stayed dark. The silcrow paint *is
 gated off-glass; the heading badge never was. **The wrong reason was the
 plausible one, which is why the byte check came before the fix.**
 
+## Pagination is the printer's
+
+The page-break question was open, and the operator closed it with a correction to
+my framing: *"we do not know how long the pages are so all we can do is print
+using some default values … it's less a document structure thing than a printer
+capabilities thing … luckily printers typically are on white paper and 80 chars
+wide or there abouts."*
+
+Two things follow, and neither is code in okuda:
+
+- **The width default was wrong, and the reason it was wrong is instructive.** I
+  had defaulted the rung to 100 columns. Paper's canonical width is ~80 — the
+  *printer's* width, not the terminal's fallback — and that agreement (8.5in of
+  monospace on white) is why a terminal render prints at all. At 80 columns the
+  type takes the full 10pt cap, so the printer's width is also the most readable
+  page; 100 columns prints at ~9pt and remains available for anyone who wants it.
+- **The page break is a printer capability.** A renderer cannot know how long a
+  printer's page is; it can only declare a page box and let the driver place it.
+  A4 at 8mm margins and 10pt holds 80 × 66, the rung now states that, and the
+  browser breaks between lines — which is the entire mechanism. A heading may land
+  at the foot of a page; fixing that needs block structure, i.e. the second
+  backend this rung refuses, so it stays a *printer-layout* question rather than
+  becoming a document-structure one.
+
 ## The habit that earned its keep
 
 Three times in one day, the gate was green while the artefact was wrong: the

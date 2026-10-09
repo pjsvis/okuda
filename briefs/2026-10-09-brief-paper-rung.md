@@ -19,6 +19,21 @@ That is the design: **one render, two artefacts.** The PDF is the streaming
 canvas with paper under it, not a second layout. okuda keeps deciding width,
 wrapping, colour roles and elision; the chain below only prints.
 
+## The defaults are the printer's, not the terminal's
+
+**80 columns**, and the reason matters more than the number: paper is the one
+output whose geometry we do not control, and 80 columns is the *printer's* width
+(8.5in of monospace on white) rather than the terminal's fallback. The agreement
+is not a coincidence; both media are the same shape. At 80 columns the type takes
+the full **10pt** cap, so the default page is also the most readable one —
+100 columns is available (`--width 100`), prints at ~9pt, and is not the default
+because it is not the medium's habit.
+
+The rung states its own page: **A4, 8mm margins, 10pt → 80 × 66**, and reports
+that line so the operator knows what a page is. Beyond that box, fidelity is the
+driver's: Letter, fit-to-page, a scale factor — the printer's business, and not
+something a document should try to out-guess.
+
 ## What was measured first (2026-10-09)
 
 | question | answer |
@@ -91,11 +106,15 @@ work.
 
 ## Open questions, deliberately not answered here
 
-- **Page breaks.** The `pre` breaks lines, not sections: pages cut mid-document.
-  Breaking at headings needs *structure*, and structure lives in the renderer —
-  reaching for it from the byte stream would mean re-parsing what okuda already
-  knows. If paper wants section breaks, that is a second backend (a `--html`
-  rung emitting semantic blocks), not a flag on this one.
+- **Page breaks — closed 2026-10-09: pagination is a printer capability, not a
+  document structure.** The operator's framing, adopted: we cannot know how long
+  a *printer's* page is, so all any renderer can do is declare defaults for its
+  own page box (A4, 80 × 66 at 10pt) and let the driver place them. The browser
+  already breaks between lines, which is the whole of the mechanism; a heading
+  may therefore land at the foot of a page. If that ever matters it is a
+  *printer-layout* decision — and the only fix would be block structure, i.e. the
+  second backend this rung deliberately refuses. It is not a document-structure
+  problem, and it does not need a `--html` rung.
 - **Elision versus wrapping.** Code fences *elide* at the column edge
   (`ADR-UNIVERSAL-ELISION-050`); on screen the bytes are recoverable by widening
   the terminal, on paper they are gone. Sameness keeps the two rungs in

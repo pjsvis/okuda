@@ -30,6 +30,8 @@ const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 export const PAGE_MM = { width: 210, margin: 8 };
 /** Monospace advance, in em. Menlo 0.6023, SF Mono 0.600 — 0.61 leaves slack. */
 export const ADVANCE_EM = 0.61;
+/** The largest type the paper rung will use, in points. */
+export const MAX_FONT_PT = 10;
 
 /** WCAG relative luminance of an `#rrggbb` string, 0 (black) to 1 (white). */
 export function relLum(hex: string): number {
@@ -119,8 +121,27 @@ export function paperInk(hex: string, background = false): string {
   else l = darkenToContrast(h, s, l);
   return hslHex(h, s, l);
 }
-/** The largest type the paper rung will use, in points. */
-export const MAX_FONT_PT = 10;
+/** Column count for the paper rung when none is given.
+ *
+ *  **80, because that is the printer's width, not because it is the terminal's**
+ *  (the agreement is not a coincidence — both media are 8.5in of monospace on
+ *  white). Paper is the one output whose geometry we do NOT control: the page is
+ *  A4 by declaration and the *printer* decides what it does with that. So the
+ *  rung declares the conservative default — a printable 8.5in at 80 columns,
+ *  where the type takes the full 10pt cap — and the driver may scale from there.
+ *  100 columns is available (and prints at ~9pt); it is not the default because
+ *  the medium's habit is 80. */
+export const PAPER_DEFAULT_COLS = 80;
+
+/** Lines a page holds at a given type size, from this rung's own page box.
+ *  "How long is a page" is answerable for the artefact we emit — A4, known
+ *  margins, known line height — and the printer's own fidelity (Letter, fit-to-
+ *  page, a scale factor) is the printer's business. Pure. */
+export function paperLinesPerPage(fontPt: number): number {
+  const contentHeightMm = 297 - PAGE_MM.margin - 12; // top margin, bottom margin
+  const linePt = fontPt * 1.18;
+  return Math.floor(((contentHeightMm / 25.4) * 72) / linePt);
+}
 
 /** The font size that makes `cols` columns fit the page — never more than
  *  MAX_FONT_PT, and never so large that the right edge is clipped. Clipping
@@ -204,7 +225,7 @@ if (import.meta.main) {
 const argv = process.argv.slice(2);
 let file = "";
 let out = "";
-let width = 100; // paper is its own glass: the page decides, not a terminal
+let width = PAPER_DEFAULT_COLS;
 let receipt = false;
 
 for (let i = 0; i < argv.length; i++) {
@@ -253,6 +274,7 @@ const commit = spawnSync("git", ["rev-parse", "--short=7", "HEAD"], { cwd: ROOT 
   .stdout.toString()
   .trim();
 const fontPt = paperFontPt(width);
+const linesPerPage = paperLinesPerPage(fontPt);
 const html = `<!doctype html>
 <meta charset="utf-8">
 <title>${esc(basename(file))}</title>
@@ -300,6 +322,6 @@ const pages = (() => {
 process.stdout.write(
   `paper: ${outPath}${pages}\n` +
     `  render: ${useBinary ? "compiled binary" : "bun run src/cli.ts (no binary — run just build)"}` +
-    ` · ${width} cols at ${fontPt}pt${receipt ? " · receipt kept" : " · receipt dropped"} · html kept at tmp/paper/\n`,
+    ` · ${width} cols at ${fontPt}pt${receipt ? " · receipt kept" : " · receipt dropped"} · ${linesPerPage} lines/page · html kept at tmp/paper/\n`,
 );
 }

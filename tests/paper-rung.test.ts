@@ -161,3 +161,26 @@ describe("fills survive the ink transform — a badge is a mark, not a surface",
     }
   });
 });
+
+describe("paper's defaults are the printer's, not the terminal's (BRF-PAPER-RUNG)", () => {
+  test("80 columns by default — the printer's width, and the type cap", async () => {
+    const { PAPER_DEFAULT_COLS, paperFontPt } = await import("../scripts/paper");
+    expect(PAPER_DEFAULT_COLS).toBe(80);
+    // At 80 columns the type takes the full readable cap; at 100 it must shrink.
+    expect(paperFontPt(PAPER_DEFAULT_COLS)).toBe(10);
+    expect(paperFontPt(100)).toBeLessThan(10);
+  });
+
+  test("a page's length is known for OUR page box — A4, stated margins", async () => {
+    const { paperLinesPerPage } = await import("../scripts/paper");
+    expect(paperLinesPerPage(10)).toBeGreaterThan(60); // ~60-70 lines at 10pt A4
+    expect(paperLinesPerPage(10)).toBeLessThan(75);
+    expect(paperLinesPerPage(5)).toBeGreaterThan(paperLinesPerPage(10));
+  });
+
+  test("the footer and the report both state the geometry", async () => {
+    const { paperLinesPerPage, paperFontPt } = await import("../scripts/paper");
+    const lines = paperLinesPerPage(paperFontPt(80));
+    expect(lines).toBe(paperLinesPerPage(10));
+  });
+});
