@@ -83,5 +83,6 @@
 {"file":"2026-10-08-brief-reg-cli.md","date":"2026-10-08","status":"open","summary":"`reg` — the silo maintenance CLI, one entry point, one artifact","meta":{},"callsign":"BRF-REG-CLI"}
 {"file":"2026-10-08-brief-registry-discovery.md","date":"2026-10-08","status":"open","summary":"One map from the territory — the registry discovers its own tiers","meta":{},"callsign":"BRF-REGISTRY-DISCOVERY"}
 {"file":"2026-10-08-brief-silo-lexicon.md","date":"2026-10-08","status":"open","summary":"Gather the silo's terms of art into `conceptual-lexicon.md`","meta":{},"callsign":"BRF-SILO-LEXICON"}
+{"file":"2026-10-09-brief-complete-blocks.md","date":"2026-10-09","status":"open","summary":"The viewport holds complete blocks — cut at boundaries, in the printer and the frame","meta":{},"callsign":"BRF-COMPLETE-BLOCKS"}
 {"file":"2026-10-09-brief-docs-ledger.md","date":"2026-10-09","status":"open","summary":"The docs/ ledger — a prune ledger, not a registry","meta":{},"callsign":"BRF-DOCS-LEDGER"}
 {"file":"2026-10-09-brief-paper-rung.md","date":"2026-10-09","status":"done","summary":"The paper rung — the same render, printed","meta":{},"callsign":"BRF-PAPER-RUNG"}

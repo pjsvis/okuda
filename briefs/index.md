@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-09 | BRF-COMPLETE-BLOCKS | open | The viewport holds complete blocks — cut at boundaries, in the printer and the frame | 2026-10-09-brief-complete-blocks.md |
 | 2026-10-09 | BRF-DOCS-LEDGER | open | The docs/ ledger — a prune ledger, not a registry | 2026-10-09-brief-docs-ledger.md |
 | 2026-10-09 | BRF-PAPER-RUNG | done | The paper rung — the same render, printed | 2026-10-09-brief-paper-rung.md |
 | 2026-10-08 | BRF-DOCUMENT-LIFECYCLE | open | The document lifecycle — ephemeral, record, addressed, retired | 2026-10-08-brief-document-lifecycle.md |
