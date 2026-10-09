@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-09 | BRF-DOCS-LEDGER | open | The docs/ ledger — a prune ledger, not a registry | 2026-10-09-brief-docs-ledger.md |
 | 2026-10-08 | BRF-DOCUMENT-LIFECYCLE | open | The document lifecycle — ephemeral, record, addressed, retired | 2026-10-08-brief-document-lifecycle.md |
 | 2026-10-08 | BRF-REG-CLI | open | `reg` — the silo maintenance CLI, one entry point, one artifact | 2026-10-08-brief-reg-cli.md |
 | 2026-10-08 | BRF-REGISTRY-DISCOVERY | open | One map from the territory — the registry discovers its own tiers | 2026-10-08-brief-registry-discovery.md |
