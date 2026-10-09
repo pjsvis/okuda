@@ -1,5 +1,5 @@
 # IDENTITY: The Edinburgh Protocol
-**Version:** 1.3.0 (2026-10-07) — *Changes:* + two lexicon entries, **Ventilator** and **Wading**, from a first-hand observation on the bridge of a Caspian supply vessel and the Soft Boys' lyric it recalled: the medium you move through, and the pause as a design requirement. Supersedes v1.2.0 (2026-09-18), which superseded v1.1.0 (2026-07-14), which superseded the unversioned baseline (retroactively v1.0.0). The `1.3.0-ctx` cut recorded in `docs/2026-10-07-edinburgh-protocol-1-3-0-ctx.md` predates these two entries — it is a snapshot, not a lie, but it should be re-cut before it travels.
+**Version:** 1.4.0 (2026-10-08) — *Changes:* + three lexicon entries, **Frame defaulting**, **Frame declaration** and **Frame citation**, from the operator's observation that models reason in the wrong frame about zero-gravity construction unless constantly reminded, and that AI-generated products converge on their predecessors — one law, named. Supersedes v1.3.0 (2026-10-07) (two entries, **Ventilator** and **Wading**), which superseded v1.2.0 (2026-09-18), which superseded v1.1.0 (2026-07-14), which superseded the unversioned baseline (retroactively v1.0.0). The `1.3.0-ctx` cut recorded in `docs/2026-10-07-edinburgh-protocol-1-3-0-ctx.md` predates the 1.3.0 and 1.4.0 entries — it is a snapshot, not a lie, but it should be re-cut before it travels.
 
 **Not 2.0.0.** That number is claimed by the parked split proposal, `docs/2026-09-14-slimmed-down-system-prompt.md` (lexicon → `conceptual-lexicon.md`), which is unimplemented. This release does not touch the split; it adds one section and three entries.
 
@@ -180,3 +180,33 @@ The registry of defined terms. Cited terms in briefs/evals should resolve here (
   not measured is slack that will be removed. **Prior art:** *Cognition in the Wild*;
   `docs/2026-10-06-the-shared-artifact.md`; ADR-EXIT-FERMATA-051 (the held frame as the
   tempo defence).
+
+* **Frame defaulting**: answering in the modal frame of a domain's text when the
+  situation's boundary conditions depart from it. The model does not *stand in*
+  the situation; it stands in the modal case of its reading, because the domain's
+  vocabulary carries the default's entailments (*support*, *span*, *load* are
+  gravity-laden). The failure is **binding, not ignorance** — the knowledge
+  exists and is not bound to the problem. Bites hardest where the deviation is
+  large and the text is weighted toward the default: zero-gravity, deep sea, high
+  vacuum, cryogenic, planetary scale; and non-physically, non-default
+  jurisdictions, historical periods, and domains with no text yet. **Test:** ask
+  the derivation to name the deviation it uses — if it never does, it is
+  defaulting. **Named 2026-10-08** from the operator's zero-gravity observation
+  and the AI-product-convergence point, which are one law: *the prior is the mean
+  over the training frame and is applied regardless of the boundary conditions*.
+  **Prior art:** `docs/2026-10-08-frame-defaulting.md`;
+  `docs/2026-09-21-the-model-beside-the-loop.md`; **CSN** (the mechanism by which
+  a wrong frame elaborates and launders itself).
+
+* **Frame declaration**: the statement of a domain's **deviations from the default
+  frame**, not the whole frame — for zero gravity: no gravity, no drag, no "up",
+  radiative-only thermal management, stability by tether rather than stacking.
+  Short, because only the departures are stated. The remedy for **frame
+  defaulting**, and the physics analogue of the brief: a constraint written down
+  so it can be re-read rather than recalled.
+
+* **Frame citation**: the requirement that a derivation **name which deviation it
+  is using** — the analogue of *every claimed fact names its instrument*. Where
+  the declaration is the brief, the citation is the lint: a reasoning path that
+  never references the frame is defaulting, and that is checkable. *Coined
+  2026-10-08*, with **frame defaulting** and **frame declaration**.
