@@ -233,6 +233,16 @@ the same move as looking at a document instead of grepping it.
   addresses (`ADR-007`, `src/render.ts`). A paper "documents cited" appendix —
   addresses without numbers — is cheap and not built.
 
+## The lessons, kept
+
+The rung's lessons are gathered in `docs/2026-10-09-paper-the-exclusion-principle-printed.md`
+— ten of them, with the measurements behind each, plus the register argument
+(TFS excluded Themes, Fonts and Shite and got indestructible velocity; this is
+the shite filter's third instance, at the medium scale) and the three refusals
+that guard it. The short version: **a medium is a sink, not a renderer; a
+delegated decision needs an owner in every medium; what is absent looks like what
+is known; look at the artefact; the instrument is the likelier liar.**
+
 ## Related
 
 - `BRF-PAPER-RUNG` — the brief, with the measured table and the open questions
