@@ -241,3 +241,40 @@ describe("the printer is the terminal — chroma's 16-colour class codes (BRF-PA
     for (const ink of inks) expect(contrastWhite(ink)).toBeGreaterThanOrEqual(CONTRAST_FLOOR);
   });
 });
+
+describe("complete blocks in the viewport — the printer's half (BRF-COMPLETE-BLOCKS)", () => {
+  test("every block ends with its ring — the blank is a line box, not a terminator", async () => {
+    const { splitBlocks } = await import("../scripts/paper");
+    // `\n\n` in a pre is one empty line box, which is the ring; `\n` alone is a
+    // bare terminator and the air would vanish in layout while the bytes still
+    // looked right (found exactly that way, on the page).
+    for (const b of splitBlocks("a\n\nb\n")) expect(b.endsWith("\n\n")).toBe(true);
+    expect(splitBlocks("a\n\nb\n")).toEqual(["a\n\n", "b\n\n"]);
+  });
+
+  test("nothing is deleted, and a run of blanks collapses to ONE ring", async () => {
+    const { splitBlocks } = await import("../scripts/paper");
+    const src = "one\n\n\ntwo\nthree\n\nfour\n";
+    const blocks = splitBlocks(src);
+    // every content line survives, in order
+    const content = (t: string) => t.split("\n").filter((l) => l.trim() !== "");
+    expect(blocks.flatMap(content)).toEqual(["one", "two", "three", "four"]);
+    // and the two blank lines after `one` are one ring, not two gaps: uniform air
+    expect(blocks).toEqual(["one\n\n", "two\nthree\n\n", "four\n\n"]);
+  });
+
+  test("every block is its own element, and a page may not cut one open", async () => {
+    const { toHtml, splitBlocks, paperInk, DEFAULT_MUTED } = await import("../scripts/paper");
+    const ansi = "\x1b[38;2;248;248;242mfirst block\x1b[0m\n\n\x1b[38;2;248;248;242msecond\x1b[0m\n";
+    const html = splitBlocks(ansi)
+      .map((b) => `<pre class="block">${toHtml(b, paperInk(DEFAULT_MUTED))}</pre>`)
+      .join("\n");
+    expect([...html.matchAll(/<pre class="block">/g)].length).toBe(2);
+  });
+
+  test("the known limit, pinned rather than hidden: a fence with a blank line splits", async () => {
+    const { splitBlocks } = await import("../scripts/paper");
+    const fence = "```ts\nconst a = 1;\n\nconst b = 2;\n```\n";
+    expect(splitBlocks(fence).length).toBe(2); // documented: a break may land inside code
+  });
+});

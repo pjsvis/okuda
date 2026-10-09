@@ -83,8 +83,20 @@ not corruption. Fixing it properly needs the renderer to speak structure — the
 second backend this silo refuses for print. The test pins this behaviour.
 
 **Verification, on the artefact**: page 2 of a prose-heavy document, before and
-after (`pdftoppm -f 2 -l 2 -png`). Before: a paragraph fragment opens the page.
-After: the page opens with a complete block.
+after (`pdftoppm -f 2 -l 2 -png`).
+
+- **Before:** page 2 opened with *"is ours, the glass is the host's, and the wire
+  carries text."* — a paragraph's tail.
+- **After:** page 2 opens with a complete paragraph; page 1 ends with a complete
+  paragraph and the deferred block's absence is visible as white at the foot.
+
+**What it cost, measured:** that document went from **3 pages to 4**. Completeness
+costs paper — the same trade as any widow/orphan control, larger because the unit
+is a whole block. It is the price the rule names, and it is paid where the block
+cannot fit. A smarter rule (*cut only when the gap would waste more than N lines*)
+is not expressible in CSS — and the TUI's Milestone 2 **can** do it, because there
+okuda owns the glass and can measure the gap. Print takes the simple rule; the
+frame can take the better one.
 
 ## Milestone 2 — the frame (a separate brief or a follow-on commit)
 
@@ -107,9 +119,9 @@ frame costs a scrolling bug.
 ## Acceptance criteria
 
 - Every block prints whole: no page break inside a paragraph, list item, table,
-  or diagram (verified on a page image, and by the split being structural).
-- Nothing is deleted: the line count of the render is unchanged by the split, and
-  the blank-line air survives exactly.
+  or diagram — verified on the page images, not asserted.
+- Nothing is deleted: the content lines survive in order, and a run of blank lines
+  collapses to one ring (uniform air, no double gaps) — pinned by test.
 - The split is by blank line only — no markdown parsing, no renderer change, no
   new dependency.
 - The fence-with-blank-line limit is pinned by a test.

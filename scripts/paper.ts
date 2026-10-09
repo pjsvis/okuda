@@ -196,6 +196,41 @@ const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const hex = (n: string) => Number(n).toString(16).padStart(2, "0");
 
+/** Split the rendered bytes into blocks at blank-line runs, each block KEEPING
+ *  its trailing blank.
+ *
+ *  okuda separates every block with a blank line (the loose-layout rule), so the
+ *  blank line is the layout's own block separator — a *shape* rule, like "a
+ *  background equal to its foreground is a fill". No markdown parsing, no
+ *  renderer change, no structure invented.
+ *
+ *  The trailing blank stays inside the block because it is the block's focus
+ *  ring: separating them would let a page end a block with no air after it, which
+ *  is the one thing the ring exists to prevent. Known limit: a fence containing a
+ *  blank line splits in two, so a break opportunity can land inside a code
+ *  listing — it still breaks between lines, and `tests/paper-rung.test.ts` pins
+ *  that behaviour rather than hiding it. Pure. */
+export function splitBlocks(src: string): string[] {
+  const blocks: string[] = [];
+  let current: string[] = [];
+  for (const line of src.split("\n")) {
+    if (line.trim() === "") {
+      // A blank ends the block, and the block ENDS WITH THE BLANK: `\n\n` in a
+      // `pre` is one empty line box, which is the ring. Joining the blank in as
+      // the last element would make it a mere terminator — `"a\n"` — and every
+      // ring would vanish in layout while the bytes still looked right.
+      if (current.length > 0) {
+        blocks.push(current.join("\n") + "\n\n");
+        current = [];
+      }
+      continue; // leading air is dropped, never accumulated
+    }
+    current.push(line);
+  }
+  if (current.length > 0) blocks.push(current.join("\n") + "\n");
+  return blocks;
+}
+
 /** The ANSI→HTML pass. Exported for its own test: the fill rule is a decision,
  *  not an implementation detail. */
 export function toHtml(src: string, markInk: string = paperInk(DEFAULT_MUTED)): string {
@@ -343,11 +378,16 @@ const html = `<!doctype html>
   pre { white-space: pre; font-family: "SF Mono", Menlo, monospace;
         font-size: ${fontPt}pt; line-height: 1.18; color: #101014; margin: 0;
         -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* One element per block, and a page must not cut one open: complete things in
+     the viewport, or a single thing that has to scroll (BRF-COMPLETE-BLOCKS).
+     A block taller than a page cannot be kept whole — the spec ignores
+     break-inside in exactly that case — so the fallback is automatic. */
+  pre.block { break-inside: avoid; page-break-inside: avoid; }
   .prov { font-family: "SF Mono", Menlo, monospace; font-size: 6pt;
           color: #6b7280; margin-top: 6mm; -webkit-print-color-adjust: exact;
           print-color-adjust: exact; }
 </style>
-<pre>${toHtml(ansi, markInk)}</pre>
+${splitBlocks(ansi).map((b) => `<pre class="block">${toHtml(b, markInk)}</pre>`).join("\n")}
 <div class="prov">rendered projection · okuda&nbsp;${esc(commit)} · ${esc(file)} · ${width} cols at ${fontPt}pt · ${new Date().toISOString().slice(0, 10)} · no silcrows (they cannot resolve on paper) · ink mirrored for paper</div>
 `;
 
