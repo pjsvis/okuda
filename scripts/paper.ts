@@ -210,25 +210,59 @@ const hex = (n: string) => Number(n).toString(16).padStart(2, "0");
  *  blank line splits in two, so a break opportunity can land inside a code
  *  listing — it still breaks between lines, and `tests/paper-rung.test.ts` pins
  *  that behaviour rather than hiding it. Pure. */
+/** Split the rendered bytes into blocks at blank lines — **losslessly**: the
+ *  blocks are slices of the source, so `splitBlocks(src).join("") === src`.
+ *
+ *  okuda separates every block with a blank line (the loose-layout rule), so the
+ *  blank line is the layout's own block separator — a *shape* rule, like "a
+ *  background equal to its foreground is a fill". The split is at the blank's
+ *  second newline, so a block keeps its ring (`"…silo.\n\n"`), and nothing is
+ *  inserted or dropped: a run of blanks simply belongs to the block that follows
+ *  it. Pure. */
 export function splitBlocks(src: string): string[] {
   const blocks: string[] = [];
-  let current: string[] = [];
-  for (const line of src.split("\n")) {
-    if (line.trim() === "") {
-      // A blank ends the block, and the block ENDS WITH THE BLANK: `\n\n` in a
-      // `pre` is one empty line box, which is the ring. Joining the blank in as
-      // the last element would make it a mere terminator — `"a\n"` — and every
-      // ring would vanish in layout while the bytes still looked right.
-      if (current.length > 0) {
-        blocks.push(current.join("\n") + "\n\n");
-        current = [];
-      }
-      continue; // leading air is dropped, never accumulated
-    }
-    current.push(line);
+  let last = 0;
+  for (const m of src.matchAll(/\n[^\S\n]*\n/g)) {
+    const cut = (m.index ?? 0) + m[0].length;
+    blocks.push(src.slice(last, cut));
+    last = cut;
   }
-  if (current.length > 0) blocks.push(current.join("\n") + "\n");
+  if (last < src.length) blocks.push(src.slice(last));
   return blocks;
+}
+
+/** The line boxes a block occupies in a `pre`: one per line, the last one only
+ *  counting if it carries a newline. `"a\n\n"` is two (text, ring); `"a"` is one. */
+export function linesIn(block: string): number {
+  return block.split("\n").length - (block.endsWith("\n") ? 1 : 0);
+}
+
+/** Cut blocks into pages of complete things: a page takes blocks while they fit
+ *  and *stops* when the next one would not — the fat is trimmed, nothing is
+ *  inserted, and no block is ever cut open. A block taller than a page takes a
+ *  page to itself and overflows; the printer breaks it at the page edge, which
+ *  is the "get bigger paper" case, not ours.
+ *
+ *  We know the viewport, so we make the cut. Delegating it to the browser
+ *  (`break-inside: avoid`) worked but cost a page and did not say where the
+ *  breaks fell; this is deterministic, inspectable, and the same algorithm the
+ *  frame will use (BRF-COMPLETE-BLOCKS, Milestone 2). Pure. */
+export function paginate(blocks: string[], linesPerPage: number): string[][] {
+  const pages: string[][] = [];
+  let page: string[] = [];
+  let used = 0;
+  for (const block of blocks) {
+    const n = linesIn(block);
+    if (page.length > 0 && used + n > linesPerPage) {
+      pages.push(page);
+      page = [];
+      used = 0;
+    }
+    page.push(block);
+    used += n;
+  }
+  if (page.length > 0) pages.push(page);
+  return pages;
 }
 
 /** The ANSI→HTML pass. Exported for its own test: the fill rule is a decision,
@@ -378,16 +412,17 @@ const html = `<!doctype html>
   pre { white-space: pre; font-family: "SF Mono", Menlo, monospace;
         font-size: ${fontPt}pt; line-height: 1.18; color: #101014; margin: 0;
         -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  /* One element per block, and a page must not cut one open: complete things in
-     the viewport, or a single thing that has to scroll (BRF-COMPLETE-BLOCKS).
-     A block taller than a page cannot be kept whole — the spec ignores
-     break-inside in exactly that case — so the fallback is automatic. */
-  pre.block { break-inside: avoid; page-break-inside: avoid; }
+  /* WE own the viewport: the pages are cut by paginate() from the known geometry,
+     so the browser is asked only to honour the breaks — not to decide them. A
+     block is never cut open, and nothing is inserted to make that true. */
+  .page + .page { break-before: page; page-break-before: always; }
   .prov { font-family: "SF Mono", Menlo, monospace; font-size: 6pt;
           color: #6b7280; margin-top: 6mm; -webkit-print-color-adjust: exact;
           print-color-adjust: exact; }
 </style>
-${splitBlocks(ansi).map((b) => `<pre class="block">${toHtml(b, markInk)}</pre>`).join("\n")}
+${paginate(splitBlocks(ansi), linesPerPage)
+  .map((page) => `<section class="page"><pre>${toHtml(page.join(""), markInk)}</pre></section>`)
+  .join("\n")}
 <div class="prov">rendered projection · okuda&nbsp;${esc(commit)} · ${esc(file)} · ${width} cols at ${fontPt}pt · ${new Date().toISOString().slice(0, 10)} · no silcrows (they cannot resolve on paper) · ink mirrored for paper</div>
 `;
 

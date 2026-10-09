@@ -242,39 +242,54 @@ describe("the printer is the terminal — chroma's 16-colour class codes (BRF-PA
   });
 });
 
-describe("complete blocks in the viewport — the printer's half (BRF-COMPLETE-BLOCKS)", () => {
-  test("every block ends with its ring — the blank is a line box, not a terminator", async () => {
+describe("complete blocks in the viewport — we own the cut (BRF-COMPLETE-BLOCKS)", () => {
+  test("the split is lossless: we never insert or drop anything", async () => {
     const { splitBlocks } = await import("../scripts/paper");
-    // `\n\n` in a pre is one empty line box, which is the ring; `\n` alone is a
-    // bare terminator and the air would vanish in layout while the bytes still
-    // looked right (found exactly that way, on the page).
-    for (const b of splitBlocks("a\n\nb\n")) expect(b.endsWith("\n\n")).toBe(true);
-    expect(splitBlocks("a\n\nb\n")).toEqual(["a\n\n", "b\n\n"]);
+    for (const src of ["a\n\nb\n", "one\n\n\ntwo\n", "\n\nlead\n\ntail", "no blanks at all"]) {
+      expect(splitBlocks(src).join("")).toBe(src);
+    }
   });
 
-  test("nothing is deleted, and a run of blanks collapses to ONE ring", async () => {
+  test("a block keeps its ring — the bytes are the layout's, not ours", async () => {
     const { splitBlocks } = await import("../scripts/paper");
-    const src = "one\n\n\ntwo\nthree\n\nfour\n";
-    const blocks = splitBlocks(src);
-    // every content line survives, in order
-    const content = (t: string) => t.split("\n").filter((l) => l.trim() !== "");
-    expect(blocks.flatMap(content)).toEqual(["one", "two", "three", "four"]);
-    // and the two blank lines after `one` are one ring, not two gaps: uniform air
-    expect(blocks).toEqual(["one\n\n", "two\nthree\n\n", "four\n\n"]);
+    expect(splitBlocks("porch, not a silo.\n\n### next\n")).toEqual([
+      "porch, not a silo.\n\n",
+      "### next\n",
+    ]);
   });
 
-  test("every block is its own element, and a page may not cut one open", async () => {
-    const { toHtml, splitBlocks, paperInk, DEFAULT_MUTED } = await import("../scripts/paper");
-    const ansi = "\x1b[38;2;248;248;242mfirst block\x1b[0m\n\n\x1b[38;2;248;248;242msecond\x1b[0m\n";
-    const html = splitBlocks(ansi)
-      .map((b) => `<pre class="block">${toHtml(b, paperInk(DEFAULT_MUTED))}</pre>`)
-      .join("\n");
-    expect([...html.matchAll(/<pre class="block">/g)].length).toBe(2);
+  test("line boxes are counted as the pre lays them out", async () => {
+    const { linesIn } = await import("../scripts/paper");
+    expect(linesIn("a\n\n")).toBe(2); // text + ring
+    expect(linesIn("a")).toBe(1);
+    expect(linesIn("a\nb\n")).toBe(2);
+  });
+
+  test("a page takes complete blocks and stops when the next will not fit", async () => {
+    const { paginate, linesIn } = await import("../scripts/paper");
+    const block = (n: number) => Array.from({ length: n }, (_, i) => `l${i}`).join("\n") + "\n\n";
+    // The ring is a LINE BOX, so a 10-line block occupies 11 — the air is not
+    // free, it is paper. Four such blocks are 44 lines, and 25-line pages of a
+    // greedy pack: 22 + 22.
+    expect(linesIn(block(10))).toBe(11);
+    const pages = paginate([block(10), block(10), block(10), block(10)], 25);
+    expect(pages.map((p) => p.length)).toEqual([2, 2]);
+    expect(pages.every((p) => p.reduce((n, b) => n + linesIn(b), 0) <= 25)).toBe(true);
+  });
+
+  test("no block is ever cut open, and the pages are the blocks — lossless", async () => {
+    const { paginate } = await import("../scripts/paper");
+    const block = (n: number) => Array.from({ length: n }, (_, i) => `l${i}`).join("\n") + "\n\n";
+    const blocks = [block(30), block(5), block(40), block(2)];
+    const pages = paginate(blocks, 20);
+    expect(pages.flat()).toEqual(blocks); // every block whole, in order, exactly once
+    expect(pages.map((p) => p.join("")).join("")).toBe(blocks.join(""));
+    // the oversized block gets a page to itself and overflows: bigger paper, not our problem
+    expect(pages.find((p) => p.includes(blocks[1]!))!.length).toBeLessThanOrEqual(2);
   });
 
   test("the known limit, pinned rather than hidden: a fence with a blank line splits", async () => {
     const { splitBlocks } = await import("../scripts/paper");
-    const fence = "```ts\nconst a = 1;\n\nconst b = 2;\n```\n";
-    expect(splitBlocks(fence).length).toBe(2); // documented: a break may land inside code
+    expect(splitBlocks("```ts\nconst a = 1;\n\nconst b = 2;\n```\n").length).toBe(2);
   });
 });

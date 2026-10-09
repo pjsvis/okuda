@@ -67,14 +67,28 @@ blank line (the loose-layout rule), so **the blank line is the layout's own bloc
 separator** — a *shape* rule, like "a background equal to its foreground is a
 fill". No markdown parsing, no renderer change, no structure invented.
 
-- Split the rendered bytes into blocks at blank-line runs, each block keeping its
-  trailing blank (the ring belongs to the block; a page must not separate a block
-  from its own air).
-- One `<pre>` per block with `break-inside: avoid` (+ the `page-break-inside`
-  alias).
-- A block taller than a page cannot be kept whole; `break-inside: avoid` is
-  *ignored* in that case by specification, so the fallback is automatic — the
-  singles that need scrolling scroll.
+**We make the cut — the browser only honours it** (operator's ruling, second
+pass: *"we know the viewport we are targeting, all we are doing is trimming the
+fat."*). The first attempt delegated the decision to CSS (`break-inside: avoid`)
+and it worked, but it cost a page, did not say where the breaks fell, and could
+not look ahead. Since the viewport is *known* — 80 columns, 66 lines at 10pt —
+the cut is arithmetic:
+
+- `splitBlocks` slices the render at blank lines, **losslessly**: the blocks are
+  slices of the source, so `join("")` is the source. Nothing is inserted, nothing
+  is dropped, and a block keeps its ring verbatim.
+- `paginate(blocks, linesPerPage)` takes blocks while they fit and *stops* when
+  the next would not: the fat is trimmed, no block is ever cut open, and the
+  emitted pages are the blocks — in order, exactly once.
+- The browser is told only `break-before: page` between pages. No
+  `break-inside: avoid`, no delegation, no heuristics: deterministic, inspectable,
+  and **the same algorithm the frame will use** (Milestone 2), which is the prize.
+- A block taller than a page is not our problem: it takes a page and overflows —
+  *"if the paper is not big enough then they need to get bigger paper."*
+
+**Measured:** the same document is **3 pages** on this rule, against 4 under
+`break-inside: avoid` — a greedy pack beats a lookahead-free browser heuristic on
+both determinism and paper.
 
 **Known limit, stated rather than hidden:** a fence containing a blank line is
 split into two blocks, so a break opportunity can land inside a code listing. It
@@ -135,6 +149,10 @@ frame costs a scrolling bug.
   cost, and it is not this brief's.
 - **Widow/orphan control inside a block.** A block is atomic; its interior is the
   renderer's business.
+- **Elision versus wrapping — closed by ruling** (2026-10-09): *"with regard to
+  elision on paper, just elide … if the paper is not big enough then they need to
+  get bigger paper, not our concern."* So paper keeps okuda's elision exactly, and
+  the sameness rule holds with no exception to maintain. The open question retires.
 - **Deleting or truncating content.** Defer, never drop.
 - **Page geometry.** The page box stays A4, 80 columns, 10pt (BRF-PAPER-RUNG).
 
