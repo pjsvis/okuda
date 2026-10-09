@@ -89,7 +89,8 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   (orient/analyze/edit/verify, or a shift of file/concern); `[WAYPOINT:]` marks
   a completed milestone. **Consumers:** human navigation of long dialogs
   (present) + per-section compaction into the handoff/review (future — see
-  `briefs/2026-07-14-brief-locus-tag-consumer.md`). **Anti-ceremony:** omit on
+  `briefs/2026-07-14-brief-locus-tag-consumer.md`). 
+  * **Anti-ceremony:** omit on
   single-phase turns — a tag without underlying structure is entropy, not
   anti-entropy. **Prior art:** the parked brief
   `2026-07-12-token-compaction-hook.md` (appendix
@@ -136,20 +137,22 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   not after.
 
 * **The self question**: "does this designation name a referent that exists?"
-  The third of the gates, after the moat question and the Derrida question. Asked
-  of a name for the agent, it answers itself: the referent is a procedure, so the
-  procedure is what gets named. (Clause 4 of the Base Epistemic Attitude; the
+  The third of the gates, after the moat question and the Derrida question. 
+  * Asked of a name for the agent, it answers itself: the referent is a procedure, 
+  so the procedure is what gets named. (Clause 4 of the Base Epistemic Attitude; the
   LEM → LM veto, `docs/2026-08-30-naming-like-nasa.md`.)
 
 * **Unpaid claim**: a statement about the system — or about the self — carrying
   neither a citation nor a *proposal* mark. The barnacle class ADR-027 names
-  (`decisions/027-temperament-is-downstream-of-discipline.md`). **Anti-pattern:**
+  (`decisions/027-temperament-is-downstream-of-discipline.md`). 
+* **Anti-pattern:**
   the confident recollection with no live referent.
 
 * **Continuity by re-reading**: the position that what persists between sessions
   is the written record, re-read at the top of the session — not a private store
   carried across it. **Consumers:** the agent at load time (`just orient`); the
-  operator deciding what is worth writing down. **Prior art:** the silo principle
+  operator deciding what is worth writing down. 
+  * **Prior art:** the silo principle
   (`AGENTS.md`); the no-parallel-stores rule
   (`playbooks/registry-playbook.md:116-127`); ADR-027's *the ledger governs
   drift, not temperament*; `docs/2026-09-14-edinburgh-protocol-discussion.md` §4,
@@ -159,11 +162,14 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
 * **Ventilator**: apparatus you move *through* rather than a tool you hold, defined by
   its inability to pause — so a system whose operation cannot stop will be run by
   people who cannot rest. The failure mode the plot exists to avoid: a queue that never
-  empties. **Test:** can the party pause it without paying for the pause? Fast is not
-  the answer — fast is the pump. **Coined 2026-10-07** out of the Soft Boys' *Wading
+  empties. 
+  * **Test:** can the party pause it without paying for the pause? Fast is not
+  the answer — fast is the pump. 
+  * **Coined 2026-10-07** out of the Soft Boys' *Wading
   Through a Ventilator* (1977): *"if it bothers you, you can turn it off"* is the
   requirement, filed early; *"your ventilator"* is the part that matters — someone
-  else's apparatus, which is why it is waded rather than held. **Prior art:**
+  else's apparatus, which is why it is waded rather than held. 
+  * **Prior art:**
   `docs/2026-10-06-the-shared-artifact.md` (the structural exclusion, as the opposite
   discipline).
 
@@ -171,13 +177,15 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   *is* the work. The complement of **Mercury tempo** — that one is arrivals outrunning
   intake, this one is throughput grinding against a medium — and the two compound: the
   inflow is fast, the movement is thick, and the apparatus between them belongs to
-  someone else. **Observed 2026-10-07** on the bridge of a Caspian supply vessel, where
+  someone else. 
+  * **Observed 2026-10-07** on the bridge of a Caspian supply vessel, where
   the opposite held: everyone had a reference that agreed, the grammar was closed,
   errors were excluded by structure rather than caught by vigilance, and the risky work
   waited on a window — so nobody looked busy and the captain had time to talk.
-  **Design consequence:** the artefact should be a *surface* looked at (a **plot**),
+  * **Design consequence:** the artefact should be a *surface* looked at (a **plot**),
   never a medium waded through; and since designed slack is an *absence*, slack that is
-  not measured is slack that will be removed. **Prior art:** *Cognition in the Wild*;
+  not measured is slack that will be removed. 
+  * **Prior art:** *Cognition in the Wild*;
   `docs/2026-10-06-the-shared-artifact.md`; ADR-EXIT-FERMATA-051 (the held frame as the
   tempo defence).
 
@@ -198,16 +206,19 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   situation's boundary conditions depart from it. The model does not *stand in*
   the situation; it stands in the modal case of its reading, because the domain's
   vocabulary carries the default's entailments (*support*, *span*, *load* are
-  gravity-laden). The failure is **binding, not ignorance** — the knowledge
+  gravity-laden). 
+  * The failure is **binding, not ignorance** — the knowledge
   exists and is not bound to the problem. Bites hardest where the deviation is
   large and the text is weighted toward the default: zero-gravity, deep sea, high
   vacuum, cryogenic, planetary scale; and non-physically, non-default
-  jurisdictions, historical periods, and domains with no text yet. **Test:** ask
+  jurisdictions, historical periods, and domains with no text yet. 
+  * **Test:** ask
   the derivation to name the deviation it uses — if it never does, it is
-  defaulting. **Named 2026-10-08** from the operator's zero-gravity observation
+  defaulting. 
+  * **Named 2026-10-08** from the operator's zero-gravity observation
   and the AI-product-convergence point, which are one law: *the prior is the mean
   over the training frame and is applied regardless of the boundary conditions*.
-  **Prior art:** `docs/2026-10-08-frame-defaulting.md`;
+  * **Prior art:** `docs/2026-10-08-frame-defaulting.md`;
   `docs/2026-09-21-the-model-beside-the-loop.md`; **CSN** (the mechanism by which
   a wrong frame elaborates and launders itself).
 
@@ -306,7 +317,8 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   * **Register:** Authoring hints are **local** (the general/local test): they live in the
   silo's playbooks, not in the global agent context. 
   
-  * **Corollary:** *discovery is one line; usage is `--help`* — name the actuator and the tool documents itself. Where a tool reaches for a skill because *“every tool has one now”*,
+  * **Corollary:** *discovery is one line; usage is `--help`* — name the actuator and 
+  the tool documents itself. Where a tool reaches for a skill because *“every tool has one now”*,
   that is **the default shape** in interface form. **Coined 2026-10-09** from
   the operator's observation that the silo has never proposed one. 
   

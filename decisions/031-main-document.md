@@ -85,10 +85,14 @@ registry-validated at render time.
 
 The jump map is an **in-memory structure belonging to the main
 document**: vector number → target, derived by scanning the main
-document's source at render time. The painted `[NN]` annotations are
+document's source at render time. 
+
+The painted `[NN]` annotations are
 **illustrative text** — a projection of the map, nothing more. The
 source document is never mutated; there are no side-car wiring files;
-nothing persists. Re-derivation replaces invalidation: `r` reload
+nothing persists. 
+
+Re-derivation replaces invalidation: `r` reload
 rebuilds the map, the numbers stay deterministic per (document,
 content), and 99 carries nothing between instances because the clone
 re-derives its own.

@@ -1,8 +1,12 @@
+# History is Bunk
+
 "History" in computing was never an intellectual concept; it was a cheap accounting trick to paper over an architectural failure.
 
 The web browser committed original sin on day one: **destructive in-place state replacement.**
 
-When you clicked a link, the browser didn't open a reference; it obliterated the document you were reading, loaded a completely new one into the exact same memory buffer, and then threw a single URL onto a dirty linear LIFO (Last-In, First-Out) stack. Calling that **"History"** was marketing genius designed to make an amnesic, destructive runtime look like a profound philosophical journey.
+When you clicked a link, the browser didn't open a reference; it obliterated the document you were reading, loaded a completely new one into the exact same memory buffer, and then threw a single URL onto a dirty linear LIFO (Last-In, First-Out) stack. 
+
+Calling that **"History"** was marketing genius designed to make an amnesic, destructive runtime look like a profound philosophical journey.
 
 ---
 
