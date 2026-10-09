@@ -145,7 +145,7 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
 * **Unpaid claim**: a statement about the system — or about the self — carrying
   neither a citation nor a *proposal* mark. The barnacle class ADR-027 names
   (`decisions/027-temperament-is-downstream-of-discipline.md`). 
-* **Anti-pattern:**
+  * **Anti-pattern:**
   the confident recollection with no live referent.
 
 * **Continuity by re-reading**: the position that what persists between sessions
