@@ -56,8 +56,8 @@ info:
 # Protocol install
 [group('navigation')]
 protocol-install:
-    @cp system.md "$${OKUDA_AGENTS:-$$HOME/.pi/agent/AGENTS.md}"
-    @echo "protocol installed: system.md -> $${OKUDA_AGENTS:-$$HOME/.pi/agent/AGENTS.md}"
+    @cp system.md "$HOME/.pi/agent/AGENTS.md"
+    @echo "protocol installed: system.md -> ~/.pi/agent/AGENTS.md"
 
 # AMPER drift
 [group('navigation')]
