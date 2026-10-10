@@ -572,6 +572,11 @@ reg-sync:
 reg-sync-fix:
     @bun scripts/reg-sync.ts --all --fix
 
+# Stamp a silo
+[group('registries')]
+new-silo dir name desc:
+    @scripts/new-silo.sh "{{dir}}" "{{name}}" "{{desc}}"
+
 # List briefs
 [group('registries')]
 reg-briefs:

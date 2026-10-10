@@ -61,7 +61,8 @@ files are outputs, not stores.
 
 1. **Name and scope**, one line each; the name must name something that exists.
 2. **Remote first** — `git init`, create the GitHub repo, decide visibility.
-3. **Stamp** the identity and constitution from the canonical source.
+3. **Stamp** the identity and constitution from the canonical source —
+   `just new-silo <dir> "<Name>" "<desc>"` in the incubator silo.
 4. **Create the registers** it needs now, each with its registry.
 5. **Wire the actuator** — `justfile`; day-1 `just check` is `reg-sync --all` and
    nothing else.
@@ -93,7 +94,11 @@ next silo that gates are decorative.
   and portable; `callsign-lint` and `prose-check` import the product's `src/root`
   and cannot be copied, only earned — so day-1 `check` begins at registry
   agreement. The template must be a stamper, not a mirror, or the first spin-off
-  reproduces the barnacle it was meant to avoid.
+  reproduces the barnacle it was meant to avoid. The stamper is `just new-silo`
+  (`templates/silo/` + `scripts/new-silo.sh` in the incubator); it drives
+  `reg-sync` on **named tiers** (`briefs decisions playbooks`), because `--all`
+  assumes every configured register directory exists and a newborn silo has only
+  three. `reg-menu` pulls `jump-demo`, so it graduates rather than shipping.
 
 ## Open questions
 
