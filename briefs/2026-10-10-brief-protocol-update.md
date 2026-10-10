@@ -3,7 +3,7 @@ type: Brief
 callsign: BRF-PROTOCOL-UPDATE
 ---
 
-# Brief: The protocol update — add the comment-referent rule, and a process that is one edit, one command, one commit
+# Brief: The protocol update — self-contained documents, and a deploy that crosses the seam honestly
 
 **Date:** 2026-10-10
 **Status:** Open
@@ -11,94 +11,102 @@ callsign: BRF-PROTOCOL-UPDATE
 
 ## Context
 
-`system.md` is the protocol, and updating it should be as cheap as updating any
-other document — but it is not obvious how. It is versioned, it is deployed to
-the agent runtime across a symlink chain into a **second repository**, and the
-current ritual (edit, bump the growing version line, `just protocol-install`,
-commit here, commit there) is heavier than the rule it carries. This brief adds
-the comment-referent rule and settles the process.
+`system.md` accretes a version preface (`Supersedes … v1.0.0`) and is deployed to
+the runtime through a **symlink chain that writes into a second repository**. The
+preface is one instance of a pattern the operator finds across the corpus; the
+chain is a bad idea. This brief adds the rule the corpus is missing, and replaces
+the chain with a message.
 
 ## Objective
 
-Add the **comment's referent** entry to `system.md`'s lexicon, and record a
-protocol-update process that is one edit, one command and one commit per repo —
-the deploy a build step, not a ritual.
+Add two lexicon entries to `system.md` — **references, not recitals** (a document
+is its current state; git is the history) and its code corollary **the comment's
+referent** — and replace the symlink-chain deploy with an **inbox message** to
+`cool-pi-extensions`, whose receiver commits.
 
 ## Evidence
 
-The mechanism today (`scripts/protocol-install.sh`; `just protocol-install`):
-
-- `system.md` is the source; the runtime target `~/.pi/agent/AGENTS.md` is a
-  **symlink chain** into `cool-pi-extensions/SYSTEM.md` — so an install writes a
-  *second repository's* file.
-- The script `cmp`s, copies, and **declares** the chain and the sibling's
-  uncommitted state (the impostor-symlink rule, `docs/2026-10-10-the-seam.md`).
-- The header carries a version and a growing `Supersedes …` chain (v2.6.0 today,
-  back to v1.0.0).
-- There is no drift check beyond the install's own `cmp`, which is silent when
-  in sync.
-
-So the process is five steps — edit · bump · install · commit okuda · commit
-sibling. Four are mechanical; the version line grows without bound.
+- **The history preface is everywhere**: 22 documents carry a visible
+  `Supersedes` chain or an `amended 2026…` preamble — `system.md`, `&briefs.md`,
+  `docs/style-guide.md`, ten-plus decisions, several briefs. Measured 2026-10-10.
+- **The chain**: `scripts/protocol-install.sh` writes `system.md` through
+  `~/.pi/agent/AGENTS.md → cool-pi-extensions/prompts/edinburgh-protocol.md →
+  cool-pi-extensions/SYSTEM.md` — two hops into a foreign repo, declared only by
+  the script's own output.
+- `system.md`'s header is a hand-kept changelog (v2.6.0 back to v1.0.0) — history
+  that git already holds.
 
 ## Scope
 
-**In:** the lexicon entry (drafted in Notes); the process, recorded where the
-next editor will find it; a `just protocol` wrapper if the install and its
-declaration are worth one command.
+**In:** the two lexicon entries; replacing `system.md`'s version preface with a
+single **cut** line; retiring the write path through the symlink chain; delivering
+a `system.md` change as an **inbox message** to `cool-pi-extensions`; a check that
+lists **every silo whose `system.md` copy is behind**.
 
-**Out:** *where the protocol should live* — the copy-vs-retire question is an
-ADR, not this brief; the content of any other lexicon addition.
+**Out:** repointing the runtime symlink on the machine — an operator action
+outside the silo; the sibling's commit — the receiver's, per the seam rule; the
+broader history-preface sweep across the 22 documents (a follow-on pass).
 
 ## Preconditions
 
-- [x] `system.md` and the deployed copy are in sync. **Verified 2026-10-10**
-      (`protocol-install` reports `already in sync`).
+- [ ] `cool-pi-extensions` has an inbox (`msgs/`) — the seam's message mechanism.
+      Verify; if it has none, creating it is the first deliverable.
 
 ## Work Plan
 
-1. [ ] Add the lexicon entry to `system.md`; bump the version clause (one line).
-2. [ ] Record the process beside the mechanism (a short section in
-      `scripts/protocol-install.sh`'s header, and one line in the playbooks).
-3. [ ] Cap the `Supersedes` chain at the last three cuts (prune older), so the
-      header cannot grow without bound.
-4. [ ] `just protocol-install`; commit `system.md` here; commit the sibling copy
-      there (the script names the repo and the file).
+1. [ ] Add the two entries; replace `system.md`'s version preface with one **cut**
+      line (git is the changelog).
+2. [ ] Replace `protocol-install.sh`'s write-through-chain with an **inbox send**:
+      write the new `system.md` (or its diff) into `cool-pi-extensions`' inbox and
+      **print** the destination and the receiver's next action.
+3. [ ] `just protocol-check`: `cmp` the source against each silo's `system.md` and
+      **list who is behind** — the roster the operator asked to keep.
+4. [ ] The runtime stops reading through the chain; the operator repoints it. Named,
+      not automated.
 
 ## Acceptance Criteria
 
-- The **comment's referent** entry is in `system.md`'s lexicon, with its test and
-  its prior art.
-- The process is written where the next editor finds it, and is four steps.
-- The header's `Supersedes` chain is bounded to three cuts.
-- `just protocol-install` reports `already in sync` after the commit.
+- Both entries are in `system.md`'s lexicon.
+- `system.md` has no `Supersedes` chain; a single cut line replaces it.
+- A `system.md` change lands in `cool-pi-extensions`' inbox; the script **names it
+  and does not commit it**.
+- `just protocol-check` lists every silo whose copy is behind.
+- No command writes through the symlink chain.
 
 ## Notes
 
-The draft entry:
+The entries:
 
-> - **The comment's referent**: a comment is a claim about a function, and it
->   owes a referent **in that function's scope** — or an explicit pointer to
->   where the referent lives. A comment that names a *feature* while sitting in
->   the half of the code that only *parses* it is an **unpaid claim in prose
->   form**: the reader greps where the comment points, finds nothing, and
->   correctly concludes "half-implemented". The rule: **a comment lives with the
->   contract it describes, not with the bytes it consumes.** Test: name the
->   symbol in this file that cashes the comment's claim. If there is none, point
->   to it or trim the comment to its own scope. Worked instance, 2026-10-10:
->   `splitKeyEvents`' comment named the header-to-header jump, three files from
->   it — and the jump it named was dead.
+> - **References, not recitals**: a document states what is true *now* and
+>   **references** what it needs; it does not recite or assume a history. A
+>   version preface, a `Supersedes …` chain, an "amended on / amended on"
+>   preamble — each asks the reader to hold a past the file does not need and the
+>   repo already keeps. **Git is the history; the file is the state.** Reference
+>   the thing; do not recite its timeline. Test: does the document stand if the
+>   reader knows nothing before it? A sentence that only makes sense with the
+>   history is a preface — reference it or cut it. (A decision that *reverses*
+>   another may still cite it — by reference, not by recital.)
+>   *Prior art:* clause 3 (*the repo is the memory*); references, not hypertext.
+>
+> - **The comment's referent**: a comment is a claim about a function, and it owes
+>   a referent **in that function's scope** — or an explicit pointer to where the
+>   referent lives. A comment that names a feature while sitting in the half of
+>   the code that only *parses* it is an **unpaid claim in prose form**. The rule:
+>   **a comment lives with the contract it describes, not with the bytes it
+>   consumes.** Test: name the symbol in this file that cashes the claim; if there
+>   is none, point to it or trim. Worked instance 2026-10-10: `splitKeyEvents`'
+>   comment named the header-to-header jump, three files away — and the jump it
+>   named was dead.
 >   *Prior art:* clause 1 (*every output is a claim*); the audit surface.
 
-The process, in one line: **edit `system.md` → `just protocol-install` → commit
-here → commit there.** The deploy is a build step; the drift check is the
-install's own `cmp` (idempotent — it prints `already in sync` when there is
-nothing to do).
+The deploy, in one line: **edit `system.md` → send it to the sibling's inbox →
+the sibling commits → `just protocol-check` names who is still behind.** No chain,
+no cross-repo write, no sender-side commit.
 
 ## Related
 
-- `system.md` — the protocol this governs
-- `scripts/protocol-install.sh` — the deploy, and the impostor-symlink declaration
-- `docs/2026-10-10-the-seam.md` — a crossing declares itself
-- `docs/2026-10-10-the-wall-and-the-seam.md` — the same shape (a claim whose referent is elsewhere) one layer up
-- BRF-SEAM-AUDIT — the rule this entry records
+- `system.md` — the protocol these entries join
+- `scripts/protocol-install.sh` — the write-through-chain this replaces
+- `docs/2026-10-10-the-seam.md` — a crossing declares itself; messages, not shared files
+- `docs/2026-10-10-the-wall-and-the-seam.md` — the impostor-symlink chain, documented
+- BRF-SEAM-AUDIT — the comment rule's worked instance

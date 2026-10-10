@@ -11,7 +11,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 |---|---|---|---|---|
 | 2026-10-10 | BRF-BOUNDARY-MARK | open | The boundary mark — the receipt elides the addresses the cap never realised | 2026-10-10-brief-boundary-mark.md |
 | 2026-10-10 | BRF-COMMISSION-BLANDINGS | open | Commission the Blandings silo — and the procedure that makes the next one routine | 2026-10-10-brief-commission-blandings.md |
-| 2026-10-10 | BRF-PROTOCOL-UPDATE | open | The protocol update — add the comment-referent rule, and a process that is one edit, one command, one commit | 2026-10-10-brief-protocol-update.md |
+| 2026-10-10 | BRF-PROTOCOL-UPDATE | open | The protocol update — self-contained documents, and a deploy that crosses the seam honestly | 2026-10-10-brief-protocol-update.md |
 | 2026-10-10 | BRF-READ-ACTUATOR | open | Read actuator — the current document, handed to the voice | 2026-10-10-brief-read-actuator.md |
 | 2026-10-10 | BRF-RENDER-DEFECTS | open | Render defects — the stack map's four findings, and how they stop recurring | 2026-10-10-brief-render-defects.md |
 | 2026-10-10 | BRF-SEAM-AUDIT | done | The seam audit — the input path, where a run was mistaken for a spelling | 2026-10-10-brief-seam-audit.md |

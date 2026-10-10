@@ -147,7 +147,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-RENDER-DEFECTS | · open | the stack map's four findings (epic) | — |
 | BRF-BOUNDARY-MARK | · open | The boundary mark — the receipt elides the addresses the cap never realised | — |
 | BRF-SEAM-AUDIT | ✓ done | the seam audit — the run buffer generalised, `]]`/`[[` fire across reads, the read-boundary test added (landed same day) | — |
-| BRF-PROTOCOL-UPDATE | · open | The protocol update — add the comment-referent rule, and a process that is one edit, one command, one commit | — |
+| BRF-PROTOCOL-UPDATE | · open | self-contained documents — the history preface out, an inbox deploy in (the symlink chain retired) | — |
 
 ## Parked / deferred
 
