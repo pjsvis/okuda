@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-10 | BRF-BOUNDARY-MARK | open | The boundary mark — the receipt elides the addresses the cap never realised | 2026-10-10-brief-boundary-mark.md |
 | 2026-10-10 | BRF-COMMISSION-BLANDINGS | open | Commission the Blandings silo — and the procedure that makes the next one routine | 2026-10-10-brief-commission-blandings.md |
 | 2026-10-10 | BRF-READ-ACTUATOR | open | Read actuator — the current document, handed to the voice | 2026-10-10-brief-read-actuator.md |
 | 2026-10-10 | BRF-RENDER-DEFECTS | open | Render defects — the stack map's four findings, and how they stop recurring | 2026-10-10-brief-render-defects.md |
