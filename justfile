@@ -405,6 +405,11 @@ reg-sync-fix:
 new-silo dir name desc:
     @scripts/new-silo.sh "{{dir}}" "{{name}}" "{{desc}}"
 
+# Cadence report
+[group('registries')]
+cadence:
+    @bun scripts/cadence.ts
+
 # List briefs
 [group('registries')]
 reg-briefs:
