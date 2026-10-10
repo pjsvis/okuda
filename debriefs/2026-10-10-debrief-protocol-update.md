@@ -22,10 +22,10 @@ states the state, the deploy sends a message.
 
 ## What was built
 
-- **`system.md`** — the version preface replaced by one `**Cut:** 2.7.0
-  (2026-10-10)` line (*this file is the state; `git log system.md` is the
-  history*), and two lexicon entries: **References, not recitals** (the rule) and
-  **The comment's referent** (its code corollary), each with a test and prior art.
+- **`system.md`** — the version preface replaced by one `**Cut:** 2.7.1
+  (2026-10-10)` line (*this file is the state; its history is in git*), and two
+  lexicon entries: **References, not recitals** (the rule) and **The comment's
+  referent** (its code corollary), each with a test and prior art.
 - **`scripts/protocol-install.sh`** — the write-through-chain replaced by an
   inbox send: a message JSON in `cool-pi-extensions/msgs/from-*`, carrying the
   full cut, its `source_commit`, and the receiver's next action. It writes no
@@ -60,6 +60,23 @@ target), `polyvis` (v1.1.0) — and **two declared local variants**,
 - **The deploy's after-state is named, not automated.** The runtime still reads
   through `~/.pi/agent/AGENTS.md`; repointing it is an operator action. The
   script says so on every run rather than reaching across the seam to do it.
+
+## Postscript — the receiver's two findings
+
+Cool-pi-extensions committed the 2.7.0 cut (`15732af`, `origin/main`) and
+returned two findings; the cut was patched to 2.7.1 and sent again.
+
+- **The transport dropped the last byte.** `--arg detail "$(cat …)"` strips the
+  file's trailing newline in command substitution, so the message's `detail`
+  hashed to `02f3dbef…` against the stated `c740e1008aec`. Fixed with `--rawfile`,
+  which reads the file exactly: a cut's `detail` now hashes byte-identically to
+  `system.md`. A silent one-byte loss in a deploy is the class the message was
+  supposed to prevent.
+- **The cut line's reference did not resolve everywhere.** `git log system.md`
+  is mixed-case; the sibling tracks `SYSTEM.md`, so a case-sensitive checkout
+  fails the reference. 2.7.1 makes it path-agnostic — *its history is in git* —
+  which is also closer to what the line means (the state/history split, not a
+  filename).
 
 ## Acceptance
 

@@ -61,7 +61,7 @@ jq -n \
   --arg cut "$CUT" \
   --arg commit "$COMMIT" \
   --arg timestamp "$ISO" \
-  --arg detail "$(cat "$SRC")" \
+  --rawfile detail "$SRC" \
   '{
     from: $from,
     to: $to,
