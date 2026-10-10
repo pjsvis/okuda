@@ -14,7 +14,8 @@
 # playbooks/commissioning-playbook.md (git init, GitHub repo, visibility, push,
 # visitor test).
 #
-# macOS: uses BSD `sed -i ''`.
+# Portable `sed -i` (GNU and BSD); placeholder values are escaped for sed, so a
+# name containing `&` or `|` cannot corrupt the stamp.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
@@ -31,21 +32,33 @@ fi
 SLUG="$(basename "$TARGET")"
 DATE="$(date +%F)"
 
-[ -e "$TARGET" ] && { echo "refusing: $TARGET already exists" >&2; exit 1; }
+# Tolerate an empty existing directory — the checklist may have run `git init`
+# first — and refuse a populated one: the stamp must own the path.
+if [ -e "$TARGET" ] && ! { [ -d "$TARGET" ] && [ -z "$(ls -A "$TARGET" 2>/dev/null)" ]; }; then
+  echo "refusing: $TARGET exists and is not an empty directory" >&2
+  exit 1
+fi
 [ -d "$TEMPLATE" ] || { echo "refusing: template missing at $TEMPLATE" >&2; exit 1; }
 
 mkdir -p "$TARGET"
 cp -R "$TEMPLATE/." "$TARGET/"
 
-# Substitute placeholders across the stamped text files.
+# Substitute placeholders across the stamped text files. The values are
+# ESCAPED for a sed replacement: unescaped, `&` expands to the whole match and
+# the `|` delimiter ends the expression — a name like "S&W" corrupted the stamp.
+esc() { printf '%s' "$1" | sed -e 's/[\\&|]/\\&/g'; }
+NAME_E="$(esc "$NAME")"; SLUG_E="$(esc "$SLUG")"; DESC_E="$(esc "$DESC")"; DATE_E="$(esc "$DATE")"
+# GNU sed takes `-i` alone; BSD sed needs `-i ''`.
+if sed --version >/dev/null 2>&1; then SED_I=(sed -i); else SED_I=(sed -i ''); fi
+
 find "$TARGET" -type f \
   \( -name '*.md' -o -name '.gitignore' -o -name 'justfile' -o -name '*.sh' \) -print0 |
 while IFS= read -r -d '' f; do
-  sed -i '' \
-    -e "s|__SILO__|$NAME|g" \
-    -e "s|__SLUG__|$SLUG|g" \
-    -e "s|__DESC__|$DESC|g" \
-    -e "s|__DATE__|$DATE|g" "$f"
+  "${SED_I[@]}" \
+    -e "s|__SILO__|$NAME_E|g" \
+    -e "s|__SLUG__|$SLUG_E|g" \
+    -e "s|__DESC__|$DESC_E|g" \
+    -e "s|__DATE__|$DATE_E|g" "$f"
 done
 
 # Canonical items — copied from the live source, never a checked-in mirror.

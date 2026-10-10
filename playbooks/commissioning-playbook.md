@@ -60,17 +60,25 @@ files are outputs, not stores.
 ## The checklist
 
 1. **Name and scope**, one line each; the name must name something that exists.
-2. **Remote first** — `git init`, create the GitHub repo, decide visibility.
-3. **Stamp** the identity and constitution from the canonical source —
-   `just new-silo <dir> "<Name>" "<desc>"` in the incubator silo.
-4. **Create the registers** it needs now, each with its registry.
-5. **Wire the actuator** — `justfile`; day-1 `just check` is `reg-sync --all` and
-   nothing else.
-6. **Write the founding record** — a genesis brief or decision.
-7. **`just check` green — then read the index** (the count and the sample,
-   below) — **first commit**, on a branch.
-8. **`just orient`** answers state; push.
-9. **The visitor test** on a cold clone.
+2. **Stamp** the identity and constitution from the canonical source —
+   `just new-silo <dir> "<Name>" "<desc>"` in the incubator silo. The stamper
+   **creates the target** (it refuses a populated directory and tolerates an
+   empty one) and writes the registers the silo needs now, with their indexes —
+   so nothing else may touch the path before this runs.
+3. **Decide the remote, then `git init`** inside the stamped directory; create
+   the GitHub repo and fix visibility. *Decide* it before the work starts — that
+   is the point of "remote first" — but the directory comes after the stamp,
+   because the stamper owns the path.
+4. **Amend the founding record** the template ships
+   (`decisions/001-founding.md`): the name, the scope, and the day-1 aims **and
+   non-goals**. It is the drift instrument, not a formality — a silo without one
+   has nothing its later documents can be measured against.
+5. **`just check` green — then read the index** (the count and the sample,
+   below) — **first commit**, on a branch. Day-1 `check` is `reg-sync` on the
+   **named tiers** (`briefs decisions playbooks`): `--all` walks registers a
+   newborn silo does not have, and reports `index.md MISSING` for each of them.
+6. **`just orient`** answers state; push.
+7. **The visitor test** on a cold clone.
 
 ## Acceptance
 
@@ -88,18 +96,27 @@ files are outputs, not stores.
   stale-ledger class again. This holds for every generated index, registry or
   report, not only a newborn silo's.
 
+**Acceptance is pending.** This playbook is canonical as the *procedure*, but its
+acceptance — the template **used** to provision a real silo — is the
+commissioning of Blandings itself
+(`briefs/2026-10-10-brief-commission-blandings.md`). Until that lands, the
+procedure is agreed and the template is unproven; the first stamp is the test,
+not this page.
+
 ## What graduates (not day 1)
 
 `date-lint`, `archive-lint`, `td-id-lint`, `tree-lint`, the `pre-push` hook, and
-the coupled checks (`callsign-lint`, `prose-check`, which need a resolver). Each
+the coupled checks (`callsign-lint`, which needs the resolver; `td-id-lint`, its
+shared scan set; `prose-check`, which needs the renderer). Each
 arrives when the corpus can feed it. An empty gate that always passes teaches the
 next silo that gates are decorative.
 
 ## Field notes — what we learn, appended
 
 - **2026-10-10** — first extraction, for Blandings. Findings: `reg-sync` is pure
-  and portable; `callsign-lint` and `prose-check` import the product's `src/root`
-  and cannot be copied, only earned — so day-1 `check` begins at registry
+  and portable; `callsign-lint` imports the product's `src/root` and
+  `prose-check` imports its renderer, so neither can be copied, only earned;
+  `td-id-lint` is portable. Day-1 `check` therefore begins at registry
   agreement. The template must be a stamper, not a mirror, or the first spin-off
   reproduces the barnacle it was meant to avoid. The stamper is `just new-silo`
   (`templates/silo/` + `scripts/new-silo.sh` in the incubator); it drives

@@ -6,6 +6,13 @@
 help:
     @just --list
 
+# What this is
+[group('navigation')]
+info:
+    @echo "__SILO__ — __DESC__"
+    @echo ""
+    @echo "An Edinburgh Protocol silo. Start at: just help, then just orient."
+
 [group('navigation')]
 orient:
     @bash scripts/orient.sh

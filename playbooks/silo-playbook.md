@@ -18,13 +18,18 @@ is discoverable from the `justfile`.
 
 ## Minimum Viable Silo
 
-A silo starts with the playbooks folder and the root files. Nothing else.
+A silo starts with the playbooks folder and the root files. Nothing else —
+**beyond the registry floor**: the directories that must exist before the first
+document is written, because adding them later migrates everything that grew
+without them.
 
 ```
 <silo>/
  ├── playbooks/          ← first folder: operational protocols
  │   ├── REGISTRY.jsonl
  │   └── *.md
+ ├── briefs/             ← registry floor: present at birth, with an index
+ ├── decisions/          ← registry floor
  ├── justfile            ← shared operational lexicon (agent ↔ operator)
  ├── system.md           ← The Edinburgh Protocol — the silo's constitution
  ├── .gitignore
@@ -35,6 +40,15 @@ A silo starts with the playbooks folder and the root files. Nothing else.
 is a claim about future work, and it carries obligations (an index, sync
 discipline) with no content to justify them. A directory is created the
 moment the first document that belongs in it is written — not before.
+
+**The floor is the one exception, and it is narrow.** `playbooks/`, `briefs/`
+and `decisions/` each carry a document at birth — the protocols, the founding
+record, the day-1 work — so they *are* needed on day 1. Everything else
+(`debriefs/`, `advisories/`, the archive) arrives with its first document, by
+the rule above. The procedure that imposes the floor is
+`playbooks/commissioning-playbook.md`: this playbook owns what a silo *is*, that
+one owns how it is *made*, and on the stamped path (`just new-silo`) the floor
+arrives already built.
 
 Other root files — an agent-facing `AGENTS.md` for rules of engagement,
 a `DEPENDENCIES.md` inventory of external tools — are optional additions
