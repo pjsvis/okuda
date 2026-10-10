@@ -131,6 +131,7 @@ cluttering it.
 
 ## Related
 
+- `playbooks/commissioning-playbook.md` — how to create a new silo
 - `playbooks/registry-playbook.md` — index schema and sync workflow
 - `playbooks/briefs-playbook.md` — the spine documents
 - `playbooks/td-playbook.md` — session and task workflow

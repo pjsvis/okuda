@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-10 | PLY-COMMISSION | canonical | Commissioning Playbook | commissioning-playbook.md |
 | 2026-10-07 | PLY-DEFECT | canonical | defect discipline: symptom before cause, fix or defer by kind, instrument the deferral, keep the museum | defect-playbook.md |
 | 2026-09-30 | PLY-GREP | canonical | Grep Playbook — the probe instrument, and its two traps | grep-playbook.md |
 | 2026-09-27 | PLY-GLOAM-PREVIEW | canonical | Gloam Preview Playbook | gloam-preview-playbook.md |
