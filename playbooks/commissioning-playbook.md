@@ -62,8 +62,9 @@ files are outputs, not stores.
 1. **Name and scope**, one line each; the name must name something that exists.
 2. **Stamp** the identity and constitution from the canonical source —
    `just new-silo <dir> "<Name>" "<desc>"` in the incubator silo. The stamper
-   **creates the target** (it refuses a populated directory and tolerates an
-   empty one) and writes the registers the silo needs now, with their indexes —
+   **creates the target** (it refuses a populated directory and tolerates one
+   holding nothing but `.git`, so `git init` may come first) and writes the
+   registers the silo needs now, with their indexes —
    so nothing else may touch the path before this runs.
 3. **Decide the remote, then `git init`** inside the stamped directory; create
    the GitHub repo and fix visibility. *Decide* it before the work starts — that

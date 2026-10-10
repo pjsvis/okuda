@@ -32,11 +32,19 @@ fi
 SLUG="$(basename "$TARGET")"
 DATE="$(date +%F)"
 
-# Tolerate an empty existing directory — the checklist may have run `git init`
-# first — and refuse a populated one: the stamp must own the path.
-if [ -e "$TARGET" ] && ! { [ -d "$TARGET" ] && [ -z "$(ls -A "$TARGET" 2>/dev/null)" ]; }; then
-  echo "refusing: $TARGET exists and is not an empty directory" >&2
-  exit 1
+# Tolerate a directory holding nothing but `.git` — the checklist may have run
+# `git init` first — and refuse anything else: the stamp must own the path.
+# `ls -A` is NOT the test: it lists dotfiles, so a git-init'd directory reads as
+# non-empty and is refused, which is the very case this is meant to allow.
+if [ -e "$TARGET" ]; then
+  leftover=""
+  if [ -d "$TARGET" ]; then
+    leftover="$(find "$TARGET" -mindepth 1 -maxdepth 1 -not -name '.git' -print -quit 2>/dev/null)"
+  fi
+  if [ -n "$leftover" ] || [ ! -d "$TARGET" ]; then
+    echo "refusing: $TARGET exists and is not empty (or a fresh git-init)" >&2
+    exit 1
+  fi
 fi
 [ -d "$TEMPLATE" ] || { echo "refusing: template missing at $TEMPLATE" >&2; exit 1; }
 

@@ -41,14 +41,20 @@ is a claim about future work, and it carries obligations (an index, sync
 discipline) with no content to justify them. A directory is created the
 moment the first document that belongs in it is written — not before.
 
-**The floor is the one exception, and it is narrow.** `playbooks/`, `briefs/`
-and `decisions/` each carry a document at birth — the protocols, the founding
-record, the day-1 work — so they *are* needed on day 1. Everything else
-(`debriefs/`, `advisories/`, the archive) arrives with its first document, by
-the rule above. The procedure that imposes the floor is
-`playbooks/commissioning-playbook.md`: this playbook owns what a silo *is*, that
-one owns how it is *made*, and on the stamped path (`just new-silo`) the floor
-arrives already built.
+**The floor is the one exception, and it is narrow — and it is a REGISTRY
+floor, not a document floor.** `playbooks/`, `briefs/` and `decisions/` exist
+from day 1 because the *contract* — a dated name, front matter, and an index
+that agrees with the directory — cannot be added to a corpus that has already
+grown without it; retro-fitting means migrating every document. Only
+`decisions/` carries a document at birth (the founding record). `briefs/` and
+`playbooks/` are seeded with their registries and the generated `index.md` —
+which is not content: it is derived, marked `generated: true`, and excluded
+from every scan — and they fill with their first real document. **The exception
+is justified by the contract, not by content.** Everything else (`debriefs/`,
+`advisories/`, the archive) arrives with its first document, by the rule above.
+The procedure that imposes the floor is `playbooks/commissioning-playbook.md`:
+this playbook owns what a silo *is*, that one owns how it is *made*, and on the
+stamped path (`just new-silo`) the floor arrives already built.
 
 Other root files — an agent-facing `AGENTS.md` for rules of engagement,
 a `DEPENDENCIES.md` inventory of external tools — are optional additions
