@@ -9,6 +9,10 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 
 ## Landed today — the debt this table was tracking
 
+- **The amp reconciliation** (2026-10-10) — the `&briefs` state table is back in
+  agreement with the registry: 46 briefs added, the coverage check reads live
+  *and* archive (a landed brief is not a phantom), and the `&alpha` fixture wire
+  is gone. `just amp` is green.
 - **&stack — the map** (2026-10-10) — the silo, the seam and the reader as one
   walkable document: a root AMPER page with four expansions, each carrying its
   diagram and its named failure. The render found four defects, now briefed and
@@ -180,14 +184,10 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
   never silently mapped to `open`, but which words the registry
   *stores* is a corpus decision, not a sync repair: settle it, then
   either widen the map or normalise the documents · **S**
-- **The amp-check backlog** (pre-existing; re-measured 2026-10-10)
-  — `just amp-check` is red with **50** items: the `&briefs.md` state
-  table has drifted from the registry in both directions (briefs the
-  table omits, and tabled briefs the registry no longer holds), plus
-  one dead legacy wire at `&alpha.md:123` (`briefs/x.md` — ADR-031
-  retired the grammar; the straggler wire should become a real
-  reference like the `&speak.md` rows). `&stack.md` is clean; the
-  table's red count is the noise it hides in · **M**
+- **The amp-check backlog** — *landed 2026-10-10* (see the landed list
+  above): `&briefs` reconciled (46 briefs added), the coverage check now
+  reads the live and archive registries, and the `&alpha` fixture wire is
+  gone. This entry is the tombstone · **S**
 - **BRF-SILO-MNEMONICS — close or scope** — resolution shipped, badge
   shipped, bootstrap deferred: what remains is likely a debrief and a
   close · **S**
