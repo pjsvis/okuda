@@ -150,6 +150,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-PROTOCOL-UPDATE | · open | self-contained documents — the history preface out, an inbox deploy in (the symlink chain retired) | — |
 | BRF-AMP-CELL | · open | The state cell derives — a status change reaches the table | — |
 | BRF-HISTORY-PREFACE | · open | the header is Date + Status — the history preface and the `TD` field out, with a lint for both | — |
+| BRF-LEAK-FENCE | · open | The leak gate's fence exemption — anchor on the source, not a rendered match | — |
 
 ## Parked / deferred
 
