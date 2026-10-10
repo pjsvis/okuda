@@ -12,7 +12,7 @@ How a document in this silo reaches a voice. Three stages, three owners:
 | Stage | Owner | Artefact |
 |---|---|---|
 | Render | okuda | coloured bytes for the glass |
-| Flatten | `speak-md` (a separate silo) | prose plus breath markers |
+| Flatten | `speak-md` (the pipe, in Blandings) | prose plus breath markers |
 | Speak | the environment (`say`) | sound |
 
 **okuda emits text and stops.** There is no speech code in this repo (ADR-036) —
@@ -146,5 +146,5 @@ Casting is the consequence of ADR-033, not a violation of it.
 - `briefs/2026-09-14-brief-search-surface.md` — the glass as a voice control surface
 - `explainers/accessibility.md` — the ladder and the first law of time
 - `&ear.md` — the ear queue
-- External: `~/Dev/GitHub/speak-md` (the flattener; its `breaths.json` and
+- External: `../blandings/speak-md` (the flattener; its `breaths.json` and
   `lexicon.json` are the silo's tuning state)

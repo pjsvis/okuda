@@ -213,7 +213,7 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
   audit, the capabilities doc, the seam verdict; it clears when they
   do, not by a date. GLOAM-OWNS-THE-LOOP scoping is the first agenda
   item) · **the speech set** (leaves this table —
-  ADR-PERIMETER-039: the tuning loop is `../speak-md/`'s, and the ear
+  ADR-PERIMETER-039: the tuning loop is Blandings', and the ear
   owes its own corpus the auditions. **BRF-SPOKEN-BLOCK-GRAMMAR stays**,
   because ADR-037 cites it and moving it breaks the record) · **the docs
   candidates** (speech-driven design, the intention loop — landed,
