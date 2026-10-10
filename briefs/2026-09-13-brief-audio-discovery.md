@@ -169,7 +169,8 @@ Which leaves the resolution the reader found, and it is the portable one:
 lower register; she is a different speaker. A voice is portable where a tag is
 not (`say -v Moir`, `espeak -v`, any engine), it cannot collide with the document
 because a different speaker is unmistakable, and it costs the grammar nothing.
-`&ear.md` has Moir in the queue already — *the names session*, `just moira-house`,
+`&ear.md` has Moir in the queue already — *the names session*, the play
+silo's `just house` (Blandings),
 verdict pending: **mwah** vs **mwar** vs **more**. The cue channel gives that row
 a reason to land.
 

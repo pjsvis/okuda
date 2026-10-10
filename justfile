@@ -197,19 +197,6 @@ moira-ride:
     @speak-md ride --dry > tmp/ride.txt
     @say -v Moira -r 140 -f tmp/ride.txt
 
-# The audition book
-[group('moira')]
-moira-auditions:
-    @speak-md ../speak-md/auditions.md
-
-# Literature stress test
-[group('moira')]
-moira-story:
-    #!/bin/bash
-    set -euo pipefail
-    f="$(gum file ../speak-md/narratives --file)"
-    [ -n "$f" ] && speak-md --style narrative "$f"
-
 # Repertoire audit
 [group('moira')]
 moira-recital:
@@ -285,13 +272,6 @@ moira-latin:
     @mkdir -p tmp
     @speak-md probe --dry tmp/latin-probe.md > tmp/latin-flat.txt
     @say -v Moira -r 140 -f tmp/latin-flat.txt
-
-# House terms
-[group('moira')]
-moira-house:
-    @mkdir -p tmp
-    @speak-md --dry ../speak-md/house-terms.md > tmp/house-flat.txt
-    @say -v Moira -r 140 -f tmp/house-flat.txt
 
 # Commendation rehearsal
 [group('moira')]
