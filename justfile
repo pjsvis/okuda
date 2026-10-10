@@ -390,6 +390,11 @@ next:
 briefs:
     @./okuda --tui '&briefs.md'
 
+# The map
+[group('dogfood')]
+stack:
+    @./okuda --tui '&stack.md'
+
 # Listening queue
 [group('dogfood')]
 ear:

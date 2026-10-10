@@ -2,7 +2,7 @@
 /**
  * amp-check.ts — AMPER drift report: the &-family documents vs. reality.
  *
- * The & docs (&alpha, &briefs, &next) are editorial state documents, not
+ * The & docs (&alpha, &briefs, &next, &stack) are editorial state documents, not
  * generated ones — the grouping and the verdicts are the value, so this
  * script never writes them. It reads only, and reports:
  *   1. Jump-wire targets — every %%okuda-rhs:NN%% line's .md paths must exist.
@@ -22,7 +22,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const AMPERS = ["&alpha.md", "&briefs.md", "&next.md"];
+const AMPERS = ["&alpha.md", "&briefs.md", "&next.md", "&stack.md"];
 
 let hardDrift = 0;
 
