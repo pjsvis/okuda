@@ -165,6 +165,13 @@ tts file:
 tts-rate file rate:
     @./okuda {{file}} --no-color | tee /dev/tty | say -r {{rate}}
 
+# Recite a document
+[group('moira')]
+recite file:
+    @mkdir -p tmp
+    @speak-md --dry {{file}} > tmp/recite-flat.txt
+    @say -v Moira -r 140 -f tmp/recite-flat.txt
+
 # Prosody probe
 [group('moira')]
 moira:

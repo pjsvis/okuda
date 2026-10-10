@@ -23,7 +23,8 @@ the pause are not ours to tune.
 ## The pipeline
 
 ```bash
-just tts <file>                 # render --no-color | tee /dev/tty | say
+just recite <file>              # the prosody render: speak-md --dry | say — Moira's cue card
+just tts <file>                 # render --no-color | tee /dev/tty | say (see-and-hear)
 just tts-rate <file> <rate>     # the same, at a given rate
 just moira-*                    # the audition recipes (probe, drill, recital, …)
 speak-md --dry <file>           # flatten and print, speak nothing
