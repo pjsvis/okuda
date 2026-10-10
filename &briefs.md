@@ -148,6 +148,8 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-BOUNDARY-MARK | · open | The boundary mark — the receipt elides the addresses the cap never realised | — |
 | BRF-SEAM-AUDIT | ✓ done | the seam audit — the run buffer generalised, `]]`/`[[` fire across reads, the read-boundary test added (landed same day) | — |
 | BRF-PROTOCOL-UPDATE | · open | self-contained documents — the history preface out, an inbox deploy in (the symlink chain retired) | — |
+| BRF-AMP-CELL | · open | The state cell derives — a status change reaches the table | — |
+| BRF-HISTORY-PREFACE | · open | References, not recitals — the history preface out of the visible body | — |
 
 ## Parked / deferred
 
