@@ -86,4 +86,7 @@
 {"file":"2026-10-09-brief-complete-blocks.md","date":"2026-10-09","status":"open","summary":"The viewport holds complete blocks — cut at boundaries, in the printer and the frame","meta":{},"callsign":"BRF-COMPLETE-BLOCKS"}
 {"file":"2026-10-09-brief-docs-ledger.md","date":"2026-10-09","status":"open","summary":"The docs/ ledger — a prune ledger, not a registry","meta":{},"callsign":"BRF-DOCS-LEDGER"}
 {"file":"2026-10-09-brief-paper-rung.md","date":"2026-10-09","status":"done","summary":"The paper rung — the same render, printed","meta":{},"callsign":"BRF-PAPER-RUNG"}
+{"file":"2026-10-10-brief-boundary-mark.md","date":"2026-10-10","status":"open","summary":"The boundary mark — the receipt elides the addresses the cap never realised","meta":{},"callsign":"BRF-BOUNDARY-MARK"}
 {"file":"2026-10-10-brief-commission-blandings.md","date":"2026-10-10","status":"open","summary":"Commission the Blandings silo — and the procedure that makes the next one routine","meta":{},"callsign":"BRF-COMMISSION-BLANDINGS"}
+{"file":"2026-10-10-brief-read-actuator.md","date":"2026-10-10","status":"open","summary":"Read actuator — the current document, handed to the voice","meta":{},"callsign":"BRF-READ-ACTUATOR"}
+{"file":"2026-10-10-brief-render-defects.md","date":"2026-10-10","status":"open","summary":"Render defects — the stack map's four findings, and how they stop recurring","meta":{},"callsign":"BRF-RENDER-DEFECTS"}

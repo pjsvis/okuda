@@ -2,16 +2,17 @@
 /**
  * amp-check.ts — AMPER drift report: the &-family documents vs. reality.
  *
- * The & docs (&alpha, &briefs, &next) are editorial state documents, not
+ * The & docs (&alpha, &briefs, &next, &stack) are editorial state documents, not
  * generated ones — the grouping and the verdicts are the value, so this
  * script never writes them. It reads only, and reports:
  *   1. Jump-wire targets — every %%okuda-rhs:NN%% line's .md paths must exist.
  *   2. Duplicate jump numbers within a file (session codes collide silently).
- *   3. Registry coverage — briefs/INDEX.jsonl callsigns missing from &briefs,
- *      and &briefs callsigns absent from the registry.
- *   4. Staleness — days since each & doc was last committed.
+ *   3. Staleness — days since each & doc was last committed.
  *
- * Exit 1 on hard drift (missing target, unknown callsign); advisory drift
+ * &briefs membership is owned by `amp-briefs.ts` (ADR-DERIVED-AMP-TABLE-058):
+ * the row set is reconciled from the registry, so it is not mirrored here.
+ *
+ * Exit 1 on hard drift (missing target, duplicate wire); advisory drift
  * (staleness) prints but exits 0 — the eyeball decides, the machine counts.
  *
  * Usage: bun scripts/amp-check.ts   (wrapped by `just amp`)
@@ -22,7 +23,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const AMPERS = ["&alpha.md", "&briefs.md", "&next.md"];
+const AMPERS = ["&alpha.md", "&briefs.md", "&next.md", "&stack.md"];
 
 let hardDrift = 0;
 
@@ -60,31 +61,6 @@ for (const doc of AMPERS) {
   }
   console.log(`  ${doc} — ${wires} wire(s), ${seen.size} distinct jump number(s)`);
 }
-
-// ── Registry coverage: every brief callsign in the INDEX must sit in
-// &briefs, and vice versa (the state table claims "all N").
-const ampBriefs = join(ROOT, "&briefs.md");
-const ampText = readFileSync(ampBriefs, "utf8");
-const ampCallsigns = new Set(ampText.match(/BRF-[A-Z0-9-]+/g) ?? []);
-const registry = readFileSync(join(ROOT, "briefs/INDEX.jsonl"), "utf8")
-  .trim()
-  .split("\n")
-  .map((l) => JSON.parse(l));
-const regCallsigns = new Set(registry.map((e: any) => e.callsign as string));
-
-for (const c of regCallsigns) {
-  if (!ampCallsigns.has(c)) {
-    console.error(`✗ &briefs — registry brief absent from the state table: ${c}`);
-    hardDrift++;
-  }
-}
-for (const c of ampCallsigns) {
-  if (!regCallsigns.has(c)) {
-    console.error(`✗ &briefs — tabled brief not in registry: ${c}`);
-    hardDrift++;
-  }
-}
-console.log(`  registry — ${regCallsigns.size} briefs; &briefs carries ${ampCallsigns.size}`);
 
 // ── Staleness: advisory only. The judgment pass is human; the calendar
 // is not.

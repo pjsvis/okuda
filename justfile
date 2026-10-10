@@ -84,6 +84,12 @@ hooks-install:
 [group('navigation')]
 amp:
     @bun scripts/amp-check.ts
+    @bun scripts/amp-briefs.ts --check
+
+# AMPER regen
+[group('navigation')]
+amp-regen:
+    @bun scripts/amp-briefs.ts --write
 
 # State
 [group('navigation')]
@@ -389,6 +395,11 @@ next:
 [group('dogfood')]
 briefs:
     @./okuda --tui '&briefs.md'
+
+# The map
+[group('dogfood')]
+stack:
+    @./okuda --tui '&stack.md'
 
 # Listening queue
 [group('dogfood')]

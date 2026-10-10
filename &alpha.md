@@ -120,8 +120,8 @@ lying.
    repository](https://github.com/pjsvis/okuda) renders as a link;
    the web is not the silo.
 9. **Legacy wiring is silent** — the token at the end of this line is
-   stripped without a badge: %%okuda-rhs:11%% briefs/x.md — retired,
-   not honored (ADR-022 reversed).
+   stripped without a badge: %%okuda-rhs:11%% — retired, not honored
+   (ADR-022 reversed).
 10. **Callsign in a table cell** — vectors paint in tables too:
 
 | ADR | Rule |
