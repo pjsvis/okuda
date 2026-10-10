@@ -91,7 +91,7 @@
 {"file":"2026-10-10-brief-commission-blandings.md","date":"2026-10-10","status":"open","summary":"Commission the Blandings silo — and the procedure that makes the next one routine","meta":{},"callsign":"BRF-COMMISSION-BLANDINGS"}
 {"file":"2026-10-10-brief-history-preface.md","date":"2026-10-10","status":"open","summary":"The header is Date and Status — the history preface and the TD field, out","meta":{},"callsign":"BRF-HISTORY-PREFACE"}
 {"file":"2026-10-10-brief-leak-fence.md","date":"2026-10-10","status":"open","summary":"The leak gate's fence exemption — anchor on the source, not a rendered match","meta":{},"callsign":"BRF-LEAK-FENCE"}
-{"file":"2026-10-10-brief-protocol-update.md","date":"2026-10-10","status":"open","summary":"The protocol update — self-contained documents, and a deploy that crosses the seam honestly","meta":{},"callsign":"BRF-PROTOCOL-UPDATE"}
+{"file":"2026-10-10-brief-protocol-update.md","date":"2026-10-10","status":"done","summary":"The protocol update — self-contained documents, and a deploy that crosses the seam honestly","meta":{},"callsign":"BRF-PROTOCOL-UPDATE"}
 {"file":"2026-10-10-brief-read-actuator.md","date":"2026-10-10","status":"open","summary":"Read actuator — the current document, handed to the voice","meta":{},"callsign":"BRF-READ-ACTUATOR"}
 {"file":"2026-10-10-brief-render-defects.md","date":"2026-10-10","status":"open","summary":"Render defects — the stack map's four findings, and how they stop recurring","meta":{},"callsign":"BRF-RENDER-DEFECTS"}
 {"file":"2026-10-10-brief-seam-audit.md","date":"2026-10-10","status":"done","summary":"The seam audit — the input path, where a run was mistaken for a spelling","meta":{},"callsign":"BRF-SEAM-AUDIT"}

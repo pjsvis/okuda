@@ -29,6 +29,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-SYNC-OUTPUT | ✓ landed | DECSET 2026 atomicity; one frame, one write; ADR-028's first rung | — |
 | BRF-PAPER-RUNG | ✓ done | one render, two artefacts — the paper rung | [debrief](debriefs/2026-10-09-debrief-paper-rung.md) |
 | BRF-STREAM-IDENTITY-HEADER | ✓ done | the render names the document for the unknown destination; awaiting the archive move | — |
+| BRF-PROTOCOL-UPDATE | ✓ done | the file is the state; the deploy is a message into the sibling's inbox | [debrief](debriefs/2026-10-10-debrief-protocol-update.md) |
 
 ## Landed today — ADR-031, the working copy
 
@@ -147,7 +148,6 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-RENDER-DEFECTS | · open | the stack map's four findings (epic) | — |
 | BRF-BOUNDARY-MARK | · open | The boundary mark — the receipt elides the addresses the cap never realised | — |
 | BRF-SEAM-AUDIT | ✓ done | the seam audit — the run buffer generalised, `]]`/`[[` fire across reads, the read-boundary test added (landed same day) | — |
-| BRF-PROTOCOL-UPDATE | · open | self-contained documents — the history preface out, an inbox deploy in (the symlink chain retired) | — |
 | BRF-AMP-CELL | · open | The state cell derives — a status change reaches the table | — |
 | BRF-HISTORY-PREFACE | · open | the header is Date + Status — the history preface and the `TD` field out, with a lint for both | — |
 | BRF-LEAK-FENCE | · open | The leak gate's fence exemption — anchor on the source, not a rendered match | — |
