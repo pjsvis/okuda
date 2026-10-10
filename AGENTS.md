@@ -7,7 +7,7 @@ A terminal markdown viewer built on `Bun.markdown`, rendering mermaid fences via
 1. **Orient first.** `just orient` at session start. `td usage --new-session` for task identity.
 2. **Brief before build.** Non-trivial work gets a brief in `briefs/` before code is written.
 3. **td is the continuity system.** Brief-scale work (epics) and implementation tasks live in td: `td create` when work is defined, `td start` before touching files, `td log` after substantive changes, `td handoff --done/--remaining` at session end, `td review` to close. Work not in td isn't tracked.
-4. **Branch hygiene.** Never commit work directly to `main`. Branch `feat/<name>`, one logical change per commit.
+4. **Branch hygiene.** Never commit work directly to `main`. Branch `feat/<name>`, one logical change per commit. Docs fast-forward to `main` without a PR; **code merges through a PR** (ADR-DOCS-DIRECT-060).
 5. **Quality gate.** `just check` before every commit — it must pass.
 6. **Registry principle.** If a directory accumulates documents, it gets a JSONL index. Add document + index entry in the same commit (`just reg-sync-fix`, then review the derived entry).
 7. **Decisions get ADRs.** Two viable options, a reversed approach, or a new pattern → `decisions/NNN-*.md`. On reversal, run the palimpsest protocol (`playbooks/decisions-playbook.md`).

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # orient.sh — one glance answers "are both machines looking at the same
 # thing?" The two-machine protocol (2026-09-02): origin is the single
-# source of truth, merges go through PRs, builds happen only from clean
-# refs that are not behind. This report surfaces every way that protocol
+# source of truth; docs merge direct, code merges through a PR
+# (ADR-DOCS-DIRECT-060); builds happen only from clean refs that are not
+# behind. This report surfaces every way that protocol
 # can silently fail:
 #
 #   1. branch sync — fetch + ahead/behind vs upstream (local-only

@@ -56,3 +56,4 @@
 {"file":"057-document-lifecycle.md","date":"2026-10-08","status":"Accepted","summary":"The document lifecycle — ephemeral, record, addressed, retired","meta":{},"callsign":"ADR-DOCUMENT-LIFECYCLE-057"}
 {"file":"058-derived-amp-table.md","date":"2026-10-10","status":"Accepted","summary":"The state table derives its rows — the registry is the membership, the editor keeps the grouping","meta":{},"callsign":"ADR-DERIVED-AMP-TABLE-058"}
 {"file":"059-seam-copy.md","date":"2026-10-10","status":"Accepted","summary":"The seam is crossed by a copy the receiver commits — not a shared symlink","meta":{},"callsign":"ADR-SEAM-COPY-059"}
+{"file":"060-docs-direct-code-pr.md","date":"2026-10-10","status":"Accepted","summary":"Match the review to the risk — docs merge direct, PRs are for code","meta":{},"callsign":"ADR-DOCS-DIRECT-060"}

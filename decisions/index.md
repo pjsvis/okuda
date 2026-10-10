@@ -11,6 +11,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 |---|---|---|---|---|
 | 2026-10-10 | ADR-DERIVED-AMP-TABLE-058 | Accepted | The state table derives its rows — the registry is the membership, the editor keeps the grouping | 058-derived-amp-table.md |
 | 2026-10-10 | ADR-SEAM-COPY-059 | Accepted | The seam is crossed by a copy the receiver commits — not a shared symlink | 059-seam-copy.md |
+| 2026-10-10 | ADR-DOCS-DIRECT-060 | Accepted | Match the review to the risk — docs merge direct, PRs are for code | 060-docs-direct-code-pr.md |
 | 2026-10-08 | ADR-DOCUMENT-LIFECYCLE-057 | Accepted | The document lifecycle — ephemeral, record, addressed, retired | 057-document-lifecycle.md |
 | 2026-10-07 | ADR-SEARCH-RECENCY-053 | Accepted | Recency first in the picker — newest at the top, and case-insensitive directories | 053-search-recency.md |
 | 2026-10-07 | ADR-WIDENING-LAG-054 | Accepted | Lag the widening direction — a frame narrower than the pane is a margin, a frame wider is a lie | 054-widening-lag.md |
