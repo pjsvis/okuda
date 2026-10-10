@@ -88,6 +88,7 @@
 {"file":"2026-10-09-brief-paper-rung.md","date":"2026-10-09","status":"done","summary":"The paper rung — the same render, printed","meta":{},"callsign":"BRF-PAPER-RUNG"}
 {"file":"2026-10-10-brief-boundary-mark.md","date":"2026-10-10","status":"open","summary":"The boundary mark — the receipt elides the addresses the cap never realised","meta":{},"callsign":"BRF-BOUNDARY-MARK"}
 {"file":"2026-10-10-brief-commission-blandings.md","date":"2026-10-10","status":"open","summary":"Commission the Blandings silo — and the procedure that makes the next one routine","meta":{},"callsign":"BRF-COMMISSION-BLANDINGS"}
+{"file":"2026-10-10-brief-protocol-update.md","date":"2026-10-10","status":"open","summary":"The protocol update — add the comment-referent rule, and a process that is one edit, one command, one commit","meta":{},"callsign":"BRF-PROTOCOL-UPDATE"}
 {"file":"2026-10-10-brief-read-actuator.md","date":"2026-10-10","status":"open","summary":"Read actuator — the current document, handed to the voice","meta":{},"callsign":"BRF-READ-ACTUATOR"}
 {"file":"2026-10-10-brief-render-defects.md","date":"2026-10-10","status":"open","summary":"Render defects — the stack map's four findings, and how they stop recurring","meta":{},"callsign":"BRF-RENDER-DEFECTS"}
 {"file":"2026-10-10-brief-seam-audit.md","date":"2026-10-10","status":"done","summary":"The seam audit — the input path, where a run was mistaken for a spelling","meta":{},"callsign":"BRF-SEAM-AUDIT"}
