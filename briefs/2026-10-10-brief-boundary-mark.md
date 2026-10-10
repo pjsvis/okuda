@@ -39,6 +39,28 @@ A **partial hand list** keeps its receipt, and the unexpected receipt is the sig
 *Related was incomplete*. A **truncated map** keeps its receipt too, and there the
 receipt is the only surface that can carry the boundary.
 
+## Evidence
+
+Measured 2026-10-10 with uncapped discovery (`tmp/cap-mark-uncapped.ts` — the same
+regexes and gates as `scanReferences`, minus the slice), against the map the product
+builds:
+
+| document | occurrences | distinct destinations | map today | map after fork B | never realised |
+|---|---|---|---|---|---|
+| `&briefs.md` | 113 | 113 | 80 | 80 | **33** |
+| `briefs/index.md` | 96 | 93 | 77 | 80 | **13** |
+
+The reach, over the corpus: **2 of 389** files carrying references are truncated, and
+**46 destinations** never receive a silcrow. Both are generated indexes; the next
+busiest documents hold 29 and 21 destinations, so the headroom elsewhere is an order of
+magnitude. The ADR-047 annotation's 82 rows / 80 occurrences / 77 addresses is now
+93 / 80 / — : the corpus passed the cap between 2026-09-30 and today, so the failure is
+**live, not latent**.
+
+The receipt renders on both documents today — `referencesCovered` is false (the body is
+a table, never a list item), so suppression does not fire on the annotated rung
+(`tmp/cap-mark-suppression.ts`). The mark would therefore have a home on arrival.
+
 ## The mark, and the grammar it borrows
 
 Not a warning. A warning is a separate channel that fires on a condition the reader did
@@ -83,6 +105,12 @@ an otherwise complete hand list exactly when the map is truncated, so its mere p
 reports the truncation — a conditional element reporting its condition (*Attributable
 structure*), the same mechanism as the partial-list receipt, one level down.
 
+**Measured:** neither live truncated document reaches this branch — both are tables,
+not self-tabling lists, and both render their receipt (`tmp/cap-mark-suppression.ts`).
+The term is insurance against the document that does not exist yet: a page with 81+
+distinct destinations whose final section is a complete `## Related` list. The control
+is the same measurement, inverted, and it is in the acceptance set.
+
 **4. One signal, every rung.** The mark is not a silcrow, so it needs no TTY gate and
 rides the section source: identical painted, piped, and under `NO_COLOR`.
 `--no-references` (the paper rung) drops the receipt entirely and gets no mark — there is
@@ -118,10 +146,13 @@ tests.
       remaining cap is on destinations (`briefs/2026-09-14-brief-address-cap.md`;
       `docs/2026-09-15-the-cap-is-on-the-wrong-quantity.md`). Without it the predicate
       cannot tell full from truncated.
-- [ ] A truncated fixture exists — a source with 81+ distinct destinations, or the
-      corpus's own `briefs/index.md` at its current count.
+- [ ] A truncated fixture exists — the corpus's own `&briefs.md` (113 distinct → 80)
+      and `briefs/index.md` (93 → 80) are live fixtures; a synthetic 81-destination
+      source pins the unit case.
 - [ ] The false-positive control exists — a source with exactly 80 distinct destinations
-      and no repeats.
+      and no repeats, which must render no mark.
+- [ ] `tmp/cap-mark-uncapped.ts` and `tmp/cap-mark-suppression.ts` reproduce the Evidence
+      table (scratch, gitignored; the numbers above are their output).
 - [ ] `just check` and `just test` green before starting.
 
 ## Work Plan
