@@ -393,3 +393,14 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   `splitKeyEvents`' comment named the header-to-header jump, three files away —
   and the jump it named was dead. *Prior art:* clause 1 (*every output is a
   claim*); the **audit surface**.
+
+* **Craft pass and safety pass**: the two reviews, and the rule for spending
+  each. The **safety pass** asks *is this right?* — it catches a broken thing,
+  and everything gets it. The **craft pass** asks *is this as good as it could
+  be?* — it catches a thing that works and could be better; it is spent where a
+  second mind is worth the cost, never by habit. Code wants both (a pull request
+  is its craft pass); written prose wants the safety pass alone, because a wrong
+  sentence is cheap to annotate and a document is not executed. **Test:** name
+  which pass a review is — a review that cannot say is ceremony in a control's
+  clothes. *Prior art:* the long-standing split between an automated correctness
+  gate (tests, CI) and human code review done for craft.
