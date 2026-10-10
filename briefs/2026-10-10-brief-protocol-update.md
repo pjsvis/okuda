@@ -6,8 +6,8 @@ callsign: BRF-PROTOCOL-UPDATE
 # Brief: The protocol update — self-contained documents, and a deploy that crosses the seam honestly
 
 **Date:** 2026-10-10
-**Status:** Open
-**TD:** (to create)
+**Status:** Done
+**TD:** the BRF-PROTOCOL-UPDATE epic (tracked in td; four tasks)
 
 ## Context
 
@@ -49,19 +49,19 @@ broader history-preface sweep across the 22 documents (a follow-on pass).
 
 ## Preconditions
 
-- [ ] `cool-pi-extensions` has an inbox (`msgs/`) — the seam's message mechanism.
+- [x] `cool-pi-extensions` has an inbox (`msgs/`) — the seam's message mechanism.
       Verify; if it has none, creating it is the first deliverable.
 
 ## Work Plan
 
-1. [ ] Add the two entries; replace `system.md`'s version preface with one **cut**
+1. [x] Add the two entries; replace `system.md`'s version preface with one **cut**
       line (git is the changelog).
-2. [ ] Replace `protocol-install.sh`'s write-through-chain with an **inbox send**:
+2. [x] Replace `protocol-install.sh`'s write-through-chain with an **inbox send**:
       write the new `system.md` (or its diff) into `cool-pi-extensions`' inbox and
       **print** the destination and the receiver's next action.
-3. [ ] `just protocol-check`: `cmp` the source against each silo's `system.md` and
+3. [x] `just protocol-check`: `cmp` the source against each silo's `system.md` and
       **list who is behind** — the roster the operator asked to keep.
-4. [ ] The runtime stops reading through the chain; the operator repoints it. Named,
+4. [x] The runtime stops reading through the chain; the operator repoints it. Named,
       not automated.
 
 ## Acceptance Criteria

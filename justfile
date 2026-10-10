@@ -58,6 +58,11 @@ info:
 protocol-install:
     @bash scripts/protocol-install.sh
 
+# Protocol roster
+[group('navigation')]
+protocol-check:
+    @bash scripts/protocol-check.sh
+
 # ── td (task identity) ───────────────────────────────────────
 
 # Task last

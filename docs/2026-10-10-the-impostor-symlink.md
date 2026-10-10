@@ -1,8 +1,8 @@
 ---
 date: 2026-10-10
-kind: finding and fix — the deploy target is a symlink chain into another repository; the install now resolves the chain and declares what it wrote
+kind: finding and fix — the deploy target is a symlink chain into another repository; the install first resolved the chain and declared what it wrote, then the write itself was retired for an inbox message (BRF-PROTOCOL-UPDATE)
 lineage: found on 2026-10-10 while checking whether bold/italic styles could be added to the Pi theme — reading `~/.pi/agent/settings.json` and the `cool-pi-extensions` theme exposed the `AGENTS.md` symlink. Residue of the Blandings spin-off: the commissioning work that placed a copy of the Protocol in a second repository.
-status: recorded — the install declares its target; the copy-versus-symlink decision is open
+status: recorded — the finding; the write path is retired (the deploy is now a message; the receiver commits), and the copy-versus-symlink decision is open
 ---
 
 # The impostor symlink — `AGENTS.md` is not a file
@@ -51,6 +51,13 @@ The deploy is not refused. The wiring is deliberate — the pi prompt *should*
 live in a versioned repo — but it can no longer be silent, and it can no longer
 leave a repo dirty without naming the file and the repo. **The impostor is now
 an announced address.**
+
+**Superseded 2026-10-10 (BRF-PROTOCOL-UPDATE):** declaring the chain was still
+a write *through* the seam. The deploy is now a **message** — `just
+protocol-install` publishes a copy of `system.md` into `cool-pi-extensions`'s
+inbox (`msgs/from-*`), and the receiver owns `SYSTEM.md` and the commit. The
+chain is the runtime's *read* path; this silo no longer writes through it. See
+`docs/2026-10-10-the-seam.md`, the seam rule.
 
 ## The residue still standing
 

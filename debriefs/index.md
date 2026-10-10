@@ -10,6 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-10-10 | DBF-COMMISSION-RESIDUE | done | Debrief: The commissioning residue — a procedure, a stamper, and the same class twice | 2026-10-10-debrief-commission-residue.md |
+| 2026-10-10 | DBF-PROTOCOL-UPDATE | done | Debrief: The protocol update — the file is the state, and the deploy is a message | 2026-10-10-debrief-protocol-update.md |
 | 2026-10-09 | DBF-PAPER-RUNG | done | Debrief: The paper rung — the same render, printed | 2026-10-09-debrief-paper-rung.md |
 | 2026-10-08 | DBF-PRUNE-BATCH-1 | done | Debrief: Prune batch 1 — four settled briefs into the archive scope | 2026-10-08-debrief-prune-batch-1.md |
 | 2026-10-08 | DBF-PRUNE-BATCH-2 | done | Debrief: Prune batch 2 — the first deletion, and a word that must not be borrowed | 2026-10-08-debrief-prune-batch-2.md |
