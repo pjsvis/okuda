@@ -408,7 +408,7 @@ new-silo dir name desc:
 # Cadence report
 [group('registries')]
 cadence:
-    @bun scripts/cadence.ts
+    @bun scripts/cadence.ts --write
 
 # List briefs
 [group('registries')]
