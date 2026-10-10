@@ -125,6 +125,16 @@ next silo that gates are decorative.
   assumes every configured register directory exists and a newborn silo has only
   three. `reg-menu` pulls `jump-demo`, so it graduates rather than shipping.
 
+- **2026-10-10, later the same session** — the rule above caught this page,
+  twice. Two claims in the first review pass were accepted without reading the
+  tree: the registry floor was described as three birth **documents**, when two
+  of them hold only a registry and a generated index; and the empty-directory
+  tolerance was reported working after a run against a `mkdir`'d directory, not
+  the `git init` case its own comment named. Both are the class the
+  count-and-sample rule already names — a claim about the artefact made by
+  counting or assuming rather than by reading. **The rule is not only for
+  generated indexes: a procedure's claims about *itself* need the reading too.**
+
 ## Open questions
 
 - Where the procedure lives once it leaves the incubator — this tier, or a shared
