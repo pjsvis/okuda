@@ -168,8 +168,9 @@ a message moves no derived state, and the receiver files it on its own terms. A
 file, and the receiver inherits the sender's path. A copy is the message.
 
 A crossing **declares itself**. `scripts/protocol-install.sh` is the worked
-example: it resolves the target's symlink chain and names the repository and the
-uncommitted state — because it once wrote silently through a two-hop symlink into
+example: it publishes a copy of `system.md` into `cool-pi-extensions`'s inbox
+(`msgs/from-*`) and names the receiver and the commit that is the receiver's —
+replacing an earlier version that wrote silently through a two-hop symlink into
 another silo and left it dirty.
 
 **Undeclared scope is the defect class, not non-blocking scope.** A gate that

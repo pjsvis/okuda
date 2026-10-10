@@ -223,10 +223,11 @@ See `ADR-BUILD-SIGNS-040` and `docs/2026-09-21-the-page-the-signature-got-wrong.
   validates tags against `chroma --list` before piping. The table is
   chroma's; okuda owns no extension→language map.
 
-## The protocol deploy target — an external consumer (verified 2026-10-10)
+## The protocol deploy target — a sibling silo's inbox (verified 2026-10-10)
 
-`just protocol-install` copies `system.md` to `~/.pi/agent/AGENTS.md`. On this
-machine that path is a **symlink chain into another repository**:
+`just protocol-install` publishes `system.md` into `cool-pi-extensions`'s inbox
+(`msgs/from-*`). It is a **message, not a write**: the sender owns the cut, the
+**receiver owns `SYSTEM.md` and the commit**. The machine's runtime chain —
 
 ```
 ~/.pi/agent/AGENTS.md
@@ -234,11 +235,11 @@ machine that path is a **symlink chain into another repository**:
      -> cool-pi-extensions/SYSTEM.md
 ```
 
-So the install writes a copy of `system.md` into `cool-pi-extensions`, and that
-copy has to be committed **there** — otherwise the two drift silently, and the
-drift is in a repo this silo does not commit to. `scripts/protocol-install.sh`
-resolves the chain and names the real file and its repository, with whether the
-copy is uncommitted. See `docs/2026-10-10-the-impostor-symlink.md`.
+— is the runtime's *read* path; this silo no longer writes through it. Repointing
+the runtime off the chain is an operator action, named and not automated.
+`just protocol-check` `cmp`s each sibling's `SYSTEM.md` against `system.md` and
+names who is behind. See `docs/2026-10-10-the-seam.md` (the seam rule) and
+`docs/2026-10-10-the-impostor-symlink.md`.
 
 ## Verification discipline
 
