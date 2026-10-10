@@ -8,7 +8,7 @@ callsign: BRF-COMMISSION-BLANDINGS
 **Date:** 2026-10-10
 **Status:** open
 **Origin:** the entertainment/work-product split (this session). Companion to
-`docs/2026-09-11-the-repertory-company.md` and `playbooks/ear-playbook.md`.
+the repertory company doc (Blandings) and `playbooks/ear-playbook.md`.
 
 ## Objective
 
@@ -47,7 +47,7 @@ earns its shape.
   committed** — referenced by title, read from local files.
 - **The text standard is the property, not the canon** — the comic periodic
   sentence, densest in early-20th-century comic prose (Wodehouse, Benson), plus
-  the translated Borges/Calvino. See `docs/2026-09-11-the-repertory-company.md`.
+  the translated Borges/Calvino. See the repertory company doc (Blandings).
 
 ## Scope
 
@@ -91,7 +91,7 @@ earns its shape.
    house-terms, the Moira recital/audition material, the acoustic half of the
    AST-to-prosody work. Cite-not-copy the okuda content.
 4. **Repair the citation graph across silos** — `&speak.md`,
-   `playbooks/ear-playbook.md`, `docs/2026-09-11-the-repertory-company.md`. A
+   `playbooks/ear-playbook.md`, the repertory company doc (Blandings). A
    moved document must not leave a dangling reference.
 5. **Record the rights/corpus policy** as a decision in Blandings.
 6. **Push public; run the visitor test on a cold clone.**
@@ -133,7 +133,7 @@ pass this is not done.
 
 ## Related
 
-- `docs/2026-09-11-the-repertory-company.md` — the casting doctrine and the
+- the repertory company doc (Blandings) — the casting doctrine and the
   bloodline (Wodehouse)
 - `playbooks/ear-playbook.md` — the three-stage pipeline; `speak-md` the
   flattener

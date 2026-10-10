@@ -35,6 +35,19 @@ The filesystem is the message bus; any tool that writes markdown to a file is al
 
 L§AB — the Leith Scriptorium & Bond. Pre-implementation instrument. Design source: [docs/2026-08-20-origin-doc.md](docs/2026-08-20-origin-doc.md) — the *what*. Design rationale: [docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md](docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md) — the *why* (the Derrida gate, the Foxtrot Oscar, and the ventilator).
 
+## Related silos
+
+okuda is one of three silos, and each names the others without linking into them:
+
+- **Blandings** — the speech play: the house voices Moira and Moir, the library,
+  the elocution playbook, the tuning. Entertainment, not rendering.
+- **speak-md** — the pipe: the flattener that turns markdown into speech-safe
+  prose. okuda calls it for a recital; it owns no prose.
+
+The boundaries are real: they reference by name, never by link. The filesystem
+is the message bus, and a crossing is a copy the receiver commits, declared
+(`docs/2026-10-10-the-seam.md`).
+
 ## Repository Layout
 
 This repo is a **silo** — external tool dependencies are inventoried in [`DEPENDENCIES.md`](DEPENDENCIES.md).
