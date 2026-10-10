@@ -67,7 +67,8 @@ files are outputs, not stores.
 5. **Wire the actuator** — `justfile`; day-1 `just check` is `reg-sync --all` and
    nothing else.
 6. **Write the founding record** — a genesis brief or decision.
-7. **`just check` green, then the first commit**, on a branch.
+7. **`just check` green — then read the index** (the count and the sample,
+   below) — **first commit**, on a branch.
 8. **`just orient`** answers state; push.
 9. **The visitor test** on a cold clone.
 
@@ -80,6 +81,12 @@ files are outputs, not stores.
   confidently*; a spin-off that leaves a dangling citation, a duplicated
   authority, or a stale index row is not done (see the file
   `briefs/2026-10-10-brief-commission-blandings.md`).
+- **The count and the sample** — a green gate reports a *count*; that is not a
+  verdict. Check the count against expectation, then **read** the first row, the
+  last row, and one or two from the middle. The count is the control, the reading
+  is the judge — a right count can still sit over a wrong row, which is the
+  stale-ledger class again. This holds for every generated index, registry or
+  report, not only a newborn silo's.
 
 ## What graduates (not day 1)
 

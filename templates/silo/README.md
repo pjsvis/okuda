@@ -3,7 +3,7 @@
 __DESC__
 
 A **silo** — a self-contained project directory with named compartments and a
-registry-backed memory. `just help` orients; `just check` is the gate; the
+registry-backed memory. `just orient` orients; `just check` is the gate; the
 constitution is `system.md`.
 
 ## Layout
