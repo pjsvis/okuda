@@ -63,14 +63,14 @@ describe("keygrammar — the two-digit language as data", () => {
 });
 
 describe("keygrammar — splitKeyEvents (the lexer)", () => {
-  test("vim section pairs ride whole: ]] and [[ are one event each", () => {
-    // BRF-OKUDAGRAM-STEP: the declared header-to-header jump. A burst
-    // paste of "]]j" is a frame jump then a line step, not two loose
-    // brackets swallowed one at a time.
+  test("brackets are not lexed — a run is not a spelling (BRF-SEAM-AUDIT)", () => {
+    // `]]` is two keypresses delivered as two reads; the run buffer pairs
+    // them (tui.ts, advanceRunBuffer), not the lexer. The lexer groups only
+    // the terminal's spellings — the escape sequences below.
     const events = splitKeyEvents(new Uint8Array([0x5d, 0x5d, 0x6a]));
-    expect(events.map((e) => Array.from(e))).toEqual([[0x5d, 0x5d], [0x6a]]);
+    expect(events.map((e) => Array.from(e))).toEqual([[0x5d], [0x5d], [0x6a]]);
     const up = splitKeyEvents(new Uint8Array([0x5b, 0x5b]));
-    expect(up.map((e) => Array.from(e))).toEqual([[0x5b, 0x5b]]);
+    expect(up.map((e) => Array.from(e))).toEqual([[0x5b], [0x5b]]);
   });
 
   test("mixed brackets split — [ and ] alone are single events", () => {

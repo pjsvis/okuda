@@ -68,10 +68,13 @@ export function verbFor(token: number): Verb | "vector" | null {
   return null;
 }
 
-/** Split a raw stdin read into key events: the four supported escape
+/** Split a raw stdin read into key events: the supported escape
  *  sequences ride as single multi-byte events, everything else is a
  *  single-byte event. Burst-safe: a pasted "12" yields two presses,
- *  not one swallowed byte. Pure. */
+ *  not one swallowed byte. Runs are NOT grouped — `99` and `]]` are two
+ *  keypresses delivered as two reads, so the stateful run buffer owns
+ *  them (`advanceRunBuffer`, tui.ts); the lexer undoes only the
+ *  terminal's *spellings* (one key encoded as several bytes). Pure. */
 export function splitKeyEvents(bytes: Uint8Array): Uint8Array[] {
   const events: Uint8Array[] = [];
   let i = 0;
@@ -89,16 +92,8 @@ export function splitKeyEvents(bytes: Uint8Array): Uint8Array[] {
         continue;
       }
     }
-    // Vim's section motions, `]]` and `[[`, ride whole: a single bracket
-    // stays a single event, the pair is one key event (BRF-OKUDAGRAM-STEP).
-    // The lexer's job ends at keeping the pair together — `decodeKey` maps
-    // it to frame-down/frame-up (tui.ts) and the TUI performs the declared
-    // header-to-header jump via `snapFrame(headingLines(...))` (frames.ts).
-    if ((bytes[i] === 0x5d || bytes[i] === 0x5b) && bytes[i] === bytes[i + 1]) {
-      events.push(bytes.slice(i, i + 2));
-      i += 2;
-      continue;
-    }
+    // A bracket is a single event, never a pair: `]]` is two keypresses,
+    // a run, and the run buffer owns it (tui.ts, `advanceRunBuffer`).
     events.push(bytes.slice(i, i + 1));
     i += 1;
   }

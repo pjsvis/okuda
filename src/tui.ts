@@ -102,8 +102,10 @@ const ESC = 0x1b;
 
 /**
  * Decode a raw stdin buffer to a symbolic action. Single-byte controls
- * (Ctrl-C/D/U, q, j, k, g, G, r), the two vim motion pairs (}/{, ]]/[[)
+ * (Ctrl-C/D/U, q, j, k, g, G, r), the vim paragraph pair (}/{)
  * and the four common arrow/page escape sequences (ESC [ A/B/5~/6~).
+ * The bracket pair (]]/[[) is not here: it is a RUN — two keypresses
+ * across two reads — owned by the run buffer in `applyKey`.
  * Unknown bytes and partial sequences are `null` (no-op) — a split escape
  * read is re-synthesised on the next chunk.
  */
@@ -136,10 +138,8 @@ export function decodeKey(buf: Uint8Array): KeyAction {
     case 0x7f: return "back";           // DEL (Backspace on most terminals)
     case 0x08: return "back";           // BS  (Backspace on some terminals)
   }
-  // Vim's section motions, kept whole by the lexer — the declared
-  // header-to-header jump (may gap; honest because named).
-  if (buf.length === 2 && buf[0] === 0x5d && buf[1] === 0x5d) return "frame-down";  // ]]
-  if (buf.length === 2 && buf[0] === 0x5b && buf[1] === 0x5b) return "frame-up";    // [[
+  // Vim's section motions (]]/[[) are NOT decoded here — they are a run,
+  // handled by the run buffer in `applyKey` (BRF-SEAM-AUDIT).
   // Escape sequences: ESC [ <final> or ESC [ <n> ~.
   if (b0 === ESC && buf.length >= 3 && buf[1] === 0x5b) {
     switch (buf[2]) {
@@ -443,13 +443,15 @@ export interface JumpEntry {
   path: string;
 }
 
-/** The numeric jump buffer's state (BRF-PROLONGED-PRESS): a digit
- *  run, held. `null` = empty; `{ keys, spent: false }` = one digit
- *  held, awaiting its pair; `{ keys, spent: true }` = the run's pair
- *  has resolved and the LATCH is set — the run is still held so its
- *  remainder can be swallowed. `keys` is the run's own digits: one
- *  held digit, or the resolved doubled pair. */
-export type NumBuffer = { keys: string; spent: boolean } | null;
+/** The run buffer's state (BRF-PROLONGED-PRESS): a tap run, held. A tap
+ *  is a digit, `[` or `]`. `null` = empty; `{ keys, spent: false }` = one
+ *  tap held, awaiting its pair; `{ keys, spent: true }` = the pair has
+ *  fired and the LATCH is set — the run is still held so its tail can be
+ *  swallowed. `keys` is the run's own taps: one held tap, or the resolved
+ *  pair. */
+export type RunBuffer = { keys: string; spent: boolean } | null;
+/** Kept name: the numeric run was the buffer's first use. */
+export type NumBuffer = RunBuffer;
 
 /** The result of advancing the numeric jump buffer one keystroke.
  *  `buffer` is the new state (null = empty); `token` is the resolved
@@ -459,60 +461,74 @@ export interface NumBufferStep {
   token: number | null;
 }
 
-/** Advance the numeric jump buffer (BRF-PROLONGED-PRESS): the buffer
- *  knows a digit run is a run. Three states — empty, held (one digit
- *  pending), spent (the pair fired, the latch set):
+/** The result of advancing the run buffer one keystroke: the new state,
+ *  and the resolved pair as a string when a pair completed (`"99"`,
+ *  `"]]"`, `"]["`) — the caller reads it. Pure. */
+export interface RunStep {
+  buffer: RunBuffer;
+  pair: string | null;
+}
+
+/** Advance the run buffer (BRF-PROLONGED-PRESS; brackets generalised by
+ *  BRF-SEAM-AUDIT, 2026-10-10): the buffer knows a run is a run. `99` is
+ *  one key spelled nine times, `]]` is one key spelled in two reads — both
+ *  are RUNS, and a run is not a spelling, so neither is the lexer's job
+ *  (the lexer undoes the terminal's spellings: the escape sequences).
+ *  Three states — empty, held (one tap pending), spent (the pair fired,
+ *  the latch set):
  *
- *  - empty + digit → held: the run's first tap.
- *  - held + same digit → the doubled pair resolves; the run stays
- *    held, spent — the latch that swallows the tail.
- *  - held + different digit → the mixed pair resolves (a vector) and
- *    the buffer empties — a vector is never latched, which is why
- *    `12` `12` fires two jumps back to back while `9` `9` `9` `9`
- *    fires one clone.
- *  - spent + same digit → swallowed. Nothing fires, the latch holds.
- *  - spent + different digit → a new run begins (the reader has moved
- *    on; the gesture is over).
- *  - any state + non-digit (motion, escape, letters) → empty. The
- *    abort: a stray keystroke never ambushes a half-typed token, and
- *    a lone ESC stands a pending digit down.
+ *  - empty + tap → held: the run's first tap.
+ *  - held + same tap → the doubled pair resolves; the run stays held,
+ *    spent — the latch that swallows the tail.
+ *  - held + different tap → the mixed pair resolves and the buffer empties.
+ *    For digits that is a vector (`12`); for brackets it is nothing (`][`).
+ *    The caller reads the pair: two digits are a token, `]]`/`[[` are the
+ *    frame motions.
+ *  - spent + same tap → swallowed. Nothing fires, the latch holds.
+ *  - spent + different tap → a new run begins (the reader has moved on).
+ *  - any state + non-tap (motion, escape, letters) → empty. The abort: a
+ *    stray keystroke never ambushes a half-typed token; a lone ESC stands a
+ *    pending tap down.
  *
- *  Grab the actuator pair and swallow the rest of the keystrokes —
- *  the reader's phrasing, given state. A prolonged hold is one
- *  actuation, not a stream of them: a run of identical digits can
- *  only ever be a doubled pair, which by ADR-032's canon is an
- *  actuator and never a jump, so the swallow is safe by
- *  construction — no legitimate jump exists in a run.
- *
- *  The swallow is LATCHED, not read-scoped: at the terminal's repeat
- *  rate each repeat byte lands in its own read, so a swallow scoped
- *  to the current read would re-grab the pair at byte 4, 6, 8, 10 —
- *  five clones, the reported bug. Only a different byte or the
- *  abort ends the latch.
+ *  The swallow is LATCHED, not read-scoped: at the terminal's repeat rate
+ *  each repeat byte lands in its own read, so a swallow scoped to the
+ *  current read would re-grab the pair at byte 4, 6, 8, 10 — five clones,
+ *  the reported bug. Only a different tap or the abort ends the latch.
  *
  *  NO CLOCK. No expiry, no deadline, anywhere in the input path: the
- *  reader's tempo is not an input. The parked quiet period (the
- *  latch's eventual expiry) is IO and lives in the caller when it
- *  lands, clearing the latch only — never a pending digit. And this
- *  is NOT the lexer's job: `]]` is one key spelled in two bytes,
- *  `99` is one key spelled nine times — the lexer undoes the
- *  terminal's spellings, and a run is not a spelling.
- *  Pure — the caller performs the IO (jumpTo/back) the resolved
- *  token implies. */
-export function advanceNumBuffer(
-  prev: NumBuffer,
-  digit: string | null,
-): NumBufferStep {
-  if (digit === null) return { buffer: null, token: null }; // the abort
-  if (prev === null) return { buffer: { keys: digit, spent: false }, token: null };
-  const run = prev.keys[0]!; // the run's digit, held or spent
+ *  reader's tempo is not an input. The parked quiet period (the latch's
+ *  eventual expiry) is IO and lives in the caller when it lands, clearing
+ *  the latch only — never a pending tap.
+ *  Pure — the caller performs the IO the resolved pair implies. */
+export function advanceRunBuffer(prev: RunBuffer, tap: string | null): RunStep {
+  if (tap === null) return { buffer: null, pair: null }; // the abort
+  if (prev === null) return { buffer: { keys: tap, spent: false }, pair: null };
+  const run = prev.keys[0]!; // the run's tap, held or spent
   if (prev.spent) {
-    if (digit === run) return { buffer: prev, token: null }; // swallowed — one gesture
-    return { buffer: { keys: digit, spent: false }, token: null }; // a new run begins
+    if (tap === run) return { buffer: prev, pair: null }; // swallowed — one gesture
+    return { buffer: { keys: tap, spent: false }, pair: null }; // a new run begins
   }
-  const pair = prev.keys + digit;
-  if (digit === run) return { buffer: { keys: pair, spent: true }, token: Number(pair) };
-  return { buffer: null, token: Number(pair) }; // mixed pair — a vector, never latched
+  const pair = prev.keys + tap;
+  if (tap === run) return { buffer: { keys: pair, spent: true }, pair };
+  return { buffer: null, pair }; // a mixed pair — the caller reads it
+}
+
+/** The numeric run as a token: the pair-as-number view of
+ *  `advanceRunBuffer`, kept for the gesture matrix and numeric callers.
+ *  Pure. */
+export function advanceNumBuffer(prev: NumBuffer, digit: string | null): NumBufferStep {
+  const { buffer, pair } = advanceRunBuffer(prev, digit);
+  return { buffer, token: pair !== null ? Number(pair) : null };
+}
+
+/** The tap a run holds: a single-byte digit, `[` or `]`; else null. A
+ *  multi-byte event (escape sequence, arrow) is never a tap — those are the
+ *  terminal's spellings, the lexer's job. Pure. */
+export function tapOf(buf: Uint8Array): string | null {
+  const digit = digitOf(buf);
+  if (digit !== null) return digit;
+  if (buf.length === 1 && (buf[0] === 0x5b || buf[0] === 0x5d)) return String.fromCharCode(buf[0]!);
+  return null;
 }
 
 /** Scan markdown source for jump wiring — a `%%okuda-rhs:NN%%` token
@@ -715,7 +731,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   let mainText = "";
   let mainJumps: Map<number, string> = new Map();
   let backstack: { file: string; scroll: number }[] = [];
-  let numBuffer: NumBuffer = null; // the digit-run state (BRF-PROLONGED-PRESS)
+  let runBuffer: RunBuffer = null; // the tap-run state (BRF-PROLONGED-PRESS; brackets BRF-SEAM-AUDIT)
 
   // Initial fetch through the gate: prev=null is the initial-load sentinel,
   // so a successful first read is `changed` (content arrived) and a failed
@@ -1082,25 +1098,32 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // arrive as multi-byte events (the lexer keeps them whole), so a
     // single-byte ESC is genuinely alone: stand the buffer down.
     if (bytes.length === 1 && bytes[0] === ESC) {
-      if (numBuffer !== null) numBuffer = advanceNumBuffer(numBuffer, null).buffer;
+      if (runBuffer !== null) runBuffer = advanceRunBuffer(runBuffer, null).buffer;
       return false;
     }
-    // Numeric jump buffer: two digits → token → verb. Any non-digit
-    // (motion, escape sequence, letters) cancels a pending buffer.
-    const digit = digitOf(bytes);
-    const step = advanceNumBuffer(numBuffer, digit);
-    numBuffer = step.buffer;
-    if (step.token !== null) {
-      const verb = verbFor(step.token);
-      if (verb === "vector") {
-        void jumpTo(step.token);
-      } else {
-        verbHandlers[verb]?.();
+    // The run buffer: two identically-spelled taps → a pair (BRF-SEAM-AUDIT;
+    // BRF-PROLONGED-PRESS generalised). A digit pair is a jump token; `]]`
+    // and `[[` are the frame motions. Any non-tap (motion, escape, letters)
+    // cancels a pending tap. The buffer spans READS — the terminal delivers
+    // one keypress per read, so a two-tap run cannot be lexed within one.
+    const tap = tapOf(bytes);
+    const step = advanceRunBuffer(runBuffer, tap);
+    runBuffer = step.buffer;
+    let action: KeyAction = null;
+    if (step.pair !== null) {
+      if (/^\d\d$/.test(step.pair)) {
+        const token = Number(step.pair);
+        const verb = verbFor(token);
+        if (verb === "vector") void jumpTo(token);
+        else verbHandlers[verb]?.();
+        return cleaned; // the exit verb ended the session — report it
       }
-      return cleaned; // the exit verb ended the session — report it
+      action = step.pair === "]]" ? "frame-down" : step.pair === "[[" ? "frame-up" : null;
+    } else if (tap !== null) {
+      return false; // the run's first tap — pending
+    } else {
+      action = decodeKey(bytes);
     }
-    if (digit !== null) return false; // first digit only — buffer pending
-    const action = decodeKey(bytes);
     if (action === null) return false;
     if (action === "quit") {
       cleanup();
