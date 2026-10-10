@@ -22,7 +22,7 @@
  * nothing; they are reserved, not missing.
  */
 
-import { RESERVED_VECTORS, VECTOR_MIN, VECTOR_MAX } from "./vectors";
+import { DOUBLED_PAIRS, VECTOR_MIN, VECTOR_MAX } from "./vectors";
 
 export type Verb =
   | "exit"
@@ -55,14 +55,15 @@ export function readOnlyActive(): boolean {
  *  for the address range, `null` for reserved-unassigned tokens (the
  *  press is acknowledged and does nothing — reserved, not missing).
  *  The doubled pairs (ADR-032, canonized 2026-09-12 — one actuator
- *  class, never jumps) all resolve to null unless bound: 11 by range
- *  (below the floor), {22,…,77} via the pocket Set, 00/88/99 via their
- *  bound verbs in the table. The boundaries are read from the
- *  constants, never retyped here. Pure. */
+ *  class, never jumps) all resolve to null unless bound: 00/88/99 via
+ *  their bound verbs in the table, 11 and {22,…,77} via the class Set.
+ *  The question is "is this a doubled pair?", never "is it in range" —
+ *  a floor change cannot turn an actuator into a vector. The boundaries
+ *  are read from the constants, never retyped here. Pure. */
 export function verbFor(token: number): Verb | "vector" | null {
   const verb = KEYBINDINGS[token];
   if (verb) return verb;
-  if (RESERVED_VECTORS.has(token)) return null; // ADR-032 actuator pocket
+  if (DOUBLED_PAIRS.has(token)) return null; // ADR-032: the class, bound or not
   if (token >= VECTOR_MIN && token <= VECTOR_MAX) return "vector";
   return null;
 }

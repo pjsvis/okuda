@@ -45,26 +45,47 @@
  * token-boundaried (`YYYY-MM-DD` is a date template, not `YYY-MM-DD`).
  */
 
+/**
+ * The two-digit space (00–99), partitioned by actuator type rather than by
+ * range — two shape rules cover all of it (ADR-031, ADR-032):
+ *
+ *   [01–10]                          modes and single-key verbs — what the
+ *                                    instance DOES
+ *   [00,11,22,33,44,55,66,77,88,99]  the doubled pairs — one actuator class,
+ *                                    bound or reserved; never a jump
+ *   everything else                  the silcrow vectors — what the instance
+ *                                    SHOWS
+ *
+ * A doubled pair is always an actuator and a mixed-digit pair is always an
+ * address, in every document, forever (ADR-032: global, never per-document).
+ * The class wraps: 00 (exit) sits beside 99 (clone), its two bound ends and
+ * adjacent keys on the number row — which is why the doubled pairs are a Set,
+ * never a range.
+ */
+
+/** Vectors run 12–98: the mixed-digit pairs, used as addresses. Silcrow 12 is
+ *  always first (the reading-order floor). */
 export const VECTOR_MIN = 12;
 export const VECTOR_MAX = 98;
-/** The clone verb (ADR-031): not a vector — reserved in the two-digit space. */
+
+/** The doubled pairs, all ten (ADR-032) — the one home of the class. 00 exit
+ *  and 99 clone are bound; 11 and {22,…,77} are the reserved pocket; 88 is
+ *  bound to edit. */
+export const DOUBLED_PAIRS = new Set([0, 11, 22, 33, 44, 55, 66, 77, 88, 99]);
+
+/** The clone verb (ADR-031): the 99 end of the class, never an address. */
 export const CLONE_TOKEN = 99;
-/** Repeated-digit actuators (ADR-032; the canon 2026-09-12: ALL doubled
- *  pairs are one actuator class — 00, 11, 22, … 99 — system verbs,
- *  never jumps; an accessibility rule, zero exceptions). This Set is the
- *  class *inside the vector range* — the unbound pocket {22,…,88}.
- *  The bound members live elsewhere: 00 and 99 in KEYBINDINGS
- *  (`src/keygrammar.ts`); 11 sits below the floor and resolves to null
- *  by range, not membership. The allocator and verbFor share this one
- *  Set — a shape rule, not a range rule: doubled pair = actuator,
- *  mixed digits = address. The grammar reserves them; documents
- *  never see the gap (numbers are dynamic). */
-export const RESERVED_VECTORS = new Set([22, 33, 44, 55, 66, 77, 88]);
-/** The two-digit space is 00-99, partitioned by actuator type (the
- *  canon): 00-10 verbs/modes; 00,11,22,…,99 the doubled-pair class
- *  (00 and 99 bound — exit, clone — the rest the pocket); mixed
- *  digits 12-98 the jump vectors — 80 addresses, silcrow 12 always
- *  first. */
+
+/** The doubled pairs inside the vector range — the seven the allocator skips
+ *  and `verbFor` resolves to null. Derived from the class, never retyped, so a
+ *  new doubled pair cannot silently widen the address space. (00, 11 and 99
+ *  lie outside the range — below the floor, or the clone end — so a walk from
+ *  VECTOR_MIN meets only these.) */
+export const RESERVED_VECTORS = new Set(
+  [...DOUBLED_PAIRS].filter((n) => n >= VECTOR_MIN && n <= VECTOR_MAX),
+);
+
+/** The addressable count: the range minus the pocket it skips — 80. */
 export const MAX_REFS = VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size;
 
 /** Callsign shape: tier prefix + significant tokens, uppercase. Moved
