@@ -12,10 +12,11 @@ are text; the shortlist landed; the porch and working-copy rows added);
 amended 2026-09-30 (the step-inventory row — assessed `· open`, the
 epic's logs are empty); amended 2026-10-04 (the diagram-describe row —
 assessed `· open`, its render-path design refused); amended 2026-10-10
-(the ledger reconciliation — 46 live briefs added, placed by registry
-status; the coverage check now resolves a tabled callsign against the
-live *and* archive registries).
-Editorial surface; `just amp` checks the drift against the registry.
+(the ledger reconciliation — the row set is derived: `just amp-regen`
+appends any live brief the table is missing to its status's section, and
+`just amp` fails while one is unfiled).
+Editorial surface: the **sections and notes** are the editor's; the
+**membership** is the registry's — ADR-DERIVED-AMP-TABLE-058.
 
 ## Landed — debrief on file
 
