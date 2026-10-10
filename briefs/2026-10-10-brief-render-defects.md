@@ -7,7 +7,7 @@ callsign: BRF-RENDER-DEFECTS
 
 **Date:** 2026-10-10
 **Status:** Open
-**TD:** (to create)
+**TD:** (epic tracked by callsign)
 
 ## Context
 
