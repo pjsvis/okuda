@@ -2,7 +2,7 @@
 date: 2026-10-10
 kind: finding and fix — the deploy target is a symlink chain into another repository; the install first resolved the chain and declared what it wrote, then the write itself was retired for an inbox message (BRF-PROTOCOL-UPDATE)
 lineage: found on 2026-10-10 while checking whether bold/italic styles could be added to the Pi theme — reading `~/.pi/agent/settings.json` and the `cool-pi-extensions` theme exposed the `AGENTS.md` symlink. Residue of the Blandings spin-off: the commissioning work that placed a copy of the Protocol in a second repository.
-status: recorded — the finding; the write path is retired (the deploy is now a message; the receiver commits), and the copy-versus-symlink decision is open
+status: recorded — the finding; the write path is retired (the deploy is now a message; the receiver commits), and the copy-versus-symlink decision is recorded (ADR-SEAM-COPY-059)
 ---
 
 # The impostor symlink — `AGENTS.md` is not a file
@@ -86,6 +86,12 @@ owed commit for a hard path dependency.
 Unrecorded as a decision. If the operator picks one, it earns an ADR; the
 finding does not need one, because the fix (declare the write) is right under
 either.
+
+**Decided 2026-10-10 — ADR-SEAM-COPY-059**: the copy is kept, refreshed by a
+message whose commit belongs in `cool-pi-extensions` (option **(a)**); the
+cross-repo symlink, the declared `cp`, and reading the source directly were
+refused, with reasons. The section above is the finding as it stood before the
+choice.
 
 ## Related
 
