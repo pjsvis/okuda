@@ -3,47 +3,65 @@ type: Brief
 callsign: BRF-HISTORY-PREFACE
 ---
 
-# Brief: References, not recitals — the history preface out of the visible body
+# Brief: The header is Date and Status — the history preface and the TD field, out
 
 **Date:** 2026-10-10
 **Status:** Open
-**TD:** (to create)
 
 ## Context
 
-The rule lands in `system.md` under BRF-PROTOCOL-UPDATE: a document states its
-current state and **references** what it needs; it does not recite a history.
-Twenty-two documents carry a visible history preface today — so this is a corpus
-job, not a one-file edit.
+A document's header should answer two **present-state** questions — *when is this
+from?* and *what state is it in?* — and nothing else. Today the header block
+(between the H1 and the first H2) collects two other things: a **history
+preface** (`Supersedes …`, `amended …`, `Built …; amended …`), a recital of a
+past the reader does not have, and a **`TD` field**, a pointer into an ephemeral
+local database. Both are references that cannot travel. This brief removes them
+and standardises the header so the failure is detectable.
 
 ## Objective
 
-Remove the visible history prefaces from the corpus, keeping each document's
-state and replacing any *needed* history with a reference.
+Standardise the document header to **Date and Status only**; remove the history
+prefaces and the `TD` fields; add a lint that reports any tier document whose
+header block carries anything else.
 
 ## Evidence
 
-Measured 2026-10-10 (`grep -rl 'Supersedes|amended 2026'`): **22 files** — among
-them `system.md` (the v2.6.0→v1.0.0 chain), `&briefs.md` (*"Built 2026-08-30;
-amended 2026-09-04; amended 2026-09-30; amended 2026-10-04 …"*),
-`docs/style-guide.md`, ten-plus decisions, and several briefs.
+- **History prefaces**: 22 documents carry one (measured 2026-10-10), and they sit
+  **wedged between the H1 and the first H2** — read as an introduction.
+- **`TD` fields**: 32 briefs carry `**TD:**`; 34 cite a `td-xxxxxx` ID — the
+  One-Way Valve's baseline.
+- The header standard is today **emergent**: `briefs-playbook.md`'s Format block
+  lists only Date and Status; the `TD` field grew in practice, unwritten in the
+  template.
 
-The class, split by the rule's test (*does the document stand if the reader knows
-nothing before it?*):
+## The standard
 
-| occurrence | verdict |
-|---|---|
-| `Supersedes v2.5.0 …, v2.4.0 …` — a chain of cuts | **recital** — cut |
-| `amended 2026-09-04 (…); amended 2026-09-30 (…)` | **recital** — cut, or compress to the clause that still governs |
-| `supersedes ADR-031` — a single pointer | **reference** — keep |
+The header is the title, then two bold field lines, then the body — and
+nothing else between them:
+
+```markdown
+# <Title>
+
+Date: YYYY-MM-DD
+Status: <word>
+
+<body — first ##, or prose>
+```
+
+**Nothing else in the header block.** Date and Status survive because they are
+**present-state facts**: *this is current as of X; this is where it stands* — the
+two reassurances a reader needs to know they are where they think they are. A
+history preface is the **past-state** form of the same field shape, and it is
+unverifiable from the file and already kept by git.
 
 ## Scope
 
-**In:** the visible body of the 22 documents (and any sibling the same test
-catches) — the mechanical strip and the per-file judgment.
+**In:** the header block of every tier document (briefs, decisions, debriefs,
+playbooks, docs); the 22 history prefaces; the 32 `TD` fields; a **header lint**.
 
-**Out:** YAML frontmatter (`lineage:`, `date:` — tool-facing, elided, not
-visible); a decision record that cites a superseded decision **by reference**.
+**Out:** YAML frontmatter (invisible, tool-facing); Date and Status themselves; a
+*reversal that cites a decision by reference* — kept, because it is a reference,
+not a chain.
 
 ## Preconditions
 
@@ -52,31 +70,34 @@ visible); a decision record that cites a superseded decision **by reference**.
 
 ## Work Plan
 
-1. [ ] Re-run the census; list each file with each occurrence tagged
-      recital/reference.
-2. [ ] Clear the recitals: leave the state, reference the rest. A *"supersedes
-      X"* sentence survives as a reference; a chain does not.
-3. [ ] Where a history sentence carries a **live constraint**, keep the
-      constraint and cut only the timeline. Never lose a live rule to the sweep.
-4. [ ] Re-run the census; the remainder is references only, each justified.
+1. [ ] Cut the history prefaces; keep any **live constraint** a history sentence
+      carries, and reference the rest.
+2. [ ] Drop the `TD` fields; the linkage runs **td → callsign** (the issue names
+      the brief), never brief → td.
+3. [ ] Standardise the surviving headers to Date + Status.
+4. [ ] The **lint**: report any tier document whose header block is not exactly
+      Date and Status. Ship as a **report first**, then a gate.
 
 ## Acceptance Criteria
 
-- No document's visible body opens with a version, supersession, or amendment
-  chain.
-- Every remaining `supersedes` / `amended` occurrence is a single reference, or
-  is justified in its commit message.
-- The census is re-run and reported — the number before and after.
+- No header block carries a history preface or a `TD` field.
+- Every tier document's header is Date + Status only.
+- The lint reports every header that fails, and zero on the corrected corpus.
+- The census is reported before and after (22 prefaces, 32 TD fields → 0).
 
 ## Notes
 
-The mechanical rule and the judgment rule are different, and the sweep must not
-confuse them: a `grep` finds the candidates; **only the test clears them.** A
-live constraint written as a history sentence (*"we reverted X because of Y"*)
-is a recital with a live half — keep the half, reference the rest.
+**The lint's region is the reason this works**: it checks the block between the
+**H1 and the first H2** (or the first body content) — where the preface hides,
+*almost like an introduction*. A `grep` for `Supersedes` misses the
+`Built …; amended …` form; the block test catches every shape.
+
+The One-Way Valve (`playbooks/td-playbook.md`) already forbids citing a td ID in
+a persisted document; this brief removes the field that invites it.
 
 ## Related
 
 - `system.md` — the entry this sweeps for
 - BRF-PROTOCOL-UPDATE — the rule and the deploy that carries it
-- `&briefs.md` — the largest single recital
+- `playbooks/briefs-playbook.md` — the Format block the standard makes explicit
+- `&briefs.md` — the largest single history preface
