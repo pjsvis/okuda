@@ -149,6 +149,36 @@ record. The test that separates a cache from a shadow store: **can it be deleted
 regenerated from the silo?** If yes it is a cache and may be lossy; if no it is a
 shadow store and the knowledge belongs in a document.
 
+### Across silos — the seam
+
+The rule above holds *inside* a boundary. Across one it has a harder form: a
+silo's gates are exactly as wide as its boundary, so **a cross-boundary write is
+unverifiable by construction** — no gate spans a seam.
+
+**Silos communicate by message, never by shared file** (the actor model):
+
+- the **sender** owns the content and publishes it — a copy, a stamp, a message;
+- the **receiver** owns its copy, its derived state (registers, manifests) and
+  **the commit**;
+- the sender **never reaches in**, and never does the receiver's commit.
+
+An inbox — `msgs/from-*/` in a sibling silo — is the mechanism: unregistered, so
+a message moves no derived state, and the receiver files it on its own terms. A
+**symlink across a seam is shared memory**, not a message: neither side owns the
+file, and the receiver inherits the sender's path. A copy is the message.
+
+A crossing **declares itself**. `scripts/protocol-install.sh` is the worked
+example: it resolves the target's symlink chain and names the repository and the
+uncommitted state — because it once wrote silently through a two-hop symlink into
+another silo and left it dirty.
+
+**Undeclared scope is the defect class, not non-blocking scope.** A gate that
+states its limit is not a false signal; one that does not is. (Measured: a
+register's drifted content hashes were reported as a gap, and the gate's own
+header had declared that check informational in v1.)
+
+See **the seam rule** in `system.md` and `docs/2026-10-10-the-seam.md`.
+
 ---
 
 ## The lifecycle — the exit
