@@ -11,7 +11,10 @@ Built 2026-08-30; amended 2026-09-04 (the wiring retired — references
 are text; the shortlist landed; the porch and working-copy rows added);
 amended 2026-09-30 (the step-inventory row — assessed `· open`, the
 epic's logs are empty); amended 2026-10-04 (the diagram-describe row —
-assessed `· open`, its render-path design refused).
+assessed `· open`, its render-path design refused); amended 2026-10-10
+(the ledger reconciliation — 46 live briefs added, placed by registry
+status; the coverage check now resolves a tabled callsign against the
+live *and* archive registries).
 Editorial surface; `just amp` checks the drift against the registry.
 
 ## Landed — debrief on file
@@ -23,6 +26,8 @@ Editorial surface; `just amp` checks the drift against the registry.
 | BRF-OKF-CALLSIGN | ✓ done | OKF conformance + callsign layer | [debrief](debriefs/2026-08-29-debrief-okf-callsign-migration.md) |
 | BRF-CONTENT-SHORTLIST | ✓ landed 2026-09-04 | the live search, as default; ADR-030 | [debrief](debriefs/2026-09-04-debrief-gloam-live-search.md) |
 | BRF-SYNC-OUTPUT | ✓ landed | DECSET 2026 atomicity; one frame, one write; ADR-028's first rung | — |
+| BRF-PAPER-RUNG | ✓ done | one render, two artefacts — the paper rung | [debrief](debriefs/2026-10-09-debrief-paper-rung.md) |
+| BRF-STREAM-IDENTITY-HEADER | ✓ done | the render names the document for the unknown destination; awaiting the archive move | — |
 
 ## Landed today — ADR-031, the working copy
 
@@ -79,6 +84,7 @@ Editorial surface; `just amp` checks the drift against the registry.
 | BRF-SSH-BLOG | · open | gopher-serve v1 | — |
 | BRF-SSH-SERVED-2 | · open | dynamic portal | — |
 | BRF-SSH-TUI | · open | escape protocol integration | — |
+| BRF-SSH-HOST | · open | landing the ADR-013 reading room where SSH gives a shell | — |
 
 ## Open queue
 
@@ -99,6 +105,45 @@ Editorial surface; `just amp` checks the drift against the registry.
 | BRF-AUDIO-STYLE | · open | audio-first style guide + lint | — |
 | BRF-RESTICTED-GRAMMAR | · open | AST → SSML mapping | — |
 | BRF-TERMINAL-SPEECH | · open | speech pipeline easter egg | — |
+| BRF-SCROLL-REPAINT | · open | one line per scroll — scroll-region repaint for the TUI | — |
+| BRF-CONCORDANCE-PREFILTER | · open | the concordance pre-filter — the pipe, the bang, and case at the seam | — |
+| BRF-TTS-DOGFOOD | · open | coupled-frame TTS dogfood (mac say) | — |
+| BRF-DIAGRAM-INGESTION | · open | mermaid-to-md as the show/elide/hide gate | — |
+| BRF-TTS-TEMPORAL | · open | temporal punctuation — markdown prosody for say | — |
+| BRF-TTS-STEPPER | · open | the TTS stepper — frame-as-para, prosody-as-colour | — |
+| BRF-CENSUS-MODE | · open | the mentions-inclusive map, as a reader's opt-in | — |
+| BRF-AUDIO-DISCOVERY | · open | the actuator grammar, heard (epic) | — |
+| BRF-PROLONGED-PRESS | · open | three gestures, one actuation, no leak (epic) | — |
+| BRF-ADDRESS-CAP | · open | the invariant is the destination | — |
+| BRF-CONCEPTUAL-LEXICON | · open | extract the lexicon from system.md | — |
+| BRF-JUMP-LIST | · open | the jump list — the search screen as its projection | — |
+| BRF-SPEECH-STRIDE | · open | the arrows given to the ear, the unit heard | — |
+| BRF-CALLSIGN-EVERY-DOC | · open | the name and the address are orthogonal | — |
+| BRF-SPOKEN-BLOCK-GRAMMAR | · open | announce the kind, enumerate, never elide silently; stays for ADR-037 | — |
+| BRF-GLYPH-LEAD | · open | the state glyph is emitted twice on a list lead | — |
+| BRF-CAPABILITIES-DOC | · open | a snapshot inventory, not a changelog | — |
+| BRF-GLOAM-OWNS-LOOP | · open | the search TUI retires the fzf dependency | — |
+| BRF-PALETTE-AUDIT | · open | review the colours before the brightness controller scales them | — |
+| BRF-SRC-LINE-LEDGER | · open | the 10 edit lands the editor at the eye | — |
+| BRF-SILCROW-PATHS | · open | the gate grows a second substrate | — |
+| BRF-FENCE-DISCIPLINE | · open | one fence rule — five scanners | — |
+| BRF-READING-FRACTION | · open | a meter for the glass, from state the glass already holds | — |
+| BRF-DEMO-SANDBOX | · open | the public demo room — two access modes, one grammar | — |
+| BRF-DOC-SEARCH-FERMATA | · open | a held frame at the reading/searching boundary | — |
+| BRF-STICKY-HEADING-STEPPER | · open | step by section, heading as anchor, never truncate | — |
+| BRF-AST-PROSODY | · open | AST to prosody — the intermediate representation | — |
+| BRF-KINDLE-PORCH | · open | the silo on an e-ink glass, over ssh, nothing on the device | — |
+| BRF-FRAME-INDEX | · open | an address two parties can both name | — |
+| BRF-TABLE-LADDER | · open | the band and the ladder — table fit from a design width of 80 | — |
+| BRF-DOCUMENT-LIFECYCLE | · open | ephemeral, record, addressed, retired (in review) | — |
+| BRF-REG-CLI | · open | the silo maintenance CLI, one entry point | — |
+| BRF-REGISTRY-DISCOVERY | · open | one map from the territory — the registry discovers its tiers | — |
+| BRF-SILO-LEXICON | · open | gather the silo's terms of art | — |
+| BRF-COMPLETE-BLOCKS | · open | the viewport holds complete blocks — cut at boundaries | — |
+| BRF-DOCS-LEDGER | · open | a prune ledger, not a registry | — |
+| BRF-COMMISSION-BLANDINGS | · open | commission the Blandings silo, and the procedure | — |
+| BRF-READ-ACTUATOR | · open | 77 calls the speech function (epic) | — |
+| BRF-RENDER-DEFECTS | · open | the stack map's four findings (epic) | — |
 
 ## Parked / deferred
 
@@ -108,6 +153,10 @@ Editorial surface; `just amp` checks the drift against the registry.
 | BRF-PI-MARKDOWN | ↓ parked | Pi's rendering issue | — |
 | BRF-MENU-TEMPLATES | ↓ parked | fires on the second menu kind | — |
 | BRF-DOCUMENT-SEARCH | ↓ deferred | deferred by the live search; host owns ctrl+f | — |
+| BRF-BM25-EVALUATION | ↓ parked | benchmark local BM25 against ripgrep and AST traversal | — |
+| BRF-SEARCH-SURFACE | ↓ parked | the search state machine and the invariant audit | — |
+| BRF-TELEVISION-PREVIEW | ↓ parked | okuda as the renderer, OKUDA_WIDTH as the knob | — |
+| BRF-TERMINAL-CELL-GRID | ↓ parked | 2D terminal cell grid architecture | — |
 
 ## Debriefs without briefs
 

@@ -7,8 +7,10 @@
  * script never writes them. It reads only, and reports:
  *   1. Jump-wire targets — every %%okuda-rhs:NN%% line's .md paths must exist.
  *   2. Duplicate jump numbers within a file (session codes collide silently).
- *   3. Registry coverage — briefs/INDEX.jsonl callsigns missing from &briefs,
- *      and &briefs callsigns absent from the registry.
+ *   3. Registry coverage — briefs/INDEX.jsonl callsigns missing from &briefs
+ *      (live only: the table is the work queue), and &briefs callsigns absent
+ *      from the LIVE or ARCHIVE registry (the union `loadCallsigns` uses, so a
+ *      landed row is not a phantom).
  *   4. Staleness — days since each & doc was last committed.
  *
  * Exit 1 on hard drift (missing target, unknown callsign); advisory drift
@@ -72,6 +74,20 @@ const registry = readFileSync(join(ROOT, "briefs/INDEX.jsonl"), "utf8")
   .map((l) => JSON.parse(l));
 const regCallsigns = new Set(registry.map((e: any) => e.callsign as string));
 
+// A landed brief moves to the archive tier, so a tabled callsign resolves
+// against live AND archive — the union `loadCallsigns` uses
+// (ADR-ARCHIVE-RESOLUTION). The completeness check below stays live-only:
+// the state table is the work queue, and its landed rows are history.
+const archiveRegistry = join(ROOT, ".archive/briefs/INDEX.jsonl");
+const archiveCallsigns: string[] = existsSync(archiveRegistry)
+  ? readFileSync(archiveRegistry, "utf8")
+      .trim()
+      .split("\n")
+      .filter(Boolean)
+      .map((l) => JSON.parse(l).callsign as string)
+  : [];
+const knownCallsigns = new Set<string>([...regCallsigns, ...archiveCallsigns]);
+
 for (const c of regCallsigns) {
   if (!ampCallsigns.has(c)) {
     console.error(`✗ &briefs — registry brief absent from the state table: ${c}`);
@@ -79,12 +95,14 @@ for (const c of regCallsigns) {
   }
 }
 for (const c of ampCallsigns) {
-  if (!regCallsigns.has(c)) {
+  if (!knownCallsigns.has(c)) {
     console.error(`✗ &briefs — tabled brief not in registry: ${c}`);
     hardDrift++;
   }
 }
-console.log(`  registry — ${regCallsigns.size} briefs; &briefs carries ${ampCallsigns.size}`);
+console.log(
+  `  registry — ${regCallsigns.size} live, ${archiveCallsigns.length} archived; &briefs carries ${ampCallsigns.size}`,
+);
 
 // ── Staleness: advisory only. The judgment pass is human; the calendar
 // is not.
