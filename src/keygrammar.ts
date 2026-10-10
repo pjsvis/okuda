@@ -89,10 +89,11 @@ export function splitKeyEvents(bytes: Uint8Array): Uint8Array[] {
         continue;
       }
     }
-    // Vim's section motions ride whole: `]]` and `[[` (BRF-
-    // OKUDAGRAM-STEP — the declared header-to-header jump). A single
-    // bracket stays a single event; the pair is one key event, burst-
-    // safe like the escape sequences.
+    // Vim's section motions, `]]` and `[[`, ride whole: a single bracket
+    // stays a single event, the pair is one key event (BRF-OKUDAGRAM-STEP).
+    // The lexer's job ends at keeping the pair together — `decodeKey` maps
+    // it to frame-down/frame-up (tui.ts) and the TUI performs the declared
+    // header-to-header jump via `snapFrame(headingLines(...))` (frames.ts).
     if ((bytes[i] === 0x5d || bytes[i] === 0x5b) && bytes[i] === bytes[i + 1]) {
       events.push(bytes.slice(i, i + 2));
       i += 2;
