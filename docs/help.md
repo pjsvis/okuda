@@ -44,11 +44,9 @@ into a new instance, `12`–`98` jump to a reference). The whole grammar is
 
 ## Dogfood sessions
 
-- `just next` — the decision table (`&next.md`): what to start, what waits, what's parked.
-- `just briefs` — the registry state table; the visible face of `just amp`'s drift count.
-- `just ear` — the listening queue: open verdicts, one recipe per row.
+- `just open` — the picker over the silo pages: `&next.md` (the decision table), `&briefs.md` (the registry state table), `&ear.md` (the listening queue), `&speak.md` (the speech vector), `&stack.md` (the map). The list is a `ls '&'*.md` glob, so it cannot drift from the pages that exist.
 - `just palette-audit` — the three audit exhibits in sequence (quit each to advance); the rig BRF-PALETTE-AUDIT names. Revisit when the brightness controller lands — the exhibits gain their α extremes.
-- Older sessions live elsewhere in the menu: `just dogfood` (α), `just speech` (the speech vector), `just showcase` (the grammar tour), `just chip` / `keyboard-dogfood` / `stamp` (build group).
+- Older sessions live elsewhere in the menu: `just dogfood` (α), `just showcase` (the grammar tour), `just chip` / `keyboard-dogfood` / `stamp` (build group).
 
 ## Searching
 

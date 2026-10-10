@@ -16,6 +16,15 @@ set positional-arguments
 help:
     @./okuda docs/help.md
 
+# Open a page
+[group('navigation')]
+open:
+    #!/bin/bash
+    set -euo pipefail
+    f="$(ls '&'*.md | gum choose --header 'open — a silo page' || true)"
+    [ -n "$f" ] || exit 0
+    exec ./okuda --tui "$f"
+
 # Ephemeral status island
 [group('navigation')]
 island:
@@ -341,11 +350,6 @@ moir-poet voice:
     @speak-md probe --dry tmp/poet-probe.md > tmp/poet-moir-flat.txt
     @say -v {{voice}} -r 140 -f tmp/poet-moir-flat.txt
 
-# Speech vector
-[group('moira')]
-speech:
-    @./okuda --tui '&speak.md'
-
 # March map
 [group('moira')]
 census:
@@ -377,26 +381,6 @@ scan *args:
     @bash scripts/scan.sh "$@"
 
 # ── Dogfood sessions ──────────────────────────────────────
-
-# Decision table
-[group('dogfood')]
-next:
-    @./okuda --tui '&next.md'
-
-# State table
-[group('dogfood')]
-briefs:
-    @./okuda --tui '&briefs.md'
-
-# The map
-[group('dogfood')]
-stack:
-    @./okuda --tui '&stack.md'
-
-# Listening queue
-[group('dogfood')]
-ear:
-    @./okuda --tui '&ear.md'
 
 # Palette exhibits
 [group('dogfood')]
