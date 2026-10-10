@@ -9,6 +9,10 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 
 ## Landed today — the debt this table was tracking
 
+- **&stack — the map** (2026-10-10) — the silo, the seam and the reader as one
+  walkable document: a root AMPER page with four expansions, each carrying its
+  diagram and its named failure. The render found four defects, now briefed and
+  issued; the reference list is self-tabling, so the receipt is suppressed.
 - **BRF-KINDLE-PORCH** (2026-10-06) — the silo on an e-ink glass. Device
   known: **Paperwhite 11th gen (PW5)**. The next move is five minutes and
   cannot wait: **Airplane Mode on, then read the firmware version** — the
@@ -69,6 +73,16 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 
 ## Recommended — start these next
 
+- **BRF-READ-ACTUATOR** (td-166367, 2026-10-10) — the speech actuator: **77
+  calls a function that does the speech thing**, and what it does is the epic's
+  to find. Three issues — bind the token, find the function, dogfood by ear. The
+  definition is deliberately empty so the speech work is *pressable* before it is
+  decided. · **S**
+- **BRF-RENDER-DEFECTS** (td-51ea5e, 2026-10-10) — the stack map's four render
+  findings: parallel-edge collapse, back-edge label collision, the LR width
+  fallback, and the headless map's optimism. The okuda correction is the hazard
+  rules plus a lint (report first); the two renderer defects are a **message
+  across the seam** to `mermaid-to-md`. · **S**
 - **BRF-AST-PROSODY** (2026-10-05) — intermediate representation for speech
   rendering. Open, awaiting the perimeter verdict and the seam decision.
   · **S**
@@ -166,12 +180,14 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
   never silently mapped to `open`, but which words the registry
   *stores* is a corpus decision, not a sync repair: settle it, then
   either widen the map or normalise the documents · **S**
-- **The amp-check backlog** (pre-existing, measured during td-1c8fca)
-  — `just amp-check` is red with 29 items: 28 registry briefs absent
-  from the `&briefs.md` state table (the facade stopped updating 28
-  briefs ago), and one dead legacy wire at `&alpha.md:71`
-  (`briefs/x.md` — ADR-031 retired the grammar; the straggler wire
-  should become a real reference like the `&speak.md` rows) · **M**
+- **The amp-check backlog** (pre-existing; re-measured 2026-10-10)
+  — `just amp-check` is red with **50** items: the `&briefs.md` state
+  table has drifted from the registry in both directions (briefs the
+  table omits, and tabled briefs the registry no longer holds), plus
+  one dead legacy wire at `&alpha.md:123` (`briefs/x.md` — ADR-031
+  retired the grammar; the straggler wire should become a real
+  reference like the `&speak.md` rows). `&stack.md` is clean; the
+  table's red count is the noise it hides in · **M**
 - **BRF-SILO-MNEMONICS — close or scope** — resolution shipped, badge
   shipped, bootstrap deferred: what remains is likely a debrief and a
   close · **S**
