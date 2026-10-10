@@ -56,8 +56,7 @@ info:
 # Protocol install
 [group('navigation')]
 protocol-install:
-    @cp system.md "$HOME/.pi/agent/AGENTS.md"
-    @echo "protocol installed: system.md -> ~/.pi/agent/AGENTS.md"
+    @bash scripts/protocol-install.sh
 
 # ── td (task identity) ───────────────────────────────────────
 

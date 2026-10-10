@@ -223,6 +223,23 @@ See `ADR-BUILD-SIGNS-040` and `docs/2026-09-21-the-page-the-signature-got-wrong.
   validates tags against `chroma --list` before piping. The table is
   chroma's; okuda owns no extension→language map.
 
+## The protocol deploy target — an external consumer (verified 2026-10-10)
+
+`just protocol-install` copies `system.md` to `~/.pi/agent/AGENTS.md`. On this
+machine that path is a **symlink chain into another repository**:
+
+```
+~/.pi/agent/AGENTS.md
+  -> cool-pi-extensions/prompts/edinburgh-protocol.md
+     -> cool-pi-extensions/SYSTEM.md
+```
+
+So the install writes a copy of `system.md` into `cool-pi-extensions`, and that
+copy has to be committed **there** — otherwise the two drift silently, and the
+drift is in a repo this silo does not commit to. `scripts/protocol-install.sh`
+resolves the chain and names the real file and its repository, with whether the
+copy is uncommitted. See `docs/2026-10-10-the-impostor-symlink.md`.
+
 ## Verification discipline
 
 - Preconditions in briefs verify tools listed here (existence, version, behaviour) before work starts.
