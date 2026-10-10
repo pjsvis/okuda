@@ -105,11 +105,13 @@ describe("tui — decodeKey (single-byte controls)", () => {
     expect(decodeKey(buf(0x7d))).toBe("para-down"); // }
     expect(decodeKey(buf(0x7b))).toBe("para-up");   // {
   });
-  test("the frame jumps: ]] down, [[ up — single brackets unbound", () => {
-    expect(decodeKey(buf(0x5d, 0x5d))).toBe("frame-down"); // ]]
-    expect(decodeKey(buf(0x5b, 0x5b))).toBe("frame-up");   // [[
-    expect(decodeKey(buf(0x5d))).toBeNull();               // lone ]
-    expect(decodeKey(buf(0x5b))).toBeNull();               // lone [
+  test("brackets are a run, not a spelling — the run buffer owns them (BRF-SEAM-AUDIT)", () => {
+    // decodeKey never sees ]] / [[ now: they are two keypresses, paired
+    // across reads by advanceRunBuffer (tui.ts). Single brackets unbound.
+    expect(decodeKey(buf(0x5d, 0x5d))).toBeNull(); // ]]
+    expect(decodeKey(buf(0x5b, 0x5b))).toBeNull(); // [[
+    expect(decodeKey(buf(0x5d))).toBeNull();       // lone ]
+    expect(decodeKey(buf(0x5b))).toBeNull();       // lone [
   });
   test("unknown byte → null", () => {
     expect(decodeKey(buf(0x7a))).toBeNull(); // 'z' — unbound

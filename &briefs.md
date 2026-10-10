@@ -146,7 +146,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-READ-ACTUATOR | · open | 77 calls the speech function (epic) | — |
 | BRF-RENDER-DEFECTS | · open | the stack map's four findings (epic) | — |
 | BRF-BOUNDARY-MARK | · open | The boundary mark — the receipt elides the addresses the cap never realised | — |
-| BRF-SEAM-AUDIT | · open | The seam audit — the input path, where a run was mistaken for a spelling | — |
+| BRF-SEAM-AUDIT | ✓ done | the seam audit — the run buffer generalised, `]]`/`[[` fire across reads, the read-boundary test added (landed same day) | — |
 
 ## Parked / deferred
 

@@ -6,8 +6,8 @@ callsign: BRF-SEAM-AUDIT
 # Brief: The seam audit — the input path, where a run was mistaken for a spelling
 
 **Date:** 2026-10-10
-**Status:** Open
-**TD:** (to create)
+**Status:** Done — landed 2026-10-10: the run buffer generalised (`advanceRunBuffer`), the lexer's bracket pairing removed, `tests/input-seam.test.ts` added
+**TD:** (the deliverable landed the same day; no epic needed)
 
 ## Context
 
@@ -65,19 +65,19 @@ entry for the rule (drafted, not documented; a separate call).
 
 ## Work Plan
 
-1. [ ] Decide the mechanism: the lexer keeps only the terminal's **spellings**
+1. [x] Decide the mechanism: the lexer keeps only the terminal's **spellings**
       (escape sequences, one write); a two-tap **run** (`]]`, `[[`) belongs to a
-      stateful buffer, the digit run's model. Generalise `advanceNumBuffer`, or
-      add a sibling bracket buffer.
-2. [ ] Fix; keep the bracket run and the digit run from swallowing each other's
+      stateful buffer, the digit run's model. Landed as `advanceRunBuffer` — one
+      buffer for every run, digit or bracket; the caller reads the pair.
+2. [x] Fix; keep the bracket run and the digit run from swallowing each other's
       taps.
-3. [ ] Add the seam test: two reads, real lexer + reducer, assert
+3. [x] Add the seam test: two reads, real lexer + reducer, assert
       frame-down/frame-up.
-4. [ ] Comment-referent pass over the three files: every comment names its own
+4. [x] Comment-referent pass over the three files: every comment names its own
       contract, or points to the referent. The `splitKeyEvents` comment no longer
       names the jump.
-5. [ ] State the criterion in one place, so the follow-on seams have a written
-      rule to cite.
+5. [ ] State the criterion in one place — deferred to the separate `system.md`
+      brief (the rule is general; the protocol deploy is its own act).
 
 ## Acceptance Criteria
 
