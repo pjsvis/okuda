@@ -15,6 +15,56 @@ This is not a style guide for general markdown. It is the house style for this w
 
 We are not embracing the CommonMark standard. We are plundering it for the benefit of the interested reader. Every convention here is justified by a perceptual property — a stress it removes or a scan it enables. If a convention stops earning its place, it goes (foxtrot oscar).
 
+## The comprehension surface — match the intent to the medium
+
+Every pattern below is an affordance of one medium; this is the law that says
+which to reach for. The medium's defining property is not the inventory — tables,
+lists, gold, diagrams — but the **predictable comprehension surface**: rendering
+is deterministic and the grammar is closed (`src/render.ts`, the string-tag
+protocol), so the author can predict what the reader will see, and the reader sees
+what the author predicted. Structure carries meaning only because of that — a bold
+lead scans because `strong` renders gold, a table aligns because its columns are
+computed, a silcrow resolves because the vector is derived. Strip the determinism
+and every pattern is decoration.
+
+**The affordances carry different shapes of content.** Match the shape of what you
+know to the shape that carries it:
+
+| the content is… | the affordance | where |
+|---|---|---|
+| relations, states, a sequence | a diagram (text source, re-rendered) | *The muted source echo* |
+| a comparison across fixed axes | a loose table | *The decision matrix*, *Tables have a width contract* |
+| named items, each with a payload | a bold-lead list | *The bold-lead list pattern* |
+| one load-bearing assertion | bold + gold, in the body | the bold-lead pattern, promoted |
+| claims that qualify at an address | a reference (path / callsign) | *References are text* |
+| a state per item | a status glyph | *The status-led list* |
+| a remembered aside | the pipe blockquote | *The vertical-pipe blockquote* |
+
+**The state-diagram discussion is the marquee case.** A diagram's source is text,
+so a state machine is a *conversational object*: two parties propose, re-render,
+and disagree on one edge at a time (`playbooks/mermaid-diagrams-playbook.md`). The
+disagreement is localised to an edge, where prose would thread it through a
+paragraph and grow the wall around it. That is why this medium can hold a
+*discussion*, not only a record.
+
+**The failure is a mismatch, and it runs both ways.** Prose carrying content that
+already has a shape — a comparison, a list of named things, a relation — is the
+**wall**: the shape was available and the author enumerated in sentences instead
+(the meter that reports it is `just prose-check`). A table or a diagram carrying
+shapeless content is **decorated Stuff**: structure with no referent. Reach for
+the shape the content already has; do not impose one.
+
+**The artifact is the document; the okudagram is its diagram — and the
+inspiration.** "Okudagram" names the ASCII art a mermaid fence renders
+(`playbooks/mermaid-diagrams-playbook.md`). It is the clearest instance of this
+law, not a name widened to cover the whole artifact — a designation must not
+exceed its referent. The structured artifact is the *document*.
+
+**Test.** After a glance, can the reader state the document's shape in one
+sentence — *"it's a comparison"*, *"it's a state machine"*, *"it's six
+decisions"*? If not, the intent was not matched to the medium, and the wall is what
+fills the gap.
+
 ## The bold-lead list pattern
 
 The house-style signature. A loose list where each item opens with a **bold lead** (the key), followed by prose (the value):

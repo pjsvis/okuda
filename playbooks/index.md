@@ -9,12 +9,12 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-12 | PLY-AUTHORING | canonical | The house markdown style, and the comprehension surface that says which affordance carries which content | authoring-playbook.md |
 | 2026-10-12 | PLY-CRAFT | canonical | The craft pass — the comment probe, the surfaces to wander, and the failure modes | craft-playbook.md |
 | 2026-10-10 | PLY-COMMISSION | canonical | Commissioning Playbook | commissioning-playbook.md |
 | 2026-10-07 | PLY-DEFECT | canonical | defect discipline: symptom before cause, fix or defer by kind, instrument the deferral, keep the museum | defect-playbook.md |
 | 2026-09-30 | PLY-GREP | canonical | Grep Playbook — the probe instrument, and its two traps | grep-playbook.md |
 | 2026-09-27 | PLY-GLOAM-PREVIEW | canonical | Gloam Preview Playbook | gloam-preview-playbook.md |
-| 2026-09-14 | PLY-AUTHORING | canonical | Authoring Playbook | authoring-playbook.md |
 | 2026-09-14 | PLY-EAR | canonical | Ear Playbook — getting a document spoken | ear-playbook.md |
 | 2026-09-14 | PLY-JUSTFILE | canonical | Justfile facade: house style (noun-phrase comments, comment-attribute-recipe order, groups, @-silencing), tricky parts, revit protocol | justfile-playbook.md |
 | 2026-09-14 | PLY-REGISTRY | canonical | Document index system: JSONL schema, reg-sync workflow, status conventions | registry-playbook.md |
