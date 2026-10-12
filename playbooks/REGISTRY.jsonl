@@ -3,6 +3,7 @@
 {"file":"briefs-playbook.md","date":"2026-08-20","status":"canonical","summary":"Brief format, naming convention, and execution process — general, project-agnostic","meta":{"source":"blog-posts","adapted":"2026-08-20 generalised from blog-specific import"},"callsign":"PLY-BRIEFS"}
 {"file":"chrome-playbook.md","date":"2026-08-25","status":"canonical","summary":"Chrome Playbook","meta":{},"callsign":"PLY-CHROME"}
 {"file":"commissioning-playbook.md","date":"2026-10-10","status":"canonical","summary":"Commissioning Playbook","meta":{},"callsign":"PLY-COMMISSION"}
+{"file":"craft-playbook.md","date":"2026-10-12","status":"canonical","summary":"The craft pass — the comment probe, the surfaces to wander, and the failure modes","meta":{},"callsign":"PLY-CRAFT"}
 {"file":"debriefs-playbook.md","date":"2026-08-20","status":"canonical","summary":"Debrief format for retrospectives after completing a brief","meta":{"source":"blog-posts"},"callsign":"PLY-DEBRIEFS"}
 {"file":"decisions-playbook.md","date":"2026-08-20","status":"canonical","summary":"ADR format, lifecycle, and the palimpsest mitigation protocol","meta":{"source":"blog-posts"},"callsign":"PLY-DECISIONS"}
 {"file":"defect-playbook.md","date":"2026-10-07","status":"canonical","summary":"defect discipline: symptom before cause, fix or defer by kind, instrument the deferral, keep the museum","meta":{},"callsign":"PLY-DEFECT"}
