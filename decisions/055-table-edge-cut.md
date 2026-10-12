@@ -13,6 +13,12 @@ date: 2026-10-07
 
 2026-10-08 — the third branch (BRF-WRAP-AT-CAP): past the cap the columns wrap; the edge cut stands below the cap and for the irreducible set. See *The third branch* below.
 
+2026-10-12 — the FIT WIDTH (BRF-TABLE-GLASS-FIT): the wrap targets `min(glass,
+cap)`, not the cap, so a table below the cap wraps at the glass rather than
+cutting at it; the edge cut stands only for the irreducible set. The *Alternatives*
+rejection of *"Wrap at the glass, any width"* is overturned. See *The glass target*
+below.
+
 ## Amends
 
 ADR-UNIVERSAL-ELISION-050 (which repealed the wrap and certified the squeeze); completes the doctrine ADR-TABLE-ELISION-014 stated and ADR-022 narrowed to menus.
@@ -103,7 +109,8 @@ made the retired cut detector disagree with the render.
 twenty lines a row renders as twenty, and the instrument says so by name. No wrap
 to the *glass*: the floor test only matters where the reader has no lever, so the
 wrap targets the cap and a narrower glass still cuts recoverably (widen and the
-bytes return). No wrapping of the irreducible set: a long filename or URL is the
+bytes return). **Superseded 2026-10-12** — the wrap targets the fit width
+(`min(glass, cap)`); see *The glass target* below. No wrapping of the irreducible set: a long filename or URL is the
 document's problem, or the compositor's.
 
 - **The contract:** authors write tables to 80 columns; 120 is headroom. Enforceable
@@ -144,7 +151,7 @@ right ones off-screen" — the principle, stated as a measurement.
 | Keep the ladder (per-column completion) | It answers "how do I make this fit" for an artefact that does not need to fit. It costs the grid, and it carried four defects in a single day — all of them arithmetic about budgets, margins and formats that the edge cut does not have. |
 | Ladder when it can, edge cut when it cannot | Two policies for one surface, and the reader cannot tell which they are looking at. The ladder's convergence with the edge cut in the median case means the second policy buys almost nothing for a second set of rules. |
 | Wrap the prose column (the brief's increment 4) | It exists to hold a wrapped cell, i.e. to answer a question the squeeze created. Remove the squeeze and the question dissolves; the row block, the zip stratum and their defects go with it. |
-| Wrap at the glass, any width | The floor test then runs below the cap, where the reader has a lever; it also reflows on every resize and asks the words a question only the cap needs asked. The wrap targets the cap; a narrower glass cuts recoverably. |
+| Wrap at the glass, any width | The floor test then runs below the cap, where the reader has a lever; it also reflows on every resize and asks the words a question only the cap needs asked. The wrap targets the cap; a narrower glass cuts recoverably. **Overturned 2026-10-12** — *The glass target* below; the floor test runs at the fit width and is what buys monotonicity. |
 | Leave the cap cut (no third branch) | Past the cap the cut hides content with no remedy — the one case the model cannot justify. |
 | Squeeze only the widest column | Still a squeeze, still per-column arithmetic, still hides content inside a cell rather than at one honest edge. |
 | Raise the cap past 120 | Beyond 120 columns a table gains air between its columns rather than information (BRF-TABLE-LADDER). The cap is a legibility boundary, not a budget limit. |
@@ -174,7 +181,63 @@ right ones off-screen" — the principle, stated as a measurement.
   has no remedy but tucking the pane away. The model presupposes a pane at or above
   the authoring width; the compositor cannot supply one, and telling it the width is
   ADR-ROLE-LAYOUT-022's layer violation. This is the condition under which the model
-  holds, and it is the environment's to meet, not the renderer's.
+  holds, and it is the environment's to meet, not the renderer's. **Amended
+  2026-10-12** — the renderer now wraps to the glass rather than presupposing one;
+  see *The glass target* below.
+
+## The glass target — the fit width, not the cap (2026-10-12)
+
+BRF-TABLE-GLASS-FIT retargets the wrap from the cap to the FIT WIDTH —
+`target = Math.min(glass, cap)`. The old model composed to the cap and cut at the
+glass, so below 116 columns the difference was taken from the last column; on a
+table whose cells are prose that is always the column the author wrote last,
+which is where the argument lives. On `tests/fixtures/contracts-contact-map.md`
+at 80 the `Notes` column was elided to `Ed…` before and wraps whole after; the
+fixture's eight tables report 0 hidden and 0 starved
+(`bun scripts/tables-check.ts --width 80 <fixture>`).
+
+**The law is two states and a total order.** WIDE-ENOUGH: every column's floor
+fits the target → the columns wrap to the target and nothing is hidden.
+TOO-NARROW: a floor does not fit → the table draws at the author's widths and
+the composed line is cut at the target. Widening never reveals less, and at the
+table's natural width nothing is hidden. The tests assert this as a width sweep
+(`tests/table-fit.test.ts`, *elision is monotone in the glass*).
+
+**This overturns the *Alternatives* rejection of "Wrap at the glass, any
+width."** Its two costs are answered, not denied:
+
+- *"It reflows on every resize."* Above the natural width nothing wraps — the
+  second state — so only a glass below the table's own width reflows, which is
+  ADR-WIDENING-LAG-054's territory and the condition any fit model must move
+  under.
+- *"It asks the words a question only the cap needs asked."* The floor test is
+  O(columns), and it is what buys monotonicity: it names the one case in which a
+  wrap is impossible, so everything else wraps rather than cuts.
+
+**The floor is a segment, not a word.** `longestWord` (`src/render.ts`) and the
+hard-split in `wrapANSI` (`src/wrap.ts`) treat `/ . _ @ -` as break
+opportunities: a URL or path is not atomic, so its floor is its longest segment
+and it slips at a delimiter rather than being elided or cut mid-token. A token
+with no delimiter stays irreducible and still gets `…`. The instrument measures
+the same segments, or it would call a table irreducible that the renderer wraps.
+
+**Instrument** (`scripts/tables-check.ts`): `elided` skips a column whose source
+carries a literal `…` anywhere (a mid-cell ellipsis in prose had been read as a
+cut); `hidden` requires the target to have reached the cap (below the cap an
+elision is recoverable, not hidden); `starved` requires the table to have been
+wrappable at the fit width (a too-narrow table is a state, not an allocator
+fault); `word` measures segments.
+
+**Measured 2026-10-12** (`bun scripts/tables-check.ts --width W`, the silo's
+tracked `.md`): at 80, starved tables 127 → 0 (the wrap now happens at the
+glass); at 120, hidden 6 → 0 and starved 4 → 0 (delimiter-aware floors and the
+retired prose-matrix guard let more tables wrap). `--strict --strict-starved`
+exits 0 at 74, 80 and 120. The 6 hidden at 80 under the old instrument were
+elisions below the cap that widening recovers; the too-narrow state proper lives
+below the smallest floor sum.
+
+- **Unverified:** the tall-row cost of wrapping a `prose`-shaped table has not
+  been measured against a reader. The tests pin height stability, not height.
 
 **Constraints this imposes:**
 - The instrument's `starved` reading becomes meaningless (nothing is squeezed) and
