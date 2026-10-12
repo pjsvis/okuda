@@ -6,7 +6,7 @@ callsign: ADR-MAIN-DOCUMENT-031
 # Decision: The main document — optimistic vectors, 99 promotes, u unwinds
 
 **Date:** 2026-09-04
-**Status:** Accepted (*optimism* clause superseded 2026-09-24 by ADR-VALIDATED-SILCROWS-044 — "discovery never validates, the actuator fails honestly" is retired: inferred callsign-shaped tokens now gate on the tier registries, because the probe counted 117 painted silcrows that resolved to nothing. One clause, not the ADR: dynamism, the one-destination-one-silcrow citation convention, the doubled-pair reservations, and re-derivation-replaces-invalidation all stand. Explicit `.md` links stay optimistic — the author's link is a deliberate claim; the boundary holds by parameter, so the render path still reads no registry itself.) Amended 2026-09-30 by ADR-REFERENCES-SECTION-047: the map gains a visible projection — every main-document render ends with a generated `## References` section, the renderer's receipt for its own map. The discovery contract itself is unchanged; discovery still mints, the section only lists.
+**Status:** Accepted (*optimism* clause superseded 2026-09-24 by ADR-VALIDATED-SILCROWS-044 — "discovery never validates, the actuator fails honestly" is retired: inferred callsign-shaped tokens now gate on the tier registries, because the probe counted 117 painted silcrows that resolved to nothing. One clause, not the ADR: dynamism, the one-destination-one-silcrow citation convention, the doubled-pair reservations, and re-derivation-replaces-invalidation all stand. Explicit `.md` links stay optimistic — the author's link is a deliberate claim; the boundary holds by parameter, so the render path still reads no registry itself.) Amended 2026-09-30 by ADR-REFERENCES-SECTION-047: the map gains a visible projection — every main-document render ends with a generated `## References` section, the renderer's receipt for its own map. The discovery contract itself is unchanged; discovery still mints, the section only lists. Amended 2026-10-12 by BRF-CODE-SILCROWS: a whole-file code render (a non-`.md` file, `wrapWholeFile`) is a main document too — discovery runs over its **comment** regions only, callsign-only, gated by the registry; authored markdown fences stay excluded, and the fence exclusion's stated reason is corrected (a badge *does* render inside a code fence).
 
 ## Context
 
@@ -99,6 +99,36 @@ re-derives its own.
 
 The actuator resolves a vector's target through the filesystem and
 registry at use time; the footer flash is the only failure surface.
+
+## Code documents — a rendered file is a document for its prose (2026-10-12)
+
+A non-`.md` file rendered by okuda is wrapped whole in a fence
+(`src/render.ts` `wrapWholeFile`) and was scanned as a document, so the fence
+exclusion swallowed every reference and a code file's map came out empty
+(`BRF-CODE-SILCROWS`; measured: `jumpMapFor` on the wrapped source ⇒ 0).
+
+**Decision.** A whole-file code render is a main document for its **comment
+prose**. Discovery is restricted to comment regions (`commentRegions` in
+`src/render.ts`, a `regions` predicate on `scanReferences`) and to callsigns —
+the auditable documents — gated by the same registry. The exclusion for
+**authored** markdown fences stands: a sample's paths are illustrative, not
+citations.
+
+**Why the comment region is required, not tidy.** ADR-044's gate drains tokens
+that do not resolve; it cannot drain a resolvable token *quoted as data*. The
+probe (`tmp/code-silcrow-probe.ts`) measured 344 resolved callsigns in code
+comments against 192 resolvable tokens *outside* comments — test fixtures and
+demo strings (`tests/vectors.test.ts` is `scanReferences("see ADR-030…")`), which
+a whole-file scan would paint. **Resolution is not reference.**
+
+**Correction.** The fence exclusion's comment claimed a badge inside a fence
+never renders. It does: a `%okuda-vector:NN%` token inside a code fence renders
+`§NN`. The exclusion was sound in intent and wrong in mechanism — and the wrong
+mechanism concealed the case this amendment settles.
+
+- **Measured 2026-10-12:** 381 callsigns in code comments, 344 resolve, 37 gated
+  as junk; `src/cli.ts` renders a 10-entry `## References` receipt where it had
+  none.
 
 ## Consequences
 

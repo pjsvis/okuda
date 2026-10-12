@@ -118,13 +118,19 @@ const RE_MD_PATH = /\b[\w@&.-]+(?:\/[\w@&.-]+)+\.md(?::\d{1,4})?\b/g;
  *  evidence, not suspicion. One line per future exile. */
 const EXILED_EXTS = new Set(["jsonl"]);
 
-/** Fenced blocks as (start, end) offset ranges. The house rule: the
- *  fence is not prose — verbatim, load-bearing input. A badge injected
- *  inside a fence never renders (mermaid fences are replaced by art;
- *  code fences render literally), so a reference born inside a fence
- *  is a hole in the numbering, not a vector. Discovery stops at the
- *  fence line. An unterminated fence fences the rest of the document.
- *  Pure. */
+/** Fenced blocks as (start, end) offset ranges. The house rule: an
+ *  **authored** fence is not prose — verbatim, load-bearing input — so a
+ *  reference in a sample is illustrative, not a citation, and discovery
+ *  stops at the fence line. An unterminated fence fences the rest of the
+ *  document. Pure.
+ *
+ *  Reason corrected 2026-10-12 (BRF-CODE-SILCROWS): this once claimed a
+ *  badge injected inside a fence *never renders*, and code fences render
+ *  literally. A token inside a code fence does render; the exclusion was
+ *  always the sample's *intent*, never a paint limitation. The correction
+ *  matters because the false reason hid a real case: a whole-file code
+ *  render is not an authored fence, and is scanned in code mode (a
+ *  `regions` predicate) where this exclusion is skipped. */
 function fenceRanges(source: string): Array<[number, number]> {
   const ranges: Array<[number, number]> = [];
   let pos = 0;
@@ -162,6 +168,11 @@ export interface RefOccurrence {
 export function scanReferences(
   source: string,
   resolves?: (target: string) => boolean,
+  /** Restrict occurrences to these regions — a code file's comments
+   *  (BRF-CODE-SILCROWS). Present ⇒ code mode: the caller is scanning a
+   *  code file, not markdown prose, so the markdown fence exclusion is
+   *  skipped — a code file's backticks are not fences. */
+  regions?: (pos: number) => boolean,
 ): RefOccurrence[] {
   const fm = source.match(/^---\n[\s\S]*?\n---/);
   const bodyStart = fm ? fm[0]!.length : 0;
@@ -175,17 +186,20 @@ export function scanReferences(
   // not source-truth, so the scan stays pure (makeSelfExclusion).
   const self = fm?.[0]!.match(/^\s*callsign:\s*(\S+)\s*$/m)?.[1];
   const fences = fenceRanges(source);
+  const codeMode = regions !== undefined;
+  const ok = (i: number): boolean =>
+    i >= bodyStart && (codeMode || !inFence(i, fences)) && (regions === undefined || regions(i));
   const hits: RefOccurrence[] = [];
   for (const m of source.matchAll(RE_MD_LINK)) {
     const i = m.index!;
-    if (i >= bodyStart && !inFence(i, fences)) hits.push({ pos: i, end: i + m[0]!.length, target: m[1]! });
+    if (ok(i)) hits.push({ pos: i, end: i + m[0]!.length, target: m[1]! });
   }
   // The ADR-044 gate applies to the inferred reference only — the bare
   // callsign-shaped token. A bare UTF-8 in prose made no claim; the
   // registry check is the retraction.
   for (const m of source.matchAll(RE_CALLSIGN)) {
     const i = m.index!;
-    if (i >= bodyStart && !inFence(i, fences) && m[0] !== self && (!resolves || resolves(m[0]!))) {
+    if (ok(i) && m[0] !== self && (!resolves || resolves(m[0]!))) {
       hits.push({ pos: i, end: i + m[0]!.length, target: m[0]! });
     }
   }
@@ -201,7 +215,7 @@ export function scanReferences(
     const target = m[0]!.replace(/:\d{1,4}$/, "");
     const ext = /\.([A-Za-z0-9]{1,5})$/.exec(target)?.[1]?.toLowerCase();
     if (ext && EXILED_EXTS.has(ext)) continue; // ADR-049: never a vector
-    if (i >= bodyStart && !inFence(i, fences) && (!resolves || resolves(target))) {
+    if (ok(i) && (!resolves || resolves(target))) {
       hits.push({ pos: i, end: i + m[0]!.length, target });
     }
   }
@@ -218,7 +232,7 @@ export function scanReferences(
   for (const m of source.matchAll(RE_MD_PATH)) {
     const i = m.index!;
     const target = m[0]!.replace(/:\d{1,4}$/, "");
-    if (i >= bodyStart && !inFence(i, fences) && !inLink(i) && (!resolves || resolves(target))) {
+    if (ok(i) && !inLink(i) && (!resolves || resolves(target))) {
       hits.push({ pos: i, end: i + m[0]!.length, target });
     }
   }
@@ -255,8 +269,9 @@ export function buildJumpMap(refs: RefOccurrence[]): Map<number, string> {
 export function jumpMapFor(
   source: string,
   resolves?: (target: string) => boolean,
+  regions?: (pos: number) => boolean,
 ): Map<number, string> {
-  return buildJumpMap(scanReferences(source, resolves));
+  return buildJumpMap(scanReferences(source, resolves, regions));
 }
 
 /** Inject one paint marker after each reference occurrence — each
@@ -265,10 +280,14 @@ export function jumpMapFor(
  *  the painted `§NN` is illustrative text, and the returned string is
  *  used for rendering only, never persisted. Replaces from the end so
  *  positions stay valid. Pure. */
-export function annotateSource(source: string, map: Map<number, string>): string {
+export function annotateSource(
+  source: string,
+  map: Map<number, string>,
+  regions?: (pos: number) => boolean,
+): string {
   const targetNum = new Map<string, number>();
   for (const [num, target] of map) targetNum.set(target, num);
-  const occ = scanReferences(source);
+  const occ = scanReferences(source, undefined, regions);
   let out = source;
   for (let i = occ.length - 1; i >= 0; i--) {
     const num = targetNum.get(occ[i]!.target);

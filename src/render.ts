@@ -769,13 +769,64 @@ function codeBlockLines(lines: string[], ctx: Ctx): string {
  * mapping (we own no map). No text is invented or merged: the file IS
  * the fence, so this is normalisation, not compositing. Markdown stays
  * itself; extensionless and dotless files pass through untouched. */
-export function wrapWholeFile(file: string, text: string): string {
-  if (/\.markdown$/i.test(file) || /\.md$/i.test(file)) return text;
+/** Would `wrapWholeFile` fence this file? The same test, named once so a
+ *  caller can branch on "is this a code file" without duplicating it. */
+export function isWholeFileFence(file: string): boolean {
+  if (/\.markdown$/i.test(file) || /\.md$/i.test(file)) return false;
   const dot = file.lastIndexOf(".");
-  if (dot <= 0) return text;
-  const tag = file.slice(dot + 1).toLowerCase();
-  if (!RE_FENCE_TAG.test(tag)) return text;
+  if (dot <= 0) return false;
+  return RE_FENCE_TAG.test(file.slice(dot + 1).toLowerCase());
+}
+
+export function wrapWholeFile(file: string, text: string): string {
+  if (!isWholeFileFence(file)) return text;
+  const tag = file.slice(file.lastIndexOf(".") + 1).toLowerCase();
   return `\`\`\`${tag}\n${text.replace(/\n+$/, "")}\n\`\`\`\n`;
+}
+
+/** Comment spans of a code file, as a predicate over source offsets:
+ *  `//`, `#`, and `/* *\/`. Line-based and language-agnostic —
+ *  over-approximates (a `#` in a string counts as a comment; `//` after a
+ *  scheme colon does not). Used to restrict reference discovery to comment
+ *  prose, because code is verbatim and a string literal is data
+ *  (BRF-CODE-SILCROWS). Pure. */
+export function commentRegions(text: string): (pos: number) => boolean {
+  const spans: Array<[number, number]> = [];
+  let pos = 0;
+  let inBlock = false;
+  for (const line of text.split("\n")) {
+    const lineEnd = pos + line.length;
+    if (inBlock) {
+      const close = line.indexOf("*/");
+      spans.push([pos, close < 0 ? lineEnd : pos + close]);
+      if (close >= 0) inBlock = false;
+    } else {
+      let start = -1;
+      let block = false;
+      for (const tok of ["//", "#", "/*"]) {
+        let p = line.indexOf(tok);
+        while (p >= 0 && tok === "//" && p > 0 && line[p - 1] === ":") p = line.indexOf(tok, p + 1);
+        if (p >= 0 && (start < 0 || p < start)) {
+          start = p;
+          block = tok === "/*";
+        }
+      }
+      if (start >= 0) {
+        const rest = line.slice(start);
+        const close = rest.indexOf("*/");
+        if (block && close < 0) {
+          spans.push([pos + start, lineEnd]);
+          inBlock = true;
+        } else if (block) {
+          spans.push([pos + start, pos + start + close]);
+        } else {
+          spans.push([pos + start, lineEnd]);
+        }
+      }
+    }
+    pos = lineEnd + 1;
+  }
+  return (p) => spans.some(([a, b]) => p >= a && p < b);
 }
 
 /** Build the Bun.markdown handler set. */

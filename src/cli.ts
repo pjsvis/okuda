@@ -13,7 +13,7 @@
 
 import { detectColorMode } from "./ansi";
 import { loadPalette } from "./palette";
-import { renderDocument, wrapWholeFile } from "./render";
+import { renderDocument, wrapWholeFile, isWholeFileFence, commentRegions } from "./render";
 import { runTui, displayPath } from "./tui";
 import { runLauncher, invokedAsGloam, rankedShortlistEntries } from "./launcher";
 import {
@@ -135,7 +135,7 @@ async function readSource(file: string | null): Promise<string> {
       process.stderr.write(`okuda: no such file: ${file}\n`);
       process.exit(1);
     }
-    return wrapWholeFile(file, await f.text());
+    return await f.text();
   }
   // Stdin piping (origin doc): `cat doc.md | okuda`
   if (!process.stdin.isTTY) return await new Response(process.stdin).text();
@@ -264,9 +264,19 @@ async function main(): Promise<void> {
     // The receipt is dropped, and the map with it — nothing downstream
     // needs it.
     const wantMap = !args.noReferences;
-    const map = wantMap ? jumpMapFor(source, silcrowResolves) : new Map<number, string>();
-    const source2 = process.stdout.isTTY && wantMap ? annotateSource(source, map) : source;
-    const body = wantMap ? appendReferences(source2, map, process.stdout.isTTY) : source2;
+    // A whole-file code render is a document for its comment prose
+    // (BRF-CODE-SILCROWS): discovery runs over the comments only, so a callsign
+    // cited in a comment paints while the same token in a string literal — a
+    // test fixture, demo data — does not. The paint already works inside the
+    // fence; the fence was only gating discovery.
+    const regions = args.file && isWholeFileFence(args.file) ? commentRegions(source) : undefined;
+    const map = wantMap ? jumpMapFor(source, silcrowResolves, regions) : new Map<number, string>();
+    const source2 = process.stdout.isTTY && wantMap ? annotateSource(source, map, regions) : source;
+    // Wrap AFTER annotation (the tokens ride in the fence) and BEFORE the
+    // receipt (the References section is markdown prose beneath the block, not
+    // code inside it).
+    const fenced = args.file ? wrapWholeFile(args.file, source2) : source2;
+    const body = wantMap ? appendReferences(fenced, map, process.stdout.isTTY) : fenced;
     const out = await renderDocument(body, {
       width,
       palette,

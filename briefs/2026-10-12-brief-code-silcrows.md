@@ -6,7 +6,7 @@ callsign: BRF-CODE-SILCROWS
 # Brief: Code-comment silcrows — a rendered code file is a document for its prose
 
 **Date:** 2026-10-12
-**Status:** Open
+**Status:** Done
 **TD:** BRF-CODE-SILCROWS
 
 ## Context
@@ -71,30 +71,30 @@ verbatim); non-callsign tokens; syntax highlighting.
 
 ## Preconditions
 
-- [ ] `tmp/code-silcrow-probe.ts` reproduces the numbers (it does; the table above
+- [x] `tmp/code-silcrow-probe.ts` reproduces the numbers (it does; the table above
       is its output).
-- [ ] ADR-031, ADR-044, ADR-045 read; the fence-exclusion reason confirmed false
+- [x] ADR-031, ADR-044, ADR-045 read; the fence-exclusion reason confirmed false
       for code fences.
-- [ ] The read/wrap seam named: `readSource` (`src/cli.ts:131`) wraps **before**
-      discovery, so the raw text is not available to the map.
+- [x] The read/wrap seam named: `readSource` (`src/cli.ts:131`) wrapped **before**
+      discovery; split.
 
 ## Work Plan
 
-1. [ ] Baseline: record the probe output and the current render (`map 0`) for a
-       code file.
-2. [ ] Write the failing test: a code comment citing a resolvable callsign paints
-       `§NN`; a fixture string in the same file does not; an authored markdown
+1. [x] Baseline: recorded the probe output and the current render (`map 0`).
+2. [x] Failing-then-passing tests in `tests/code-silcrows.test.ts`: a comment
+       callsign paints, its string-literal twin does not, an authored markdown
        fence still paints nothing.
-3. [ ] Add the comment-region predicate to discovery (a parameter on
-       `scanReferences`/`jumpMapFor`, not a fork), callsign-only for code files.
-4. [ ] Split `readSource`/`wrapWholeFile` so the map and annotation run on the raw
-       source; wrap after.
-5. [ ] Confirm the References receipt appears for a code file and renders after
-       the block.
-6. [ ] Correct the fence-exclusion comment (`src/vectors.ts:127`) and amend the ADR
-       it cites (palimpsest).
-7. [ ] `just check`; re-run the probe on the corpus; render `src/cli.ts`,
-       `src/tui.ts`, `src/vectors.ts` and eyeball.
+3. [x] `scanReferences` / `jumpMapFor` / `annotateSource` take a `regions`
+       predicate (code mode: the markdown fence check is skipped);
+       `commentRegions` in `src/render.ts` builds it.
+4. [x] `readSource` returns the raw text; `draw` annotates, then wraps, then
+       appends the receipt.
+5. [x] Receipt confirmed: `src/cli.ts` 10 entries, `src/tui.ts` 16; none when the
+       map is empty.
+6. [x] Fence-exclusion comment corrected (`src/vectors.ts`); ADR-MAIN-DOCUMENT-031
+       amended in place (the comment cited no ADR, so the parent by subject was
+       ADR-031).
+7. [x] `just check` and `just ship` pass; probe re-run; code renders eyeballed.
 
 ## Acceptance Criteria
 

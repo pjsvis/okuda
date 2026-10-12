@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-12 | DBF-CODE-SILCROWS | done | Debrief: Code-comment silcrows | 2026-10-12-debrief-code-silcrows.md |
 | 2026-10-12 | DBF-TABLE-GLASS | done | Debrief: Table fit — wrap to the glass, elide only the floor | 2026-10-12-debrief-table-glass-fit.md |
 | 2026-10-10 | DBF-COMMISSION-RESIDUE | done | Debrief: The commissioning residue — a procedure, a stamper, and the same class twice | 2026-10-10-debrief-commission-residue.md |
 | 2026-10-10 | DBF-PROTOCOL-UPDATE | done | Debrief: The protocol update — the file is the state, and the deploy is a message | 2026-10-10-debrief-protocol-update.md |
