@@ -398,8 +398,8 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   each. The **safety pass** asks *is this right?* — it catches a broken thing,
   and everything gets it. The **craft pass** asks *is this as good as it could
   be?* — it catches a thing that works and could be better; it is spent where a
-  second mind is worth the cost, never by habit. Code wants both (a pull request
-  is its craft pass); written prose wants the safety pass alone, because a wrong
+  second mind is worth the cost, never by habit. Code wants both (its craft pass
+  is the recorded review); written prose wants the safety pass alone, because a wrong
   sentence is cheap to annotate and a document is not executed. **Test:** name
   which pass a review is — a review that cannot say is ceremony in a control's
   clothes. *Prior art:* the long-standing split between an automated correctness

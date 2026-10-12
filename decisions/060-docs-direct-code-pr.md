@@ -8,6 +8,12 @@ callsign: ADR-DOCS-DIRECT-060
 **Date:** 2026-10-10
 **Status:** Accepted
 
+## Amended
+
+2026-10-12 — code lands direct, behind a recorded td review, as docs already do
+(BRF-TABLE-GLASS-FIT). The PR is dropped for both artefacts; the review is the
+control. See *Code direct* below.
+
 ## Context
 
 The two-machine protocol (2026-09-02) carried one rule for every merge: *merges
@@ -41,7 +47,8 @@ doc, was faff.
   PR gate is what is dropped.
 - **Code keeps the PR**, where it serves the **craft** review — *is this as good
   as it could be?* — distinct from the **safety** review the two-hander performs
-  (*is this right?*).
+  (*is this right?*). **Superseded 2026-10-12** — code lands direct too, behind a
+  recorded td review; see *Code direct* below.
 - **The two-hander is the review for docs.** "No PR" means the review moved, not
   that docs are unreviewed.
 
@@ -70,7 +77,41 @@ recorded in `td`.
   two-tier rule.
 - The **craft** review is reserved for code. Dropping PRs for code would cost the
   aspiration, not just the faff — this decision drops them for docs only.
+  **Superseded 2026-10-12** — the PR is dropped for code too, but the craft review
+  is kept as the recorded td review; see *Code direct* below.
 - A default, not a prohibition: a doc that wants eyes may still take a PR.
+
+## Code direct — the review is the control (2026-10-12)
+
+The two-tier split above matched the review to the risk, and it made the PR the
+**craft** pass for code. In a silo with one human and one agent, the frame a PR
+buys is a diff rendered at a distance — and the same frame survives as the
+recorded td review. What does not survive is a second, independent *reader*, which
+a solo silo cannot conjure by opening a webpage. The PR was the ceremony; the
+review is the control.
+
+**Decision.** Code lands on `main` the way docs do: a short-lived branch, one
+logical change per commit, `just check` green from a clean tree, a recorded td
+review (`td review` → `td approve --reviewed-by`, or `--self-review`), then
+fast-forward into `main` and push. A PR is neither required nor the gate. A code
+change that wants eyes may still take one — a default, not a prohibition.
+
+**What this does not drop.** Branch hygiene and the atomic-commit history
+(`feat/<name>`, fast-forward, branch deleted) — "no PR" is not "edit `main` in
+place". The review obligation does not shrink: the td review reason is a **claim
+with evidence** (what passed, what is residual, what is unverified), not a tick.
+
+**The risk, named.** A PR is a *forcing function*: it makes the review happen and
+makes an independent reader the default. Dropping it leaves the recorded review as
+the only control between "the tests pass" and "the judgement was sound", and a
+self-review by the same session shares blind spots with the work. The mitigation
+is the reason field and the habit it demands; it is not a gate, and this ADR says
+so rather than pretending otherwise.
+
+- **Measured 2026-10-12:** BRF-TABLE-GLASS-FIT was the first code change to take
+  this path — four commits fast-forwarded `ede877b..b5bf676`, `just check` exit 0,
+  719/720 `bun test` (the one failure pre-existing and reproduced on a clean
+tree), self-reviewed in `td`.
 
 ## Related
 
@@ -79,3 +120,5 @@ recorded in `td`.
 - `playbooks/td-playbook.md` — the review workflow the two-hander runs
 - `docs/2026-10-10-the-seam.md` — the review moves; the control is matched to the
   risk
+- `briefs/2026-10-12-brief-table-glass-fit.md` — the first code change to land
+  direct under the 2026-10-12 amendment
