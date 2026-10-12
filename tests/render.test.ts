@@ -387,6 +387,22 @@ describe("render — lists (loose, markers, continuation)", () => {
     expect(out2).not.toContain("\u0000");
   });
 
+  test("a flattened third level keeps one column — marker line and wrap share a base", async () => {
+    // The cap flatten dedents a continuation line to its marker line's own base,
+    // or the flattened item tears: the first line at the parent's indent and the
+    // tail eight columns deeper (found 2026-10-12).
+    const out = await render(
+      "- top\n\n  - child\n\n    - a third level whose text is long enough to wrap at this width today",
+      60,
+    );
+    const ls = lines(out);
+    const i = ls.findIndex((l) => stripANSI(l).includes("a third level"));
+    const indent = (s: string) => s.match(/^ */)![0].length;
+    expect(i).toBeGreaterThan(0);
+    expect(stripANSI(ls[i]!).includes("•")).toBe(false); // flattened — no marker
+    expect(indent(ls[i + 1]!)).toBe(indent(ls[i]!)); // the wrap shares the base
+  });
+
   test("a sub-list's first item is spaced from its parent like its siblings", async () => {
     // The parent→first-child seam is the one pair that lacks the blank
     // line `itemBlocks.join("\n\n")` gives every other pair. Source blank

@@ -1487,12 +1487,15 @@ function renderList(
   return tagNestedOpen(myTag) + indented + TAG_NESTED_CLOSE;
 }
 
-/** Strip list markers and indent as continuation text (cap flatten). */
+/** Strip list markers and indent as continuation text (cap flatten). The
+ *  line's own wrap-indent is removed too (trimStart): a marker line and its
+ *  continuation must share one base column, or the flattened item tears —
+ *  the first line at the parent's indent, the tail eight columns deeper. */
 function flattenNested(body: string): string {
   return body
     .split("\n")
     .map((l) => {
-      const stripped = l.replace(/^\s*(?:•|\d+\.)\s+/, "");
+      const stripped = l.replace(/^\s*(?:•|\d+\.)\s+/, "").trimStart();
       return stripped === "" ? "" : "  " + stripped;
     })
     .join("\n");
