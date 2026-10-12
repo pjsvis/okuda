@@ -23,6 +23,10 @@
 import { scanRuns, type Run } from "./width";
 
 const RE_SGR_RESET = /^\x1b\[0*m$/;
+// A token may slip AFTER one of these: the delimiters a reader already parses
+// as separators (BRF-TABLE-GLASS-FIT). A URL or path hard-splits at a
+// separator rather than mid-token.
+const RE_BREAK_CHAR = /^[/._@-]$/;
 // OSC 8: \x1b]8;<params>;<URI>ST — params usually empty, URI empty on close.
 const RE_OSC8 = /^\x1b\]8;([^\x07\x1b;]*);([^\x07\x1b]*)(?:\x07|\x1b\\)$/;
 
@@ -176,25 +180,30 @@ export function wrapANSI(text: string, opts: WrapOptions): string[] {
       word = [];
       return;
     }
-    // Hard-split the word across lines.
-    let chunk: Unit[] = [];
-    let chunkW = 0;
-    for (const u of word) {
-      const uw = u.kind === "grapheme" ? u.width : 0;
-      if (chunkW + uw > remaining && chunk.length > 0) {
-        lineUnits.push(...chunk);
-        lineHasContent = true;
-        flushLine();
-        remaining = width - (lineIsFirst ? strWidth(firstIndent) : strWidth(indent));
-        chunk = [];
-        chunkW = 0;
+    // Hard-split the word across lines, preferring a break AFTER a delimiter
+    // so a URL or path slips at a separator rather than mid-token
+    // (BRF-TABLE-GLASS-FIT). The last delimiter that fits the line wins, and
+    // only a token with no fitting delimiter is cut mid-word.
+    let rest = word;
+    while (rest.length > 0) {
+      const available = width - (lineIsFirst ? strWidth(firstIndent) : strWidth(indent));
+      let fit = 0;
+      let w = 0;
+      let lastDelim = -1;
+      while (fit < rest.length) {
+        const u = rest[fit]!;
+        const uw = u.kind === "grapheme" ? u.width : 0;
+        if (w + uw > available) break;
+        w += uw;
+        if (u.kind === "grapheme" && RE_BREAK_CHAR.test(u.raw)) lastDelim = fit;
+        fit++;
       }
-      chunk.push(u);
-      chunkW += uw;
-    }
-    if (chunk.length > 0) {
-      lineUnits.push(...chunk);
+      if (fit === 0) fit = 1; // never stall on a zero-width budget
+      const split = lastDelim > 0 && lastDelim + 1 < fit ? lastDelim + 1 : fit;
+      lineUnits.push(...rest.slice(0, split));
       lineHasContent = true;
+      rest = rest.slice(split);
+      if (rest.length > 0) flushLine();
     }
     word = [];
   };

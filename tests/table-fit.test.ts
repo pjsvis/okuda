@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import { renderDocument } from "../src/render";
 import { displayWidth, stripANSI } from "../src/width";
 
@@ -84,15 +85,49 @@ describe("the table at the cap (BRF-WRAP-AT-CAP)", () => {
   });
 });
 
-describe("the table ladder", () => {
-  test("keys render whole and the remainder goes to the prose column", async () => {
+describe("the table at the glass (BRF-TABLE-GLASS-FIT)", () => {
+  test("every column wraps at the glass — the prose column is not elided", async () => {
     const lines = visible(await renderDocument(PILOT, { width: 80, color: "none" }));
-    // Every key cell survives intact — this is what the floor plus completion buys.
-    for (const key of ["Element", "heading", "structural", "purple bold", "#bd93f9"]) {
+    // Every cell survives whole, the prose column included: the floor test runs
+    // at the glass, and the slack is spent on wrapped lines, not a cut.
+    for (const key of ["Element", "heading", "structural", "purple", "#bd93f9",
+      "yellow", "italic", "document"]) {
       expect(lines.some((l) => l.includes(key))).toBe(true);
     }
-    // The prose column is the one that pays for it.
-    expect(lines.some((l) => l.includes("…"))).toBe(true);
+    expect(lines.every((l) => !l.includes("…"))).toBe(true);
+  });
+
+  test("the contact map keeps its prose column at 80 (the fixture)", async () => {
+    const src = readFileSync("tests/fixtures/contracts-contact-map.md", "utf8");
+    const lines = visible(await renderDocument(src, { width: 80, color: "none" }));
+    // The Notes column is present and read, not elided.
+    expect(lines.some((l) => l.includes("Notes"))).toBe(true);
+    expect(lines.some((l) => l.includes("Consultancy"))).toBe(true);
+    expect(lines.some((l) => l.includes("architecture"))).toBe(true);
+    expect(lines.every((l) => !l.includes("…"))).toBe(true);
+  });
+
+  test("elision is monotone in the glass — more width never reveals less", async () => {
+    const src = readFileSync("tests/fixtures/contracts-contact-map.md", "utf8");
+    const elided = async (w: number) =>
+      stripANSI(await renderDocument(src, { width: w, color: "none" }))
+        .split("\n")
+        .filter((l) => l.includes("…")).length;
+    let prev = Infinity;
+    for (let w = 40; w <= 200; w += 2) {
+      const n = await elided(w);
+      expect(n).toBeLessThanOrEqual(prev);
+      prev = n;
+    }
+    // zero at and above the natural width — the whole document visible
+    for (const w of [120, 160, 200]) expect(await elided(w)).toBe(0);
+  });
+
+  test("a URL wraps at its delimiters — never elided at 80, never cut mid-segment", async () => {
+    const src = "| Name | Blog URL |\n|---|---|\n| Colin | blog.scottlogic.com/ceberhardt |\n";
+    const lines = visible(await renderDocument(src, { width: 80, color: "none" }));
+    expect(lines.every((l) => !l.includes("…"))).toBe(true);
+    expect(lines.some((l) => l.includes("blog.scottlogic.com/ceberhardt"))).toBe(true);
   });
 
   test("the floor buys the leading word whole, not a word-boundary cut", async () => {

@@ -74,27 +74,20 @@ describe("render — tables (uniform presentation policy)", () => {
     expect(displayWidth(ruleLines[0]!)).toBeLessThan(W - 4);
   });
 
-  test("cells elide at their column budget — rows stay single-line (ADR-UNIVERSAL-ELISION-050)", async () => {
-    // The wrap policy (and the zip/word-salad stratum built to hold it)
-    // is repealed: a cell over its budget truncates with …, one line per
-    // row, columns hold by construction. The reader's remedy for the …
-    // is a wider glass, not a taller table.
+  test("a narrow glass wraps the cells — rows become blocks, nothing is elided", async () => {
+    // BRF-TABLE-GLASS-FIT repealed the below-cap squeeze and the single-line
+    // cut: the floor test runs at the glass, so a cell over its share wraps
+    // onto continuation lines rather than truncating with `…`.
     const out = await renderDocument(
       "| a | b |\n|---|---|\n| hi | long cell content here |\n",
       { width: 24 },
     );
     const ls = out.split("\n");
-    // The body row is ONE line — the short column intact, the long
-    // column elided, never wrapped.
-    const bodyRows = ls.filter((l) => stripANSI(l).includes("hi"));
-    expect(bodyRows.length).toBe(1);
-    const row = stripANSI(bodyRows[0]!);
-    expect(row).toMatch(/\bhi\b/);
-    expect(row).toContain("…");
-    // The wrap never happened: no continuation line carrying the
-    // elided cell's tail at the left margin.
-    expect(ls.filter((l) => stripANSI(l).match(/^\s+content/)).length).toBe(0);
-    // No line exceeds the width — the cut is ours, never the terminal's
+    // Every word of the long cell is present: the row is a block, not a cut.
+    for (const word of ["hi", "long", "content", "here"]) {
+      expect(ls.some((l) => stripANSI(l).includes(word))).toBe(true);
+    }
+    expect(ls.every((l) => !l.includes("…"))).toBe(true);
     for (const l of ls) expect(displayWidth(l)).toBeLessThanOrEqual(24);
   });
 
@@ -210,18 +203,20 @@ describe("render — menu tables (ADR-022 right-anchored role fit, td-b81597)", 
     }
   });
 
-  test("unwired tables stay generic: proportional budget + per-cell elision, no role ladder", async () => {
+  test("unwired tables stay generic: no role ladder, and the glass wraps them", async () => {
     const plain =
       `| Document | Callsign | # |\n|---|---|---|\n` +
       row("A very long title that goes on and on far past the budget", "BRF-ELISION-PRIMITIVE", "11", "briefs/x.md")
         .replace(/ <!-- [^>]* -->/, ""); // wiring stripped → generic
     const out = await renderDocument(plain, { width: 40 });
-    // generic path under ADR-UNIVERSAL-ELISION-050: proportional budget,
-    // single-line rows, per-cell … — the menu's right-anchored ladder
-    // (floor homes, suppression order) never runs on an unwired table.
-    const bodyRows = out.split("\n").filter((l) => stripANSI(l).includes("A very long"));
-    expect(bodyRows.length).toBe(1); // single-line — no zip, no ladder rows
-    expect(bodyRows[0]).toContain("…"); // the long title elides at its budget
+    // The menu's right-anchored ladder (floor homes, suppression order) never
+    // runs on an unwired table; the generic path wraps the long title at the
+    // glass instead of suppressing it (BRF-TABLE-GLASS-FIT).
+    const ls = out.split("\n");
+    for (const word of ["very", "long", "title", "budget", "PRIMITIVE"]) {
+      expect(ls.some((l) => stripANSI(l).includes(word))).toBe(true);
+    }
+    expect(ls.every((l) => !l.includes("…"))).toBe(true);
   });
 
   test("wiring never leaks: the comment is invisible in output", async () => {

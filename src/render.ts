@@ -283,6 +283,11 @@ function colorFg(hex: string, text: string): string {
  *  mid-glass (ADR-ROLE-LAYOUT-022). */
 const BAND_CONTENT = 116;
 
+/** Where a token may wrap: after a delimiter a reader already parses as a
+ *  separator. A URL or path is therefore not atomic — its floor is the
+ *  longest segment between delimiters (BRF-TABLE-GLASS-FIT). */
+const RE_BREAK_AFTER = /(?<=[/._@-])/;
+
 interface Cell {
   text: string; // may contain inline ANSI
   align?: "left" | "center" | "right";
@@ -1543,9 +1548,16 @@ function renderTable(t: TableState, ctx: Ctx): string {
   const bodyNat = new Array<number>(cols).fill(0);
   const bodyWord = new Array<number>(cols).fill(0);
   const headWord = new Array<number>(cols).fill(0);
+  // A word's floor is its longest UNBREAKABLE SEGMENT, not its longest
+  // whitespace token (BRF-TABLE-GLASS-FIT). A URL or path carries the
+  // delimiters a reader already parses as separators, so it may wrap after
+  // one; measuring the whole token as atomic made it "irreducible" and
+  // handed the last column to the edge cut.
   const longestWord = (text: string, into: number[], i: number): void => {
     for (const word of stripANSI(text).split(/\s+/)) {
-      into[i] = Math.max(into[i]!, displayWidth(word));
+      for (const seg of word.split(RE_BREAK_AFTER)) {
+        into[i] = Math.max(into[i]!, displayWidth(seg));
+      }
     }
   };
   header.forEach((cell, i) => longestWord(cell?.text ?? "", headWord, i));
@@ -1564,39 +1576,35 @@ function renderTable(t: TableState, ctx: Ctx): string {
 
   const gutter = 3;
 
-  // The band's cap: a table is never drawn wider than 120 columns, whatever the
-  // glass offers (BRF-TABLE-LADDER), and this is the width the drawn lines are cut
-  // to.
+  // The FIT WIDTH: the glass, capped at the band (BRF-TABLE-LADDER). Both the
+  // composition and the cut use THIS width, so the two can no longer disagree
+  // (BRF-TABLE-GLASS-FIT): the previous model composed to the cap and cut at the
+  // glass, and the difference was taken from the last column.
   const target = Math.min(width, BAND_CONTENT);
 
-  // A column's floor is its longest word, header or body (BRF-WRAP-AT-CAP). A
-  // word cannot be broken, so no share may fall below it; the floor is the
+  // A column's floor is its longest unbreakable segment, header or body. No
+  // share may fall below it without eliding content; the floor is the
   // PREDICATE's unit, never an allocation across columns.
   const wordFloor = colWidth.map((_, i) => Math.max(headWord[i]!, bodyWord[i]!));
 
-  // The three branches, one grammar (BRF-WRAP-AT-CAP). The boundary is the CAP,
-  // not the glass: below it the reader's lever is to widen, so the edge cut is
-  // recoverable and nothing is asked of the words. Past the cap, 120 and 200
-  // columns render identically and the cut HIDES content — the one thing the
-  // table model refuses — so the columns wrap until the table fits the cap, and
-  // only a word that cannot fit falls through to the edge cut.
+  // Two states and a total order (BRF-TABLE-GLASS-FIT). WIDE-ENOUGH: every
+  // column's floor fits the target, so the columns WRAP to the target and
+  // nothing is hidden — the state the cap-bounded wrap could not reach below
+  // 116. TOO-NARROW: a floor does not fit, so the table draws at the author's
+  // widths and the composed line is cut at the target — the irreducible set the
+  // instrument names. Widen, and hidden content only falls.
   const natural = colWidth.reduce((a, w) => a + w, 0) + gutter * (cols - 1);
   const wordBudget = wordFloor.reduce((a, w) => a + w, 0) + gutter * (cols - 1);
-  // Two columns no band width can hold are a prose matrix — two notes wearing
-  // pipes. The remedy is the document (ADR-REFERENCES-SECTION-047), not a
-  // taller render, and ADR-TABLE-EDGE-CUT-055 already names them.
-  const giants = colWidth.filter((n) => n > BAND_CONTENT).length > 1;
-  const wrap = natural > BAND_CONTENT && wordBudget <= BAND_CONTENT && !giants;
+  const wrap = natural > target && wordBudget <= target;
 
   // The wrap's allocation, and why it is not the ladder: every column takes its
-  // longest word as a floor (a word cannot break below it) and the SLACK IS SPLIT
-  // EVENLY. There is no per-column need, no completion order and no proportional
-  // budget — the arithmetic that made two models disagree is deliberately absent.
-  // The floor test above is a predicate at the cap, never an allocator across
-  // columns.
+  // floor and the SLACK IS SPLIT EVENLY. There is no per-column need, no
+  // completion order and no proportional budget — the arithmetic that made two
+  // models disagree is deliberately absent. The floor test above is a predicate
+  // at the fit width, never an allocator across columns.
   let slots = colWidth;
   if (wrap) {
-    const avail = BAND_CONTENT - gutter * (cols - 1);
+    const avail = target - gutter * (cols - 1);
     const slack = avail - wordFloor.reduce((a, w) => a + w, 0);
     const base = Math.floor(slack / cols);
     const rem = slack % cols;
