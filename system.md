@@ -404,3 +404,17 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   which pass a review is — a review that cannot say is ceremony in a control's
   clothes. *Prior art:* the long-standing split between an automated correctness
   gate (tests, CI) and human code review done for craft.
+  * **The comment probe — the craft pass's mechanism.** The human reads the
+  comments — the code's intent in prose, and the one part of the repo no test
+  re-reads — and asks of anything that does not land: *"what did you mean?"* The
+  agent answers with the referent (what the code actually does); the barnacle is
+  where text and referent disagree. The fix is a diff, and it names which is
+  stale: the comment, or the code's obedience to the intent the comment records.
+  A comment rewritten without that question is a cosmetic scrape, and the scraper
+  can be the barnacle. **Why it works:** the human holds the naive reader, the
+  agent holds the referent — neither closes the loop alone. It is a checksum on
+  intent: the comment is the redundancy, *"what did you mean?"* is the
+  retransmission. **Test:** the finding is the evidence — nothing scraped over a
+  stretch means either the surface is clean or the pass is not happening. Worked
+  instance: `src/keygrammar.ts` and its zone table; `68cb5c2` (a comment whose
+  referent had moved).
