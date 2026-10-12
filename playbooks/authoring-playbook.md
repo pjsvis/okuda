@@ -54,11 +54,13 @@ already has a shape — a comparison, a list of named things, a relation — is 
 shapeless content is **decorated Stuff**: structure with no referent. Reach for
 the shape the content already has; do not impose one.
 
-**The artifact is the document; the okudagram is its diagram — and the
-inspiration.** "Okudagram" names the ASCII art a mermaid fence renders
-(`playbooks/mermaid-diagrams-playbook.md`). It is the clearest instance of this
-law, not a name widened to cover the whole artifact — a designation must not
-exceed its referent. The structured artifact is the *document*.
+**The artifact is the document; the okudagram is what it renders to.** The
+structured artifact is the *document*. The **okudagram** is its rendered form —
+deterministic and recomputed, `okudagram = f(source, width, palette)`
+(`briefs/2026-08-29-brief-okudagram-frame.md`) — the good-looking end this medium
+is built to produce, and the aspiration behind this law. It names the render, not
+the source: use *document* for the artifact, and let the okudagram stay the thing
+you are aiming at.
 
 **Test.** After a glance, can the reader state the document's shape in one
 sentence — *"it's a comparison"*, *"it's a state machine"*, *"it's six
