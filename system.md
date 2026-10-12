@@ -250,6 +250,22 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   `docs/2026-08-20-origin-doc.md` (its *Out of scope* section as an audit surface
   for a design's boundary). **Coined 2026-10-09** from the operator's reading of
   `playbooks/td-playbook.md` in the okuda render.
+  * **The surface steadies; the actuation converts** (2026-10-12). The
+  *possibility* of dereferencing steadies; the *act* is what changes behaviour,
+  and the act happens only when it is cheap. A fetched citation costs a
+  keystroke, a bare callsign a search — drop the checking cost below the
+  credulity cost and readers stop granting credence by presence and start
+  looking. That is the difference between a **social** signal (it looks like
+  scholarship) and an **operational** one (it is a handle); the mechanism is the
+  price of the check, not persuasion. The general form: **structure converts a
+  claim into a referent**, and a claim with a referent can be argued with rather
+  than believed. **Test:** name the cost of verifying one claim — a keystroke, a
+  search, a build? If it exceeds the cost of believing it, the surface is
+  decoration. **Boundary:** a silcrow that resolves licenses the *check*, never
+  the *conclusion* (`ADR-DOCUMENT-LIFECYCLE-057`: *a citation that resolves is
+  not yet a citation that means*). Worked instance: `§NN` on a code comment
+  (BRF-CODE-SILCROWS) turned a silently-credited reference into a question with a
+  referent.
 
 * **Subtraction as discovery**: removing options is an *instrument of discovery*,
   not merely an economy. What survives removal is the problem's shape — its
