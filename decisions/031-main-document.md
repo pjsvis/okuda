@@ -116,7 +116,7 @@ citations.
 
 **Why the comment region is required, not tidy.** ADR-044's gate drains tokens
 that do not resolve; it cannot drain a resolvable token *quoted as data*. The
-probe (`tmp/code-silcrow-probe.ts`) measured 344 resolved callsigns in code
+probe (`scripts/code-silcrow-probe.ts`) measured 344 resolved callsigns in code
 comments against 192 resolvable tokens *outside* comments — test fixtures and
 demo strings (`tests/vectors.test.ts` is `scanReferences("see ADR-030…")`), which
 a whole-file scan would paint. **Resolution is not reference.**

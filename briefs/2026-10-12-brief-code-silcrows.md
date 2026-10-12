@@ -16,7 +16,7 @@ and fenced content is excluded from reference discovery (`src/vectors.ts`
 `fenceRanges:127`), so a comment citing `ADR-030` or `BRF-ROOT-CONTAINMENT` paints
 nothing. The asymmetry: a document citing `src/tui.ts` earns a silcrow (ADR-045
 Ring A) while the rendered file citing a document earns none. Measured 2026-10-12
-(`tmp/code-silcrow-probe.ts`): 381 callsigns in code comments, 344 resolve (90.3%).
+(`scripts/code-silcrow-probe.ts`): 381 callsigns in code comments, 344 resolve (90.3%).
 The exclusion is discovery-side, not a paint limit — but a prose
 `%okuda-vector:12%` marker is not consumed by the chromed fence path either
 (chroma colours the content before any handler sees it), so the code render needs
@@ -32,7 +32,7 @@ so a code comment's document reference earns the same silcrow a document's does.
 
 ## Evidence
 
-**The probe** (`bun tmp/code-silcrow-probe.ts`, 92 code files):
+**The probe** (`bun scripts/code-silcrow-probe.ts`, 92 code files):
 
 | population | tokens | resolve | junk |
 |---|---|---|---|
@@ -73,7 +73,7 @@ verbatim); non-callsign tokens; syntax highlighting.
 
 ## Preconditions
 
-- [x] `tmp/code-silcrow-probe.ts` reproduces the numbers (it does; the table above
+- [x] `scripts/code-silcrow-probe.ts` reproduces the numbers (it does; the table above
       is its output).
 - [x] ADR-031, ADR-044, ADR-045 read; the fence-exclusion reason examined —
       discovery, not a paint limit, and the paint needed its own code marker.
@@ -106,7 +106,7 @@ verbatim); non-callsign tokens; syntax highlighting.
   exclusion stands for samples).
 - A code file renders with a `## References` receipt listing its comment callsigns,
   and no receipt when the map is empty.
-- `tmp/code-silcrow-probe.ts`'s resolved-in-comments count (344) is the set the
+- `scripts/code-silcrow-probe.ts`'s resolved-in-comments count (344) is the set the
   change admits — no more.
 - No `okuda-vector` or `okuda-codevec` marker leaks in any code render, in
 either colour mode.
@@ -131,7 +131,7 @@ either colour mode.
 
 ## Related
 
-- `tmp/code-silcrow-probe.ts` — the measurement
+- `scripts/code-silcrow-probe.ts` — the measurement
 - `decisions/031-main-document.md` — what a main document's map is
 - `decisions/044-validated-silcrows.md` — the gate, and the 117-junk precedent
 - `decisions/045-silcrow-paths.md` — Ring A, the document→code direction
