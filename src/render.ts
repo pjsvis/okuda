@@ -422,7 +422,7 @@ export async function renderDocument(
     const rail = ctx.width - 4; // chip + space + rail + space + chip = width
     out = rendered + styler.headingChip() + " " + styler.rule(rail) + " " + styler.headingChip() + "\n";
   }
-  const body = finalize(out);
+  const body = finalize(out, ctx.styler);
   // Identity header (BRF-STREAM-IDENTITY-HEADER): where the destination is
   // unknown — a pipe, a page, a pin array, an agent's context — the content
   // names itself. One line, a blank, the body: the blank is the separator
@@ -759,7 +759,12 @@ async function interceptCode(
  * one thing it must never do). Prose stops at `width - 2`; so does this. */
 function codeBlockLines(lines: string[], ctx: Ctx): string {
   const open = tagRawOpen("code");
-  const body = lines.map((l) => (l === "" ? "" : "  " + elideToWidth(l, ctx.width - 2)));
+  // Paint before eliding: an unpainted `%okuda-vector:NN%` is 17 columns wide,
+  // and elision can cut it mid-token, leaving a fragment the finalize pass can
+  // no longer match. Painting first shrinks it to `§NN` and the cut lands
+  // somewhere honest.
+  const body = lines.map((l) =>
+    l === "" ? "" : "  " + elideToWidth(paintCodeVectors(l, ctx.styler), ctx.width - 2));
   return `${open}${body.join("\n")}${TAG_RAW_CLOSE}\n\n`;
 }
 
@@ -1082,7 +1087,8 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       const open = tagRawOpen("code");
       const lines = body
         .split("\n")
-        .map((l) => (l === "" ? "" : styler.codeLine("  " + elideToWidth(l, width - 2))));
+        .map((l) =>
+          l === "" ? "" : styler.codeLine("  " + elideToWidth(paintCodeVectors(l, styler), width - 2)));
       return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n\n`;
     },
 
@@ -1884,8 +1890,35 @@ function padNatural(c: Cell, i: number, colWidth: number[]): string {
 }
 
 /** Final document assembly: strip tags, apply margins, tidy edges. */
-function finalize(rendered: string): string {
-  const stripped = stripTags(rendered);
+/** Paint the code-comment vector markers (`okuda-codevec`, injected by
+ *  `annotateSource` in code mode) in the vector role. A coloured code fence
+ *  never reaches the prose handlers — chroma colours it before any handler
+ *  runs — so these markers are painted here and in `codeBlockLines` /
+ *  the generic code handler, and always BEFORE elision (an unpainted marker
+ *  is 19 columns wide and can be cut mid-token). The enclosing SGR is
+ *  restored after the badge, or the rest of the line loses its code colour
+ *  (the badge's reset is a hard reset). The distinct `codevec` name keeps a
+ *  literal `%okuda-vector:NN%` in a code sample or fixture untouched. Pure. */
+function paintCodeVectors(text: string, styler: ReturnType<typeof makeStyler>): string {
+  if (!text.includes("okuda-codevec")) return text;
+  const active = (prefix: string): string => {
+    const runs: string[] = [];
+    for (const m of prefix.matchAll(/\x1b\[([0-9;]*)m/g)) {
+      const p = m[1] ?? "";
+      if (p === "" || p === "0") runs.length = 0;
+      else runs.push(m[0]!);
+    }
+    return runs.join("");
+  };
+  return text.replace(
+    /%{1,2}okuda-codevec:(\d{1,2})%{1,2}/g,
+    (_m, n: string, offset: number) =>
+      styler.roleBold("vector", `\u00a7${n}`) + active(text.slice(0, offset)),
+  );
+}
+
+function finalize(rendered: string, styler: ReturnType<typeof makeStyler>): string {
+  const stripped = paintCodeVectors(stripTags(rendered), styler);
   // 2-char left margin on every non-empty line (Glow Document margin).
   // Right margin is implicit: wrap used (width - 4), so content stops
   // 2 cols short of the terminal edge.

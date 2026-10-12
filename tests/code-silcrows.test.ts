@@ -45,33 +45,41 @@ describe("code-comment silcrows (BRF-CODE-SILCROWS)", () => {
     expect(targets.filter((t) => t === "ADR-031")).toHaveLength(1); // the string is data
   });
 
-  test("a code render paints the comment callsign and leaves the string literal bare", async () => {
-    const regions = commentRegions(CODE);
-    const map = jumpMapFor(CODE, makeSilcrowGate("demo.ts", process.cwd()), regions);
-    expect([...map.values()]).toEqual(["ADR-031"]); // UTF-8 gated, string excluded
-    const annotated = annotateSource(CODE, map, regions);
-    const body = appendReferences(wrapWholeFile("demo.ts", annotated), map, true);
-    const out = stripANSI(await renderDocument(body, { width: 100, color: "none" }));
+  // Both colour modes: plain is where a fenced token happens to paint, and
+  // truecolor is the one the glass actually uses — chroma colours the fence
+  // before any handler runs, so the token must survive to finalize
+  // (found 2026-10-12: the first version leaked in truecolor only).
+  for (const color of ["none", "truecolor"] as const) {
+    test(`a code render paints the comment callsign (${color}) and leaves the string literal bare`, async () => {
+      const regions = commentRegions(CODE);
+      const map = jumpMapFor(CODE, makeSilcrowGate("demo.ts", process.cwd()), regions);
+      expect([...map.values()]).toEqual(["ADR-031"]); // UTF-8 gated, string excluded
+      const annotated = annotateSource(CODE, map, regions);
+      const body = appendReferences(wrapWholeFile("demo.ts", annotated), map, true);
+      const out = stripANSI(await renderDocument(body, { width: 100, color }));
 
-    const commentLine = lines(out).find((l) => l.includes("a comment citing"));
-    expect(commentLine).toContain("§");
-    const fixtureLine = lines(out).find((l) => l.includes("const fixture"));
-    expect(fixtureLine).not.toContain("§");
-    expect(out).toContain("## References");
-    expect(lines(out).some((l) => l.includes("ADR-031"))).toBe(true);
-  });
+      expect(/okuda-(?:vector|codevec):\d/.test(out)).toBe(false); // no leak, either mode
+      const commentLine = lines(out).find((l) => l.includes("a comment citing"));
+      expect(commentLine).toContain("§");
+      const fixtureLine = lines(out).find((l) => l.includes("const fixture"));
+      expect(fixtureLine).not.toContain("§");
+      expect(out).toContain("## References");
+    });
+  }
 
   test("an authored markdown fence still paints nothing", () => {
     expect(scanReferences("```ts\n// cites ADR-031\n```\n")).toEqual([]);
   });
 
-  test("no vector token leaks into the render", async () => {
+  test("no injected marker leaks into the render (both modes)", async () => {
     const regions = commentRegions(CODE);
     const map = jumpMapFor(CODE, makeSilcrowGate("demo.ts", process.cwd()), regions);
-    const out = await renderDocument(
-      wrapWholeFile("demo.ts", annotateSource(CODE, map, regions)),
-      { width: 100, color: "none" },
-    );
-    expect(out.includes("%okuda-vector")).toBe(false);
+    for (const color of ["none", "truecolor"] as const) {
+      const out = await renderDocument(
+        wrapWholeFile("demo.ts", annotateSource(CODE, map, regions)),
+        { width: 100, color },
+      );
+      expect(/okuda-(?:vector|codevec):\d/.test(out)).toBe(false);
+    }
   });
 });

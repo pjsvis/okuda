@@ -6,7 +6,7 @@ callsign: ADR-MAIN-DOCUMENT-031
 # Decision: The main document — optimistic vectors, 99 promotes, u unwinds
 
 **Date:** 2026-09-04
-**Status:** Accepted (*optimism* clause superseded 2026-09-24 by ADR-VALIDATED-SILCROWS-044 — "discovery never validates, the actuator fails honestly" is retired: inferred callsign-shaped tokens now gate on the tier registries, because the probe counted 117 painted silcrows that resolved to nothing. One clause, not the ADR: dynamism, the one-destination-one-silcrow citation convention, the doubled-pair reservations, and re-derivation-replaces-invalidation all stand. Explicit `.md` links stay optimistic — the author's link is a deliberate claim; the boundary holds by parameter, so the render path still reads no registry itself.) Amended 2026-09-30 by ADR-REFERENCES-SECTION-047: the map gains a visible projection — every main-document render ends with a generated `## References` section, the renderer's receipt for its own map. The discovery contract itself is unchanged; discovery still mints, the section only lists. Amended 2026-10-12 by BRF-CODE-SILCROWS: a whole-file code render (a non-`.md` file, `wrapWholeFile`) is a main document too — discovery runs over its **comment** regions only, callsign-only, gated by the registry; authored markdown fences stay excluded, and the fence exclusion's stated reason is corrected (a badge *does* render inside a code fence).
+**Status:** Accepted (*optimism* clause superseded 2026-09-24 by ADR-VALIDATED-SILCROWS-044 — "discovery never validates, the actuator fails honestly" is retired: inferred callsign-shaped tokens now gate on the tier registries, because the probe counted 117 painted silcrows that resolved to nothing. One clause, not the ADR: dynamism, the one-destination-one-silcrow citation convention, the doubled-pair reservations, and re-derivation-replaces-invalidation all stand. Explicit `.md` links stay optimistic — the author's link is a deliberate claim; the boundary holds by parameter, so the render path still reads no registry itself.) Amended 2026-09-30 by ADR-REFERENCES-SECTION-047: the map gains a visible projection — every main-document render ends with a generated `## References` section, the renderer's receipt for its own map. The discovery contract itself is unchanged; discovery still mints, the section only lists. Amended 2026-10-12 by BRF-CODE-SILCROWS: a whole-file code render (a non-`.md` file, `wrapWholeFile`) is a main document too — discovery runs over its **comment** regions only, callsign-only, gated by the registry; authored markdown fences stay excluded, and the fence exclusion's stated reason is corrected (the exclusion is discovery, not a paint limit; the code render uses a distinct after-colour marker, `okuda-codevec`).
 
 ## Context
 
@@ -122,9 +122,15 @@ demo strings (`tests/vectors.test.ts` is `scanReferences("see ADR-030…")`), wh
 a whole-file scan would paint. **Resolution is not reference.**
 
 **Correction.** The fence exclusion's comment claimed a badge inside a fence
-never renders. It does: a `%okuda-vector:NN%` token inside a code fence renders
-`§NN`. The exclusion was sound in intent and wrong in mechanism — and the wrong
-mechanism concealed the case this amendment settles.
+never renders, implying a paint limit. The exclusion was always discovery — a
+sample is verbatim — and the paint is a *separate* problem the claim concealed:
+a prose `okuda-vector` marker is **not** consumed by the chromed fence path,
+because chroma colours the content before any handler sees it (found in review:
+a plain-mode check painted while truecolor leaked the raw marker). The code
+render therefore emits a distinct `okuda-codevec` marker, painted in
+`codeBlockLines` and the generic code handler, **before** elision — an unpainted
+`%okuda-codevec:NN%` is 19 columns wide and elision can cut it mid-token. A
+literal `%okuda-vector:NN%` in a code sample or fixture is left verbatim.
 
 - **Measured 2026-10-12:** 381 callsigns in code comments, 344 resolve, 37 gated
   as junk; `src/cli.ts` renders a 10-entry `## References` receipt where it had

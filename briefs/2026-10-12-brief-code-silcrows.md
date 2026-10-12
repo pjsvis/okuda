@@ -17,9 +17,12 @@ and fenced content is excluded from reference discovery (`src/vectors.ts`
 nothing. The asymmetry: a document citing `src/tui.ts` earns a silcrow (ADR-045
 Ring A) while the rendered file citing a document earns none. Measured 2026-10-12
 (`tmp/code-silcrow-probe.ts`): 381 callsigns in code comments, 344 resolve (90.3%).
-And the paint is not the obstacle — a `%okuda-vector:12%` token inside a code
-fence renders as `§12`, so the exclusion is discovery-side, and its stated reason
-(*"a badge injected inside a fence never renders"*) is false for code fences.
+The exclusion is discovery-side, not a paint limit — but a prose
+`%okuda-vector:12%` marker is not consumed by the chromed fence path either
+(chroma colours the content before any handler sees it), so the code render needs
+a distinct marker painted after colour. (The first draft missed this: a
+plain-mode check painted while truecolor leaked the raw marker — found in
+review.)
 
 ## Objective
 
@@ -42,12 +45,11 @@ generated-demo strings** — `tests/vectors.test.ts:21` is
 `scanReferences("see ADR-030 and ADR-028…")`, `scripts/references-demo.ts:60`
 builds a demo document inside a string. Resolvable, and not references.
 
-**The paint already works inside a fence.** Isolated render, 2026-10-12:
-
-| source | rendered |
-|---|---|
-| ` ```ts` / `// see %okuda-vector:12% ADR-030` / ` ``` ` | `// see  §12 ADR-030` |
-| the same fence with a bare `ADR-030` | `// see ADR-030` (nothing) |
+**The paint needed a code marker.** `%okuda-vector:NN%` inside a code fence is
+consumed in plain mode but **leaks in truecolor** (chroma colours the fence
+before the handler sees it) — verified 2026-10-12. So code mode emits
+`%okuda-codevec:NN%`, painted after colour and before elision; a bare `ADR-030`
+in a fence still mints nothing (discovery is fenced).
 
 **Top files** by comment callsigns: `src/tui.ts` 50 (45 ok), `src/render.ts` 44
 (43), `src/vectors.ts` 42 (37), `src/launcher.ts` 30 (29). The 37 junk are the
@@ -73,8 +75,8 @@ verbatim); non-callsign tokens; syntax highlighting.
 
 - [x] `tmp/code-silcrow-probe.ts` reproduces the numbers (it does; the table above
       is its output).
-- [x] ADR-031, ADR-044, ADR-045 read; the fence-exclusion reason confirmed false
-      for code fences.
+- [x] ADR-031, ADR-044, ADR-045 read; the fence-exclusion reason examined —
+      discovery, not a paint limit, and the paint needed its own code marker.
 - [x] The read/wrap seam named: `readSource` (`src/cli.ts:131`) wrapped **before**
       discovery; split.
 
@@ -106,7 +108,8 @@ verbatim); non-callsign tokens; syntax highlighting.
   and no receipt when the map is empty.
 - `tmp/code-silcrow-probe.ts`'s resolved-in-comments count (344) is the set the
   change admits — no more.
-- No `%okuda-vector` token leaks in any code render.
+- No `okuda-vector` or `okuda-codevec` marker leaks in any code render, in
+either colour mode.
 - `just check` and `just ship` pass.
 
 ## Notes

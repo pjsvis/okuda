@@ -125,12 +125,14 @@ const EXILED_EXTS = new Set(["jsonl"]);
  *  document. Pure.
  *
  *  Reason corrected 2026-10-12 (BRF-CODE-SILCROWS): this once claimed a
- *  badge injected inside a fence *never renders*, and code fences render
- *  literally. A token inside a code fence does render; the exclusion was
- *  always the sample's *intent*, never a paint limitation. The correction
- *  matters because the false reason hid a real case: a whole-file code
- *  render is not an authored fence, and is scanned in code mode (a
- *  `regions` predicate) where this exclusion is skipped. */
+ *  badge injected inside a fence *never renders*. The exclusion was always
+ *  discovery (a sample is verbatim), never a paint limit — and the paint
+ *  turned out to be a separate problem the claim concealed: a prose
+ *  `okuda-vector` marker is *not* consumed by the chromed fence path, because
+ *  chroma colours the content before any handler sees it. A whole-file code
+ *  render is not an authored fence: it is scanned in code mode (a `regions`
+ *  predicate) where this exclusion is skipped, and its marker is the distinct
+ *  `okuda-codevec`, painted after colour and before elision. */
 function fenceRanges(source: string): Array<[number, number]> {
   const ranges: Array<[number, number]> = [];
   let pos = 0;
@@ -285,6 +287,12 @@ export function annotateSource(
   map: Map<number, string>,
   regions?: (pos: number) => boolean,
 ): string {
+  // Code mode emits a DISTINCT marker (`okuda-codevec`). The renderer paints
+  // it after colour (a chroma fence is coloured before any handler sees it),
+  // and the distinct name keeps a *literal* `%okuda-vector:NN%` in a code
+  // sample or a test fixture untouched — an authored fence stays verbatim
+  // (BRF-CODE-SILCROWS).
+  const marker = regions === undefined ? "okuda-vector" : "okuda-codevec";
   const targetNum = new Map<string, number>();
   for (const [num, target] of map) targetNum.set(target, num);
   const occ = scanReferences(source, undefined, regions);
@@ -293,7 +301,7 @@ export function annotateSource(
     const num = targetNum.get(occ[i]!.target);
     if (num === undefined || !map.has(num)) continue; // the paint is a projection of the map
     const o = occ[i]!;
-    out = out.slice(0, o.end) + ` %okuda-vector:${num}%` + out.slice(o.end);
+    out = out.slice(0, o.end) + ` %${marker}:${num}%` + out.slice(o.end);
   }
   return out;
 }
