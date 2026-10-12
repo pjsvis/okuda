@@ -110,8 +110,7 @@ gate.
 
 - `src/keygrammar.ts` — its header says the file is a grammar and some actuators;
   the zone table and `KEYBINDINGS` are the control surface. Commit `68cb5c2` is a
-  comment whose referent had moved (`docs/2026-10-09-the-heuristics-index.md`
-  keeps the class of such findings).
+  comment whose referent had moved (`system.md`, *the comment's referent*).
 - `VECTOR_MIN` / `VECTOR_MAX` (`src/vectors.ts:68-69`) — the numeric floor read
   against the doubled-pair canon and the lexer's classification.
 
