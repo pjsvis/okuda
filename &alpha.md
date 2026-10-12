@@ -2,27 +2,28 @@
 
 ## what is this
 
-- **Okuda** renders restricted-grammar markdown in the terminal, fast.
+- **Gloam** is a restricted grammar markdown document viewer inspired by Charm Bracelet's Glow  
 
-- **Gloam** is the search: type to find filenames and content; Enter reads the document. 
+- **Silo** is a folder or a git repo on your machine where Gloam starts its search
 
-- **Silo** a ailo is a folder or a git repo on your machine
-
-- **Over `ssh://`** the silo is on another machine
-
+- **Onion Search** is a file filter that comprehends the ISO-date-string prefixed file names and optional register data 
 
 ## how to operate
 
-- **§NN** — rubricated silcrows actuate via [12-98] to render references : the reference renders
-  without silcrows, see [The silcrow explainer](docs/2026-09-04-the-silcrow.md).
+- **CNTRL+C** : jump to onion-search panel, and again to quit from Gloam
 
-- **BKSP** — unwind: back to the main document, annotated again.
+- **ENTER** : view selected onion-search document
 
-- **00** — return to he search/filter panel
+- **§NN** : rubricated silcrows actuate to render references, see docs/2026-09-04-the-silcrow.md
 
-- **CNTRL+C** — quit
+- **BKSP** : unwind from reference to main document
+
+- **00** : return from main document to onion-search panel
+
 
 ## the words
+
+- Okuda: [Why Star Trek's Design Makes Sense](https://www.youtube.com/watch?v=D24tYFIVyv0&list=TLPQMTIxMDIwMjZLb--PNCh5-g&index=11)
 
 - **A silo** is a repo that indexes itself — five tiers of documents,
   one registry each. The registries are the data; the picker is the
