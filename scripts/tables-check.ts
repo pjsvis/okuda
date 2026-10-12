@@ -180,6 +180,12 @@ function plain(s: string): string {
     .trim();
 }
 
+/** The renderer's break opportunities: a token may wrap after one of these
+ *  delimiters, so a URL or path is not one unbreakable word (render.ts
+ *  RE_BREAK_AFTER, BRF-TABLE-GLASS-FIT). The instrument must measure what the
+ *  renderer draws or it will call a table irreducible that wraps. */
+const breaksOf = (word: string): string[] => word.split(/(?<=[/._@-])/);
+
 /** Split a table row on cell separators. An ESCAPED pipe (`\|`, which the
  *  concordance brief uses inside a code span) is cell content, not a boundary —
  *  Bun.markdown honours the escape, and splitting on it invents a column. */
@@ -245,7 +251,8 @@ function findTables(text: string): Table[] {
       for (let k = 0; k < cols; k++) {
         const cell = plain(r[k] ?? "");
         nat[k] = Math.max(nat[k]!, displayWidth(cell));
-        for (const w of cell.split(/\s+/)) word[k] = Math.max(word[k]!, displayWidth(w));
+        for (const w of cell.split(/\s+/))
+          for (const s of breaksOf(w)) word[k] = Math.max(word[k]!, displayWidth(s));
       }
     }
     // The header row is rows[0] (findTables pushes it first). A multiline header
@@ -253,7 +260,8 @@ function findTables(text: string): Table[] {
     for (let k = 0; k < cols; k++) {
       const h = plain(rows[0]?.[k] ?? "");
       headNat[k] = displayWidth(h);
-      for (const w of h.split(/\s+/)) headWord[k] = Math.max(headWord[k]!, displayWidth(w));
+      for (const w of h.split(/\s+/))
+        for (const s of breaksOf(w)) headWord[k] = Math.max(headWord[k]!, displayWidth(s));
       let b = 0;
       for (const r of rows.slice(1)) b = Math.max(b, displayWidth(plain(r[k] ?? "")));
       bodyNat[k] = b;
@@ -352,7 +360,10 @@ async function read(t: Table, source: string): Promise<Reading> {
   // so `endsWith`, not `includes`. A column whose SOURCE ends in `…` renders one
   // too, with the allocator blameless — skip those columns outright.
   const elided = starts.map((_, k) => {
-    if (plain(columnText[k] ?? "").endsWith("…")) return 0;
+    // A literal `…` anywhere in the column's source makes every tail ambiguous:
+    // the renderer is blameless for a mark it did not add. (Was `endsWith` on
+    // the column; a mid-cell ellipsis in prose escaped it — BRF-TABLE-GLASS-FIT.)
+    if (plain(columnText[k] ?? "").includes("…")) return 0;
     return run.filter((l) => frag(l, k).endsWith("…")).length;
   });
   const samples = starts.map((_, k) => run.map((l) => frag(l, k)).find((c) => c.endsWith("…")) ?? "");
@@ -443,17 +454,15 @@ for (const file of files) {
     // label's full width here would measure a column the renderer never makes.
     const colNat = t.nat.map((n, k) => Math.max(t.bodyNat[k] ?? 0, t.headWord[k] ?? 0, 0));
     const natural = colNat.reduce((a, b) => a + b, 0) + GUTTER * Math.max(0, cols - 1);
-    // A column is starved when it fits whole alongside every other column's
-    // floor, and the render shows the allocator eliding it anyway. The floor is
-    // the allocator's own (3, src/render.ts) — the promise it makes each
-    // column the moment it starts handing out shares. The budget is the
-    // renderer's TARGET, not the glass: since BRF-TABLE-LADDER a table is never
-    // drawn wider than the band's cap, so judging starvation against a wider
-    // glass counts elisions the renderer was right to make.
-    const floorOthers = 3 * Math.max(0, cols - 1);
+    // A column is starved only when the table was WRAPPABLE at this fit width
+    // — every column's own floor fits — yet the render elided it anyway. That
+    // is an allocator fault: the room existed and was not used. A table whose
+    // floors do not all fit is the too-narrow state (recoverable by widening,
+    // or irreducible past the cap), not starvation (BRF-TABLE-GLASS-FIT).
     const budget = Math.min(CONTENT, BAND_CONTENT) - GUTTER * Math.max(0, cols - 1);
+    const wrappable = t.wordBudget - GUTTER * Math.max(0, cols - 1) <= budget;
     const starvedCols = colNat
-      .map((n, k) => (n + floorOthers <= budget && (r.elided[k] ?? 0) > 0 ? k : -1))
+      .map((_, k) => (wrappable && (r.elided[k] ?? 0) > 0 ? k : -1))
       .filter((k) => k >= 0);
     // HIDDEN at the cap: over the cap (no lever) and the render did NOT wrap.
     // `wrapped` is observed from the render (a body row became a multi-line
@@ -462,7 +471,12 @@ for (const file of files) {
     // produced no marker and is not hidden; the elision gate keeps that honest
     // where a literal `…` in cell content would otherwise be read as a cut.
     const wrapped = r.lines > r.rows;
-    const hidden = natural > BAND_CONTENT && !wrapped && r.elided.some((n) => n > 0);
+    // HIDDEN means "no lever": only when the target reached the band's cap.
+    // Below the cap the cut is recoverable — widen and the bytes return — so an
+    // elision at 80 is the too-narrow state, not hidden content
+    // (BRF-TABLE-GLASS-FIT).
+    const atCap = CONTENT >= BAND_CONTENT;
+    const hidden = atCap && natural > BAND_CONTENT && !wrapped && r.elided.some((n) => n > 0);
     if (!hidden && r.lines !== r.rows && r.lines >= 0) reflow++;
     // The last slot is inferred from the header geometry as whatever is left to
     // CONTENT (the header's first line is the title when the table is not
