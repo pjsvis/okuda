@@ -371,6 +371,21 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   visiting any of it**? If not, it is navigation, not context. **Prior art:**
   `docs/2026-10-10-the-unit-of-context.md`; Conklin's *lost in hyperspace*;
   **audit surface** (the references are its visible half).
+  * **The closed set is what orients** (2026-10-12). A reference you *cannot*
+  follow is information: a mention on a leaf is prose, and its non-door-ness says
+  *this is not part of the argument you are in*. Doors belong to the main
+  document; a referenced document renders clean (ADR-031's two-render contract),
+  so the set of exits is small and knowable. Two conditions make the reader
+  unlost — **bounded doors** (a closed set that defines the current context) and
+  **a cheap, guaranteed return** (the main document one backspace away, the
+  stack depth one). And the valuation is the mirror of **audit surface**: a
+  silcrow makes the *check* cheap, so you check; its absence makes the *stop*
+  cheap, so you stop. An interface that knows when to let you stop is as
+  valuable as one that knows where to send you. **Test:** at any point, can the
+  reader name the whole set of places they can go, and the one way back? If not,
+  it is navigation, not context. **Boundary:** the relief is sound only when the
+  unreachable thing does not matter; when it does, the move is to make it the
+  main document — deliberately, not by grazing.
 
 * **Derived, not specified**: a **specified** structure — a knowledge graph, a
   taxonomy, an embedding index — must have its nodes and edges **supplied by
