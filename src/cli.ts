@@ -13,7 +13,7 @@
 
 import { detectColorMode } from "./ansi";
 import { loadPalette } from "./palette";
-import { renderDocument, wrapWholeFile, isWholeFileFence, commentRegions } from "./render";
+import { renderDocument, wrapWholeFile, regionsForFile } from "./render";
 import { runTui, displayPath } from "./tui";
 import { runLauncher, invokedAsGloam, rankedShortlistEntries } from "./launcher";
 import {
@@ -269,7 +269,7 @@ async function main(): Promise<void> {
     // cited in a comment paints while the same token in a string literal — a
     // test fixture, demo data — does not. The paint already works inside the
     // fence; the fence was only gating discovery.
-    const regions = args.file && isWholeFileFence(args.file) ? commentRegions(source) : undefined;
+    const regions = regionsForFile(args.file, source);
     const map = wantMap ? jumpMapFor(source, silcrowResolves, regions) : new Map<number, string>();
     const source2 = process.stdout.isTTY && wantMap ? annotateSource(source, map, regions) : source;
     // Wrap AFTER annotation (the tokens ride in the fence) and BEFORE the

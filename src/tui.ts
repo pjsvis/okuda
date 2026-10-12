@@ -17,11 +17,12 @@
 
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
 import { annotateSource, appendReferences, jumpMapFor, CLONE_TOKEN } from "./vectors";
+
 import { cloneArgs, editArgs, resolveEditor } from "./clone";
 import { frameBounds, headingLines, pageStep, paragraphStarts, snapFrame } from "./frames";
 import { readOnlyActive, splitKeyEvents, verbFor, type Verb } from "./keygrammar";
 import { loadPalette, type Palette } from "./palette";
-import { renderDocument, wrapWholeFile } from "./render";
+import { renderDocument, wrapWholeFile, regionsForFile } from "./render";
 import { isWithinRoot } from "./root";
 import { basename, dirname, isAbsolute, join, resolve } from "node:path";
 import { appendFileSync, existsSync } from "node:fs";
@@ -727,7 +728,12 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   // a projection of the map — the main render annotates, dereferenced
   // renders are clean.
   const mainFile = opts.file;
-  const deriveMain = (text: string): Map<number, string> => jumpMapFor(text, opts.resolves);
+  // A code file is a document for its comment prose (BRF-CODE-SILCROWS): the
+  // regions predicate restricts discovery to comments, so a string literal
+  // quoting a callsign is data and never paints. `regionsForFile` is the one
+  // composition, shared with the streaming render.
+  const deriveMain = (text: string): Map<number, string> =>
+    jumpMapFor(text, opts.resolves, regionsForFile(mainFile, text));
   let mainText = "";
   let mainJumps: Map<number, string> = new Map();
   let backstack: { file: string; scroll: number }[] = [];
@@ -747,7 +753,11 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   }
   const initialRender = initialFetch.ok
     ? await renderAtGlass(
-        appendReferences(annotateSource(initialFetch.text, mainJumps), mainJumps, true),
+        appendReferences(
+          annotateSource(initialFetch.text, mainJumps, regionsForFile(mainFile, initialFetch.text)),
+          mainJumps,
+          true,
+        ),
       )
     : [];
   const init = gateFetch(null, initialFetch, initialRender);
@@ -977,7 +987,13 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // settled on. Keeping the loop here is what multiplied a drag's events by three.
     const next = fetch.ok
       ? await renderLines(
-        atMain ? appendReferences(annotateSource(fetch.text, mainJumps), mainJumps, true) : fetch.text,
+        atMain
+          ? appendReferences(
+            annotateSource(fetch.text, mainJumps, regionsForFile(mainFile, fetch.text)),
+            mainJumps,
+            true,
+          )
+          : fetch.text,
         cols,
       )
       : [];
@@ -1052,7 +1068,11 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // Back is a MAIN render: annotated, and it ends with the map's
     // receipt (ADR-047) — the same foot the initial render carries.
     const next = await renderLines(
-      appendReferences(annotateSource(fetch.text, mainJumps), mainJumps, true),
+      appendReferences(
+        annotateSource(fetch.text, mainJumps, regionsForFile(mainFile, fetch.text)),
+        mainJumps,
+        true,
+      ),
       dims().cols,
     );
     present(fetch, next, prev.scroll);

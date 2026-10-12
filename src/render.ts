@@ -829,6 +829,17 @@ export function commentRegions(text: string): (pos: number) => boolean {
   return (p) => spans.some(([a, b]) => p >= a && p < b);
 }
 
+/** The discovery regions for a file's source: a code file's comments, or
+ *  `undefined` for markdown prose (BRF-CODE-SILCROWS). One composition, so
+ *  the streaming render and the TUI cannot drift — the lesson the silcrow
+ *  gate already learned ("one composition", `makeSilcrowGate`). */
+export function regionsForFile(
+  file: string | null | undefined,
+  text: string,
+): ((pos: number) => boolean) | undefined {
+  return file && isWholeFileFence(file) ? commentRegions(text) : undefined;
+}
+
 /** Build the Bun.markdown handler set. */
 function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => string | null> {
   const { styler, width } = ctx;

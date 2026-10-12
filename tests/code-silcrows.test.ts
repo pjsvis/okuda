@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { commentRegions, wrapWholeFile, renderDocument } from "../src/render";
+import { commentRegions, regionsForFile, wrapWholeFile, renderDocument } from "../src/render";
 import { scanReferences, jumpMapFor, annotateSource, appendReferences } from "../src/vectors";
 import { stripANSI } from "../src/width";
 import { makeSilcrowGate } from "../src/root";
@@ -22,6 +22,14 @@ describe("code-comment silcrows (BRF-CODE-SILCROWS)", () => {
     expect(r(src.indexOf("still inside"))).toBe(true);
     expect(r(src.indexOf("const x"))).toBe(false);
     expect(r(src.indexOf("ADR-032"))).toBe(true);
+  });
+
+  test("regionsForFile: comments for a code file, undefined for markdown", () => {
+    const code = regionsForFile("demo.ts", "// cites ADR-031");
+    expect(code).toBeDefined();
+    expect(code!("// cites ADR-031".indexOf("ADR-031"))).toBe(true);
+    expect(regionsForFile("doc.md", "see ADR-031")).toBeUndefined();
+    expect(regionsForFile(null, "// cites ADR-031")).toBeUndefined();
   });
 
   test("a scheme colon is not a comment start", () => {
