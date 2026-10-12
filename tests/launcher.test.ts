@@ -337,7 +337,11 @@ describe("launcher — conformance smoke: the search the operator runs", () => {
     expect(proc.exitCode).toBe(0);
     const out = proc.stdout.toString();
     expect(out).toContain("load-bearing"); // evidence rows
-    expect(out).not.toContain("DEPENDENCIES.md"); // root files are shelf, not dive
+    // Root files are the shelf, not the dive — so assert a root *row*, not the
+    // bare substring. `not.toContain` also caught the nested candidate
+    // `templates/silo/DEPENDENCIES.md` once the silo template landed
+    // (2026-10-12); the root file itself is correctly absent from the dive.
+    expect(out.split("\n").some((l) => l.startsWith("DEPENDENCIES.md"))).toBe(false);
   });
 
   test("entry path: --entries with no query lists the shelf", () => {
