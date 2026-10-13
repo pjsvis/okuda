@@ -7,7 +7,7 @@ status: recorded — the law, one sitting's scoreboard as its receipt, and the c
 
 # The mechanism is the fallible half
 
-> ◆ One sitting. **Fourteen** mechanism claims falsified by measurement; **zero** goals
+> ◆ One sitting. **Eighteen** mechanism claims falsified by measurement; **zero** goals
 > falsified. Two goals were revised, and both by an *argument* — never by a check.
 
 ## The law
@@ -38,6 +38,10 @@ Offered as a table so it can be argued with rather than admired.
 | "`script -q` is the pty harness" | it needs a tty on its own stdin; it dies when the loop drives it |
 | "the redundant endpoints are superfluous" | they are the **axis**, not claims — the position has no referent without them |
 | "the local delta needs the server" | it needs a cache **key**; the render is already a pure function |
+| "we are still not rendering our special characters" | 0 of 514 lost in prose, code spans and headings — but a mermaid label loses **465 of 514**, and the ambiguous-width class is undeclared |
+| "a combining mark is one column wide" (my reference) | Unicode says **Mn/Me/Cf own no column** — so this instrument reported okuda's *correct* answers as defects |
+| "the survival detector reads zero losses" | it indexed a per-character **map** as a boolean: `not {…}` is always `False`, so every reading was zero and the control could not fire |
+| "the property escapes all work" | one unsupported pattern (`\p{East_Asian_Width=…}`) is a **parse error**, which killed the whole probe rather than one row |
 
 Against that: the frame's clean edges; *know where you are*; *a format that assists decision
 and allows inspection*; *the vocabulary is the scale*; *the registry is two orthogonal
@@ -96,7 +100,8 @@ on the apparatus, and it is not a licence.
 
 Count, per sitting's record, the mechanism claims the corpus falsified against the goals an
 argument revised. **If mechanisms are not the more frequently corrected half, this law is
-wrong.** (2026-10-13: 14 to 0.)
+wrong.** (2026-10-13: 18 to 0, and four of the eighteen were falsified *within the hour* of
+writing the first draft of this table.)
 
 ## Related
 
