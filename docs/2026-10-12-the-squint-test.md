@@ -11,7 +11,9 @@ status: measured — the controls pass, the corpus is sampled twice, and the num
 > header and **515** close on the renderer's terminator, with no blank line above
 > the head or below the foot. At **31 columns** — 39% of the default glass — every
 > document still carries headings, rules and prose, **90%** still carry diagram
-> glyphs, and the mark of damage rises from **92 documents to 287**.
+> glyphs, and the mark of the cut rises from **92 documents to 287**. **Every one
+> of those cuts is recoverable** — the ladder confirms the law per document, and
+> only **3 documents in 516** lose anything that widening cannot restore.
 
 ## The claim
 
@@ -57,6 +59,7 @@ Three things make it checkable rather than impressionistic:
 |---|---|---|
 | Frame contract | Do the brackets hold, and where is blank allowed? | `scripts/okudagram-probe.ts` |
 | Squint ladder | Which classes survive the narrowing, and what is lost? | `scripts/squint-probe.ts` |
+| Recoverability | Does widening restore, and what can it not restore? | `scripts/elision-monotone.ts` |
 
 Both take the whole tracked corpus (`git ls-files '*.md'` — **515 documents on
 2026-10-12**; the count is a reading, not an invariant, and every number below
@@ -124,11 +127,17 @@ Four readings, and the fourth is the one that matters:
    contract's own standard — *a degradation that is lossless or marked*
    (`docs/2026-10-08-the-resize-contract.md`) — applied to width rather than
    height.
-4. **The corpus is already damaged at its own default.** At 80 columns, **92 of
-   515 documents (18%) lose content to a cut, and 9 lose diagram art.** This is
-   not a distance problem; it is a legibility fact at the house's default glass,
-   and it lives in the render plane beside `ADR-LEGIBILITY-GATE-049`. It is the
-   largest open finding here.
+4. **The cut at the default is the model working, not damage.** At 80 columns
+   **92 of 515 documents (18%) carry a cut**, and this was first read here as a
+   legibility fault at the house's own glass. **Corrected in place, 2026-10-12,
+   after reading the decision that owns the class.** `ADR-TABLE-EDGE-CUT-055`
+   states the law and it is older than this document: *below the cap the edge cut
+   is recoverable — the reader's lever is widen, and widening brings the bytes
+   back; past the cap there is no lever, so the cut no longer truncates, it
+   **hides**, and hiding is the one thing the model refuses.* A recoverable cut
+   is admitted by construction. The open question is therefore not *how many
+   cuts* — the third result measures that, and the answer is that they all come
+   back — but whether anything is left that widening cannot repair.
 
 **And the inflation is prose.** Halving the width multiplies the line count by
 2.4, and the ten worst inflators account for only 187 of the 1,864 net glyph
@@ -136,6 +145,47 @@ lines added — a tenth. The growth is ordinary wrapping (the worst single docum
 adds 1,086 lines and 12 glyph lines). Diagram art does not reflow; it is cut. So
 the far read is not *damaged* by narrowing as much as it is **lengthened** — which
 is a scroll problem, and therefore the frame's problem, not the viewport's.
+
+## Result three — the cut is recoverable, and the residue is named
+
+Class survival says the map holds. It does not say the cut can be undone, which
+is the whole of the cut's defence: *widening brings the bytes back.* Tables are
+covered (`tests/table-fit.test.ts` asserts *elision is monotone in the glass*,
+and `scripts/tables-check.ts` owns the class). Nothing asserted it for diagram
+art, code fences or prose. So: **the number of cut lines must be non-increasing
+as the glass widens** — a document that cuts more at a wider rung is a *hide*, and
+a hide is the defect class, not the cut.
+
+| width | cut lines | documents | docs losing art |
+|---|---|---|---|
+| 60 | 1,587 | 137 | 25 |
+| 74 | 598 | 100 | 16 |
+| 80 | 325 | 70 | 10 |
+| 100 | 64 | 24 | 1 |
+| 120 | 29 | 5 | 1 |
+| 160 | **10** | **2** | **1** |
+
+**The law is universal.** Cut count falls at every rung, and **no document**, at
+any step, cuts more at a wider glass. `ADR-TABLE-EDGE-CUT-055`'s recoverability
+clause is not a table property; it is a property of the renderer.
+
+**And the residue is named.** At 160 columns — past the band cap of 116 — three
+documents of 516 still lose content that widening cannot repair:
+
+| cut lines | art | document |
+|---|---|---|
+| 6 | ok | `docs/2026-10-08-ai-human-development-workflow-08.md` |
+| 4 | ok | `docs/2026-10-08-ai-human-development-workflow-06.md` |
+| 0 | **lost** | `docs/2026-10-12-the-squint-test.md` |
+
+This is the set `ADR-TABLE-EDGE-CUT-055` hands back to the document — *"Computer
+says NO: Too ugly"*, an instrument that names the outlier rather than teaching the
+renderer to fold it — and for tables the instrument already does it
+(`scripts/tables-check.ts`, six tables at the cap). For the three remaining
+classes **nothing named it.** Now something does, and one of the three is this
+document: its own mermaid fence draws wider than 160 columns, so the measurement
+is one of its own outliers. The remedy is the document's — reshape the diagram —
+which is the law working as stated.
 
 ## The term
 
@@ -182,6 +232,14 @@ any corpus number was read:
 
 ## Open edges
 
+The 18%-at-80 edge this document opened with is **closed**: the cuts are
+recoverable by construction and measured so, and the irreducible residue is three
+documents named above, each a document problem rather than a renderer one.
+
+- **The irreducible set.** Two documents cut, one loses art, at any width. They
+  are named; whether to reshape them is an authoring call, and the shape of the
+  instrument is owed: `elision-monotone.ts` should become the non-table sibling
+  of `scripts/tables-check.ts` with a `--strict` gate once the corpus obeys.
 - **The gutter.** 315 diagram blocks; 82% sit flush to the 2-column margin. But the
   median right slack is 2 columns — most diagrams fill the glass. Only **12%** are
   the side-pushed case (flush left *and* ≥20 columns unused). A rendered diagram
@@ -189,7 +247,7 @@ any corpus number was read:
   centring the document is not — and the measurement says the case is a narrow
   class, not a policy.
 - **The 18% already cut at 80.** The largest open item, and it is not about the
-  viewport at all.
+  viewport at all. **Closed 2026-10-12** — see *Open edges* and Result three.
 - **The cap mark** (`BRF-BOUNDARY-MARK`). The receipt's truncation and the cut are
   one family, separated by the same rule: a mark is legitimate when it reports a
   **fixed fact about the artifact** (this line was cut; the receipt was truncated)
@@ -205,6 +263,8 @@ any corpus number was read:
 - **The two audiences** — `docs/2026-08-26-the-okuda-net.md`
 - **The frame rule** — `briefs/2026-08-29-brief-okudagram-frame.md` (`BRF-PAGED-OKUDAGRAM`)
 - **Elision as the universal policy** — `decisions/050-universal-elision.md` (`ADR-UNIVERSAL-ELISION-050`)
+- **The table edge cut, and recoverability as the test** — `decisions/055-table-edge-cut.md` (`ADR-TABLE-EDGE-CUT-055`)
+- **Table fit to the glass** — `briefs/2026-10-12-brief-table-glass-fit.md` (`BRF-TABLE-GLASS-FIT`)
 - **The legibility gate** — `decisions/049-legibility-gate.md` (`ADR-LEGIBILITY-GATE-049`)
 - **The resize contract** — `docs/2026-10-08-the-resize-contract.md`
 - **The ornament that re-encodes** — `docs/2026-09-19-the-ornament-that-pays-rent.md`
