@@ -169,23 +169,26 @@ a hide is the defect class, not the cut.
 any step, cuts more at a wider glass. `ADR-TABLE-EDGE-CUT-055`'s recoverability
 clause is not a table property; it is a property of the renderer.
 
-**And the residue is named.** At 160 columns — past the band cap of 116 — three
+**And the residue is named.** At 160 columns — past the band cap of 116 — two
 documents of 516 still lose content that widening cannot repair:
 
 | cut lines | art | document |
 |---|---|---|
 | 6 | ok | `docs/2026-10-08-ai-human-development-workflow-08.md` |
 | 4 | ok | `docs/2026-10-08-ai-human-development-workflow-06.md` |
-| 0 | **lost** | `docs/2026-10-12-the-squint-test.md` |
 
 This is the set `ADR-TABLE-EDGE-CUT-055` hands back to the document — *"Computer
 says NO: Too ugly"*, an instrument that names the outlier rather than teaching the
 renderer to fold it — and for tables the instrument already does it
-(`scripts/tables-check.ts`, six tables at the cap). For the three remaining
-classes **nothing named it.** Now something does, and one of the three is this
-document: its own mermaid fence draws wider than 160 columns, so the measurement
-is one of its own outliers. The remedy is the document's — reshape the diagram —
-which is the law working as stated.
+(`scripts/tables-check.ts`, six tables at the cap). For the cut classes **nothing
+named it.** Now something does.
+
+**A correction, made the same day.** The first run of this probe listed a third
+document — *this* one — as losing diagram art. It lost nothing: this document has
+no mermaid fence, and it quotes the words `art elided` in prose while explaining
+the mechanism. The detector matched its own subject matter. The pattern is now
+anchored on the indicator's leading `⋮`, which is what the renderer emits and
+what prose about it does not.
 
 ## Two floors, and the recommendation to the author
 
@@ -212,7 +215,8 @@ it would need, produced by an instrument at authoring time and **never by chrome
 at read time** (the argument `BRF-BOUNDARY-MARK` makes against a warning that
 fires on every render of a growing view). `scripts/tables-check.ts` already
 speaks this verdict; `--strict` is the same verdict for the other three classes,
-and it currently names three documents: two that cut, and this one.
+and it currently names two documents — both workflow notes, both carrying a word
+no cap can hold, which is an authoring call and not a renderer one.
 
 The contract, then, in one line: **okuda makes the author's work look good as
 long as the document's floor fits the glass's.** Below that line the honest output
@@ -260,6 +264,11 @@ any corpus number was read:
    every fence at every width, so a `⋮`-based detector would have reported damage
    where there was none. The fix was to read the renderer's own words — `art
    elided` — which is what `ADR-UNIVERSAL-ELISION-050` was for.
+5. **A detector can match its own subject matter.** The `art elided` pattern then
+   matched this document's *prose about* `art elided`, listing a document with no
+   diagram as losing one. The pattern is now anchored on the indicator's leading
+   `⋮`; the general lesson is that a probe reading a corpus that documents the
+   probe is reading itself.
 
 ## Open edges
 
@@ -296,7 +305,8 @@ documents named above, each a document problem rather than a renderer one.
 - **The frame rule** — `briefs/2026-08-29-brief-okudagram-frame.md` (`BRF-PAGED-OKUDAGRAM`)
 - **Elision as the universal policy** — `decisions/050-universal-elision.md` (`ADR-UNIVERSAL-ELISION-050`)
 - **The table edge cut, and recoverability as the test** — `decisions/055-table-edge-cut.md` (`ADR-TABLE-EDGE-CUT-055`)
-- **Table fit to the glass** — `briefs/2026-10-12-brief-table-glass-fit.md` (`BRF-TABLE-GLASS-FIT`)- **The legibility gate** — `decisions/049-legibility-gate.md` (`ADR-LEGIBILITY-GATE-049`)
+- **Table fit to the glass** — `briefs/2026-10-12-brief-table-glass-fit.md` (`BRF-TABLE-GLASS-FIT`)
+- **The legibility gate** — `decisions/049-legibility-gate.md` (`ADR-LEGIBILITY-GATE-049`)
 - **The resize contract** — `docs/2026-10-08-the-resize-contract.md`
 - **The ornament that re-encodes** — `docs/2026-09-19-the-ornament-that-pays-rent.md`
 - **The ergonomic box** — `docs/2026-09-04-the-ergonomic-box.md`

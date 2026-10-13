@@ -69,7 +69,10 @@ const GATE_LADDER = [60, 80, 120, 160];
 const LADDER = GATE ? GATE_LADDER : REPORT_LADDER;
 
 const CUT = "\u2026"; // …
-const ART_LOST = /art elided/;
+/** Anchored on the leading `⋮`: the renderer's indicator line opens with it, and
+ *  a document that merely QUOTES the phrase in prose (this project's own
+ *  documents do, at length) must not be read as losing a diagram. */
+const ART_LOST = /^\s*\u22ee.*art elided/;
 
 /** Replace the source's own ellipses — see the header. One character, same
  *  width, no break semantics, so the composed layout is unchanged. */
