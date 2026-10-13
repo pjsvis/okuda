@@ -39,6 +39,30 @@ Protocol mechanics (locus tags, wrap-up) and the protocol-wide terms live in `sy
   marked*, applied to width rather than height);
   `docs/2026-10-12-the-squint-test.md` (the measurement and the instruments).
 
+* **Control surface**: a panel is a **control surface** when its **references
+  actuate** — reading it and operating it are one gesture, because the `§NN` a row
+  carries is the actuator for the thing that row names. The distinction is a
+  *property*, not a class: a panel whose references are painted but inert is a
+  **display**, and one whose references resolve is a surface you steer from.
+  **Observed 2026-10-13** on `&briefs` in the glass — read a row, `§NN` to
+  dereference, `u` to unwind, `99` to promote; the operator's words, *"it is most
+  definitely a decision control surface."*
+  * **Test:** do the references actuate? If the reader cannot *act* on the thing a
+  panel names, the surface is a display and any reassurance it offers is
+  decorative.
+  * **Failure it names:** the surface that looks actuatable and is not — the
+  painted silcrow that jumps nowhere (`ADR-VALIDATED-SILCROWS-044` retired 117 of
+  them), and the `§` a retraction must paint back out when the target dies or is
+  exiled (`ADR-SILCROW-PATHS-045`).
+  * **Prior art:** the physical and audio senses of the phrase — an aircraft's
+  aileron, elevator and rudder are the moving parts that act on the medium, and a
+  mixing desk is a control surface rather than a display; the panel thesis at
+  `docs/2026-08-26-the-okuda-net.md:129-130` (*no interactivity, just structured
+  information in a readable form… you decide what to do* — the computer retrieves,
+  the human acts); the actuator grammar at `ADR-MAIN-DOCUMENT-031`; and
+  **references, not hypertext** (the reference is a map you hold — this is the map
+  you can act from).
+
 ---
 
 ## Register open — the gathering
