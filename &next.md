@@ -9,6 +9,16 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 
 ## Landed today — the debt this table was tracking
 
+- **BRF-TABLE-SLOT-INSTRUMENT** (2026-10-13) — the header/body drift filed by eye was a
+  **measurement artifact**, and the two traps that made it are named: the renderer receives
+  `glass − 4` (the document margin, `src/render.ts:348`), so slots computed from the glass
+  disagree with the bytes; and a cell's parsed text is not its markdown source (a link's URL
+  is visible content). `tableSlots` is exported and `renderTable` calls it, so the renderer
+  and the instrument are one function; the output-only alignment check finds **0 of 1676**
+  table×glass combinations disagreeing, and the monster table at glass 160 draws
+  `2/17/32/44/54/65/73/85/97` for header and body alike. A body cell wider than its slot
+  wraps to it before padding, so the drift **cannot** be drawn. · see
+  `briefs/2026-10-13-brief-table-slot-instrument.md`, `tests/table-slot.test.ts`
 - **The brief's status vocabulary is settled** (2026-10-13,
   ADR-BRIEF-LIFECYCLE-061) — the Hygiene entry it pays had stood since 2026-10-05:
   ten unrecognised words, reported loudly and never guessed at. They were **five**.
@@ -92,13 +102,6 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
   clock-free), reviewed td-3da242 (archive sweep).
 
 ## Recommended — start these next
-
-- **BRF-TABLE-SLOT-INSTRUMENT** (2026-10-13) — the table's columns are
-  **unobservable from its output**, so a header/body drift in the wrapped row block
-  sits measured but unattributed: +2, +1, +1, +1, 0, 0, 0, 0 across nine columns.
-  Three of my own derivations were wrong before the fourth measurement held. The
-  instrument is to export the slot computation and ask it directly. · **S**
-  — see `briefs/2026-10-13-brief-table-slot-instrument.md`
 
 - **BRF-READ-ACTUATOR** (td-166367, 2026-10-10) — the speech actuator: **77
   calls a function that does the speech thing**, and what it does is the epic's

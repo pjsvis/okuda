@@ -4,11 +4,57 @@ callsign: BRF-TABLE-SLOT-INSTRUMENT
 date: 2026-10-13
 ---
 
-# Brief: The table's columns are unobservable — a slot instrument, and a header/body alignment test
+# Brief: The slot instrument — the table's columns made observable, and header/body alignment pinned
 
 **Date:** 2026-10-13
-**Status:** Open — measurement made, cause **unattributed**, instrument not built
+**Status:** Done — answered **NO**: the drift was a **measurement artifact**, and the instrument is built
 **Lineage:** the operator's observation while reading the rendered `docs/tables-monster.md`, 2026-10-13 — *"noting a right alignment in the columns"* — and the investigation it forced, in which **three of my own derivations were wrong before the fourth measurement held**
+
+## The answer (2026-10-13, ses_4c3236)
+
+**No drift is drawn, and none can be.** The hypothesis's *premise* holds — in the wrapped
+state most body cells are wider than their slots (on the monster table's first row, 24 of
+81) — but its *mechanism* cannot fire. A body cell wider than its slot is wrapped to that
+slot before it is padded (`src/render.ts:1782`: the `wrapANSI(cell.text, { width: slot })` call),
+and a table that is *not* wrapped has `slots = colWidth`, which is every cell's natural
+width by definition. `padDisplay`'s unpadded-on-overflow branch (`src/width.ts:378`) is
+therefore unreachable for a generic cell. Header and body are padded from the same `slots`
+array by the same `padNatural`, so their starts agree **structurally**, not by coincidence.
+
+**The measurement, corrected.** The output-only instrument — the header's pipes define the
+grid, and every body row must show a 3-space gutter at each pipe's position — finds **0
+disagreements across 1676 table×glass combinations** (every `.md` in the silo, at glass 80,
+100, 120, 160). On the monster table's first row at glass 160 the drawn grid is
+`2/17/32/44/54/65/73/85/97` for **both** the header and every body block.
+
+**Why the original numbers were wrong — two traps, both now closed by the instrument:**
+
+1. **The content width, not the glass.** The renderer receives `glass − 4`
+   (`renderDocument`, the 2+2 document margin: `src/render.ts:348`). Slots computed from
+   the glass disagree with slots computed from the content width, and the two look like
+   drift when read against the same bytes. This is the likely origin of the artifact.
+   `tableSlots` takes the **content** width, as its docstring now says.
+2. **Raw source, not parsed cells.** A cell's text as `Bun.markdown` hands it over is not
+   its markdown source: a `[text](url)` link flattens to `text url` (and its URL is a
+   visible, unbreakable word). Slots computed from raw source are wrong for any table with
+   a link — the `&briefs.md` table below the registry is the worked case.
+
+There is also a flat contradiction in the original record: the monster table's natural
+width is 158 > the band (116), so it is **always** in the wrapped state. Its claimed
+*"natural state"* numbers (`2/19/34/…/107`) cannot be of this table at all — and no
+nine-column table anywhere in the corpus has them. The observation was of something other
+than the bytes on screen.
+
+**What is delivered:** `tableSlots` (`src/render.ts`) is exported and unit-tested;
+`renderTable` calls it, so the renderer and the instrument can no longer disagree; and
+`tests/table-slot.test.ts` pins header/body column agreement in the fitted **and** wrapped
+states, with the overhang control shown to fail when body wrapping is disabled.
+
+---
+
+## The original record (kept: the artifact is the evidence)
+
+### The observation
 
 ## The observation
 
@@ -88,18 +134,20 @@ Proposed, in order:
 
 ## Acceptance
 
-- `tableSlots` (or equivalent) is exported and unit-tested.
-- The hypothesis is answered **yes** (a bug, with a reproduction and a fix) or **no** (an
-  artifact, with the measurement corrected) — stated in this brief, whichever way it falls.
-- A rendered-output test asserts header/body column agreement in the natural **and** wrapped
-  states.
-- `just check` green; `just test` green.
+- [x] `tableSlots` (or equivalent) is exported and unit-tested (`src/render.ts`,
+  `tests/table-slot.test.ts`).
+- [x] The hypothesis is answered **no** — the measurement corrected (above): no overhang is
+  drawn; 0/1676 corpus combinations disagree.
+- [x] A rendered-output test asserts header/body column agreement in the natural **and**
+  wrapped states (`tests/table-slot.test.ts`), and the overhang assertion is shown to fail
+  when body wrapping is disabled (the gate can fail).
+- [x] `just check` and `just test` green.
 
 ## Preconditions
 
-- [x] The drift is reproduced and recorded (the table above), with its ruled-out causes.
+- [x] The drift is recorded (the table above), with its ruled-out causes.
 - [x] The three failed derivations are recorded, so the next attempt does not repeat them.
-- [ ] `just check` and `just test` green before starting.
+- [x] `just check` and `just test` green before starting.
 
 ## Related
 
@@ -111,3 +159,7 @@ Proposed, in order:
   the common one
 - `docs/2026-10-13-the-mechanism-is-the-fallible-half.md` — the three wrong derivations, in
   their natural habitat
+- `tests/table-slot.test.ts` — the alignment instrument: `tableSlots`' contract, and
+  header/body column agreement in both states
+- `src/render.ts:1628` (`tableSlots`) — the exported slot computation; `renderTable` and
+  every checker now share it
