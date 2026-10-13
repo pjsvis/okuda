@@ -7,7 +7,9 @@ date: 2026-10-10
 # Brief: The boundary mark — the receipt elides the addresses the cap never realised
 
 **Date:** 2026-10-10
-**Status:** Open
+**Status:** Done (2026-10-13) — all seven Work Plan items. See *Outcome* below: the fixture
+numbers were re-measured (the corpus grew), the mark is plain rather than muted
+(a declared deviation), and the suppression term is an amendment to ADR-047.
 **TD:** BRF-BOUNDARY-MARK (epic; depends on BRF-ADDRESS-CAP)
 
 ## Lineage
@@ -142,33 +144,70 @@ tests.
 
 ## Preconditions
 
-- [ ] BRF-ADDRESS-CAP fork B landed: `scanReferences` returns every occurrence, and the
-      remaining cap is on destinations (`briefs/2026-09-14-brief-address-cap.md`;
-      `docs/2026-09-15-the-cap-is-on-the-wrong-quantity.md`). Without it the predicate
-      cannot tell full from truncated.
-- [ ] A truncated fixture exists — the corpus's own `&briefs.md` (113 distinct → 80)
-      and `briefs/index.md` (93 → 80) are live fixtures; a synthetic 81-destination
-      source pins the unit case.
-- [ ] The false-positive control exists — a source with exactly 80 distinct destinations
-      and no repeats, which must render no mark.
-- [ ] `tmp/cap-mark-uncapped.ts` and `tmp/cap-mark-suppression.ts` reproduce the Evidence
-      table (scratch, gitignored; the numbers above are their output).
-- [ ] `just check` and `just test` green before starting.
+- [x] BRF-ADDRESS-CAP fork B landed: `scanReferences` returns every occurrence, and the
+      remaining cap is on destinations (`briefs/2026-09-14-brief-address-cap.md`).
+      **Verified 2026-10-13** — landed the same day, with `deriveReferences` returning
+      `truncated` as part of it, because that fact is only computable once discovery stops
+      slicing.
+- [x] A truncated fixture exists — the corpus's own documents are live fixtures. **The
+      numbers here have grown:** `&briefs.md` is now **120 distinct → 80** (was 113) and
+      `briefs/index.md` **101 → 80** (was 93); *never realised* is **61, not 46**. A
+      synthetic 81-destination source pins the unit case.
+- [x] The false-positive control exists — a source with exactly 80 distinct destinations
+      and no repeats, which must render no mark. Pinned as a test, not merely asserted.
+- [x] The scratch probes have been superseded by `scripts/elision-monotone.ts` and the
+      address-cap measurement; the numbers above were re-taken 2026-10-13.
+- [x] `just check` and `just test` green before starting.
 
 ## Work Plan
 
-1. [ ] Return `truncated` from the derivation: the document's distinct destinations
-      exceed the map's entries after the address cap applies.
-2. [ ] Emit the mark in `referencesSection` when `truncated` — the final line, muted,
-      no silcrow.
-3. [ ] Add the term to the suppression: a truncated map is never suppressed.
-4. [ ] Thread the fact through the `cli.ts` and `tui.ts` call sites.
-5. [ ] Pin it: the vectors test gets the truncated case, the exact-80 control, the
-      self-tabling-truncated case, and the no-silcrow-on-the-mark assertion.
-6. [ ] The record: amend ADR-047 (its suppression condition gains `!truncated`) and
-      record the boundary-mark pattern — a new ADR if it outgrows the amendment; run the
-      palimpsest protocol on any amendment (`playbooks/decisions-playbook.md`).
-7. [ ] `just check` green; `just test` green.
+1. [x] Return `truncated` from the derivation — the document's distinct destinations
+      exceed the map's entries. **Landed with BRF-ADDRESS-CAP** as
+      `deriveReferences(source) → DerivedMap`, so the predicate and the separation landed
+      together rather than leaving the knowledge derived and discarded.
+2. [x] Emit the mark in `referencesSection` when `truncated` — the final line, no silcrow.
+      **Deviation:** **plain, not muted**, and it is a deviation worth the name — no muted
+      channel exists from a markdown source, the receipt's other lines are not muted
+      either, and a new paint channel for one glyph is the ceremony this house refuses.
+      What distinguishes the mark is what it is *not* (no silcrow, no number, nothing
+      actuable), which is the half this brief argued for.
+3. [x] Add the term to the suppression: `annotated && !truncated && referencesCovered`.
+      Amends ADR-047's 2026-10-09 ruling — see the annotation of 2026-10-13.
+4. [x] Thread the fact through the call sites: `cli.ts` uses `deriveReferences`;
+      `tui.ts`'s `deriveMain` returns the map **and** the fact, carried as
+      `mainTruncated` to all three `appendReferences` calls.
+5. [x] Pin it — four cases in `tests/vectors.test.ts`: 81 distinct → 80 rows and one bare
+      `…`; exactly 80 → **no** mark (the false-positive control); a truncated
+      self-tabling document keeps its receipt and the mark; the mark identical on the
+      painted and the plain rung. Plus the structural case: an empty map yields no mark,
+      so `--no-references` drops the receipt and the mark with it.
+6. [x] The record: ADR-047 amended in place (palimpsest, dated 2026-10-13). **No new ADR**
+      — the mark is a projection of a decision this ADR already owns, and a second
+      decision file for one `…` would split the law.
+7. [x] `just check` green; `just test` green (740 pass).
+
+## Outcome (2026-10-13)
+
+**The mark has a home on arrival, verified on the live documents:**
+
+| document | distinct | mapped | never realised | receipt | mark |
+|---|---|---|---|---|---|
+| `&briefs.md` | 120 | 80 | **40** | kept | **yes** |
+| `briefs/index.md` | 101 | 80 | **21** | kept | **yes** |
+
+Both keep their receipt (`referencesCovered` is false: their bodies are tables, never
+list items), so the mark renders on both.
+
+**What the first annotation's measurement is now.** This brief's Evidence table put the
+reach at *2 of 389* files and *46* destinations. It is **2 of 517** and **61** — the
+boundary is growing with the corpus, which is the case for marking rather than warning:
+a warning would now be firing on two renders and would keep firing on more.
+
+**The one thing this brief did not settle, and did not need to.** The mark says the list
+has an end; it does not say *how many* addresses the document asked for. That is
+deliberate (*why not a count*), and the consequence is honest: a reader who wants the
+number opens the document. The alternative — a count that moves on every render of a
+growing index — is the shape both this brief and ADR-047 refuse.
 
 ## Acceptance
 

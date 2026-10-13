@@ -12,7 +12,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-10-12 | BRF-CODE-SILCROWS | done | Code-comment silcrows — a rendered code file is a document for its prose | 2026-10-12-brief-code-silcrows.md |
 | 2026-10-12 | BRF-TABLE-GLASS-FIT | done | Table fit — wrap to the glass, elide only the floor | 2026-10-12-brief-table-glass-fit.md |
 | 2026-10-10 | BRF-AMP-CELL | open | The state cell derives — a status change reaches the table | 2026-10-10-brief-amp-cell.md |
-| 2026-10-10 | BRF-BOUNDARY-MARK | open | The boundary mark — the receipt elides the addresses the cap never realised | 2026-10-10-brief-boundary-mark.md |
+| 2026-10-10 | BRF-BOUNDARY-MARK | done | The boundary mark — the receipt elides the addresses the cap never realised | 2026-10-10-brief-boundary-mark.md |
 | 2026-10-10 | BRF-COMMISSION-BLANDINGS | open | Commission the Blandings silo — and the procedure that makes the next one routine | 2026-10-10-brief-commission-blandings.md |
 | 2026-10-10 | BRF-HISTORY-PREFACE | open | The header is Date and Status — the history preface and the TD field, out | 2026-10-10-brief-history-preface.md |
 | 2026-10-10 | BRF-LEAK-FENCE | open | The leak gate's fence exemption — anchor on the source, not a rendered match | 2026-10-10-brief-leak-fence.md |

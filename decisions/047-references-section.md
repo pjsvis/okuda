@@ -6,7 +6,7 @@ callsign: ADR-REFERENCES-SECTION-047
 # Decision: The References section — the renderer emits a receipt for its own map
 
 **Date:** 2026-09-30
-**Status:** Accepted (amends ADR-MAIN-DOCUMENT-031 — the discovery contract is unchanged; this adds its projection. Brief BRF-REFERENCES-SECTION.) · **amended 2026-10-09** — suppressed where the page already carries the table; see the annotation at the foot.
+**Status:** Accepted (amends ADR-MAIN-DOCUMENT-031 — the discovery contract is unchanged; this adds its projection. Brief BRF-REFERENCES-SECTION.) · **amended 2026-10-09** — suppressed where the page already carries the table; see the annotation at the foot. · **amended 2026-10-13** — the receipt states its own end (a bare `…`), and a **truncated map is never suppressed**; see the second annotation at the foot.
 
 ## Context
 
@@ -170,3 +170,67 @@ operator's argument above.
 - The guard is the test trio: a complete final list → suppressed (annotated
   rung) and kept (plain rung); a partial list → kept; a body-only citation →
   kept.
+
+## Annotation (2026-10-13) — the boundary mark, and a truncated map is never suppressed
+
+Two changes, both from BRF-BOUNDARY-MARK. The second **amends the 2026-10-09
+ruling above**.
+
+**1. The receipt states its own end.** The map is capped by the address space —
+80 destinations, the mixed-digit pairs (`ADR-REPEATED-DIGIT-ACTUATORS-032`). Past the cap
+the receipt listed what fit and **read as complete**: the omission the 2026-10-07
+annotation conceded, entering without discretion and without a word. The last
+line of the section is now a bare `…` when the document holds more distinct
+destinations than the map has entries — and **only** then.
+
+- **Derived, never judged.** The predicate is *distinct destinations outnumber the
+  map's entries* (`deriveReferences`), never `map.size === 80`. Exactly eighty
+  distinct destinations is **complete** — the space is exactly full — and a mark
+  there would lie about its referent. The predicate is a comparison precisely so it
+  covers both truncation sources without naming either.
+- **Bare, never `… and N more`.** The count is a second quantity to keep honest and
+  it moves on every render of a growing corpus: the warning shape this file's own
+  literature refuses — *an alarm that fires on every render of a growing view is an
+  alarm that is off* (BRF-BOUNDARY-MARK).
+- **Not a silcrow.** It carries no number, so nothing paints it and nothing can
+  actuate it. It rides the section source, so it is identical painted, piped and
+  under `NO_COLOR`, and needs no TTY gate. `⋮` is the recorded alternative — truer
+  to a list's axis, and it already paints `state-parked` — deferred because it is
+  bound to the *mermaid source elided* indicator, and one glyph with two referents
+  is what *Attributable structure* names.
+- **Plain, not muted — a declared deviation.** No muted channel exists from a
+  markdown source, and the receipt's other lines are not muted either (the `§NN`
+  badge paints in the vector role, the target is prose). A new paint channel for
+  one glyph is the ceremony this house refuses. The mark is distinguished by what
+  it is *not*: no silcrow, no number, nothing actuable — the load-bearing half.
+
+**2. A truncated map is never suppressed — this amends the 2026-10-09 ruling.**
+That ruling suppresses when `referencesCovered` is true, and `referencesCovered`
+checks the **map's** destinations. On a truncated map it can therefore be true
+while the document still holds destinations the receipt never saw — and
+suppression would hide the **boundary** along with the receipt: the very failure
+that annotation exists to prevent, re-entering through its own fix. The condition
+gains one term: suppress only when `annotated && !truncated && referencesCovered`.
+
+The reader then sees a receipt reappear over an otherwise complete hand list
+exactly when the map was truncated — **its mere presence reports the
+condition**, the same mechanism as the partial-list case above, one level down.
+
+**Measured, 2026-10-13** — the mark has a home on arrival. Live fixtures:
+`&briefs.md` 120 distinct destinations → 80, **40 never realised**;
+`briefs/index.md` 101 → 80, **21 never realised**. **61 across two documents**, up
+from 46 on 2026-09-10 — the boundary is live, not latent. Both carry a receipt
+today (`referencesCovered` is false for both: their bodies are tables, never list
+items), so both carry the mark.
+
+**Constraints this imposes.**
+- One predicate (`deriveReferences`) and one emitter (`referencesSection`). A
+  second of either is a new decision, not a patch.
+- The mark lives **inside** the section, so anything that drops the section drops
+  it. Intended: there is nothing left to mark. `--no-references` (the paper rung)
+  is unchanged by construction.
+- `…` may become `⋮`; that is a swap in one constant, and the trigger is dogfood
+  reading the mark as a cell cut rather than a list boundary.
+- The guard is the test quartet in `tests/vectors.test.ts`: 81 distinct → 80 rows
+  and one bare `…`; exactly 80 → **no** mark; a truncated self-tabling document →
+  receipt kept with the mark; the mark identical on the painted and the plain rung.
