@@ -1,0 +1,15 @@
+{
+  "note": "The accepted residue of the recoverability invariant's widest rung (scripts/elision-monotone.ts --strict, 160 columns). Each entry is a document that still loses content at that width, with the columns it would need. The baseline MAY ONLY SHRINK: a document that no longer loses content must be dropped, and a new one fails the gate. Reshaping these is an authoring call, not a renderer one — both are embedded payloads whose code lines run past 200 characters, and a code fence has no cap, so widening repairs them.",
+  "measured": "2026-10-13",
+  "rung": 160,
+  "accepted": {
+    "docs/2026-10-08-ai-human-development-workflow-06.md": {
+      "cuts": 4,
+      "needs": 250
+    },
+    "docs/2026-10-08-ai-human-development-workflow-08.md": {
+      "cuts": 6,
+      "needs": 320
+    }
+  }
+}

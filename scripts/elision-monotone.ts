@@ -49,11 +49,17 @@
  *   bun scripts/elision-monotone.ts --gate     # the invariant only; exit 1 on a rise
  *   bun scripts/elision-monotone.ts --strict   # --gate, and exit 1 on the irreducible set
  *
- * `--gate` runs on `just check`. The corpus is clean as of 2026-10-12 (0 rises
- * in 516 documents), which is the house condition for promoting a report to a
- * gate (BRF-RENDER-DEFECTS: *ship as a report first; a gate when the corpus is
- * clean*).
+ * `--gate` runs on `just check`: the corpus is clean (0 rises), which is the house
+ * condition for promoting a report to a gate (BRF-RENDER-DEFECTS: *ship as a
+ * report first; a gate when the corpus is clean*). `--strict` also runs there,
+ * and it gates the RESIDUE against `scripts/elision-baseline.json`, which may
+ * only shrink — the house idiom, three baselines deep already
+ * (`callsign-baseline.json`, `date-baseline.json`, `lexicon-baseline.json`).
+ * So the residue cannot grow without failing, and cannot sit there unexamined
+ * either: a document that stops losing content names its own prune.
  */
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { renderDocument, BAND_CONTENT } from "../src/render";
 import { displayWidth, stripANSI } from "../src/width";
 
@@ -253,13 +259,34 @@ if (GATE) {
   if (STRICT) {
     const widest = LADDER[LADDER.length - 1]!;
     const readings = await pool(files, CONCURRENCY, (f) => lose(Bun.file(f).text(), widest));
-    const stubborn = files.filter((_, i) => readings[i]!.cuts > 0 || readings[i]!.art > 0);
-    if (stubborn.length > 0) {
-      console.error(`elision-monotone: FAIL (strict) — ${stubborn.length} document(s) still lose content at ${widest} columns`);
-      for (const f of stubborn) console.error(`  ${await names(f)}`);
+    const stubborn = files
+      .map((file, i) => ({ file, ...readings[i]! }))
+      .filter((s) => s.cuts > 0 || s.art > 0);
+
+    const baseline = JSON.parse(
+      readFileSync(join(import.meta.dir, "elision-baseline.json"), "utf8"),
+    ) as { accepted: Record<string, { cuts: number; needs: number }> };
+    const known = baseline.accepted;
+
+    const problems: string[] = [];
+    for (const s of stubborn) {
+      const b = known[s.file];
+      if (b === undefined) problems.push(`not in the baseline: ${await names(s.file)}`);
+      else if (s.cuts > b.cuts) problems.push(`worse than the baseline: ${s.file} (${s.cuts} > ${b.cuts})`);
+    }
+    const shrunk = Object.keys(known).filter((f) => !stubborn.some((s) => s.file === f));
+
+    if (problems.length > 0) {
+      console.error(`elision-monotone: FAIL (strict) — the residue grew at ${widest} columns`);
+      for (const p of problems) console.error(`  ${p}`);
+      console.error("  reshape the document, or add it to scripts/elision-baseline.json with a reason");
       process.exit(1);
     }
+    for (const f of shrunk) {
+      console.error(`  baseline can shrink: ${f} no longer loses content — drop the entry`);
+    }
   }
+
   console.log(
     `elision-monotone: OK (${files.length} documents; cut lines ${cuts.get(LADDER[0]!)} at ${LADDER[0]!} to ${cuts.get(WIDE)} at ${WIDE}; no rise anywhere)`,
   );

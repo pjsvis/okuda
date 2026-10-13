@@ -297,9 +297,13 @@ documents named above, each a document problem rather than a renderer one.
   a wider glass and the columns needed are reported. Neither is irreducible in
   `ADR-TABLE-EDGE-CUT-055`'s sense. The instrument is settled —
   **`elision-monotone.ts` is the non-table sibling of `scripts/tables-check.ts`**:
-  its invariant runs on `just check` (`--gate`), and the residue is reachable with
-  `--strict`. `--strict` joins the gate when the residue is empty, which is the
-  house rule (*ship as a report first; a gate when the corpus is clean*).
+  `--gate` (the invariant) and `--strict` (the residue) both run on `just check`.
+  The residue is held in **`scripts/elision-baseline.json`, which may only
+  shrink** — the house idiom, three baselines deep already
+  (`callsign`, `date`, `lexicon`). Reshaping the two documents is an authoring
+  call and would mean editing an embedded payload, so the baseline is the honest
+  form: the set cannot grow, and a document that stops losing content names its
+  own prune.
 - **The gutter.** 315 diagram blocks; 82% sit flush to the 2-column margin. But the
   median right slack is 2 columns — most diagrams fill the glass. Only **12%** are
   the side-pushed case (flush left *and* ≥20 columns unused). A rendered diagram
