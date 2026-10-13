@@ -17,7 +17,6 @@
 {"file":"2026-08-27-brief-ssh-tui-integration.md","date":"2026-08-27","status":"open","summary":"Modern terminal escape protocol integration for SSH TUI delivery","meta":{},"callsign":"BRF-SSH-TUI"}
 {"file":"2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md","date":"2026-08-28","status":"parked","summary":"Inline Ask-the-Doc and Local SSH Transport","meta":{},"callsign":"BRF-AI-DOC"}
 {"file":"2026-08-28-brief-jump-demo-honesty.md","date":"2026-08-28","status":"open","summary":"jump-demo honesty — slug derivation + state-glyph signal","meta":{},"callsign":"BRF-JUMP-DEMO"}
-{"file":"2026-08-28-brief-notification-style.md","date":"2026-08-28","status":"done","summary":"011-zero-notification-stillness-and-decoupled-inbox-watchers","meta":{},"callsign":"BRF-NOTIFICATION-STYLE"}
 {"file":"2026-08-28-brief-oklch-tuning.md","date":"2026-08-28","status":"open","summary":"OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling","meta":{},"callsign":"BRF-OKLCH-TUNING"}
 {"file":"2026-08-28-brief-ssh-served-dynamic-markdown-portal.md","date":"2026-08-28","status":"parked","summary":"2026-08-28-brief-ssh-served-dynamic-markdown-portal","meta":{},"callsign":"BRF-SSH-SERVED-2"}
 {"file":"2026-08-28-brief-state-glyph-vocabulary.md","date":"2026-08-28","status":"open","summary":"State-glyph vocabulary — colour + bold, the closed lexicon","meta":{},"callsign":"BRF-STATE-GLYPH-2"}
@@ -25,7 +24,6 @@
 {"file":"2026-08-29-audio-style-guide.md","date":"2026-08-29","status":"open","summary":"Audio-First Style Guide and Linting Heuristics","meta":{},"callsign":"BRF-AUDIO-STYLE"}
 {"file":"2026-08-29-brief-fzf-owns-the-loop.md","date":"2026-08-29","status":"rejected","summary":"fzf owns the loop (cursor-preserve experiment)","meta":{},"callsign":"BRF-FZF-OWNS-LOOP"}
 {"file":"2026-08-29-brief-menu-templates-deferred.md","date":"2026-08-29","status":"parked","summary":"Menu templates (deferred — fires on the second menu kind)","meta":{},"callsign":"BRF-MENU-TEMPLATES"}
-{"file":"2026-08-29-brief-okudagram-frame.md","date":"2026-08-29","status":"done","summary":"The okudagram frame — a portioning rule","meta":{},"callsign":"BRF-PAGED-OKUDAGRAM"}
 {"file":"2026-08-29-brief-resticted-grammar-speech.md","date":"2026-08-29","status":"open","summary":"Okuda Markdown AST to W3C SSML Mapping Investigation","meta":{},"callsign":"BRF-RESTICTED-GRAMMAR"}
 {"file":"2026-08-29-brief-terminal-speech.md","date":"2026-08-29","status":"open","summary":"Terminal Speech Pipeline Easter Egg","meta":{},"callsign":"BRF-TERMINAL-SPEECH"}
 {"file":"2026-08-29-mermaid-hard-boundary-CSN.md","date":"2026-08-29","status":"open","summary":"Mermaid Rendering Hard Boundary State Machine (CSN Diagnostics)","meta":{},"callsign":"BRF-MERMAID-HARD"}
@@ -39,7 +37,6 @@
 {"file":"2026-09-02-brief-synchronized-output.md","date":"2026-09-02","status":"open","summary":"Synchronized output — deliver each paint as one frame","meta":{},"callsign":"BRF-SYNC-OUTPUT"}
 {"file":"2026-09-04-brief-porch-matrix.md","date":"2026-09-04","status":"open","summary":"The porch matrix — click a URL, land in a terminal, read the silo","meta":{},"callsign":"BRF-PORCH-MATRIX"}
 {"file":"2026-09-04-brief-working-copy.md","date":"2026-09-04","status":"open","summary":"The working copy — vector render mode, 99 clone, honest actuator","meta":{},"callsign":"BRF-WORKING-COPY"}
-{"file":"2026-09-05-brief-stream-identity-header.md","date":"2026-09-05","status":"done","summary":"Stream identity header — name the document for the unknown destination","meta":{},"callsign":"BRF-STREAM-IDENTITY-HEADER"}
 {"file":"2026-09-06-brief-concordance-prefilter.md","date":"2026-09-06","status":"open","summary":"The concordance pre-filter — `|`, `!`, and case at the silo's seam","meta":{},"callsign":"BRF-CONCORDANCE-PREFILTER"}
 {"file":"2026-09-06-brief-tts-dogfood.md","date":"2026-09-06","status":"open","summary":"Coupled-frame TTS dogfood (mac `say`)","meta":{},"callsign":"BRF-TTS-DOGFOOD"}
 {"file":"2026-09-07-brief-diagram-ingestion.md","date":"2026-09-07","status":"open","summary":"The diagram ingestion pipeline — mermaid-to-md as the show/elide/hide gate","meta":{},"callsign":"BRF-DIAGRAM-INGESTION"}
@@ -48,7 +45,6 @@
 {"file":"2026-09-12-brief-census-mode.md","date":"2026-09-12","status":"open","summary":"Census mode — the mentions-inclusive map, as a reader's opt-in","meta":{},"callsign":"BRF-CENSUS-MODE"}
 {"file":"2026-09-13-brief-audio-discovery.md","date":"2026-09-13","status":"open","summary":"Audio discovery — the actuator grammar, heard","meta":{},"callsign":"BRF-AUDIO-DISCOVERY"}
 {"file":"2026-09-13-brief-prolonged-press.md","date":"2026-09-13","status":"open","summary":"The prolonged press — three gestures, one actuation, no leak","meta":{},"callsign":"BRF-PROLONGED-PRESS"}
-{"file":"2026-09-14-brief-address-cap.md","date":"2026-09-14","status":"done","summary":"The address cap — the invariant is the destination","meta":{},"callsign":"BRF-ADDRESS-CAP"}
 {"file":"2026-09-14-brief-conceptual-lexicon.md","date":"2026-09-14","status":"open","summary":"Extract the Conceptual Lexicon from system.md","meta":{},"callsign":"BRF-CONCEPTUAL-LEXICON"}
 {"file":"2026-09-14-brief-jump-list.md","date":"2026-09-14","status":"open","summary":"The jump list — the search screen as its projection","meta":{},"callsign":"BRF-JUMP-LIST"}
 {"file":"2026-09-14-brief-search-surface.md","date":"2026-09-14","status":"parked","summary":"The search surface — the state machine, the array, and the invariant audit","meta":{},"callsign":"BRF-SEARCH-SURFACE"}
@@ -85,18 +81,12 @@
 {"file":"2026-10-08-brief-silo-lexicon.md","date":"2026-10-08","status":"open","summary":"Gather the silo's terms of art into `conceptual-lexicon.md`","meta":{},"callsign":"BRF-SILO-LEXICON"}
 {"file":"2026-10-09-brief-complete-blocks.md","date":"2026-10-09","status":"open","summary":"The viewport holds complete blocks — cut at boundaries, in the printer and the frame","meta":{},"callsign":"BRF-COMPLETE-BLOCKS"}
 {"file":"2026-10-09-brief-docs-ledger.md","date":"2026-10-09","status":"open","summary":"The docs/ ledger — a prune ledger, not a registry","meta":{},"callsign":"BRF-DOCS-LEDGER"}
-{"file":"2026-10-09-brief-paper-rung.md","date":"2026-10-09","status":"done","summary":"The paper rung — the same render, printed","meta":{},"callsign":"BRF-PAPER-RUNG"}
 {"file":"2026-10-10-brief-amp-cell.md","date":"2026-10-10","status":"open","summary":"The state cell derives — a status change reaches the table","meta":{},"callsign":"BRF-AMP-CELL"}
-{"file":"2026-10-10-brief-boundary-mark.md","date":"2026-10-10","status":"done","summary":"The boundary mark — the receipt elides the addresses the cap never realised","meta":{},"callsign":"BRF-BOUNDARY-MARK"}
 {"file":"2026-10-10-brief-commission-blandings.md","date":"2026-10-10","status":"open","summary":"Commission the Blandings silo — and the procedure that makes the next one routine","meta":{},"callsign":"BRF-COMMISSION-BLANDINGS"}
 {"file":"2026-10-10-brief-history-preface.md","date":"2026-10-10","status":"open","summary":"The header is Date and Status — the history preface and the TD field, out","meta":{},"callsign":"BRF-HISTORY-PREFACE"}
 {"file":"2026-10-10-brief-leak-fence.md","date":"2026-10-10","status":"open","summary":"The leak gate's fence exemption — anchor on the source, not a rendered match","meta":{},"callsign":"BRF-LEAK-FENCE"}
-{"file":"2026-10-10-brief-protocol-update.md","date":"2026-10-10","status":"done","summary":"The protocol update — self-contained documents, and a deploy that crosses the seam honestly","meta":{},"callsign":"BRF-PROTOCOL-UPDATE"}
 {"file":"2026-10-10-brief-read-actuator.md","date":"2026-10-10","status":"open","summary":"Read actuator — the current document, handed to the voice","meta":{},"callsign":"BRF-READ-ACTUATOR"}
 {"file":"2026-10-10-brief-render-defects.md","date":"2026-10-10","status":"open","summary":"Render defects — the stack map's four findings, and how they stop recurring","meta":{},"callsign":"BRF-RENDER-DEFECTS"}
-{"file":"2026-10-10-brief-seam-audit.md","date":"2026-10-10","status":"done","summary":"The seam audit — the input path, where a run was mistaken for a spelling","meta":{},"callsign":"BRF-SEAM-AUDIT"}
 {"file":"2026-10-10-brief-table-gutter.md","date":"2026-10-10","status":"rejected","summary":"The table's gutter — the separator is chrome, and the cap pays for it","meta":{},"callsign":"BRF-TABLE-GUTTER"}
-{"file":"2026-10-12-brief-code-silcrows.md","date":"2026-10-12","status":"done","summary":"Code-comment silcrows — a rendered code file is a document for its prose","meta":{},"callsign":"BRF-CODE-SILCROWS"}
-{"file":"2026-10-12-brief-table-glass-fit.md","date":"2026-10-12","status":"done","summary":"Table fit — wrap to the glass, elide only the floor","meta":{},"callsign":"BRF-TABLE-GLASS-FIT"}
 {"file":"2026-10-13-brief-align-across-tables.md","date":"2026-10-13","status":"open","summary":"The align meta is misattributed across tables — a later table un-aligns an earlier one","meta":{},"callsign":"BRF-ALIGN-ACROSS-TABLES"}
 {"file":"2026-10-13-brief-table-slot-instrument.md","date":"2026-10-13","status":"done","summary":"The table's columns are unobservable — a slot instrument, and a header/body alignment test","meta":{},"callsign":"BRF-TABLE-SLOT-INSTRUMENT"}

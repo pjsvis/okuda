@@ -18,12 +18,16 @@
 {"file":"2026-08-28-brief-elision-primitive.md","date":"2026-08-28","status":"done","summary":"Elision primitive — close ADR-014, fix the code-fence soft-wrap lie","meta":{},"callsign":"BRF-ELISION-PRIMITIVE"}
 {"file":"2026-08-28-brief-index-and-jump.md","date":"2026-08-28","status":"done","summary":"Ephemeral Index Generation and Numeric Jump Navigation","meta":{},"callsign":"BRF-INDEX-JUMP"}
 {"file":"2026-08-28-brief-launcher-fut.md","date":"2026-08-28","status":"done","summary":"Launcher FUT — session-scoped alt-screen","meta":{},"callsign":"BRF-LAUNCHER-FUT"}
+{"file":"2026-08-28-brief-notification-style.md","date":"2026-08-28","status":"done","summary":"011-zero-notification-stillness-and-decoupled-inbox-watchers","meta":{},"callsign":"BRF-NOTIFICATION-STYLE"}
 {"file":"2026-08-28-brief-state-glyph-render-path.md","date":"2026-08-28","status":"done","summary":"State-glyph render path — the showcase environment + first cut","meta":{},"callsign":"BRF-STATE-GLYPH"}
 {"file":"2026-08-29-brief-okf-callsign-migration.md","date":"2026-08-29","status":"done","summary":"OKF conformance migration and the callsign layer","meta":{},"callsign":"BRF-OKF-CALLSIGN"}
+{"file":"2026-08-29-brief-okudagram-frame.md","date":"2026-08-29","status":"done","summary":"The okudagram frame — a portioning rule","meta":{},"callsign":"BRF-PAGED-OKUDAGRAM"}
+{"file":"2026-09-05-brief-stream-identity-header.md","date":"2026-09-05","status":"done","summary":"Stream identity header — name the document for the unknown destination","meta":{},"callsign":"BRF-STREAM-IDENTITY-HEADER"}
 {"file":"2026-09-07-brief-okudagram-step.md","date":"2026-09-07","status":"done","summary":"The okudagram step — no gaps in coverage","meta":{},"callsign":"BRF-OKUDAGRAM-STEP"}
 {"file":"2026-09-07-brief-onion-search-grammar.md","date":"2026-09-07","status":"done","summary":"The onion search grammar — staged filtering, path/content separation","meta":{},"callsign":"BRF-ONION-SEARCH-GRAMMAR"}
 {"file":"2026-09-13-brief-references-section.md","date":"2026-09-13","status":"done","summary":"The References section — the renderer emits its own map","meta":{},"callsign":"BRF-REFERENCES-SECTION"}
 {"file":"2026-09-13-brief-tidy-first.md","date":"2026-09-13","status":"done","summary":"Tidy-first — the path to a good place","meta":{},"callsign":"BRF-TIDY-FIRST"}
+{"file":"2026-09-14-brief-address-cap.md","date":"2026-09-14","status":"done","summary":"The address cap — the invariant is the destination","meta":{},"callsign":"BRF-ADDRESS-CAP"}
 {"file":"2026-09-14-brief-table-width.md","date":"2026-09-14","status":"done","summary":"The cut cell — the renderer breaks words the glass had room for","meta":{},"callsign":"BRF-TABLE-WIDTH"}
 {"file":"2026-09-16-brief-math-glyphs.md","date":"2026-09-16","status":"done","summary":"The Math Glyph Pass — inline LaTeX to Unicode, closed vocabulary, corpus-gated","meta":{},"callsign":"BRF-MATH-GLYPHS"}
 {"file":"2026-09-19-brief-remote-speech-seam.md","date":"2026-09-19","status":"done","summary":"The remote speech seam — a question to settle before anything builds","meta":{},"callsign":"BRF-REMOTE-SPEECH-SEAM"}
@@ -40,3 +44,9 @@
 {"file":"2026-10-03-brief-heading-ansi-strip.md","date":"2026-10-03","status":"done","summary":"Strip ANSI from heading children — the heading role owns every byte of colour","meta":{},"callsign":"BRF-HEADING-ANSI-STRIP"}
 {"file":"2026-10-08-brief-date-invariant.md","date":"2026-10-08","status":"done","summary":"The date is a claim — the invariant, the lint, and the time document","meta":{},"callsign":"BRF-DATE-INVARIANT"}
 {"file":"2026-10-08-brief-wrap-at-cap.md","date":"2026-10-08","status":"done","summary":"Wrap at the cap — the third branch","meta":{},"callsign":"BRF-WRAP-AT-CAP"}
+{"file":"2026-10-09-brief-paper-rung.md","date":"2026-10-09","status":"done","summary":"The paper rung — the same render, printed","meta":{},"callsign":"BRF-PAPER-RUNG"}
+{"file":"2026-10-10-brief-boundary-mark.md","date":"2026-10-10","status":"done","summary":"The boundary mark — the receipt elides the addresses the cap never realised","meta":{},"callsign":"BRF-BOUNDARY-MARK"}
+{"file":"2026-10-10-brief-protocol-update.md","date":"2026-10-10","status":"done","summary":"The protocol update — self-contained documents, and a deploy that crosses the seam honestly","meta":{},"callsign":"BRF-PROTOCOL-UPDATE"}
+{"file":"2026-10-10-brief-seam-audit.md","date":"2026-10-10","status":"done","summary":"The seam audit — the input path, where a run was mistaken for a spelling","meta":{},"callsign":"BRF-SEAM-AUDIT"}
+{"file":"2026-10-12-brief-code-silcrows.md","date":"2026-10-12","status":"done","summary":"Code-comment silcrows — a rendered code file is a document for its prose","meta":{},"callsign":"BRF-CODE-SILCROWS"}
+{"file":"2026-10-12-brief-table-glass-fit.md","date":"2026-10-12","status":"done","summary":"Table fit — wrap to the glass, elide only the floor","meta":{},"callsign":"BRF-TABLE-GLASS-FIT"}

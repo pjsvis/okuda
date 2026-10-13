@@ -9,6 +9,12 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-12 | BRF-CODE-SILCROWS | done | Code-comment silcrows — a rendered code file is a document for its prose | 2026-10-12-brief-code-silcrows.md |
+| 2026-10-12 | BRF-TABLE-GLASS-FIT | done | Table fit — wrap to the glass, elide only the floor | 2026-10-12-brief-table-glass-fit.md |
+| 2026-10-10 | BRF-BOUNDARY-MARK | done | The boundary mark — the receipt elides the addresses the cap never realised | 2026-10-10-brief-boundary-mark.md |
+| 2026-10-10 | BRF-PROTOCOL-UPDATE | done | The protocol update — self-contained documents, and a deploy that crosses the seam honestly | 2026-10-10-brief-protocol-update.md |
+| 2026-10-10 | BRF-SEAM-AUDIT | done | The seam audit — the input path, where a run was mistaken for a spelling | 2026-10-10-brief-seam-audit.md |
+| 2026-10-09 | BRF-PAPER-RUNG | done | The paper rung — the same render, printed | 2026-10-09-brief-paper-rung.md |
 | 2026-10-08 | BRF-DATE-INVARIANT | done | The date is a claim — the invariant, the lint, and the time document | 2026-10-08-brief-date-invariant.md |
 | 2026-10-08 | BRF-WRAP-AT-CAP | done | Wrap at the cap — the third branch | 2026-10-08-brief-wrap-at-cap.md |
 | 2026-10-03 | BRF-ARCHIVE-RESOLUTION | done | The archive resolution tier — citations must survive the archive move | 2026-10-03-brief-archive-resolution-tier.md |
@@ -24,15 +30,19 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-24 | BRF-VALIDATED-SILCROWS | done | Validated silcrows — the shape scan consults the registry it stands on | 2026-09-24-brief-validated-silcrows.md |
 | 2026-09-19 | BRF-REMOTE-SPEECH-SEAM | done | The remote speech seam — a question to settle before anything builds | 2026-09-19-brief-remote-speech-seam.md |
 | 2026-09-16 | BRF-MATH-GLYPHS | done | The Math Glyph Pass — inline LaTeX to Unicode, closed vocabulary, corpus-gated | 2026-09-16-brief-math-glyphs.md |
+| 2026-09-14 | BRF-ADDRESS-CAP | done | The address cap — the invariant is the destination | 2026-09-14-brief-address-cap.md |
 | 2026-09-14 | BRF-TABLE-WIDTH | done | The cut cell — the renderer breaks words the glass had room for | 2026-09-14-brief-table-width.md |
 | 2026-09-13 | BRF-REFERENCES-SECTION | done | The References section — the renderer emits its own map | 2026-09-13-brief-references-section.md |
 | 2026-09-13 | BRF-TIDY-FIRST | done | Tidy-first — the path to a good place | 2026-09-13-brief-tidy-first.md |
 | 2026-09-07 | BRF-OKUDAGRAM-STEP | done | The okudagram step — no gaps in coverage | 2026-09-07-brief-okudagram-step.md |
 | 2026-09-07 | BRF-ONION-SEARCH-GRAMMAR | done | The onion search grammar — staged filtering, path/content separation | 2026-09-07-brief-onion-search-grammar.md |
+| 2026-09-05 | BRF-STREAM-IDENTITY-HEADER | done | Stream identity header — name the document for the unknown destination | 2026-09-05-brief-stream-identity-header.md |
 | 2026-08-29 | BRF-OKF-CALLSIGN | done | OKF conformance migration and the callsign layer | 2026-08-29-brief-okf-callsign-migration.md |
+| 2026-08-29 | BRF-PAGED-OKUDAGRAM | done | The okudagram frame — a portioning rule | 2026-08-29-brief-okudagram-frame.md |
 | 2026-08-28 | BRF-ELISION-PRIMITIVE | done | Elision primitive — close ADR-014, fix the code-fence soft-wrap lie | 2026-08-28-brief-elision-primitive.md |
 | 2026-08-28 | BRF-INDEX-JUMP | done | Ephemeral Index Generation and Numeric Jump Navigation | 2026-08-28-brief-index-and-jump.md |
 | 2026-08-28 | BRF-LAUNCHER-FUT | done | Launcher FUT — session-scoped alt-screen | 2026-08-28-brief-launcher-fut.md |
+| 2026-08-28 | BRF-NOTIFICATION-STYLE | done | 011-zero-notification-stillness-and-decoupled-inbox-watchers | 2026-08-28-brief-notification-style.md |
 | 2026-08-28 | BRF-STATE-GLYPH | done | State-glyph render path — the showcase environment + first cut | 2026-08-28-brief-state-glyph-render-path.md |
 | 2026-08-27 | BRF-NECKBEARD-FZF | done | gloam-finder: Wrapper to launch fzf with hardened interactive semantics | 2026-08-27-brief-neckbeard-fzf-assimilation.md |
 | 2026-08-26 | BRF-GLOAM-LAUNCHER | done | Gloam Launcher Promotion — argv[0] No-Arg Mode (parked) | 2026-08-26-brief-gloam-launcher-promotion.md |
