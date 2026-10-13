@@ -154,6 +154,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-AMP-CELL | · open | The state cell derives — a status change reaches the table | — |
 | BRF-HISTORY-PREFACE | · open | the header is Date + Status — the history preface and the `TD` field out, with a lint for both | — |
 | BRF-LEAK-FENCE | · open | The leak gate's fence exemption — anchor on the source, not a rendered match | — |
+| BRF-TABLE-SLOT-INSTRUMENT | · open | The table's columns are unobservable — a slot instrument, and a header/body alignment test | — |
 
 ## Parked / deferred
 
