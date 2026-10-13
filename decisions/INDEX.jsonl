@@ -58,3 +58,4 @@
 {"file":"059-seam-copy.md","date":"2026-10-10","status":"Accepted","summary":"The seam is crossed by a copy the receiver commits — not a shared symlink","meta":{},"callsign":"ADR-SEAM-COPY-059"}
 {"file":"060-docs-direct-code-pr.md","date":"2026-10-10","status":"Accepted","summary":"Match the review to the risk — docs merge direct, PRs are for code","meta":{},"callsign":"ADR-DOCS-DIRECT-060"}
 {"file":"061-brief-lifecycle-vocabulary.md","date":"2026-10-13","status":"Accepted","summary":"The brief's lifecycle — the vocabulary is the scale","meta":{},"callsign":"ADR-BRIEF-LIFECYCLE-061"}
+{"file":"062-one-gesture-one-token.md","date":"2026-10-13","status":"Accepted","summary":"One gesture, one token — how a digit run resolves, and why there is no clock","meta":{},"callsign":"ADR-ONE-GESTURE-062"}

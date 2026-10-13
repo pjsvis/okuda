@@ -45,6 +45,33 @@ Every two-digit press is exactly one of the three. No mode toggles,
 no modifier keys, no state beyond the render stack — the grammar is
 the state machine.
 
+### The three gestures (2026-10-13, ADR-ONE-GESTURE-062)
+
+How a two-digit token is *typed* is settled, and it is the same token however the
+reader types it. A tty has no key-up event, so three physical affordances arrive
+as one byte-stream:
+
+| Gesture | What arrives | Result |
+|---|---|---|
+| Two deliberate taps | the same digit twice | the pair — one token |
+| A fast double tap | the same digit twice, quickly | the pair — one token |
+| A prolonged hold | the same digit repeating | the pair — one token |
+
+The pair is grabbed at the **second** tap and the rest of the run is **swallowed**,
+so a held key fires once, not fifteen times. Nothing but another key ends the run.
+
+**There is no timer.** Two taps a second apart and two taps an hour apart are both
+a pair; the reader's tempo is not an input. The cost, stated because it is the one
+you will meet: a doubled pair is **one-shot** — `99 … 99` fires once, and a verb
+needing rapid repetition belongs in the vector space (`1212` fires two jumps back
+to back).
+
+**The abort is any other key.** A pending first digit waits indefinitely, so to
+discard a half-typed pair — or to find out you are not in one — press `ESC`, or an
+arrow, or anything that is not a digit: every non-tap clears it. Nothing is owed to
+the clock, and nothing needs to be remembered except that typing something else
+gets you out.
+
 ## Mapping to what exists
 
 - **[00] exit** — cheap: the cleanup path exists; `00` completes the
