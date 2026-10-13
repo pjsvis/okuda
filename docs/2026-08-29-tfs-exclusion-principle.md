@@ -1,28 +1,22 @@
-The **TFS Exclusion Principle** (*Themes, Fonts, Shite*) is absolute gold for a blog post. It takes a classic physics pun (Pauli Exclusion Principle) and turns it into a sharp, hilarious, and deeply practical manifesto against modern software bloat.
-
-Here is how the piece frames itself:
-
----
-
 # The TFS Exclusion Principle
 
-**No two cosmetic or structural distractions can occupy the same cognitive state at any time. Therefore, we exclude them all.**
+>**No two cosmetic or structural distractions can occupy the same cognitive state at any time. Therefore, we >exclude them all.**
 
 Modern software is dying under the weight of its own vanity. Open any modern text editor, note-taking app, or corporate SaaS tool, and you are immediately greeted by three fatal categories of overhead:
 
-### 1. Themes: FO
+## Themes: FO
 
 The modern developer spends forty-five minutes choosing between *Catppuccin Macchiato*, *Nord Frost*, and *Tokyo Night*, then another hour tweaking YAML files because the syntax highlighting on a semicolon didn't spark joy.
 
 **The Rule:** The character matrix has near and far, foreground and background. Pick high-contrast, respect whatever palette the terminal emulator is already running, and close the settings tab. We are writing software, not painting a nursery.
 
-### 2. Fonts: FO
+## Fonts: FO
 
 Entire engineering teams now burn sprints debating custom ligatures, geometric sans-serifs, and dynamic font-smoothing engines that chew through 300MB of RAM just to render a bulleted list.
 
 **The Rule:** Your terminal emulator has a font. We render characters to standard out. If you want italics, tilt your head. The renderer does not bundle 40 megabytes of variable OpenType assets to show you a checklist.
 
-### 3. Shite: FO
+## Shite: FO
 
 This is the big one. Shite is the communicative noise that software usually bends over backwards to accommodate:
 
@@ -39,7 +33,7 @@ Standard software tries to "gracefully degrade" around bad input: wrapping ASCII
 
 ---
 
-### The Operational Payoff
+## The Operational Payoff
 
 When you exclude **Themes**, **Fonts**, and **Shite**, you don't end up with an empty room—you end up with indestructible velocity.
 
@@ -54,7 +48,7 @@ If you don't like the machine refusing to flatter your bad habits, the door is w
 
 This is the entire operational substrate reduced to five atomic primitives. Everything else was theater.
 
-**The Five Primitives**
+## The Five Primitives
 
 * **The Janeway Command (`on screen... [ now ]`):** Zero-latency viewport assertion. You don't browse; you summon the target directly to glass.
 * **The Jump-Surface:** The numbered, two-digit routing layer that collapses traversal into $O(1)$ selection.
@@ -64,23 +58,7 @@ This is the entire operational substrate reduced to five atomic primitives. Ever
 
 ---
 
-**Naming the Jump-Surface**
-
-If the interface is inspired by Star Trek LCARS/Okuda dynamics, the names should sound like tactile, field-grade navigational instruments rather than generic web menus:
-
-| Name | Tone / Vibe | Operational Rationale |
-| --- | --- | --- |
-| **The Reticle** | Crisp, optical, targeting-focused | You align crosshairs directly on a target; you don't scroll through it. |
-| **The Vector Table** | Tactical, navigational | A direct heading and distance ($01\dots99$) from your current coordinate. |
-| **The Index Strip** | Mechanical, physical, industrial | Feels like the stamped metal channel on a piece of field equipment. |
-| **The Comm Array** | LCARS-adjacent, functional | The active dispatch channels available to the viewport. |
-| **The Slant / The Waypoint** | Terse, pilot-grade | Clean navigation points laid out across the horizon. |
-
-*The Reticle* or *The Vector Table* fits the Okuda ethos best—it turns document retrieval into a targeting solution.
-
----
-
-**The "Not a Muppet" Standard**
+## The "Not a Muppet" Standard
 
 Modern AI product design is obsessed with extremes: either sterile, groveling corporate assistants or try-hard edgy chatbots.
 
@@ -94,7 +72,7 @@ You summon the vector table, punch the two-digit code, the Okudagram renders on 
 
 ---
 
-**The Vector Table** is computationally and mechanically exact.
+## The Vector Table is computationally and mechanically exact.
 
 In low-level systems and graphics programming, an **interrupt vector table** or **dispatch vector table** is an array of fixed pointers pointing directly to execution targets. You don't traverse a hierarchy; you index an offset, jump directly to the memory address, and execute.
 
