@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-13 | BRF-ALIGN-ACROSS-TABLES | open | The align meta is misattributed across tables — a later table un-aligns an earlier one | 2026-10-13-brief-align-across-tables.md |
 | 2026-10-13 | BRF-TABLE-SLOT-INSTRUMENT | done | The table's columns are unobservable — a slot instrument, and a header/body alignment test | 2026-10-13-brief-table-slot-instrument.md |
 | 2026-10-12 | BRF-CODE-SILCROWS | done | Code-comment silcrows — a rendered code file is a document for its prose | 2026-10-12-brief-code-silcrows.md |
 | 2026-10-12 | BRF-TABLE-GLASS-FIT | done | Table fit — wrap to the glass, elide only the floor | 2026-10-12-brief-table-glass-fit.md |
