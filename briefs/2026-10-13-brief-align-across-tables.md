@@ -7,7 +7,7 @@ date: 2026-10-13
 # Brief: The align meta is misattributed across tables — a later table un-aligns an earlier one
 
 **Date:** 2026-10-13
-**Status:** Open — reproduced in raw Bun, cause upstream, workaround undecided
+**Status:** Open — reproduced in raw Bun, **filed upstream as `oven-sh/bun#45175`**, workaround undecided
 **Lineage:** the operator's reading of the rendered `docs/tables.md`, 2026-10-13 — *"the tables.md test showed all columns left aligned"* — while checking the slot-instrument work (BRF-TABLE-SLOT-INSTRUMENT).
 
 ## The observation
@@ -77,7 +77,14 @@ the alignment back out of Bun's token.
    that `decisions/005` assigns to `Bun.markdown` — a seam to declare, not to smuggle.
 2. **Decline the workaround; report upstream and document the limit.** Record in
    `docs/tables.md` §3 that alignment is unreliable in a multi-table document under Bun
-   1.4.0, and file the raw-Bun repro with Bun. Honest, and no second grammar.
+   1.4.0, and file the raw-Bun repro with Bun. Honest, and no second grammar. **The filing
+   is done** — `oven-sh/bun#45175` — so this option now costs only the note in §3.
+
+   The upstream report leads with `Bun.markdown.html()` and no callbacks, which is the
+   sharpest form of the repro: with `| :--- | :---: | ---: |` followed by any second table,
+   the first table emits `align="left"/"center"` dropped and only `right` kept; with the
+   second table first, the *unaligned* table is handed `align="left"/"center"` borrowed
+   from the aligned one. Both directions are deterministic and need no okuda.
 
 The tilting factor is whether the corpus relies on table alignment: one delimiter row in
 `docs/tables.md` carries colons, and it is the row this brief is about. If that stays the
@@ -93,6 +100,7 @@ only one, option 2 costs nothing and option 1 buys a workaround for a single exh
 
 ## Related
 
+- `oven-sh/bun#45175` — the upstream report (table alignment mis-attributed across tables)
 - `docs/tables.md` §3 — the exhibit, and the claim the render falsifies
 - `briefs/2026-10-13-brief-table-slot-instrument.md` — the sibling finding; its aligned test
   passed only because the fixture was the sole table
