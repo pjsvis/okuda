@@ -20,7 +20,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-10-10 | BRF-READ-ACTUATOR | open | Read actuator — the current document, handed to the voice | 2026-10-10-brief-read-actuator.md |
 | 2026-10-10 | BRF-RENDER-DEFECTS | open | Render defects — the stack map's four findings, and how they stop recurring | 2026-10-10-brief-render-defects.md |
 | 2026-10-10 | BRF-SEAM-AUDIT | done | The seam audit — the input path, where a run was mistaken for a spelling | 2026-10-10-brief-seam-audit.md |
-| 2026-10-10 | BRF-TABLE-GUTTER | open | The table's gutter — the separator is chrome, and the cap pays for it | 2026-10-10-brief-table-gutter.md |
+| 2026-10-10 | BRF-TABLE-GUTTER | rejected | The table's gutter — the separator is chrome, and the cap pays for it | 2026-10-10-brief-table-gutter.md |
 | 2026-10-09 | BRF-COMPLETE-BLOCKS | open | The viewport holds complete blocks — cut at boundaries, in the printer and the frame | 2026-10-09-brief-complete-blocks.md |
 | 2026-10-09 | BRF-DOCS-LEDGER | open | The docs/ ledger — a prune ledger, not a registry | 2026-10-09-brief-docs-ledger.md |
 | 2026-10-09 | BRF-PAPER-RUNG | done | The paper rung — the same render, printed | 2026-10-09-brief-paper-rung.md |
@@ -54,7 +54,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-17 | BRF-BM25-EVALUATION | parked | Benchmark Local BM25 Against Ripgrep and AST Traversal Over Markdown SSOT | 2026-09-17-brief-bm25-evaluation.md |
 | 2026-09-15 | BRF-CALLSIGN-EVERY-DOC | open | A callsign for every document — the name and the address are orthogonal | 2026-09-15-brief-callsign-every-document.md |
 | 2026-09-15 | BRF-SPOKEN-BLOCK-GRAMMAR | open | The spoken block grammar — announce the kind, enumerate the elements, never elide silently | 2026-09-15-brief-spoken-block-grammar.md |
-| 2026-09-14 | BRF-ADDRESS-CAP | open | The address cap — the invariant is the destination | 2026-09-14-brief-address-cap.md |
+| 2026-09-14 | BRF-ADDRESS-CAP | done | The address cap — the invariant is the destination | 2026-09-14-brief-address-cap.md |
 | 2026-09-14 | BRF-CONCEPTUAL-LEXICON | open | Extract the Conceptual Lexicon from system.md | 2026-09-14-brief-conceptual-lexicon.md |
 | 2026-09-14 | BRF-JUMP-LIST | open | The jump list — the search screen as its projection | 2026-09-14-brief-jump-list.md |
 | 2026-09-14 | BRF-SEARCH-SURFACE | parked | The search surface — the state machine, the array, and the invariant audit | 2026-09-14-brief-search-surface.md |

@@ -126,7 +126,7 @@ two hubs are exactly the pages a reader walks by reference: `&briefs.md`
 truth — *"the paint is a projection of the map"* (`src/vectors.ts:175`) —
 so the stride and the paint share one derivation by construction.
 
-Honest bound: the stride's stops are the map's entries, so `MAX_REFS` = 80
+Honest bound: the stride's stops are the map's entries, so `MAX_ADDRESSES` (= 80)
 is the ceiling, and one document already reaches it. The stride is bounded
 by the map's invariant, not the document's.
 
@@ -282,7 +282,7 @@ them apart. That is a medium constraint, not a missed design choice.
   outer table motion stays out of scope here
 - `src/frames.ts` — `headingLines`, `snapFrame`, `paragraphStarts`,
   `pageStep`
-- `src/vectors.ts` — `scanReferences`, `buildJumpMap`, `MAX_REFS`
+- `src/vectors.ts` — `scanReferences`, `buildJumpMap`, `MAX_ADDRESSES`
 - `src/tui.ts` — the dispatch (`:804-856`), the wheel path (`:120-122`,
   `:833-834`), `HINTS` (`:224`)
 - `playbooks/chrome-playbook.md` — the restraint ledger; the gift this brief

@@ -15,8 +15,12 @@ ADR-031 is the decision; this brief is the build. The model: the main document r
 ## What
 
 1. **Reference discovery — `discoverReferences(source: string): Ref[]`.**
-   Scan the main document's source in reading order; return the
-   reference-shaped targets, capped at 88:
+   Scan the main document's source in reading order; return **every**
+   reference-shaped occurrence. **There is no occurrence cap**, and the
+   address space is not one: a destination cited many times takes one
+   address, so a discovery bound keyed on the address count starves the
+   destinations that follow (the defect BRF-ADDRESS-CAP found — see the
+   destination rule in the acceptance criteria):
    - callsign-shaped tokens (`CALLSIGN_SHAPE`, moved to a shared module)
    - markdown inline links to local `.md` paths — `[text](target.md)`
    - **never**: zero-padded or single-digit bracketed numbers (`[07]`
@@ -103,8 +107,13 @@ ADR-031 is the decision; this brief is the build. The model: the main document r
   flashes the honest error and stays put.
 - `99` inside tmux opens a new window with the current document as
   main (annotated); `99` outside tmux flashes the honest host message.
-- A document with >88 references renders the first 88 as vectors and
-  the rest as text.
+- **The destination rule: a document with N distinct destinations carries N
+  addresses, however often each is cited** (BRF-ADDRESS-CAP, 2026-09-14). The
+  address space is 80 — the mixed-digit pairs — and it is the *map's* cap, never
+  discovery's. A document citing one target eighty times mints **one** address;
+  the document that then cites eighty more distinct targets gets the space it
+  has left. Past the space the 81st destination renders as text with no marker
+  (`BRF-BOUNDARY-MARK` owns the mark).
 - `just check` green; the retired-wiring tests are gone, the new ones
   pin discovery, map, paint, actuator, clone.
 

@@ -7,7 +7,10 @@ date: 2026-09-14
 # Brief: The address cap — the invariant is the destination
 
 **Created:** 2026-09-14
-**Status:** Open
+**Status:** Done (2026-10-13) — all six Work Plan items, plus `deriveReferences`,
+which is BRF-BOUNDARY-MARK's precondition and the reason the separation is worth
+anything. See *Outcome* below, which also corrects this brief's own worst-case
+extrapolation: the live damage was **3 addresses in one document**, not 70%.
 
 ## TD
 
@@ -74,24 +77,74 @@ citing one target many times never starves the destinations that follow it.
       2026-09-14** (same probe).
 - [x] `BRF-WORKING-COPY` is Open and specifies the defect. **Verified 2026-09-14**
       (`briefs/2026-09-04-brief-working-copy.md:23`, `:110–111`).
-- [ ] `just check` and `just test` green before starting.
+- [x] `just check` and `just test` green before starting. **Verified 2026-10-13.**
 
 ## Work Plan
 
-1. [ ] **Separate the two quantities.** `scanReferences` returns every
-       reference-shaped occurrence. The occurrence bound becomes its own constant,
-       chosen as a performance guard, and is not the address count.
-2. [ ] **Name the quantity.** `MAX_REFS` becomes the address count under a name
-       that says so; the occurrence guard takes its own name. One constant, one
-       meaning.
-3. [ ] **Correct `BRF-WORKING-COPY`.** `## What` item 1 and the Acceptance
-       criterion state the destination rule: a document with N distinct
-       destinations carries N vectors, however often each is cited.
-4. [ ] **Correct the drift.** `src/vectors.ts:5`, `src/vectors.ts:10` and
-       `src/tui.ts:675` render `§NN` — two digits, section sign.
-5. [ ] **Pin it.** `tests/vectors.test.ts` gains the starved-target case and the
-       many-occurrences case.
-6. [ ] `just check` green; `just test` green.
+1. [x] **Separate the two quantities.** `scanReferences` returns every
+       reference-shaped occurrence. **Deviation, deliberate:** there is **no
+       occurrence guard** rather than a new constant. A slice keyed on a new
+       number is the same defect in a new place — silent truncation is exactly
+       what this brief is about — and the source is already the bound. Measured
+       before removing it: `scanReferences` on the busiest document
+       (`&briefs.md`, 120 occurrences, 11 KB) is **0.18 ms**; `annotateSource`
+       the same. A guard here would be ceremony paying rent in the currency this
+       brief refuses.
+2. [x] **Name the quantity.** `MAX_REFS` → **`MAX_ADDRESSES`**, documented as the
+       address count. No occurrence constant exists, so there is nothing for it
+       to be confused with. One quantity, one name.
+3. [x] **Correct `BRF-WORKING-COPY`.** `## What` item 1 now returns every
+       occurrence and states that the address space is not an occurrence bound;
+       the Acceptance criterion carries the destination rule as a bullet of its
+       own.
+4. [x] **Correct the drift.** `§NN` at `src/vectors.ts:5`, `src/vectors.ts:13`
+       and `src/tui.ts:1034` (the line numbers had drifted from the brief's).
+       `rg -n '\[[0-9]{2}\]' src/vectors.ts src/tui.ts` now returns exactly one
+       hit — the `[07]`-is-text example.
+5. [x] **Pin it.** `tests/vectors.test.ts`: the retired `cap: discovery stops at
+       MAX_REFS` test *pinned the defect* and is replaced by three — 120 distinct
+       targets all returned; the starved-target case (one target × 80, then five
+       distinct → six addresses); and `deriveReferences`' truncation predicate,
+       including the full-map control that must **not** read as truncated.
+6. [x] `just check` green; `just test` green (736 pass).
+
+## Outcome (2026-10-13) — and the brief's own framing corrected
+
+Built by the Work Plan above, plus one thing the plan implied and did not state:
+**`deriveReferences(source) → { map, truncated }`**, with `jumpMapFor` kept as a
+thin wrapper so the blast radius is one function. That predicate is
+`BRF-BOUNDARY-MARK`'s precondition, and it is computable **only** because
+discovery stopped slicing — deriving it and discarding it would have been the
+whole point of the separation, thrown away. No mark is painted; overflow stays
+silent here, as this brief's Notes say.
+
+**The defect is real and the live damage is smaller than the brief's example.**
+The brief extrapolated from the corpus's worst ratio (43 occurrences to 13
+destinations → a 70% loss of the address space). The mechanism is exactly right
+and the corpus has not yet reached it, because the loss needs 80 *occurrences*
+before 80 *destinations*. Measured across all 517 tracked documents:
+
+| | before the fix | after |
+|---|---|---|
+| documents where the slice lost addresses | — | **1** (`briefs/index.md`, 104 occurrences, 101 distinct: **77 → 80** addresses) |
+| addresses recovered | — | **3** |
+
+So: **3 addresses, one document, recovered.** The rest of the corpus is safe
+because a document with no repetition has its first 80 occurrences *be* its first
+80 destinations — which is why the bug hid for weeks, and why the brief's ratio
+case is a cliff rather than a hole. It would have bitten the first repetitive
+document to pass 80 occurrences, and one document (`&briefs.md`) now sits at 120.
+
+**And the two quantities are now cleanly separated in the record:**
+
+| | count | grows? |
+|---|---|---|
+| addresses lost to the **slice** (the defect) | 3, in one document | fixed here |
+| destinations never realised at the **address cap** (intended, unmarked) | **61** across 2 documents (was 46 across 2 on 2026-09-10) | yes, with the corpus |
+
+The second row is not a defect — it is the two-digit space doing its job — and it
+is what `BRF-BOUNDARY-MARK` exists to mark. It was 46, it is now 61, and it is
+unmarked today.
 
 ## Acceptance
 

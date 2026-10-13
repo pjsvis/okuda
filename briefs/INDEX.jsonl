@@ -48,7 +48,7 @@
 {"file":"2026-09-12-brief-census-mode.md","date":"2026-09-12","status":"open","summary":"Census mode — the mentions-inclusive map, as a reader's opt-in","meta":{},"callsign":"BRF-CENSUS-MODE"}
 {"file":"2026-09-13-brief-audio-discovery.md","date":"2026-09-13","status":"open","summary":"Audio discovery — the actuator grammar, heard","meta":{},"callsign":"BRF-AUDIO-DISCOVERY"}
 {"file":"2026-09-13-brief-prolonged-press.md","date":"2026-09-13","status":"open","summary":"The prolonged press — three gestures, one actuation, no leak","meta":{},"callsign":"BRF-PROLONGED-PRESS"}
-{"file":"2026-09-14-brief-address-cap.md","date":"2026-09-14","status":"open","summary":"The address cap — the invariant is the destination","meta":{},"callsign":"BRF-ADDRESS-CAP"}
+{"file":"2026-09-14-brief-address-cap.md","date":"2026-09-14","status":"done","summary":"The address cap — the invariant is the destination","meta":{},"callsign":"BRF-ADDRESS-CAP"}
 {"file":"2026-09-14-brief-conceptual-lexicon.md","date":"2026-09-14","status":"open","summary":"Extract the Conceptual Lexicon from system.md","meta":{},"callsign":"BRF-CONCEPTUAL-LEXICON"}
 {"file":"2026-09-14-brief-jump-list.md","date":"2026-09-14","status":"open","summary":"The jump list — the search screen as its projection","meta":{},"callsign":"BRF-JUMP-LIST"}
 {"file":"2026-09-14-brief-search-surface.md","date":"2026-09-14","status":"parked","summary":"The search surface — the state machine, the array, and the invariant audit","meta":{},"callsign":"BRF-SEARCH-SURFACE"}
@@ -95,6 +95,6 @@
 {"file":"2026-10-10-brief-read-actuator.md","date":"2026-10-10","status":"open","summary":"Read actuator — the current document, handed to the voice","meta":{},"callsign":"BRF-READ-ACTUATOR"}
 {"file":"2026-10-10-brief-render-defects.md","date":"2026-10-10","status":"open","summary":"Render defects — the stack map's four findings, and how they stop recurring","meta":{},"callsign":"BRF-RENDER-DEFECTS"}
 {"file":"2026-10-10-brief-seam-audit.md","date":"2026-10-10","status":"done","summary":"The seam audit — the input path, where a run was mistaken for a spelling","meta":{},"callsign":"BRF-SEAM-AUDIT"}
-{"file":"2026-10-10-brief-table-gutter.md","date":"2026-10-10","status":"open","summary":"The table's gutter — the separator is chrome, and the cap pays for it","meta":{},"callsign":"BRF-TABLE-GUTTER"}
+{"file":"2026-10-10-brief-table-gutter.md","date":"2026-10-10","status":"rejected","summary":"The table's gutter — the separator is chrome, and the cap pays for it","meta":{},"callsign":"BRF-TABLE-GUTTER"}
 {"file":"2026-10-12-brief-code-silcrows.md","date":"2026-10-12","status":"done","summary":"Code-comment silcrows — a rendered code file is a document for its prose","meta":{},"callsign":"BRF-CODE-SILCROWS"}
 {"file":"2026-10-12-brief-table-glass-fit.md","date":"2026-10-12","status":"done","summary":"Table fit — wrap to the glass, elide only the floor","meta":{},"callsign":"BRF-TABLE-GLASS-FIT"}

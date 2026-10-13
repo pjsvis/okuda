@@ -7,7 +7,7 @@ date: 2026-10-10
 # Brief: The table's gutter — the separator is chrome, and the cap pays for it
 
 **Date:** 2026-10-10
-**Status:** **Rejected (2026-10-13)** — the gutter is the body's column boundary, not chrome. See *Rejected* at the foot: the premise, the re-measurement, and the rule.
+**Status:** Rejected (2026-10-13) — the gutter is the body's column boundary, not chrome. See *Rejected* at the foot: the premise, the re-measurement, and the rule.
 **TD:** BRF-TABLE-GUTTER (epic tracked by callsign)
 
 ## Context
