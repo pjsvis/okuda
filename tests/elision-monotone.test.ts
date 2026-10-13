@@ -4,6 +4,13 @@ import { displayWidth, stripANSI } from "../src/width";
 
 /** The recoverability invariant, pinned where it is fast to pin.
  *
+ *  SCOPE, stated because the sibling test's name is close enough to mislead:
+ *  this file asserts the **renderer's** monotonicity through `renderDocument`.
+ *  It does not import `scripts/elision-monotone.ts`. The GATE's own judgement
+ *  (the ladder's rise detection, the baseline comparison) is asserted in
+ *  `tests/elision-monotone-gate.test.ts`. Two different claims; both are now
+ *  checked, and for a day only one of them was.
+ *
  *  ADR-TABLE-EDGE-CUT-055: *below the cap a cut is recoverable — the reader's
  *  lever is widen; past the cap there is no lever.* `tests/table-fit.test.ts`
  *  asserts this for tables (*elision is monotone in the glass*). This asserts it

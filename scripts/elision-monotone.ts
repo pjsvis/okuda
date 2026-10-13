@@ -107,6 +107,56 @@ function read(raw: string, glass: number): Reading {
  *  atomic token (no `/ . _ @ -` to break at), which no target below 70 can
  *  hold; and an LR diagram chain whose art is ~116 columns. Verified: 4 cut
  *  lines at 60, 0 at 120. */
+/** A document whose cut count ROSE at a wider rung: a hide, not a cut. */
+export interface Rise { file: string; from: number; to: number; before: number; after: number }
+
+/** **The invariant, as a function.** Cut counts are non-increasing as the glass
+ *  widens; a document that cuts MORE at a wider rung is the defect class. Pure,
+ *  so `tests/elision-monotone-gate.test.ts` can assert it by constructing the
+ *  per-document counts — the test file that shares this gate's name asserts the
+ *  RENDERER's monotonicity, which is supporting coverage and not this. */
+export function risesIn(perDoc: Map<string, Map<number, number>>, ladder: number[]): Rise[] {
+  const out: Rise[] = [];
+  for (const [file, m] of perDoc) {
+    for (let i = 1; i < ladder.length; i++) {
+      const lo = ladder[i - 1]!;
+      const hi = ladder[i]!;
+      const before = m.get(lo) ?? 0;
+      const after = m.get(hi) ?? 0;
+      if (after > before) out.push({ file, from: lo, to: hi, before, after });
+    }
+  }
+  return out;
+}
+
+/** The corpus totals, same rule. Pure. */
+export function totalsMonotone(cuts: Map<number, number>, ladder: number[]): boolean {
+  return ladder.every((w, i) => i === 0 || cuts.get(w)! <= cuts.get(ladder[i - 1]!)!);
+}
+
+/** What the residue check found. Pure: the shell renders the sentences. */
+export interface Residue {
+  grown: string[];
+  worse: { file: string; cuts: number; baseline: number }[];
+  shrunk: string[];
+}
+
+/** **The baseline, judged.** A document outside it fails; one worse than its
+ *  recorded count fails; one that no longer loses content must be dropped (the
+ *  baselines may only shrink). Pure. */
+export function residueAgainst(
+  stubborn: { file: string; cuts: number }[],
+  accepted: Record<string, { cuts: number }>,
+): Residue {
+  return {
+    grown: stubborn.filter((s) => accepted[s.file] === undefined).map((s) => s.file),
+    worse: stubborn
+      .filter((s) => accepted[s.file] !== undefined && s.cuts > accepted[s.file]!.cuts)
+      .map((s) => ({ file: s.file, cuts: s.cuts, baseline: accepted[s.file]!.cuts })),
+    shrunk: Object.keys(accepted).filter((f) => !stubborn.some((s) => s.file === f)),
+  };
+}
+
 const ATOMIC = "ALPHA".repeat(14);
 
 const FIXTURE = [
@@ -130,203 +180,204 @@ const FIXTURE = [
   "",
 ].join("\n");
 
-const NARROW = LADDER[0]!;
-const WIDE = LADDER[LADDER.length - 1]!;
-const pos = read(await renderDocument(neutral(FIXTURE), { width: NARROW, color: "none" }), NARROW);
-const neg = read(await renderDocument(neutral(FIXTURE), { width: 120, color: "none" }), 120);
+/** The shell: controls, the corpus sweep, the report, the gates' exits.
+ *  `import.meta.main` because the pure judgement above is what a test asserts —
+ *  importing this module must not render 520 documents. Every lint in this
+ *  directory is shaped the same way, and the missing guard is why this gate's
+ *  own logic had no test. */
+async function main(): Promise<void> {
+  const NARROW = LADDER[0]!;
+  const WIDE = LADDER[LADDER.length - 1]!;
+  const pos = read(await renderDocument(neutral(FIXTURE), { width: NARROW, color: "none" }), NARROW);
+  const neg = read(await renderDocument(neutral(FIXTURE), { width: 120, color: "none" }), 120);
 
-if (!GATE) {
-  console.log("=== controls ===");
-  console.log(`POS @${NARROW} : ${JSON.stringify(pos)}`);
-  console.log(`NEG @120  : ${JSON.stringify(neg)}`);
-}
-if (pos.cuts === 0) {
-  console.error(`HALT — the fixture does not cut at ${NARROW}. The sweep measures nothing.`);
-  process.exit(1);
-}
-if (neg.cuts > 0) {
-  console.error("HALT — the fixture still cuts at 120. The ladder has no clean baseline.");
-  process.exit(1);
-}
-if (!GATE) {
-  console.log(`POS passes (the fixture cuts at ${NARROW}: ${pos.cuts}).`);
-  console.log("NEG passes (the fixture is clean at 120).");
-}
-
-// ── The corpus ─────────────────────────────────────────────────────────
-const files = Bun.spawnSync(["git", "ls-files", "*.md"], { stdout: "pipe" })
-  .stdout.toString()
-  .split("\n")
-  .filter((s) => s.trim() !== "");
-
-/** A rendering pass is subprocess-bound (the mermaid pipe spawns per fence), so
- *  a small pool buys most of the wall clock back. Renders are pure, and one
- *  document's fences never touch another's. */
-async function pool<T, R>(items: T[], limit: number, fn: (t: T) => Promise<R>): Promise<R[]> {
-  const out = new Array<R>(items.length);
-  let next = 0;
-  await Promise.all(
-    Array.from({ length: Math.min(limit, items.length) }, async () => {
-      for (;;) {
-        const k = next++;
-        if (k >= items.length) return;
-        out[k] = await fn(items[k]!);
-      }
-    }),
-  );
-  return out;
-}
-
-/** One document, one glass. Returns what the renderer lost there. */
-async function lose(srcPromise: Promise<string>, w: number): Promise<Reading> {
-  return read(await renderDocument(neutral(await srcPromise), { width: w, color: "none" }), w);
-}
-
-const CONCURRENCY = 8;
-
-async function sweep(widths: number[]) {
-  const cuts = new Map<number, number>();
-  const docs = new Map<number, number>();
-  const art = new Map<number, number>();
-  const perDoc = new Map<string, Map<number, number>>();
-  for (const w of widths) {
-    cuts.set(w, 0);
-    docs.set(w, 0);
-    art.set(w, 0);
-    const readings = await pool(files, CONCURRENCY, (f) => {
-      let m = perDoc.get(f);
-      if (!m) perDoc.set(f, (m = new Map()));
-      return lose(Bun.file(f).text(), w).then((r) => {
-        m.set(w, r.cuts);
-        return r;
-      });
-    });
-    for (const r of readings) {
-      cuts.set(w, cuts.get(w)! + r.cuts);
-      if (r.cuts > 0) docs.set(w, docs.get(w)! + 1);
-      if (r.art > 0) art.set(w, art.get(w)! + 1);
-    }
-    if (!GATE) process.stderr.write(`  ${w} done\n`);
+  if (!GATE) {
+    console.log("=== controls ===");
+    console.log(`POS @${NARROW} : ${JSON.stringify(pos)}`);
+    console.log(`NEG @120  : ${JSON.stringify(neg)}`);
   }
-  return { cuts, docs, art, perDoc };
-}
-
-const { cuts, docs, art, perDoc } = await sweep(LADDER);
-
-const rises: { file: string; from: number; to: number; before: number; after: number }[] = [];
-for (const [file, m] of perDoc) {
-  for (let i = 1; i < LADDER.length; i++) {
-    const lo = LADDER[i - 1]!;
-    const hi = LADDER[i]!;
-    const a = m.get(lo) ?? 0;
-    const b = m.get(hi) ?? 0;
-    if (b > a) rises.push({ file, from: lo, to: hi, before: a, after: b });
-  }
-}
-const totalMono = LADDER.every((w, i) => i === 0 || cuts.get(w)! <= cuts.get(LADDER[i - 1]!)!);
-
-/** **The residue is not the irreducible set, and the difference matters.**
- *  `ADR-TABLE-EDGE-CUT-055`'s irreducible set is a *floor the cap cannot hold* —
- *  no allocation at 116 columns works, so widening genuinely cannot repair it.
- *  A code fence has no cap: it elides at the glass, so ANY code line is repaired
- *  by enough columns. The honest question for the residue is therefore not *is it
- *  irreducible* but **how many columns would it need** — which is the number that
- *  makes a recommendation to an author actionable. Widening is the pane OR the
- *  zoom, so that number is the reader's price in either currency. */
-const NEED_LADDER = [160, 200, 250, 320, 400, 600];
-
-async function columnsNeeded(file: string): Promise<string> {
-  const src = await Bun.file(file).text();
-  for (const w of NEED_LADDER) {
-    const r = read(await renderDocument(neutral(src), { width: w, color: "none" }), w);
-    if (r.cuts === 0 && r.art === 0) return `needs <= ${w} columns`;
-  }
-  return `needs > ${NEED_LADDER[NEED_LADDER.length - 1]} columns`;
-}
-
-async function names(file: string): Promise<string> {
-  const src = await Bun.file(file).text();
-  const r = read(await renderDocument(neutral(src), { width: LADDER[LADDER.length - 1]!, color: "none" }), LADDER[LADDER.length - 1]!);
-  return `${String(r.cuts).padStart(3)} cut line(s), art ${r.art > 0 ? "LOST" : "ok  "}, ${await columnsNeeded(file)}  ${file}`;
-}
-
-if (GATE) {
-  if (rises.length > 0 || !totalMono) {
-    console.error(`elision-monotone: FAIL — ${rises.length} document(s) cut MORE at a wider glass`);
-    for (const r of rises.slice(0, 12)) console.error(`  ${r.file}: ${r.before} at ${r.from} -> ${r.after} at ${r.to}`);
+  if (pos.cuts === 0) {
+    console.error(`HALT — the fixture does not cut at ${NARROW}. The sweep measures nothing.`);
     process.exit(1);
   }
-  if (STRICT) {
-    const widest = LADDER[LADDER.length - 1]!;
-    const readings = await pool(files, CONCURRENCY, (f) => lose(Bun.file(f).text(), widest));
-    const stubborn = files
-      .map((file, i) => ({ file, ...readings[i]! }))
-      .filter((s) => s.cuts > 0 || s.art > 0);
-
-    const baseline = JSON.parse(
-      readFileSync(join(import.meta.dir, "elision-baseline.json"), "utf8"),
-    ) as { accepted: Record<string, { cuts: number; needs: number }> };
-    const known = baseline.accepted;
-
-    const problems: string[] = [];
-    for (const s of stubborn) {
-      const b = known[s.file];
-      if (b === undefined) problems.push(`not in the baseline: ${await names(s.file)}`);
-      else if (s.cuts > b.cuts) problems.push(`worse than the baseline: ${s.file} (${s.cuts} > ${b.cuts})`);
-    }
-    const shrunk = Object.keys(known).filter((f) => !stubborn.some((s) => s.file === f));
-
-    if (problems.length > 0) {
-      console.error(`elision-monotone: FAIL (strict) — the residue grew at ${widest} columns`);
-      for (const p of problems) console.error(`  ${p}`);
-      console.error("  reshape the document, or add it to scripts/elision-baseline.json with a reason");
-      process.exit(1);
-    }
-    for (const f of shrunk) {
-      console.error(`  baseline can shrink: ${f} no longer loses content — drop the entry`);
-    }
+  if (neg.cuts > 0) {
+    console.error("HALT — the fixture still cuts at 120. The ladder has no clean baseline.");
+    process.exit(1);
+  }
+  if (!GATE) {
+    console.log(`POS passes (the fixture cuts at ${NARROW}: ${pos.cuts}).`);
+    console.log("NEG passes (the fixture is clean at 120).");
   }
 
-  console.log(
-    `elision-monotone: OK (${files.length} documents; cut lines ${cuts.get(LADDER[0]!)} at ${LADDER[0]!} to ${cuts.get(WIDE)} at ${WIDE}; no rise anywhere)`,
-  );
-  process.exit(0);
+  // ── The corpus ─────────────────────────────────────────────────────────
+  const files = Bun.spawnSync(["git", "ls-files", "*.md"], { stdout: "pipe" })
+    .stdout.toString()
+    .split("\n")
+    .filter((s) => s.trim() !== "");
+
+  /** A rendering pass is subprocess-bound (the mermaid pipe spawns per fence), so
+   *  a small pool buys most of the wall clock back. Renders are pure, and one
+   *  document's fences never touch another's. */
+  async function pool<T, R>(items: T[], limit: number, fn: (t: T) => Promise<R>): Promise<R[]> {
+    const out = new Array<R>(items.length);
+    let next = 0;
+    await Promise.all(
+      Array.from({ length: Math.min(limit, items.length) }, async () => {
+        for (;;) {
+          const k = next++;
+          if (k >= items.length) return;
+          out[k] = await fn(items[k]!);
+        }
+      }),
+    );
+    return out;
+  }
+
+  /** One document, one glass. Returns what the renderer lost there. */
+  async function lose(srcPromise: Promise<string>, w: number): Promise<Reading> {
+    return read(await renderDocument(neutral(await srcPromise), { width: w, color: "none" }), w);
+  }
+
+  const CONCURRENCY = 8;
+
+  async function sweep(widths: number[]) {
+    const cuts = new Map<number, number>();
+    const docs = new Map<number, number>();
+    const art = new Map<number, number>();
+    const perDoc = new Map<string, Map<number, number>>();
+    for (const w of widths) {
+      cuts.set(w, 0);
+      docs.set(w, 0);
+      art.set(w, 0);
+      const readings = await pool(files, CONCURRENCY, (f) => {
+        let m = perDoc.get(f);
+        if (!m) perDoc.set(f, (m = new Map()));
+        return lose(Bun.file(f).text(), w).then((r) => {
+          m.set(w, r.cuts);
+          return r;
+        });
+      });
+      for (const r of readings) {
+        cuts.set(w, cuts.get(w)! + r.cuts);
+        if (r.cuts > 0) docs.set(w, docs.get(w)! + 1);
+        if (r.art > 0) art.set(w, art.get(w)! + 1);
+      }
+      if (!GATE) process.stderr.write(`  ${w} done\n`);
+    }
+    return { cuts, docs, art, perDoc };
+  }
+
+  const { cuts, docs, art, perDoc } = await sweep(LADDER);
+
+  const rises = risesIn(perDoc, LADDER);
+  const totalMono = totalsMonotone(cuts, LADDER);
+
+  /** **The residue is not the irreducible set, and the difference matters.**
+   *  `ADR-TABLE-EDGE-CUT-055`'s irreducible set is a *floor the cap cannot hold* —
+   *  no allocation at 116 columns works, so widening genuinely cannot repair it.
+   *  A code fence has no cap: it elides at the glass, so ANY code line is repaired
+   *  by enough columns. The honest question for the residue is therefore not *is it
+   *  irreducible* but **how many columns would it need** — which is the number that
+   *  makes a recommendation to an author actionable. Widening is the pane OR the
+   *  zoom, so that number is the reader's price in either currency. */
+  const NEED_LADDER = [160, 200, 250, 320, 400, 600];
+
+  async function columnsNeeded(file: string): Promise<string> {
+    const src = await Bun.file(file).text();
+    for (const w of NEED_LADDER) {
+      const r = read(await renderDocument(neutral(src), { width: w, color: "none" }), w);
+      if (r.cuts === 0 && r.art === 0) return `needs <= ${w} columns`;
+    }
+    return `needs > ${NEED_LADDER[NEED_LADDER.length - 1]} columns`;
+  }
+
+  async function names(file: string): Promise<string> {
+    const src = await Bun.file(file).text();
+    const r = read(await renderDocument(neutral(src), { width: LADDER[LADDER.length - 1]!, color: "none" }), LADDER[LADDER.length - 1]!);
+    return `${String(r.cuts).padStart(3)} cut line(s), art ${r.art > 0 ? "LOST" : "ok  "}, ${await columnsNeeded(file)}  ${file}`;
+  }
+
+  if (GATE) {
+    if (rises.length > 0 || !totalMono) {
+      console.error(`elision-monotone: FAIL — ${rises.length} document(s) cut MORE at a wider glass`);
+      for (const r of rises.slice(0, 12)) console.error(`  ${r.file}: ${r.before} at ${r.from} -> ${r.after} at ${r.to}`);
+      process.exit(1);
+    }
+    if (STRICT) {
+      const widest = LADDER[LADDER.length - 1]!;
+      const readings = await pool(files, CONCURRENCY, (f) => lose(Bun.file(f).text(), widest));
+      const stubborn = files
+        .map((file, i) => ({ file, ...readings[i]! }))
+        .filter((s) => s.cuts > 0 || s.art > 0);
+
+      const baseline = JSON.parse(
+        readFileSync(join(import.meta.dir, "elision-baseline.json"), "utf8"),
+      ) as { accepted: Record<string, { cuts: number; needs: number }> };
+      const known = baseline.accepted;
+
+      const { grown, worse, shrunk } = residueAgainst(
+        stubborn.map((s) => ({ file: s.file, cuts: s.cuts })),
+        known,
+      );
+      const problems: string[] = [];
+      for (const f of grown) problems.push(`not in the baseline: ${await names(f)}`);
+      for (const w of worse) problems.push(`worse than the baseline: ${w.file} (${w.cuts} > ${w.baseline})`);
+
+      if (problems.length > 0) {
+        console.error(`elision-monotone: FAIL (strict) — the residue grew at ${widest} columns`);
+        for (const p of problems) console.error(`  ${p}`);
+        console.error("  reshape the document, or add it to scripts/elision-baseline.json with a reason");
+        process.exit(1);
+      }
+      for (const f of shrunk) {
+        console.error(`  baseline can shrink: ${f} no longer loses content — drop the entry`);
+      }
+    }
+
+    console.log(
+      `elision-monotone: OK (${files.length} documents; cut lines ${cuts.get(LADDER[0]!)} at ${LADDER[0]!} to ${cuts.get(WIDE)} at ${WIDE}; no rise anywhere)`,
+    );
+    process.exit(0);
+  }
+
+  // ── The report ─────────────────────────────────────────────────────────
+  console.log(`\n=== corpus: ${files.length} documents on the ladder ===\n`);
+  console.log(`width   cuts   docs  artElided`);
+  console.log("-".repeat(34));
+  for (const w of LADDER) {
+    console.log(
+      [
+        String(w).padStart(5),
+        String(cuts.get(w)).padStart(6),
+        String(docs.get(w)).padStart(6),
+        String(art.get(w)).padStart(10),
+      ].join(""),
+    );
+  }
+
+  console.log(`\n=== the invariant: cuts are non-increasing as the glass widens ===`);
+  console.log(`documents whose cut count ROSE at a wider rung : ${rises.length}`);
+  for (const r of rises.slice(0, 12)) {
+    console.log(`  ${r.file}: ${r.before} at ${r.from} -> ${r.after} at ${r.to}`);
+  }
+  console.log(`corpus totals non-increasing                   : ${totalMono ? "yes" : "NO"}`);
+
+  // ── The irreducible set ────────────────────────────────────────────────
+  // ADR-TABLE-EDGE-CUT-055 names its irreducible tables by file and line
+  // ("Computer says NO: Too ugly"). Nothing named the residue in the other
+  // classes — the losses widening cannot repair, which the law hands back to the
+  // document. So name them, with the columns they would need.
+  console.log(`\n=== the irreducible set at ${WIDE} columns (widening cannot repair) ===`);
+  const widestRead = await pool(files, CONCURRENCY, (f) => lose(Bun.file(f).text(), WIDE));
+  const stubborn = files
+    .map((file, i) => ({ file, ...widestRead[i]! }))
+    .filter((s) => s.cuts > 0 || s.art > 0)
+    .sort((a, b) => b.cuts - a.cuts);
+  console.log(`documents still losing content : ${stubborn.length} of ${files.length}`);
+  console.log("(the recommendation to the author is this list — a named set, never a warning,");
+  console.log(" and the columns each would need, because widen means the pane or the zoom)");
+  for (const s of stubborn) console.log(`  ${await names(s.file)}`);
+
 }
 
-// ── The report ─────────────────────────────────────────────────────────
-console.log(`\n=== corpus: ${files.length} documents on the ladder ===\n`);
-console.log(`width   cuts   docs  artElided`);
-console.log("-".repeat(34));
-for (const w of LADDER) {
-  console.log(
-    [
-      String(w).padStart(5),
-      String(cuts.get(w)).padStart(6),
-      String(docs.get(w)).padStart(6),
-      String(art.get(w)).padStart(10),
-    ].join(""),
-  );
-}
-
-console.log(`\n=== the invariant: cuts are non-increasing as the glass widens ===`);
-console.log(`documents whose cut count ROSE at a wider rung : ${rises.length}`);
-for (const r of rises.slice(0, 12)) {
-  console.log(`  ${r.file}: ${r.before} at ${r.from} -> ${r.after} at ${r.to}`);
-}
-console.log(`corpus totals non-increasing                   : ${totalMono ? "yes" : "NO"}`);
-
-// ── The irreducible set ────────────────────────────────────────────────
-// ADR-TABLE-EDGE-CUT-055 names its irreducible tables by file and line
-// ("Computer says NO: Too ugly"). Nothing named the residue in the other
-// classes — the losses widening cannot repair, which the law hands back to the
-// document. So name them, with the columns they would need.
-console.log(`\n=== the irreducible set at ${WIDE} columns (widening cannot repair) ===`);
-const widestRead = await pool(files, CONCURRENCY, (f) => lose(Bun.file(f).text(), WIDE));
-const stubborn = files
-  .map((file, i) => ({ file, ...widestRead[i]! }))
-  .filter((s) => s.cuts > 0 || s.art > 0)
-  .sort((a, b) => b.cuts - a.cuts);
-console.log(`documents still losing content : ${stubborn.length} of ${files.length}`);
-console.log("(the recommendation to the author is this list — a named set, never a warning,");
-console.log(" and the columns each would need, because widen means the pane or the zoom)");
-for (const s of stubborn) console.log(`  ${await names(s.file)}`);
+if (import.meta.main) void main();
