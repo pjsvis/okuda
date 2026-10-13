@@ -16,7 +16,7 @@
  */
 
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
-import { annotateSource, appendReferences, jumpMapFor, CLONE_TOKEN } from "./vectors";
+import { annotateSource, appendReferences, deriveReferences, CLONE_TOKEN } from "./vectors";
 
 import { cloneArgs, editArgs, resolveEditor } from "./clone";
 import { frameBounds, headingLines, pageStep, paragraphStarts, snapFrame } from "./frames";
@@ -731,11 +731,14 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   // A code file is a document for its comment prose (BRF-CODE-SILCROWS): the
   // regions predicate restricts discovery to comments, so a string literal
   // quoting a callsign is data and never paints. `regionsForFile` is the one
-  // composition, shared with the streaming render.
-  const deriveMain = (text: string): Map<number, string> =>
-    jumpMapFor(text, opts.resolves, regionsForFile(mainFile, text));
+  // composition, shared with the streaming render. Returns the map AND the
+  // truncation fact (BRF-ADDRESS-CAP → BRF-BOUNDARY-MARK): the receipt's mark
+  // is derived, so the fact has to travel with the map it describes.
+  const deriveMain = (text: string) =>
+    deriveReferences(text, opts.resolves, regionsForFile(mainFile, text));
   let mainText = "";
   let mainJumps: Map<number, string> = new Map();
+  let mainTruncated = false;
   let backstack: { file: string; scroll: number }[] = [];
   let runBuffer: RunBuffer = null; // the tap-run state (BRF-PROLONGED-PRESS; brackets BRF-SEAM-AUDIT)
 
@@ -749,7 +752,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   const initialFetch = await readSource();
   if (initialFetch.ok) {
     mainText = initialFetch.text;
-    mainJumps = deriveMain(mainText);
+    ({ map: mainJumps, truncated: mainTruncated } = deriveMain(mainText));
   }
   const initialRender = initialFetch.ok
     ? await renderAtGlass(
@@ -757,6 +760,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
           annotateSource(initialFetch.text, mainJumps, regionsForFile(mainFile, initialFetch.text)),
           mainJumps,
           true,
+          mainTruncated,
         ),
       )
     : [];
@@ -974,7 +978,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     const atMain = backstack.length === 0;
     if (fetch.ok && atMain) {
       mainText = fetch.text;
-      mainJumps = deriveMain(mainText); // the map re-derives; no invalidation
+      ({ map: mainJumps, truncated: mainTruncated } = deriveMain(mainText)); // the map re-derives; no invalidation
     }
     // The main render annotates (ADR-031) and carries the generated
     // References section (ADR-047 — the map's receipt, downstream of the
@@ -992,6 +996,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
             annotateSource(fetch.text, mainJumps, regionsForFile(mainFile, fetch.text)),
             mainJumps,
             true,
+            mainTruncated,
           )
           : fetch.text,
         cols,
@@ -1063,7 +1068,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     const fetch = await readSource(prev.file);
     if (!fetch.ok) return; // main gone — stay; entry dropped
     mainText = fetch.text;
-    mainJumps = deriveMain(mainText);
+    ({ map: mainJumps, truncated: mainTruncated } = deriveMain(mainText));
     currentFile = prev.file;
     // Back is a MAIN render: annotated, and it ends with the map's
     // receipt (ADR-047) — the same foot the initial render carries.
@@ -1072,6 +1077,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
         annotateSource(fetch.text, mainJumps, regionsForFile(mainFile, fetch.text)),
         mainJumps,
         true,
+        mainTruncated,
       ),
       dims().cols,
     );

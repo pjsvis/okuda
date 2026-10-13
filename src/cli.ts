@@ -24,7 +24,7 @@ import {
   resolveByCallsign,
   siloRoot,
 } from "./root";
-import { CALLSIGN_SHAPE, jumpMapFor, annotateSource, appendReferences } from "./vectors";
+import { CALLSIGN_SHAPE, deriveReferences, annotateSource, appendReferences } from "./vectors";
 import { terminalCols, terminalRows } from "./width";
 import { existsSync } from "node:fs";
 
@@ -270,13 +270,16 @@ async function main(): Promise<void> {
     // test fixture, demo data — does not. The paint already works inside the
     // fence; the fence was only gating discovery.
     const regions = regionsForFile(args.file, source);
-    const map = wantMap ? jumpMapFor(source, silcrowResolves, regions) : new Map<number, string>();
+    const derived = wantMap
+      ? deriveReferences(source, silcrowResolves, regions)
+      : { map: new Map<number, string>(), truncated: false };
+    const map = derived.map;
     const source2 = process.stdout.isTTY && wantMap ? annotateSource(source, map, regions) : source;
     // Wrap AFTER annotation (the tokens ride in the fence) and BEFORE the
     // receipt (the References section is markdown prose beneath the block, not
     // code inside it).
     const fenced = args.file ? wrapWholeFile(args.file, source2) : source2;
-    const body = wantMap ? appendReferences(fenced, map, process.stdout.isTTY) : fenced;
+    const body = wantMap ? appendReferences(fenced, map, process.stdout.isTTY, derived.truncated) : fenced;
     const out = await renderDocument(body, {
       width,
       palette,

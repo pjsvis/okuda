@@ -297,7 +297,7 @@ export function deriveReferences(
   source: string,
   resolves?: (target: string) => boolean,
   regions?: (pos: number) => boolean,
-): { map: Map<number, string>; truncated: boolean } {
+): DerivedMap {
   const refs = scanReferences(source, resolves, regions);
   const map = buildJumpMap(refs);
   const distinct = new Set(refs.map((r) => r.target)).size;
@@ -357,11 +357,46 @@ export function annotateSource(
  *  mention, never a link, so the section cannot re-mint the map that
  *  lists it. Empty map, empty string — no section, no empty header.
  *  Pure: map in, section source out. */
-export function referencesSection(map: Map<number, string>): string {
+/** The derivation's result: the map, and whether the document holds more distinct
+ *  destinations than the address space holds. **A full map is not a truncated
+ *  map** — exactly eighty distinct destinations is complete — so the fact is a
+ *  comparison, never `map.size === MAX_ADDRESSES`. (BRF-ADDRESS-CAP,
+ *  BRF-BOUNDARY-MARK.) */
+export interface DerivedMap {
+  map: Map<number, string>;
+  truncated: boolean;
+}
+
+/** The boundary mark — the receipt reached the address cap and says so.
+ *
+ *  A bare `…`: the silo's elision glyph, and **not a silcrow** — it carries no
+ *  number and cannot be actuated. Bare rather than `… and N more`, because the
+ *  count is a second quantity to keep honest and it moves on every render of a
+ *  growing corpus: exactly the warning shape that fires on every render of a
+ *  growing view (BRF-BOUNDARY-MARK, *why not a count*).
+ *
+ *  **`⋮` was the recorded alternative** — truer to a list's axis, and it already
+ *  paints `state-parked` through the state-glyph table — and it stays deferred:
+ *  it is bound to the *mermaid source elided* indicator, and one glyph with two
+ *  referents is the failure *Attributable structure* names. Promote it to `⋮` if
+ *  dogfood reads this mark as a cell cut rather than a list boundary.
+ *
+ *  The mark is plain text, not muted. **Deviation from the brief, declared:** no
+ *  muted channel exists from a markdown source — the receipt's other lines are
+ *  not muted either (the `§NN` badge paints in the vector role, the target is
+ *  prose) — and a new paint channel for one glyph is the ceremony this silo
+ *  refuses. What distinguishes the mark is what it is *not*: no silcrow, no
+ *  number, nothing actuable, which is the load-bearing half. */
+const BOUNDARY_MARK = "\u2026";
+
+export function referencesSection(map: Map<number, string>, truncated = false): string {
   if (map.size === 0) return "";
   // `[...map]` iterates insertion order — the map's minting order,
   // reading order ascending. The section reorders nothing.
   const entries = [...map].map(([num, target]) => `%okuda-vector:${num}% ${target}`);
+  // Derived, never judged: the mark follows from the comparison the derivation
+  // already made, so a full map (eighty distinct, no repeats) carries none.
+  if (truncated) entries.push(BOUNDARY_MARK);
   // Each entry is its own loose line: one paragraph per destination, so
   // the renderer keeps one § per line (consecutive bare lines would join
   // into one paragraph and lose the scannable ascent).
@@ -427,19 +462,28 @@ export function referencesCovered(source: string, map: Map<number, string>): boo
  *  "why this duplication?", and nothing on the page answers it. A partial
  *  list keeps the receipt, and the reader who asks "why is this here?"
  *  finds the answer by comparison — *Related was incomplete* — which
- *  reassures rather than leaves doubt. Pure. */
+ *  reassures rather than leaves doubt.
+ *
+ *  **A truncated map is never suppressed** (BRF-BOUNDARY-MARK, amending
+ *  ADR-047). `referencesCovered` checks the *map's* destinations, so on a
+ *  truncated map it can be true while the document still holds destinations
+ *  the receipt never saw — and suppression would then hide the boundary with
+ *  the receipt. So the receipt reappears over an otherwise complete hand list
+ *  exactly when the map is truncated: its mere presence reports the
+ *  truncation, a conditional element reporting its condition. Pure. */
 export function appendReferences(
   source: string,
   map: Map<number, string>,
   annotated = false,
+  truncated = false,
 ): string {
-  const section = referencesSection(map);
+  const section = referencesSection(map, truncated);
   if (!section) return source;
   // Suppress only where the addresses are already ON the page: `annotated`
   // is the caller's statement that the silcrows are present (cli gates it on
   // `process.stdout.isTTY`; the TUI always annotates). On the plain/piped
   // rung the receipt IS the address table — ADR-047, "painted silcrows on
   // the glass, plain numbers elsewhere" — so it is never suppressed there.
-  if (annotated && referencesCovered(source, map)) return source;
+  if (annotated && !truncated && referencesCovered(source, map)) return source;
   return source.replace(/\s*$/, "\n\n") + section + "\n";
 }

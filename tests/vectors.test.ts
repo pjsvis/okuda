@@ -399,6 +399,57 @@ describe("vectors — the generated References section (ADR-047, BRF-REFERENCES-
     expect(appendReferences("body\n", new Map())).toBe("body\n");
   });
 
+  describe("the boundary mark (BRF-BOUNDARY-MARK)", () => {
+    const names = (n: number) => Array.from({ length: n }, (_, i) => `ADR-${1000 + i}`);
+    const rows = (s: string) => s.split("\n").filter((l) => l.startsWith("%okuda-vector:")).length;
+    const lastLine = (s: string) => s.trimEnd().split("\n").slice(-1)[0]!;
+
+    test("81 distinct destinations: 80 rows, then a bare … that is not an address", () => {
+      const d = deriveReferences(names(81).join(" ") + "\n");
+      expect(d.truncated).toBe(true);
+      const section = referencesSection(d.map, d.truncated);
+      expect(rows(section)).toBe(MAX_ADDRESSES);
+      expect(lastLine(section)).toBe("…");
+      // Not a silcrow, so nothing can paint it and nothing can actuate it.
+      expect(lastLine(section)).not.toContain("%okuda-vector");
+    });
+
+    test("a full map carries no mark — the false-positive control", () => {
+      // Exactly eighty distinct destinations is COMPLETE. A mark there would lie
+      // about its referent: the predicate is a comparison, never the constant 80.
+      const d = deriveReferences(names(80).join(" ") + "\n");
+      expect(d.truncated).toBe(false);
+      expect(rows(referencesSection(d.map, d.truncated))).toBe(MAX_ADDRESSES);
+      expect(referencesSection(d.map, d.truncated)).not.toContain("…");
+    });
+
+    test("a truncated map is never suppressed — the receipt's presence reports it", () => {
+      // A hand list covering every destination the MAP holds, so
+      // `referencesCovered` is true: before the amendment the receipt was
+      // suppressed, and the boundary was hidden with it.
+      const all = names(81);
+      const src =
+        "# Doc\n\n" + all.join(" ") + "\n\n## Related\n\n" + all.map((n) => `- ${n}`).join("\n") + "\n";
+      const d = deriveReferences(src);
+      expect(d.truncated).toBe(true);
+      expect(referencesCovered(src, d.map)).toBe(true);
+      // The new term, isolated: coverage alone still suppresses…
+      expect(appendReferences(src, d.map, true, false)).toBe(src);
+      // …coverage with truncation does not, and the mark rides the kept receipt.
+      const kept = appendReferences(src, d.map, true, true);
+      expect(kept).toContain("## References");
+      expect(lastLine(kept)).toBe("…");
+    });
+
+    test("the mark is not TTY-gated: identical on the painted and the plain rung", () => {
+      const d = deriveReferences(names(81).join(" ") + "\n");
+      // A silcrow needs the TTY gate; the mark needs none — it is plain text in
+      // the section source, so a pipe and NO_COLOR lose nothing.
+      expect(lastLine(appendReferences("body\n", d.map, false, d.truncated))).toBe("…");
+      expect(lastLine(appendReferences("body\n", d.map, true, d.truncated))).toBe("…");
+    });
+  });
+
   test("the map-identity invariant: the section never feeds the map (the loop's guard)", () => {
     // A doc with its section appended derives the same map as the same
     // doc without one — the acceptance criterion. Repeats dedupe by
