@@ -43,11 +43,21 @@ describe("the tier vocabulary", () => {
     expect(statusFor("rejected", "briefs")).toBe("rejected");
     expect(statusFor("draft", "briefs")).toBe("open"); // the corpus's word for not-started
     expect(statusFor("proposed", "briefs")).toBe("open");
+    // Added 2026-10-13 (ADR-BRIEF-LIFECYCLE-061): the state the panels had been
+    // maintaining by hand, and three folds that name another tier's moment or a
+    // gate that does not exist.
+    expect(statusFor("ready", "briefs")).toBe("ready");
+    expect(statusFor("aborted", "briefs")).toBe("rejected");
+    expect(statusFor("accepted", "briefs")).toBe("done");
+    expect(statusFor("pending", "briefs")).toBe("open");
   });
 
   test("an unknown word is null — a finding, never a silent `open`", () => {
-    expect(statusFor("ready", "briefs")).toBeNull();
+    // `ready` sat in this assertion until 2026-10-13: the test had encoded the
+    // vocabulary gap as a contract, which is how it survived six briefs using
+    // the word and a panel maintaining the section by hand.
     expect(statusFor("frobnicated", "briefs")).toBeNull();
+    expect(statusFor("ready", "decisions")).toBeNull(); // no `ready` in the ADR lifecycle
   });
 
   test("decisions: the ADR lifecycle plus the abort", () => {

@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-13 | ADR-BRIEF-LIFECYCLE-061 | Accepted | The brief's lifecycle — the vocabulary is the scale | 061-brief-lifecycle-vocabulary.md |
 | 2026-10-10 | ADR-DERIVED-AMP-TABLE-058 | Accepted | The state table derives its rows — the registry is the membership, the editor keeps the grouping | 058-derived-amp-table.md |
 | 2026-10-10 | ADR-SEAM-COPY-059 | Accepted | The seam is crossed by a copy the receiver commits — not a shared symlink | 059-seam-copy.md |
 | 2026-10-10 | ADR-DOCS-DIRECT-060 | Accepted | Match the review to the risk — docs merge direct, PRs are for code | 060-docs-direct-code-pr.md |

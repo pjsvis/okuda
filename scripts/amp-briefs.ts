@@ -45,12 +45,16 @@ const known = new Set<string>([...live, ...archive].map((e) => e.callsign));
 // The editor moves it from there; this map is the only default.
 const SECTION: Record<string, string> = {
   open: "Open queue",
+  // The heading already exists by hand (BRF-AMP-TABLE): the vocabulary was the
+  // half that lagged. The map is prefix-based, so it matches that heading.
+  ready: "Ready — specced, next up",
   done: "Landed — debrief on file",
   parked: "Parked / deferred",
   rejected: "Closed by other means",
 };
 const GLYPH: Record<string, string> = {
   open: "· open",
+  ready: "▸ ready",
   done: "✓ done",
   parked: "↓ parked",
   rejected: "✗ rejected",

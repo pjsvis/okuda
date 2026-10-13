@@ -72,16 +72,39 @@ export interface Entry {
  *  corpus's words for a brief not yet started — both already recorded as
  *  `open`, so the entry documents behaviour rather than changing it. A map
  *  narrower than the vocabulary silently reported every parked brief as
- *  `open` — the defect that let a stale index row sit unnoticed. */
+ *  `open` — the defect that let a stale index row sit unnoticed.
+ *
+ *  **Settled 2026-10-13** (ADR-BRIEF-LIFECYCLE-061) after this gate reported
+ *  ten unrecognised words. Five words, two classes: one genuine missing state
+ *  (`ready`), three folds, and one document whose Status line was a sentence
+ *  rather than a state (a document fix, not a vocabulary entry). The vocabulary
+ *  IS the scale a lifecycle indicator draws, so a word it cannot read is a
+ *  position the panel cannot render. */
 const BRIEF_STATUS: Record<string, string> = {
   open: "open",
   "in progress": "in_progress",
+  // **`ready` is a state, not a synonym for open.** Six briefs wrote it
+  // independently and `&briefs.md` has carried a hand-maintained
+  // `## Ready — specced, next up` section for months: the state exists in the
+  // panel and only the vocabulary was behind. It is the position between
+  // *specified* and *started*, and a scale needs it.
+  ready: "ready",
   done: "done",
   landed: "done",
   parked: "parked",
   rejected: "rejected",
   draft: "open",
   proposed: "open",
+  // Folds, each because the word names another tier's moment for the same event,
+  // or a gate that does not exist:
+  //  - `aborted` is the decisions vocabulary's word (ADR-MNEMONIC-MODEL-025); a
+  //    brief at that moment is `rejected`, which the registry already stored.
+  //  - `accepted` means the brief's proposal became a decision — a landing, and
+  //    the *which* is in the body.
+  //  - `pending` named no gate, so there was nothing to be parked ON.
+  aborted: "rejected",
+  accepted: "done",
+  pending: "open",
 };
 
 /** The decisions vocabulary (ADR-025's lifecycle plus the abort). */
