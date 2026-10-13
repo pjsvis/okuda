@@ -72,6 +72,12 @@ arrow, or anything that is not a digit: every non-tap clears it. Nothing is owed
 the clock, and nothing needs to be remembered except that typing something else
 gets you out.
 
+**And a waiting digit is on screen.** Because it never expires, the footer shows
+it: a keycap at the right end, beside `? help` — `[9]` while a `9` waits, gone the
+moment the pair resolves or you type anything else. It is your receipt that the first
+tap of a gesture landed, which is the only way to tell a pending pair from a
+swallowed one.
+
 ## Mapping to what exists
 
 - **[00] exit** — cheap: the cleanup path exists; `00` completes the

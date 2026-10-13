@@ -94,9 +94,8 @@ slot** — `99 … 99` fires once — and the answer is allocation rather than a
 repeatable verbs belong in the **vector** space, where the mixed pair is never
 latched (`1212` fires two jumps back to back), and every bound doubled pair is a
 one-shot system verb already. A pending digit **never expires** — so it must be
-**visible**, an obligation `BRF-PROLONGED-PRESS` names and this ADR deliberately
-does not fold in: the abort answers *how do I get out of it*; only rendering
-answers *how do I know I am in it*.
+**visible**: the abort answers *how do I get out of it*; only rendering answers
+*how do I know I am in it*. That is discharged below.
 
 ## Alternatives Considered
 
@@ -128,6 +127,67 @@ what was missing was the **decision record**, and that is this.
 the reader's abort is "type anything else". `docs/2026-09-05-keyboard-controls.md`
 should name the three gestures and this abort beside the digit bindings.
 
+## The pending tap is visible (2026-10-13)
+
+The obligation above is discharged. A held, unresolved tap draws a **keycap at the
+footer's right end, muted, immediately left of `? help`**:
+
+```
+Gloam okuda · DOC-X · docs/audit.md                        [9]  ? help
+```
+
+- **A keycap, because the render decided it.** A bare `9` beside `? help` reads as
+  a count or a stray character; `[9]` reads as *this key is held*, and the
+  enclosure means what it shows without a legend. A bracket tap is already an
+  enclosure, so it is shown doubled — a held `[` is half of a frame motion, and
+  the reader's own spelling of that half is `[[`. (Both rendered and compared
+  before choosing, the way the table gutter was settled.)
+- **Muted and beside the affordance**, because it is *state* and state shares the
+  perimeter with the affordance (`BRF-READING-FRACTION` ruling 2: rose+bold is the
+  control channel, reserved for what is actuable). The mark and `? help` render as
+  one muted run, so the reader tells them apart by **presence** — the conditional
+  element reporting its condition, exactly as the receipt does at the foot of a
+  document.
+- **Only the unspent tap is shown.** Once a pair resolves the run is *spent* and
+  the token has already fired, so there is nothing pending to report; the swallowed
+  remainder paints nothing, because nothing changed.
+
+### The defect the dogfood found — and the whole reason to run one
+
+**The mark could never appear, and the abort could never clear it.** Every early
+return in the run buffer's section of `applyKey` returned `false` — "keep going" —
+without repainting, because nothing in that path had ever changed a *visible*
+thing before. So the reducer was correct, the renderer was correct, the unit tests
+passed, and the feature was inert:
+
+| path | before | after |
+|---|---|---|
+| a first tap lands | `return false` | paint if visibility changed |
+| `ESC` clears a pending tap | `return false` | paint if visibility changed |
+| a non-tap clears it | `return false` | paint if visibility changed |
+| a pair resolves | no paint | paint **before** the verb dispatch |
+
+The ordering is load-bearing: the paint is issued immediately after the buffer
+update, *before* the verb runs, because several verbs paint nothing of their own —
+`clone` spawns a terminal, `edit` spawns an editor — and without it the mark would
+linger past the actuation it was reporting.
+
+**The harness, and why this one is `expect`.** `tmp/dogfood-probe.ts` drives the
+TUI through `script -q`, which needs a **tty on its own stdin**: it dies with
+`tcgetattr/ioctl: Operation not supported on socket` when the loop runs it, so that
+probe can only be exercised by a human at a terminal. `scripts/dogfood-pending.exp`
+allocates the pty itself, which is what makes this dogfood runnable in the loop
+(`just dogfood-pending`). It also names an **unknown clone integration**, because
+`cloneArgs` resolves the integration *before* the `OKUDA_CLONE_CMD` escape hatch —
+setting the cmd alone does not stop a real window being spawned, and the first run
+of the probe opened one.
+
+**The control.** Against the code *without* the repaint, the probe fails three
+checks (*the pending mark never appeared*, *no frame after ESC*, *no frame for the
+first tap*) and passes eight with it. A negative assertion passes vacuously when
+the positive one never fires — which is why the run as a whole has to fail, and why
+the three failing checks are the evidence rather than the eight passing ones.
+
 ## Related
 
 - `ADR-REPEATED-DIGIT-ACTUATORS-032` — **which** pairs are actuators; this is how a run resolves to one
@@ -135,5 +195,6 @@ should name the three gestures and this abort beside the digit bindings.
 - `briefs/2026-10-10-brief-seam-audit.md` — where the code actually landed, and the debt it records
 - `src/tui.ts` — `advanceRunBuffer`, `tapOf`, `advanceNumBuffer`
 - `tests/tui.test.ts`, `tests/input-seam.test.ts` — the gesture matrix
+- `scripts/dogfood-pending.exp` — the pty dogfood, and its control
 - `BRF-PROLONGED-PRESS` — the design, and the pending-state obligation this owes
 - `docs/2026-09-05-keyboard-controls.md` — the reader-facing surface this owes a paragraph
