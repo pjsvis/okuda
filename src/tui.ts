@@ -351,6 +351,17 @@ export const SYNC_END = "\x1b[?2026l";
 export const syncWrap = (frame: string): string =>
   SYNC_BEGIN + frame + SYNC_END;
 
+/** A held tap, as the footer shows it (BRF-PROLONGED-PRESS: a pending digit
+ *  must be VISIBLE). A keycap shape rather than a bare character, because the
+ *  bare character is ambiguous in the perimeter — a lone `9` beside `? help`
+ *  reads as a count — and the enclosure *means* what it shows ("this key is
+ *  held") without a legend. A bracket tap is already an enclosure, so it is
+ *  shown doubled: a held `[` is half of a frame motion, and the reader's own
+ *  spelling of that half is `[[`. Pure. */
+export function pendingMark(tap: string): string {
+  return tap === "[" || tap === "]" ? tap + tap : `[${tap}]`;
+}
+
 /** Compact LHS: the help affordance only. Pure. */
 function compactLeft(): string {
   return "? help";
@@ -608,9 +619,19 @@ export function footerLine(
   badge: (s: string) => string,
   silo?: string,
   callsign?: string,
+  /** A tap held and waiting, already rendered by `pendingMark` (BRF-PROLONGED-
+   *  PRESS). MUTED and beside the affordance, because state shares the
+   *  perimeter with the affordance (BRF-READING-FRACTION ruling 2: rose+bold is
+   *  the control channel, reserved for what is actuable — this is state).
+   *  Conditional, and its APPEARANCE reports its condition (*Attributable
+   *  structure*): the mark is on screen exactly while a tap waits. Absent →
+   *  nothing, never an empty slot. */
+  pending?: string,
 ): string {
   const name = displayPath(file);
-  const rightText = compactLeft();
+  // The pending mark sits LEFT of the affordance, so `? help` keeps the edge
+  // and the conditional element grows and shrinks to its left.
+  const rightText = (pending !== undefined ? pending + "  " : "") + compactLeft();
   // identity run: muted silo + callsign, dot-joined, each trailing ` · `.
   // Empty when unrooted — collapses to today's badge + filename. The
   // width math uses plain lengths (ANSI is zero-width), parity with
@@ -881,7 +902,8 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // blank gap on the wire; removing it is option 1, deferred.
     let frame = "\x1b[2J\x1b[H"; // clear + home
     frame += view.visible.join("\n");
-    const footer = footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined);
+    const held = runBuffer !== null && !runBuffer.spent ? runBuffer.keys : undefined;
+    const footer = footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined, held === undefined ? undefined : pendingMark(held));
     // Chrome geometry (BRF-FOOTER-SEPARATOR): the badge owns the BOTTOM
     // edge — the last row, permanent identity under the transient; the
     // separator row above it is blank by default and carries hints and
@@ -1124,13 +1146,26 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  BRF-PROLONGED-PRESS layer 2, load-bearing independently of the
    *  burst). */
   const applyKey = (bytes: Uint8Array): boolean => {
+    /** Is a tap held and waiting? The footer's pending mark is drawn from
+     *  exactly this (BRF-PROLONGED-PRESS: with no expiry a held tap waits
+     *  forever, so it must be VISIBLE). */
+    const pendingVisible = (): boolean => runBuffer !== null && !runBuffer.spent;
+    // A buffer change is a VISIBLE change: the mark must clear when a pending
+    // tap stops waiting. This is the only path that returns before the tap
+    // path's own paint, and it used not to repaint at all — so an abort left
+    // the mark on the glass.
+    const wasPending = pendingVisible();
+    const done = (): boolean => {
+      if (pendingVisible() !== wasPending) paint();
+      return false;
+    };
     // A lone ESC (keyboard-controls: "ESC cancels partial vector") —
     // the user's escape from a half-typed sequence. Arrow sequences
     // arrive as multi-byte events (the lexer keeps them whole), so a
     // single-byte ESC is genuinely alone: stand the buffer down.
     if (bytes.length === 1 && bytes[0] === ESC) {
       if (runBuffer !== null) runBuffer = advanceRunBuffer(runBuffer, null).buffer;
-      return false;
+      return done();
     }
     // The run buffer: two identically-spelled taps → a pair (BRF-SEAM-AUDIT;
     // BRF-PROLONGED-PRESS generalised). A digit pair is a jump token; `]]`
@@ -1140,6 +1175,12 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     const tap = tapOf(bytes);
     const step = advanceRunBuffer(runBuffer, tap);
     runBuffer = step.buffer;
+    // The tap path paints here, once, whenever the mark's visibility changed:
+    // a first tap makes it appear, and a resolving pair (which lands in
+    // `spent` — no longer pending) makes it clear. Several verbs paint nothing
+    // of their own — `clone` spawns a terminal — so without this the mark would
+    // linger past the actuation it was reporting.
+    if (pendingVisible() !== wasPending) paint();
     let action: KeyAction = null;
     if (step.pair !== null) {
       if (/^\d\d$/.test(step.pair)) {
@@ -1151,7 +1192,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       }
       action = step.pair === "]]" ? "frame-down" : step.pair === "[[" ? "frame-up" : null;
     } else if (tap !== null) {
-      return false; // the run's first tap — pending
+      return false; // the run's first tap — pending, already painted
     } else {
       action = decodeKey(bytes);
     }

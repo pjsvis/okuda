@@ -6,6 +6,7 @@ import {
   resolveJumpTarget,
   advanceNumBuffer,
   footerLine,
+  pendingMark,
   viewport,
   contentHeight,
   geometryOf,
@@ -227,6 +228,44 @@ describe("tui — footerLine (identity left, affordance right)", () => {
     expect(displayWidth(stripANSI(f))).toBe(72);
     expect(stripANSI(f).endsWith(" ")).toBe(true);
   });
+  test("the pending tap is visible, muted, and left of the affordance", () => {
+    // BRF-PROLONGED-PRESS: with no expiry, a held tap waits forever, so it must
+    // be VISIBLE or the reader fires an actuation they cannot explain. Muted,
+    // because it is state and the rose+bold channel is reserved for what is
+    // actuable (BRF-READING-FRACTION ruling 2).
+    const f = footerLine(72, "Gloam", FILE, muted, badge, "okuda", "DOC-X", pendingMark("9"));
+    // The mark and the affordance share ONE muted run — both are state on the
+    // perimeter, so the reader distinguishes them by PRESENCE, not by role.
+    expect(stripANSI(f)).toContain("[9]  ? help");
+    expect(f).toContain(muted("[9]  ? help"));
+    expect(stripANSI(f).indexOf("[9]")).toBeLessThan(stripANSI(f).indexOf("? help"));
+    expect(f.endsWith(" ")).toBe(true); // the corner pad still owns the last column
+    expect(displayWidth(stripANSI(f))).toBe(72); // the gap absorbs it; the row still fills
+  });
+  test("no tap: no mark, and no empty slot where one would be (the conditional reports)", () => {
+    const without = footerLine(72, "Gloam", FILE, muted, badge, "okuda", "DOC-X");
+    // Assert on the rendered mark, not on "[" — the escapes carry brackets
+    // (\x1b[7m), which is how this assertion first failed.
+    expect(without).not.toContain("[9]");
+    expect(without).toBe(footerLine(72, "Gloam", FILE, muted, badge, "okuda", "DOC-X", undefined));
+  });
+  test("pendingMark: a keycap for a digit, the gesture's own spelling for a bracket", () => {
+    expect(pendingMark("9")).toBe("[9]");
+    expect(pendingMark("0")).toBe("[0]");
+    // `[` is already an enclosure, so doubling it shows the half-gesture: the
+    // reader's own spelling of "one more and it is a frame motion".
+    expect(pendingMark("[")).toBe("[[");
+    expect(pendingMark("]")).toBe("]]");
+  });
+  test("pending mark under NO_COLOR: plain text, no escapes, width still exact", () => {
+    const none = makeStyler(DRACULA_PALETTE, "none");
+    const f = footerLine(72, "Gloam", FILE,
+      (s) => none.role("muted", s), (s) => none.badge(s), "okuda", "DOC-X", pendingMark("9"));
+    expect(f).not.toContain("\x1b");
+    expect(f).toContain("[9]  ? help");
+    expect(displayWidth(f)).toBe(72);
+  });
+
   test("unrooted (no silo): byte-for-byte today's footer", () => {
     const withSilo = footerLine(72, "Gloam", FILE, muted, badge, undefined);
     const without = footerLine(72, "Gloam", FILE, muted, badge);
