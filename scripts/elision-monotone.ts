@@ -57,6 +57,16 @@
  * (`callsign-baseline.json`, `date-baseline.json`, `lexicon-baseline.json`).
  * So the residue cannot grow without failing, and cannot sit there unexamined
  * either: a document that stops losing content names its own prune.
+ *
+ * **Cost, and how to measure it.** Measured 2026-10-13 on a box at load ~4.4 of
+ * 10 cores, six consecutive runs of the SAME command spanned **7.2–12.4 s** — so a
+ * stopwatch here cannot resolve a couple of seconds, and an optimisation claimed
+ * by wall clock is an unpaid claim. The deterministic proxy is **corpus passes**:
+ * `--gate` is one pass per rung, and `--strict` and the report's residue list
+ * read the widest rung that pass already holds (a fifth pass before 2026-10-13,
+ * when only `cuts` was kept and not the whole Reading). Count renders and
+ * subprocess spawns, not seconds. `CONCURRENCY = 8` also oversubscribes a box
+ * that already has other work — a candidate cause, measurable before changeable.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -244,7 +254,12 @@ async function main(): Promise<void> {
     const cuts = new Map<number, number>();
     const docs = new Map<number, number>();
     const art = new Map<number, number>();
-    const perDoc = new Map<string, Map<number, number>>();
+    // The whole Reading per (document, rung) — not just the cut count. The
+    // residue sets (`--strict`, and the report's irreducible list) are the
+    // WIDEST rung of this same sweep; storing only `cuts` made them re-render
+    // every document at that rung, a second full corpus pass for a fact the
+    // first one already had.
+    const perDoc = new Map<string, Map<number, Reading>>();
     for (const w of widths) {
       cuts.set(w, 0);
       docs.set(w, 0);
@@ -253,7 +268,7 @@ async function main(): Promise<void> {
         let m = perDoc.get(f);
         if (!m) perDoc.set(f, (m = new Map()));
         return lose(Bun.file(f).text(), w).then((r) => {
-          m.set(w, r.cuts);
+          m.set(w, r);
           return r;
         });
       });
@@ -269,7 +284,11 @@ async function main(): Promise<void> {
 
   const { cuts, docs, art, perDoc } = await sweep(LADDER);
 
-  const rises = risesIn(perDoc, LADDER);
+  // `risesIn` takes cut counts; the sweep holds Readings. Derived here, once.
+  const cutDoc = new Map<string, Map<number, number>>(
+    [...perDoc].map(([f, m]) => [f, new Map([...m].map(([w, r]) => [w, r.cuts]))]),
+  );
+  const rises = risesIn(cutDoc, LADDER);
   const totalMono = totalsMonotone(cuts, LADDER);
 
   /** **The residue is not the irreducible set, and the difference matters.**
@@ -305,9 +324,9 @@ async function main(): Promise<void> {
     }
     if (STRICT) {
       const widest = LADDER[LADDER.length - 1]!;
-      const readings = await pool(files, CONCURRENCY, (f) => lose(Bun.file(f).text(), widest));
+      // The widest rung is already in the sweep: no second pass.
       const stubborn = files
-        .map((file, i) => ({ file, ...readings[i]! }))
+        .map((file) => ({ file, ...(perDoc.get(file)?.get(widest) ?? { cuts: 0, art: 0 }) }))
         .filter((s) => s.cuts > 0 || s.art > 0);
 
       const baseline = JSON.parse(
@@ -368,9 +387,9 @@ async function main(): Promise<void> {
   // classes — the losses widening cannot repair, which the law hands back to the
   // document. So name them, with the columns they would need.
   console.log(`\n=== the irreducible set at ${WIDE} columns (widening cannot repair) ===`);
-  const widestRead = await pool(files, CONCURRENCY, (f) => lose(Bun.file(f).text(), WIDE));
+  // Same reuse: the sweep's widest rung IS this list's source.
   const stubborn = files
-    .map((file, i) => ({ file, ...widestRead[i]! }))
+    .map((file) => ({ file, ...(perDoc.get(file)?.get(WIDE) ?? { cuts: 0, art: 0 }) }))
     .filter((s) => s.cuts > 0 || s.art > 0)
     .sort((a, b) => b.cuts - a.cuts);
   console.log(`documents still losing content : ${stubborn.length} of ${files.length}`);
