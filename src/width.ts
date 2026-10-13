@@ -108,7 +108,19 @@ const EAW_WIDE: Array<[number, number]> = [
   [0x30000, 0x3fffd],
 ];
 
-/** Zero-width: combining marks, variation selectors, format controls. */
+/** Zero-width: combining marks, variation selectors, format controls.
+ *
+ *  **A floor, not the class.** This table is hand-maintained and was already
+ *  incomplete — Tamil's virama (U+0BCD, 23 occurrences in the corpus) and
+ *  Myanmar's signs were absent, so each measured **1** where the truth is **0**,
+ *  misaligning every column after a language example that quotes one standing
+ *  alone. The class is not a list to maintain: it is the Unicode general
+ *  categories **Mn** (nonspacing mark), **Me** (enclosing mark) and **Cf**
+ *  (format). `ZERO_MARK` below is that truth, and `graphemeWidth` takes the
+ *  UNION — additive by construction, so nothing that measured 0 can start
+ *  measuring 1. Delete this table only once the union is shown to equal the
+ *  property test over the whole corpus. (Measured 2026-10-13: the union changed
+ *  exactly five codepoints, all from 1 to 0.) */
 const ZERO_WIDTH: Array<[number, number]> = [
   [0x0300, 0x036f], // combining diacritical marks
   [0x0483, 0x0489],
@@ -228,6 +240,11 @@ export function expandTabs(s: string): string {
 
 const segmenter = new Intl.Segmenter("en", { granularity: "grapheme" });
 
+/** The zero-width class, DERIVED: a combining or format codepoint owns no
+ *  column. Bun supports these property escapes (and rejects
+ *  `\p{East_Asian_Width=…}`, which is why the wide table above stays a table). */
+const ZERO_MARK = /^[\p{Mn}\p{Me}\p{Cf}]$/u;
+
 /** Display width of a single grapheme cluster (no escapes inside). */
 export function graphemeWidth(cluster: string): number {
   let width = 0;
@@ -236,7 +253,7 @@ export function graphemeWidth(cluster: string): number {
     const cp = ch.codePointAt(0)!;
     if (cp === 0xfe0f) hasVS16 = true;
     if (cp === 0x09) return 2; // tab (defensive; expandTabs usually first)
-    if (inRanges(cp, ZERO_WIDTH)) continue;
+    if (inRanges(cp, ZERO_WIDTH) || ZERO_MARK.test(ch)) continue;
     if (inRanges(cp, EAW_WIDE) || inRanges(cp, EMOJI_PRESENTATION)) {
       width = 2;
     } else if (width === 0 && cp >= 0x20) {
