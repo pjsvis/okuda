@@ -496,10 +496,15 @@ export interface RunStep {
  *  current read would re-grab the pair at byte 4, 6, 8, 10 — five clones,
  *  the reported bug. Only a different tap or the abort ends the latch.
  *
- *  NO CLOCK. No expiry, no deadline, anywhere in the input path: the
- *  reader's tempo is not an input. The parked quiet period (the latch's
- *  eventual expiry) is IO and lives in the caller when it lands, clearing
- *  the latch only — never a pending tap.
+ *  NO CLOCK — and this is the load-bearing half of the rule, not an
+ *  implementation detail (ADR-ONE-GESTURE-062). No expiry, no deadline, no
+ *  de-bounce, anywhere in the input path: the reader's tempo is not an input,
+ *  because a clock is the one mechanism that can make a DELIBERATE gesture fail
+ *  for being slow. The quiet period was deleted, not parked — do not add one
+ *  here without reversing that decision. Two accepted costs are answered
+ *  elsewhere: a doubled pair is a one-shot slot (repeatable verbs belong in the
+ *  vector space, where a mixed pair is never latched), and a pending tap never
+ *  expires (so it must be visible — td-51d5f4).
  *  Pure — the caller performs the IO the resolved pair implies. */
 export function advanceRunBuffer(prev: RunBuffer, tap: string | null): RunStep {
   if (tap === null) return { buffer: null, pair: null }; // the abort
