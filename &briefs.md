@@ -20,7 +20,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 ## Landed — debrief on file
 
-| Brief | State | Note | Debrief |
+| Brief | State | Narrative | Debrief |
 |---|---|---|---|
 | BRF-ELISION-PRIMITIVE | ✓ done | elision primitive; [ADR-TABLE-ELISION-014](decisions/014-table-elision-over-shrink-wrap.md) closed | [debrief](debriefs/2026-08-30-debrief-elision-primitive.md) |
 | BRF-INDEX-JUMP | ✓ done | ephemeral index + numeric jump | [debrief](debriefs/2026-08-29-debrief-index-and-jump.md) |
@@ -30,16 +30,18 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-PAPER-RUNG | ✓ done | one render, two artefacts — the paper rung | [debrief](debriefs/2026-10-09-debrief-paper-rung.md) |
 | BRF-STREAM-IDENTITY-HEADER | ✓ done | the render names the document for the unknown destination; awaiting the archive move | — |
 | BRF-PROTOCOL-UPDATE | ✓ done | the file is the state; the deploy is a message into the sibling's inbox | [debrief](debriefs/2026-10-10-debrief-protocol-update.md) |
+| BRF-CODE-SILCROWS | ✓ done | Code-comment silcrows — a rendered code file is a document for its prose | [debrief](debriefs/2026-10-12-debrief-code-silcrows.md) |
+| BRF-TABLE-GLASS-FIT | ✓ done | Table fit — wrap to the glass, elide only the floor | [debrief](debriefs/2026-10-12-debrief-table-glass-fit.md) |
 
 ## Landed today — ADR-031, the working copy
 
-| Brief | State | Note | Debrief |
+| Brief | State | Narrative | Debrief |
 |---|---|---|---|
 | BRF-WORKING-COPY | ✓ implemented | vector render mode; 99 clone; honest actuator | — |
 
 ## Open — fresh
 
-| Brief | State | Note | Debrief |
+| Brief | State | Narrative | Debrief |
 |---|---|---|---|
 | BRF-PORCH-MATRIX | · open | click a URL, land in a terminal; per-glass matrix | — |
 | BRF-DIAGRAM-DESCRIBE | · open | prose descriptions of mermaid diagrams — the render-path design refused 2026-10-04; the residue is the lint | — |
@@ -47,15 +49,16 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 ## Closed by other means — registry status is stale on all three
 
-| Brief | State | Note | Debrief |
+| Brief | State | Narrative | Debrief |
 |---|---|---|---|
 | BRF-FZF-OWNS-LOOP | ✗ aborted | experiment reverted; passive stdin restored | [debrief](debriefs/2026-08-30-debrief-fzf-owns-the-loop-aborted.md) |
 | BRF-MERMAID-SOURCE-OMITTED | ✓ landed 2026-08-30 | ⋮ indicator; checksum dropped; td approved | — |
 | BRF-VIEWPORT-PADDING | ✗ rejected | resize-anchor debrief covers the boundary work | [debrief](debriefs/2026-08-26-debrief-resize-anchor-boundary-conditions.md) |
+| BRF-TABLE-GUTTER | ✗ rejected | The table's gutter — the separator is chrome, and the cap pays for it | — |
 
 ## Ready — specced, next up
 
-| Brief | State | Note | Debrief |
+| Brief | State | Narrative | Debrief |
 |---|---|---|---|
 | BRF-DOCUMENT-LINKS | · ready | gopher links; keyspace unified 11–99 | — |
 | BRF-REFRESH-OFF-DISK | · ready | resize race + R placebo; td-2df019 | — |
@@ -68,7 +71,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 ## In flight — partially landed, has commits
 
-| Brief | State | Note | Debrief |
+| Brief | State | Narrative | Debrief |
 |---|---|---|---|
 | BRF-MERMAID-HARD | ◆ partial | CSN diagnostics landed; boundary machine pending | — |
 | BRF-JUMP-DEMO | ◆ partial | demo + honesty pass | — |
@@ -80,7 +83,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 ## SSH family — feasibility debriefed, build pending
 
-| Brief | State | Note | Debrief |
+| Brief | State | Narrative | Debrief |
 |---|---|---|---|
 | BRF-SSH-SERVED | ◆ feasibility ✓ | ForceCommand feasibility on file | [debrief](debriefs/2026-08-27-debrief-ssh-forcecommand-feasibility.md) |
 | BRF-SSH-BLOG | · open | gopher-serve v1 | — |
@@ -90,7 +93,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 ## Open queue
 
-| Brief | State | Note | Debrief |
+| Brief | State | Narrative | Debrief |
 |---|---|---|---|
 | BRF-REGISTRY-MARKDOWN | · open | silo dashboard | — |
 | BRF-PANEL-LIBRARY | · open | chunk-addressable okudagrams | — |
@@ -154,7 +157,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 ## Parked / deferred
 
-| Brief | State | Note | Debrief |
+| Brief | State | Narrative | Debrief |
 |---|---|---|---|
 | BRF-PALETTE-LIGHTNESS | ↓ parked | global brightness knob | — |
 | BRF-PI-MARKDOWN | ↓ parked | Pi's rendering issue | — |

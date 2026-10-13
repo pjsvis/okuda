@@ -3,7 +3,7 @@
  * amp-briefs.ts — the &briefs state table: membership derived, grouping editorial.
  *
  * `&briefs.md` is a hand-grouped view of the briefs registry. Its ROWS are the
- * registry's membership; its SECTIONS, state glyphs, notes and debrief links are
+ * registry's membership; its SECTIONS, state glyphs, narratives and debrief links are
  * the editor's. This script reconciles the membership only
  * (ADR-DERIVED-AMP-TABLE-058):
  *
@@ -102,8 +102,11 @@ for (const e of live) {
     errors.push(`no section for status '${e.status}' (brief ${e.callsign})`);
     continue;
   }
-  const note = e.summary.replace(/\|/g, "\\|");
-  adds.push({ section, row: `| ${e.callsign} | ${GLYPH[e.status] ?? "· open"} | ${note} | — |` });
+  // The fourth column is the ROW's narrative: what the work was, in one phrase.
+  // Named `narrative` because the header says so — the panel's vocabulary and
+  // its producer's must not drift (the one-constant rule, applied to a word).
+  const narrative = e.summary.replace(/\|/g, "\\|");
+  adds.push({ section, row: `| ${e.callsign} | ${GLYPH[e.status] ?? "· open"} | ${narrative} | — |` });
 }
 
 for (const e of errors) console.error(`✗ &briefs — ${e}`);
