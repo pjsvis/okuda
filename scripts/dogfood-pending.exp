@@ -1,0 +1,102 @@
+#!/usr/bin/expect -f
+# scripts/dogfood-pending.exp — the pending-tap indicator, dogfooded in the REAL TUI
+# on a real pty (the pending-state obligation of BRF-PROLONGED-PRESS).
+#
+# Why expect and not `script -q`: `script` needs a tty on ITS stdin, and an agent
+# driving it from a tool has a socket there — it dies with `tcgetattr/ioctl`, so
+# tmp/dogfood-probe.ts can only be run by a human at a terminal — which is why
+# this one exists as a sibling rather than an amendment: a harness the loop
+# cannot run is not a harness. expect allocates
+# the pty itself, which is what makes this dogfood runnable in the loop.
+#
+# SAFETY. `99` is the clone verb and its integration defaults to `ghostty`, which
+# `cloneArgs` resolves BEFORE the OKUDA_CLONE_CMD escape hatch — so setting the
+# cmd alone does not stop a real window being spawned. Naming an UNKNOWN
+# integration makes cloneArgs return an error, which is what routes the verb to
+# OKUDA_CLONE_CMD and keeps this dogfood observational.
+#
+# STRUCTURE. expect's buffer accumulates from the last match, so a check written
+# after two frames reads BOTH of them. Every case below therefore matches ONE
+# frame at a time: each `expect -re {\? help}` resets the buffer to the frame it
+# just matched.
+#
+# Run: just dogfood-pending   (or: expect scripts/dogfood-pending.exp)
+
+set timeout 5
+log_user 0 ;# silence the child; expect_out still captures
+set here [pwd]
+set log "$here/tmp/pending-clone.log"
+exec sh -c "rm -f $log"
+set env(OKUDA_CLONE) "cmd-probe"
+set env(OKUDA_CLONE_CMD) "echo fired >> $log"
+
+set failures 0
+proc check {ok msg} {
+  global failures
+  if {$ok} { puts "  PASS  $msg" } else { puts "  FAIL  $msg"; incr failures }
+}
+proc hasMark {frame} { expr {[string first "\[9\]" $frame] >= 0} }
+proc clones {} {
+  global log
+  if {![file exists $log]} { return 0 }
+  set f [open $log r]
+  set data [read $f]
+  close $f
+  if {[string trim $data] eq ""} { return 0 }
+  return [llength [split [string trim $data] "\n"]]
+}
+
+puts "=== the pending indicator, on the glass ===\n"
+spawn -noecho bun src/cli.ts tmp/okuda-jump-demo.md --tui
+
+# 1. the baseline frame: the footer is there and nothing is pending.
+expect {
+  -re {\? help} { check 1 "the footer is on the glass with its affordance" }
+  timeout { check 0 "the TUI never painted a footer"; exit 1 }
+}
+check [expr {![hasMark $expect_out(buffer)]}] "no tap held -> no mark (the element is conditional)"
+
+# 2. a tap lands: the mark appears, and the affordance keeps the edge.
+send -- "9"
+expect {
+  -re {\[9\]  \? help} { check 1 "after one tap the footer carries the keycap, left of the affordance" }
+  timeout { check 0 "the pending mark never appeared in the frame" }
+}
+
+# 3. ESC clears it, and the clearing is PAINTED (the abort used to return
+#    without repainting, so the mark stayed on the glass).
+send -- "\033"
+expect {
+  -re {\? help} { check [expr {![hasMark $expect_out(buffer)]}] "after ESC the mark is gone, and the frame says so" }
+  timeout { check 0 "no frame after ESC - the abort did not repaint" }
+}
+
+# 4. a pair resolves: the pending frame, then a frame with the mark cleared.
+set before [clones]
+send -- "9"
+expect {
+  -re {\? help} { check [expr {[hasMark $expect_out(buffer)]}] "the first tap of a pair is visible too" }
+  timeout { check 0 "no frame for the first tap" }
+}
+send -- "9"
+expect {
+  -re {\? help} { check [expr {![hasMark $expect_out(buffer)]}] "the resolving tap clears the mark (a spent latch is not a pending tap)" }
+  timeout { check 0 "no frame for the resolving tap" }
+}
+after 400
+check [expr {[clones] == $before + 1}] "exactly one clone fired ($before -> [clones])"
+
+# 5. the one-shot slot: while the run is spent its remainder is SWALLOWED, so
+#    two more taps fire nothing — and, having nothing to say, paint nothing.
+send -- "9"
+after 200
+send -- "9"
+after 400
+check [expr {[clones] == $before + 1}] "still one clone after the swallowed remainder, and it painted nothing (the one-shot slot holds)"
+
+send -- "q"
+after 300
+expect eof
+
+puts "\n[expr {$failures == 0 ? {dogfood: OK} : {dogfood: FAILURE(S)}}]\n"
+exit $failures

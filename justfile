@@ -231,6 +231,11 @@ palette-audit:
     @./okuda docs/showcase.md --tui
     @./okuda docs/2026-09-05-palette-swatch.md --tui
 
+# Pending tap dogfood
+[group('dogfood')]
+dogfood-pending:
+    @expect scripts/dogfood-pending.exp
+
 # ── Writing ──────────────────────────────────────────────
 
 # Two-panel writing
