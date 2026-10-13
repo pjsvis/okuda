@@ -58,6 +58,43 @@ So the report *"we are still not rendering our special characters"* has one meas
 and it is this declaration: **we render them; we do not agree with every terminal about how
 wide they are.**
 
+## What it costs, predicted (2026-10-13)
+
+Measured with `tmp/align-risk.ts` and a rendered-line count, and the cost is **not subtle** —
+the frame does not drift, it **breaks**:
+
+| document | table/rule lines carrying a contested glyph | predicted tear, CJK terminal |
+|---|---|---|
+| `&briefs.md` | 28 of its 123 table rows | **76 columns** on the rail lines |
+| `docs/tables-monster.md` | 20 | **76** |
+| `docs/2026-09-02-i811-glyph-stress-test.md` | 24 | 6 median, 74 worst |
+
+**Because the rail is made of the ambiguous glyph.** A full-width rule is `─` × 76; under the
+other convention it is 152 columns — so the rule, the terminator and every table rule **wrap
+onto a second line** instead of stopping at the glass. That is a broken frame, not a
+misaligned one. 180 of the 268 documents carrying a table place a contested glyph inside it
+(1,432 occurrences), and `&briefs.md` is the worst: `—`×118, `·`×75, `✓`×14, `↓`×8,
+`◆`×6, `✗`×3.
+
+**This is a prediction, not an observation** — okuda has no CJK-locale terminal to test on,
+and the count is arithmetic. The check is therefore by eye, and the terminal owns it: an
+option meaning *treat ambiguous-width characters as wide* (WezTerm names it
+`treat_east_asian_ambiguous_width_as_wide`; iTerm2 has a checkbox; **not verified for
+Ghostty**). Open `&briefs.md` under it and look at the rail.
+
+**The alternative, and why it is refused.** The rails, pipes and chips could be drawn from
+ASCII — `-`, `|`, `#` are one column everywhere, no declaration needed. Refused on the
+design language: the box-drawing and block sets *are* the okudagram (`docs/2026-08-26-the-okuda-net.md`
+— *the look is the error-correction scheme*), and an ASCII frame would be a different
+artifact. Recorded here so the refusal is a position with a cost, not an oversight.
+
+**A check that cannot be written, and should not be attempted.** A byte-level alignment
+test finds **nothing, by construction**: `displayWidth` is the same function that does the
+padding, so every line is self-consistent in the bytes and only the terminal can disagree.
+The risk can be *triaged* (`tmp/align-risk.ts` ranks the documents) and the result must be
+*looked at*. This is the one class in this corpus with no possible gate, and saying so is
+more honest than shipping a lint that always passes.
+
 ## Related
 
 - `docs/2026-10-13-the-mechanism-is-the-fallible-half.md` — the scoreboard this exchange grew
