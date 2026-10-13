@@ -281,7 +281,7 @@ function colorFg(hex: string, text: string): string {
  *  crosses more gap to compare two cells. The menu pattern is exempt — its
  *  number is the strong-stop at the visual right edge, which the cap would park
  *  mid-glass (ADR-ROLE-LAYOUT-022). */
-const BAND_CONTENT = 116;
+export const BAND_CONTENT = 116;
 
 /** Where a token may wrap: after a delimiter a reader already parses as a
  *  separator. A URL or path is therefore not atomic — its floor is the
