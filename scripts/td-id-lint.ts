@@ -14,8 +14,14 @@ import { join } from "node:path";
 /** Real ID shape, 6–8 hex, case-insensitive (length-proof). */
 export const TD_ID = /\btd-[a-f0-9]{6,8}\b/gi;
 
-/** The td manual documents the ephemeral layer's own command syntax. */
-export const EXEMPT_FILES = new Set(["playbooks/td-playbook.md"]);
+/** Files that MENTION the vocabulary without minting it. The td manual
+ *  documents the ephemeral layer's own command syntax; the decision template
+ *  shows a callsign SHAPE (`callsign: ADR-<WORDS>-NNN`) so the next author
+ *  copies a legal one — and the census read that placeholder as a minted code
+ *  the moment it landed (2026-10-13: *"ADR- — unregistered and uncited; it owes
+ *  a date, not a name"*). Both are exemptions of the same class: a document
+ *  about the notation, not a use of it. */
+export const EXEMPT_FILES = new Set(["playbooks/td-playbook.md", "decisions/TEMPLATE.md"]);
 
 /** Registry dirs + docs/ + root files; *.jsonl registries included.
  *  Exported: one scan set, two gates (this lint + the callsign
