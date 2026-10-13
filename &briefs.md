@@ -20,7 +20,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 ## Landed — debrief on file
 
-| Brief | State | Debrief | |
+| Brief | State | Note | Debrief |
 |---|---|---|---|
 | BRF-ELISION-PRIMITIVE | ✓ done | elision primitive; [ADR-TABLE-ELISION-014](decisions/014-table-elision-over-shrink-wrap.md) closed | [debrief](debriefs/2026-08-30-debrief-elision-primitive.md) |
 | BRF-INDEX-JUMP | ✓ done | ephemeral index + numeric jump | [debrief](debriefs/2026-08-29-debrief-index-and-jump.md) |
@@ -33,13 +33,13 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 ## Landed today — ADR-031, the working copy
 
-| Brief | State | Note | |
+| Brief | State | Note | Debrief |
 |---|---|---|---|
 | BRF-WORKING-COPY | ✓ implemented | vector render mode; 99 clone; honest actuator | — |
 
 ## Open — fresh
 
-| Brief | State | Note | |
+| Brief | State | Note | Debrief |
 |---|---|---|---|
 | BRF-PORCH-MATRIX | · open | click a URL, land in a terminal; per-glass matrix | — |
 | BRF-DIAGRAM-DESCRIBE | · open | prose descriptions of mermaid diagrams — the render-path design refused 2026-10-04; the residue is the lint | — |
@@ -47,7 +47,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 ## Closed by other means — registry status is stale on all three
 
-| Brief | State | Debrief | |
+| Brief | State | Note | Debrief |
 |---|---|---|---|
 | BRF-FZF-OWNS-LOOP | ✗ aborted | experiment reverted; passive stdin restored | [debrief](debriefs/2026-08-30-debrief-fzf-owns-the-loop-aborted.md) |
 | BRF-MERMAID-SOURCE-OMITTED | ✓ landed 2026-08-30 | ⋮ indicator; checksum dropped; td approved | — |
@@ -55,7 +55,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 ## Ready — specced, next up
 
-| Brief | State | Note | |
+| Brief | State | Note | Debrief |
 |---|---|---|---|
 | BRF-DOCUMENT-LINKS | · ready | gopher links; keyspace unified 11–99 | — |
 | BRF-REFRESH-OFF-DISK | · ready | resize race + R placebo; td-2df019 | — |
@@ -68,7 +68,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 ## In flight — partially landed, has commits
 
-| Brief | State | Note | |
+| Brief | State | Note | Debrief |
 |---|---|---|---|
 | BRF-MERMAID-HARD | ◆ partial | CSN diagnostics landed; boundary machine pending | — |
 | BRF-JUMP-DEMO | ◆ partial | demo + honesty pass | — |
@@ -80,7 +80,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 ## SSH family — feasibility debriefed, build pending
 
-| Brief | State | Debrief | |
+| Brief | State | Note | Debrief |
 |---|---|---|---|
 | BRF-SSH-SERVED | ◆ feasibility ✓ | ForceCommand feasibility on file | [debrief](debriefs/2026-08-27-debrief-ssh-forcecommand-feasibility.md) |
 | BRF-SSH-BLOG | · open | gopher-serve v1 | — |
@@ -90,7 +90,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 ## Open queue
 
-| Brief | State | Note | |
+| Brief | State | Note | Debrief |
 |---|---|---|---|
 | BRF-REGISTRY-MARKDOWN | · open | silo dashboard | — |
 | BRF-PANEL-LIBRARY | · open | chunk-addressable okudagrams | — |
@@ -154,7 +154,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 ## Parked / deferred
 
-| Brief | State | Note | |
+| Brief | State | Note | Debrief |
 |---|---|---|---|
 | BRF-PALETTE-LIGHTNESS | ↓ parked | global brightness knob | — |
 | BRF-PI-MARKDOWN | ↓ parked | Pi's rendering issue | — |
