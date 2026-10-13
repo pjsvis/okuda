@@ -187,6 +187,37 @@ document: its own mermaid fence draws wider than 160 columns, so the measurement
 is one of its own outliers. The remedy is the document's — reshape the diagram —
 which is the law working as stated.
 
+## Two floors, and the recommendation to the author
+
+Widening is not only the pane. A host that **zooms out** buys columns too, so the
+lever is better read as *the reader's lever is columns* — the pane and the font
+size are two actuators on one quantity, and both belong to the host (windowing is
+the host's, `okuda/AGENTS.md`). Which means zoom-out is a legitimate repair for
+every recoverable cut this document measured, and the ladder's rungs are the same
+currency in either direction.
+
+But zoom-out has a floor, and that gives the law its second half. Two floors
+bound every document:
+
+| floor | what it is | where it lives |
+|---|---|---|
+| the **word floor** | the widest unbreakable segment, in columns | `ADR-TABLE-EDGE-CUT-055` |
+| the **legibility gate** | the narrowest glass whose text still reads | `ADR-LEGIBILITY-GATE-049` |
+
+Where the word floor needs more columns than the legibility gate allows, **no
+rendering is both complete and legible** — and the document, not the renderer,
+owns the problem. That is the whole of the recommendation this owes an author,
+and it is not a warning: it is a named set, stating the document and the columns
+it would need, produced by an instrument at authoring time and **never by chrome
+at read time** (the argument `BRF-BOUNDARY-MARK` makes against a warning that
+fires on every render of a growing view). `scripts/tables-check.ts` already
+speaks this verdict; `--strict` is the same verdict for the other three classes,
+and it currently names three documents: two that cut, and this one.
+
+The contract, then, in one line: **okuda makes the author's work look good as
+long as the document's floor fits the glass's.** Below that line the honest output
+is the recommendation, and the renderer still refuses to fold, squeeze or hide.
+
 ## The term
 
 **Progressive engagement**: one artifact yields a truthful reading at each of
@@ -237,9 +268,10 @@ recoverable by construction and measured so, and the irreducible residue is thre
 documents named above, each a document problem rather than a renderer one.
 
 - **The irreducible set.** Two documents cut, one loses art, at any width. They
-  are named; whether to reshape them is an authoring call, and the shape of the
-  instrument is owed: `elision-monotone.ts` should become the non-table sibling
-  of `scripts/tables-check.ts` with a `--strict` gate once the corpus obeys.
+  are named, and the shape of the instrument is settled — **`elision-monotone.ts`
+  is now the non-table sibling of `scripts/tables-check.ts`**: its invariant runs
+  on `just check` (`--gate`), and the set is reachable with `--strict` once the
+  corpus obeys. It does not, and the two documents are the reason.
 - **The gutter.** 315 diagram blocks; 82% sit flush to the 2-column margin. But the
   median right slack is 2 columns — most diagrams fill the glass. Only **12%** are
   the side-pushed case (flush left *and* ≥20 columns unused). A rendered diagram
@@ -264,8 +296,7 @@ documents named above, each a document problem rather than a renderer one.
 - **The frame rule** — `briefs/2026-08-29-brief-okudagram-frame.md` (`BRF-PAGED-OKUDAGRAM`)
 - **Elision as the universal policy** — `decisions/050-universal-elision.md` (`ADR-UNIVERSAL-ELISION-050`)
 - **The table edge cut, and recoverability as the test** — `decisions/055-table-edge-cut.md` (`ADR-TABLE-EDGE-CUT-055`)
-- **Table fit to the glass** — `briefs/2026-10-12-brief-table-glass-fit.md` (`BRF-TABLE-GLASS-FIT`)
-- **The legibility gate** — `decisions/049-legibility-gate.md` (`ADR-LEGIBILITY-GATE-049`)
+- **Table fit to the glass** — `briefs/2026-10-12-brief-table-glass-fit.md` (`BRF-TABLE-GLASS-FIT`)- **The legibility gate** — `decisions/049-legibility-gate.md` (`ADR-LEGIBILITY-GATE-049`)
 - **The resize contract** — `docs/2026-10-08-the-resize-contract.md`
 - **The ornament that re-encodes** — `docs/2026-09-19-the-ornament-that-pays-rent.md`
 - **The ergonomic box** — `docs/2026-09-04-the-ergonomic-box.md`
