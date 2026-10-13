@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { KEYBINDINGS, verbFor } from "../src/keygrammar";
-import { RESERVED_VECTORS, VECTOR_MIN, VECTOR_MAX, MAX_REFS } from "../src/vectors";
+import { RESERVED_VECTORS, VECTOR_MIN, VECTOR_MAX, MAX_ADDRESSES } from "../src/vectors";
 
 const DOC = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -64,6 +64,6 @@ describe("keymap doc — the map is refereed against the territory", () => {
     // The range is stated as `MIN–MAX` (en dash); if the constants
     // move, this fails until the page catches up.
     expect(src).toContain(`${VECTOR_MIN}–${VECTOR_MAX}`);
-    expect(src).toContain(`${MAX_REFS} addresses`);
+    expect(src).toContain(`${MAX_ADDRESSES} addresses`);
   });
 });

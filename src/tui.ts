@@ -1031,7 +1031,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  (its references are not shown — the tour cannot proceed from here).
    *  Depth one: only the main document actuates. Optimistic paint means
    *  the target may not exist — the failure is a footer flash, and the
-   *  wording belongs to the vector: "[14] — no document to render". */
+   *  wording belongs to the vector: "§14 — no document to render". */
   const jumpTo = async (token: number): Promise<void> => {
     if (backstack.length > 0) return; // dereferenced render is clean — nothing to actuate
     const target = mainJumps.get(token);

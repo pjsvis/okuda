@@ -32,7 +32,7 @@
  *   just references-demo                    # generate + frame in the TUI
  */
 
-import { scanReferences, jumpMapFor, referencesSection, MAX_REFS, VECTOR_MIN } from "../src/vectors";
+import { scanReferences, jumpMapFor, referencesSection, MAX_ADDRESSES, VECTOR_MIN } from "../src/vectors";
 
 /** The fixture. Every path is real and every callsign resolves, so the
  *  silcrows actuate — the demo is the corpus, not a mock of it. Pure.
@@ -147,7 +147,7 @@ function reportMap(source: string): void {
   const missing = [...map.values()].filter((t) => !listed.has(t));
 
   console.log(`references-demo — ${occurrences.length} occurrences, ${map.size} destinations`);
-  console.log(`floor ${VECTOR_MIN} · cap ${MAX_REFS} occurrences · the generated section (ADR-047):`);
+  console.log(`floor ${VECTOR_MIN} · cap ${MAX_ADDRESSES} addresses · the generated section (ADR-047):`);
   console.log("");
   console.log(section);
   console.log("");

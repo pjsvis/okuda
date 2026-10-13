@@ -3,11 +3,12 @@ import {
   VECTOR_MIN,
   VECTOR_MAX,
   CLONE_TOKEN,
-  MAX_REFS,
+  MAX_ADDRESSES,
   RESERVED_VECTORS,
   scanReferences,
   buildJumpMap,
   jumpMapFor,
+  deriveReferences,
   annotateSource,
   referencesSection,
   referencesCovered,
@@ -117,16 +118,54 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
     expect(refs).toEqual(["ADR-030"]); // own callsign skipped
   });
 
-  test("cap: discovery stops at MAX_REFS", () => {
+  test("discovery is NOT capped at the address count (BRF-ADDRESS-CAP)", () => {
+    // The cap belongs to the MAP. Discovery returns every occurrence, however
+    // many addresses the space holds — slicing discovery at the address count
+    // was the defect this brief found, and it was silent by construction.
     const src = Array.from({ length: 120 }, (_, i) => `ADR-${1000 + i}`).join(" ");
     const refs = scanReferences(src);
-    expect(refs.length).toBe(MAX_REFS);
+    expect(refs.length).toBe(120);
     // The canon (2026-09-12): the doubled pairs reserved → 80 addresses.
-    expect(MAX_REFS).toBe(80);
+    expect(MAX_ADDRESSES).toBe(80);
+  });
+
+  test("repetition never starves a destination (the silent loss)", () => {
+    // One target eighty times, then five distinct ones. Under the retired
+    // slice this minted ONE address: the 79 destinations that followed were
+    // starved by repetition, and nothing on the page said so.
+    const src =
+      Array.from({ length: 80 }, () => "ADR-030").join(" ") +
+      " " +
+      ["ADR-001", "ADR-002", "ADR-003", "ADR-004", "ADR-005"].join(" ");
+    const map = jumpMapFor(src);
+    expect(map.size).toBe(6);
+    expect([...map.values()]).toEqual([
+      "ADR-030",
+      "ADR-001",
+      "ADR-002",
+      "ADR-003",
+      "ADR-004",
+      "ADR-005",
+    ]);
+    // The destination rule: N distinct destinations carry N addresses, however
+    // often each is cited — 85 occurrences, six destinations.
+    expect(scanReferences(src).length).toBe(85);
+  });
+
+  test("deriveReferences states truncation, and a FULL map is not a truncated one", () => {
+    // BRF-BOUNDARY-MARK's precondition: the predicate is a comparison, never the
+    // constant 80. Exactly eighty distinct destinations is complete.
+    const of = (n: number) => Array.from({ length: n }, (_, i) => `ADR-${1000 + i}`).join(" ");
+    expect(deriveReferences(of(80)).truncated).toBe(false);
+    expect(deriveReferences(of(80)).map.size).toBe(MAX_ADDRESSES);
+    expect(deriveReferences(of(81)).truncated).toBe(true);
+    expect(deriveReferences(of(81)).map.size).toBe(MAX_ADDRESSES);
+    // Repetition is not truncation: one destination cited eighty times.
+    expect(deriveReferences(Array.from({ length: 80 }, () => "ADR-030").join(" ")).truncated).toBe(false);
   });
 
   test("the pocket Set's invariant: exactly the doubled pairs in range", () => {
-    // MAX_REFS derives from RESERVED_VECTORS.size — the derivation is
+    // MAX_ADDRESSES derives from RESERVED_VECTORS.size — the derivation is
     // only honest while the Set is the doubled-pair class *inside* the
     // vector range. This is the check that keeps it so.
     for (const n of RESERVED_VECTORS) {
@@ -217,10 +256,10 @@ describe("vectors — the jump map (the translation table)", () => {
     expect(map.has(11)).toBe(false);  // the double-tap pocket — never a silcrow
   });
 
-  test("buildJumpMap caps at MAX_REFS", () => {
+  test("buildJumpMap caps at MAX_ADDRESSES", () => {
     const refs = Array.from({ length: 120 }, (_, i) => ({ pos: i, end: i + 1, target: `ADR-${i}` }));
     const map = buildJumpMap(refs);
-    expect(map.size).toBe(MAX_REFS);
+    expect(map.size).toBe(MAX_ADDRESSES);
     expect(map.has(VECTOR_MAX + 1)).toBe(false);
   });
 
@@ -228,7 +267,7 @@ describe("vectors — the jump map (the translation table)", () => {
     // 84 distinct refs: fills 12-21, skips 22, fills 23-32, skips 33, …
     const refs = Array.from({ length: 84 }, (_, i) => ({ pos: i, end: i + 1, target: `ADR-${i}` }));
     const map = buildJumpMap(refs);
-    expect(map.size).toBe(MAX_REFS); // 80 — four short of 84
+    expect(map.size).toBe(MAX_ADDRESSES); // 80 — four short of 84
     for (const r of [11, 22, 33, 44, 55, 66, 77, 88]) expect(map.has(r)).toBe(false);
     expect(map.get(12)).toBe("ADR-0");
     expect(map.get(21)).toBe("ADR-9");  // last before the 22 gap

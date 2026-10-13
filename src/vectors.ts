@@ -2,7 +2,7 @@
  * vectors.ts — the main document's jump map (ADR-031).
  *
  * The main document renders with its references annotated as vectors:
- * `[12]` … `[98]`, painted after each reference in the reserved
+ * `§12` … `§98`, painted after each reference in the reserved
  * vector paint. The map is an in-memory structure belonging to the main
  * document — vector number → target string — derived by scanning the
  * source at render time. The paint is illustrative; the source is never
@@ -10,7 +10,7 @@
  * 117 corpus silcrows pointed at nothing): the inferred reference now
  * gates on the registry, and the paint and the actuator share one
  * resolution semantics, so they cannot disagree. Explicit .md links
- * stay optimistic; the actuator still fails honestly ("[14] — no
+ * stay optimistic; the actuator still fails honestly ("§14 — no
  * document to render") when a destination isn't there.
  *
  * Discovery (reading order, unique targets, capped):
@@ -85,8 +85,16 @@ export const RESERVED_VECTORS = new Set(
   [...DOUBLED_PAIRS].filter((n) => n >= VECTOR_MIN && n <= VECTOR_MAX),
 );
 
-/** The addressable count: the range minus the pocket it skips — 80. */
-export const MAX_REFS = VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size;
+/** **The address count, and not an occurrence count** (BRF-ADDRESS-CAP). The
+ *  two-digit space minus the pocket it skips — 80. A destination may be cited as
+ *  often as the document likes; it takes **one** address, however many times it
+ *  appears. Naming this after occurrences (`MAX_REFS`) was the specification's
+ *  defect, and the code implemented the wrong quantity faithfully: discovery was
+ *  sliced at the address count, so a document citing one target 80 times minted
+ *  one address and starved the 79 that could have followed — a silent loss of up
+ *  to 99% of the address space, and the mechanism is invisible because a slice
+ *  leaves no marker. */
+export const MAX_ADDRESSES = VECTOR_MAX - VECTOR_MIN + 1 - RESERVED_VECTORS.size;
 
 /** Callsign shape: tier prefix + significant tokens, uppercase. Moved
  *  here from cli.ts — the dispatch and the discovery scan share one
@@ -158,9 +166,13 @@ const inFence = (pos: number, ranges: Array<[number, number]>): boolean =>
  *  in reading order, **with repeats** — the vector↔filename relationship
  *  is one-to-many (two mentions of the same ADR are two vectors, both
  *  translating to the same filename; each mention is its own actuation
- *  point). Capped at MAX_REFS. Optimistic: nothing validated. The
- *  frontmatter is not scanned (a document's own callsign is identity,
- *  not a reference). Legacy `okuda-rhs` numbers are not honored. Pure. */
+ *  point). **Every occurrence is returned: there is no occurrence cap.** The
+ *  bound on occurrences is the source itself, and a spike would be a measured
+ *  decision — never a silent slice keyed on the *address* count, which is what
+ *  this used to be (BRF-ADDRESS-CAP: two quantities, one name, and the cap on
+ *  the wrong one). Optimistic: nothing validated. The frontmatter is not
+ *  scanned (a document's own callsign is identity, not a reference). Legacy
+ *  `okuda-rhs` numbers are not honored. Pure. */
 export interface RefOccurrence {
   pos: number;
   end: number;
@@ -239,7 +251,7 @@ export function scanReferences(
     }
   }
   hits.sort((a, b) => a.pos - b.pos);
-  return hits.slice(0, MAX_REFS);
+  return hits;
 }
 
 /** The jump map — the in-memory translation table: vector number →
@@ -247,7 +259,8 @@ export function scanReferences(
  *  repeatedly carries one number, reused at every mention (the citation
  *  convention: IEEE reprints, legal §-cross-references). First
  *  occurrence assigns; numbers ascend in reading order; capped at
- *  MAX_REFS — the cap is the map's invariant. Rebuilt on every render —
+ *  MAX_ADDRESSES — the cap is the map's invariant, and it is the *address*
+ *  space, never discovery. Rebuilt on every render —
  *  re-derivation replaces invalidation. */
 export function buildJumpMap(refs: RefOccurrence[]): Map<number, string> {
   const map = new Map<number, string>();
@@ -266,14 +279,42 @@ export function buildJumpMap(refs: RefOccurrence[]): Map<number, string> {
   return map;
 }
 
-/** Convenience: derive the map straight from a main document's source.
+/** The derivation, and the fact it can now state — BRF-BOUNDARY-MARK's
+ *  precondition. Returns the map, and whether the document holds more distinct
+ *  destinations than the address space holds.
+ *
+ *  **A full map is not a truncated map.** Exactly 80 distinct destinations, no
+ *  repeats, is *complete* — the space is exactly full — and a mark there would
+ *  lie about its referent. The predicate is therefore a comparison rather than a
+ *  constant, and it is computable only because discovery no longer slices at the
+ *  address count. It also covers both truncation sources without naming either.
+ *
+ *  No mark is painted from this: overflow stays silent here, and the notice is
+ *  the boundary-mark brief's (ADR-028's wire-budget conversation). This is the
+ *  derivation stating what it knows, which is what the alternative — deriving it
+ *  and discarding it — could not do. */
+export function deriveReferences(
+  source: string,
+  resolves?: (target: string) => boolean,
+  regions?: (pos: number) => boolean,
+): { map: Map<number, string>; truncated: boolean } {
+  const refs = scanReferences(source, resolves, regions);
+  const map = buildJumpMap(refs);
+  const distinct = new Set(refs.map((r) => r.target)).size;
+  return { map, truncated: distinct > map.size };
+}
+
+/** Convenience: the map alone, for the callers that do not need the truncation
+ *  fact. A wrapper over `deriveReferences`, so the two can never disagree about
+ *  what the map is.
+ *
  *  The optional `resolves` is the ADR-044 gate — see scanReferences. */
 export function jumpMapFor(
   source: string,
   resolves?: (target: string) => boolean,
   regions?: (pos: number) => boolean,
 ): Map<number, string> {
-  return buildJumpMap(scanReferences(source, resolves, regions));
+  return deriveReferences(source, resolves, regions).map;
 }
 
 /** Inject one paint marker after each reference occurrence — each

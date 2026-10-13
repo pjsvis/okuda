@@ -19,7 +19,7 @@
 import { renderDocument } from "../src/render";
 import { loadPalette } from "../src/palette";
 import { detectColorMode } from "../src/ansi";
-import { jumpMapFor, annotateSource, scanReferences, VECTOR_MIN, VECTOR_MAX, MAX_REFS, RESERVED_VECTORS } from "../src/vectors";
+import { jumpMapFor, annotateSource, scanReferences, VECTOR_MIN, VECTOR_MAX, MAX_ADDRESSES, RESERVED_VECTORS } from "../src/vectors";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -116,4 +116,4 @@ if (fail > 0) {
   console.error(`vector-check: FAIL — ${fail} case(s)`);
   process.exit(1);
 }
-console.log(`vector-check: OK — ${map.size} mapped, ${painted.length} painted, ${MAX_REFS} addressable`);
+console.log(`vector-check: OK — ${map.size} mapped, ${painted.length} painted, ${MAX_ADDRESSES} addressable`);
