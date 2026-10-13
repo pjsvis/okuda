@@ -117,6 +117,39 @@ record**, three of them mine from the same day.
 - Branches beside `main`: 12 → **1** (declared).
 - Review queue at its worst: 10. At the close: 0.
 
+## The panel probe — four artifacts, one defect (21:00)
+
+`&next.md`'s own header claims a format: *one line, one action — name, verdict,
+cost*. The grammar probe tests that against the panel. Four instrument artifacts
+had to be removed before the numbers meant anything, and each is the same lesson:
+**check the pattern's referent before believing the count.**
+
+| artifact | what it read | the fix |
+|---|---|---|
+| bold-lead bullets | `&alpha`'s glossary entries (`Gloam is…`) as action blocks | scope to the decision headings |
+| one population | the landed list's missing costs as format failures | report **per section** — a landed cost is spent |
+| an unnamed column | `&briefs`' empty 4th cell as an empty *cost* column | read the header: it was a **nameless debrief column** |
+| parenthesised only | `BRF-SILO-MNEMONICS`, whose callsign is the entry's **name**, as unreferenced | a reference is anything lookable-up |
+
+Scoped and corrected, the panel reads: **Recommended 11/11 referenced and costed,
+Ready 3/3, Hygiene 2/2** — and the landed section 13/15 with one cost, correctly,
+because history is not a decision and a spent cost is not owed.
+
+**The defect the probe's first reading pointed at was not the one it named.** It
+reported "three hygiene entries with no reference". Reading the referents showed
+three **tombstones** sitting in a section headed *small, owed* — each one saying
+*"see the landed list above"*, i.e. duplicating the landed list it pointed at. A
+section headed **owed** holding paid debts is the *Attributable structure* failure:
+the panel asks a question it does not answer. The two tombstones with landed
+counterparts are gone; the third — the status vocabulary — is **paid**, so it moved
+to the landed list as the settlement it now is.
+
+**And the notes in the debrief above are the same failure at three more points:**
+a test asserting `ready` is unknown (the vocabulary gap encoded as a contract), a
+`reg-sync` vocabulary one word short of the corpus, and a Status line that was a
+sentence — which held a landed rule at `open` for six weeks, reported loudly by the
+gate and acted on by nobody.
+
 ## Related
 
 - `docs/2026-10-12-the-squint-test.md` — the measurement, corrected in place

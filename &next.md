@@ -9,6 +9,22 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 
 ## Landed today — the debt this table was tracking
 
+- **The brief's status vocabulary is settled** (2026-10-13,
+  ADR-BRIEF-LIFECYCLE-061) — the Hygiene entry it pays had stood since 2026-10-05:
+  ten unrecognised words, reported loudly and never guessed at. They were **five**.
+  `ready` is a **state** — six briefs wrote it and `&briefs` had been maintaining
+  the section by hand, so only the vocabulary lagged — while `aborted`, `accepted`
+  and `pending` fold onto `rejected`, `done` and `open`. One of the ten was a
+  Status line that was a *sentence* rather than a state, and it had held the
+  okudagram-frame row at `open` for **six weeks against a rule that landed**.
+  `just check` now reports zero unrecognised words.
+- **Two gates, three closed edges** (2026-10-13) — `elision-monotone` (the
+  recoverability invariant: 518 documents, no rise anywhere, residue baselined)
+  and `ref-census` (a branch is deleted, current, or declared) both run on
+  `just check`. `BRF-ADDRESS-CAP` moved the cap onto destinations, and
+  `BRF-BOUNDARY-MARK` gave the receipt its end — a bare `…` when the document
+  holds more destinations than the space holds (ADR-047 amended). `BRF-TABLE-GUTTER`
+  was **rejected**: the gutter is the body's column boundary, not chrome.
 - **The amp reconciliation** (2026-10-10) — the `&briefs` state table is back in
   agreement with the registry: 46 briefs added, the coverage check reads live
   *and* archive (a landed brief is not a phantom), and the `&alpha` fixture wire
@@ -174,20 +190,6 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 
 ## Hygiene — small, owed
 
-- **reg-sync does not propagate a brief's status** — *landed 2026-10-05*
-  (see the landed list above): check mode now compares the derived
-  fields, so this entry is the tombstone.
-- **The brief status vocabulary is incomplete** (found 2026-10-05 by the
-  new reg-sync drift check, which found it by *refusing* to guess) — ten
-  briefs declare statuses the registry map does not know: `ready` (×6),
-  `accepted`, `pending`, `aborted`, `rule`. They are reported loudly and
-  never silently mapped to `open`, but which words the registry
-  *stores* is a corpus decision, not a sync repair: settle it, then
-  either widen the map or normalise the documents · **S**
-- **The amp-check backlog** — *landed 2026-10-10* (see the landed list
-  above): `&briefs` reconciled (46 briefs added), the coverage check now
-  reads the live and archive registries, and the `&alpha` fixture wire is
-  gone. This entry is the tombstone · **S**
 - **BRF-SILO-MNEMONICS — close or scope** — resolution shipped, badge
   shipped, bootstrap deferred: what remains is likely a debrief and a
   close · **S**
