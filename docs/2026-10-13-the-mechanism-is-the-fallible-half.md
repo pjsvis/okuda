@@ -7,7 +7,7 @@ status: recorded — the law, one sitting's scoreboard as its receipt, and the c
 
 # The mechanism is the fallible half
 
-> ◆ One sitting. **Eighteen** mechanism claims falsified by measurement; **zero** goals
+> ◆ One sitting. **Nineteen** mechanism claims falsified by measurement; **zero** goals
 > falsified. Two goals were revised, and both by an *argument* — never by a check.
 
 ## The law
@@ -42,6 +42,7 @@ Offered as a table so it can be argued with rather than admired.
 | "a combining mark is one column wide" (my reference) | Unicode says **Mn/Me/Cf own no column** — so this instrument reported okuda's *correct* answers as defects |
 | "the survival detector reads zero losses" | it indexed a per-character **map** as a boolean: `not {…}` is always `False`, so every reading was zero and the control could not fire |
 | "the property escapes all work" | one unsupported pattern (`\p{East_Asian_Width=…}`) is a **parse error**, which killed the whole probe rather than one row |
+| "a mermaid label is a lossy context (465 of 514)" | **withdrawn.** One node label holding all 514 characters is a measurement of the *fixture*: 46 candidates across twelve scripts all survive a real label, and a deliberate NEG control could not be made to fire at all — which is the signal that the *premise* was wrong rather than the detector blind |
 
 Against that: the frame's clean edges; *know where you are*; *a format that assists decision
 and allows inspection*; *the vocabulary is the scale*; *the registry is two orthogonal

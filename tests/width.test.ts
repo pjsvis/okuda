@@ -174,3 +174,29 @@ describe("terminalCols — fzf preview width (FZF_PREVIEW_COLUMNS)", () => {
     expect(terminalCols(80)).toBe(80);
   });
 });
+
+describe("the width frame declaration (docs/2026-10-13-the-width-frame-declaration.md)", () => {
+  test("East-Asian AMBIGUOUS is ONE column — the declared deviation", () => {
+    // The house's most-used characters are all in this class, and a terminal in a
+    // CJK locale draws them as TWO. This asserts the convention rather than
+    // trusting it: if this test needs changing, re-read the declaration first.
+    for (const ch of ["\u2014", "\u2500", "\u2192", "\u2502", "\u2026", "\u00B7", "\u00A7", "\u00D7", "\u25C6"]) {
+      expect(graphemeWidth(ch), `ambiguous ${JSON.stringify(ch)} must measure 1`).toBe(1);
+    }
+  });
+
+  test("genuinely WIDE stays two — the declaration is not a licence to flatten the class", () => {
+    for (const ch of ["\u4E00", "\uFF01"]) expect(graphemeWidth(ch)).toBe(2);
+  });
+
+  test("the zero-width class is DERIVED (Mn/Me/Cf), not the enumerated table", () => {
+    // These five were absent from ZERO_WIDTH and measured 1 until 2026-10-13 —
+    // Tamil's virama 23 times in the corpus alone. The property test is the truth;
+    // the table is a floor.
+    for (const ch of ["\u0BCD", "\u103A", "\u0BC0", "\u102F", "\u102D"]) {
+      expect(graphemeWidth(ch), `combining mark U+${ch.codePointAt(0)!.toString(16).toUpperCase()} must measure 0`).toBe(0);
+    }
+    // And a base+mark cluster is still one column, not zero.
+    expect(graphemeWidth("\u0BA4\u0BCD")).toBe(1);
+  });
+});
