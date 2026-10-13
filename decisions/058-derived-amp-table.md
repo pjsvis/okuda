@@ -47,7 +47,7 @@ class, one layer up the toolchain.
 
 ```mermaid
 title: One direction, one owner
-flowchart LR
+flowchart TD
   R[briefs registry] -->|membership| T[amp-regen]
   E[editor] -->|grouping| T
   T --> D[the state table]
