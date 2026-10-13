@@ -93,6 +93,13 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 
 ## Recommended — start these next
 
+- **BRF-TABLE-SLOT-INSTRUMENT** (2026-10-13) — the table's columns are
+  **unobservable from its output**, so a header/body drift in the wrapped row block
+  sits measured but unattributed: +2, +1, +1, +1, 0, 0, 0, 0 across nine columns.
+  Three of my own derivations were wrong before the fourth measurement held. The
+  instrument is to export the slot computation and ask it directly. · **S**
+  — see `briefs/2026-10-13-brief-table-slot-instrument.md`
+
 - **BRF-READ-ACTUATOR** (td-166367, 2026-10-10) — the speech actuator: **77
   calls a function that does the speech thing**, and what it does is the epic's
   to find. Three issues — bind the token, find the function, dogfood by ear. The
