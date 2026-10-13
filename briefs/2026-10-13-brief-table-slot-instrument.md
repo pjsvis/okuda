@@ -19,7 +19,14 @@ slot before it is padded (`src/render.ts:1782`: the `wrapANSI(cell.text, { width
 and a table that is *not* wrapped has `slots = colWidth`, which is every cell's natural
 width by definition. `padDisplay`'s unpadded-on-overflow branch (`src/width.ts:378`) is
 therefore unreachable for a generic cell. Header and body are padded from the same `slots`
-array by the same `padNatural`, so their starts agree **structurally**, not by coincidence.
+array by the same `padNatural`, so they share one grid **structurally**, not by coincidence.
+
+**The invariant is the grid, not the cell start.** For a default-left column the content
+sits on the slot boundary, so header and body starts coincide; for a centred or right-aligned
+column they do **not**, and must not — `docs/tables.md` §3 (`:---:` and `---:`) is the
+counterexample. A header/body *start* comparison would flag a correctly aligned table as
+broken. The instrument asserts what actually must hold: the header's pipes and the body's
+gutters fall on the same slot boundaries, and each cell is padded per its declared align.
 
 **The measurement, corrected.** The output-only instrument — the header's pipes define the
 grid, and every body row must show a 3-space gutter at each pipe's position — finds **0
@@ -47,8 +54,8 @@ than the bytes on screen.
 
 **What is delivered:** `tableSlots` (`src/render.ts`) is exported and unit-tested;
 `renderTable` calls it, so the renderer and the instrument can no longer disagree; and
-`tests/table-slot.test.ts` pins header/body column agreement in the fitted **and** wrapped
-states, with the overhang control shown to fail when body wrapping is disabled.
+`tests/table-slot.test.ts` pins the shared grid in the fitted, wrapped and aligned states,
+with the overhang control shown to fail when body wrapping is disabled.
 
 ---
 
@@ -127,10 +134,12 @@ Proposed, in order:
    wrapped state? If yes, that is the defect and the fix is in the allocation or in `cut`. If
    no, the drift is a **measurement artifact** and the measurement must be corrected — and the
    correction is itself the deliverable.
-3. **A test that pins header/body column agreement**, in both states, from the rendered output:
-   the header's cell starts (derive them from the pipes) must equal the body's cell starts
-   (derive them from the first line of each cell's block). This is the instrument the silo does
-   not have, and it is the one that would have caught this automatically rather than by eye.
+3. **A test that pins the shared grid**, in both states, from the rendered output: the
+   header's pipes and the body's gutters must fall on the same slot boundaries, and each cell
+   must be padded per its declared align. (An earlier draft said "the header's cell starts
+   must equal the body's cell starts" — wrong for centred and right-aligned columns;
+   corrected here.) This is the instrument the silo does not have, and it is the one that
+   would have caught a real drift automatically rather than by eye.
 
 ## Acceptance
 
@@ -138,8 +147,8 @@ Proposed, in order:
   `tests/table-slot.test.ts`).
 - [x] The hypothesis is answered **no** — the measurement corrected (above): no overhang is
   drawn; 0/1676 corpus combinations disagree.
-- [x] A rendered-output test asserts header/body column agreement in the natural **and**
-  wrapped states (`tests/table-slot.test.ts`), and the overhang assertion is shown to fail
+- [x] A rendered-output test asserts the shared grid in the natural, wrapped **and**
+  aligned states (`tests/table-slot.test.ts`), and the overhang assertion is shown to fail
   when body wrapping is disabled (the gate can fail).
 - [x] `just check` and `just test` green.
 
@@ -159,7 +168,7 @@ Proposed, in order:
   the common one
 - `docs/2026-10-13-the-mechanism-is-the-fallible-half.md` — the three wrong derivations, in
   their natural habitat
-- `tests/table-slot.test.ts` — the alignment instrument: `tableSlots`' contract, and
-  header/body column agreement in both states
+- `tests/table-slot.test.ts` — the alignment instrument: `tableSlots`' contract, the
+  header/body grid in both states, and left/centre/right padding
 - `src/render.ts:1628` (`tableSlots`) — the exported slot computation; `renderTable` and
   every checker now share it
