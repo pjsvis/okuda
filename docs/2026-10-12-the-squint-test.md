@@ -169,19 +169,30 @@ a hide is the defect class, not the cut.
 any step, cuts more at a wider glass. `ADR-TABLE-EDGE-CUT-055`'s recoverability
 clause is not a table property; it is a property of the renderer.
 
-**And the residue is named.** At 160 columns — past the band cap of 116 — two
-documents of 516 still lose content that widening cannot repair:
+**And the residue is named, with its price.** At 160 columns **two documents of
+516** still lose content:
 
-| cut lines | art | document |
+| cut lines | columns needed | document |
 |---|---|---|
-| 6 | ok | `docs/2026-10-08-ai-human-development-workflow-08.md` |
-| 4 | ok | `docs/2026-10-08-ai-human-development-workflow-06.md` |
+| 6 | ≤ 320 | `docs/2026-10-08-ai-human-development-workflow-08.md` |
+| 4 | ≤ 250 | `docs/2026-10-08-ai-human-development-workflow-06.md` |
 
-This is the set `ADR-TABLE-EDGE-CUT-055` hands back to the document — *"Computer
-says NO: Too ugly"*, an instrument that names the outlier rather than teaching the
-renderer to fold it — and for tables the instrument already does it
-(`scripts/tables-check.ts`, six tables at the cap). For the cut classes **nothing
-named it.** Now something does.
+**Neither is irreducible, and the distinction is the point.**
+`ADR-TABLE-EDGE-CUT-055`'s *irreducible set* is a **floor the cap cannot hold** —
+no allocation at 116 columns works, so widening genuinely cannot repair it, and
+the document owns the problem. A code fence has **no cap**: it elides at the
+glass, so any code line is repaired by enough columns. Both documents here are
+embedded payloads whose code lines run past 200 characters; they need a wider
+glass, and the number says how much wider. So the honest claim is *still loses
+content at 160 columns*, never *irreducible* — which is what this probe's first
+run said, and why the wording changed. Reported as the columns needed rather than
+a verdict, because **widen means the pane or the zoom** and the reader pays in
+either currency.
+
+This is `ADR-TABLE-EDGE-CUT-055`'s "Computer says NO: Too ugly" in the wild — an
+instrument that names the outlier rather than teaching the renderer to fold it.
+For tables the instrument already does it (`scripts/tables-check.ts`, six tables
+at the cap); for the cut classes nothing did. Now something does.
 
 **A correction, made the same day.** The first run of this probe listed a third
 document — *this* one — as losing diagram art. It lost nothing: this document has
@@ -215,8 +226,9 @@ it would need, produced by an instrument at authoring time and **never by chrome
 at read time** (the argument `BRF-BOUNDARY-MARK` makes against a warning that
 fires on every render of a growing view). `scripts/tables-check.ts` already
 speaks this verdict; `--strict` is the same verdict for the other three classes,
-and it currently names two documents — both workflow notes, both carrying a word
-no cap can hold, which is an authoring call and not a renderer one.
+and it currently names two documents — both embedded payloads whose code lines run
+past 200 characters, both repaired by a wider glass (≤ 250 and ≤ 320 columns), so
+both an authoring call and not a renderer one.
 
 The contract, then, in one line: **okuda makes the author's work look good as
 long as the document's floor fits the glass's.** Below that line the honest output
@@ -246,7 +258,7 @@ It closes a triad the house was already keeping, at the third level down:
 | structure | **attributable structure** | can the reader explain each element from the page? |
 | perception | **progressive engagement** | is each distance's read complete? |
 
-## Method honesty — four detector defects, all caught by the control
+## Method honesty — six detector defects, all caught by the control
 
 A probe's first number is a claim about the probe. Each of these was found before
 any corpus number was read:
@@ -269,6 +281,11 @@ any corpus number was read:
    diagram as losing one. The pattern is now anchored on the indicator's leading
    `⋮`; the general lesson is that a probe reading a corpus that documents the
    probe is reading itself.
+6. **And the label lied about its referent.** The residue was first printed as
+   *widening cannot repair*, which is `ADR-TABLE-EDGE-CUT-055`'s *irreducible* — a
+   claim about a floor the **cap** cannot hold. A code fence has no cap, so the
+   claim was false for both documents it named. It now prints the **columns
+   needed**: the actionable form, since widen is the pane or the zoom.
 
 ## Open edges
 
@@ -276,11 +293,13 @@ The 18%-at-80 edge this document opened with is **closed**: the cuts are
 recoverable by construction and measured so, and the irreducible residue is three
 documents named above, each a document problem rather than a renderer one.
 
-- **The irreducible set.** Two documents cut, one loses art, at any width. They
-  are named, and the shape of the instrument is settled — **`elision-monotone.ts`
-  is now the non-table sibling of `scripts/tables-check.ts`**: its invariant runs
-  on `just check` (`--gate`), and the set is reachable with `--strict` once the
-  corpus obeys. It does not, and the two documents are the reason.
+- **The residue.** Two documents lose content at 160 columns; both are repaired by
+  a wider glass and the columns needed are reported. Neither is irreducible in
+  `ADR-TABLE-EDGE-CUT-055`'s sense. The instrument is settled —
+  **`elision-monotone.ts` is the non-table sibling of `scripts/tables-check.ts`**:
+  its invariant runs on `just check` (`--gate`), and the residue is reachable with
+  `--strict`. `--strict` joins the gate when the residue is empty, which is the
+  house rule (*ship as a report first; a gate when the corpus is clean*).
 - **The gutter.** 315 diagram blocks; 82% sit flush to the 2-column margin. But the
   median right slack is 2 columns — most diagrams fill the glass. Only **12%** are
   the side-pushed case (flush left *and* ≥20 columns unused). A rendered diagram

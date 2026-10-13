@@ -219,6 +219,31 @@ for (const [file, m] of perDoc) {
 }
 const totalMono = LADDER.every((w, i) => i === 0 || cuts.get(w)! <= cuts.get(LADDER[i - 1]!)!);
 
+/** **The residue is not the irreducible set, and the difference matters.**
+ *  `ADR-TABLE-EDGE-CUT-055`'s irreducible set is a *floor the cap cannot hold* —
+ *  no allocation at 116 columns works, so widening genuinely cannot repair it.
+ *  A code fence has no cap: it elides at the glass, so ANY code line is repaired
+ *  by enough columns. The honest question for the residue is therefore not *is it
+ *  irreducible* but **how many columns would it need** — which is the number that
+ *  makes a recommendation to an author actionable. Widening is the pane OR the
+ *  zoom, so that number is the reader's price in either currency. */
+const NEED_LADDER = [160, 200, 250, 320, 400, 600];
+
+async function columnsNeeded(file: string): Promise<string> {
+  const src = await Bun.file(file).text();
+  for (const w of NEED_LADDER) {
+    const r = read(await renderDocument(neutral(src), { width: w, color: "none" }), w);
+    if (r.cuts === 0 && r.art === 0) return `needs <= ${w} columns`;
+  }
+  return `needs > ${NEED_LADDER[NEED_LADDER.length - 1]} columns`;
+}
+
+async function names(file: string): Promise<string> {
+  const src = await Bun.file(file).text();
+  const r = read(await renderDocument(neutral(src), { width: LADDER[LADDER.length - 1]!, color: "none" }), LADDER[LADDER.length - 1]!);
+  return `${String(r.cuts).padStart(3)} cut line(s), art ${r.art > 0 ? "LOST" : "ok  "}, ${await columnsNeeded(file)}  ${file}`;
+}
+
 if (GATE) {
   if (rises.length > 0 || !totalMono) {
     console.error(`elision-monotone: FAIL — ${rises.length} document(s) cut MORE at a wider glass`);
@@ -230,12 +255,8 @@ if (GATE) {
     const readings = await pool(files, CONCURRENCY, (f) => lose(Bun.file(f).text(), widest));
     const stubborn = files.filter((_, i) => readings[i]!.cuts > 0 || readings[i]!.art > 0);
     if (stubborn.length > 0) {
-      console.error(`elision-monotone: FAIL (strict) — ${stubborn.length} document(s) widening cannot repair at ${widest}`);
-      for (const f of stubborn) {
-        const i = files.indexOf(f);
-        const r = readings[i]!;
-        console.error(`  ${String(r.cuts).padStart(3)} cut line(s), art ${r.art > 0 ? "LOST" : "ok  "}  ${f}`);
-      }
+      console.error(`elision-monotone: FAIL (strict) — ${stubborn.length} document(s) still lose content at ${widest} columns`);
+      for (const f of stubborn) console.error(`  ${await names(f)}`);
       process.exit(1);
     }
   }
@@ -276,9 +297,9 @@ console.log(`\n=== the irreducible set at ${WIDE} columns (widening cannot repai
 const widestRead = await pool(files, CONCURRENCY, (f) => lose(Bun.file(f).text(), WIDE));
 const stubborn = files
   .map((file, i) => ({ file, ...widestRead[i]! }))
-  .filter((s) => s.cuts > 0 || s.art > 0);
+  .filter((s) => s.cuts > 0 || s.art > 0)
+  .sort((a, b) => b.cuts - a.cuts);
 console.log(`documents still losing content : ${stubborn.length} of ${files.length}`);
-console.log("(the recommendation to the author is this list — a named set, never a warning)");
-for (const s of stubborn.sort((a, b) => b.cuts - a.cuts)) {
-  console.log(`  ${String(s.cuts).padStart(3)} cut line(s), art ${s.art > 0 ? "LOST" : "ok  "}  ${s.file}`);
-}
+console.log("(the recommendation to the author is this list — a named set, never a warning,");
+console.log(" and the columns each would need, because widen means the pane or the zoom)");
+for (const s of stubborn) console.log(`  ${await names(s.file)}`);
