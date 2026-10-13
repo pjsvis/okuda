@@ -19,6 +19,26 @@ Protocol mechanics (locus tags, wrap-up) and the protocol-wide terms live in `sy
   Stuff; above it, the slab is the Thing. Codified in the authoring
   playbook's short-paragraphs entry, 2026-09-10.
 
+* **Progressive engagement**: one artifact yields a truthful reading at each of
+  several viewing distances, and each reading is complete *at its distance* — the
+  far read is not a truncated near read, and the near read is not a decoration of
+  the far one. **Test:** the **squint ladder** — element-class survival flat
+  across a geometric ladder of widths while damage is *marked*; the positive and
+  negative controls must pass before any corpus number is read. **Observed
+  2026-10-12**, 515 documents at 79/61/43/31 columns: classes survive at
+  100/100/100/90 per cent, the mark of damage rises from 92 to 287 documents, and
+  the line count inflates 2.4×. **Failure it names:** a class that vanishes as the
+  glass narrows, or a loss that is not stated. **Not** a licence for new chrome —
+  a terminal has one type size, so distance is bought with glyph density and
+  colour block, never with added furniture. **Prior art:**
+  `docs/2026-08-26-the-okuda-net.md:120-124` (*the two audiences were one
+  artefact… the pauser was the design target*);
+  `docs/2026-09-19-the-ornament-that-pays-rent.md` (a restatement re-encodes and
+  is free, a new sign must be learned and is not);
+  `docs/2026-10-08-the-resize-contract.md` (*a degradation that is lossless or
+  marked*, applied to width rather than height);
+  `docs/2026-10-12-the-squint-test.md` (the measurement and the instruments).
+
 ---
 
 ## Register open — the gathering
