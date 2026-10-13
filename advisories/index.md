@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-13 | ADV-FFF-DECLINED | open | ADV-FFF-DECLINED — Advisory declining `fff-search`, a trojan horse of packaged state | ADV-FFF-DECLINED.md |
 | 2026-09-30 | ADV-THE-PILE | open | ADV-THE-PILE — Advisory on the pile of wonky abstractions, and the boundary that domesticates it | ADV-THE-PILE.md |
 | 2026-09-05 | ADV-BOUNDED-CONTEXT-COMMON | open | ADV-BOUNDED-CONTEXT-COMMON — Advisory on the bounded context as a common, shared with others | ADV-BOUNDED-CONTEXT-COMMON.md |
 | 2026-09-05 | ADV-CEPHALOPOD-RFC | open | ADV-CEPHALOPOD-RFC — Advisory for cephalopods (request for comments) | ADV-CEPHALOPOD-RFC.md |
