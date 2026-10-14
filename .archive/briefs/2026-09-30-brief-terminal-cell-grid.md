@@ -6,7 +6,7 @@ callsign: BRF-TERMINAL-CELL-GRID
 # Brief: 2D Terminal Cell Grid Architecture (parked)
 
 **Date:** 2026-09-30
-**Status:** Parked — gated on a real per-cell consumer
+**Status:** rejected — dropped 2026-10-14 (was parked) — gated on a real per-cell consumer
 
 ## Gate
 

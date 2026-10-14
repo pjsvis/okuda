@@ -17,7 +17,6 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-10-10 | BRF-LEAK-FENCE | open | The leak gate's fence exemption — anchor on the source, not a rendered match | 2026-10-10-brief-leak-fence.md |
 | 2026-10-10 | BRF-READ-ACTUATOR | open | Read actuator — the current document, handed to the voice | 2026-10-10-brief-read-actuator.md |
 | 2026-10-10 | BRF-RENDER-DEFECTS | open | Render defects — the stack map's four findings, and how they stop recurring | 2026-10-10-brief-render-defects.md |
-| 2026-10-10 | BRF-TABLE-GUTTER | rejected | The table's gutter — the separator is chrome, and the cap pays for it | 2026-10-10-brief-table-gutter.md |
 | 2026-10-09 | BRF-COMPLETE-BLOCKS | open | The viewport holds complete blocks — cut at boundaries, in the printer and the frame | 2026-10-09-brief-complete-blocks.md |
 | 2026-10-09 | BRF-DOCS-LEDGER | open | The docs/ ledger — a prune ledger, not a registry | 2026-10-09-brief-docs-ledger.md |
 | 2026-10-08 | BRF-DOCUMENT-LIFECYCLE | open | The document lifecycle — ephemeral, record, addressed, retired | 2026-10-08-brief-document-lifecycle.md |
@@ -29,14 +28,12 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-10-06 | BRF-KINDLE-PORCH | open | The Kindle porch — the silo on an e-ink glass, over ssh, nothing on the device | 2026-10-06-brief-kindle-porch.md |
 | 2026-10-05 | BRF-AST-PROSODY | open | AST-to-Prosody Intermediate Representation for Speech Rendering | 2026-10-05-brief-ast-to-prosody-unsloth.md |
 | 2026-10-04 | BRF-STICKY-HEADING-STEPPER | open | The sticky-heading pager — step through a document section by section, heading as anchor, never truncate (BRF-STICKY-HEADING-STEPPER) | 2026-10-04-brief-sticky-heading-stepper.md |
-| 2026-10-03 | BRF-DIAGRAM-DESCRIBE | rejected | Prose descriptions of mermaid diagrams via an external binary — diagram source in, markdown prose out (BRF-DIAGRAM-DESCRIBE) | 2026-10-03-brief-diagram-describe.md |
 | 2026-10-03 | BRF-DOC-SEARCH-FERMATA | open | The doc→search fermata — a held frame at the reading/searching boundary (BRF-DOC-SEARCH-FERMATA) | 2026-10-03-brief-doc-search-fermata.md |
 | 2026-10-02 | BRF-DEMO-SANDBOX | open | The public demo room — two access modes, one sandbox grammar | 2026-10-02-brief-demo-sandbox.md |
 | 2026-10-01 | BRF-READING-FRACTION | open | The reading fraction — a meter for the glass, from the state the glass already holds | 2026-10-01-brief-reading-fraction.md |
 | 2026-09-30 | BRF-FENCE-DISCIPLINE | open | One fence rule — five scanners, four disciplines, one of them fixed | 2026-09-30-brief-fence-discipline.md |
 | 2026-09-30 | BRF-STEP-INVENTORY | open | The stride inventory — what steps, what compounds, what is missing | 2026-09-30-brief-step-inventory.md |
 | 2026-09-30 | BRF-TELEVISION-PREVIEW | parked | Television Preview — okuda as the renderer, OKUDA_WIDTH as the width knob | 2026-09-30-brief-television-preview.md |
-| 2026-09-30 | BRF-TERMINAL-CELL-GRID | parked | 2D Terminal Cell Grid Architecture (parked) | 2026-09-30-brief-terminal-cell-grid.md |
 | 2026-09-29 | BRF-SILCROW-PATHS | open | Silcrow paths — the gate grows a second substrate | 2026-09-29-brief-silcrow-paths.md |
 | 2026-09-29 | BRF-SSH-HOST | parked | SSH host — landing the ADR-013 reading room where SSH gives a shell | 2026-09-29-brief-ssh-host.md |
 | 2026-09-24 | BRF-SRC-LINE-LEDGER | open | The source-line ledger — `10` edit lands the editor at the eye | 2026-09-24-brief-source-line-ledger.md |
@@ -47,12 +44,10 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-18 | BRF-PERIMETER-GATE | open | The perimeter gate — the moira group holds only recipes that invoke okuda | 2026-09-18-brief-perimeter-gate.md |
 | 2026-09-18 | BRF-PERIMETER-RUNNER | open | The perimeter runner — the tuning recipes and their artifacts leave the task runner | 2026-09-18-brief-perimeter-runner.md |
 | 2026-09-18 | BRF-PERIMETER-SILO | open | The perimeter silo — the speech doctrine and its records leave okuda | 2026-09-18-brief-perimeter-silo.md |
-| 2026-09-17 | BRF-BM25-EVALUATION | parked | Benchmark Local BM25 Against Ripgrep and AST Traversal Over Markdown SSOT | 2026-09-17-brief-bm25-evaluation.md |
 | 2026-09-15 | BRF-CALLSIGN-EVERY-DOC | open | A callsign for every document — the name and the address are orthogonal | 2026-09-15-brief-callsign-every-document.md |
 | 2026-09-15 | BRF-SPOKEN-BLOCK-GRAMMAR | open | The spoken block grammar — announce the kind, enumerate the elements, never elide silently | 2026-09-15-brief-spoken-block-grammar.md |
 | 2026-09-14 | BRF-CONCEPTUAL-LEXICON | open | Extract the Conceptual Lexicon from system.md | 2026-09-14-brief-conceptual-lexicon.md |
 | 2026-09-14 | BRF-JUMP-LIST | open | The jump list — the search screen as its projection | 2026-09-14-brief-jump-list.md |
-| 2026-09-14 | BRF-SEARCH-SURFACE | parked | The search surface — the state machine, the array, and the invariant audit | 2026-09-14-brief-search-surface.md |
 | 2026-09-14 | BRF-SPEECH-STRIDE | open | The speech stride — the arrows given to the ear, the unit heard | 2026-09-14-brief-speech-stride.md |
 | 2026-09-13 | BRF-AUDIO-DISCOVERY | open | Audio discovery — the actuator grammar, heard | 2026-09-13-brief-audio-discovery.md |
 | 2026-09-13 | BRF-PROLONGED-PRESS | open | The prolonged press — three gestures, one actuation, no leak | 2026-09-13-brief-prolonged-press.md |
@@ -62,18 +57,13 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-07 | BRF-DIAGRAM-INGESTION | open | The diagram ingestion pipeline — mermaid-to-md as the show/elide/hide gate | 2026-09-07-brief-diagram-ingestion.md |
 | 2026-09-06 | BRF-CONCORDANCE-PREFILTER | open | The concordance pre-filter — `\|`, `!`, and case at the silo's seam | 2026-09-06-brief-concordance-prefilter.md |
 | 2026-09-06 | BRF-TTS-DOGFOOD | open | Coupled-frame TTS dogfood (mac `say`) | 2026-09-06-brief-tts-dogfood.md |
-| 2026-09-04 | BRF-PORCH-MATRIX | rejected | The porch matrix — click a URL, land in a terminal, read the silo | 2026-09-04-brief-porch-matrix.md |
 | 2026-09-04 | BRF-WORKING-COPY | open | The working copy — vector render mode, 99 clone, honest actuator | 2026-09-04-brief-working-copy.md |
 | 2026-09-02 | BRF-SCROLL-REPAINT | open | One line per scroll — scroll-region repaint for the TUI | 2026-09-02-brief-scroll-region-repaint.md |
 | 2026-09-02 | BRF-SYNC-OUTPUT | open | Synchronized output — deliver each paint as one frame | 2026-09-02-brief-synchronized-output.md |
-| 2026-09-01 | BRF-FLOW-WRAP | rejected | Flow wrap — internal break opportunities so paths flow as text | 2026-09-01-brief-flow-wrap.md |
-| 2026-08-31 | BRF-CITTY-CLI | ready | the CLI contract — adopting citty for the okuda/gloam surface | 2026-08-31-brief-citty-cli.md |
 | 2026-08-30 | BRF-CONTENT-SHORTLIST | open | content shortlist — rg as the discovery source | 2026-08-30-brief-content-shortlist.md |
 | 2026-08-30 | BRF-REFRESH-OFF-DISK | open | refresh off disk — the resize race + the R placebo | 2026-08-30-brief-refresh-off-disk.md |
 | 2026-08-30 | BRF-IPAD-MINI | open | 2026-08-30-ipad-mini-demo | 2026-08-30-ipad-mini-demo.md |
 | 2026-08-29 | BRF-AUDIO-STYLE | open | Audio-First Style Guide and Linting Heuristics | 2026-08-29-audio-style-guide.md |
-| 2026-08-29 | BRF-FZF-OWNS-LOOP | rejected | fzf owns the loop (cursor-preserve experiment) | 2026-08-29-brief-fzf-owns-the-loop.md |
-| 2026-08-29 | BRF-MENU-TEMPLATES | parked | Menu templates (deferred — fires on the second menu kind) | 2026-08-29-brief-menu-templates-deferred.md |
 | 2026-08-29 | BRF-RESTICTED-GRAMMAR | open | Okuda Markdown AST to W3C SSML Mapping Investigation | 2026-08-29-brief-resticted-grammar-speech.md |
 | 2026-08-29 | BRF-TERMINAL-SPEECH | open | Terminal Speech Pipeline Easter Egg | 2026-08-29-brief-terminal-speech.md |
 | 2026-08-29 | BRF-MERMAID-HARD | open | Mermaid Rendering Hard Boundary State Machine (CSN Diagnostics) | 2026-08-29-mermaid-hard-boundary-CSN.md |
@@ -88,15 +78,10 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-27 | BRF-FETCH-STATE | open | Fetch-state stamp: checked-time + changed/same/failed in footer; fixes the empty-doc-on-fetch-failure lie; LCARS colouring with a new alert palette role; obeys the first temporal directive (fetch-time, not doc-time) | 2026-08-27-brief-fetch-state-stamp.md |
 | 2026-08-27 | BRF-PANEL-LIBRARY | open | The Panel Library — Chunk-Addressable Okudagrams | 2026-08-27-brief-panel-library.md |
 | 2026-08-27 | BRF-SSH-TUI | parked | Modern terminal escape protocol integration for SSH TUI delivery | 2026-08-27-brief-ssh-tui-integration.md |
-| 2026-08-26 | BRF-DOCUMENT-LINKS | rejected | Document Links — Gopher Hypertext in the Reader | 2026-08-26-brief-document-links.md |
 | 2026-08-26 | BRF-HERDR-DASHBOARD | ready | Herdr Dashboard — the Build's Exhaust, Composed | 2026-08-26-brief-herdr-dashboard.md |
 | 2026-08-26 | BRF-DOCUMENT-SEARCH | open | In-Document Search and Outlining — Fast Navigation in Gloam | 2026-08-26-brief-in-document-search-and-outlining.md |
-| 2026-08-26 | BRF-PALETTE-LIGHTNESS | parked | Palette Lightness Knob — Global Brightness, Hue Preserved | 2026-08-26-brief-palette-lightness-knob.md |
 | 2026-08-26 | BRF-SSH-BLOG | parked | SSH Blog Feed — the Gopher-Serve v1 | 2026-08-26-brief-ssh-blog-feed.md |
 | 2026-08-26 | BRF-SSH-SERVED | parked | SSH-served markdown — option 1 (OpenSSH ForceCommand) | 2026-08-26-brief-ssh-served-markdown.md |
 | 2026-08-26 | BRF-TELEMETRY-CONVENTIONS | ready | Telemetry Conventions — Markdown as Message Bus | 2026-08-26-brief-telemetry-conventions.md |
 | 2026-08-26 | BRF-TTY-REVERSE | ready | TTY Reverse-Print — Land at the Top | 2026-08-26-brief-tty-reverse-print.md |
-| 2026-08-26 | BRF-TUI-LIVE | parked | TUI live documents — fs.watch → anchored re-render | 2026-08-26-brief-tui-live-documents.md |
-| 2026-08-25 | BRF-PI-MARKDOWN | parked | Pi markdown rendering via okuda (Pi's issue) | 2026-08-25-brief-pi-markdown-rendering-via-okuda.md |
 | 2026-08-25 | BRF-REGISTRY-MARKDOWN | open | Registry-aware markdown browser — the silo dashboard | 2026-08-25-brief-registry-markdown-browser.md |
-| 2026-08-25 | BRF-VIEWPORT-PADDING | rejected | Viewport padding — upper and lower render margins (rejected same day: blank only signals at a boundary; viewport pad fights the content-anchor) | 2026-08-25-brief-viewport-padding.md |

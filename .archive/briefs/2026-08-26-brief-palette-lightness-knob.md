@@ -6,7 +6,7 @@ callsign: BRF-PALETTE-LIGHTNESS
 # Brief: Palette Lightness Knob — Global Brightness, Hue Preserved (parked)
 
 **Date:** 2026-08-26
-**Status:** Parked — gated on a real cross-terminal brightness itch
+**Status:** rejected — dropped 2026-10-14 (was parked) — gated on a real cross-terminal brightness itch
 
 ## Gate
 

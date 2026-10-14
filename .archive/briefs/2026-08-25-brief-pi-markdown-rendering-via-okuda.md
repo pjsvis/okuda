@@ -11,7 +11,7 @@ callsign: BRF-PI-MARKDOWN
 # Brief: Pi markdown rendering via okuda (PARKED — Pi's issue)
 
 **Date:** 2026-08-25
-**Status:** Parked (Pi-side spike; okuda stays clean standalone)
+**Status:** rejected — dropped 2026-10-14 (was parked) (Pi-side spike; okuda stays clean standalone)
 
 ## Context
 

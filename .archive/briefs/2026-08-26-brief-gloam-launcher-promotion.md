@@ -6,7 +6,7 @@ callsign: BRF-GLOAM-LAUNCHER
 # Brief: Gloam Launcher Promotion — argv[0] No-Arg Mode (parked)
 
 **Date:** 2026-08-26
-**Status:** Unparked 2026-08-27 (ADR-016) — the gate fired on
+**Status:** done — unparked 2026-08-27 (ADR-016) — the gate fired on
 *Gloam-native chrome in the picker*, not loop friction. The fzf
 key-grammar parity work (`e041f4f`) established that owning the
 picker's behaviour means owning the fzf invocation, which a shell

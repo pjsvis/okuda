@@ -6,7 +6,7 @@ callsign: BRF-RIGHT-EDGE
 # Brief: Right-edge LCARS tab on headers — the visible right bound
 
 **Date:** 2026-08-25
-**Status:** Implemented (feat/rhs-chip-headers; td-9fdca0) — final form: muted solid block (bg=fg=muted on `█`), constant 1 cell, at the content boundary. Dogfooded across two documents; emergent earneds (bounded section, reflow legibility, transition smoother, vocabulary coherence) captured for the debrief. Extend to non-header blocks parked behind further dogfood.
+**Status:** done — implemented (feat/rhs-chip-headers; td-9fdca0) — final form: muted solid block (bg=fg=muted on `█`), constant 1 cell, at the content boundary. Dogfooded across two documents; emergent earneds (bounded section, reflow legibility, transition smoother, vocabulary coherence) captured for the debrief. Extend to non-header blocks parked behind further dogfood.
 **Context:** dogfood finding during the stacked comparison — the left
 margin implies the LHS of the render area, but the RHS is unbounded
 visually. Reflow on horizontal resize has no visible bound, so the

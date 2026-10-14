@@ -7,7 +7,7 @@ callsign: BRF-MENU-TEMPLATES
 
 **Created:** 2026-08-29
 **TD:** (to create when started)
-**Status:** Parked — gated on a second menu kind existing
+**Status:** rejected — dropped 2026-10-14 (was parked) — gated on a second menu kind existing
 
 ## What
 

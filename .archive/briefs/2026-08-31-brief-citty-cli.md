@@ -6,7 +6,7 @@ callsign: BRF-CITTY-CLI
 # Brief: the CLI contract — adopting citty for the okuda/gloam surface
 
 **Date:** 2026-08-31
-**Status:** Ready — decision made pending the three gates
+**Status:** rejected — superseded 2026-10-14 by the flag-table approach; a dependency for generated help we can derive. Was: decision made, three gates pending.
 **Branch:** feat/gloam-launcher
 
 ## Context
