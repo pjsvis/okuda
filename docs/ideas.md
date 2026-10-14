@@ -87,3 +87,17 @@ The outcome is `open`, `promoted: <callsign>`, or `refused: <why>`.
   (`ADR-TABLE-EDGE-CUT-055`: below the cap a cut is recoverable, the lever is
   widen) and the ladder is `docs/2026-10-13-the-width-frame-declaration.md`; the
   perceptual half is unmeasured.
+
+- **`reader-is-three-words`** · 2026-10-14 · `vocabulary` · **open**
+  *the reader* names three things at once: the human who reads (ADR-029's ruling,
+  and the dominant sense); the software in its reading role — down to a type
+  literal, `src/cue.ts` declaring `surface: "reader" | "launcher"`, and
+  "the launcher inherits the reader's verb grammar" (`decisions/016`); and the
+  *device*, where "screen reader" is an external assistive-technology term we
+  cite and do not own.
+  **Trigger:** the three senses already coexist in one corpus, and the cheap half
+  is the software (about ten occurrences, and the software already has a name —
+  okuda). What is undecided is *the human's* name, and that is a taste call:
+  curate it, do not generate it. Cost is bounded by the retirement rule this
+  silo just adopted — the corpus holds ~1400 occurrences but only **220 are on
+  the living surface**, and the protocol's 12 come with a deploy.
