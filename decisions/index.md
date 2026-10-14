@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-14 | ADR-ARCHIVE-BREADTH-063 | Accepted | The archive holds the refused, not only the finished | 063-archive-breadth.md |
 | 2026-10-13 | ADR-BRIEF-LIFECYCLE-061 | Accepted | The brief's lifecycle — the vocabulary is the scale | 061-brief-lifecycle-vocabulary.md |
 | 2026-10-13 | ADR-ONE-GESTURE-062 | Accepted | One gesture, one token — how a digit run resolves, and why there is no clock | 062-one-gesture-one-token.md |
 | 2026-10-10 | ADR-DERIVED-AMP-TABLE-058 | Accepted | The state table derives its rows — the registry is the membership, the editor keeps the grouping | 058-derived-amp-table.md |

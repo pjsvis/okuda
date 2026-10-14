@@ -45,4 +45,38 @@ describe("archive-lint — the scope, the flag and the status (ADR-DOCUMENT-LIFE
     const { violations } = checkArchive(base, [], read({}));
     expect(violations.some((v) => v.includes("no folder"))).toBe(true);
   });
+
+  test("a settled set widens the tier to refusals; parked is not settled", () => {
+    const cfg: Record<string, ArchiveConfig> = {
+      ...base,
+      ".archive/briefs": { ...base[".archive/briefs"]!, settled: ["done", "rejected"] },
+    };
+    const data = {
+      "briefs/INDEX.jsonl": [
+        { file: "finished.md", status: "done" },
+        { file: "refused.md", status: "rejected" },
+        { file: "deferred.md", status: "parked" },
+        { file: "working.md", status: "open" },
+      ],
+      ".archive/briefs/INDEX.jsonl": [
+        { file: "a.md", status: "done" },
+        { file: "b.md", status: "rejected" },
+      ],
+    };
+    const { violations, queue } = checkArchive(cfg, [".archive/briefs"], read(data));
+    expect(violations).toEqual([]);
+    // done and rejected move; parked and open stay live
+    expect(queue).toEqual(["briefs/finished.md", "briefs/refused.md"]);
+  });
+
+  test("under a settled set, a parked document in the archive is a violation", () => {
+    const cfg: Record<string, ArchiveConfig> = {
+      ...base,
+      ".archive/briefs": { ...base[".archive/briefs"]!, settled: ["done", "rejected"] },
+    };
+    const data = { ".archive/briefs/INDEX.jsonl": [{ file: "c.md", status: "parked" }] };
+    const { violations } = checkArchive(cfg, [".archive/briefs"], read(data));
+    expect(violations).toHaveLength(1);
+    expect(violations[0]).toContain("parked");
+  });
 });

@@ -32,6 +32,11 @@ interface RegistryDef {
    *  reads it, the launcher's search channel never does. The drift
    *  test pins each list against its own consumer. */
   archive?: boolean;
+  /** The statuses that SETTLE a document into an archive tier. Unset means
+   *  `[defaultStatus]`. The archive holds what is finished AND what is
+   *  refused; `parked` is deferred, not settled, and stays live
+   *  (ADR-ARCHIVE-BREADTH-063). */
+  settled?: string[];
 }
 
 // Exported for the drift test (BRF-VALIDATED-SILCROWS P-0): root.ts's
@@ -51,7 +56,11 @@ export const REGISTRIES: Record<string, RegistryDef> = {
   // .archive/briefs (ADR-052): the permanent record — settled briefs,
   // reg-sync maintained, resolver-read. Search stays the work queue;
   // resolution becomes the whole citable silo, live and settled.
-  ".archive/briefs": { dir: ".archive/briefs", index: "INDEX.jsonl", defaultStatus: "done", exclude: ["index.md"], fmType: "Brief", csPrefix: "BRF", archive: true },
+  // Breadth (ADR-ARCHIVE-BREADTH-063): a brief settles at `done` OR
+  // `rejected` — a refusal is the permanent record too, and deleting it
+  // would dangle every citation that names it. `parked` is deferred and
+  // stays live.
+  ".archive/briefs": { dir: ".archive/briefs", index: "INDEX.jsonl", defaultStatus: "done", settled: ["done", "rejected"], exclude: ["index.md"], fmType: "Brief", csPrefix: "BRF", archive: true },
 };
 
 export interface Entry {
@@ -128,13 +137,13 @@ export function statusWord(content: string): string {
 }
 
 /** A tier's status vocabulary, or null when the tier's statuses are
- *  fixed by definition. The archive is fixed by LOCATION, not by the
- *  body's word: a brief in `.archive/briefs` is settled (ADR-052), so
- *  five archived briefs whose bodies still say `Open`/`Draft` are not
- *  drift — the archive is the truth about them. A debrief is done and a
- *  playbook canonical, likewise. Pure. */
+ *  fixed by definition. The archive briefs tier SHARES the brief
+ *  vocabulary, because it now records WHICH settled word a document
+ *  carries (`done` or `rejected`) rather than flattening every archival
+ *  to `done` (ADR-ARCHIVE-BREADTH-063). A debrief is done and a playbook
+ *  canonical, likewise. Pure. */
 export function statusVocabulary(registry: string): Record<string, string> | null {
-  if (registry === "briefs") return BRIEF_STATUS;
+  if (registry === "briefs" || registry === ".archive/briefs") return BRIEF_STATUS;
   if (registry === "decisions") return DECISION_STATUS;
   return null;
 }
@@ -303,7 +312,15 @@ function deriveDate(content: string, path: string): string {
 }
 
 function deriveStatus(content: string, def: RegistryDef, registry: string): string {
-  return statusFor(statusWord(content), registry) ?? def.defaultStatus;
+  const resolved = statusFor(statusWord(content), registry);
+  if (def.archive) {
+    // The archive records which SETTLED word the body declares; a legacy
+    // archived brief whose body still says `open`/`draft` keeps the
+    // archive's default (it is settled by location, and stays `done`).
+    const settled = def.settled ?? [def.defaultStatus];
+    return resolved && settled.includes(resolved) ? resolved : def.defaultStatus;
+  }
+  return resolved ?? def.defaultStatus;
 }
 
 function deriveSummary(content: string, file: string): string {

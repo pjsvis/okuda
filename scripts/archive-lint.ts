@@ -23,6 +23,10 @@ export interface ArchiveConfig {
   dir: string;
   index: string;
   defaultStatus: string;
+  /** The statuses that settle into this tier. Unset means `[defaultStatus]`.
+   *  The archive holds what is finished AND what is refused; `parked` is
+   *  deferred, not settled, and stays live (ADR-ARCHIVE-BREADTH-063). */
+  settled?: string[];
   archive?: boolean;
   csPrefix: string;
 }
@@ -76,10 +80,11 @@ export function checkArchive(
   }
 
   for (const [name, def] of archive) {
+    const settled = def.settled ?? [def.defaultStatus];
     for (const e of read(def.dir, def.index)) {
-      if (e.status !== def.defaultStatus) {
+      if (!settled.includes(e.status)) {
         violations.push(
-          `${def.dir}/${e.file}: status "${e.status}" in an archive tier — an archived document is "${def.defaultStatus}"`,
+          `${def.dir}/${e.file}: status "${e.status}" in an archive tier — an archived document is ${settled.map((s) => `"${s}"`).join(" or ")}`,
         );
       }
     }
@@ -99,11 +104,12 @@ export function checkArchive(
   // The move queue: a live entry whose status has settled to its tier's archive
   // default. Filing is not archiving, so this is a reading, never a failure.
   for (const [name, def] of archive) {
+    const settled = def.settled ?? [def.defaultStatus];
     const live = Object.entries(regs).find(([n, d]) => n !== name && d.csPrefix === def.csPrefix && !d.archive);
     if (!live) continue;
     const [liveName, liveDef] = live;
     for (const e of read(liveDef.dir, liveDef.index)) {
-      if (e.status === def.defaultStatus) queue.push(`${liveName}/${e.file}`);
+      if (settled.includes(e.status)) queue.push(`${liveName}/${e.file}`);
     }
   }
 
