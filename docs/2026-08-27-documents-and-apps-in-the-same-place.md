@@ -5,6 +5,8 @@
 > property that emerged from bounded references, and it's the one
 > that matters.
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 A position paper on what Gloam and okuda are, emerging from the
 product-placement riff of 2026-08-27. Not a manifesto; a statement of
 where the product thesis sits, so it can be cited by short string from

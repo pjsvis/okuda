@@ -5,6 +5,8 @@
 > the gap it surfaces is the persistence of traversal knowledge. Seed
 > for a future thread, not a plan.
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 ## The exhibition
 
 An exhibition of native Canadian paintings, in Ottawa (the reference is

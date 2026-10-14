@@ -2,6 +2,8 @@
 
 >**No two cosmetic or structural distractions can occupy the same cognitive state at any time. Therefore, we >exclude them all.**
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 Modern software is dying under the weight of its own vanity. Open any modern text editor, note-taking app, or corporate SaaS tool, and you are immediately greeted by three fatal categories of overhead:
 
 ## Themes: FO

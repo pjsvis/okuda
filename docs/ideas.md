@@ -75,3 +75,15 @@ The outcome is `open`, `promoted: <callsign>`, or `refused: <why>`.
   on either definition means something different by it — a designation with two
   referents and no way to tell which is canon. Raised and promoted the same day
   (operator call, 2026-10-14); the precedent is `ADR-RETIRE-OKW-018`.
+
+- **`ragged-elision-signal`** · 2026-10-14 · `render` · **open**
+  The ragged elision markers may indicate withheld content *positively* — the
+  broken edge reads as a marker rather than as damage, so the cut announces
+  itself instead of being discovered — and that is what makes widening feel like
+  it pays.
+  **Trigger:** a squint rung where the ragged edge stops reading as a signal, or
+  a reader taking an elided cell for a complete one. Raised 2026-10-14 from the
+  operator's reading of the table layout. The recoverability half is law already
+  (`ADR-TABLE-EDGE-CUT-055`: below the cap a cut is recoverable, the lever is
+  widen) and the ladder is `docs/2026-10-13-the-width-frame-declaration.md`; the
+  perceptual half is unmeasured.

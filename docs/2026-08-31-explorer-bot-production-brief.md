@@ -7,6 +7,8 @@
 > the facts do the work. If a scene requires breaking one of the rules
 > below, the rules win — that is what makes the fiction free.
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 ## The scenario
 
 An explorer bot is stranded — asteroid, deep field, your choice. Power

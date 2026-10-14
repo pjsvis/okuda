@@ -5,6 +5,8 @@ brief: briefs/2026-08-29-brief-okudagram-frame.md (BRF-PAGED-OKUDAGRAM)
 
 # Okudagram-frame edge cases
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 **Date:** 2026-08-29
 **Purpose:** dogfood every edge case the okudagram-frame rule
 has named. Render this document in okuda and walk it. The results are

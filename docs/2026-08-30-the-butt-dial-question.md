@@ -4,6 +4,8 @@
 > temptation resurfaces a third time, it graduates to a one-paragraph ADR
 > ("bare digits never fire") purely to stop relitigating.
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 The butt-dial has been ignored long enough. This is the memo it deserves.
 
 The scenario: type `55` to jump to a doc, mean to type `u` to return, and

@@ -4,6 +4,8 @@
 > marketing-excerpt candidates flagged in the final section. Origin:
 > silo-internal, forged in dialogue, every claim hash-referenced.
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 ## The objection, steelmanned
 
 *"This is just a git PR workflow with extra paperwork. Git gives you review,

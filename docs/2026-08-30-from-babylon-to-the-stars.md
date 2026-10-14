@@ -2,6 +2,8 @@
 
 > *"We asked for knowledge, but all we got was the Library of Babel in jigsaw form."*
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 Modern computing is dying under the weight of its own vanity. Open any contemporary text editor, enterprise wiki, or SaaS platform, and you are greeted by an explosion of decorative sludge: pastel palettes, dynamic font ligatures, and Electron wrappers devouring 400MB of RAM just to display a five-item checklist.
 
 We wanted a tool to think with. Instead, we got a gorilla holding a banana and dragging an entire jungle behind it.

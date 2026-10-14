@@ -6,7 +6,7 @@ callsign: BRF-PAGED-OKUDAGRAM
 # Brief: The okudagram frame — a portioning rule
 
 **Date:** 2026-08-29 (rewritten 2026-09-03 — the rule, superseding the constraint-space exploration and its fold-in clauses)
-**Status:** Done (2026-09-05) — the rule is fully specified and v1 landed as the **okudaframe** (keyboard-controls `01`). Named per the attribution badge: okudaframe = the design language applied to reading pagination; okudagram stays the diagrams' name. **Corrected 2026-10-13:** this line read `Rule fully specified; v1 LANDED …`, so `statusWord` took "Rule" as the state and the registry row sat at `open` for six weeks against a landed rule. A Status line states a state; the note follows it.
+**Status:** Done (2026-09-05) — the rule is fully specified and v1 landed as the **okudaframe** (keyboard-controls `01`). Named per the attribution badge: okudaframe = the design language applied to reading pagination; okudagram stays the diagrams' name. **Corrected 2026-10-13:** this line read `Rule fully specified; v1 LANDED …`, so `statusWord` took "Rule" as the state and the registry row sat at `open` for six weeks against a landed rule. A Status line states a state; the note follows it. **Naming superseded 2026-10-14:** the attribution-badge clause above is retired — artifacts are named for what they are (a diagram, a frame, the render), and Okuda's screens are cited in prose. See `ADR-RETIRE-OKUDAGRAM-066`. The frame rule itself is unaffected; this is the coining clause, and a coining clause is annotated rather than rewritten.
 **Branch:** feat/gloam-launcher (parked; no code yet)
 
 > **Rewrite (2026-09-03).** The brief was an aspiration with a mapped

@@ -3,6 +3,8 @@
 > *"If an equation cannot be expressed on an 80-column character grid, it is
 > probably over-parameterized."*
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 Provenance: distilled from a raw brainstorm paste (2026-08-31, rescued from
 `docs/2026-09-30-i811-language-test.md` — future-dated, fence-unbalanced, and
 doubled; the paste was decorated Stuff, the test vectors inside it are not).

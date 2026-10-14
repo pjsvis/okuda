@@ -1,5 +1,7 @@
 # The poverty of UI design — design the actuator, the screen, the channel; let the interface emerge
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 **Date:** 2026-09-05
 **Type:** design note (the root error the session's posture docs circle; the capstone of the shite-filter / motor-map / no-tree-no-outline triad)
 **Status:** The "why" under the posture. Design the three things; the interface is what they compose to.

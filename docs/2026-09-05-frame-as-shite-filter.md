@@ -1,5 +1,7 @@
 # The frame is a shite filter — the document-level instance
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 **Date:** 2026-09-05
 **Type:** design note (the shite-filter posture applied to the okudaframe; companion to `docs/2026-09-05-search-as-shite-filter.md`)
 **Status:** The posture the frame brief should be read in. Does not supersede `briefs/`2026-08-26-brief-paged-okudagram.md`; refines its "slippy-within" clause.

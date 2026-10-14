@@ -1,5 +1,7 @@
 ### Ephemeral UI Rendering & Mnemonic Recall Specification
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 This specification formalizes the stateless, pull-based telemetry stack for the Omarchy Linux and Okudagram environment. The architecture decouples the **Intent Ingress Head** (conversational agent/coordinator) from the **Telemetry Render Head** (stateless terminal display), using bounded Git repositories as the authoritative ledger.
 
 ```mermaid

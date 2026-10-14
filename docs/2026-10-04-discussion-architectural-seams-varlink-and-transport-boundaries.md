@@ -1,5 +1,7 @@
 # **Architectural Discussion: Transport Boundaries, Raw Streams, and Gloam/Okuda**
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 **Document Type:** Architecture & Operational Heuristic Discussion Paper  
 **Status:** Active Discussion  
 **Focus:** Decoupling Transport from Presentation, Varlink/Stream Upgrades, and the Operational Heuristic in Gloam & Okuda

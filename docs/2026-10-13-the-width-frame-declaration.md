@@ -10,6 +10,8 @@ status: recorded — the deviation is stated, and a test pins it so it cannot ch
 > ◆ **143** codepoints the corpus uses are East-Asian **ambiguous**. okuda measures every
 > one of them as **1 column**. A terminal in a CJK locale draws them as **2**.
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 ## The deviation, stated
 
 `graphemeWidth` (`src/width.ts`) treats East-Asian *Ambiguous* as one column, and falls

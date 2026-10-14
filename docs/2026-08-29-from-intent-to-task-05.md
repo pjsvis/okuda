@@ -6,6 +6,8 @@ Here is the revised architecture section with the flowchart handling the executi
 
 ### Formal Architecture: The Bounded Git-Backed Intent Ledger
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 Enterprise adoption of agentic AI routinely fails security and compliance reviews due to the **nondeterministic execution gap**: human operators interact with conversational agents in unlogged chat interfaces, outputs are manually pasted into disparate tools, and the resulting paper trail is fragmented across ephemeral session logs, SaaS silos, and undocumented prompt histories.
 
 The **Bounded Git-Backed Intent Ledger** solves this by enforcing an air-gapped, append-only topology where every strategic brief, agent plan, intermediate telemetry checkpoint, and final artifact is anchored in a version-controlled repository.

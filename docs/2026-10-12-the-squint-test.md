@@ -15,6 +15,8 @@ status: measured — the controls pass, the corpus is sampled twice, and the num
 > of those cuts is recoverable** — the ladder confirms the law per document, and
 > only **3 documents in 516** lose anything that widening cannot restore.
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 ## The claim
 
 **Progressive engagement**: one artifact yields a truthful reading at each of

@@ -1,5 +1,7 @@
 # The Okudagram Scratchpad
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 **Date:** 2026-08-27
 **Kind:** scratchpad, not manifesto.
 

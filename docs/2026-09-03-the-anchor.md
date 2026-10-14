@@ -6,6 +6,8 @@
 > The frame is the anchor made visible; this doc is the anchor made
 > explicit. Citations are file:line against the corpus on `main`.
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 ## The claim
 
 **The anchor is a system invariant.** It will be defended against a

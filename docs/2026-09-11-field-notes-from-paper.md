@@ -8,6 +8,8 @@ status: noted — each item carries its next step.
 
 # Field notes from paper
 
+> **Terminology (2026-10-14).** The word *okudagram* is retired — the composite is **the render**, one portion is **the frame**, a drawing is **a diagram** (`ADR-RETIRE-OKUDAGRAM-066`). This record keeps its words; the ADR is the map.
+
 Taken with a fountain pen — the analog scratch tier: no purge daemon,
 no config file, no registry obligation — during document listening.
 Digitized before the paper outlives the session's memory. Each item:
