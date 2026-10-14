@@ -20,6 +20,7 @@
 {"file":"2026-08-26-brief-tui-live-documents.md","date":"2026-08-26","status":"rejected","summary":"TUI live documents — fs.watch → anchored re-render","meta":{},"callsign":"BRF-TUI-LIVE"}
 {"file":"2026-08-26-session-handoff-okuda-net.md","date":"2026-08-26","status":"done","summary":"Session handoff — the okuda-net riff epoch","meta":{},"callsign":"BRF-SESSION-HANDOFF-4"}
 {"file":"2026-08-27-brief-neckbeard-fzf-assimilation.md","date":"2026-08-27","status":"done","summary":"gloam-finder: Wrapper to launch fzf with hardened interactive semantics","meta":{},"callsign":"BRF-NECKBEARD-FZF"}
+{"file":"2026-08-27-brief-panel-library.md","date":"2026-08-27","status":"rejected","summary":"The Panel Library — Chunk-Addressable Okudagrams","meta":{},"callsign":"BRF-PANEL-LIBRARY"}
 {"file":"2026-08-28-brief-elision-primitive.md","date":"2026-08-28","status":"done","summary":"Elision primitive — close ADR-014, fix the code-fence soft-wrap lie","meta":{},"callsign":"BRF-ELISION-PRIMITIVE"}
 {"file":"2026-08-28-brief-index-and-jump.md","date":"2026-08-28","status":"done","summary":"Ephemeral Index Generation and Numeric Jump Navigation","meta":{},"callsign":"BRF-INDEX-JUMP"}
 {"file":"2026-08-28-brief-launcher-fut.md","date":"2026-08-28","status":"done","summary":"Launcher FUT — session-scoped alt-screen","meta":{},"callsign":"BRF-LAUNCHER-FUT"}
@@ -29,6 +30,7 @@
 {"file":"2026-08-29-brief-menu-templates-deferred.md","date":"2026-08-29","status":"rejected","summary":"Menu templates (deferred — fires on the second menu kind)","meta":{},"callsign":"BRF-MENU-TEMPLATES"}
 {"file":"2026-08-29-brief-okf-callsign-migration.md","date":"2026-08-29","status":"done","summary":"OKF conformance migration and the callsign layer","meta":{},"callsign":"BRF-OKF-CALLSIGN"}
 {"file":"2026-08-29-brief-okudagram-frame.md","date":"2026-08-29","status":"done","summary":"The okudagram frame — a portioning rule","meta":{},"callsign":"BRF-PAGED-OKUDAGRAM"}
+{"file":"2026-08-30-brief-content-shortlist.md","date":"2026-08-30","status":"done","summary":"content shortlist — rg as the discovery source","meta":{},"callsign":"BRF-CONTENT-SHORTLIST"}
 {"file":"2026-08-31-brief-citty-cli.md","date":"2026-08-31","status":"rejected","summary":"the CLI contract — adopting citty for the okuda/gloam surface","meta":{},"callsign":"BRF-CITTY-CLI"}
 {"file":"2026-09-01-brief-flow-wrap.md","date":"2026-09-01","status":"rejected","summary":"Flow wrap — internal break opportunities so paths flow as text","meta":{},"callsign":"BRF-FLOW-WRAP"}
 {"file":"2026-09-01-brief-mermaid-source-omitted.md","date":"2026-09-01","status":"done","summary":"Omit the mermaid source from the render","meta":{},"callsign":"BRF-MERMAID-SOURCE-OMITTED"}
@@ -57,10 +59,13 @@
 {"file":"2026-10-03-brief-archive-resolution-tier.md","date":"2026-10-03","status":"done","summary":"The archive resolution tier — citations must survive the archive move","meta":{},"callsign":"BRF-ARCHIVE-RESOLUTION"}
 {"file":"2026-10-03-brief-diagram-describe.md","date":"2026-10-03","status":"rejected","summary":"Prose descriptions of mermaid diagrams via an external binary","meta":{},"callsign":"BRF-DIAGRAM-DESCRIBE"}
 {"file":"2026-10-03-brief-heading-ansi-strip.md","date":"2026-10-03","status":"done","summary":"Strip ANSI from heading children — the heading role owns every byte of colour","meta":{},"callsign":"BRF-HEADING-ANSI-STRIP"}
+{"file":"2026-10-07-brief-table-allocator-ladder.md","date":"2026-10-07","status":"rejected","summary":"The band and the ladder — the table fit, from a design width of 80","meta":{},"callsign":"BRF-TABLE-LADDER"}
 {"file":"2026-10-08-brief-date-invariant.md","date":"2026-10-08","status":"done","summary":"The date is a claim — the invariant, the lint, and the time document","meta":{},"callsign":"BRF-DATE-INVARIANT"}
+{"file":"2026-10-08-brief-document-lifecycle.md","date":"2026-10-08","status":"done","summary":"The document lifecycle — ephemeral, record, addressed, retired","meta":{},"callsign":"BRF-DOCUMENT-LIFECYCLE"}
 {"file":"2026-10-08-brief-wrap-at-cap.md","date":"2026-10-08","status":"done","summary":"Wrap at the cap — the third branch","meta":{},"callsign":"BRF-WRAP-AT-CAP"}
 {"file":"2026-10-09-brief-paper-rung.md","date":"2026-10-09","status":"done","summary":"The paper rung — the same render, printed","meta":{},"callsign":"BRF-PAPER-RUNG"}
 {"file":"2026-10-10-brief-boundary-mark.md","date":"2026-10-10","status":"done","summary":"The boundary mark — the receipt elides the addresses the cap never realised","meta":{},"callsign":"BRF-BOUNDARY-MARK"}
+{"file":"2026-10-10-brief-history-preface.md","date":"2026-10-10","status":"done","summary":"The header is Date and Status — the history preface and the TD field, out","meta":{},"callsign":"BRF-HISTORY-PREFACE"}
 {"file":"2026-10-10-brief-protocol-update.md","date":"2026-10-10","status":"done","summary":"The protocol update — self-contained documents, and a deploy that crosses the seam honestly","meta":{},"callsign":"BRF-PROTOCOL-UPDATE"}
 {"file":"2026-10-10-brief-seam-audit.md","date":"2026-10-10","status":"done","summary":"The seam audit — the input path, where a run was mistaken for a spelling","meta":{},"callsign":"BRF-SEAM-AUDIT"}
 {"file":"2026-10-10-brief-table-gutter.md","date":"2026-10-10","status":"rejected","summary":"The table's gutter — the separator is chrome, and the cap pays for it","meta":{},"callsign":"BRF-TABLE-GUTTER"}

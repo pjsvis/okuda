@@ -6,7 +6,7 @@ callsign: BRF-DOCUMENT-LIFECYCLE
 # Brief: The document lifecycle — ephemeral, record, addressed, retired
 
 **Date:** 2026-10-08
-**Status:** Open
+**Status:** done — landed (ADR-DOCUMENT-LIFECYCLE-057; the prune batches debriefed; archive-lint and reg-sync in place); swept 2026-10-14.
 
 ## Context
 

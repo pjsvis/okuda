@@ -7,7 +7,7 @@ date: 2026-10-02
 # Brief: The public demo room — two access modes, one sandbox grammar
 
 **Created:** 2026-10-02
-**Status:** Open — brief only; tasks written when the work starts
+**Status:** parked — remote-shaped (an SSH-hosted demo service); parked with the SSH family pending a decision on what remote is for (2026-10-14).
 
 ## Lineage
 

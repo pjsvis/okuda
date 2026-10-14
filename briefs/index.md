@@ -13,23 +13,20 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-10-13 | BRF-TABLE-SLOT-INSTRUMENT | done | The table's columns are unobservable — a slot instrument, and a header/body alignment test | 2026-10-13-brief-table-slot-instrument.md |
 | 2026-10-10 | BRF-AMP-CELL | open | The state cell derives — a status change reaches the table | 2026-10-10-brief-amp-cell.md |
 | 2026-10-10 | BRF-COMMISSION-BLANDINGS | open | Commission the Blandings silo — and the procedure that makes the next one routine | 2026-10-10-brief-commission-blandings.md |
-| 2026-10-10 | BRF-HISTORY-PREFACE | open | The header is Date and Status — the history preface and the TD field, out | 2026-10-10-brief-history-preface.md |
 | 2026-10-10 | BRF-LEAK-FENCE | open | The leak gate's fence exemption — anchor on the source, not a rendered match | 2026-10-10-brief-leak-fence.md |
 | 2026-10-10 | BRF-READ-ACTUATOR | open | Read actuator — the current document, handed to the voice | 2026-10-10-brief-read-actuator.md |
 | 2026-10-10 | BRF-RENDER-DEFECTS | open | Render defects — the stack map's four findings, and how they stop recurring | 2026-10-10-brief-render-defects.md |
 | 2026-10-09 | BRF-COMPLETE-BLOCKS | open | The viewport holds complete blocks — cut at boundaries, in the printer and the frame | 2026-10-09-brief-complete-blocks.md |
 | 2026-10-09 | BRF-DOCS-LEDGER | open | The docs/ ledger — a prune ledger, not a registry | 2026-10-09-brief-docs-ledger.md |
-| 2026-10-08 | BRF-DOCUMENT-LIFECYCLE | open | The document lifecycle — ephemeral, record, addressed, retired | 2026-10-08-brief-document-lifecycle.md |
 | 2026-10-08 | BRF-REG-CLI | open | `reg` — the silo maintenance CLI, one entry point, one artifact | 2026-10-08-brief-reg-cli.md |
 | 2026-10-08 | BRF-REGISTRY-DISCOVERY | open | One map from the territory — the registry discovers its own tiers | 2026-10-08-brief-registry-discovery.md |
 | 2026-10-08 | BRF-SILO-LEXICON | open | Gather the silo's terms of art into `conceptual-lexicon.md` | 2026-10-08-brief-silo-lexicon.md |
 | 2026-10-07 | BRF-FRAME-INDEX | open | The frame index — an address two parties can both name | 2026-10-07-brief-frame-index.md |
-| 2026-10-07 | BRF-TABLE-LADDER | open | The band and the ladder — the table fit, from a design width of 80 | 2026-10-07-brief-table-allocator-ladder.md |
 | 2026-10-06 | BRF-KINDLE-PORCH | open | The Kindle porch — the silo on an e-ink glass, over ssh, nothing on the device | 2026-10-06-brief-kindle-porch.md |
 | 2026-10-05 | BRF-AST-PROSODY | open | AST-to-Prosody Intermediate Representation for Speech Rendering | 2026-10-05-brief-ast-to-prosody-unsloth.md |
 | 2026-10-04 | BRF-STICKY-HEADING-STEPPER | open | The sticky-heading pager — step through a document section by section, heading as anchor, never truncate (BRF-STICKY-HEADING-STEPPER) | 2026-10-04-brief-sticky-heading-stepper.md |
 | 2026-10-03 | BRF-DOC-SEARCH-FERMATA | open | The doc→search fermata — a held frame at the reading/searching boundary (BRF-DOC-SEARCH-FERMATA) | 2026-10-03-brief-doc-search-fermata.md |
-| 2026-10-02 | BRF-DEMO-SANDBOX | open | The public demo room — two access modes, one sandbox grammar | 2026-10-02-brief-demo-sandbox.md |
+| 2026-10-02 | BRF-DEMO-SANDBOX | parked | The public demo room — two access modes, one sandbox grammar | 2026-10-02-brief-demo-sandbox.md |
 | 2026-10-01 | BRF-READING-FRACTION | open | The reading fraction — a meter for the glass, from the state the glass already holds | 2026-10-01-brief-reading-fraction.md |
 | 2026-09-30 | BRF-FENCE-DISCIPLINE | open | One fence rule — five scanners, four disciplines, one of them fixed | 2026-09-30-brief-fence-discipline.md |
 | 2026-09-30 | BRF-STEP-INVENTORY | open | The stride inventory — what steps, what compounds, what is missing | 2026-09-30-brief-step-inventory.md |
@@ -60,7 +57,6 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-04 | BRF-WORKING-COPY | open | The working copy — vector render mode, 99 clone, honest actuator | 2026-09-04-brief-working-copy.md |
 | 2026-09-02 | BRF-SCROLL-REPAINT | open | One line per scroll — scroll-region repaint for the TUI | 2026-09-02-brief-scroll-region-repaint.md |
 | 2026-09-02 | BRF-SYNC-OUTPUT | open | Synchronized output — deliver each paint as one frame | 2026-09-02-brief-synchronized-output.md |
-| 2026-08-30 | BRF-CONTENT-SHORTLIST | open | content shortlist — rg as the discovery source | 2026-08-30-brief-content-shortlist.md |
 | 2026-08-30 | BRF-REFRESH-OFF-DISK | open | refresh off disk — the resize race + the R placebo | 2026-08-30-brief-refresh-off-disk.md |
 | 2026-08-30 | BRF-IPAD-MINI | open | 2026-08-30-ipad-mini-demo | 2026-08-30-ipad-mini-demo.md |
 | 2026-08-29 | BRF-AUDIO-STYLE | open | Audio-First Style Guide and Linting Heuristics | 2026-08-29-audio-style-guide.md |
@@ -76,7 +72,6 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-27 | BRF-ARTPACK-AESTHETICS | open | Plundered artpack aesthetics & high-SNR dark terminal rendering | 2026-08-27-brief-artpack-aesthetics.md |
 | 2026-08-27 | BRF-DENSE-DYNAMIC | open | Dense terminal visual primitives for dynamic telemetry | 2026-08-27-brief-dense-dynamic-displays.md |
 | 2026-08-27 | BRF-FETCH-STATE | open | Fetch-state stamp: checked-time + changed/same/failed in footer; fixes the empty-doc-on-fetch-failure lie; LCARS colouring with a new alert palette role; obeys the first temporal directive (fetch-time, not doc-time) | 2026-08-27-brief-fetch-state-stamp.md |
-| 2026-08-27 | BRF-PANEL-LIBRARY | open | The Panel Library — Chunk-Addressable Okudagrams | 2026-08-27-brief-panel-library.md |
 | 2026-08-27 | BRF-SSH-TUI | parked | Modern terminal escape protocol integration for SSH TUI delivery | 2026-08-27-brief-ssh-tui-integration.md |
 | 2026-08-26 | BRF-HERDR-DASHBOARD | ready | Herdr Dashboard — the Build's Exhaust, Composed | 2026-08-26-brief-herdr-dashboard.md |
 | 2026-08-26 | BRF-DOCUMENT-SEARCH | open | In-Document Search and Outlining — Fast Navigation in Gloam | 2026-08-26-brief-in-document-search-and-outlining.md |

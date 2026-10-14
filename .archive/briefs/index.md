@@ -12,12 +12,15 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-10-12 | BRF-CODE-SILCROWS | done | Code-comment silcrows — a rendered code file is a document for its prose | 2026-10-12-brief-code-silcrows.md |
 | 2026-10-12 | BRF-TABLE-GLASS-FIT | done | Table fit — wrap to the glass, elide only the floor | 2026-10-12-brief-table-glass-fit.md |
 | 2026-10-10 | BRF-BOUNDARY-MARK | done | The boundary mark — the receipt elides the addresses the cap never realised | 2026-10-10-brief-boundary-mark.md |
+| 2026-10-10 | BRF-HISTORY-PREFACE | done | The header is Date and Status — the history preface and the TD field, out | 2026-10-10-brief-history-preface.md |
 | 2026-10-10 | BRF-PROTOCOL-UPDATE | done | The protocol update — self-contained documents, and a deploy that crosses the seam honestly | 2026-10-10-brief-protocol-update.md |
 | 2026-10-10 | BRF-SEAM-AUDIT | done | The seam audit — the input path, where a run was mistaken for a spelling | 2026-10-10-brief-seam-audit.md |
 | 2026-10-10 | BRF-TABLE-GUTTER | rejected | The table's gutter — the separator is chrome, and the cap pays for it | 2026-10-10-brief-table-gutter.md |
 | 2026-10-09 | BRF-PAPER-RUNG | done | The paper rung — the same render, printed | 2026-10-09-brief-paper-rung.md |
 | 2026-10-08 | BRF-DATE-INVARIANT | done | The date is a claim — the invariant, the lint, and the time document | 2026-10-08-brief-date-invariant.md |
+| 2026-10-08 | BRF-DOCUMENT-LIFECYCLE | done | The document lifecycle — ephemeral, record, addressed, retired | 2026-10-08-brief-document-lifecycle.md |
 | 2026-10-08 | BRF-WRAP-AT-CAP | done | Wrap at the cap — the third branch | 2026-10-08-brief-wrap-at-cap.md |
+| 2026-10-07 | BRF-TABLE-LADDER | rejected | The band and the ladder — the table fit, from a design width of 80 | 2026-10-07-brief-table-allocator-ladder.md |
 | 2026-10-03 | BRF-ARCHIVE-RESOLUTION | done | The archive resolution tier — citations must survive the archive move | 2026-10-03-brief-archive-resolution-tier.md |
 | 2026-10-03 | BRF-DIAGRAM-DESCRIBE | rejected | Prose descriptions of mermaid diagrams via an external binary | 2026-10-03-brief-diagram-describe.md |
 | 2026-10-03 | BRF-HEADING-ANSI-STRIP | done | Strip ANSI from heading children — the heading role owns every byte of colour | 2026-10-03-brief-heading-ansi-strip.md |
@@ -46,6 +49,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-01 | BRF-FLOW-WRAP | rejected | Flow wrap — internal break opportunities so paths flow as text | 2026-09-01-brief-flow-wrap.md |
 | 2026-09-01 | BRF-MERMAID-SOURCE-OMITTED | done | Omit the mermaid source from the render | 2026-09-01-brief-mermaid-source-omitted.md |
 | 2026-08-31 | BRF-CITTY-CLI | rejected | the CLI contract — adopting citty for the okuda/gloam surface | 2026-08-31-brief-citty-cli.md |
+| 2026-08-30 | BRF-CONTENT-SHORTLIST | done | content shortlist — rg as the discovery source | 2026-08-30-brief-content-shortlist.md |
 | 2026-08-29 | BRF-FZF-OWNS-LOOP | rejected | fzf owns the loop (cursor-preserve experiment) | 2026-08-29-brief-fzf-owns-the-loop.md |
 | 2026-08-29 | BRF-MENU-TEMPLATES | rejected | Menu templates (deferred — fires on the second menu kind) | 2026-08-29-brief-menu-templates-deferred.md |
 | 2026-08-29 | BRF-OKF-CALLSIGN | done | OKF conformance migration and the callsign layer | 2026-08-29-brief-okf-callsign-migration.md |
@@ -56,6 +60,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-28 | BRF-NOTIFICATION-STYLE | done | 011-zero-notification-stillness-and-decoupled-inbox-watchers | 2026-08-28-brief-notification-style.md |
 | 2026-08-28 | BRF-STATE-GLYPH | done | State-glyph render path — the showcase environment + first cut | 2026-08-28-brief-state-glyph-render-path.md |
 | 2026-08-27 | BRF-NECKBEARD-FZF | done | gloam-finder: Wrapper to launch fzf with hardened interactive semantics | 2026-08-27-brief-neckbeard-fzf-assimilation.md |
+| 2026-08-27 | BRF-PANEL-LIBRARY | rejected | The Panel Library — Chunk-Addressable Okudagrams | 2026-08-27-brief-panel-library.md |
 | 2026-08-26 | BRF-DOCUMENT-LINKS | rejected | Document Links — Gopher Hypertext in the Reader | 2026-08-26-brief-document-links.md |
 | 2026-08-26 | BRF-GLOAM-LAUNCHER | done | Gloam Launcher Promotion — argv[0] No-Arg Mode (parked) | 2026-08-26-brief-gloam-launcher-promotion.md |
 | 2026-08-26 | BRF-PALETTE-LIGHTNESS | rejected | Palette Lightness Knob — Global Brightness, Hue Preserved (parked) | 2026-08-26-brief-palette-lightness-knob.md |

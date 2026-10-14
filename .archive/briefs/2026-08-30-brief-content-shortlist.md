@@ -6,7 +6,7 @@ callsign: BRF-CONTENT-SHORTLIST
 # Brief: content shortlist — rg as the discovery source
 
 **Date:** 2026-08-30
-**Status:** Open (amended 2026-09-04 — unified ranking, see §Ranked sources)
+**Status:** done — landed 2026-09-04 (ADR-LIVE-SEARCH-030; `rankedShortlistEntries` in src/launcher.ts); swept 2026-10-14.
 **Branch:** feat/gloam-launcher
 
 ## Context

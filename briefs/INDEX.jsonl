@@ -8,7 +8,6 @@
 {"file":"2026-08-27-brief-artpack-aesthetics.md","date":"2026-08-27","status":"open","summary":"Plundered artpack aesthetics & high-SNR dark terminal rendering","meta":{},"callsign":"BRF-ARTPACK-AESTHETICS"}
 {"file":"2026-08-27-brief-dense-dynamic-displays.md","date":"2026-08-27","status":"open","summary":"Dense terminal visual primitives for dynamic telemetry","meta":{},"callsign":"BRF-DENSE-DYNAMIC"}
 {"file":"2026-08-27-brief-fetch-state-stamp.md","date":"2026-08-27","status":"open","summary":"Fetch-state stamp: checked-time + changed/same/failed in footer; fixes the empty-doc-on-fetch-failure lie; LCARS colouring with a new alert palette role; obeys the first temporal directive (fetch-time, not doc-time)","meta":{"depends_on":"2026-08-26-brief-tui-live-documents.md (watch + content gate)","sibling":"2026-08-23-brief-gloam-tui-footer.md","gated_on":"fs.watch in TUI + alert palette-role ADR","td":"td-a27b86","perceptual_property":"permitting, not demanding — the temporal analogue of the loose layout (pull-model attention)"},"callsign":"BRF-FETCH-STATE"}
-{"file":"2026-08-27-brief-panel-library.md","date":"2026-08-27","status":"open","summary":"The Panel Library — Chunk-Addressable Okudagrams","meta":{"scope":"render","feature":"chunk-addressing"},"callsign":"BRF-PANEL-LIBRARY"}
 {"file":"2026-08-27-brief-ssh-tui-integration.md","date":"2026-08-27","status":"parked","summary":"Modern terminal escape protocol integration for SSH TUI delivery","meta":{},"callsign":"BRF-SSH-TUI"}
 {"file":"2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md","date":"2026-08-28","status":"parked","summary":"Inline Ask-the-Doc and Local SSH Transport","meta":{},"callsign":"BRF-AI-DOC"}
 {"file":"2026-08-28-brief-jump-demo-honesty.md","date":"2026-08-28","status":"open","summary":"jump-demo honesty — slug derivation + state-glyph signal","meta":{},"callsign":"BRF-JUMP-DEMO"}
@@ -20,7 +19,6 @@
 {"file":"2026-08-29-brief-resticted-grammar-speech.md","date":"2026-08-29","status":"open","summary":"Okuda Markdown AST to W3C SSML Mapping Investigation","meta":{},"callsign":"BRF-RESTICTED-GRAMMAR"}
 {"file":"2026-08-29-brief-terminal-speech.md","date":"2026-08-29","status":"open","summary":"Terminal Speech Pipeline Easter Egg","meta":{},"callsign":"BRF-TERMINAL-SPEECH"}
 {"file":"2026-08-29-mermaid-hard-boundary-CSN.md","date":"2026-08-29","status":"open","summary":"Mermaid Rendering Hard Boundary State Machine (CSN Diagnostics)","meta":{},"callsign":"BRF-MERMAID-HARD"}
-{"file":"2026-08-30-brief-content-shortlist.md","date":"2026-08-30","status":"open","summary":"content shortlist — rg as the discovery source","meta":{},"callsign":"BRF-CONTENT-SHORTLIST"}
 {"file":"2026-08-30-brief-refresh-off-disk.md","date":"2026-08-30","status":"open","summary":"refresh off disk — the resize race + the R placebo","meta":{},"callsign":"BRF-REFRESH-OFF-DISK"}
 {"file":"2026-08-30-ipad-mini-demo.md","date":"2026-08-30","status":"open","summary":"2026-08-30-ipad-mini-demo","meta":{},"callsign":"BRF-IPAD-MINI"}
 {"file":"2026-09-02-brief-scroll-region-repaint.md","date":"2026-09-02","status":"open","summary":"One line per scroll — scroll-region repaint for the TUI","meta":{},"callsign":"BRF-SCROLL-REPAINT"}
@@ -53,14 +51,12 @@
 {"file":"2026-09-30-brief-step-inventory.md","date":"2026-09-30","status":"open","summary":"The stride inventory — what steps, what compounds, what is missing","meta":{},"callsign":"BRF-STEP-INVENTORY"}
 {"file":"2026-09-30-brief-television-preview.md","date":"2026-09-30","status":"parked","summary":"Television Preview — okuda as the renderer, OKUDA_WIDTH as the width knob","meta":{},"callsign":"BRF-TELEVISION-PREVIEW"}
 {"file":"2026-10-01-brief-reading-fraction.md","date":"2026-10-01","status":"open","summary":"The reading fraction — a meter for the glass, from the state the glass already holds","meta":{},"callsign":"BRF-READING-FRACTION"}
-{"file":"2026-10-02-brief-demo-sandbox.md","date":"2026-10-02","status":"open","summary":"The public demo room — two access modes, one sandbox grammar","meta":{},"callsign":"BRF-DEMO-SANDBOX"}
+{"file":"2026-10-02-brief-demo-sandbox.md","date":"2026-10-02","status":"parked","summary":"The public demo room — two access modes, one sandbox grammar","meta":{},"callsign":"BRF-DEMO-SANDBOX"}
 {"file":"2026-10-03-brief-doc-search-fermata.md","date":"2026-10-03","status":"open","summary":"The doc→search fermata — a held frame at the reading/searching boundary (BRF-DOC-SEARCH-FERMATA)","meta":{},"callsign":"BRF-DOC-SEARCH-FERMATA"}
 {"file":"2026-10-04-brief-sticky-heading-stepper.md","date":"2026-10-04","status":"open","summary":"The sticky-heading pager — step through a document section by section, heading as anchor, never truncate (BRF-STICKY-HEADING-STEPPER)","meta":{},"callsign":"BRF-STICKY-HEADING-STEPPER"}
 {"file":"2026-10-05-brief-ast-to-prosody-unsloth.md","date":"2026-10-05","status":"open","summary":"AST-to-Prosody Intermediate Representation for Speech Rendering","meta":{},"callsign":"BRF-AST-PROSODY"}
 {"file":"2026-10-06-brief-kindle-porch.md","date":"2026-10-06","status":"open","summary":"The Kindle porch — the silo on an e-ink glass, over ssh, nothing on the device","meta":{},"callsign":"BRF-KINDLE-PORCH"}
 {"file":"2026-10-07-brief-frame-index.md","date":"2026-10-07","status":"open","summary":"The frame index — an address two parties can both name","meta":{},"callsign":"BRF-FRAME-INDEX"}
-{"file":"2026-10-07-brief-table-allocator-ladder.md","date":"2026-10-07","status":"open","summary":"The band and the ladder — the table fit, from a design width of 80","meta":{},"callsign":"BRF-TABLE-LADDER"}
-{"file":"2026-10-08-brief-document-lifecycle.md","date":"2026-10-08","status":"open","summary":"The document lifecycle — ephemeral, record, addressed, retired","meta":{},"callsign":"BRF-DOCUMENT-LIFECYCLE"}
 {"file":"2026-10-08-brief-reg-cli.md","date":"2026-10-08","status":"open","summary":"`reg` — the silo maintenance CLI, one entry point, one artifact","meta":{},"callsign":"BRF-REG-CLI"}
 {"file":"2026-10-08-brief-registry-discovery.md","date":"2026-10-08","status":"open","summary":"One map from the territory — the registry discovers its own tiers","meta":{},"callsign":"BRF-REGISTRY-DISCOVERY"}
 {"file":"2026-10-08-brief-silo-lexicon.md","date":"2026-10-08","status":"open","summary":"Gather the silo's terms of art into `conceptual-lexicon.md`","meta":{},"callsign":"BRF-SILO-LEXICON"}
@@ -68,7 +64,6 @@
 {"file":"2026-10-09-brief-docs-ledger.md","date":"2026-10-09","status":"open","summary":"The docs/ ledger — a prune ledger, not a registry","meta":{},"callsign":"BRF-DOCS-LEDGER"}
 {"file":"2026-10-10-brief-amp-cell.md","date":"2026-10-10","status":"open","summary":"The state cell derives — a status change reaches the table","meta":{},"callsign":"BRF-AMP-CELL"}
 {"file":"2026-10-10-brief-commission-blandings.md","date":"2026-10-10","status":"open","summary":"Commission the Blandings silo — and the procedure that makes the next one routine","meta":{},"callsign":"BRF-COMMISSION-BLANDINGS"}
-{"file":"2026-10-10-brief-history-preface.md","date":"2026-10-10","status":"open","summary":"The header is Date and Status — the history preface and the TD field, out","meta":{},"callsign":"BRF-HISTORY-PREFACE"}
 {"file":"2026-10-10-brief-leak-fence.md","date":"2026-10-10","status":"open","summary":"The leak gate's fence exemption — anchor on the source, not a rendered match","meta":{},"callsign":"BRF-LEAK-FENCE"}
 {"file":"2026-10-10-brief-read-actuator.md","date":"2026-10-10","status":"open","summary":"Read actuator — the current document, handed to the voice","meta":{},"callsign":"BRF-READ-ACTUATOR"}
 {"file":"2026-10-10-brief-render-defects.md","date":"2026-10-10","status":"open","summary":"Render defects — the stack map's four findings, and how they stop recurring","meta":{},"callsign":"BRF-RENDER-DEFECTS"}

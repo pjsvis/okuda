@@ -6,7 +6,7 @@ callsign: BRF-HISTORY-PREFACE
 # Brief: The header is Date and Status — the history preface and the TD field, out
 
 **Date:** 2026-10-10
-**Status:** Open
+**Status:** done — landed (no document carries a history preface; date-lint and td-id-lint hold the header); swept 2026-10-14.
 
 ## Context
 

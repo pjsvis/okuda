@@ -6,7 +6,7 @@ callsign: BRF-TABLE-LADDER
 # Brief: The band and the ladder — the table fit, from a design width of 80
 
 **Date:** 2026-10-07
-**Status:** Open
+**Status:** rejected — superseded by ADR-TABLE-EDGE-CUT-055 (the ladder retired); swept 2026-10-14.
 
 ## Context
 

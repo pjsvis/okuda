@@ -6,7 +6,7 @@ callsign: BRF-PANEL-LIBRARY
 # Brief: The Panel Library — Chunk-Addressable Okudagrams
 
 **Date:** 2026-08-27
-**Status:** Open
+**Status:** rejected — superseded by ADR-ROLE-LAYOUT-022 (closure landed 2026-08-30); swept 2026-10-14.
 
 ---
 
