@@ -1,6 +1,7 @@
 ---
 type: Debrief
 callsign: DBF-SILCROW-RING-B
+briefs: [BRF-SILCROW-PATHS]
 ---
 
 # Debrief: Ring B and the legibility gate — the silcrow grows a conscience

@@ -5,6 +5,7 @@ date: 2026-10-12
 tags: [rendering, silcrows, vectors, code]
 agent: pi
 environment: local
+briefs: [BRF-CODE-SILCROWS]
 ---
 
 # Debrief: Code-comment silcrows

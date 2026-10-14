@@ -1,6 +1,7 @@
 ---
 type: Debrief
 callsign: DBF-REFERENCES-SECTION
+briefs: [BRF-REFERENCES-SECTION]
 ---
 
 # Debrief: The References section — the renderer's receipt for its own map

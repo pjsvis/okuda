@@ -2,6 +2,7 @@
 type: Debrief
 callsign: DBF-ARCHIVE-SWEEP
 date: 2026-10-03
+briefs: [BRF-ARCHIVE-RESOLUTION]
 ---
 
 # Debrief: The archive sweep — closing the loop the procedure left open

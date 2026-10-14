@@ -1,6 +1,7 @@
 ---
 type: Debrief
 callsign: DBF-TIDY-FIRST
+briefs: [BRF-TIDY-FIRST]
 ---
 
 # Debrief: Tidy-first — the path to a good place

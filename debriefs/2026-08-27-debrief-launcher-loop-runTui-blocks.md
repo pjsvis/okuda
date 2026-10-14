@@ -7,6 +7,7 @@ agent: pi (ses_b0d27c)
 environment: local
 td: td-17e01c
 branch: feat/gloam-launcher
+briefs: [BRF-GLOAM-LAUNCHER]
 ---
 
 # Debrief: the launcher loop — runTui blocks, and the three bugs that were one

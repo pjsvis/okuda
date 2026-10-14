@@ -5,6 +5,7 @@ date: 2026-09-03
 tags: [knowledge-system, brief, okudagram-frame, anchor]
 agent: pi (Gemini 2.5 Pro)
 environment: local
+briefs: [BRF-PAGED-OKUDAGRAM]
 ---
 
 # Debrief: The framing thing — knocked into a cocked hat

@@ -7,6 +7,7 @@ agent: pi (ses_15ce67)
 environment: local
 td: td-f3e0b9
 branch: feat/tui-live-documents
+briefs: [BRF-SSH-SERVED, BRF-TUI-LIVE, BRF-SSH-TUI]
 ---
 
 # Debrief: SSH ForceCommand feasibility — the transport, and the "fps" reframe

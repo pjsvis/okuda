@@ -5,6 +5,7 @@ date: 2026-10-12
 tags: [rendering, tables, elision]
 agent: pi
 environment: local
+briefs: [BRF-TABLE-GLASS-FIT]
 ---
 
 # Debrief: Table fit — wrap to the glass, elide only the floor

@@ -1,6 +1,7 @@
 ---
 type: Debrief
 callsign: DBF-OS-UPGRADE
+briefs: [BRF-GLOAM-OWNS-LOOP]
 ---
 
 # Debrief: The OS upgrade — one stale page hash, and two lessons the silo already held

@@ -2,6 +2,7 @@
 type: Debrief
 callsign: DBF-WRAP-AT-CAP
 date: 2026-10-08
+briefs: [BRF-WRAP-AT-CAP]
 ---
 
 # Debrief: Wrap at the cap — the third branch, and the count that moved

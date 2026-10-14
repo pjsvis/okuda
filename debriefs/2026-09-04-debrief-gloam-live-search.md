@@ -1,6 +1,7 @@
 ---
 type: Debrief
 callsign: DBF-GLOAM-LIVE-SEARCH
+briefs: [BRF-CONTENT-SHORTLIST]
 ---
 
 # Debrief: the gloam live search — one day, three UX failures, one ADR

@@ -2,6 +2,7 @@
 type: Debrief
 callsign: DBF-COMMISSION-RESIDUE
 date: 2026-10-10
+briefs: [BRF-COMMISSION-BLANDINGS]
 ---
 
 # Debrief: The commissioning residue — a procedure, a stamper, and the same class twice

@@ -1,6 +1,7 @@
 ---
 type: Debrief
 callsign: DBF-PROTOCOL-UPDATE
+briefs: [BRF-PROTOCOL-UPDATE]
 ---
 
 # Debrief: The protocol update — the file is the state, and the deploy is a message

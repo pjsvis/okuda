@@ -7,6 +7,7 @@ agent: pi (ses_9e4b52)
 environment: local
 td: td-bdfce0 · td-a87bfd (review)
 branch: feat/gloam-launcher
+briefs: [BRF-OKF-CALLSIGN]
 ---
 
 # Debrief: the OKF migration and callsign layer — one movement, four slices

@@ -2,6 +2,7 @@
 type: Debrief
 callsign: DBF-PROSE-THREAD
 date: 2026-10-08
+briefs: [BRF-DOCUMENT-LIFECYCLE]
 ---
 
 # Debrief: The prose thread — a meter, a gate, and the exit

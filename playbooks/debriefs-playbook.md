@@ -28,6 +28,7 @@ date: [YYYY-MM-DD]
 tags: [area, tooling]
 agent: [agent identity]
 environment: [local | development | production]
+briefs: [BRF-…]   # the briefs this debrief measures; [] if the work had none
 ---
 
 # Debrief: [Work Title]
@@ -70,11 +71,34 @@ Per-area notes on how the work revealed the system behaving:
 
 ## Post-Debrief Checklist
 
-- [ ] Frontmatter present: `date`, `tags`, `agent`, `environment`
+- [ ] Frontmatter present: `date`, `tags`, `agent`, `environment`, **`briefs:`**
 - [ ] Registered in `debriefs/INDEX.jsonl` — `status: done`, meta `adr`/`brief` as applicable
 - [ ] ADRs written for any decisions made during execution (not just those planned in the brief)
 - [ ] Status of the originating brief updated to `done`
 ```
+
+## The `briefs:` field
+
+A debrief's frontmatter declares the briefs it measures:
+
+```yaml
+briefs: [BRF-TABLE-GLASS-FIT]   # the brief(s) whose landing this records
+briefs: []                      # the work had no brief — infra, theme, a defect
+```
+
+**Callsigns, not paths.** A brief's filename is not its callsign, and a callsign
+resolves live *and* archived (`ADR-ARCHIVE-RESOLUTION`), so the edge survives
+the brief's move to `.archive/briefs/`.
+
+**`[]` is not the same as absent.** Empty says *no brief*, which is a claim and a
+common one — work that never briefed. Absent says *not declared*, which is a
+finding. This is the edge that makes a landing pass mechanical instead of
+grep-and-hand-verify (`ADR-RECORD-LINKAGE-065`), and its absence is why gap 3 of
+`DBF-COMPRESSION` cost a whole sitting.
+
+**Frontmatter only, and it is not a content edit.** A debrief's prose is frozen
+on completion; the field is registry-facing metadata, like the callsign
+`reg-sync` adds, and backfilling it does not unfreeze the body.
 
 ## Guidance
 

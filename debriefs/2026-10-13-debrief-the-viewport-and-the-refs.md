@@ -5,6 +5,7 @@ date: 2026-10-13
 tags: [rendering, vectors, refs, process]
 agent: pi
 environment: local
+briefs: [BRF-ADDRESS-CAP, BRF-BOUNDARY-MARK, BRF-TABLE-GUTTER]
 ---
 
 # Debrief: The viewport riff, and the refs behind it

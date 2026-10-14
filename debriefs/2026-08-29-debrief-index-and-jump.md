@@ -7,6 +7,7 @@ agent: pi (ses_9e4b52)
 environment: local
 td: td-9d9981 · td-a87bfd
 branch: feat/gloam-launcher
+briefs: [BRF-INDEX-JUMP]
 ---
 
 # Debrief: index-and-jump — menus as documents, and the demo that kept them honest

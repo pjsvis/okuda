@@ -5,6 +5,7 @@ date: 2026-08-20
 tags: [knowledge-system, playbooks]
 agent: pi (claude)
 environment: local
+briefs: [BRF-PROJECT-INITIALISATION]
 ---
 
 # Debrief: Playbook generalisation — silo de-blogging completed

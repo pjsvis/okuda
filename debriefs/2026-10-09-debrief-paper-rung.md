@@ -2,6 +2,7 @@
 type: Debrief
 callsign: DBF-PAPER-RUNG
 date: 2026-10-09
+briefs: [BRF-PAPER-RUNG]
 ---
 
 # Debrief: The paper rung — the same render, printed

@@ -2,6 +2,7 @@
 type: Debrief
 callsign: DBF-PRUNE-BATCH-1
 date: 2026-10-08
+briefs: [BRF-DOCUMENT-LIFECYCLE]
 ---
 
 # Debrief: Prune batch 1 — four settled briefs into the archive scope

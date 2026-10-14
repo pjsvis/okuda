@@ -2,6 +2,7 @@
 type: Debrief
 callsign: DBF-PRUNE-BATCH-5
 date: 2026-10-08
+briefs: [BRF-DOCUMENT-LIFECYCLE]
 ---
 
 # Debrief: Prune batch 5 — the reading, and the thing that was noticed but not carried

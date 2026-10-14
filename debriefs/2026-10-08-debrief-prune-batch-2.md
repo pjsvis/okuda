@@ -2,6 +2,7 @@
 type: Debrief
 callsign: DBF-PRUNE-BATCH-2
 date: 2026-10-08
+briefs: [BRF-DOCUMENT-LIFECYCLE]
 ---
 
 # Debrief: Prune batch 2 — the first deletion, and a word that must not be borrowed

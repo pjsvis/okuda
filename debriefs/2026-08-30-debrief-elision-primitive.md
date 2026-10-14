@@ -7,6 +7,7 @@ agent: pi (ses_9e4b52)
 environment: local
 td: td-b81597
 branch: feat/gloam-launcher
+briefs: [BRF-ELISION-PRIMITIVE]
 ---
 
 # Debrief: elision primitive — one primitive, two consumers, and an ADR that got superseded mid-build

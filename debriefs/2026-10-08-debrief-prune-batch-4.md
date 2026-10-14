@@ -2,6 +2,7 @@
 type: Debrief
 callsign: DBF-PRUNE-BATCH-4
 date: 2026-10-08
+briefs: [BRF-DOCUMENT-LIFECYCLE]
 ---
 
 # Debrief: Prune batch 4 — the batch that deleted nothing, and why

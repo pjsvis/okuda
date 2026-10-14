@@ -2,6 +2,7 @@
 type: Debrief
 callsign: DBF-PRUNE-BATCH-3
 date: 2026-10-08
+briefs: [BRF-DOCUMENT-LIFECYCLE]
 ---
 
 # Debrief: Prune batch 3 — containment, and a grep that cannot read
