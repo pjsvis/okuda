@@ -6,7 +6,7 @@ callsign: ADR-RENDERER-READER-029
 # Decision: Disambiguate the renderer, the reader, and the glass
 
 **Date:** 2026-09-03
-**Status:** Accepted — **amended 2026-10-14** (the fourth role: the composite is **the render**; `ADR-RETIRE-OKUDAGRAM-066`)
+**Status:** Accepted — **amended 2026-10-14** (the fourth role: the composite is **the render**; `ADR-RETIRE-OKUDAGRAM-066`) — **further amended 2026-10-14** (the human row is **the principal**; `ADR-PRINCIPAL-CLERK-067`)
 
 ## Context
 
@@ -27,12 +27,14 @@ stretched across all three.
 ## Decision
 
 **The renderer** is the software (okuda). **The reader** is the human.
+*(Renamed 2026-10-14: the human is **the principal** — see the amendment below.
+"Reader" keeps one job, for whoever happens to read with no standing.)*
 **The terminal** / **the glass** is the device. Three roles, three
 unambiguous nouns.
 
 | Role | What it does | Term |
 |---|---|---|
-| The human | reads, forms opinions, decides | **the reader** |
+| The human | reads, forms opinions, decides | **the principal** |
 | The software | renders markdown to bytes, fast | **okuda** / **the renderer** |
 | The device | displays the bytes | **the terminal** / **the glass** |
 | The composite | the bytes as laid out for this width | **the render** |
@@ -44,6 +46,16 @@ from the same pattern the table already uses: the software **renders**, so its
 output is **the render**, exactly as the human **reads** and the device is **the
 glass**. One portion of a render is **a frame**; a drawing inside it is **a
 diagram**. Three roles here, four now named, one referent each.
+
+**Further amendment, 2026-10-14** (`ADR-PRINCIPAL-CLERK-067`). The human row is
+renamed: **the principal**. The ruling above stands untouched — this decision
+moved *reader* onto the human and off the software, and that direction was right;
+what it got wrong was the noun. An *activity* word invites an instrument (a card
+reader, an e-reader, a screen reader), so the name now states the human's
+**standing** instead: the party who intends, decides, and is owed the record.
+The agent it transacts with is **the clerk** — the party that owes the writing
+down. The word *reader* keeps one legitimate job, for whoever happens to read
+with no standing: that party is **a stranger**, not a principal.
 
 Where the scratchpad said "the viewer" meaning the software, it now
 says **okuda** (the proper name) or **the renderer** (the role). Where

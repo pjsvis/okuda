@@ -88,7 +88,7 @@ The outcome is `open`, `promoted: <callsign>`, or `refused: <why>`.
   widen) and the ladder is `docs/2026-10-13-the-width-frame-declaration.md`; the
   perceptual half is unmeasured.
 
-- **`reader-is-three-words`** · 2026-10-14 · `vocabulary` · **open**
+- **`reader-is-three-words`** · 2026-10-14 · `vocabulary` · **promoted: BRF-PRINCIPAL-CLERK**
   *the reader* names three things at once: the human who reads (ADR-029's ruling,
   and the dominant sense); the software in its reading role — down to a type
   literal, `src/cue.ts` declaring `surface: "reader" | "launcher"`, and

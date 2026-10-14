@@ -65,6 +65,35 @@ Protocol mechanics (locus tags, wrap-up) and the protocol-wide terms live in `sy
 
 ---
 
+* **the principal**: the party the silo serves — the human whose decisions are
+  recorded, and to whom the record is owed. A **standing**, not an activity, so no
+  instrument can share the name (a card reader, an e-reader, a screen reader).
+  **Test:** if the sentence can be rewritten as *"the person who decides"*, it is
+  the principal; if it can be replaced by *"the rule"*, it is the principle.
+  **Not** a stranger: a document addressing an unknown party addresses **a
+  stranger** (`docs/2026-08-20-origin-doc.md`), who has no standing and no work
+  to be owed. Defined by `ADR-PRINCIPAL-CLERK-067`.
+  **Prior art:** the standard name for the party in an agency relationship; the
+  protocol's *operator*, which named the same party by an action on a machine and
+  narrowed it; `docs/2026-08-30-naming-like-nasa.md` — a name must not lie about
+  its referent, and the near-miss with *principle* is the mnemonic, not an
+  accident.
+
+* **the clerk**: the agent in its duty to the record — the party that owes the
+  writing down. Intention runs principal → clerk; the record runs back, so the
+  pair states **direction of intention** in two words. The clerk's memory is the
+  ledger, which is continuity by re-reading given a name; and it is a *post*, not
+  a person, which is what the protocol asks of a name for the agent. *The agent*
+  names what the thing is (the runtime); *the clerk* names what it owes — two
+  codes, one referent, each in its own register. Defined by
+  `ADR-PRINCIPAL-CLERK-067`.
+  **Prior art:** the record-keeping clerk of every registry — the task is old
+  enough to have a name, and the name is not a diminution; the two-codes lesson
+  at `docs/2026-08-30-naming-like-nasa.md`; the commissioning vocabulary at
+  `playbooks/commissioning-playbook.md`, of which this names the other half.
+
+---
+
 ## Register open — the gathering
 
 This file is deliberately thin on the day it was created. The lexicon it was

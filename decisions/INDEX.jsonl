@@ -63,3 +63,4 @@
 {"file":"064-idea-ledger.md","date":"2026-10-14","status":"Accepted","summary":"The idea ledger — a pre-brief register with a trigger gate","meta":{},"callsign":"ADR-IDEA-LEDGER-064"}
 {"file":"065-record-linkage.md","date":"2026-10-14","status":"Accepted","summary":"The record's linkage — a debrief declares its briefs","meta":{},"callsign":"ADR-RECORD-LINKAGE-065"}
 {"file":"066-retire-the-okudagram-term.md","date":"2026-10-14","status":"Accepted","summary":"Retire the okudagram term — the render, the frame, and the diagram","meta":{},"callsign":"ADR-RETIRE-OKUDAGRAM-066"}
+{"file":"067-the-principal-and-the-clerk.md","date":"2026-10-14","status":"Accepted","summary":"The principal and the clerk — the two parties, named by their standing","meta":{},"callsign":"ADR-PRINCIPAL-CLERK-067"}

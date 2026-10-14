@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-14 | BRF-PRINCIPAL-CLERK | open | The principal and the clerk — the three-way triage | 2026-10-14-brief-principal-and-clerk.md |
 | 2026-10-13 | BRF-ALIGN-ACROSS-TABLES | open | The align meta is misattributed across tables — a later table un-aligns an earlier one | 2026-10-13-brief-align-across-tables.md |
 | 2026-10-13 | BRF-TABLE-SLOT-INSTRUMENT | done | The table's columns are unobservable — a slot instrument, and a header/body alignment test | 2026-10-13-brief-table-slot-instrument.md |
 | 2026-10-10 | BRF-AMP-CELL | open | The state cell derives — a status change reaches the table | 2026-10-10-brief-amp-cell.md |
