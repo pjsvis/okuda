@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-14 | DBF-BARNACLE | done | Debrief: The barnacle — one word, three referents, and a gate that holds the line | 2026-10-14-debrief-the-barnacle.md |
 | 2026-10-14 | DBF-COMPRESSION | done | Debrief: The compression — and the four gaps it exposed | 2026-10-14-debrief-the-compression.md |
 | 2026-10-14 | DBF-FUNNEL | done | Debrief: The funnel — an intake gate, and the edge that was missing | 2026-10-14-debrief-the-funnel.md |
 | 2026-10-13 | DBF-VIEWPORT-REFS | done | Debrief: The viewport riff, and the refs behind it | 2026-10-13-debrief-the-viewport-and-the-refs.md |

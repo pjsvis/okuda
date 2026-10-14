@@ -6,7 +6,7 @@ callsign: BRF-RETIRE-OKUDAGRAM
 # Brief: Retire the okudagram term — the render, the frame, and the diagram
 
 **Date:** 2026-10-14
-**Status:** In Progress
+**Status:** Done
 **Context:** The word names our own artifacts with someone else's work, and it
 carries **three referents at once**: the composed screen
 (`explainers/concepts-and-terms.md`), the diagrams and the frame (the head
@@ -62,14 +62,36 @@ checksum.
 
 ## Work Plan
 
-1. [ ] The ledger entry, promoted (the first promotion the ledger records).
-2. [ ] `ADR-RETIRE-OKUDAGRAM-066`, plus the in-place annotation on
+1. [x] The ledger entry, promoted (the first promotion the ledger records).
+2. [x] `ADR-RETIRE-OKUDAGRAM-066`, plus the in-place annotation on
        `ADR-RENDERER-READER-029` (the decisions playbook's checklist item).
-3. [ ] The code surface: comments in `src/`, `tests/`, `scripts/`, and the
+3. [x] The code surface: comments in `src/`, `tests/`, `scripts/`, and the
        `frame-probe` rename.
-4. [ ] The living prose: five playbooks, the explainers, the lexicon candidate
+4. [x] The living prose: five playbooks, the explainers, the lexicon candidate
        list, the `&` panels, the four undated `docs/` references.
-5. [ ] `just check` green; `bun test` green.
+5. [x] `just check` green; `bun test` green (797 pass).
+
+## Landing
+
+Landed 2026-10-14 as `4b66e1c`. `scripts/retired-terms-lint.ts` read 24 living
+paths before the tidy and reads zero after, and it is on `just check`, so the
+count cannot drift back up. Two self-caught residues, both from the same hand
+and both worth the note: the brief and ADR cited `ADR-CALLSIGNS-ARE-DATA-024`,
+which is not the callsign (`ADR-CALLSIGN-DATA-024` is) — `callsign-lint`
+refused it; and `just amp-regen` filed the new brief's panel row using the
+brief's title verbatim, which reintroduced the retired term into a living
+surface — the panel's *note* is the editor's, so it was rewritten there, and
+that is a small standing hazard of deriving membership and authoring notes.
+
+The lint needed two refinements the tree taught it: a callsign is data and not
+an occurrence (otherwise `BRF-PAGED-OKUDAGRAM` fails the gate that protects
+it), and an address is not a use — but the blunt slash test let
+`frame/okudagram mode` through, so an address must carry a file extension.
+
+One process failure, recorded rather than smoothed: the commit was made on
+`main` before a branch existed, against Rule 4. Repaired unpushed by
+`git branch feat/retire-okudagram` plus a reset of `main`, so the tree and the
+history are intact — but the rule is the rule, and the miss was mine.
 
 ## Acceptance Criteria
 
