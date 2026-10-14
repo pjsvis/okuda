@@ -377,12 +377,12 @@ describe("launcher — conformance smoke: the search the operator runs", () => {
 
   test("'load bearing' surfaces corpus documents (hyphenated in the prose)", async () => {
     const entries = rankedShortlistEntries("load bearing", process.cwd());
-    const hit = entries.find((e) => pathOf(e) === "briefs/2026-08-26-brief-tui-live-documents.md");
+    const hit = entries.find((e) => pathOf(e) === "briefs/2026-09-19-brief-gloam-owns-the-loop.md");
     expect(hit).toBeDefined();
     expect(hit).toContain("load-bearing"); // evidence: the hyphenated row
     // And through the real matcher: the phrase query must surface it.
     const matches = await fzfFilter("load bearing", entries);
-    expect(matches).toContain("briefs/2026-08-26-brief-tui-live-documents.md");
+    expect(matches).toContain("briefs/2026-09-19-brief-gloam-owns-the-loop.md");
   });
 });
 
@@ -633,7 +633,7 @@ describe("launcher — the onion search grammar (BRF-ONION-SEARCH-GRAMMAR)", () 
     // it always had — the load-bearing smoke path, asserted here.
     const entries = rankedShortlistEntries("briefs/ load bearing", process.cwd());
     const paths = entries.map((e) => e.split("\t")[0]!);
-    expect(paths).toContain("briefs/2026-08-26-brief-tui-live-documents.md");
+    expect(paths).toContain("briefs/2026-09-19-brief-gloam-owns-the-loop.md");
   });
 
   test("src/ alone lists the directory's files", () => {

@@ -68,13 +68,14 @@ describe("the tier vocabulary", () => {
     expect(statusFor("parked", "decisions")).toBeNull();
   });
 
-  test("tiers whose status is fixed by definition have no vocabulary", () => {
-    // The archive is settled by LOCATION (ADR-052): five archived briefs
-    // whose bodies still say Open/Draft are not drift. A debrief is done;
-    // a playbook canonical; an advisory open.
+  test("the archive briefs tier shares the brief vocabulary", () => {
+    // ADR-ARCHIVE-BREADTH-063: the archive records WHICH settled word a
+    // body declares (done or rejected), so it shares the brief vocabulary
+    // rather than flattening every archival to `done`. The statuses fixed
+    // by definition — debrief, playbook, advisory — still have none.
     expect(statusVocabulary("briefs")).not.toBeNull();
     expect(statusVocabulary("decisions")).not.toBeNull();
-    expect(statusVocabulary(".archive/briefs")).toBeNull();
+    expect(statusVocabulary(".archive/briefs")).toBe(statusVocabulary("briefs"));
     expect(statusVocabulary("debriefs")).toBeNull();
     expect(statusVocabulary("playbooks")).toBeNull();
     expect(statusVocabulary("advisories")).toBeNull();
