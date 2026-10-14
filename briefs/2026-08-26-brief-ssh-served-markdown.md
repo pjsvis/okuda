@@ -6,7 +6,7 @@ callsign: BRF-SSH-SERVED
 # Brief: SSH-served markdown — option 1 (OpenSSH ForceCommand)
 
 **Date:** 2026-08-26
-**Status:** Open
+**Status:** parked — the SSH family is parked pending a decision on what remote is for (2026-10-13)
 **Branch:** feat/rhs-chip-headers → feat/ssh-deploy
 
 ## Context

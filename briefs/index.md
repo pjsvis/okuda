@@ -29,7 +29,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-10-06 | BRF-KINDLE-PORCH | open | The Kindle porch — the silo on an e-ink glass, over ssh, nothing on the device | 2026-10-06-brief-kindle-porch.md |
 | 2026-10-05 | BRF-AST-PROSODY | open | AST-to-Prosody Intermediate Representation for Speech Rendering | 2026-10-05-brief-ast-to-prosody-unsloth.md |
 | 2026-10-04 | BRF-STICKY-HEADING-STEPPER | open | The sticky-heading pager — step through a document section by section, heading as anchor, never truncate (BRF-STICKY-HEADING-STEPPER) | 2026-10-04-brief-sticky-heading-stepper.md |
-| 2026-10-03 | BRF-DIAGRAM-DESCRIBE | open | Prose descriptions of mermaid diagrams via an external binary — diagram source in, markdown prose out (BRF-DIAGRAM-DESCRIBE) | 2026-10-03-brief-diagram-describe.md |
+| 2026-10-03 | BRF-DIAGRAM-DESCRIBE | rejected | Prose descriptions of mermaid diagrams via an external binary — diagram source in, markdown prose out (BRF-DIAGRAM-DESCRIBE) | 2026-10-03-brief-diagram-describe.md |
 | 2026-10-03 | BRF-DOC-SEARCH-FERMATA | open | The doc→search fermata — a held frame at the reading/searching boundary (BRF-DOC-SEARCH-FERMATA) | 2026-10-03-brief-doc-search-fermata.md |
 | 2026-10-02 | BRF-DEMO-SANDBOX | open | The public demo room — two access modes, one sandbox grammar | 2026-10-02-brief-demo-sandbox.md |
 | 2026-10-01 | BRF-READING-FRACTION | open | The reading fraction — a meter for the glass, from the state the glass already holds | 2026-10-01-brief-reading-fraction.md |
@@ -38,7 +38,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-30 | BRF-TELEVISION-PREVIEW | parked | Television Preview — okuda as the renderer, OKUDA_WIDTH as the width knob | 2026-09-30-brief-television-preview.md |
 | 2026-09-30 | BRF-TERMINAL-CELL-GRID | parked | 2D Terminal Cell Grid Architecture (parked) | 2026-09-30-brief-terminal-cell-grid.md |
 | 2026-09-29 | BRF-SILCROW-PATHS | open | Silcrow paths — the gate grows a second substrate | 2026-09-29-brief-silcrow-paths.md |
-| 2026-09-29 | BRF-SSH-HOST | open | SSH host — landing the ADR-013 reading room where SSH gives a shell | 2026-09-29-brief-ssh-host.md |
+| 2026-09-29 | BRF-SSH-HOST | parked | SSH host — landing the ADR-013 reading room where SSH gives a shell | 2026-09-29-brief-ssh-host.md |
 | 2026-09-24 | BRF-SRC-LINE-LEDGER | open | The source-line ledger — `10` edit lands the editor at the eye | 2026-09-24-brief-source-line-ledger.md |
 | 2026-09-19 | BRF-CAPABILITIES-DOC | open | The capabilities doc — a snapshot inventory, not a changelog | 2026-09-19-brief-capabilities-doc.md |
 | 2026-09-19 | BRF-GLOAM-OWNS-LOOP | open | GLoam owns the search TUI — the fzf dependency retires | 2026-09-19-brief-gloam-owns-the-loop.md |
@@ -62,12 +62,11 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-07 | BRF-DIAGRAM-INGESTION | open | The diagram ingestion pipeline — mermaid-to-md as the show/elide/hide gate | 2026-09-07-brief-diagram-ingestion.md |
 | 2026-09-06 | BRF-CONCORDANCE-PREFILTER | open | The concordance pre-filter — `\|`, `!`, and case at the silo's seam | 2026-09-06-brief-concordance-prefilter.md |
 | 2026-09-06 | BRF-TTS-DOGFOOD | open | Coupled-frame TTS dogfood (mac `say`) | 2026-09-06-brief-tts-dogfood.md |
-| 2026-09-04 | BRF-PORCH-MATRIX | open | The porch matrix — click a URL, land in a terminal, read the silo | 2026-09-04-brief-porch-matrix.md |
+| 2026-09-04 | BRF-PORCH-MATRIX | rejected | The porch matrix — click a URL, land in a terminal, read the silo | 2026-09-04-brief-porch-matrix.md |
 | 2026-09-04 | BRF-WORKING-COPY | open | The working copy — vector render mode, 99 clone, honest actuator | 2026-09-04-brief-working-copy.md |
 | 2026-09-02 | BRF-SCROLL-REPAINT | open | One line per scroll — scroll-region repaint for the TUI | 2026-09-02-brief-scroll-region-repaint.md |
 | 2026-09-02 | BRF-SYNC-OUTPUT | open | Synchronized output — deliver each paint as one frame | 2026-09-02-brief-synchronized-output.md |
-| 2026-09-01 | BRF-FLOW-WRAP | open | Flow wrap — internal break opportunities so paths flow as text | 2026-09-01-brief-flow-wrap.md |
-| 2026-09-01 | BRF-MERMAID-SOURCE-OMITTED | open | Omit the mermaid source from the render | 2026-09-01-brief-mermaid-source-omitted.md |
+| 2026-09-01 | BRF-FLOW-WRAP | rejected | Flow wrap — internal break opportunities so paths flow as text | 2026-09-01-brief-flow-wrap.md |
 | 2026-08-31 | BRF-CITTY-CLI | ready | the CLI contract — adopting citty for the okuda/gloam surface | 2026-08-31-brief-citty-cli.md |
 | 2026-08-30 | BRF-CONTENT-SHORTLIST | open | content shortlist — rg as the discovery source | 2026-08-30-brief-content-shortlist.md |
 | 2026-08-30 | BRF-REFRESH-OFF-DISK | open | refresh off disk — the resize race + the R placebo | 2026-08-30-brief-refresh-off-disk.md |
@@ -88,13 +87,13 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-27 | BRF-DENSE-DYNAMIC | open | Dense terminal visual primitives for dynamic telemetry | 2026-08-27-brief-dense-dynamic-displays.md |
 | 2026-08-27 | BRF-FETCH-STATE | open | Fetch-state stamp: checked-time + changed/same/failed in footer; fixes the empty-doc-on-fetch-failure lie; LCARS colouring with a new alert palette role; obeys the first temporal directive (fetch-time, not doc-time) | 2026-08-27-brief-fetch-state-stamp.md |
 | 2026-08-27 | BRF-PANEL-LIBRARY | open | The Panel Library — Chunk-Addressable Okudagrams | 2026-08-27-brief-panel-library.md |
-| 2026-08-27 | BRF-SSH-TUI | open | Modern terminal escape protocol integration for SSH TUI delivery | 2026-08-27-brief-ssh-tui-integration.md |
-| 2026-08-26 | BRF-DOCUMENT-LINKS | ready | Document Links — Gopher Hypertext in the Reader | 2026-08-26-brief-document-links.md |
+| 2026-08-27 | BRF-SSH-TUI | parked | Modern terminal escape protocol integration for SSH TUI delivery | 2026-08-27-brief-ssh-tui-integration.md |
+| 2026-08-26 | BRF-DOCUMENT-LINKS | rejected | Document Links — Gopher Hypertext in the Reader | 2026-08-26-brief-document-links.md |
 | 2026-08-26 | BRF-HERDR-DASHBOARD | ready | Herdr Dashboard — the Build's Exhaust, Composed | 2026-08-26-brief-herdr-dashboard.md |
 | 2026-08-26 | BRF-DOCUMENT-SEARCH | open | In-Document Search and Outlining — Fast Navigation in Gloam | 2026-08-26-brief-in-document-search-and-outlining.md |
 | 2026-08-26 | BRF-PALETTE-LIGHTNESS | parked | Palette Lightness Knob — Global Brightness, Hue Preserved | 2026-08-26-brief-palette-lightness-knob.md |
-| 2026-08-26 | BRF-SSH-BLOG | ready | SSH Blog Feed — the Gopher-Serve v1 | 2026-08-26-brief-ssh-blog-feed.md |
-| 2026-08-26 | BRF-SSH-SERVED | open | SSH-served markdown — option 1 (OpenSSH ForceCommand) | 2026-08-26-brief-ssh-served-markdown.md |
+| 2026-08-26 | BRF-SSH-BLOG | parked | SSH Blog Feed — the Gopher-Serve v1 | 2026-08-26-brief-ssh-blog-feed.md |
+| 2026-08-26 | BRF-SSH-SERVED | parked | SSH-served markdown — option 1 (OpenSSH ForceCommand) | 2026-08-26-brief-ssh-served-markdown.md |
 | 2026-08-26 | BRF-TELEMETRY-CONVENTIONS | ready | Telemetry Conventions — Markdown as Message Bus | 2026-08-26-brief-telemetry-conventions.md |
 | 2026-08-26 | BRF-TTY-REVERSE | ready | TTY Reverse-Print — Land at the Top | 2026-08-26-brief-tty-reverse-print.md |
 | 2026-08-26 | BRF-TUI-LIVE | parked | TUI live documents — fs.watch → anchored re-render | 2026-08-26-brief-tui-live-documents.md |

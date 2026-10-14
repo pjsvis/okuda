@@ -37,6 +37,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-07 | BRF-OKUDAGRAM-STEP | done | The okudagram step — no gaps in coverage | 2026-09-07-brief-okudagram-step.md |
 | 2026-09-07 | BRF-ONION-SEARCH-GRAMMAR | done | The onion search grammar — staged filtering, path/content separation | 2026-09-07-brief-onion-search-grammar.md |
 | 2026-09-05 | BRF-STREAM-IDENTITY-HEADER | done | Stream identity header — name the document for the unknown destination | 2026-09-05-brief-stream-identity-header.md |
+| 2026-09-01 | BRF-MERMAID-SOURCE-OMITTED | done | Omit the mermaid source from the render | 2026-09-01-brief-mermaid-source-omitted.md |
 | 2026-08-29 | BRF-OKF-CALLSIGN | done | OKF conformance migration and the callsign layer | 2026-08-29-brief-okf-callsign-migration.md |
 | 2026-08-29 | BRF-PAGED-OKUDAGRAM | done | The okudagram frame — a portioning rule | 2026-08-29-brief-okudagram-frame.md |
 | 2026-08-28 | BRF-ELISION-PRIMITIVE | done | Elision primitive — close ADR-014, fix the code-fence soft-wrap lie | 2026-08-28-brief-elision-primitive.md |

@@ -6,7 +6,7 @@ callsign: BRF-PORCH-MATRIX
 # Brief: The porch matrix — click a URL, land in a terminal, read the silo
 
 **Date:** 2026-09-04
-**Status:** Open
+**Status:** rejected — dropped 2026-10-13 (operator first pass)
 
 ## Context
 

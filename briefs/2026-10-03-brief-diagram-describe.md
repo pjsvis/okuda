@@ -10,7 +10,7 @@ callsign: BRF-DIAGRAM-DESCRIBE
 ## Amended
 
 2026-10-04 — the render-path design is refused; the description belongs to authoring, and the accessibility half to the flattener (§Finding)
-**Status:** Open — the residue is the lint and the flattener's fence policy
+**Status:** rejected — dropped 2026-10-13 (operator first pass; the record keeps the residue)
 **TD:** (to create — the lint; the flattener half is `BRF-SPOKEN-BLOCK-GRAMMAR`)
 
 ## Lineage

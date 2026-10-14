@@ -6,7 +6,7 @@ callsign: BRF-DOCUMENT-LINKS
 # Brief: Document Links — Gopher Hypertext in the Reader
 
 **Date:** 2026-08-26
-**Status:** Ready (small-medium; reader surface, src work)
+**Status:** rejected — superseded (operator first pass 2026-10-13)
 
 ## Depends on
 

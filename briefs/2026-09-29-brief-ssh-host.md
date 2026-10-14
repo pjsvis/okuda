@@ -7,7 +7,7 @@ date: 2026-09-29
 # Brief: SSH host — landing the ADR-013 reading room where SSH gives a shell
 
 **Created:** 2026-09-29
-**Status:** Proposed — awaiting operator review
+**Status:** parked — the SSH family is parked pending a decision on what remote is for (2026-10-13)
 **TD:** td-83cc47 (epic; P1 is the only in-silo code, P0/P2/P3 are ops tracked here for lineage)
 **Branch:** feat/ssh-reading-room
 

@@ -1,12 +1,12 @@
 {"file":"2026-08-25-brief-pi-markdown-rendering-via-okuda.md","date":"2026-08-25","status":"parked","summary":"Pi markdown rendering via okuda (Pi's issue)","meta":{},"callsign":"BRF-PI-MARKDOWN"}
 {"file":"2026-08-25-brief-registry-markdown-browser.md","date":"2026-08-25","status":"open","summary":"Registry-aware markdown browser — the silo dashboard","meta":{},"callsign":"BRF-REGISTRY-MARKDOWN"}
 {"file":"2026-08-25-brief-viewport-padding.md","date":"2026-08-25","status":"rejected","summary":"Viewport padding — upper and lower render margins (rejected same day: blank only signals at a boundary; viewport pad fights the content-anchor)","meta":{},"callsign":"BRF-VIEWPORT-PADDING"}
-{"file":"2026-08-26-brief-document-links.md","date":"2026-08-26","status":"ready","summary":"Document Links — Gopher Hypertext in the Reader","meta":{},"callsign":"BRF-DOCUMENT-LINKS"}
+{"file":"2026-08-26-brief-document-links.md","date":"2026-08-26","status":"rejected","summary":"Document Links — Gopher Hypertext in the Reader","meta":{},"callsign":"BRF-DOCUMENT-LINKS"}
 {"file":"2026-08-26-brief-herdr-dashboard.md","date":"2026-08-26","status":"ready","summary":"Herdr Dashboard — the Build's Exhaust, Composed","meta":{},"callsign":"BRF-HERDR-DASHBOARD"}
 {"file":"2026-08-26-brief-in-document-search-and-outlining.md","date":"2026-08-26","status":"open","summary":"In-Document Search and Outlining — Fast Navigation in Gloam","meta":{"scope":"gloam","feature":"search+outlining"},"callsign":"BRF-DOCUMENT-SEARCH"}
 {"file":"2026-08-26-brief-palette-lightness-knob.md","date":"2026-08-26","status":"parked","summary":"Palette Lightness Knob — Global Brightness, Hue Preserved","meta":{},"callsign":"BRF-PALETTE-LIGHTNESS"}
-{"file":"2026-08-26-brief-ssh-blog-feed.md","date":"2026-08-26","status":"ready","summary":"SSH Blog Feed — the Gopher-Serve v1","meta":{},"callsign":"BRF-SSH-BLOG"}
-{"file":"2026-08-26-brief-ssh-served-markdown.md","date":"2026-08-26","status":"open","summary":"SSH-served markdown — option 1 (OpenSSH ForceCommand)","meta":{},"callsign":"BRF-SSH-SERVED"}
+{"file":"2026-08-26-brief-ssh-blog-feed.md","date":"2026-08-26","status":"parked","summary":"SSH Blog Feed — the Gopher-Serve v1","meta":{},"callsign":"BRF-SSH-BLOG"}
+{"file":"2026-08-26-brief-ssh-served-markdown.md","date":"2026-08-26","status":"parked","summary":"SSH-served markdown — option 1 (OpenSSH ForceCommand)","meta":{},"callsign":"BRF-SSH-SERVED"}
 {"file":"2026-08-26-brief-telemetry-conventions.md","date":"2026-08-26","status":"ready","summary":"Telemetry Conventions — Markdown as Message Bus","meta":{},"callsign":"BRF-TELEMETRY-CONVENTIONS"}
 {"file":"2026-08-26-brief-tty-reverse-print.md","date":"2026-08-26","status":"ready","summary":"TTY Reverse-Print — Land at the Top","meta":{},"callsign":"BRF-TTY-REVERSE"}
 {"file":"2026-08-26-brief-tui-live-documents.md","date":"2026-08-26","status":"parked","summary":"TUI live documents — fs.watch → anchored re-render","meta":{},"callsign":"BRF-TUI-LIVE"}
@@ -14,7 +14,7 @@
 {"file":"2026-08-27-brief-dense-dynamic-displays.md","date":"2026-08-27","status":"open","summary":"Dense terminal visual primitives for dynamic telemetry","meta":{},"callsign":"BRF-DENSE-DYNAMIC"}
 {"file":"2026-08-27-brief-fetch-state-stamp.md","date":"2026-08-27","status":"open","summary":"Fetch-state stamp: checked-time + changed/same/failed in footer; fixes the empty-doc-on-fetch-failure lie; LCARS colouring with a new alert palette role; obeys the first temporal directive (fetch-time, not doc-time)","meta":{"depends_on":"2026-08-26-brief-tui-live-documents.md (watch + content gate)","sibling":"2026-08-23-brief-gloam-tui-footer.md","gated_on":"fs.watch in TUI + alert palette-role ADR","td":"td-a27b86","perceptual_property":"permitting, not demanding — the temporal analogue of the loose layout (pull-model attention)"},"callsign":"BRF-FETCH-STATE"}
 {"file":"2026-08-27-brief-panel-library.md","date":"2026-08-27","status":"open","summary":"The Panel Library — Chunk-Addressable Okudagrams","meta":{"scope":"render","feature":"chunk-addressing"},"callsign":"BRF-PANEL-LIBRARY"}
-{"file":"2026-08-27-brief-ssh-tui-integration.md","date":"2026-08-27","status":"open","summary":"Modern terminal escape protocol integration for SSH TUI delivery","meta":{},"callsign":"BRF-SSH-TUI"}
+{"file":"2026-08-27-brief-ssh-tui-integration.md","date":"2026-08-27","status":"parked","summary":"Modern terminal escape protocol integration for SSH TUI delivery","meta":{},"callsign":"BRF-SSH-TUI"}
 {"file":"2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md","date":"2026-08-28","status":"parked","summary":"Inline Ask-the-Doc and Local SSH Transport","meta":{},"callsign":"BRF-AI-DOC"}
 {"file":"2026-08-28-brief-jump-demo-honesty.md","date":"2026-08-28","status":"open","summary":"jump-demo honesty — slug derivation + state-glyph signal","meta":{},"callsign":"BRF-JUMP-DEMO"}
 {"file":"2026-08-28-brief-oklch-tuning.md","date":"2026-08-28","status":"open","summary":"OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling","meta":{},"callsign":"BRF-OKLCH-TUNING"}
@@ -31,11 +31,10 @@
 {"file":"2026-08-30-brief-refresh-off-disk.md","date":"2026-08-30","status":"open","summary":"refresh off disk — the resize race + the R placebo","meta":{},"callsign":"BRF-REFRESH-OFF-DISK"}
 {"file":"2026-08-30-ipad-mini-demo.md","date":"2026-08-30","status":"open","summary":"2026-08-30-ipad-mini-demo","meta":{},"callsign":"BRF-IPAD-MINI"}
 {"file":"2026-08-31-brief-citty-cli.md","date":"2026-08-31","status":"ready","summary":"the CLI contract — adopting citty for the okuda/gloam surface","meta":{},"callsign":"BRF-CITTY-CLI"}
-{"file":"2026-09-01-brief-flow-wrap.md","date":"2026-09-01","status":"open","summary":"Flow wrap — internal break opportunities so paths flow as text","meta":{},"callsign":"BRF-FLOW-WRAP"}
-{"file":"2026-09-01-brief-mermaid-source-omitted.md","date":"2026-09-01","status":"open","summary":"Omit the mermaid source from the render","meta":{},"callsign":"BRF-MERMAID-SOURCE-OMITTED"}
+{"file":"2026-09-01-brief-flow-wrap.md","date":"2026-09-01","status":"rejected","summary":"Flow wrap — internal break opportunities so paths flow as text","meta":{},"callsign":"BRF-FLOW-WRAP"}
 {"file":"2026-09-02-brief-scroll-region-repaint.md","date":"2026-09-02","status":"open","summary":"One line per scroll — scroll-region repaint for the TUI","meta":{},"callsign":"BRF-SCROLL-REPAINT"}
 {"file":"2026-09-02-brief-synchronized-output.md","date":"2026-09-02","status":"open","summary":"Synchronized output — deliver each paint as one frame","meta":{},"callsign":"BRF-SYNC-OUTPUT"}
-{"file":"2026-09-04-brief-porch-matrix.md","date":"2026-09-04","status":"open","summary":"The porch matrix — click a URL, land in a terminal, read the silo","meta":{},"callsign":"BRF-PORCH-MATRIX"}
+{"file":"2026-09-04-brief-porch-matrix.md","date":"2026-09-04","status":"rejected","summary":"The porch matrix — click a URL, land in a terminal, read the silo","meta":{},"callsign":"BRF-PORCH-MATRIX"}
 {"file":"2026-09-04-brief-working-copy.md","date":"2026-09-04","status":"open","summary":"The working copy — vector render mode, 99 clone, honest actuator","meta":{},"callsign":"BRF-WORKING-COPY"}
 {"file":"2026-09-06-brief-concordance-prefilter.md","date":"2026-09-06","status":"open","summary":"The concordance pre-filter — `|`, `!`, and case at the silo's seam","meta":{},"callsign":"BRF-CONCORDANCE-PREFILTER"}
 {"file":"2026-09-06-brief-tts-dogfood.md","date":"2026-09-06","status":"open","summary":"Coupled-frame TTS dogfood (mac `say`)","meta":{},"callsign":"BRF-TTS-DOGFOOD"}
@@ -61,14 +60,14 @@
 {"file":"2026-09-19-brief-palette-audit.md","date":"2026-09-19","status":"open","summary":"The palette audit — review the colours before the brightness controller scales them","meta":{},"callsign":"BRF-PALETTE-AUDIT"}
 {"file":"2026-09-24-brief-source-line-ledger.md","date":"2026-09-24","status":"open","summary":"The source-line ledger — `10` edit lands the editor at the eye","meta":{},"callsign":"BRF-SRC-LINE-LEDGER"}
 {"file":"2026-09-29-brief-silcrow-paths.md","date":"2026-09-29","status":"open","summary":"Silcrow paths — the gate grows a second substrate","meta":{},"callsign":"BRF-SILCROW-PATHS"}
-{"file":"2026-09-29-brief-ssh-host.md","date":"2026-09-29","status":"open","summary":"SSH host — landing the ADR-013 reading room where SSH gives a shell","meta":{},"callsign":"BRF-SSH-HOST"}
+{"file":"2026-09-29-brief-ssh-host.md","date":"2026-09-29","status":"parked","summary":"SSH host — landing the ADR-013 reading room where SSH gives a shell","meta":{},"callsign":"BRF-SSH-HOST"}
 {"file":"2026-09-30-brief-fence-discipline.md","date":"2026-09-30","status":"open","summary":"One fence rule — five scanners, four disciplines, one of them fixed","meta":{},"callsign":"BRF-FENCE-DISCIPLINE"}
 {"file":"2026-09-30-brief-step-inventory.md","date":"2026-09-30","status":"open","summary":"The stride inventory — what steps, what compounds, what is missing","meta":{},"callsign":"BRF-STEP-INVENTORY"}
 {"file":"2026-09-30-brief-television-preview.md","date":"2026-09-30","status":"parked","summary":"Television Preview — okuda as the renderer, OKUDA_WIDTH as the width knob","meta":{},"callsign":"BRF-TELEVISION-PREVIEW"}
 {"file":"2026-09-30-brief-terminal-cell-grid.md","date":"2026-09-30","status":"parked","summary":"2D Terminal Cell Grid Architecture (parked)","meta":{},"callsign":"BRF-TERMINAL-CELL-GRID"}
 {"file":"2026-10-01-brief-reading-fraction.md","date":"2026-10-01","status":"open","summary":"The reading fraction — a meter for the glass, from the state the glass already holds","meta":{},"callsign":"BRF-READING-FRACTION"}
 {"file":"2026-10-02-brief-demo-sandbox.md","date":"2026-10-02","status":"open","summary":"The public demo room — two access modes, one sandbox grammar","meta":{},"callsign":"BRF-DEMO-SANDBOX"}
-{"file":"2026-10-03-brief-diagram-describe.md","date":"2026-10-03","status":"open","summary":"Prose descriptions of mermaid diagrams via an external binary — diagram source in, markdown prose out (BRF-DIAGRAM-DESCRIBE)","meta":{},"callsign":"BRF-DIAGRAM-DESCRIBE"}
+{"file":"2026-10-03-brief-diagram-describe.md","date":"2026-10-03","status":"rejected","summary":"Prose descriptions of mermaid diagrams via an external binary — diagram source in, markdown prose out (BRF-DIAGRAM-DESCRIBE)","meta":{},"callsign":"BRF-DIAGRAM-DESCRIBE"}
 {"file":"2026-10-03-brief-doc-search-fermata.md","date":"2026-10-03","status":"open","summary":"The doc→search fermata — a held frame at the reading/searching boundary (BRF-DOC-SEARCH-FERMATA)","meta":{},"callsign":"BRF-DOC-SEARCH-FERMATA"}
 {"file":"2026-10-04-brief-sticky-heading-stepper.md","date":"2026-10-04","status":"open","summary":"The sticky-heading pager — step through a document section by section, heading as anchor, never truncate (BRF-STICKY-HEADING-STEPPER)","meta":{},"callsign":"BRF-STICKY-HEADING-STEPPER"}
 {"file":"2026-10-05-brief-ast-to-prosody-unsloth.md","date":"2026-10-05","status":"open","summary":"AST-to-Prosody Intermediate Representation for Speech Rendering","meta":{},"callsign":"BRF-AST-PROSODY"}

@@ -7,7 +7,7 @@ callsign: BRF-SSH-TUI
 
 **Created:** 2026-08-26
 **TD:** td-00842
-**Status:** draft
+**Status:** parked — the SSH family is parked pending a decision on what remote is for (2026-10-13)
 
 ## What
 Integrate modern terminal wire protocols into the Okuda SSH rendering pipeline to achieve atomic, tear-free frame updates and predictable client capability negotiation.

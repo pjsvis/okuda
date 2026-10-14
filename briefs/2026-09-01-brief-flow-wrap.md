@@ -6,7 +6,7 @@ callsign: BRF-FLOW-WRAP
 # Brief: Flow wrap — internal break opportunities so paths flow as text
 
 **Date:** 2026-09-01
-**Status:** Open
+**Status:** rejected — superseded (operator first pass 2026-10-13)
 **Branch:** feat/gloam-launcher
 **Context:** a nit on `decisions/021-jump-token-numbering-offset.md`. The Context paragraph reads:
 

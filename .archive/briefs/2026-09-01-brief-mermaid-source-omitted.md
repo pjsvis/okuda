@@ -6,7 +6,7 @@ callsign: BRF-MERMAID-SOURCE-OMITTED
 # Brief: Omit the mermaid source from the render
 
 **Date:** 2026-09-01
-**Status:** Open (amended 2026-09-29 — the notice now reaches every fence; see Amendment below)
+**Status:** done — landed 2026-08-30 (operator first pass 2026-10-13)
 **Branch:** feat/gloam-launcher
 
 ## Context
