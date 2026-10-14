@@ -112,13 +112,15 @@ describe("launcher — listMarkdownFiles (rg-sourced, BRF-CONTENT-SHORTLIST)", (
 
 describe("launcher — rankedShortlistEntries (the -g merge, integration)", () => {
   test("a pure-registry query ranks the owning document first", () => {
-    // SHORTLIST names exactly one owner: the brief itself. Registry
-    // channel fires, body mentions rank later, filename remainder last.
-    // (Orientation files float above all channels — ADR-030-era channel
-    // 0 — so the owning doc is the first row *with a directory*.)
-    const entries = rankedShortlistEntries("BRF-CONTENT-SHORTLIST", process.cwd());
+    // The callsign names exactly one owner: the ADR itself. A DECISION is
+    // used rather than a brief because briefs archive and an ADR does not,
+    // so the fixture cannot move out from under the test (it did, twice).
+    // Registry channel fires, body mentions rank later, filename remainder
+    // last. (Orientation files float above all channels — ADR-030-era
+    // channel 0 — so the owning doc is the first row *with a directory*.)
+    const entries = rankedShortlistEntries("ADR-LIVE-SEARCH-030", process.cwd());
     const firstTiered = entries.find((e) => pathOf(e).includes("/"));
-    expect(pathOf(firstTiered!)).toBe("briefs/2026-08-30-brief-content-shortlist.md");
+    expect(pathOf(firstTiered!)).toBe("decisions/030-live-search-picker.md");
     expect(entries.length).toBeGreaterThan(1); // the remainder followed
   });
 
