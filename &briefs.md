@@ -32,6 +32,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-PROTOCOL-UPDATE | ✓ done | the file is the state; the deploy is a message into the sibling's inbox | [debrief](debriefs/2026-10-10-debrief-protocol-update.md) |
 | BRF-CODE-SILCROWS | ✓ done | Code-comment silcrows — a rendered code file is a document for its prose | [debrief](debriefs/2026-10-12-debrief-code-silcrows.md) |
 | BRF-TABLE-GLASS-FIT | ✓ done | Table fit — wrap to the glass, elide only the floor | [debrief](debriefs/2026-10-12-debrief-table-glass-fit.md) |
+| BRF-IDEA-LEDGER | ✓ landed 2026-10-14 | the intake gate — ideas stage, promises are promoted; and a debrief declares its briefs | [debrief](debriefs/2026-10-14-debrief-the-funnel.md) |
 
 ## Landed today — ADR-031, the working copy
 
@@ -156,7 +157,6 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-LEAK-FENCE | · open | The leak gate's fence exemption — anchor on the source, not a rendered match | — |
 | BRF-TABLE-SLOT-INSTRUMENT | · open | The table's columns are unobservable — a slot instrument, and a header/body alignment test | — |
 | BRF-ALIGN-ACROSS-TABLES | · open | The align meta is misattributed across tables — a later table un-aligns an earlier one | — |
-| BRF-IDEA-LEDGER | · open | Close the funnel — the idea ledger, and the record's linkage | — |
 
 ## Parked / deferred
 

@@ -6,7 +6,7 @@ callsign: BRF-IDEA-LEDGER
 # Brief: Close the funnel — the idea ledger, and the record's linkage
 
 **Date:** 2026-10-14
-**Status:** In Progress
+**Status:** Done
 **Context:** The briefs backlog is 71 live documents — 59 `open`, 3 `ready`,
 8 `parked` — against a lifecycle (`ADR-BRIEF-LIFECYCLE-061`) whose four positions
 have one occupant. An idea has nowhere to be written except as a *promise*, so
@@ -69,13 +69,23 @@ the ledger line carries the callsign so the citation survives); a
 
 ## Work Plan
 
-1. [ ] `ADR-IDEA-LEDGER-064` and `ADR-RECORD-LINKAGE-065`.
-2. [ ] `docs/ideas.md` — the format, its own rules at the head, and seeds.
-3. [ ] `scripts/idea-lint.ts` — the trigger gate, and the promotion-rate reading.
-4. [ ] `scripts/debrief-link-lint.ts` + `scripts/debrief-link-baseline.json`.
-5. [ ] Tier row, route, and the `briefs:` field in the three playbooks.
-6. [ ] `tests/idea-lint.test.ts`, `tests/debrief-link-lint.test.ts`.
-7. [ ] `just check` green; `bun test` green.
+1. [x] `ADR-IDEA-LEDGER-064` and `ADR-RECORD-LINKAGE-065`.
+2. [x] `docs/ideas.md` — the format, its own rules at the head, and seeds.
+3. [x] `scripts/idea-lint.ts` — the trigger gate, and the promotion-rate reading.
+4. [x] `scripts/debrief-link-lint.ts` + `scripts/debrief-link-baseline.json`.
+5. [x] Tier row, route, and the `briefs:` field in the three playbooks.
+6. [x] `tests/idea-lint.test.ts`, `tests/debrief-link-lint.test.ts`.
+7. [x] `just check` green; `bun test` green (790 pass).
+
+## Landing
+
+Landed 2026-10-14 as `fb11f60` and `e93a712`. Two check-finds, both the
+instruments working: `facade-lint` refused a four-word recipe comment, and
+`prose-check --strict-leaks` caught the ledger's own format spec printing its
+`**` — which is also why `parseLedger` now skips fenced blocks, since a gate
+that reads the spec as a malformed entry fails on the document that defines it.
+The 20-debrief baseline is recorded debt, not a hidden allowance: the lint
+names the coverage it does not have on every run.
 
 ## Acceptance Criteria
 
