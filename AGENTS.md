@@ -11,7 +11,8 @@ A terminal markdown viewer built on `Bun.markdown`, rendering mermaid fences via
 5. **Quality gate.** `just check` before every commit — it must pass.
 6. **Registry principle.** If a directory accumulates documents, it gets a JSONL index. Add document + index entry in the same commit (`just reg-sync-fix`, then review the derived entry).
 7. **Decisions get ADRs.** Two viable options, a reversed approach, or a new pattern → `decisions/NNN-*.md`. On reversal, run the palimpsest protocol (`playbooks/decisions-playbook.md`).
-8. **Debrief when done.** Significant work closes with a retrospective in `debriefs/`.
+8. **Stage explicitly.** Never `git add -A` / `git add .`. Stage only paths the agent authored or the operator named. Untracked paths the agent did not create are the operator's — surface them in `git status`, never commit them. The operator includes them by name (`include <path>`) or with *"the untracked files are mine"*.
+9. **Debrief when done.** Significant work closes with a retrospective in `debriefs/`.
 
 ## Scope Discipline
 
