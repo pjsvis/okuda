@@ -11,6 +11,16 @@ A brief is the **record of intent** for a piece of work: what we will do, why, w
 
 Every brief is a single `.md` file in `briefs/`.
 
+**A brief is written for a *promoted* idea.** The intake gate is
+`docs/ideas.md`: an idea is staged there, costs one line, and names its
+**trigger** — the observation that would make it worth doing. The gate exists
+because a brief is a *promise*, and a promise is the wrong container for an
+idea: it carries a work plan, preconditions and acceptance criteria, so writing
+one is a commitment, so every idea became one, so 59 of 71 live briefs sat at
+`open`. A brief may still be written without a ledger entry when the warrant is
+an operator call or a defect — but that is a choice, and it should read as one
+(`ADR-IDEA-LEDGER-064`).
+
 ## Naming Convention
 
 Every brief is named `YYYY-MM-DD-brief-slug.md`. Strictly date-first.
@@ -82,6 +92,8 @@ do not belong here; they go to ADRs (`playbooks/decisions-playbook.md`).
 ## Writing Rules
 
 - One brief per deliverable. Phased or multi-deliverable work is coordinated in td (`td epic create`), not in extra-large briefs — each phase's deliverable still gets its own brief.
+- If the work came from an idea, that idea is **promoted** — promoted in the
+  ledger (`docs/ideas.md`), not merely remembered.
 - The objective must be specific: "explain why flat code improves LLM comprehension", not "write about AI".
 - No ambiguous language: "should", "maybe", "consider" are banned. State what will happen.
 - Acceptance criteria are testable by inspection or command.
@@ -131,6 +143,13 @@ silcrow discovery read live registries only; `EXCLUSIONS` states
 permanent record into the work queue. A completed brief is work that
 shipped; keeping it in `briefs/` makes the open list a graveyard.
 The archive is the permanent record; the live list is the work queue.
+
+**An idea demoted out of a brief is a rejection, not a parking.** `parked` means
+*deferred, will revisit* and stays live (`ADR-ARCHIVE-BREADTH-063`); an idea that
+is going back to the ledger as a line is not going to be worked, so its brief is
+`rejected`, settles into `.archive/briefs/` on the normal ritual, and the ledger
+entry carries the callsign — which is what keeps the citation resolving
+(`ADR-IDEA-LEDGER-064`).
 
 **What does not go in `briefs/` (ADR-017):**
 

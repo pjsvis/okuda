@@ -20,6 +20,7 @@ One table, one owner. Anything else that needs it cites this.
 
 | Tier | Where | Answers | Written | Lifetime |
 |---|---|---|---|---|
+| **Idea** *(not a tier)* | `docs/ideas.md` | Is this worth a promise? | before it is a brief | Promoted, refused, or deleted with the ledger that holds it (`ADR-IDEA-LEDGER-064`) |
 | **Brief** | `briefs/` | What will we build? | before the work | Becomes irrelevant when the work lands; settles to `.archive/briefs/` (ADR-ARCHIVE-RESOLUTION) |
 | **ADR** | `decisions/` | Why did we choose X over Y? | during, at the moment of decision | Retains value indefinitely; superseded in place, never deleted (Palimpsest Protocol) |
 | **Playbook** | `playbooks/` | How do we do X? | when a task repeats or a standard emerges | Living; updated when it fails |
@@ -39,6 +40,16 @@ happens to it, and therefore how much it must be right: a brief that turns out
 wrong costs an argument, an ADR that turns out wrong keeps teaching until someone
 annotates it in place.
 
+**The Idea row is the intake gate, and it is not a tier.** A brief is a
+*promise* — intent, preconditions, acceptance criteria — so writing one is a
+commitment; without a cheaper container every idea becomes a promise, which is
+how 59 of 71 live briefs came to sit at `open`. The ledger is a *record*
+(`ADR-DOCUMENT-LIFECYCLE-057`): no callsign, no registry, one entry per idea,
+and a **trigger** — the observation that would make it worth doing — because a
+trigger is the one thing a brief cannot require. Promotion into a brief or an
+epic is its only exit. If the ledger stops promoting, it is deleted, not
+curated.
+
 ## The Route
 
 The Rules of Engagement (`AGENTS.md`) say what the rules are. This is the order
@@ -46,6 +57,10 @@ they run in, who owns each step, and what goes wrong at it.
 
 - **Orient and claim** — `playbooks/td-playbook.md`. Work that is not in td is
   not tracked.
+- **Idea** — `docs/ideas.md`. An idea is staged with its trigger while it is
+  still cheap to drop; a brief is written only for a *promoted* one
+  (`ADR-IDEA-LEDGER-064`). Skipping this step is how the open list became a
+  pile of unmade decisions.
 - **Brief** — `playbooks/briefs-playbook.md`. Building before the intent is
   written: the brief becomes a post-hoc rationalisation of code that exists.
 - **Decide** — `playbooks/decisions-playbook.md`. **Written at the end, from
@@ -102,6 +117,7 @@ It is enforced where the author is — the review checklist in
 | Where you are | Read |
 |---|---|
 | Starting a session, wondering what to work on | `playbooks/td-playbook.md` |
+| Holding an idea, before it is a promise | `docs/ideas.md`, then `decisions/064-idea-ledger.md` |
 | About to propose or begin non-trivial work | `playbooks/briefs-playbook.md` |
 | Choosing between two reasonable options | `playbooks/decisions-playbook.md` |
 | About to write something down, unsure which artefact | the tier table above |

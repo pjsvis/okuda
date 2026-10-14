@@ -156,6 +156,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-LEAK-FENCE | · open | The leak gate's fence exemption — anchor on the source, not a rendered match | — |
 | BRF-TABLE-SLOT-INSTRUMENT | · open | The table's columns are unobservable — a slot instrument, and a header/body alignment test | — |
 | BRF-ALIGN-ACROSS-TABLES | · open | The align meta is misattributed across tables — a later table un-aligns an earlier one | — |
+| BRF-IDEA-LEDGER | · open | Close the funnel — the idea ledger, and the record's linkage | — |
 
 ## Parked / deferred
 

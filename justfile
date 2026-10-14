@@ -110,12 +110,17 @@ amp-regen:
 orient:
     @bash scripts/orient.sh
 
+# The idea ledger
+[group('navigation')]
+ideas:
+    @bun scripts/idea-lint.ts
+
 # ── Quality gate ─────────────────────────────────────────────
 
 # Sync gate
 [group('quality gate')]
 check:
-    @bash scripts/signature-check.sh && bash scripts/tree-lint.sh && bun scripts/ref-census.ts --gate && bun scripts/reg-sync.ts --all && bash scripts/facade-lint.sh && bun scripts/amp-check.ts && bun scripts/amp-briefs.ts --check && bun scripts/td-id-lint.ts && bun scripts/callsign-lint.ts && bun scripts/date-lint.ts && bun scripts/archive-lint.ts && bun scripts/citation-census.ts --strict && bun scripts/lexicon-lint.ts && bun scripts/prose-check.ts --strict-leaks && bun scripts/elision-monotone.ts --gate --strict
+    @bash scripts/signature-check.sh && bash scripts/tree-lint.sh && bun scripts/ref-census.ts --gate && bun scripts/reg-sync.ts --all && bash scripts/facade-lint.sh && bun scripts/amp-check.ts && bun scripts/amp-briefs.ts --check && bun scripts/td-id-lint.ts && bun scripts/callsign-lint.ts && bun scripts/date-lint.ts && bun scripts/archive-lint.ts && bun scripts/idea-lint.ts --gate && bun scripts/citation-census.ts --strict && bun scripts/lexicon-lint.ts && bun scripts/prose-check.ts --strict-leaks && bun scripts/elision-monotone.ts --gate --strict
 
 # Tests gate build
 [group('quality gate')]
