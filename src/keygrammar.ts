@@ -36,7 +36,7 @@ export type Verb =
 /** The bindings: token → verb. Data, by intent — renumber freely. */
 export const KEYBINDINGS: Record<number, Verb> = {
   0: "exit", // 00 — double-tap the easiest key
-  1: "frame", // 01 — frame/okudagram mode (needs BRF-PAGED-OKUDAGRAM)
+  1: "frame", // 01 — frame mode (needs BRF-PAGED-OKUDAGRAM)
   2: "slide", // 02 — sliding mode (today's default, named)
   3: "freeze", // 03 — the document stays still (auto-re-render off)
   88: "edit", // 88 — THIS document, in the editor (the pair to 99)

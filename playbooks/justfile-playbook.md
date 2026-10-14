@@ -32,7 +32,7 @@ check:
 
 `just --list` is a menu, not a manual. It names the items; details live in `docs/help.md` for those who delve. Failure modes, arguments, caveats belong there — one delve surface, kept out of the menu.
 
-**Comments: one or two words, terse.** The menu is an okudagram — a uniform left block of names, a uniform comment column. Comments are labels, not sentences:
+**Comments: one or two words, terse.** The menu is a render — a uniform left block of names, a uniform comment column. Comments are labels, not sentences:
 
 ```make
 # Colour audit      ✓

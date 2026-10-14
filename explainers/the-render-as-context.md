@@ -1,6 +1,6 @@
-# The okudagram as context — what it is for
+# The render as context — what it is for
 
-> Logged 2026-09-03. Status: **explainer** — the okudagram's purpose,
+> Logged 2026-09-03. Status: **explainer** — the render's purpose,
 > stated as the unifying claim. The fourth document: the anchor says
 > *how it holds still*; the variable-is-the-invariant says *what the
 > system is*; content-over-menu says *what it renders*; this says *what
@@ -8,8 +8,8 @@
 
 ## The claim
 
-The okudagram's job is not to render markdown. The rendering is the
-mechanism. The okudagram's job is to **create the shared context that
+The render's job is not to render markdown. The rendering is the
+mechanism. The render's job is to **create the shared context that
 makes decisions possible.**
 
 That is what the frame is *for* — and the boundedness is not the
@@ -23,7 +23,7 @@ position to have an opinion.
 
 A 500-page report does not create shared context. Nobody reads it, or
 everyone reads a different part, and the decision proceeds from
-asymmetric ignorance. The okudagram creates shared context *because*
+asymmetric ignorance. The render creates shared context *because*
 you can scan it in a moment or two — not despite the smallness, *through*
 it. The frame is bounded by construction: header-to-next-header, one
 portion, on screen now. It is *always* "not that much there," regardless
@@ -34,7 +34,7 @@ property of the *frame*.
 
 The elision principle one layer up: what is not on the frame is an
 invitation, not a gap; what is on the frame is enough to start. The
-okudagram does not require comprehension; it requires presence. That is
+render does not require comprehension; it requires presence. That is
 what makes it legitimate, not merely useful.
 
 ## The two legitimate responses — withhold or deliver
@@ -47,12 +47,12 @@ context-sharing. He has seen the same frame, formed a position about it
 (non-comprehension is a position), and is participating in the dialog
 from that position.
 
-This is what makes the okudagram a **conjugate** to a decision process,
+This is what makes the render a **conjugate** to a decision process,
 not a *prerequisite*. A prerequisite demands comprehension before the
 decision proceeds; a conjugate *shares the starting point* and lets each
 participant engage from there, including the engagement of refusing to
 engage. You are sharing context with the other participants of the
-dialog — or multilog, whatever the kids say these days. The okudagram
+dialog — or multilog, whatever the kids say these days. The render
 is the shared starting point; the decision is what you do from there.
 
 ## Why this unifies the corpus
@@ -63,18 +63,18 @@ Every prior claim the corpus holds is a consequence of this one:
   unit of "look at this" is the unit of shared context, and shared
   context is what makes decisions legitimate.
 - **The Poker Club** (the constitution) — "fellow members worthy of
-  rigorous, honest debate." The okudagram is what makes the club
+  rigorous, honest debate." The render is what makes the club
   possible: everyone has seen the same bounded thing. Without shared
   context, there is no debate, just people talking past each other.
 - **The ADR system** — "decisions get ADRs; two viable options, a
   reversed approach, or a new pattern." A decision needs shared
-  context; the okudagram provides it. The ADR is the opinion; the
-  okudagram is the conjugate that makes the opinion legitimate.
+  context; the render provides it. The ADR is the opinion; the
+  render is the conjugate that makes the opinion legitimate.
 - **The Derrida question** — "should this even be in our consideration
-  set?" The okudagram *is* the consideration set, bounded and present.
+  set?" The render *is* the consideration set, bounded and present.
   Refusing the frame is a legitimate answer to the Derrida question.
 - **Hume's Razor** — "if you do not know, state your ignorance
-  clearly." The okudagram permits this: you have seen the context, you
+  clearly." The render permits this: you have seen the context, you
   do not know, you say so. That is sharing context, not failing to.
 
 The anchor says *how it holds still*; the variable-is-the-invariant
@@ -87,13 +87,13 @@ possible. The mechanism serves the purpose; the purpose is context.
 
 ## The honest boundary — what the conjugate serves
 
-The okudagram conjugates with *text-structured* decision processes —
+The render conjugates with *text-structured* decision processes —
 any decision whose context can be rendered in a closed grammar to a
 terminal. A decision about a building's massing, or a surgical
 approach, or a chord progression, might need context that markdown
 cannot carry — spatial, visual, auditory. But the grammar is closed;
 the content is open. A mermaid diagram is a modality already in the
-grammar; morse code is another arriving at the open edge. The okudagram
+grammar; morse code is another arriving at the open edge. The render
 conjugates with any decision process *whose context can be rendered in a
 closed grammar to a terminal* — which is most of them, and more every
 time a modality is added at the edge.

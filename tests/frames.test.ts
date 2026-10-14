@@ -15,7 +15,7 @@ const doc = [
   "  b1",                 // 10
 ];
 
-describe("frames — the okudagram rule (BRF-PAGED-OKUDAGRAM)", () => {
+describe("frames — the frame rule (BRF-PAGED-OKUDAGRAM)", () => {
   test("a frame is a header to the next header", () => {
     const h = headingLines(doc);
     expect(h).toEqual([0, 3, 7, 9]);

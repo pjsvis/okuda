@@ -251,7 +251,7 @@ Body text wraps at the terminal column count. Mermaid ASCII bypasses wrapping en
 That is the whole grammar. Nothing more is promised; nothing more is wanted.
 
 How the document itself should end is the open question. The header opens
-the okudagram — badge left, title, chip right, spanning the width — but a
+the render — badge left, title, chip right, spanning the width — but a
 bare rule cannot close it: the rule already has a job, separating
 sections, and a terminator that doubles as a separator closes nothing.
 The closer mirrors the header's anchors on both sides — a muted chip at

@@ -65,3 +65,13 @@ The outcome is `open`, `promoted: <callsign>`, or `refused: <why>`.
   **Trigger:** the parked pile is re-read and the same question is asked of each
   member in turn. The parking itself says so: they were parked 2026-10-14 "to
   reconsider what remote is for" (`docs/2026-10-14-the-refused.md`).
+
+- **`retire-okudagram`** · 2026-10-14 · `record` · **promoted: BRF-RETIRE-OKUDAGRAM**
+  The word names our own output with someone else's work — attribution by prefix,
+  which is the fan-site register — and it carries three referents at once: the
+  composed screen (`explainers/concepts-and-terms.md`), the diagrams (the head
+  comment of `src/frames.ts`), and the header-to-header frame (`okudaframe`).
+  **Trigger:** the same word is defined twice, differently, and a reader landing
+  on either definition means something different by it — a designation with two
+  referents and no way to tell which is canon. Raised and promoted the same day
+  (operator call, 2026-10-14); the precedent is `ADR-RETIRE-OKW-018`.

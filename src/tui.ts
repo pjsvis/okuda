@@ -827,7 +827,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  override, resize still follows the glass. */
   let frozen = false;
   /** Render mode (keyboard-controls): `slide` = the continuous surface
-   *  (default); `frame` = the okudagram frame — j/k and ␣/b step one
+   *  (default); `frame` = the frame — j/k and ␣/b step one
    *  contiguous glass page (height − overlap, BRF-OKUDAGRAM-STEP:
    *  no gaps in coverage), arrows stay slippy within (their own
    *  line actions — the frame brief's claim, true in code at last),

@@ -16,7 +16,7 @@ variant). Search `state-glyphs` or `state-colours` also finds it.
 | Command | What it does | When |
 |---------|--------------|------|
 | `just state-colours` | Palette A/B in the terminal — no renderer, no chrome. Ad-hoc dim palettes vs bright. | **Tuning the colours** — eyeball hex changes before touching the palette |
-| `just state-colours-doc` | `okuda docs/state-colours.md --tui` — the renderer in the wild, full okudagram chrome. | **Verifying in the wild** — confirm the colours land in content, chrome invariant held |
+| `just state-colours-doc` | `okuda docs/state-colours.md --tui` — the renderer in the wild, full chrome. | **Verifying in the wild** — confirm the colours land in content, chrome invariant held |
 
 The two are separate by design. `state-colours` tests bytes (perceptual
 tuning); `state-colours-doc` tests the renderer (the real path). Keep

@@ -26,7 +26,7 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
   the section by hand, so only the vocabulary lagged — while `aborted`, `accepted`
   and `pending` fold onto `rejected`, `done` and `open`. One of the ten was a
   Status line that was a *sentence* rather than a state, and it had held the
-  okudagram-frame row at `open` for **six weeks against a rule that landed**.
+  the frame-mode row at `open` for **six weeks against a rule that landed**.
   `just check` now reports zero unrecognised words.
 - **Two gates, three closed edges** (2026-10-13) — `elision-monotone` (the
   recoverability invariant: 518 documents, no rise anywhere, residue baselined)

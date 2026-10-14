@@ -1,12 +1,13 @@
 /**
- * frames.ts — the okudaframe helpers (BRF-PAGED-OKUDAGRAM, ADR-031
- * frame mode, keyboard-controls [01]) and the step's two strides
+ * frames.ts — the frame helpers (BRF-PAGED-OKUDAGRAM, ADR-031 frame
+ * mode, keyboard-controls [01]) and the step's two strides
  * (BRF-OKUDAGRAM-STEP: page and paragraph).
  *
- * Naming (the attribution badge): Okuda's name goes on artifacts that
- * carry the design language — okudagram (the diagrams), okudaframe
- * (these reading frames), okuda (the palette and the badge). The
- * suffix names the artifact; the prefix is the attribution.
+ * Naming: no attribution prefix. Artifacts are named for what they are —
+ * a diagram, a frame, **the render** (ADR-RETIRE-OKUDAGRAM-066), which
+ * completes the role table in ADR-RENDERER-READER-029. Okuda's screens are
+ * cited in prose as the inspiration for the readable range — distance,
+ * detail, structure, colour — and nothing of ours wears his name.
  *
  * The rule, from the brief: **a frame is a header and its content, from
  * the header to the next header (or EOF).** The frame fills the

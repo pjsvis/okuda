@@ -43,7 +43,8 @@ The cycle is a *regular occurrence* in this silo, not an accident:
 
 - **Find the one invariant the reader actually needs.** Not the three
   mechanisms you sketched — the one thing that, if absent, the reader
-  would notice. (The okudagram-step: "no gaps in coverage." Not the
+  would notice. (The step episode, `BRF-OKUDAGRAM-STEP`: "no gaps in
+  coverage." Not the
   sticky header, not the continuation marker, not the two-case rule.)
 - **Find the one affordance the reader fetches on demand.** Context
   the reader asks for via existing actuators is an affordance; context
@@ -91,7 +92,7 @@ The discipline is running the check, not skipping it. Most over-engineered
 plans generate supersession impulses that dissolve on inspection; a few
 reveal real reversals. The playbook is the check, not the verdict.
 
-## Worked example: the okudagram step (2026-09-07)
+## Worked example: the step episode (2026-09-07, `BRF-OKUDAGRAM-STEP`)
 
 **Wanted:** a paging behaviour — step through the document, skim fast.
 

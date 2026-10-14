@@ -6,7 +6,7 @@ callsign: ADR-RENDERER-READER-029
 # Decision: Disambiguate the renderer, the reader, and the glass
 
 **Date:** 2026-09-03
-**Status:** Accepted
+**Status:** Accepted — **amended 2026-10-14** (the fourth role: the composite is **the render**; `ADR-RETIRE-OKUDAGRAM-066`)
 
 ## Context
 
@@ -35,6 +35,15 @@ unambiguous nouns.
 | The human | reads, forms opinions, decides | **the reader** |
 | The software | renders markdown to bytes, fast | **okuda** / **the renderer** |
 | The device | displays the bytes | **the terminal** / **the glass** |
+| The composite | the bytes as laid out for this width | **the render** |
+
+**Amendment, 2026-10-14** (`ADR-RETIRE-OKUDAGRAM-066`). This decision named
+three roles and left the fourth unnamed — the *composite*, the bytes as laid out.
+The gap was real, and a fan word ("okudagram") colonised it. It is now filled
+from the same pattern the table already uses: the software **renders**, so its
+output is **the render**, exactly as the human **reads** and the device is **the
+glass**. One portion of a render is **a frame**; a drawing inside it is **a
+diagram**. Three roles here, four now named, one referent each.
 
 Where the scratchpad said "the viewer" meaning the software, it now
 says **okuda** (the proper name) or **the renderer** (the role). Where

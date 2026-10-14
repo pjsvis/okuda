@@ -75,7 +75,7 @@ document — under `BRF-SILO-LEXICON`.
 
 Candidates named so far (to be defined **only** from their source documents):
 
-- **callsign**, **silcrow**, **vector** (`§NN` jumps), **okudagram**, **tier**,
+- **callsign**, **silcrow**, **vector** (`§NN` jumps), **the render**, **tier**,
   **register**, **resolver**
 - **the three concerns** (compositing / windowing / rendering) — defined in
   `okuda/AGENTS.md`

@@ -43,7 +43,7 @@ preview=$(printf '%s' "$split" | jq -r '.result.pane_id // .result.new_pane.pane
 [[ -n "$preview" && "$preview" != "null" ]] || { echo "gloam-edit: pane split failed: $split" >&2; exit 1; }
 herdr pane run "$preview" "$okuda_bin" "$f" --watch
 
-# 4. Verify before claiming: wait for the okudagram's first heading — the
+# 4. Verify before claiming: wait for the render's first heading — the
 #    shell's command echo contains the filename too, so matching the name
 #    alone proves nothing about the render. The heading text appears only
 #    once okuda has actually painted it. Then hand focus to the editor pane.

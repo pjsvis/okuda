@@ -402,7 +402,7 @@ export async function renderDocument(
     ...PARSER_OPTIONS,
   }).replace(/\n+$/, "\n\n"); // terminator wants exactly one blank line above
 
-  // Block terminator — the okudagram's bottom (candidate B of the
+  // Block terminator — the render's bottom (candidate B of the
   // 2026-08-27 four-way probe). Two chips bookend a muted rule: the
   // LHS chip mirrors the H1 badge's column (subdued — muted, not
   // heading-coloured, so it orients without declaring depth; the badge

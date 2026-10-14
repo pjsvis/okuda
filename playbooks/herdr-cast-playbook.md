@@ -30,7 +30,7 @@ bracketed-paste); prefer it over `send-text` + `send-keys enter`.
 
 The script: `bun scripts/cast.ts <file.md> [label]` —
 creates a tab rooted in the silo, runs `./okuda <file>` in its root pane,
-waits for the okudagram to render, reports the pane id. The equivalent
+waits for the document to render, reports the pane id. The equivalent
 by hand:
 
 ```bash
@@ -43,7 +43,7 @@ herdr pane close "$pane_id"                              # clean up
 ```
 
 The verification step matters: `pane wait-output --match <filename>`
-confirms the okudagram actually rendered before anything claims success.
+confirms the document actually rendered before anything claims success.
 
 ## Gotchas (each learned the hard way, once)
 
@@ -59,7 +59,7 @@ confirms the okudagram actually rendered before anything claims success.
    low-level and non-submitting; use `run` for commands.
 4. **Wait, then claim.** `pane wait-output --match <text> --timeout 15000`
    is the difference between "cast" and "cast, verified". Match on the
-   filename; the okudagram echoes it in the footer.
+   filename; the render echoes it in the footer.
 5. **The socket is there when the CLI isn't enough.** Newline-delimited
    JSON over `~/.config/herdr/herdr-client.sock` (protocol schema:
    `herdr api schema --json`); methods are dotted (`pane.send_input`,

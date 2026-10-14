@@ -1,5 +1,5 @@
 /**
- * okudagram-probe.ts — 2026-10-12
+ * frame-probe.ts — 2026-10-12
  *
  * Three questions about the frame, all of them properties of the emitted
  * bytes rather than of prose. Nothing here depends on a decision not yet
@@ -18,7 +18,7 @@
  *
  * Prints numbers, not conclusions.
  *
- * Run: bun scripts/okudagram-probe.ts
+ * Run: bun scripts/frame-probe.ts
  */
 import { renderDocument } from "../src/render";
 import { displayWidth, stripANSI } from "../src/width";

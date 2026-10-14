@@ -54,12 +54,12 @@ already has a shape — a comparison, a list of named things, a relation — is 
 shapeless content is **decorated Stuff**: structure with no referent. Reach for
 the shape the content already has; do not impose one.
 
-**The artifact is the document; the okudagram is what it renders to.** The
-structured artifact is the *document*. The **okudagram** is its rendered form —
-deterministic and recomputed, `okudagram = f(source, width, palette)`
+**The artifact is the document; the render is what it renders to.** The
+structured artifact is the *document*. **The render** is its composed form —
+deterministic and recomputed, `render = f(source, width, palette)`
 (`briefs/2026-08-29-brief-okudagram-frame.md`) — the good-looking end this medium
 is built to produce, and the aspiration behind this law. It names the render, not
-the source: use *document* for the artifact, and let the okudagram stay the thing
+the source: use *document* for the artifact, and let the render stay the thing
 you are aiming at.
 
 **Test.** After a glance, can the reader state the document's shape in one

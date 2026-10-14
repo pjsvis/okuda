@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# facade-lint.sh — enforce the justfile's okudagram invariants.
+# facade-lint.sh — enforce the justfile facade's layout invariants.
 #
 # The justfile is the facade a visitor sees first; this repo's thesis is
 # restful rendering, so the facade must not be ragged. This gate checks the
@@ -7,7 +7,7 @@
 # job — see justfile-playbook.md, Tricky Parts #7).
 #
 # Invariants (all derived from `just --list` + the justfile):
-#   1. Comment column in [20, 30] (the band the okudagram targets).
+#   1. Comment column in [20, 30] (the band a render targets).
 #   2. Recipe comments ≤ 3 words (terse labels, not sentences).
 #   3. No multi-line recipe comments (one comment line per recipe).
 #   4. No default values on parameterized recipes (`param="..."` pins the
@@ -112,7 +112,7 @@ if (( fail == 0 )) && [[ ${#violations[@]} -eq 0 ]]; then
   exit 0
 fi
 
-echo "facade-lint: FAIL — facade not an okudagram" >&2
+echo "facade-lint: FAIL — the facade is misaligned" >&2
 for v in "${violations[@]}"; do
   echo "  ✗ $v" >&2
 done

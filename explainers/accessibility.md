@@ -114,7 +114,7 @@ the cause* rather than advising patience: **the anchor**. Resize, zoom,
 reload, return from a followed link, and the eye-proxy re-matches the
 line nearest where you were and re-anchors the composition to it
 (`reanchoredScroll`; see `docs/2026-08-31-the-same-okudagram.md`). You
-get back the same okudagram, at the same place in the meaning, whatever
+get back the same render, at the same place in the meaning, whatever
 shape the container is now.
 
 Accommodating everyone's tolerance deficit simultaneously is only

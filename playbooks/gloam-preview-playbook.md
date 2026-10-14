@@ -55,7 +55,7 @@ merely tiles whatever Ghostty windows exist.
 - **Verify on the render, not the echo** — `pane wait-output` matching the
   filename proves nothing: the shell's command echo contains the name too.
   The wait matches the document's first heading, which only the painted
-  okudagram contains. (This exact mistake was made once, in public, with
+  render contains. (This exact mistake was made once, in public, with
   a screenshot pending.)
 - **Streaming `--watch`, not `--tui`** — the TUI has manual reload (`r`)
   but not file-watch; `tui-live-documents` (2026-08-26) is still open.

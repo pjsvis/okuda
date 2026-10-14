@@ -5,7 +5,7 @@
  * Usage: bun scripts/cast.ts <file.md> [label]
  *
  * Creates a Herdr tab rooted in this silo, runs the okuda binary on the
- * file in its root pane, and waits for the okudagram to render before
+ * file in its root pane, and waits for the document to render before
  * reporting. The pane stays focused; q returns it to the shell.
  *
  * Herdr control surface (herdr.dev/docs): tab create → pane run →
@@ -44,7 +44,7 @@ if (!paneId) {
 // 2. Run: submit the okuda command (pane run adds the Enter).
 herdr(["pane", "run", paneId, "./okuda", file]);
 
-// 3. Verify: wait for the okudagram to render before declaring victory.
+// 3. Verify: wait for the document to render before declaring victory.
 const probe = file.split("/").pop() ?? file;
 const wait = herdr([
   "pane", "wait-output", paneId, "--match", probe, "--timeout", "15000",

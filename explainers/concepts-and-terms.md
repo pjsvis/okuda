@@ -21,14 +21,18 @@ document in your terminal — colours, tables, diagrams, the works.
 it opens in okuda. They are the same binary — the name you type decides
 the role (`docs/2026-08-20-origin-doc.md` explains why).
 
-## The okudagram
+## The render
 
-An **okudagram** is a composed screen: the document as okuda has laid it
+**The render** is the composed screen: the document as okuda has laid it
 out for your current terminal width — headings anchored, tables fitted,
-diagrams drawn. Not a scroll of text; a page. The word comes from the
-early design notes, and its values are *on screen now* (what you see is
-composed for this moment) and *tied to the mast* (a screen that stays
-put while you study it).
+diagrams drawn. Not a scroll of text; a page. It is the fourth role beside
+*the reader*, *okuda* and *the glass* (`ADR-RENDERER-READER-029`); one
+portion of a render is **a frame**, and a drawing inside it is **a diagram**.
+Its design values are *on screen now* (what you see is composed for this
+moment) and *tied to the mast* (a screen that stays put while you study it)
+— and the readable range they come from, distance and detail and structure
+and colour, is Michael Okuda's screens, cited as an influence
+(`ADR-RETIRE-OKUDAGRAM-066`).
 
 ## Callsigns
 

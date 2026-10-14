@@ -60,7 +60,7 @@ describe("render — headings", () => {
   });
 });
 
-// ── Block terminator (the okudagram's bottom; candidate B of the
+// ── Block terminator (the render's bottom; candidate B of the
 // 2026-08-27 four-way probe). Rule to the title's column, chip in the
 // header chip's cell — renderer-emitted, never authored.
 describe("render — block terminator", () => {

@@ -1,6 +1,6 @@
 # State Colours — the showcase environment
 
-The live rendered exhibit of the state-glyph vocabulary, in the wild, inside the okudagram frame. Every glyph in every content path: table cells, list leads, prose. The chrome — H1 badge + RHS chip on the header, two-chip bookend terminator on the close — comes from the renderer, not the author; it is a system invariant, and this document is its watchdog. If the chrome ever drifts (the terminator stops closing, the chip misaligns), this doc catches it.
+The live rendered exhibit of the state-glyph vocabulary, in the wild, inside the frame. Every glyph in every content path: table cells, list leads, prose. The chrome — H1 badge + RHS chip on the header, two-chip bookend terminator on the close — comes from the renderer, not the author; it is a system invariant, and this document is its watchdog. If the chrome ever drifts (the terminator stops closing, the chip misaligns), this doc catches it.
 
 **Today:** the glyphs render plain. The palette contract (`td-28a3e6`) pins four state roles — `state-ok`, `state-todo`, `state-parked`, `state-failed` — and six tests assert their hexes, but the render path does not yet apply them to glyphs in content. This document is the gap made legible in the renderer: the glyphs are here, the chrome is intact, the colours are absent. When the render-path application lands (`td-af9959` P2), the same document shows the colours — proof of the fix, unchanged.
 

@@ -79,7 +79,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-STATE-GLYPH | ◆ partial | render path + showcase environment | — |
 | BRF-STATE-GLYPH-2 | ◆ partial | vocabulary — closed lexicon | — |
 | BRF-OKLCH-TUNING | ◆ partial | td-b4bae8 ready-to-start | — |
-| BRF-PAGED-OKUDAGRAM | · open | the okudagram frame — a portioning rule | — |
+| BRF-PAGED-OKUDAGRAM | · open | the frame — a portioning rule | — |
 | BRF-TTY-REVERSE | · open | land at the top | — |
 
 ## SSH family — feasibility debriefed, build pending
@@ -97,7 +97,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | Brief | State | Narrative | Debrief |
 |---|---|---|---|
 | BRF-REGISTRY-MARKDOWN | · open | silo dashboard | — |
-| BRF-PANEL-LIBRARY | · open | chunk-addressable okudagrams | — |
+| BRF-PANEL-LIBRARY | · open | chunk-addressable renders | — |
 | BRF-DENSE-DYNAMIC | · open | telemetry visual primitives | — |
 | BRF-FETCH-STATE | · open | fetch stamp; fixes the empty-doc lie | — |
 | BRF-HERDR-DASHBOARD | · open | the build's exhaust, composed | — |
@@ -157,6 +157,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-LEAK-FENCE | · open | The leak gate's fence exemption — anchor on the source, not a rendered match | — |
 | BRF-TABLE-SLOT-INSTRUMENT | · open | The table's columns are unobservable — a slot instrument, and a header/body alignment test | — |
 | BRF-ALIGN-ACROSS-TABLES | · open | The align meta is misattributed across tables — a later table un-aligns an earlier one | — |
+| BRF-RETIRE-OKUDAGRAM | · open | Retire the fan-word term — the render, the frame, and a diagram | — |
 
 ## Parked / deferred
 

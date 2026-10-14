@@ -113,7 +113,7 @@ The menu is bulletless, coloured, scannable, and self-documenting. In the list f
 
 ## The closing bookends
 
-The header opens the okudagram — badge left, title, chip right, spanning the width. The closer mirrors it: a muted chip at the badge's column, a muted chip at the heading chip's column, a rule between. Openings announce; closings release. A document that doesn't know it's done reads as a broken frame.
+The header opens the render — badge left, title, chip right, spanning the width. The closer mirrors it: a muted chip at the badge's column, a muted chip at the heading chip's column, a rule between. Openings announce; closings release. A document that doesn't know it's done reads as a broken frame.
 
 ---
 
