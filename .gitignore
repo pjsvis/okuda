@@ -8,6 +8,9 @@ node_modules
 *.log
 .env
 
+# a diredtory for prospective briefs
+.sparks/
+
 # Build output
 dist/
 okuda
