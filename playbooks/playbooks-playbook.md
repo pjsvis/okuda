@@ -136,12 +136,25 @@ and capture "tribal knowledge" into an explicit protocol.
 
 ### When to Write a Playbook
 
-1. **Repeatability:** if a task will be done more than twice, write a playbook.
-2. **Complexity:** if a task involves >3 steps or critical constraints, write a playbook.
+1. **Repeatability:** if a second attempt would have to re-derive what the first
+   knew, write a playbook.
+2. **Fallibility:** if a step can be done in the wrong order, or a critical
+   constraint is one that nothing downstream would catch, write a playbook.
 3. **Discovery:** if you solve a novel problem ("First Contact"), write a playbook
    to guide future agents.
 4. **Standards:** if there is a "Right Way" to do something (file naming,
    front-matter format), write a playbook.
+
+**These were counts, and a count is not a criterion.** Criterion 1 read *more than
+twice* and criterion 2 read *more than 3 steps* — the one justification this house
+refuses: *justify a convention by the perceptual property it serves, never by a
+count* (`system.md:28`). A tally is satisfied by counting, so it promotes the
+countable and buries the failure. The property underneath is **fallibility** — a
+procedure earns a playbook when following it can produce a *detectable* wrong
+answer. `okuda-assess-capability` is the worked case: its first step can return
+*no*, and its trap list exists because that step has returned the wrong no. The
+argument and its measurements are
+`docs/2026-10-16-written-down-and-promoted-on-a-count.md`.
 
 ### The Structure of a Playbook
 
