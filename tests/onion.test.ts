@@ -394,6 +394,30 @@ describe("onion — the two 2026-10-05 refinements (ADR-SEARCH-RECENCY-053)", ()
       "a/AGENTS.md",
     ]);
   });
+
+  test("orderByRecency is permutation-invariant — the order is a function of the set", () => {
+    // rg's discovery order is thread-scheduled, so a channel that kept it
+    // handed back a differently-ordered list each render. Same members,
+    // any input order, one output: ties break by path.
+    const members: ChannelHit[] = [
+      { path: "a/2026-10-05-x.md", evidence: "" },
+      { path: "a/2026-09-note.md", evidence: "" },
+      { path: "a/AGENTS.md", evidence: "" },
+      { path: "a/2026-09-16-mid.md", evidence: "" },
+      { path: "a/notes.md", evidence: "" },
+    ];
+    const permuted = [members[2]!, members[4]!, members[0]!, members[3]!, members[1]!];
+    expect(orderByRecency(members).map((h) => h.path)).toEqual(
+      orderByRecency(permuted).map((h) => h.path),
+    );
+    expect(orderByRecency(members).map((h) => h.path)).toEqual([
+      "a/2026-10-05-x.md",
+      "a/2026-09-16-mid.md",
+      "a/2026-09-note.md",
+      "a/AGENTS.md",
+      "a/notes.md",
+    ]);
+  });
 });
 
 describe("onion — ChannelHit shape", () => {

@@ -142,16 +142,28 @@ export function pathDate(path: string): string | null {
 
 /** Recency order within a channel (ADR-SEARCH-RECENCY-053): rows whose
  *  basename carries a date come first, newest first; undated rows
- *  follow in the order the channel produced them — the canonical ASCII
- *  collation, unchanged, which is why `AGENTS.md` still leads the file
- *  list. Stable, so equal dates keep their channel order: this refines
- *  the rank, it never re-derives it. Pure. */
+ *  follow. **Ties break by path**, so a channel's order is a function of
+ *  its member set — never of rg's discovery order, which is
+ *  thread-scheduled and therefore not deterministic. That matters
+ *  because `rankedShortlistEntries` re-derives the whole stream per
+ *  keystroke (the entry stream is never held): a channel that kept
+ *  discovery order handed back a differently-ordered list each render,
+ *  so `§27` named a different document every time, and any restore by
+ *  address landed on the wrong row. This refines the rank, it never
+ *  re-derives it — the channels still own precedence (registry > body >
+ *  remainder). Pure. */
 export function orderByRecency(hits: ChannelHit[]): ChannelHit[] {
   const dateOf = (h: ChannelHit): string => pathDate(h.path) ?? "";
-  const dated = hits.filter((h) => dateOf(h) !== "");
-  const undated = hits.filter((h) => dateOf(h) === "");
-  dated.sort((a, b) => (dateOf(a) < dateOf(b) ? 1 : dateOf(a) > dateOf(b) ? -1 : 0));
-  return [...dated, ...undated];
+  return [...hits].sort((a, b) => {
+    const da = dateOf(a);
+    const db = dateOf(b);
+    if (da !== db) {
+      if (da === "") return 1; // undated sorts after every dated row
+      if (db === "") return -1;
+      return da < db ? 1 : -1; // newest first
+    }
+    return a.path < b.path ? -1 : a.path > b.path ? 1 : 0; // canonical tiebreak
+  });
 }
 
 /** Layer 1 — narrow the candidate set in memory. Dates AND globally

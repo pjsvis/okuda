@@ -136,6 +136,18 @@ describe("launcher — rankedShortlistEntries (the -g merge, integration)", () =
     expect(new Set(paths).size).toBe(paths.length);
   });
 
+  test("the stream is deterministic — two runs, one order", () => {
+    // rg's discovery order is thread-scheduled, so the body channel used
+    // to hand back a differently-ordered stream each run (32 of 448 rows
+    // moved on `silcrow`). That made §NN an unstable name and any restore
+    // by address land on the wrong document. Ties now break by path, so
+    // the same query yields the same list.
+    const a = rankedShortlistEntries("silcrow", process.cwd());
+    const b = rankedShortlistEntries("silcrow", process.cwd());
+    expect(a).toEqual(b);
+    expect(a.length).toBeGreaterThan(1);
+  });
+
   test("generated index.md surfaces in no channel", () => {
     // Body hits and remainder alike exclude the generated views.
     // basename, not endsWith: the exclusion is a path component. A

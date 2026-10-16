@@ -71,14 +71,19 @@ The rules that go with it:
 
 ## Evidence
 
-Measured 2026-10-16 against the frozen capture (`sha256=cd74ced3…`, 448 rows):
+Measured 2026-10-16 against the frozen capture (`just silcrow-freeze`; its sha
+prints at the head of every run, and now reproduces — two freezes of one set give
+one sha):
 
 - **The instrument renders the contract.** `just silcrow` paints the row above;
   `just silcrow-control` paints fzf's row from the same bytes.
-- **Rank is not yet deterministic.** Two runs of `./okuda --entries silcrow`
-  move **32 of 448** rows; the first move is at row 8 (`BRF-JUMP-LIST`'s
-  defect 2 — *the rank is authoritative*, open). The address
-  is not a name until the order is.
+- **Rank determinism — fixed 2026-10-16.** Before the fix, two runs of
+  `./okuda --entries silcrow` moved **32 of 448** rows (measured then; the first
+  move at row 8), because `orderByRecency` kept rg's thread-scheduled discovery
+  order. Ties now break by path (`src/onion.ts`), so a channel's order is a
+  function of its member set — asserted by `tests/launcher.test.ts` (two runs,
+  one stream) and `tests/onion.test.ts` (permutation-invariance). *The address is
+  a name now*: `§NN` names the same document across renders.
 - **A match can fall off the right edge.** Two rows in the set match at chars 92
   and 105, past the ~96-cell clip at width 100; the snippet is clipped from the
   start, not around the match.
@@ -96,8 +101,8 @@ tests.
 **Out:** the loop and the input path (`BRF-GLOAM-OWNS-LOOP`); the
 TAB/`INPUT`/`LIST` focus machine and the digit-/query-collision resolution
 (`BRF-JUMP-LIST`); the ear's cue text (`BRF-SEARCH-SURFACE`, the row seam);
-rank determinism (`BRF-JUMP-LIST` defect 2); match-centred clipping; the
-register's missing playbook dates.
+match-centred clipping; the register's missing playbook dates. (Rank
+determinism was listed here as a dependency and is **fixed** — see Evidence.)
 
 ## Preconditions
 
