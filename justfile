@@ -241,6 +241,54 @@ palette-audit:
 dogfood-pending:
     @expect scripts/dogfood-pending.exp
 
+# ── Silcrow look gate ──────────────────────────────
+
+[group('dogfood')]
+silcrow-freeze query:
+    #!/bin/bash
+    set -euo pipefail
+    mkdir -p tmp
+    ./okuda --entries "{{query}}" > tmp/silcrow-look.entries
+    {
+      printf 'query=%s\n' "{{query}}"
+      printf 'rows=%s\n' "$(wc -l < tmp/silcrow-look.entries | tr -d ' ')"
+      printf 'frozen=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      printf 'commit=%s\n' "$(git rev-parse --short HEAD 2>/dev/null || echo none)"
+      printf 'sha256=%s\n' "$(shasum -a 256 tmp/silcrow-look.entries | cut -d' ' -f1)"
+    } | tee tmp/silcrow-look.meta
+
+# The row
+[group('dogfood')]
+silcrow:
+    #!/bin/bash
+    set -euo pipefail
+    cap=tmp/silcrow-look.entries
+    if [ ! -s "$cap" ]; then
+      echo "no frozen capture — run: just silcrow-freeze <query>" >&2
+      exit 1
+    fi
+    printf 'sha256=%s  %s\n\n' "$(shasum -a 256 "$cap" | cut -d' ' -f1)" "$(sed -n 's/^frozen=/frozen /p' tmp/silcrow-look.meta)"
+    q="$(sed -n 's/^query=//p' tmp/silcrow-look.meta)"
+    bun scripts/silcrow-look.ts --from "$cap" "$q" --quiet --focus 15
+
+# Attr control
+[group('dogfood')]
+silcrow-attrs:
+    @bun scripts/silcrow-look.ts --attrs
+
+# fzf control
+[group('dogfood')]
+silcrow-control *flags:
+    #!/bin/bash
+    set -euo pipefail
+    cap=tmp/silcrow-look.entries
+    if [ ! -s "$cap" ]; then
+      echo "no frozen capture — run: just silcrow-freeze <query>" >&2
+      exit 1
+    fi
+    q="$(sed -n 's/^query=//p' tmp/silcrow-look.meta)"
+    bun scripts/silcrow-look.ts --from "$cap" "$q" --control {{flags}}
+
 # ── Writing ──────────────────────────────────────────────
 
 # Two-panel writing
