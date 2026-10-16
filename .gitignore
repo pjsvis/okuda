@@ -8,7 +8,7 @@ node_modules
 *.log
 .env
 
-# a diredtory for prospective briefs
+# a directory for prospective briefs
 .sparks/
 
 # Build output
