@@ -91,6 +91,15 @@ one sha):
   distinguishable on the glass — verified by `just silcrow-attrs`.
 - **The roles exist.** okuda preset: `muted #445566`, `vector #fb7185`, content
   `#cacacc`, match `#dfa21a`.
+- **The look — one static render, 2026-10-16 (a first look, not a verdict).**
+  Reading the frozen list: the rubricated `§` is read first, and the column is
+  then *inferred* — the numbers are sequential, so the dim addresses cost
+  nothing. The **dates are skipped**: the rank groups by channel, so the column
+  is monotonic only *within* a block, and on this evidence the date is per-row
+  evidence rather than a comparison axis. The callsigns catch the eye, their
+  prefixes classify the tier, and the reader's own question returns. And the wall
+  does **not** read as a ventilator — *the same quantity of text is a room when
+  it is constructed* (**the constructed wall**, `system.md`).
 
 ## Scope
 
@@ -159,6 +168,13 @@ hide, and so the reasons are not re-litigated:
 **Two reversals are recorded here on purpose** — callsign-first became
 date-first, and the per-match underline became a row band. Both reversed on
 evidence, and a silent reversal is a drift source.
+
+**An open fork the look exposed: the date.** The Evidence reads the date as
+per-row evidence, not a comparison axis — the eye skips it because the rank
+groups by channel. But if the date is meant to be *compared* (latest, oldest, a
+window), the list must sort by date globally, at the cost of the channel
+precedence the rank buys. Keep the rank and the date is per-row; sort by date
+and the rank weakens. Not decided, and not decidable from one frozen list.
 
 ## Related
 

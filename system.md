@@ -189,6 +189,22 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   `docs/2026-10-06-the-shared-artifact.md`; ADR-EXIT-FERMATA-051 (the held frame as the
   tempo defence).
 
+* **The constructed wall**: a mass of content is a **ventilator** when it is
+  *weather* — a medium you move through — and a room when it is *constructed*,
+  because a constructed wall is the only wall you can put a door in. The
+  difference is not the volume: the same bytes become a plot or a queue
+  depending on whether there is somewhere to stop and enter. 
+  * **Test:** can you put a door in it — stop, hold, enter — or is there only a
+    way to keep going? *Pausable, constructed, purposive*; remove any one and
+    the mass reverts to a ventilator. 
+  * **Coined 2026-10-16** from the operator's reading of the search row
+    (`BRF-SEARCH-ROW`): *"it does not act like a ventilator, even though there
+    is a wall of text. The wall is constructed and the discovery is of what."*
+  * **Prior art:** **ventilator** (the failure this answers); **wading** and its
+    design consequence (a surface looked at, never a medium waded through);
+    **fermata** (the door, held at a mode boundary); **plot**;
+    `docs/2026-10-06-the-shared-artifact.md`.
+
 * **Fermata**: a deliberate held frame at a mode boundary — the beat before the
   next thing. Coined 2026-10-03 in the okuda exit (the drain window's frozen
   document frame before the picker, over-determined: leak bound + gear-change
