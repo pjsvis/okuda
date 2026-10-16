@@ -70,3 +70,4 @@
 {"file":"2026-10-13-brief-align-across-tables.md","date":"2026-10-13","status":"open","summary":"The align meta is misattributed across tables — a later table un-aligns an earlier one","meta":{},"callsign":"BRF-ALIGN-ACROSS-TABLES"}
 {"file":"2026-10-13-brief-table-slot-instrument.md","date":"2026-10-13","status":"done","summary":"The table's columns are unobservable — a slot instrument, and a header/body alignment test","meta":{},"callsign":"BRF-TABLE-SLOT-INSTRUMENT"}
 {"file":"2026-10-14-brief-principal-and-clerk.md","date":"2026-10-14","status":"open","summary":"The principal and the clerk — the three-way triage","meta":{},"callsign":"BRF-PRINCIPAL-CLERK"}
+{"file":"2026-10-16-brief-search-row.md","date":"2026-10-16","status":"open","summary":"The search row — the contract, frozen by the probe","meta":{},"callsign":"BRF-SEARCH-ROW"}
