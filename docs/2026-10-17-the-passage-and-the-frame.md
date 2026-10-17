@@ -106,8 +106,9 @@ behaviour, and the exclusion gate — the one gate that "cannot be gamed" — is
 gameable after all.
 
 *Proposal:* one vector whose correct answer is a bounded refusal, scored on the
-**artefact produced**, never on the sentence that precedes it. Filed as
-`td-379bb7` — *Refusal-shaped compliance.*
+**artefact produced**, never on the sentence that precedes it. Filed in td as
+*Refusal-shaped compliance* — the task is local; this document names it rather
+than citing its id, per the One-Way Valve (`playbooks/td-playbook.md`).
 
 ## A defect in the actuator, recorded because it happened here
 
