@@ -1,7 +1,7 @@
 ---
 date: 2026-10-08
 kind: register — adjacent tools seen in the wild, each entry stating its substrate, its accessibility posture, and which of our exclusions it sells; append here, one entry per sighting
-lineage: the operator's sighting of Markdific, 2026-10-08 — *"looks like we are not the only ones thinking about markdown rendering"* — and the framing this register adopts: *"the first of the new markdown tools that we have seen, ie developed after and probably by AI"*. **Extended 2026-10-16:** Entries 2 and 3 — the operator's question *"we have the SpaceXAI diagraming code which we use to convert mermaid to markdown; are there any other things out there in the world that we should consider using"*, answered as sightings rather than as a shopping list. Both entries were read from their own repositories on the sighting date.
+lineage: the operator's sighting of Markdific, 2026-10-08 — *"looks like we are not the only ones thinking about markdown rendering"* — and the framing this register adopts: *"the first of the new markdown tools that we have seen, ie developed after and probably by AI"*. **Extended 2026-10-16:** Entries 2 and 3 — the operator's question *"we have the SpaceXAI diagraming code which we use to convert mermaid to markdown; are there any other things out there in the world that we should consider using"*, answered as sightings rather than as a shopping list. Both entries were read from their own repositories on the sighting date. **Extended 2026-10-17:** Entry 4 — the operator's link to the ZenNotes TUI page (2026-10-17), and the judgement it drew: *"not worth the candle... you can only use ZenNotes to get the extras"*. This is the first entry that is a **probe** rather than a read: the shipped binaries were run against a throwaway vault. The full review is `docs/2026-10-17-not-worth-the-candle.md`.
 status: open — a register, not an argument. Grows by sighting.
 ---
 
@@ -147,6 +147,45 @@ elision that reserves the space a too-wide diagram would have taken, and the rea
 on the fence info string that already sends one fence to art and another to prose.
 `decisions/004-art-first-layout.md`, `src/render.ts:574`
 
+## Entry 4 — ZenNotes CLI + TUI (observed 2026-10-17)
+
+**What it is.** A terminal notes application — TUI, scriptable CLI and MCP server in one
+binary — sitting on a folder of markdown. Go, MIT, v0.8.0. macOS (arm64/x86_64), Windows,
+Linux; 9.3–10.5 MB per platform, static, no runtime. Homebrew, `go install`, or a direct
+download. Source: https://zennotes.org/tui (probed 2026-10-17).
+
+**Substrate — the vault, and a hidden `.zennotes/` beside it.** Unlike every other entry,
+this one owns compositing and windowing as well as rendering: `zn capture` from any shell,
+`zn open -n` for a second desktop window, and eleven `zn server` verbs for a self-hosted
+sync server. It is the first entry that is a **platform** rather than a pipe, and the
+three-concern test is what names it.
+
+**Rendering, where it differs from ours.** Glamour — *"the renderer behind Glow"*
+(`README.md:605`) — with `zen` as a built-in alternative and custom JSON style sheets.
+Mermaid fences draw **as text through a pure-Go renderer**, or as pictures when `mmdc` is
+installed (`README.md:615`). That is a thing we kept, sold by a competitor — Entry 3's
+question asked a second time, and answered the same way: the ASCII renderer is not the
+non-commodity.
+
+**Accessibility posture: an input posture, not a reading one.** which-key, a `Ctrl+G`
+palette, `F2` context actions, and Vim motions *or* a plain editor — stated, good, and
+verified in `--help`. No speech path, no tempo contract and no colour contract are stated;
+`NO_COLOR` is honoured. Not tested with a screen reader, so this is an absence of
+*statement*, not of provision.
+
+**Which of our exclusions it sells.** Themes, keymaps and export styles — the same row as
+Entries 1 and 3. The row it adds is the interesting one: **the workflow**. Tasks, boards,
+calendars, databases, comments, templates, daily notes. Those were never on the exclusion
+list, because we never considered them; they are the veto arriving from the other
+side.
+
+**The row worth carrying out of this register.** What a tool *writes* matters more than
+what it displays. Nearly all of ZenNotes is inline markdown — `@status:` on the checkbox
+line, `status:` in frontmatter, `.base` folders whose rows are `.md` — which makes it a
+**dialect**, not a hostage. The exception is comments:
+`.zennotes/comments/<note>.comments.json`, keyed by filename, demonstrated to orphan on an
+ordinary rename. Probe, tiers and verdict: `docs/2026-10-17-not-worth-the-candle.md`.
+
 ## The category hypothesis — the part the operator supplied, and it is *marked*
 
 The operator's framing: this is the **first of a new wave** of markdown tools,
@@ -185,3 +224,5 @@ against ever benchmaxxing against such a list.
 - `AGENTS.md` — the three concerns, three owners
 - `docs/2026-10-06-the-shared-artifact.md` — the practice, and the questions we would like answered
 - `docs/2026-08-25-what-it-feels-like.md` — the perceptual claim a GUI tool does not make
+- `docs/2026-10-17-not-worth-the-candle.md` — Entry 4's full review: the footprint test,
+  and Glow as the zero-footprint control
