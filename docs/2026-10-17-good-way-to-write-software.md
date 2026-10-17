@@ -49,7 +49,7 @@ the mechanism, not a filing habit:
   per sighting, each entry stating its substrate and which of our exclusions it
   sells. Yesterday's entry was a competitor probed rather than read
   (`docs/2026-10-17-not-worth-the-candle.md`).
-- `decisions/` — 66 records of the choice, the alternatives refused, and why.
+- `decisions/` — the record of each choice, the alternatives refused, and why.
 - `briefs/` — the question written down before the code is written, per
   `AGENTS.md`: *"Brief before build."*
 
@@ -140,7 +140,10 @@ inversion; keep the attribution as a quotation.
 **And the harness it produces here is not the one the draft imagined.** No
 mutation tests, no property-based framework, no headless browser — the subject is
 a TUI over a markdown corpus. What okuda has is **18 gates in `just check` over
-683 tracked files and 546 documents, plus 43 test files**. Derived from the gates'
+686 tracked files and 547 documents** — a corpus larger than the code it ships —
+plus **43 test files**. Every count in this section is the run of 2026-10-17 and
+is re-derivable by running the gate; the instrument is named because the number
+will drift and the gate will not. Derived from the gates'
 own headers, they fall into three kinds, and the distinction is the actual
 engineering:
 
@@ -153,7 +156,7 @@ engineering:
 ◆ That taxonomy is the answer to "what does the agent build to trap itself" —
 and it is mostly **epistemic, not executable**. The gates police *claims*, not
 behaviour: 213 declared callsigns against 289 registered, 0 demotion candidates;
-0 prose leaks across 437 files. A deterministic harness that only ran tests would
+0 prose leaks across 440 files. A deterministic harness that only ran tests would
 leave the entire knowledge base unpoliced, and the knowledge base is where this
 project's failures actually live.
 
