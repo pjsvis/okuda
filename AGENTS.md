@@ -26,6 +26,30 @@ okuda renders what this workflow generates: headers, loose lists, loose tables, 
 
 The test for any "should we build X": *does X touch the byte stream or the screen?* If it touches the byte stream's origin (compositing) or the pane layout (windowing), it belongs outside okuda. If it touches the screen before the byte stream, it's rendering and it's ours. One line, one gate, no exceptions — *we don't care where the text comes from.*
 
+## Authoring
+
+The silo has one written guide to producing a document: `docs/style-guide.md`.
+It is the **author's** guide, not the renderer's spec — the inverse of the
+grammar showcase, which answers *what does okuda do with my markdown*, where the
+style guide answers *what markdown do I write to get the okuda look*.
+
+Read it before authoring, not after. It is short, and it renders as the demo of
+itself.
+
+Three things it will tell you that are easy to get wrong:
+
+- **The renderer supplies the colour; the author supplies the structure that
+  earns it.** A wall of white is what an agent emits when it treats markdown as
+  a plain-text dump.
+- **A diagram never wraps.** A wrapped state machine is a lie about the
+  topology. If it does not fit, the diagram is too big — split it by view, not
+  by cutting one graph in half.
+- **Structure is a choice, not a decoration.** Before each block, ask: what is
+  this block's structure, and which pattern earns it?
+
+The anti-pattern the guide refuses is prose where structure was available and
+refused. That refusal is the whole of the house style.
+
 ## External Dependency
 
 `mermaid-to-md` (Rust CLI, `~/.local/bin/`) — reads mermaid source on stdin, writes ASCII diagram to stdout. okuda never parses mermaid itself.

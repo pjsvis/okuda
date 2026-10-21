@@ -56,6 +56,26 @@ The colour register has one principle: *is this near or far?* **Near** is the co
 A bare `.md` path in prose — `decisions/010-bounded-anchor-proportional-fallback.md` — lifts to the doc-ref gold (amended 2026-09-12: it receded to muted for one day too many — 2026-08-28 wired the gold, 2026-08-28 dimmed it, both same afternoon). The recession was by location, and location is the wrong test. The path is an affordance before it is provenance: in a silo where the filesystem is the message bus, a filename is an act — type it in the search and it resolves. So the near/far question gains its third term, answered by *what the text does*, not where it sits: content is near, provenance is far, and affordances — actable paths, keybinding hints — lift out of the gloaming into a register of their own: visible, subordinate to the rose vector paint (the silcrow is the actuation point; the path is the address). Put it last on a line, where the eye lands after the title has done its work. If the gold shouts against the emphasis register, dim by lightness (OKLCH L down, hue and chroma held) — never by guessing a new hue.
 
 
+## The frame that wraps
+
+Information is framed by a shoulder or an elbow, not by a box.
+
+A box closes. It draws a perimeter and declares the contents complete — a claim
+about the material that the author is rarely entitled to make. A shoulder turns
+one corner and a rule runs from it; an elbow turns and the information sits
+under the turn. Either way the frame **wraps**: it gathers the block and holds
+it as one thing while leaving it open at the far end. Extensible, not sealed.
+
+The distinction is the one the guide makes everywhere else. A frame that wraps
+is a gesture; a box is furniture. It costs a glyph and a rule instead of a
+perimeter, so it survives narrowing — which is what makes it compatible with
+**progressive engagement** rather than merely cheaper than a box.
+
+Reach for it when a block is one thing but not a finished thing: a section that
+continues, a set of items that will grow, a group whose boundary is the point
+and whose closure is not.
+
+
 ## Diagrams: shape the eye can trace
 
 A diagram is not a one-off ornament — it earns column space wherever prose would otherwise be describing a shape. The fence is intercepted pre-render, piped to `mermaid-to-md`, and the ASCII is coloured by channel: borders recede, arrows lead, text sits in the foreground. The diagram never wraps — a wrapped state machine is a lie about the topology.
@@ -71,6 +91,29 @@ Orientation is a semantic choice. A cycle reads across; a pipeline reads down. S
 ## The closing bookends
 
 The header opens the render — badge left, title, chip right, spanning the width. The closer mirrors it: a muted chip at the badge's column, a muted chip at the heading chip's column, a rule between. Openings announce; closings release. A document that doesn't know it's done reads as a broken frame.
+
+
+## Authoring contract
+
+The numbers and rules the guide states nowhere else — the ones an author, human
+or agent, gets wrong by default.
+
+- **Width.** Author to **79 columns**, the top rung of the squint ladder
+  (`docs/2026-10-12-the-squint-test.md`). The ceiling above which the operator
+  stops widening is a policy number and is currently unstated; 120 is the
+  proposal, not a measurement. Past the ceiling the diagram stops being read as
+  a whole, and a diagram read in halves has lost the thing it was for.
+- **Split by view, not by scissors.** Two halves of one graph contradict each
+  other within a month. A context view and a sequence view of the same system
+  do not, because they answer different questions.
+- **Labels ASCII, prose free.** Diagram and table labels stay in ASCII; prose
+  takes any script. Column alignment depends on the reader's font covering the
+  glyphs, and the font is the one input the renderer cannot see. Prose needs no
+  alignment, so prose is free.
+- **Never fake a fit.** No hand-wrapping, no hand-padding to simulate a width
+  the renderer would have elided. Elision is marked with `…`; a faked fit is
+  marked with nothing, which is the difference between a reader who widens and
+  a reader who is misled.
 
 
 ## The anti-pattern
