@@ -427,7 +427,11 @@ describe("render — mermaid pipe + colour classification", () => {
     expect(out).toContain("art elided");
   });
 
-  test("missing binary: fence dropped silently, document renders", async () => {
+  test("missing binary: the fence says why, the document renders", async () => {
+    // The inverse of the old contract. The fence used to vanish in silence,
+    // which is how a wrapper crash on Omarchy rendered as a blank line and
+    // cost a session of diagnosis (DBF-OMARCHY-TOOLCHAIN). A projection loss
+    // is said, and a missing instrument is named.
     const out = await renderDocument(
       "# Doc\n\n```mermaid\nflowchart LR\n  A --> B\n```\n\nTail\n",
       { width: W, mermaidBin: "/nonexistent/mermaid-to-md", color: "none" },
@@ -435,8 +439,47 @@ describe("render — mermaid pipe + colour classification", () => {
     expect(out).toContain("Doc");
     expect(out).toContain("Tail");
     expect(out).not.toContain("okuda-mmd");
-    expect(out).not.toContain("flowchart"); // binary missing → no art, source dropped
-    expect(out).not.toContain("mermaid source elided"); // no indicator without art
+    expect(out).not.toContain("flowchart"); // no art, source still omitted
+    expect(out).toContain("diagram unavailable"); // ...and the loss is said
+    expect(out).toContain("not found"); // ...with the instrument's name in it
+    expect(out).not.toContain("mermaid source elided"); // that receipt is for art
+  });
+
+  test("failing binary: the reason carries its exit code", async () => {
+    // The Omarchy shape exactly: the binary was present and resolved, and it
+    // exited 1 with the diagnosis on stderr. "Present but broken" and "absent"
+    // are different facts and the receipt must distinguish them.
+    const out = await renderDocument(
+      "```mermaid\nflowchart LR\n  A --> B\n```\n",
+      { width: W, mermaidBin: "/bin/false", color: "none" },
+    );
+    expect(out).toContain("diagram unavailable");
+    expect(out).toContain("exit 1");
+  });
+
+  test("silent binary: exit 0 with no art is its own reason", async () => {
+    // /usr/bin/true exits 0 and prints nothing — the third failure mode, and
+    // the one a bare `code === 0` check would have called a success.
+    const noop = existsSync("/usr/bin/true") ? "/usr/bin/true" : "";
+    if (!noop) return;
+    const out = await renderDocument(
+      "```mermaid\nflowchart LR\n  A --> B\n```\n",
+      { width: W, mermaidBin: noop, color: "none" },
+    );
+    expect(out).toContain("produced no art");
+  });
+
+  test("the receipt is one line, elided, and never wraps", async () => {
+    // Same discipline as the art it stands in for: the notice is RAW and
+    // elided to the width budget, so a 40-column terminal gets a cut notice,
+    // not a wrapped one (ADR-UNIVERSAL-ELISION-050).
+    const out = await renderDocument(
+      "```mermaid\nflowchart LR\n  A --> B\n```\n",
+      { width: 40, mermaidBin: "/nonexistent/mermaid-to-md", color: "none" },
+    );
+    const line = out.split("\n").find((l) => l.includes("diagram unavailable"))!;
+    expect(displayWidth(line)).toBeLessThanOrEqual(40);
+    expect(line.trim().endsWith("…")).toBe(true);
   });
 
   test("palette override of diagram-arrow takes effect", async () => {

@@ -153,11 +153,16 @@ const MERMAID_BIN_CANDIDATES = [
   "mermaid-to-md",
 ];
 
-/** Run the mermaid binary; return its stdout (empty string on failure). */
-async function spawnMermaid(source: string, opts: RenderOptions): Promise<string> {
+/** Run the mermaid binary. Returns the art, or the reason there is none —
+ *  the reason reaches the reader, so it must be a fact and not a shrug. */
+async function spawnMermaid(
+  source: string,
+  opts: RenderOptions,
+): Promise<{ ok: true; out: string } | { ok: false; reason: string }> {
   const candidates = opts.mermaidBin
     ? [opts.mermaidBin]
     : MERMAID_BIN_CANDIDATES;
+  let reason = "mermaid-to-md not found";
   for (const bin of candidates) {
     try {
       const proc = Bun.spawn([bin], {
@@ -165,16 +170,31 @@ async function spawnMermaid(source: string, opts: RenderOptions): Promise<string
         stdout: "pipe",
         stderr: "pipe",
       });
+      // Drain both streams before waiting: a child that fills the stderr
+      // pipe buffer blocks in write() and the exit is never reached.
+      const outP = new Response(proc.stdout).text();
+      const errP = new Response(proc.stderr).text();
       proc.stdin.write(source);
       proc.stdin.end();
-      const out = await new Response(proc.stdout).text();
+      const [out, err] = await Promise.all([outP, errP]);
       const code = await proc.exited;
-      if (code === 0 && out.trim().length > 0) return out;
+      if (code === 0 && out.trim().length > 0) return { ok: true, out };
+      reason = code !== 0
+        ? `mermaid-to-md exit ${code}${firstLineOf(err)}`
+        : "mermaid-to-md produced no art";
     } catch {
-      // try next candidate
+      // No such binary on this candidate — try the next, keep the reason.
+      reason = `mermaid-to-md not found (${bin})`;
     }
   }
-  return "";
+  return { ok: false, reason };
+}
+
+/** The child's first line of stderr, trimmed and prefixed — enough to name
+ *  a failure without letting a stack trace into the byte stream. */
+function firstLineOf(text: string): string {
+  const line = text.trim().split("\n")[0] ?? "";
+  return line === "" ? "" : ` · ${line}`;
 }
 
 /** Pipe mermaid source to diagram-describe for a prose description
@@ -307,6 +327,12 @@ function newTableState(): TableState {
 
 // ── Document render ───────────────────────────────────────────────────
 
+/** A diagram fence's outcome. Failed is a named fact, carried as data,
+ *  because the placeholder handler cannot invent a diagnosis. */
+type DiagramEntry =
+  | { art: string; title?: string | null }
+  | { failure: string; title?: string | null };
+
 interface Ctx {
   width: number;
   /** Full terminal width (opts.width), for header chip placement at the
@@ -317,7 +343,10 @@ interface Ctx {
   color: ColorMode;
   palette: Palette;
   table: TableState | null;
-  mermaid: Map<string, { art: string; title?: string | null }>;
+  /** Classified art, or the reason there is none. A union, not an empty
+   *  string: the renderer has to be able to say WHY a diagram is missing,
+   *  and `""` is a verdict with no evidence in it (DBF-OMARCHY-TOOLCHAIN). */
+  mermaid: Map<string, DiagramEntry>;
   /** Described diagrams — prose from diagram-describe (BRF-DIAGRAM-DESCRIBE). */
   described: Map<string, { prose: string; title?: string | null }>;
   /** Coloured fence lines keyed by token id (BRF-FENCE-COLOUR). */
@@ -599,15 +628,18 @@ async function interceptMermaid(
         if (prose === "") return null;
         return { described: true, prose, title: f.title };
       }
-      const out = await spawnMermaid(f.code, opts);
-      if (out === "") return null;
-      return { described: false, art: extractDiagramArt(out), title: f.title };
+      const r = await spawnMermaid(f.code, opts);
+      return r.ok
+        ? { described: false, art: extractDiagramArt(r.out), title: f.title }
+        : { described: false, failure: r.reason, title: f.title };
     }),
   );
   for (const [i, entry] of results.entries()) {
     if (entry === null) continue;
     if (entry.described) {
       ctx.described.set(String(i), { prose: entry.prose!, title: entry.title });
+    } else if (entry.failure !== undefined) {
+      ctx.mermaid.set(String(i), { failure: entry.failure, title: entry.title });
     } else {
       ctx.mermaid.set(String(i), { art: entry.art!, title: entry.title });
     }
@@ -935,12 +967,17 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         if (lines !== undefined) return codeBlockLines(lines, ctx);
         return ""; // tokenised then dropped — unreachable by construction
       }
-      // Mermaid placeholder paragraph → the classified ASCII block.
+      // Mermaid placeholder paragraph → the classified ASCII block, or the
+      // receipt for why there is none. Silence here was the defect: a
+      // wrapper that crashed became a blank line, and one session was spent
+      // finding that out (DBF-OMARCHY-TOOLCHAIN).
       const m = children.trim().match(RE_MERMAID_TOKEN);
       if (m) {
         const entry = ctx.mermaid.get(m[1]!);
-        if (entry !== undefined) return diagramBlock(entry.art, ctx, entry.title);
-        return ""; // pipe failed → drop the placeholder silently
+        if (entry === undefined) return ""; // no fence captured for this token
+        return "failure" in entry
+          ? diagramUnavailableBlock(entry.failure, ctx, entry.title)
+          : diagramBlock(entry.art, ctx, entry.title);
       }
       // Described diagram placeholder → prose block (BRF-DIAGRAM-DESCRIBE).
       const d = children.trim().match(RE_DESCRIBED_TOKEN);
@@ -1402,6 +1439,28 @@ function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   const indOpen = tagRawOpen("diagramsrc");
   const indicator = elideToWidth(`${glyph}${stmt}`, budget);
   return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n${indOpen}${indicator}${TAG_RAW_CLOSE}\n\n`;
+}
+
+/** No diagram, and the reason — one muted line where the art would have
+ *  been. The counterpart of `diagramBlock`'s `⋮ source elided` receipt, and
+ *  the same discipline: a projection loss is *said* (BRF-PROJECTION-LOSSES).
+ *  The glyph is `▸`, not `⋮` — `⋮` means "elided into a further question",
+ *  and this is not elision, it is failure. RAW-wrapped so the notice can
+ *  never be re-wrapped by a later pass, and elided to the same budget as the
+ *  art it stands in for. Under NO_COLOR the attributes survive, as they do
+ *  for every other receipt. */
+function diagramUnavailableBlock(
+  failure: string,
+  ctx: Ctx,
+  title?: string | null,
+): string {
+  const glyph = ctx.styler.roleBold("state-parked", "▸");
+  const caption = title ? ` ${title} ·` : "";
+  const base = `${caption} diagram unavailable · ${failure}`;
+  const open = tagRawOpen("diagram");
+  const indOpen = tagRawOpen("diagramsrc");
+  const line = elideToWidth(`${glyph}${ctx.styler.role("muted", base)}`, ctx.width);
+  return `${open}${indOpen}${line}${TAG_RAW_CLOSE}${TAG_RAW_CLOSE}\n\n`;
 }
 
 /** Blockquote: single-level pipe prefix, muted, re-wrapped at width-2. */
