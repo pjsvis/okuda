@@ -125,10 +125,15 @@ What this preserves and what it changes:
 - **Not fixed here:** the diagram-swallow at `src/render.ts:155-160` (a failed mermaid
   render produces no output and no warning), and `facade-lint.sh`'s silent exit 1 where
   `just` is absent. Both are reported in the note and neither belongs to this decision.
+  *Both have since landed: the swallow in `95e40a6` (`BRF-TOOLCHAIN-TRUTH`, the receipt
+  `▸ diagram unavailable · <reason>`), the gate guard in `ADR-GATE-NAMES-041`. The note
+  is kept: the deferral is the record, and it took a session to pay.*
 - **Recorded, not yet run:** nothing. This ADR reverses no behaviour — it adds a step to a
   recipe that had none, so there is no abandonment surface and no palimpsest.
 
 ## Related
+
+- Brief: `BRF-TOOLCHAIN-TRUTH` — retired the diagram-swallow deferral above
 
 - Note: `docs/2026-09-21-the-page-the-signature-got-wrong.md` — the measurement, the four controls, the falsified first story
 - Brief: `BRF-GLOAM-OWNS-LOOP` — the launcher brief whose preconditions assume a binary that runs

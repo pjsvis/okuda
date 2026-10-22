@@ -161,6 +161,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-PRINCIPAL-CLERK | · open | The principal and the clerk — the three-way triage | — |
 | BRF-SEARCH-ROW | · open | The search row — the contract, frozen by the probe | — |
 | BRF-PLATFORM-GATE | · open | The gate names its format — building okuda on Omarchy | — |
+| BRF-TOOLCHAIN-TRUTH | · open | Four claims that could not prove themselves | — |
 
 ## Parked / deferred
 

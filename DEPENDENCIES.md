@@ -4,21 +4,27 @@ External tools this silo depends on. Brief preconditions verify against
 this file — an entry with a verified date is a claim we have checked, not
 an assumption.
 
-| Tool | Version | Purpose | Verified |
-|------|---------|---------|----------|
-| `bun` | 1.4.0 | Runtime & renderer | 2026-08-27 |
-| `just` | 1.53.0 | Task runner | 2026-08-20 |
-| `codesign` | system (macOS 27.0) | Build — re-signs the compiled Mach-O (an ELF has no signature) | 2026-10-22 |
-| `rcodesign` | 0.29.0 (optional) | Build — the Linux-side signer for a cross-built Mach-O | 2026-10-22 |
-| `git` | 2.54.0 | Version control; launcher runtime (ADR-048 — the root climb) | 2026-08-20 |
-| `td` | 0.61.0 | Task management | 2026-08-27 |
-| `mermaid-to-md` | 0.1.0* (wrapper 51f5225) | Mermaid → ASCII | 2026-10-22 |
-| `diagram-describe` | — | Mermaid → prose via local LLM (BRF-DIAGRAM-DESCRIBE) | 2026-10-03 |
-| `chroma` | 2.27.0 (exact pin) | Code-fence colour — 16-colour class codes (BRF-FENCE-COLOUR) | 2026-10-22 |
-| `Google Chrome` | 153.0.8010.53 | The paper rung — headless `--print-to-pdf` (`just pdf`) | 2026-10-09 |
-| `fzf` | 0.73.1 | Fuzzy picker — runtime dep of the `gloam` launcher (both modes) | 2026-08-27 |
-| `rg` | 15.1.0 | Source for both `gloam` picker modes — file list, body shortlist, registry prefilter | 2026-09-04 |
-| `fd` | 10.4.2 | ~~File finder — preferred by `gloam`~~ RETIRED from the launcher path (BRF-CONTENT-SHORTLIST) | 2026-08-27 |
+**`Verified` is a date; `Proven by` is the instrument that can fail.** A row
+with a date and no prover is a tool nobody exercised — which is how
+`mermaid-to-md` read *verified on Linux* for a month while the pipe that
+consumes it produced nothing (`DBF-OMARCHY-TOOLCHAIN`). An empty prover cell
+is a finding, not a gap in the table.
+
+| Tool | Version | Purpose | Verified | Proven by |
+|------|---------|---------|----------|-----------|
+| `bun` | 1.4.0 | Runtime & renderer | 2026-08-27 | `bun test` (the whole suite) |
+| `just` | 1.53.0 | Task runner | 2026-08-20 | `facade-lint.sh` invariant 0 names its absence |
+| `codesign` | system (macOS 27.0) | Build — re-signs the compiled Mach-O (an ELF has no signature) | 2026-10-22 | `signature-check.sh` Mach-O branch (stub-tested on Linux) |
+| `rcodesign` | 0.29.0 (optional) | Build — the Linux-side signer for a cross-built Mach-O | 2026-10-22 | `sign-binary.sh` Mach-O branch (hand-measured 2026-10-22) |
+| `git` | 2.54.0 | Version control; launcher runtime (ADR-048 — the root climb) | 2026-08-20 | `ref-census.ts`, `fresh.sh` |
+| `td` | 0.61.0 | Task management | 2026-08-27 | `td-id-lint.ts` (an absent database is loud) |
+| `mermaid-to-md` | 0.1.0* (wrapper 51f5225) | Mermaid → ASCII | 2026-10-22 | `tests/table-diagram.test.ts` — the pipe smoke |
+| `diagram-describe` | — | Mermaid → prose via local LLM (BRF-DIAGRAM-DESCRIBE) | 2026-10-03 | — (the absent case is injected; no live proof) |
+| `chroma` | 2.27.0 (exact pin) | Code-fence colour — 16-colour class codes (BRF-FENCE-COLOUR) | 2026-10-22 | `tests/fence-colour.test.ts` (pin + bytes), `colour-smoke.sh` |
+| `Google Chrome` | 153.0.8010.53 | The paper rung — headless `--print-to-pdf` (`just pdf`) | 2026-10-09 | `just pdf` |
+| `fzf` | 0.73.1 | Fuzzy picker — runtime dep of the `gloam` launcher (both modes) | 2026-08-27 | `search-smoke.sh` |
+| `rg` | 15.1.0 | Source for both `gloam` picker modes — file list, body shortlist, registry prefilter | 2026-09-04 | `search-smoke.sh` |
+| `fd` | 10.4.2 | ~~File finder — preferred by `gloam`~~ RETIRED from the launcher path (BRF-CONTENT-SHORTLIST) | 2026-08-27 | — (retired) |
 
 \* Self-reports as `mermaid-tui 0.1.0`, lives at `~/.local/bin/` — binary
 name and package name differ. The origin doc's `spacex-mermaid` is stale;
