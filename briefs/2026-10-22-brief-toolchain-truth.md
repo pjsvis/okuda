@@ -6,7 +6,10 @@ callsign: BRF-TOOLCHAIN-TRUTH
 # Brief: Four claims that could not prove themselves
 
 **Date:** 2026-10-22
-**Status:** In progress
+**Status:** Done — shipped 2026-10-22 (`95e40a6` receipt, `49d369c` shell,
+`5fba500` pin, `3d2f92f` prover column). `bun test` 803/0 and `just ship` green
+on Omarchy. The cross-platform review found three more gaps; all filed, none
+fixed here (`DBF-TOOLCHAIN-TRUTH`).
 
 ## Context
 

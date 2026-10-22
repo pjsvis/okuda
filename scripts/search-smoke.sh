@@ -15,10 +15,25 @@ set -euo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 
-QUERY="${1:-load bearing}"
-WANT="${2:-briefs/2026-08-26-brief-tui-live-documents.md}"
 # Custom scenarios: bash scripts/search-smoke.sh <query> <expected-path>
 # (the just recipe is parameterless — facade-lint forbids param defaults).
+#
+# The default scenario DERIVES its query from the target file. It used to
+# name a fixed phrase and a fixed document, and by 2026-10-22 both were gone:
+# the brief had been archived and rewritten, and the replacement intent —
+# "type a version number, find the dependencies row" — pointed at a root-level
+# DEPENDENCIES.md that the picker's corpus does not carry. A fixture in a
+# living corpus is a thing that drifts; the longest token in the target is
+# guaranteed present and rare enough to be evidence.
+WANT="${2:-docs/help.md}"
+QUERY="${1:-}"
+if [ -z "$QUERY" ]; then
+  QUERY="$(grep -oE '[A-Za-z0-9][A-Za-z0-9._-]{14,}' "$WANT" | head -1)"
+fi
+if [ -z "$QUERY" ]; then
+  echo "search-smoke: cannot run — no query given and none derivable from $WANT" >&2
+  exit 2
+fi
 
 # ── 1. binary freshness ────────────────────────────────────────────────
 bash scripts/fresh.sh
