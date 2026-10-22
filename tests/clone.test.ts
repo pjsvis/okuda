@@ -76,23 +76,34 @@ describe("clone — the restricted grammar (ADR-031)", () => {
   });
 
   test("ghostty: spawns via interactive shell with gloam", () => {
-    const spec = cloneArgs("ghostty", "docs/x.md", "darwin", "/silo");
+    // The shell is INJECTED, like the platform: the grammar is "the user's
+    // interactive login shell", and a spec that read process.env.SHELL
+    // asserted zsh on a box running bash and read as a product failure
+    // (DBF-OMARCHY-TOOLCHAIN). The machine is the caller's problem.
+    const spec = cloneArgs("ghostty", "docs/x.md", "darwin", "/silo", undefined, "/bin/zsh");
     const args = spec as { cmd: string; args: string[] };
     expect(args.cmd).toContain("Ghostty.app/Contents/MacOS/ghostty");
     expect(args.args[0]).toBe("-e");
-    expect(args.args[1]).toContain("zsh");
+    expect(args.args[1]).toBe("/bin/zsh");
     expect(args.args[2]).toBe("-i");
     expect(args.args[3]).toBe("-c");
     expect(args.args[4]).toContain("gloam");
     expect(args.args[4]).toContain("docs/x.md");
   });
 
+  test("ghostty: whatever shell the user has, not the one we shipped on", () => {
+    const spec = cloneArgs("ghostty", "docs/x.md", "darwin", "/silo", undefined, "/usr/bin/bash");
+    const args = spec as { cmd: string; args: string[] };
+    expect(args.args[1]).toBe("/usr/bin/bash");
+    expect(args.args[2]).toBe("-i"); // still interactive, still a login shell
+  });
+
   test("ghostty-edit: spawns via interactive shell with editor", () => {
-    const spec = cloneArgs("ghostty-edit", "docs/note.md", "darwin", "/silo", "vi");
+    const spec = cloneArgs("ghostty-edit", "docs/note.md", "darwin", "/silo", "vi", "/bin/zsh");
     const args = spec as { cmd: string; args: string[] };
     expect(args.cmd).toContain("Ghostty.app/Contents/MacOS/ghostty");
     expect(args.args[0]).toBe("-e");
-    expect(args.args[1]).toContain("zsh");
+    expect(args.args[1]).toBe("/bin/zsh");
     expect(args.args[2]).toBe("-i");
     expect(args.args[3]).toBe("-c");
     expect(args.args[4]).toContain("vi");
@@ -185,10 +196,11 @@ describe("the editor — the declaration chain (88)", () => {
       { name: "vi", args: [], path: "/usr/bin/vi", gui: false },
       "darwin",
       "/silo",
+      "/bin/zsh",
     );
     const args = spec as { cmd: string; args: string[] };
     expect(args.cmd).toContain("Ghostty.app/Contents/MacOS/ghostty");
-    expect(args.args[1]).toContain("zsh");
+    expect(args.args[1]).toBe("/bin/zsh");
     expect(args.args[4]).toContain("vi");
     expect(args.args[4]).toContain("docs/x.md");
   });

@@ -132,12 +132,21 @@ export function editArgs(
   editor: Editor,
   platform: string = process.platform,
   cwd: string = process.cwd(),
+  shell?: string,
 ): CloneSpec {
   if (editor.gui && editor.path) {
     return { cmd: editor.path, args: [...editor.args, resolve(cwd, doc)] };
   }
-  return cloneArgs(integration, doc, platform, cwd, editor.name);
+  return cloneArgs(integration, doc, platform, cwd, editor.name, shell);
 }
+
+/** The shell a terminal integration spawns through. The environment is read
+ *  HERE and nowhere else, so every spec below is a function of its arguments
+ *  — the machine is the caller's problem, not the grammar's. A spec that read
+ *  `process.env.SHELL` itself asserted `zsh` on a box running bash and failed
+ *  as if the product were broken (DBF-OMARCHY-TOOLCHAIN). */
+const loginShell = (shell?: string): string =>
+  shell ?? process.env.SHELL ?? "/bin/zsh";
 
 const shellQuote = (s: string): string => `"${s.replace(/[\\"]/g, "\\$&")}"`;
 
@@ -159,6 +168,7 @@ export function cloneArgs(
   platform: string = process.platform,
   cwd: string = process.cwd(),
   editor?: string,
+  shell?: string,
 ): CloneSpec {
   const editCmd = (doc: string): string => {
     const ed = editor ?? process.env.OKUDA_EDITOR ?? process.env.EDITOR ?? "vi";
@@ -173,10 +183,9 @@ export function cloneArgs(
       return { error: "the `terminal` integration is macOS-only — use ghostty, tmux, or cmd" };
     case "ghostty": {
       // Ghostty's login shell has a bare environment — use an
-      // interactive shell so .zshrc sources PATH, aliases, etc.
-      const shell = process.env.SHELL ?? "/bin/zsh";
+      // interactive shell so the rc file sources PATH, aliases, etc.
       const ghostty = "/Applications/Ghostty.app/Contents/MacOS/ghostty";
-      return { cmd: ghostty, args: ["-e", shell, "-i", "-c", `gloam ${shellQuote(resolve(doc))}`] };
+      return { cmd: ghostty, args: ["-e", loginShell(shell), "-i", "-c", `gloam ${shellQuote(resolve(doc))}`] };
     }
     case "tmux":
       if (!process.env.TMUX) {
@@ -199,9 +208,8 @@ export function cloneArgs(
     }
     case "ghostty-edit": {
       const ed = editor ?? process.env.OKUDA_EDITOR ?? process.env.EDITOR ?? "vi";
-      const shell = process.env.SHELL ?? "/bin/zsh";
       const ghostty = "/Applications/Ghostty.app/Contents/MacOS/ghostty";
-      return { cmd: ghostty, args: ["-e", shell, "-i", "-c", `${ed} ${shellQuote(resolve(doc))}`] };
+      return { cmd: ghostty, args: ["-e", loginShell(shell), "-i", "-c", `${ed} ${shellQuote(resolve(doc))}`] };
     }
     default:
       return { error: `unknown clone integration "${integration}" — known: terminal, ghostty, tmux, cmd, herdr, edit-terminal, ghostty-edit` };
