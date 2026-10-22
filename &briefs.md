@@ -162,6 +162,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-SEARCH-ROW | · open | The search row — the contract, frozen by the probe | — |
 | BRF-PLATFORM-GATE | · open | The gate names its format — building okuda on Omarchy | — |
 | BRF-TOOLCHAIN-TRUTH | · open | Four claims that could not prove themselves | — |
+| BRF-DARWIN-CLOSE-OUT | · open | The darwin close-out — turn one promise into a measurement, and stop two paths guessing | — |
 
 ## Parked / deferred
 
