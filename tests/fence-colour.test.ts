@@ -10,10 +10,32 @@ const W = 64;
  * the wrapWholeFile unit tests still run. */
 const CHROMA = !!Bun.which("chroma");
 
+/** The pin, as a version string chroma's own `--version` starts with. */
+const CHROMA_PIN = "2.27.0";
+
 const PY = "```py\ndef f():\n    pass\n```\n";
 const BODY = "def f():\n    pass\n";
 
 describe("render — fence colour (BRF-FENCE-COLOUR)", () => {
+  test.skipIf(!CHROMA)("the installed chroma is the pinned one", () => {
+    // Every byte-level assertion below is chroma 2.27.0's output. Without
+    // this test a 2.28 install fails as "colour is broken" — a true
+    // sentence pointing at the renderer, which is innocent. Name the
+    // version, so the failure names the pin (BRF-TOOLCHAIN-TRUTH).
+    const proc = Bun.spawnSync(["chroma", "--version"]);
+    const line = new TextDecoder().decode(proc.stdout).trim();
+    expect(line).toContain(CHROMA_PIN);
+    // chroma appends its build commit and timestamp to --version, e.g.
+    // 2.27.0-a6d00fe-…; a different pin fails with the line below in the
+    // message, which is the whole point of the assertion.
+    if (!line.includes(CHROMA_PIN)) {
+      throw new Error(
+        `chroma ${line} is installed; these tests pin ${CHROMA_PIN} exactly ` +
+          `(DEPENDENCIES.md). Install the pin, or re-pin the bytes deliberately.`,
+      );
+    }
+  });
+
   test.skipIf(!CHROMA)("tagged py fence paints chroma's class codes", async () => {
     const out = await renderDocument(PY, { width: W, palette: DRACULA_PALETTE });
     // chroma 2.27.0, --formatter terminal16 --style monokai: keyword =
