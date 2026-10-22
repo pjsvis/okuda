@@ -6,7 +6,10 @@ callsign: BRF-PLATFORM-GATE
 # Brief: The gate names its format — building okuda on Omarchy
 
 **Date:** 2026-10-22
-**Status:** In progress
+**Status:** Done — shipped 2026-10-22 (2ba1777, the signer dispatch; 68aa262 the
+ampersand filing). `just build` and `just check` green on Omarchy. **Not
+verified:** the darwin path did not run on a Mac this session — code unchanged
+in substance, exercised under a `codesign` stub only.
 
 ## Context
 
@@ -102,6 +105,7 @@ why the Mach-O-without-`codesign` branch must say UNVERIFIED rather than pass.
 ## Done when
 
 - `just build` and `just check` are green on Omarchy, and still green on darwin.
+  *(Darwin untested this session — see Status. The first Mac session runs it.)*
 - An ELF that does not execute fails the check with a named reason and exit 1.
 - A Mach-O checked without `codesign` fails with exit 2 and the word UNVERIFIED.
 - `DEPENDENCIES.md` and `ADR-BUILD-SIGNS-040` say what the code now does.
