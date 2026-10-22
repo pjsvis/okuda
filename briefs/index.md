@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-22 | BRF-PLATFORM-GATE | in_progress | The gate names its format — building okuda on Omarchy | 2026-10-22-brief-platform-gate.md |
 | 2026-10-16 | BRF-SEARCH-ROW | open | The search row — the contract, frozen by the probe | 2026-10-16-brief-search-row.md |
 | 2026-10-14 | BRF-PRINCIPAL-CLERK | open | The principal and the clerk — the three-way triage | 2026-10-14-brief-principal-and-clerk.md |
 | 2026-10-13 | BRF-ALIGN-ACROSS-TABLES | open | The align meta is misattributed across tables — a later table un-aligns an earlier one | 2026-10-13-brief-align-across-tables.md |

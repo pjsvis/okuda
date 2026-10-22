@@ -8,7 +8,8 @@ an assumption.
 |------|---------|---------|----------|
 | `bun` | 1.4.0 | Runtime & renderer | 2026-08-27 |
 | `just` | 1.53.0 | Task runner | 2026-08-20 |
-| `codesign` | system (macOS 27.0) | Build — re-signs the compiled binary | 2026-09-21 |
+| `codesign` | system (macOS 27.0) | Build — re-signs the compiled Mach-O (an ELF has no signature) | 2026-10-22 |
+| `rcodesign` | 0.29.0 (optional) | Build — the Linux-side signer for a cross-built Mach-O | 2026-10-22 |
 | `git` | 2.54.0 | Version control; launcher runtime (ADR-048 — the root climb) | 2026-08-20 |
 | `td` | 0.61.0 | Task management | 2026-08-27 |
 | `mermaid-to-md` | 0.1.0* | Mermaid → ASCII | 2026-09-02 |
@@ -186,16 +187,31 @@ the plausible wrong answer. Stripping the signature is not a remedy either:
 unsigned is killed too, so the requirement is a *valid* signature, not any
 and not none.
 
-**Workaround (in the `build` recipe):** `codesign --force --sign - okuda`
-after the compile, then `scripts/signature-check.sh` to verify. The re-sign
-must stay **after** the compile. The binary **shrinks** on re-sign —
-63,976,562 → 63,604,752 bytes — because Apple's `codesign` uses 16 KiB
-pages where the linker used 4 KiB. That is not damage.
+**Workaround (in the `build` recipe):** the compile, then
+`scripts/sign-binary.sh` to re-sign, then `scripts/signature-check.sh` to
+verify. The re-sign must stay **after** the compile. The binary **shrinks** on
+re-sign — 63,976,562 → 63,604,752 bytes — because Apple's `codesign` uses
+16 KiB pages where the linker used 4 KiB. That is not damage.
 
 `codesign` ships with macOS, so the re-sign adds no install — but it is a
-**build dependency**: a Linux or CI build of okuda must skip the step, not
-fail on it, which is why `scripts/signature-check.sh` exits 0 for an absent
-binary.
+**build dependency**, and the artifact's format decides what it means
+(`ADR-BUILD-SIGNS-040`, amended 2026-10-22):
+
+- **ELF (Linux native build).** No CodeDirectory, no signed pages. The sign step
+  is a printed no-op and the check verifies the thing an ELF actually promises —
+  that it *executes*.
+- **Mach-O.** `codesign` re-signs where it exists. On a Linux host,
+  `rcodesign` (apple-codesign — not in the Arch repos; the musl release binary
+  works, 2026-10-22) is the same act: ad-hoc by default, `rcodesign sign okuda`.
+  Measured against a cross-built darwin-arm64 artifact: superblob rewritten,
+  flags `0x2`, every page hash still matching. `rcodesign verify` is **not** a
+  verifier — it self-declares as *"known to be buggy"* and rejects a valid
+  ad-hoc signature as *"no cryptographic signature present"* — so a Mach-O
+  checked on a host without `codesign` exits **2, UNVERIFIED**, and never 0.
+
+A Linux box therefore builds and gates natively today; minting a *darwin*
+artifact from it (`bun build --compile --target=bun-darwin-arm64`) works too, but
+its signature is unverifiable there. Run the gate where the artifact runs.
 
 See `ADR-BUILD-SIGNS-040` and `docs/2026-09-21-the-page-the-signature-got-wrong.md`.
 

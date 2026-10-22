@@ -6,7 +6,7 @@ callsign: ADR-BUILD-SIGNS-040
 # Decision: The build signs its own output — re-sign after compile, verify in the gate
 
 **Date:** 2026-09-21
-**Status:** Accepted
+**Status:** Accepted (amended 2026-10-22 — the signer and the verified precondition are chosen by the artifact's format; see below)
 
 ## Context
 
@@ -30,6 +30,44 @@ The reader found it as `zsh: killed gloam`.
 
 The `build` recipe re-signs the binary it produces and then verifies it, and `check`
 verifies the binary in the tree.
+
+## Amendment 2026-10-22 — the signer is chosen by the artifact's format
+
+The recipe was unconditional: `codesign --force --sign - okuda`, then the check.
+On a Linux host that recipe compiles an **ELF** and dies on line 309 with
+`codesign: command not found` — and the check this ADR promised would "skip, not
+fail, where `codesign` does not exist" instead reported *"does not carry a valid
+code signature"* about an artifact whose format has no signatures at all. The
+promise was recorded and never implemented: the script skipped an absent
+**binary**, never an absent **tool**. Measured on the Omarchy box, 2026-10-22
+(`BRF-PLATFORM-GATE`).
+
+The precondition belongs to the artifact's **format**, so both instruments now
+dispatch on the file's own magic:
+
+| Format | Sign — `scripts/sign-binary.sh` | Verify — `scripts/signature-check.sh` |
+|---|---|---|
+| ELF | no-op, reason printed | exec smoke — the ELF's actual precondition |
+| Mach-O | `codesign`, else `rcodesign`, else exit 2 | `codesign --verify --strict`, else exit 2 UNVERIFIED |
+| other | exit 2 | exit 2 |
+
+What this preserves and what it changes:
+
+- The **darwin gate is unchanged**: same strict reading, same `invalid
+  signature` diagnosis, same remedy text. The defect this ADR was written about
+  is still caught, in the place it is caught today.
+- The ELF branch is not a skip. An ELF's precondition is that it *executes*, and
+  a build that compiles an unrunnable artifact is this ADR's incident in a
+  different costume. The gate asserts executability instead of a signature.
+- **`rcodesign` (apple-codesign) is the Linux-side `codesign --force --sign -`**:
+  ad-hoc by default, measured against a cross-built darwin-arm64 artifact —
+  superblob rewritten, flags `0x2`, all 17,191 page hashes still matching. It is
+  **not** a verifier: `rcodesign verify` self-declares that it is *"known to be
+  buggy"* and rejects a valid ad-hoc signature as *"no cryptographic signature
+  present"*. Hence exit 2, not a pass, when a Mach-O is checked on a host
+  without `codesign`.
+- **Exit 2 is a third state**, per `ADR-GATE-NAMES-041`: the check could not
+  run. `just check` chains with `&&`, so an unrun gate still fails the gate.
 
 ## Alternatives Considered
 
@@ -55,7 +93,8 @@ verifies the binary in the tree.
 
 - `codesign` is a build dependency. It ships with macOS, so it is present wherever this
   arm64 binary could run at all — but a Linux or CI build must skip the step, not fail on
-  it, which is why `scripts/signature-check.sh` exits 0 for an absent binary.
+  it. *(Amended 2026-10-22: the skip is now real and format-driven — the sign step is
+  `scripts/sign-binary.sh`, and the check verifies what the format demands.)*
 - The binary **shrinks** on re-sign: 63,976,562 → 63,604,752 bytes, because Apple's
   `codesign` uses 16 KiB pages where the linker used 4 KiB. Anyone comparing artifact
   sizes will see a 372 KB drop and should not read it as a lost feature.
@@ -65,8 +104,9 @@ verifies the binary in the tree.
 - The re-sign must stay **after** the compile. A future edit that reorders the recipe
   silently reintroduces the defect — which is why the recipe verifies rather than
   trusting the order.
-- The verification is macOS-only. `signature-check.sh` must skip, not fail, where
-  `codesign` does not exist.
+- The verification is macOS-only for a Mach-O. *(Amended 2026-10-22: an ELF is verified
+  by execution; a Mach-O on a host without `codesign` exits 2 — cannot run, which is
+  neither a skip nor a pass.)*
 
 ## Notes
 
@@ -95,3 +135,4 @@ verifies the binary in the tree.
 - Dependency: `DEPENDENCIES.md` — the `codesign` row, and the `--compile` signature section
 - Playbook: `PLY-MERMAID-DIAGRAMS` — cited by the note, not by this decision
 - Skill: `macho-signature-triage` — the triage procedure, and `scripts/signature-check.sh` is its instrument in the tree
+- Brief: `BRF-PLATFORM-GATE` — the Omarchy measurement behind the 2026-10-22 amendment

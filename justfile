@@ -306,7 +306,7 @@ dev file:
 [group('build')]
 build:
     @bun build --compile --define "BUILD_SHA=\"$(git rev-parse --short=7 HEAD)\"" src/cli.ts --outfile okuda
-    @codesign --force --sign - okuda
+    @bash scripts/sign-binary.sh okuda
     @bash scripts/signature-check.sh okuda
 
 # Install
