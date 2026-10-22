@@ -12,9 +12,9 @@ an assumption.
 | `rcodesign` | 0.29.0 (optional) | Build — the Linux-side signer for a cross-built Mach-O | 2026-10-22 |
 | `git` | 2.54.0 | Version control; launcher runtime (ADR-048 — the root climb) | 2026-08-20 |
 | `td` | 0.61.0 | Task management | 2026-08-27 |
-| `mermaid-to-md` | 0.1.0* | Mermaid → ASCII | 2026-09-02 |
+| `mermaid-to-md` | 0.1.0* (wrapper 51f5225) | Mermaid → ASCII | 2026-10-22 |
 | `diagram-describe` | — | Mermaid → prose via local LLM (BRF-DIAGRAM-DESCRIBE) | 2026-10-03 |
-| `chroma` | 2.27.0 | Code-fence colour — 16-colour class codes (BRF-FENCE-COLOUR) | 2026-09-29 |
+| `chroma` | 2.27.0 (exact pin) | Code-fence colour — 16-colour class codes (BRF-FENCE-COLOUR) | 2026-10-22 |
 | `Google Chrome` | 153.0.8010.53 | The paper rung — headless `--print-to-pdf` (`just pdf`) | 2026-10-09 |
 | `fzf` | 0.73.1 | Fuzzy picker — runtime dep of the `gloam` launcher (both modes) | 2026-08-27 |
 | `rg` | 15.1.0 | Source for both `gloam` picker modes — file list, body shortlist, registry prefilter | 2026-09-04 |
@@ -24,24 +24,38 @@ an assumption.
 name and package name differ. The origin doc's `spacex-mermaid` is stale;
 `mermaid-to-md` is the real dependency.
 
-### `mermaid-to-md` platforms (verified 2026-09-02, macOS + Linux)
+### `mermaid-to-md` platforms (verified 2026-10-22, macOS + Linux x64)
 
-- **macOS**: wrapper symlinked (the upstream repo's
-  `scripts/mermaid-to-md.sh`) + the compiled `mermaid-tui` binary copied
-  to `~/.local/bin/`.
-- **Linux (Omarchy/Arch)**: verified 2026-09-02 after `cargo build
-  --release` from source. **No GitHub release assets exist** — `install.sh`
-  and the npm path are unexercised escape hatches; a fresh Linux box builds
-  from source: clone `pjsvis/mermaid-to-md`, `cargo build --release`,
-  `cp target/release/mermaid-tui ~/.local/bin/`, symlink the wrapper.
-  (The wrapper's repo-relative binary resolution does not survive the
-  symlink; it finds the binary via its PATH fallback — so the binary must
-  be *copied*, not linked, or installed somewhere on PATH.)
-- The symptom of a missing binary on a fresh machine is four opaque
-  failures in `tests/table-diagram.test.ts`; the precondition test there
-  smokes the pipe (spawns the wrapper, demands art) and names the
-  dependency before the diagram tests run — wrapper-resolvable-but-broken
-  is caught too, not just wrapper-absent.
+- **Both platforms**: wrapper symlinked (the upstream repo's
+  `scripts/mermaid-to-md.sh`) + the compiled `mermaid-tui` binary copied to
+  `~/.local/bin/`. The symlink is live, so **the clone is part of the
+  dependency** — it may not be deleted, and `git pull` in it updates the
+  installed wrapper. Linux clone: `~/dev/github/mermaid-to-md`.
+- **Linux (Omarchy/Arch)**, verified end-to-end 2026-10-22: `git pull`,
+  `cargo build --release` (2.5 s warm), `cp target/release/mermaid-tui
+  ~/.local/bin/`, `ln -sfn <clone>/scripts/mermaid-to-md.sh
+  ~/.local/bin/mermaid-to-md`. **No GitHub release assets exist** —
+  `install.sh` and the npm path are unexercised escape hatches.
+- **The binary must be copied, not linked.** The wrapper resolves
+  `../target/release/mermaid-tui` relative to its own (symlink) path, which
+  does not exist off the build tree, then falls back to `command -v
+  mermaid-tui` — the PATH fallback is what actually finds it. A symlink to
+  the build-tree binary works until the tree is cleaned.
+- **The wrapper must never reopen `/dev/stdout`** (upstream `51f5225`,
+  2026-10-22). Bake mode redirected to `${outfile:-/dev/stdout}`, which is
+  a fresh `open()` of `/proc/self/fd/1`; a caller that opened the pipe
+  itself gets ENXIO there, so the render vanished and the caller saw exit 1
+  with empty stdout. Measured: the same bytes succeed through a bash
+  pipeline and fail under `Bun.spawn` — which is how okuda pipes every
+  fence, so **every diagram in okuda rendered to nothing on a wrapper older
+  than 51f5225**. If a future wrapper bump reintroduces a `/dev/stdout`
+  redirect, this is the symptom: art missing, one bash error on stderr, no
+  okuda error at all (the swallow at `src/render.ts`).
+- The symptom of a missing *binary* on a fresh machine is opaque failures in
+  `tests/table-diagram.test.ts`; the precondition test there smokes the pipe
+  (spawns the wrapper, demands art) and names the dependency before the
+  diagram tests run — wrapper-resolvable-but-broken is caught too, not just
+  wrapper-absent.
 
 ### `mermaid-to-md` known limits (verified 2026-08-28)
 
@@ -215,12 +229,17 @@ its signature is unverifiable there. Run the gate where the artifact runs.
 
 See `ADR-BUILD-SIGNS-040` and `docs/2026-09-21-the-page-the-signature-got-wrong.md`.
 
-### `chroma` (verified 2026-09-29, macOS arm64 — BRF-FENCE-COLOUR)
+### `chroma` (verified 2026-10-22, macOS arm64 + Linux x64 — BRF-FENCE-COLOUR)
 
 - **macOS**: `brew install chroma` (2.27.0).
-- **Linux x64**: single static Go binary from GitHub releases — the same
-  provisioning shape as `mermaid-to-md`, so the reading room's deploy script
-  installs both without a second pattern.
+- **Linux x64** (verified 2026-10-22): the release asset is a single static
+  Go binary — `chroma-2.27.0-linux-amd64.tar.gz` from the GitHub release,
+  checked against the release's own `chroma-2.27.0-checksums.txt`, extracted
+  and copied to `~/.local/bin/chroma`. Not in the Arch repos; do not build
+  from source, the pinned release is the same bytes everywhere. The
+  `--version` output carries the build commit and timestamp
+  (`2.27.0-a6d00fe-…-2026-06-17T02:11:19Z`), which is how a re-install is
+  confirmed rather than assumed.
 - **Pinned bytes**: `tests/fence-colour.test.ts` pins chroma's terminal16
   `--style monokai` output exactly; a chroma major bump re-pins (the
   version above is the pin). The colour tests `skipIf` an absent binary —
