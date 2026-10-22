@@ -160,6 +160,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-ALIGN-ACROSS-TABLES | · open | The align meta is misattributed across tables — a later table un-aligns an earlier one | — |
 | BRF-PRINCIPAL-CLERK | · open | The principal and the clerk — the three-way triage | — |
 | BRF-SEARCH-ROW | · open | The search row — the contract, frozen by the probe | — |
+| BRF-PLATFORM-GATE | · open | The gate names its format — building okuda on Omarchy | — |
 
 ## Parked / deferred
 
