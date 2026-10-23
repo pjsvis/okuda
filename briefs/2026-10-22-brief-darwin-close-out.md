@@ -6,8 +6,9 @@ callsign: BRF-DARWIN-CLOSE-OUT
 # Brief: The darwin close-out — turn one promise into a measurement, and stop two paths guessing
 
 **Date:** 2026-10-22
-**Status:** Open — ready for a Mac session. Written on the Omarchy box, which
-cannot execute any of P1.
+**Status:** Open — **P1 done on a Mac, 2026-10-17** (evidence below). P2 and P3
+remain, and P2 is the operator's call: it removes verbs they use. Written on the
+Omarchy box, which cannot execute any of P1.
 
 ## Context
 
@@ -83,6 +84,117 @@ offset) but **cannot be validated there** — `rcodesign verify` refuses to be a
 witness. If the file is carried over, run `codesign -vvv` and execute it. That
 converts the last "unverifiable" row in the cross-platform table into evidence,
 in either direction.
+
+## P1 — the evidence, recorded on a Mac (2026-10-17)
+
+Run in one session on macOS arm64 (cut `c6ace0e` + the two fixes below).
+The preconditions held except two, and both were repaired rather than worked
+around.
+
+### The preconditions
+
+| Thing | State | Action |
+| --- | --- | --- |
+| `codesign` on PATH | ✓ `/usr/bin/codesign` | — |
+| `mermaid-to-md` at `51f5225`+ | clone was 1 behind | fast-forwarded to `51f5225`; `scripts/mermaid-to-md.sh` is what `~/.local/bin/mermaid-to-md` symlinks to, so the fix took effect without a rebuild. The Rust binary **was** stale — re-installed from a fresh `cargo build --release` (Aug 19 build → Oct 5 build, `mermaid-tui 0.1.0`) |
+| `chroma` at the pin | **failed**: `brew` 2.27.0 prints `?-?-?` | replaced with the upstream `chroma-2.27.0-darwin-arm64.tar.gz`, sha256 `92f418f…4a5115` matched against the release's `chroma-2.27.0-checksums.txt`, installed to `~/.local/bin/chroma` (position 4 on PATH, ahead of `/opt/homebrew/bin`). Now prints `2.27.0-a6d00fe2cdfc88da0b91396e577da16c75c9c7fb-2026-06-17T02:11:19Z` |
+| Ghostty at the bundle path | ✓ | — |
+| Chrome at the bundle path | ✓ | — |
+
+**`brew`'s build is the wrong bytes for this purpose, not the wrong version.**
+Same 2.27.0, no version metadata, so `tests/fence-colour.test.ts` could neither
+prove nor disprove the pin. `DEPENDENCIES.md`'s macOS row is corrected to the
+release asset, matching the Linux procedure — one prover on both platforms
+instead of two.
+
+**One test fixture was a Linux path.** `tests/table-diagram.test.ts` passed
+`mermaidBin: "/bin/false"`; macOS has no `/bin/false`, `posix_spawn` returns
+ENOENT, and `src/render.ts:187` correctly reported *"not found (/bin/false)"* —
+the absent case, not the failing-binary case the test is about. The test now
+resolves `/usr/bin/false` first, using the idiom its neighbour already used.
+The production code was right and is unchanged.
+
+### The five commands
+
+```
+$ just build
+  [41ms]  bundle  17 modules
+ [206ms] compile  okuda
+okuda: replacing existing signature
+sign-binary: re-signed with codesign (ad-hoc)
+signature-check: OK — okuda verifies
+
+$ just check
+exit 0 — green, signature-check first
+
+$ just ship
+ 804 pass, 0 fail · 7241 expect() calls · 42 files
+signature-check: OK — okuda verifies
+fresh: OK — c6ace0e = HEAD, PATH resolves to this repo
+
+$ bun test
+ 804 pass
+ 0 fail
+ 7241 expect() calls
+Ran 804 tests across 42 files. [4.81s]
+```
+
+### The four things Linux could not touch
+
+1. **The signature, read strictly.**
+
+```
+$ codesign -vvv okuda
+okuda: valid on disk
+okuda: satisfies its Designated Requirement
+$ codesign --verify --strict okuda ; echo $?
+0
+$ codesign -dvv okuda
+Identifier=okuda-555549444c4c440c55553144a11d99d1ccbeae57
+Format=Mach-O thin (arm64)
+CodeDirectory v=20400 size=124263 flags=0x2(adhoc) hashes=3877+2 location=embedded
+Signature=adhoc
+TeamIdentifier=not set
+```
+
+2. **A diagram**, from a document in the tree
+(`docs/2026-10-17-not-worth-the-candle.md`) — art **and** the receipt:
+
+```
+  │ inline token │   │ sibling plain file │         │ app-owned store │
+  └───────┬──────┘   └──────────┬─────────┘         └────────┬────────┘
+          └──────────┬──────────┘                       ┌────┘
+                     ▼                                  ▼
+             ┌───────────────┐                ┌───────────────────┐
+             │ portable text │                │ locked to the app │
+             └───────────────┘                └───────────────────┘
+  ⋮ mermaid source elided
+```
+
+3. **`just pdf`** — first run on either platform:
+
+```
+$ just pdf docs/2026-10-17-the-passage-and-the-frame.md
+paper: …/tmp/paper/2026-10-17-the-passage-and-the-frame.pdf, 107 KB
+  render: compiled binary · 80 cols at 10pt · receipt dropped · 66 lines/page · html kept at tmp/paper/
+```
+
+4. **The osascript paths — not run.** `okuda --clone terminal` and
+`edit-terminal` open a window on the operator's desktop; that is P2's subject
+anyway, and doing it here would have decided P2 by accident.
+
+### What this does *not* prove
+
+**The wrapper fix cannot be exercised on this box.** macOS resolves
+`/dev/stdout → fd/1` through fdescfs, where reopening a caller-owned pipe
+succeeds; Linux resolves it through procfs, where the reopen is refused. This
+Mac renders correctly **through the broken wrapper**, so a green diagram here is
+not evidence about the bug. The control for a platform-conditional defect has to
+be a test that runs the wrapper under `Bun.spawn` — until then the row is
+*"fixed and verified by reading the diff"*, not *"verified"*.
+
+Also not proven: the cross-build (no darwin artifact was carried over), and the
+two `osascript` verbs above.
 
 ## P2 — stop the guessing (decision + implementation)
 

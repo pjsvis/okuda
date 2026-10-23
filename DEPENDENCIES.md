@@ -18,7 +18,7 @@ is a finding, not a gap in the table.
 |------|---------|---------|----------|-----------|
 | `bun` | 1.4.0 (macOS) · 1.4.3 (Linux) | Runtime & renderer | 2026-10-22 | `bun test` (the whole suite) |
 | `just` | 1.53.0 (macOS) · 1.59.0 (Linux) | Task runner | 2026-10-22 | `facade-lint.sh` invariant 0 names its absence |
-| `codesign` | system (macOS 27.0) | Build — re-signs the compiled Mach-O (an ELF has no signature) | 2026-10-22 | `signature-check.sh` Mach-O branch (stub-tested on Linux) |
+| `codesign` | system (macOS 27.0) | Build — re-signs the compiled Mach-O (an ELF has no signature) | 2026-10-22 | `signature-check.sh` Mach-O branch — **ran on a Mac 2026-10-17**: `just build` re-signed ad-hoc, `codesign -vvv` reports *valid on disk* + *satisfies its Designated Requirement*, `codesign --verify --strict` exits 0 |
 | `rcodesign` | 0.29.0 (optional) | Build — the Linux-side signer for a cross-built Mach-O | 2026-10-22 | `sign-binary.sh` Mach-O branch (hand-measured 2026-10-22) |
 | `git` | 2.54.0 (macOS) · 2.56.0 (Linux) | Version control; launcher runtime (ADR-048 — the root climb) | 2026-10-22 | `ref-census.ts`, `fresh.sh` |
 | `td` | 0.61.0 (macOS) · 0.46.0 (Linux) | Task management | 2026-10-22 | `td-id-lint.ts` (an absent database is loud) |
@@ -239,17 +239,24 @@ its signature is unverifiable there. Run the gate where the artifact runs.
 
 See `ADR-BUILD-SIGNS-040` and `docs/2026-09-21-the-page-the-signature-got-wrong.md`.
 
-### `chroma` (verified 2026-10-22, macOS arm64 + Linux x64 — BRF-FENCE-COLOUR)
+### `chroma` (verified 2026-10-22 on Linux x64, 2026-10-17 on macOS arm64 — BRF-FENCE-COLOUR)
 
-- **macOS**: `brew install chroma` (2.27.0).
-- **Linux x64** (verified 2026-10-22): the release asset is a single static
-  Go binary — `chroma-2.27.0-linux-amd64.tar.gz` from the GitHub release,
-  checked against the release's own `chroma-2.27.0-checksums.txt`, extracted
-  and copied to `~/.local/bin/chroma`. Not in the Arch repos; do not build
-  from source, the pinned release is the same bytes everywhere. The
-  `--version` output carries the build commit and timestamp
-  (`2.27.0-a6d00fe-…-2026-06-17T02:11:19Z`), which is how a re-install is
-  confirmed rather than assumed.
+- **Both platforms: the upstream release asset, not the package manager**
+  (macOS corrected 2026-10-17). The asset is a single static Go binary, checked
+  against the release's own `chroma-2.27.0-checksums.txt`, extracted and copied
+  to `~/.local/bin/chroma` — which precedes `/opt/homebrew/bin` on this Mac's
+  PATH, so it wins. `brew install chroma` was the previous macOS instruction and
+  it installs **2.27.0 with no version metadata**: the binary is the right
+  version and `chroma --version` prints `?-?-?`, so the pin could be neither
+  proved nor disproved by the only instrument the test had. Same version, not the
+  same bytes; a pin that cannot report is not a pin.
+- **Linux x64** (verified 2026-10-22): `chroma-2.27.0-linux-amd64.tar.gz`. Not in
+  the Arch repos; do not build from source, the pinned release is the same bytes
+  everywhere.
+- **The prover is `--version`**, which the release asset prints in full —
+  `2.27.0-a6d00fe-…-2026-06-17T02:11:19Z` — and the package-manager build did not.
+  That is the whole reason for the correction: `tests/fence-colour.test.ts`
+  asserts the pin against this string, so the string has to exist.
 - **Pinned bytes**: `tests/fence-colour.test.ts` pins chroma's terminal16
   `--style monokai` output exactly; a chroma major bump re-pins (the
   version above is the pin). The colour tests `skipIf` an absent binary —

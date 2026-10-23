@@ -449,9 +449,20 @@ describe("render — mermaid pipe + colour classification", () => {
     // The Omarchy shape exactly: the binary was present and resolved, and it
     // exited 1 with the diagnosis on stderr. "Present but broken" and "absent"
     // are different facts and the receipt must distinguish them.
+    //
+    // Resolve `false` rather than naming /bin/false: macOS has no /bin/false, so
+    // posix_spawn returns ENOENT and the receipt correctly says "not found" —
+    // the absent case this test is not about. Same idiom as the silent-binary
+    // test below, and it reads as portable on purpose (2026-10-17, darwin).
+    const broken = existsSync("/usr/bin/false")
+      ? "/usr/bin/false"
+      : existsSync("/bin/false")
+        ? "/bin/false"
+        : "";
+    if (!broken) return;
     const out = await renderDocument(
       "```mermaid\nflowchart LR\n  A --> B\n```\n",
-      { width: W, mermaidBin: "/bin/false", color: "none" },
+      { width: W, mermaidBin: broken, color: "none" },
     );
     expect(out).toContain("diagram unavailable");
     expect(out).toContain("exit 1");
