@@ -6,8 +6,9 @@ callsign: BRF-DARWIN-CLOSE-OUT
 # Brief: The darwin close-out — turn one promise into a measurement, and stop two paths guessing
 
 **Date:** 2026-10-22
-**Status:** Open — **P1 done on a Mac, 2026-10-17** (evidence below). P2 and P3
-remain, and P2 is the operator's call: it removes verbs they use. Written on the
+**Status:** Open — **P1 done on a Mac, 2026-10-17** (evidence below); **P2 decided
+and implemented** (`ADR-ENVIRONMENT-ANSWERS-068`, `9c686df`); **P3 open**, and it
+belongs to the Linux box because the measurement was taken there. Written on the
 Omarchy box, which cannot execute any of P1.
 
 ## Context
@@ -226,6 +227,11 @@ it was not.
 Whichever way it goes, the deliverable is a **named failure**: a Linux box asked
 for `ghostty` must be told why not, in the same voice `terminal` already uses,
 and a Mac without Ghostty must get the same sentence.
+
+Implemented 2026-10-17 as `9c686df` — `resolveTerminal` in `src/clone.ts`, the
+same ladder in `scripts/paper.ts`, and eight tests, six of which fail against the
+pre-decision code. The ADR carries the implementation's one amendment (`-e` is an
+assumption with a named exit, not a per-terminal syntax table).
 
 C is an addition to the resolution order, not a reversal of a recorded choice —
 the hardcoded bundle path was a convention with a comment attached, so no
