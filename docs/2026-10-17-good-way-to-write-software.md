@@ -184,11 +184,10 @@ quarantined and theirs is not; that is the whole difference between the two
 documents.
 
 It also argues against "massive markdown prompts" in its first paragraph and
-arrives in a batch of them: two sibling drafts delivered the same day
+arrives in a batch of them: two sibling drafts from the same delivery
 (`docs/2026-10-17-core-architectural-heuristics.md`,
-`docs/2026-10-17-hejlsberg-inversion-principle.md`, both untracked when this was
-written) open with `# MASTER CONTEXT MODULE`. A rule not enforced where it counts
-is a preference.
+`docs/2026-10-17-hejlsberg-inversion-principle.md`) open with `# MASTER CONTEXT
+MODULE`. A rule not enforced where it counts is a preference.
 
 And the frame-defaulting tell is the strongest evidence for the thesis the draft
 was reaching for: the prior — Brooks, Parnas, Evans, Ousterhout plus the current
