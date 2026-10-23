@@ -8,6 +8,12 @@
  * runtime dependency; herdr and friends join the same way — one entry
  * in the grammar, or `cmd` with a command of their own.
  *
+ * Which integration runs is one question. **What runs it is another**, and it is
+ * answered by a ladder — declaration, convention, platform fact, named refusal —
+ * in `resolveTerminal` below. Two questions, two mechanisms; they were
+ * conflated, and the conflation is the defect
+ * (`ADR-ENVIRONMENT-ANSWERS-068`).
+ *
  * Pure: the function returns a spawn spec; the caller spawns, flashes,
  * and lives with the result.
  *
@@ -51,6 +57,7 @@
  * silently wins the GUI case.
  */
 
+import { existsSync } from "node:fs";
 import { basename, resolve } from "node:path";
 
 export type CloneSpec = { cmd: string; args: string[] } | { error: string };
@@ -160,6 +167,59 @@ const appleScript = (cwd: string, command: string): string => {
   return `tell application "Terminal" to do script "${appleEscape(shellLine)}"`;
 };
 
+/** The Ghostty bundle, as a fact about darwin — a fallback, never an assumption
+ *  (`ADR-ENVIRONMENT-ANSWERS-068`). */
+const GHOSTTY_BUNDLE = "/Applications/Ghostty.app/Contents/MacOS/ghostty";
+
+export interface Terminal {
+  /** The command that opens a terminal. */
+  cmd: string;
+  /** Its own arguments; the command to run inside is the caller's to append. */
+  args: string[];
+  /** Which rung answered, so a failure can name the winner rather than guess. */
+  source: "OKUDA_TERMINAL" | "TERMINAL" | "bundle";
+}
+
+/** Resolve the terminal that hosts a clone or edit verb:
+ *
+ *  1. `OKUDA_TERMINAL` — okuda's own declaration; may carry arguments.
+ *  2. `TERMINAL` — the Unix convention for exactly this question.
+ *  3. the darwin Ghostty bundle, if it is really there.
+ *  4. an honest refusal naming what to set.
+ *
+ *  The ladder `resolveEditor` already used, applied to the sibling that never
+ *  got it: three integrations hardcoded a bundle path with no platform guard, so
+ *  a Linux box was handed a spec naming a path it cannot have
+ *  (`ADR-ENVIRONMENT-ANSWERS-068`).
+ *
+ *  What this does NOT do is decide how a terminal is told to run a command. `-e`
+ *  is assumed because it is the most common form; a terminal that spells it
+ *  differently is served by the `cmd` integration, which takes the whole
+ *  invocation (`OKUDA_CLONE_CMD`). Reads env and the filesystem; pure otherwise. */
+export function resolveTerminal(
+  platform: string = process.platform,
+  exists: (path: string) => boolean = (p) => existsSync(p),
+): Terminal | { error: string } {
+  const declared = process.env.OKUDA_TERMINAL?.trim();
+  if (declared) {
+    const { cmd, args } = declare(declared);
+    return { cmd, args, source: "OKUDA_TERMINAL" };
+  }
+  const conventional = process.env.TERMINAL?.trim();
+  if (conventional) {
+    const { cmd, args } = declare(conventional);
+    return { cmd, args, source: "TERMINAL" };
+  }
+  if (platform === "darwin" && exists(GHOSTTY_BUNDLE)) {
+    return { cmd: GHOSTTY_BUNDLE, args: [], source: "bundle" };
+  }
+  return {
+    error:
+      "no terminal to open: set OKUDA_TERMINAL (or TERMINAL) to the command that " +
+      "opens one, or use the `cmd` integration with OKUDA_CLONE_CMD",
+  };
+}
+
 /** Resolve a clone integration to a spawn spec. Unknown integration or
  *  missing configuration → `{ error }` with an honest message. Pure. */
 export function cloneArgs(
@@ -182,10 +242,14 @@ export function cloneArgs(
       }
       return { error: "the `terminal` integration is macOS-only — use ghostty, tmux, or cmd" };
     case "ghostty": {
-      // Ghostty's login shell has a bare environment — use an
-      // interactive shell so the rc file sources PATH, aliases, etc.
-      const ghostty = "/Applications/Ghostty.app/Contents/MacOS/ghostty";
-      return { cmd: ghostty, args: ["-e", loginShell(shell), "-i", "-c", `gloam ${shellQuote(resolve(doc))}`] };
+      const term = resolveTerminal(platform);
+      if ("error" in term) return term;
+      // The terminal's shell has a bare environment — use an interactive
+      // shell so the rc file sources PATH, aliases, etc.
+      return {
+        cmd: term.cmd,
+        args: [...term.args, "-e", loginShell(shell), "-i", "-c", `gloam ${shellQuote(resolve(cwd, doc))}`],
+      };
     }
     case "tmux":
       if (!process.env.TMUX) {
@@ -208,8 +272,12 @@ export function cloneArgs(
     }
     case "ghostty-edit": {
       const ed = editor ?? process.env.OKUDA_EDITOR ?? process.env.EDITOR ?? "vi";
-      const ghostty = "/Applications/Ghostty.app/Contents/MacOS/ghostty";
-      return { cmd: ghostty, args: ["-e", loginShell(shell), "-i", "-c", `${ed} ${shellQuote(resolve(doc))}`] };
+      const term = resolveTerminal(platform);
+      if ("error" in term) return term;
+      return {
+        cmd: term.cmd,
+        args: [...term.args, "-e", loginShell(shell), "-i", "-c", `${ed} ${shellQuote(resolve(cwd, doc))}`],
+      };
     }
     default:
       return { error: `unknown clone integration "${integration}" — known: terminal, ghostty, tmux, cmd, herdr, edit-terminal, ghostty-edit` };

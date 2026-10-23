@@ -293,3 +293,25 @@ describe("complete blocks in the viewport — we own the cut (BRF-COMPLETE-BLOCK
     expect(splitBlocks("```ts\nconst a = 1;\n\nconst b = 2;\n```\n").length).toBe(2);
   });
 });
+
+describe("the printer ladder (ADR-ENVIRONMENT-ANSWERS-068)", () => {
+  test("OKUDA_CHROME wins, then BROWSER, then darwin's own fact", async () => {
+    const { resolveChrome } = await import("../scripts/paper");
+    expect(resolveChrome("linux", { OKUDA_CHROME: "/opt/chromium", BROWSER: "firefox" })).toEqual({
+      cmd: "/opt/chromium",
+      source: "OKUDA_CHROME",
+    });
+    expect(resolveChrome("linux", { BROWSER: "chromium" })).toEqual({
+      cmd: "chromium",
+      source: "BROWSER",
+    });
+    expect(resolveChrome("darwin", {})).toMatchObject({ source: "bundle" });
+  });
+
+  test("linux with nothing declared refuses by name — exit 2, not an empty PDF", async () => {
+    const { resolveChrome } = await import("../scripts/paper");
+    const r = resolveChrome("linux", {});
+    expect(r).toHaveProperty("error");
+    expect((r as { error: string }).error).toContain("OKUDA_CHROME");
+  });
+});

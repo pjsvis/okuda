@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { cloneArgs, editArgs, resolveEditor } from "../src/clone";
+import { cloneArgs, editArgs, resolveEditor, resolveTerminal } from "../src/clone";
 
 /** Run `fn` with the editor declarations removed, then restore them. */
 function withoutEditorEnv<T>(fn: () => T): T {
@@ -220,5 +220,83 @@ describe("the editor — the declaration chain (88)", () => {
     const args = spec as { cmd: string; args: string[] };
     expect(args.cmd).toContain("Ghostty.app");
     expect(args.args[4]).toContain("zed");
+  });
+});
+
+/** Clear the terminal declarations for a test, then restore them. The ambient
+ *  shell may set either, and the fallback rung is what the darwin tests assert:
+ *  the real environment is the test's enemy here too. */
+function withoutTerminalEnv<T>(fn: () => T): T {
+  const keys = ["OKUDA_TERMINAL", "TERMINAL"] as const;
+  const saved = keys.map((k) => [k, process.env[k]] as const);
+  for (const k of keys) delete process.env[k];
+  try {
+    return fn();
+  } finally {
+    for (const [k, v] of saved) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
+  }
+}
+
+describe("the terminal ladder (ADR-ENVIRONMENT-ANSWERS-068)", () => {
+  test("OKUDA_TERMINAL wins outright, arguments and all", () => {
+    withEnv({ OKUDA_TERMINAL: "kitty --single-instance", TERMINAL: "alacritty" }, () => {
+      expect(resolveTerminal("linux")).toEqual({
+        cmd: "kitty",
+        args: ["--single-instance"],
+        source: "OKUDA_TERMINAL",
+      });
+    });
+  });
+
+  test("TERMINAL is the convention, taken as a command line", () => {
+    withoutTerminalEnv(() =>
+      withEnv({ TERMINAL: "alacritty" }, () => {
+        expect(resolveTerminal("linux")).toEqual({
+          cmd: "alacritty",
+          args: [],
+          source: "TERMINAL",
+        });
+      }),
+    );
+  });
+
+  test("darwin falls back to the bundle — and only when it is really there", () => {
+    withoutTerminalEnv(() => {
+      expect(resolveTerminal("darwin", () => true)).toMatchObject({ source: "bundle" });
+      expect(resolveTerminal("darwin", () => false)).toHaveProperty("error");
+    });
+  });
+
+  test("linux with nothing declared refuses by name, naming what to set", () => {
+    withoutTerminalEnv(() => {
+      const r = resolveTerminal("linux", () => false);
+      expect(r).toHaveProperty("error");
+      const msg = (r as { error: string }).error;
+      expect(msg).toContain("OKUDA_TERMINAL");
+      expect(msg).toContain("TERMINAL");
+      expect(msg).toContain("cmd");
+    });
+  });
+
+  test("ghostty on Linux survives through $TERMINAL — the verb is not lost", () => {
+    withoutTerminalEnv(() =>
+      withEnv({ TERMINAL: "kitty" }, () => {
+        expect(cloneArgs("ghostty", "docs/x.md", "linux", "/silo", undefined, "/bin/bash")).toEqual({
+          cmd: "kitty",
+          args: ["-e", "/bin/bash", "-i", "-c", 'gloam "/silo/docs/x.md"'],
+        });
+      }),
+    );
+  });
+
+  test("ghostty on Linux with nothing declared: a refusal, never a bundle path", () => {
+    withoutTerminalEnv(() => {
+      const spec = cloneArgs("ghostty", "docs/x.md", "linux", "/silo");
+      expect(spec).toHaveProperty("error");
+      expect(JSON.stringify(spec)).not.toContain("Ghostty.app");
+    });
   });
 });

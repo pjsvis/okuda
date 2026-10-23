@@ -25,7 +25,31 @@ import { basename, dirname, join, resolve } from "node:path";
 import { loadPalette } from "../src/palette";
 
 const ROOT = resolve(dirname(Bun.file(import.meta.path).name ?? import.meta.path), "..");
-const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+/** The printer, resolved by the ladder the integrations use
+ *  (`ADR-ENVIRONMENT-ANSWERS-068`): declaration, then convention, then the
+ *  platform's own fact, then an honest refusal.
+ *
+ *  The rung that matters is the refusal. Chrome is used here as a *printer*, and
+ *  only the Chromium family prints this way — a `$BROWSER` naming Firefox is a
+ *  browser that cannot do the job, and the failure below has to say so rather
+ *  than report an empty page. Exported for the test. */
+export function resolveChrome(
+  platform: string = process.platform,
+  env: Record<string, string | undefined> = process.env,
+): { cmd: string; source: string } | { error: string } {
+  const declared = env.OKUDA_CHROME?.trim();
+  if (declared) return { cmd: declared, source: "OKUDA_CHROME" };
+  const conventional = env.BROWSER?.trim();
+  if (conventional) return { cmd: conventional, source: "BROWSER" };
+  if (platform === "darwin") {
+    return { cmd: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", source: "bundle" };
+  }
+  return {
+    error:
+      "no printer: set OKUDA_CHROME to a Chromium-family binary — the paper rung " +
+      "prints through --headless --print-to-pdf, which only Chromium implements",
+  };
+}
 
 /** Page geometry: A4 portrait. */
 export const PAGE_MM = { width: 210, margin: 8 };
@@ -433,8 +457,14 @@ mkdirSync(dirname(outPath), { recursive: true });
 const htmlPath = join(ROOT, "tmp", "paper", `${basename(file).replace(/\.md$/, "")}.html`);
 writeFileSync(htmlPath, html);
 
+const printer = resolveChrome();
+if ("error" in printer) {
+  // Exit 2: a missing instrument is not a verdict (ADR-GATE-NAMES-041).
+  process.stderr.write(`paper: ${printer.error}\n`);
+  process.exit(2);
+}
 const printed = spawnSync(
-  CHROME,
+  printer.cmd,
   [
     "--headless",
     "--disable-gpu",
@@ -444,8 +474,17 @@ const printed = spawnSync(
   ],
   { maxBuffer: 64 * 1024 * 1024 },
 );
-if (printed.status !== 0) {
-  process.stderr.write(`paper: chrome print failed (exit ${printed.status})\n${printed.stderr.toString()}`);
+if (printed.status !== 0 || printed.error) {
+  // Name the printer and the rung it came from: a `$BROWSER` that cannot print
+  // and a path that does not exist are different facts, and the receipt has to
+  // say which one happened (ADR-ENVIRONMENT-ANSWERS-068).
+  const why = printed.error?.message ?? `exit ${printed.status}`;
+  process.stderr.write(
+    `paper: the printer did not print — ${why}\n` +
+      `  command: ${printer.cmd}  [from ${printer.source}]\n` +
+      `${printed.stderr?.toString().trim() || ""}`.replace(/^/, "  ") +
+      "\n",
+  );
   process.exit(1);
 }
 

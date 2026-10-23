@@ -15,12 +15,12 @@ the named refusal, not a spawn spec; and `TERMINAL` set must be honoured
 ## Context
 
 Three clone integrations build a spawn spec pointing at
-`/Applications/Ghostty.app/Contents/MacOS/ghostty`, unconditionally
-(`src/clone.ts:187`, `src/clone.ts:211`). On Linux that path cannot exist, and
-nothing refuses it: the verb returns a command that will fail at `execve`, or
-succeeds and opens nothing. Two sibling verbs do it right —
+`/Applications/Ghostty.app/Contents/MacOS/ghostty`, unconditionally (two call
+sites, `src/clone.ts:244-252` and `src/clone.ts:272-281`). On Linux that path
+cannot exist, and nothing refuses it: the verb returns a command that will fail
+at `execve`, or succeeds and opens nothing. Two sibling verbs do it right —
 `terminal` and `edit-terminal` refuse by platform with a named sentence
-(`src/clone.ts:183`, `src/clone.ts:207`). So of five paths, **two refuse and three
+(`src/clone.ts:243`, `src/clone.ts:271`). So of five paths, **two refuse and three
 guess**, and the guess is exactly what the file's own principle forbids: *"The
 integration is DECLARED, not discovered"* (`src/clone.ts:5-9`) — a declaration
 with no ladder, so a path nobody declared has nowhere to come from.
@@ -34,7 +34,7 @@ question — *who knows where a terminal lives?*
 | B — delete | remove the verbs; keep only the refusals | loses a verb that is in use today |
 
 Neither is necessary, because the question is already answered in this same file,
-one function over. `resolveEditor` (`src/clone.ts:85-120`) resolves an editor
+one function over. `resolveEditor` (`src/clone.ts:111-131`) resolves an editor
 through a ladder: **`OKUDA_EDITOR`** — okuda's own declaration, which may carry
 arguments and wins outright — then a known GUI chain on `PATH`, then
 **`VISUAL`/`EDITOR`**, then `vi`. It is documented, tested, and it never hardcodes
@@ -62,6 +62,25 @@ wins:
 
 **Never** a `which` sweep over distro paths (option A's cost). **Never** a spec
 pointing at a path the running platform cannot have.
+
+### Amended 2026-10-17, during implementation — two clauses
+
+**The separator is assumed, not discovered.** The ladder says *which* program
+opens a terminal; it does not say how that terminal is told to run a command
+inside it. `-e` is assumed because it is the commonest form (ghostty, alacritty,
+xterm, konsole, foot), and it is *not* universal — wezterm wants `start --`,
+gnome-terminal wants `--`. Building a per-terminal syntax table is option A again,
+in a different coat. The escape is the integration that already exists for exactly
+this: `cmd`, which takes the whole invocation (`OKUDA_CLONE_CMD`). The ladder's
+`-e` is a documented assumption with a named exit, not a guess.
+
+**A second path of the same class was corrected in the same lines.** The two
+ghostty specs built the document path with `resolve(doc)`, against the *process*
+cwd, while taking an injected `cwd` and using it for the AppleScript `cd` and the
+tmux `-c`. So the spec named a path resolved in one place and a terminal opened in
+another. It is `resolve(cwd, doc)` in both now. Same defect as the bundle path —
+a path asserted rather than derived — found because the new test pinned the
+string.
 
 `OKUDA_CLONE` (`src/tui.ts:853`, `src/tui.ts:869`) keeps its job — *which* verb —
 and this ladder takes the other one: *what runs it*. The two were conflated, and
@@ -99,8 +118,9 @@ that conflation is the defect.
 
 - `src/clone.ts:5-9` — *the integration is DECLARED, not discovered*: the
   principle this decision keeps, and gives a ladder to
-- `src/clone.ts:183` — the refusal sentence that already exists, and the model for
-  the other four
+- `src/clone.ts:199-231` — `resolveTerminal`, the implementation of this decision
+- `src/clone.ts:243` — the refusal sentence that already existed, and the model
+  for the other four
 - `AGENTS.md` — three concerns, three owners; *opening a tab is the host's job,
   not the viewer's*
 - `ADR-031` — the main document and its vectors, where the clone verb's
