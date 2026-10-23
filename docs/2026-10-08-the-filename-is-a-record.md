@@ -124,7 +124,43 @@ name is spelled correctly or not used.
   they had no imports and no distributed copies: **landing date for imports**
   (`playbooks/authoring-playbook.md`), and a grade — not *recommended* but
   **conditional**: a document that has a date carries it in the name, and the name
-  agrees with the content (`docs/2026-10-08-time-is-a-claim.md`).
+  agrees with the content (`docs/2026-10-08-time-is-a-claim.md`). **Extended
+  2026-10-17:** the operator's capture note — *"done without the agonising over
+  bullshit"* — which supplies a third defence of the prefix (the decision it
+  defers) and the collision rule, written here for the first time.
+
+## What the prefix removes at the door
+
+The defences above are about *keeping* (provenance survives the copy) and
+*finding* (the index is the lookup key). There is a third, less argued, and it
+pays immediately: **capture**.
+
+Clipping happens at a moment of low information and high volume. You have the
+text; you do not yet have the reading. Naming at that moment forces a commitment
+— the title has to decide what the thing *is* — and both failure modes are bad: a
+name you cannot tell apart from three others, which is a clash or a silent
+overwrite; or hesitation long enough that the clip does not happen and the
+document is lost. Naming anxiety is a tax levied at the worst possible time, on
+the person holding the least information about what they are holding.
+
+The date prefix does not make that decision cheap. **It removes it.**
+`2026-10-23-XXX.md` is distinct on sight, sorts into place, and is renamable the
+moment you read it — at which point the person naming it is the person who knows.
+That is the division of labour applied to filing: the decision moves to whoever
+has the information, and the cost of a poor name is deferred until it can be paid
+cheaply. A name is not a promise.
+
+◆ The prefix makes deferral *legitimate* rather than sloppy, because the file is
+findable before it is understood — which is all a name has to do at capture, and
+the most it can honestly do.
+
+**Collisions.** A same-day clash increments a suffix: `-02`, `-03`. Written down
+here for the first time, though practised since at least
+`docs/2026-08-29-from-intent-to-task-05.md`, and as a nine-part set in
+`docs/2026-10-08-ai-human-development-workflow-01.md` … `-09`. Two digits, not
+one, so the sort survives the tenth item — the suffix is an index, and an index
+that reorders itself at ten is not an index. A convention that lives only in
+practice is an unpaid claim: the next reader re-derives it, or does not.
 
 ## What this does not fix
 
