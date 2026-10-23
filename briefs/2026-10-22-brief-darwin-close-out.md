@@ -198,28 +198,41 @@ two `osascript` verbs above.
 
 ## P2 — stop the guessing (decision + implementation)
 
-The decision is **already made in principle** and not made in writing: okuda's
-grammar is *resolve the integration honestly, or refuse with a named error*
-(`ADR-031`). Three paths currently break it. There are two ways to honour it,
-and this phase needs an **ADR** either way, because they are not the same
-product:
+The decision is **made and written**: `ADR-ENVIRONMENT-ANSWERS-068`. The
+framing below is kept because the two rejected options are the ones that will be
+proposed again — A by anyone who wants it to work on their distro, B by anyone who
+reads the scope rule strictly. The ADR's job is to have refused both in writing.
 
 | Option | What it does | Cost |
 |---|---|---|
 | **A — resolve** | `which("ghostty")` first, the bundle path second, a named refusal third; same for Chrome in `paper.ts` (probe `google-chrome`, `chromium`, the bundle) | Every distro's install path becomes okuda's problem, forever. It is a window manager by increments |
 | **B — delete** | Remove the `ghostty`, `ghostty-edit`, `terminal`, `edit-terminal` integrations and `just pdf`, or reduce them to refusals that name the host's job | Loses a verb that is used today. Needs a Herdr answer first: *can the host open the tab?* |
+| **C — declare** *(decided 2026-10-17)* | `ADR-ENVIRONMENT-ANSWERS-068`: `OKUDA_TERMINAL` → `$TERMINAL` → the darwin bundle path → a named refusal, the ladder `resolveEditor` already uses | Nothing, per distro. The verb survives on Linux because the environment says where the terminal is; okuda stops holding a path it cannot know |
 
-`AGENTS.md`'s scope discipline is the tiebreaker and it points at **B**:
-*"opening a tab is the host's job, not the viewer's."* `ghostty` and `terminal`
-are windowing wearing an integration's clothes. The Linux box's author leans B,
-and does not have the standing to decide it — the operator uses these verbs.
+**C was chosen.** A and B are both answers to *"who knows where a terminal
+lives?"* — and that question is already answered, one function over, in
+`resolveEditor` (`src/clone.ts:85-120`). C does not settle whether okuda should
+open a tab at all; it removes the guessing, so that larger question can be
+answered on its merits instead of being obscured by three wrong spawn specs.
+
+`AGENTS.md`'s scope discipline is still the tiebreaker — *"opening a tab is the
+host's job, not the viewer's"* — and C honours it more than A does, because the
+host's own declaration is what okuda obeys. `ghostty` and `terminal` remain
+windowing wearing an integration's clothes; C makes them **legible** rather than
+correct, and the scope argument still has to be had on its merits. What C removes
+is the alibi: three silent wrong specs that made the argument look resolved when
+it was not.
 
 Whichever way it goes, the deliverable is a **named failure**: a Linux box asked
 for `ghostty` must be told why not, in the same voice `terminal` already uses,
 and a Mac without Ghostty must get the same sentence.
 
-If B, the ADR runs the palimpsest protocol (`playbooks/decisions-playbook.md`) —
-this is a reversal of shipped behaviour, not an addition.
+C is an addition to the resolution order, not a reversal of a recorded choice —
+the hardcoded bundle path was a convention with a comment attached, so no
+palimpsest is owed (the ADR states that judgement so a later reader can disagree).
+If a later session chooses **B**, the palimpsest protocol
+(`playbooks/decisions-playbook.md`) applies, because that one removes shipped
+verbs.
 
 ## P3 — the picker's corpus (investigate, decide, or report)
 
@@ -247,20 +260,58 @@ them. `DEPENDENCIES.md` at minimum has a claim to being findable.
 
 ## What to hand back to the Linux box
 
-So the claim can be re-checked from the other side, leave in the debrief:
+Handed back 2026-10-17 from the Mac. Four of the five answers the brief asked
+for, one it could not have, and three things to pick up on the other side.
 
-- the exact `codesign -vvv` line for the built binary,
-- the reason string a *failing* diagram prints (or "none fired" if it rendered),
-- whether `just pdf` produced a PDF and where,
-- the sha of the commit the Mac verified (`git rev-parse --short=7 HEAD`),
-- and, if the cross-built artifact was tested: accepted or rejected, with the
-  `codesign` verdict.
+- **Commit verified:** `d0aeb34`. `just ship` green on it — `fresh: OK — d0aeb34
+  = HEAD, PATH resolves to this repo`, 804 pass / 0 fail.
+- **`codesign -vvv`**, verbatim: `okuda: valid on disk` /
+  `okuda: satisfies its Designated Requirement`. `codesign --verify --strict`
+  exits 0. `CodeDirectory v=20400 size=124263 flags=0x2(adhoc) hashes=3877+2
+  location=embedded`, `Signature=adhoc`, `TeamIdentifier=not set`. The
+  `DEPENDENCIES.md` row moved from *stub-tested on Linux* to a prover that ran.
+- **A failing diagram's reason string: none fired.** Every mermaid fence rendered,
+  art plus the receipt. The absent-binary sentence exists only in the test, and
+  reads `▸ diagram unavailable · mermaid-to-md not found (/bin/false)`.
+- **`just pdf`:** `tmp/paper/2026-10-17-the-passage-and-the-frame.pdf`, 107 KB,
+  `80 cols at 10pt · receipt dropped · 66 lines/page · html kept at tmp/paper/`.
+- **The cross-build: not tested.** No darwin artifact was carried over, so
+  `ADR-BUILD-SIGNS-040`'s cross-built row stands where it stood.
+
+### Three things for the Linux side
+
+1. **The wrapper fix still has no prover, and it cannot get one here.** macOS
+   resolves `/dev/stdout → fd/1` through fdescfs, where reopening a caller-owned
+   pipe *succeeds*; Linux resolves it through procfs, where it is refused. This
+   Mac renders correctly **through the pre-`51f5225` wrapper** — verified by
+   reading the diff, not by behaviour. The control has to be a test that runs
+   `scripts/mermaid-to-md.sh` with `stdout: "pipe"` under `Bun.spawn` and asserts
+   art: it fails on the old wrapper on Linux and passes on the new one. Until that
+   exists the row is *fixed, unverified*.
+2. **Re-check two rows from the other side.** `chroma`'s prover is now the
+   upstream release asset on **both** platforms (`DEPENDENCIES.md`), because brew's
+   build of 2.27.0 has no version metadata and prints `?-?-?`; and `codesign`'s
+   row is now proven. Both edits are on `main`.
+3. **The `/bin/false` class, not the instance.** One fixture named an absolute
+   Linux path in a test that runs on both platforms. Worth a sweep of `tests/` for
+   the same shape before the next Mac session finds the next one.
+
+P3 (the picker's corpus) stays with the Linux box: the measurement was taken
+there, and the decision is about whether the silo's root files are constitution or
+corpus.
 
 ## Lineage
 
 - `DBF-PLATFORM-GATE` — the format dispatch, and the darwin branch this brief verifies
 - `DBF-TOOLCHAIN-TRUTH` — the four instruments, the failure receipt, the `Proven by` column
 - `DBF-OMARCHY-TOOLCHAIN` — the wrapper fix (`51f5225`) and the pipe diagnosis
-- `ADR-031` — the honest-refusal grammar P2 applies
+- `ADR-ENVIRONMENT-ANSWERS-068` — **P2 decided 2026-10-17**: the integration
+  ladder (declaration, convention, platform fact, named refusal). Written because
+  both options in this brief's table were answers to the wrong question
+- `ADR-031` — the main document and its vectors; the clone verb's *restricted
+  grammar* is decided there (`src/clone.ts:1` cites it correctly). **Corrected
+  2026-10-17:** this line previously read *"the honest-refusal grammar P2
+  applies"*, which ADR-031 does not contain — the rule is `AGENTS.md`'s Scope
+  Discipline plus `src/clone.ts:5-9`. The citation resolved; it did not mean
 - `ADR-BUILD-SIGNS-040` — the signature gate P1 exercises
 - `ADR-GATE-NAMES-041` — exit 2: a missing instrument is not a verdict

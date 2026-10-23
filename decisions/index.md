@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-17 | ADR-ENVIRONMENT-ANSWERS-068 | Accepted | The environment answers first — declare, then convention, then refuse by name | 068-the-environment-answers-first.md |
 | 2026-10-14 | ADR-ARCHIVE-BREADTH-063 | Accepted | The archive holds the refused, not only the finished | 063-archive-breadth.md |
 | 2026-10-14 | ADR-IDEA-LEDGER-064 | Accepted | The idea ledger — a pre-brief register with a trigger gate | 064-idea-ledger.md |
 | 2026-10-14 | ADR-RECORD-LINKAGE-065 | Accepted | The record's linkage — a debrief declares its briefs | 065-record-linkage.md |
