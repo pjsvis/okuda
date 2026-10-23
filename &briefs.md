@@ -163,6 +163,8 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-PLATFORM-GATE | · open | The gate names its format — building okuda on Omarchy | — |
 | BRF-TOOLCHAIN-TRUTH | · open | Four claims that could not prove themselves | — |
 | BRF-DARWIN-CLOSE-OUT | · open | The darwin close-out — turn one promise into a measurement, and stop two paths guessing | — |
+| BRF-AUTHORING-CONVENTION | · open | Authoring Convention — Route Agents to the Style Guide | — |
+| BRF-PROBES-TIER | · open | Establish Registered `probes/` Tier for Exploratory Python Scripts | — |
 
 ## Parked / deferred
 

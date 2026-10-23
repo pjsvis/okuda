@@ -12,6 +12,8 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-10-22 | BRF-DARWIN-CLOSE-OUT | open | The darwin close-out — turn one promise into a measurement, and stop two paths guessing | 2026-10-22-brief-darwin-close-out.md |
 | 2026-10-22 | BRF-PLATFORM-GATE | done | The gate names its format — building okuda on Omarchy | 2026-10-22-brief-platform-gate.md |
 | 2026-10-22 | BRF-TOOLCHAIN-TRUTH | done | Four claims that could not prove themselves | 2026-10-22-brief-toolchain-truth.md |
+| 2026-10-21 | BRF-AUTHORING-CONVENTION | open | Authoring Convention — Route Agents to the Style Guide | 2026-10-21-brief-authoring-convention.md |
+| 2026-10-21 | BRF-PROBES-TIER | open | Establish Registered `probes/` Tier for Exploratory Python Scripts | 2026-10-21-brief-registered-probes-tier.md |
 | 2026-10-16 | BRF-SEARCH-ROW | open | The search row — the contract, frozen by the probe | 2026-10-16-brief-search-row.md |
 | 2026-10-14 | BRF-PRINCIPAL-CLERK | open | The principal and the clerk — the three-way triage | 2026-10-14-brief-principal-and-clerk.md |
 | 2026-10-13 | BRF-ALIGN-ACROSS-TABLES | open | The align meta is misattributed across tables — a later table un-aligns an earlier one | 2026-10-13-brief-align-across-tables.md |
