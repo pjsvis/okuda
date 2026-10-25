@@ -268,11 +268,15 @@ function artWidth(art: string): number {
  *  blank line in a fence would be a claim about the *source* (there is no
  *  statement there) — and that claim would be false. */
 export function elideCanvasRow(painted: string, budget: number): string {
-  // The prefix the cut would keep, marker-free. `elideToWidth` is reused rather
-  // than hand-slicing so the ANSI bookkeeping stays in one place; the trailing
-  // reset it may append is stripped before the blankness test.
-  if (stripANSI(elideToWidth(painted, budget, "")).trim() === "") return "";
-  return elideToWidth(painted, budget);
+  // Judged on the line that will actually be emitted, not on a probe at a
+  // marker-free budget: those two differ by the marker's own width, so a row
+  // whose only content sat exactly at the cut column passed the probe and then
+  // lost that column to the marker — a bare `…` on a row the rule was meant to
+  // blank. (Measured on `docs/2026-10-25-test-diagrams.md` at 40 columns: 12
+  // such rows, all one column short of the check.) The marker is always the
+  // last character of the emission, so removing it and trimming is exact.
+  const cut = elideToWidth(painted, budget);
+  return stripANSI(cut).replace(/…$/, "").trim() === "" ? "" : cut;
 }
 
 /** The canvas every fence is laid out on, in columns.
@@ -433,6 +437,14 @@ function newTableState(): TableState {
  *  because the placeholder handler cannot invent a diagnosis. */
 type DiagramEntry =
   | { art: string; title?: string | null }
+  /** The engine drew no diagram: it hands back the source in a box. okuda
+   *  discards the box and renders the fence's own source as a code block —
+   *  same styling as every other preformatted listing, elided at the glass,
+   *  with `why` stated above it. (The box was a third presentation nobody
+   *  asked for: a foreign frame, whose title came from the source's first word
+   *  — `%%{init:` when a directive led — and which re-flowed its content when
+   *  the canvas was narrow.) */
+  | { listing: { source: string; why: string }; title?: string | null }
   | { failure: string; title?: string | null };
 
 interface Ctx {
@@ -733,22 +745,21 @@ async function interceptMermaid(
       const r = await spawnMermaid(f.code, opts, LAYOUT_CANVAS);
       if (!r.ok) return { described: false, failure: r.reason, title: f.title };
       const art = extractDiagramArt(r.out);
-      // The engine would not lay it out even on the generous canvas — a
-      // diagram past the parser's own ceiling, not one that is too wide for
-      // this pane. It is stated as the layout refusal it is; `▸` is reserved
-      // for exactly this (no art at all), and no width is claimed here
-      // because none was measured.
-      if (art.includes(ENGINE_TOO_WIDE) && RE_SOURCE_BOX.test(art)) {
-        return {
-          described: false,
-          failure: `engine will not lay it out at ${LAYOUT_CANVAS} cols`,
-          title: f.title,
-        };
+      // No art came back: the engine drew nothing and handed the source in a
+      // box. The box is discarded and the fence's own source is rendered as a
+      // code block, with the reason stated above it — one presentation for
+      // every preformatted listing (`ADR-PANE-NOT-CANVAS-069`), and the reason
+      // is whichever of the two it actually was.
+      const box = art.match(RE_SOURCE_BOX);
+      if (box) {
+        const type = RE_TYPE_WORD.test(box[1]!) ? box[1] : null;
+        const why = art.includes(ENGINE_TOO_WIDE)
+          ? `the engine will not lay it out at ${LAYOUT_CANVAS} cols`
+          : type
+            ? `${type} not drawn by the engine`
+            : "not drawn by the engine";
+        return { described: false, listing: { source: f.code, why }, title: f.title };
       }
-      // Everything else is art, including the source box for a family the
-      // engine does not draw — drawn at its natural width now (the generous
-      // canvas means the fallback has nothing to wrap), and elided at the
-      // glass downstream like any other preformatted block.
       return { described: false, art, title: f.title };
     }),
   );
@@ -758,6 +769,8 @@ async function interceptMermaid(
       ctx.described.set(String(i), { prose: entry.prose!, title: entry.title });
     } else if (entry.failure !== undefined) {
       ctx.mermaid.set(String(i), { failure: entry.failure, title: entry.title });
+    } else if (entry.listing !== undefined) {
+      ctx.mermaid.set(String(i), { listing: entry.listing, title: entry.title });
     } else {
       ctx.mermaid.set(String(i), { art: entry.art!, title: entry.title });
     }
@@ -914,7 +927,7 @@ function codeBlockLines(lines: string[], ctx: Ctx): string {
   // no longer match. Painting first shrinks it to `§NN` and the cut lands
   // somewhere honest.
   const body = lines.map((l) =>
-    l === "" ? "" : "  " + elideToWidth(paintCodeVectors(l, ctx.styler), ctx.width - 2));
+    l.trim() === "" ? "" : "  " + elideToWidth(paintCodeVectors(l, ctx.styler), ctx.width - 2));
   return `${open}${body.join("\n")}${TAG_RAW_CLOSE}\n\n`;
 }
 
@@ -1100,6 +1113,9 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
             entry.title,
           );
         }
+        if ("listing" in entry) {
+          return diagramListingBlock(entry.listing.source, entry.listing.why, ctx, entry.title);
+        }
         return diagramBlock(entry.art, ctx, entry.title);
       }
       // Described diagram placeholder → prose block (BRF-DIAGRAM-DESCRIBE).
@@ -1248,7 +1264,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       const lines = body
         .split("\n")
         .map((l) =>
-          l === "" ? "" : styler.codeLine("  " + elideToWidth(paintCodeVectors(l, styler), width - 2)));
+          l.trim() === "" ? "" : styler.codeLine("  " + elideToWidth(paintCodeVectors(l, styler), width - 2)));
       return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n\n`;
     },
 
@@ -1560,23 +1576,10 @@ function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   // than a slogan. `cols` not `columns`: the note is elided to the budget,
   // and the long word cost a 36-column pane the number it was reporting.
   const note = elided > 0 ? ` · art elided · needs ${artWidth(art)} cols` : "";
-  // A fence whose "art" is the engine's bordered SOURCE box — a family it
-  // does not draw, or `Oversize::Cells` — is not art, and the standing clause
-  // would be a false claim printed above the thing it denies: `source elided`
-  // over the source. The box is kept (for a gantt or mindmap fence it is the
-  // only rendering there will ever be), drawn at its natural width because
-  // the canvas is generous, and elided at the glass like any other
-  // preformatted block — a listing is not re-flowed to the pane, because
-  // re-flowing it is the wrap this renderer does not do.
-  const sourceBox = art.match(RE_SOURCE_BOX);
-  const type = sourceBox && RE_TYPE_WORD.test(sourceBox[1]!) ? sourceBox[1] : null;
-  const core = sourceBox
-    ? type
-      ? `source shown · ${type} not drawn by the engine`
-      : "source shown · not drawn by the engine"
-    : title
-      ? "source elided"
-      : "mermaid source elided";
+  // The engine's source box no longer reaches here: a fence it would not draw
+  // is rendered as a code listing by `diagramListingBlock`, with its own
+  // reason above it. This block is art, so the standing clause is true.
+  const core = title ? "source elided" : "mermaid source elided";
   const base = title ? " " + title + " · " + core : " " + core;
   const fits = (s: string) => displayWidth(glyph + ctx.styler.role("muted", s)) <= budget;
   // Fit ladder: the receipt's claims outrank the caption — the title is
@@ -1596,6 +1599,49 @@ function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   const indOpen = tagRawOpen("diagramsrc");
   const indicator = elideToWidth(`${glyph}${stmt}`, budget);
   return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n${indOpen}${indicator}${TAG_RAW_CLOSE}\n\n`;
+}
+
+/** A fence the engine will not draw: the **source**, styled as the code
+ *  listing it is, with the reason stated above it.
+ *
+ *  Two presentations became one. The engine hands back a bordered box of the
+ *  source (`fallback`, `mermaid-to-md/src/mermaid.rs:3526`) and okuda used to
+ *  pass that through — a third presentation nobody asked for, carrying a
+ *  foreign frame into okuda's byte stream: its title came from the source's
+ *  first word (so a fence led by an `%%{init:…}%%` directive was titled
+ *  `%%{init:`), and it re-flowed its own content whenever its canvas was
+ *  narrower than the source, which is the wrap this renderer does not do.
+ *
+ *  okuda already holds the source — it is what it piped in — so the box is
+ *  discarded and the fence is rendered the way every other preformatted
+ *  listing is: `codeBlockLines`-style, two-space indent, elided at the glass
+ *  with `…` (`ADR-PANE-NOT-CANVAS-069`). One presentation for art, one for a
+ *  listing, one receipt for a pipe failure: three outcomes and no fourth.
+ *
+ *  The reason sits ABOVE the listing rather than below, unlike every other
+ *  receipt here: a reader arriving at a block needs to know what they are
+ *  about to read — source, not a diagram that failed — and a footnote after
+ *  twenty lines of mermaid answers a question they have already asked and
+ *  answered for themselves. */
+function diagramListingBlock(
+  source: string,
+  why: string,
+  ctx: Ctx,
+  title?: string | null,
+): string {
+  const { styler, width } = ctx;
+  const glyph = styler.roleBold("state-parked", "\u22ee");
+  const caption = title ? ` ${title} ·` : "";
+  const note = `${caption} source shown · ${why}`;
+  const open = tagRawOpen("diagramsrc");
+  const line = elideToWidth(`${glyph}${styler.role("muted", note)}`, ctx.width);
+  const listing = source
+    .replace(/\n$/, "")
+    .split("\n")
+    .map((l) =>
+      l.trim() === "" ? "" : styler.codeLine("  " + elideToWidth(paintCodeVectors(l, styler), width - 2)));
+  const codeOpen = tagRawOpen("code");
+  return `${open}${line}${TAG_RAW_CLOSE}\n${codeOpen}${listing.join("\n")}${TAG_RAW_CLOSE}\n\n`;
 }
 
 /** No art, and the reason — one muted line where the art would have been.

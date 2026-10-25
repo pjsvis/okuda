@@ -467,6 +467,14 @@ describe("render — mermaid pipe + colour classification", () => {
     // the loss.
     expect(elideCanvasRow(" ".repeat(32) + "┌─────┐", 20)).toBe("");
 
+    // The boundary the first version of this rule got wrong: content exactly at
+    // the last column the cut would keep. The check has to be made against the
+    // line that will be EMITTED — which is one column narrower than the probe,
+    // because the marker takes that column. Judged against a marker-free probe,
+    // this row passed and then showed as a bare `…`; measured on the fixture at
+    // 40 columns, twelve rows were exactly that one column short.
+    expect(elideCanvasRow(" ".repeat(19) + "x" + " ".repeat(20), 20)).toBe("");
+
     // And the render, end to end: no line is a bare marker.
     for (const w of [30, 34, 40, 44]) {
       const out = await renderDocument("```mermaid\n" + MERMAID_CHAIN + "```\n", {
@@ -609,18 +617,49 @@ describe("render — mermaid pipe + colour classification", () => {
     expect(narrow).toBe(wide);
   });
 
-  test("a source-only fence says the source is SHOWN, not elided", async () => {
-    // The receipt used to read `⋮ mermaid source elided` above a box that was
-    // displaying the source — a false claim printed over its own counter-
-    // example, and the class ADR-027 calls the one failure worse than
-    // saying nothing.
+  test("a source-only fence is a code listing with its reason above it", async () => {
+    // Two claims, and the second is the simplification. First: the receipt used
+    // to read `⋮ mermaid source elided` above a box that was displaying the
+    // source — a false claim printed over its own counter-example, the class
+    // ADR-027 calls the one failure worse than saying nothing.
+    //
+    // Second: okuda no longer passes the ENGINE's fallback box through. That box
+    // was a third presentation carrying a foreign frame into okuda's byte stream
+    // — its title came from the source's first word (`%%{init:` when a directive
+    // led) and it re-flowed its content when its canvas was narrow. okuda already
+    // holds the source; it renders it as the listing it is, and states why above
+    // it. So no engine framing may appear anywhere in the output.
     const out = await renderDocument("```mermaid\n" + MERMAID_UNSUPPORTED + "```\n", {
       width: W,
       color: "none",
     });
     expect(out).toContain("source shown");
-    expect(out).toContain("gantt"); // the type is named, from the box's title
+    expect(out).toContain("gantt not drawn by the engine");
     expect(out).not.toContain("mermaid source elided");
+    // the source is present, as source
+    expect(out).toContain("title Plan");
+    expect(out).toContain("Task :a, 2026-01-01, 1d");
+    // and the engine's frame is not
+    expect(out).not.toContain("╭ mermaid:");
+    expect(out).not.toContain("╰");
+    // the reason precedes the listing: a reader should know what they are about
+    // to read before they read it, not after twenty lines of mermaid
+    expect(out.indexOf("source shown")).toBeLessThan(out.indexOf("title Plan"));
+  });
+
+  test("the listing elides at the glass like any other preformatted block", async () => {
+    // A long source line is cut with `…`, never wrapped — the listing is
+    // preformatted content, and wrapping it is the claim ADR-PANE-NOT-CANVAS-069
+    // refuses. Measured at 40 columns, where the fence's own lines outrun the
+    // glass.
+    const long = "gantt\n  title " + "x".repeat(80) + "\n  section S\n  Task :a, 2026-01-01, 1d\n";
+    const out = await renderDocument("```mermaid\n" + long + "```\n", { width: 40, color: "none" });
+    for (const l of out.split("\n")) {
+      expect(displayWidth(l)).toBeLessThanOrEqual(40);
+    }
+    expect(out).toContain("…");
+    // one line of source, cut — not two lines of it
+    expect(out.split("\n").filter((l) => l.includes("xxxx")).length).toBe(1);
   });
 
   test("missing binary: the fence says why, the document renders", async () => {

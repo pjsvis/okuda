@@ -24,8 +24,13 @@ it and paints the returned ASCII verbatim.
 | `sequenceDiagram` | `parse_sequence` | `layout_sequence` |
 
 **Everything else falls back cleanly**: an unsupported or unparseable diagram
-renders its *source* as a bordered plain block under a ` mermaid: <type> `
-title (the `fallback` function). No garbage, no crash — but no diagram.
+renders its *source* **as a code listing** — okuda's own code-block styling,
+elided at the glass, with `⋮ source shown · <why>` above it. No garbage, no
+crash — but no diagram. (The engine hands back a bordered box of the source;
+okuda discards the box and renders the fence it already holds, because the box
+was a foreign frame in okuda's byte stream: its title came from the source's
+first word — `%%{init:` when a directive led — and it re-flowed its content
+when the canvas was narrow.)
 **The list below is the whole of what we do not draw**, and it is the
 renderer's to keep: okuda holds no type whitelist of its own, because a
 second copy of the engine's dispatch chain is a store that drifts
@@ -40,8 +45,8 @@ because they do not look alike in the render:
 
 | class | in the render | what is true | the author's remedy |
 |---|---|---|---|
-| **not a family we draw** — `gantt`, `pie`, `journey`, `mindmap`, `gitGraph`, `timeline`, `quadrantChart`, `sankey-beta`, `xychart-beta`, `block-beta`, `packet-beta`, `requirementDiagram`, `C4Context`, `architecture-beta`, `kanban`, `treemap` | source box + `⋮ source shown · gantt not drawn by the engine` | parsed or not, never laid out | write it as a `flowchart` — the grammar that draws what it parses |
-| **too large for the engine** — a legal fence whose canvas exceeds `MAX_CANVAS_CELLS` | the *same* source box, *without* the `too large` distinction | refused before layout | split it; no pane will help |
+| **not a family we draw** — `gantt`, `pie`, `journey`, `mindmap`, `gitGraph`, `timeline`, `quadrantChart`, `sankey-beta`, `xychart-beta`, `block-beta`, `packet-beta`, `requirementDiagram`, `C4Context`, `architecture-beta`, `kanban`, `treemap` | source as a code listing + `⋮ source shown · gantt not drawn by the engine` | parsed or not, never laid out | write it as a `flowchart` — the grammar that draws what it parses |
+| **too large for the engine** — a legal fence whose canvas exceeds `MAX_CANVAS_CELLS` | the *same* listing, same receipt, *without* the type name | refused before layout | split it; no pane will help |
 | **wider than the glass** — any diagram past the pane | art, cut at the right edge with `…`, receipt names `needs N cols` | drawn at its natural width, shown partly | widen the pane, or narrow the diagram (`ADR-PANE-NOT-CANVAS-069`) |
 
 Two honesty gaps live in the first two rows and are **upstream's**, not
@@ -49,8 +54,9 @@ okuda's to repair:
 
 - `Oversize::Cells` and "no parser matched" share one fallback
   (`src/mermaid.rs:133-136`), so a diagram too *large* is indistinguishable
-  from a family we do not draw. Both arrive as a source box; only the absence
-  of the `too wide` hint separates them from a width refusal.
+  from a family we do not draw. Both arrive as the same listing with the same
+  receipt; only the absence of the `too wide` hint separates them from a width
+  refusal, and nothing separates them from each other.
 - Beyond `MAX_NODES` and `MAX_EDGES` the parser **drops content silently**
   (`over_cap` is set and never surfaced), so an over-cap diagram renders as a
   *truncated* diagram that looks whole. `BRF-MERMAID-HARD` owns this; nothing
@@ -88,13 +94,14 @@ Yes, at three levels — two shipped, one proposed:
    (`over_cap`). The diagram still renders — a *truncated* diagram.
 2. **Layout-level refusal (shipped).** If the computed canvas exceeds
    `MAX_CANVAS_CELLS` or the canvas the engine was given, the layout
-   returns `Oversize::Cells` / `Oversize::Width`, and the renderer falls
-   back to a bordered listing of the source. **There is no flag on the
-   pipe**: `mermaid-to-md` is a shell wrapper that flattens the refusal
-   into a ```` ```text ```` fence, so the only channel is the shape of
-   what comes back — a `╭ mermaid: ` box title (never present in real art)
-   plus, for `Oversize::Width` only, the appended hint. okuda reads both
-   and states which refusal it was. The two are indistinguishable for
+   returns `Oversize::Cells` / `Oversize::Width`, and the engine falls back
+   to a bordered listing of the source. **There is no flag on the pipe**:
+   `mermaid-to-md` is a shell wrapper that flattens the refusal into a
+   ```` ```text ```` fence, so the only channel is the shape of what comes
+   back — a `╭ mermaid: ` box title (never present in real art) plus, for
+   `Oversize::Width` only, the appended hint. okuda reads both to learn *that*
+   there is no diagram, then discards the box and renders the fence's own
+   source as a code listing. The two refusals are indistinguishable for
    `Oversize::Cells`, which is a gap upstream, not here.
 
    **The canvas is a constant, and it is never the pane**

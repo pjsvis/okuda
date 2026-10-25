@@ -109,9 +109,12 @@ name and package name differ. The origin doc's `spacex-mermaid` is stale;
   `too_wide` into the text fence, so okuda detects it from the shape of the
   output — the `╭ mermaid: ` box title (never present in art) plus the
   `too wide` hint, matched two words short because the hint itself is
-  wrapped to the canvas at narrow widths. Coupling to the hint string is the
-  cost of a wrapper with no structured exit; if the wrapper ever grows one,
-  this is what changes.
+  wrapped to the canvas at narrow widths. **The box is then discarded**: it
+  is the engine's presentation, not okuda's, and okuda already holds the
+  source it piped in. The fence is rendered as a code listing with the
+  reason above it, so the dependency's framing never reaches the reader.
+  Coupling to the hint string is the cost of a wrapper with no structured
+  exit; if the wrapper ever grows one, this is what changes.
 - **`Oversize::Cells` is indistinguishable from an unsupported type**
   (`src/mermaid.rs:133-136`: both emit `fallback(…, too_wide = false)`). A
   diagram too *large* therefore reads as *"this family is not drawn"*.
