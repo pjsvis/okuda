@@ -60,6 +60,32 @@ The cycle is a *regular occurrence* in this silo, not an accident:
   doesn't re-grow the decoration — because the decoration is on the
   record as FO'd, with reasons.
 
+## When the carrier is fluent
+
+The pattern above assumes the bathwater is **visible** — an over-engineered plan,
+whose decoration announces itself and trips the FO reflex. There is a second
+carrier, and it defeats that reflex: **fluent generated prose.** A well-written
+document does not announce its own bathwater; that is what well-written means.
+Nothing fires. The text is smooth, structured, confident and partly false, and the
+only way to find the part is to put an instrument on it.
+
+> **When the carrier is fluent, the extracting instrument is a measurement, not a
+> reflex.** Complexity fails loudly; plausibility fails quietly.
+
+Worked instance (2026-10-25): three documents arrived from a bath-time session
+with a model — an Omarchy LUT brief, an Apple Foundation Models probe, and an
+essay joining them. All three read well. The FO reflex never fired. The brief's
+load-bearing premise — *"dynamic statistical calculations on resize cause jitter
+and high CPU overhead"* — died on a stopwatch: a 120-paragraph render is 4.5 ms at
+80 columns, the twelve-diagram fixture is 65 ms of which ~92% is subprocess spawn,
+and the resize cost it cited had already been fixed in this repo by **coalescing**,
+structurally, not by precomputation. Four flakes of gold survived. The rest was
+yap.
+
+What the measurement did that reading could not: it named *which sentence* was
+false. A reader can only say "this feels like too much"; a stopwatch says
+"this optimises the minor term".
+
 ## The tell that you got it right
 
 The extracted baby is **shorter** than the over-engineered plan. The
@@ -67,6 +93,18 @@ right idea reduces entropy; the wrong one adds it. If the "dried-off"
 brief is longer than the over-engineered sketch, you haven't extracted
 the baby — you've re-wrapped it in a softer towel. Cut until the kernel
 is bare.
+
+**This tell inverts when the carrier is fluent.** A generated document is short
+because nothing in it was decided — every claim arrived at the same confidence,
+so there was nothing to argue and nothing to record. The extraction is *longer*,
+because a decision owes its reason, a prediction owes its falsifier, and a
+precondition owes the test that would show it unmet. Measured on the same three
+documents: 387 / 338 / 710 words in, 1197 / 1137 / 1268 words out. Read that as a
+cost, not a win — the redrafts also doubled the longest prose run (80→141,
+88→169, 98→204 words between entry points), which makes them harder to skim than
+the yap they replace. The tell is not length; it is **decidability**: can the
+reader tell, per claim, whether it is decided, proposed, or open? A document that
+answers that is the baby whatever its size.
 
 The second tell: **the corpus gets simpler, not heavier.** The correct
 extraction doesn't generate an ADR, a supersession, and a palimpsest; it
