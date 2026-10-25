@@ -76,9 +76,29 @@ continues, a set of items that will grow, a group whose boundary is the point
 and whose closure is not.
 
 
+## Wrap is for prose
+
+Wrapping is a claim that the break is insignificant. In prose the claim is
+true — a paragraph is a flow, and where its lines stop is the renderer's
+business. In a code line, a box edge, a table row or a diagram rank it is
+false: the newline **is** structure, so a break asserts a shape the author
+never wrote. A wrapped code line reads as two lines. A wrapped state machine
+reads as a different topology.
+
+So the renderer does one or the other and never both. **Prose wraps;
+structure elides.** A preformatted block that outruns the glass is cut at the
+right edge, marked `…`, and — where the block can say how wide it wanted to
+be — the receipt carries the number (`art elided · needs 241 cols`). Nothing
+is re-flowed into a shape it did not have.
+
+The test for any new block type: *does the output contain a line break the
+source did not?* For prose, that is the point. For anything else, the block
+is wrong. (`ADR-PANE-NOT-CANVAS-069`.)
+
+
 ## Diagrams: shape the eye can trace
 
-A diagram is not a one-off ornament — it earns column space wherever prose would otherwise be describing a shape. The fence is intercepted pre-render, piped to `mermaid-to-md`, and the ASCII is coloured by channel: borders recede, arrows lead, text sits in the foreground. The diagram never wraps — a wrapped state machine is a lie about the topology.
+A diagram is not a one-off ornament — it earns column space wherever prose would otherwise be describing a shape. The fence is intercepted pre-render, piped to `mermaid-to-md`, and the ASCII is coloured by channel: borders recede, arrows lead, text sits in the foreground. The diagram never wraps — a wrapped state machine is a lie about the topology. It elides instead: past the glass the art is cut with `…`, and the receipt names the columns it would need. Widening the pane shows more of the *same* diagram; it never changes the diagram. That is the difference between resizing a window and rewriting a file.
 
 ```mermaid
 flowchart LR
@@ -103,6 +123,10 @@ or agent, gets wrong by default.
   stops widening is a policy number and is currently unstated; 120 is the
   proposal, not a measurement. Past the ceiling the diagram stops being read as
   a whole, and a diagram read in halves has lost the thing it was for.
+  **What you will see if you exceed it:** not a refusal and not a wrapped
+  shape, but a cut one — `…` at the glass and `needs N cols` on the receipt.
+  That receipt is the diagram telling you its size; believe it and reshape, or
+  widen and read the rest.
 - **Split by view, not by scissors.** Two halves of one graph contradict each
   other within a month. A context view and a sequence view of the same system
   do not, because they answer different questions.

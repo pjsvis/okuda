@@ -92,6 +92,36 @@ Protocol mechanics (locus tags, wrap-up) and the protocol-wide terms live in `sy
   at `docs/2026-08-30-naming-like-nasa.md`; the commissioning vocabulary at
   `playbooks/commissioning-playbook.md`, of which this names the other half.
 
+* **Wrap is for prose**: the width law the other three constructs already
+  obeyed and diagrams did not. **Wrapping is a claim that the break is
+  insignificant** — true of a paragraph, where the newline is the renderer's
+  business, and false of anything the author wrote as a fixed shape: a code
+  line, a box edge, a table row, a diagram rank. In those, the newline *is*
+  structure, so breaking it asserts a shape nobody wrote. The renderer
+  therefore has exactly two behaviours and never confuses them: **prose
+  wraps, structure elides**, and a structural block that outruns the glass is
+  cut with `…` — plus the width it wanted, where the block can say it.
+  * **Test:** does the output contain a line break the source did not? For
+  prose, that is the point; for any other block, the block is wrong. The
+  corollary: a structural block's *height* must not depend on the pane —
+  measured on the fixture, block sequence and art-run lengths identical at
+  60/80/120/160/200 columns.
+  * **Failure it names:** the wrapped code line that reads as two lines; the
+  wrapped state machine that reads as a different topology; the engine's
+  source box that re-flowed its 272-column content into a 64-column canvas
+  and thereby *inflated its own height* (29 lines wrapped, 25 at natural
+  width) while claiming nothing had changed.
+  * **Prior art:** the style guide's *the diagram never wraps* and *never fake
+  a fit* (`docs/style-guide.md`); `ADR-UNIVERSAL-ELISION-050` (the primitive);
+  `ADR-TABLE-EDGE-CUT-055` (tables composed at the author's width and cut);
+  `ADR-PANE-NOT-CANVAS-069` (the width was never the pane's to decide).
+  **Named 2026-10-25** from the operator's words — *we wrap prose, but we do
+  not wrap and distort structure*.
+  **Promotion owed:** by this file's own test — *could another silo use it?* —
+  yes. It belongs in `system.md`'s protocol-wide lexicon and is recorded here
+  because the silo is where it was earned and the only file this silo may
+  write. Flagged, not silently localised.
+
 ---
 
 ## Register open — the gathering
