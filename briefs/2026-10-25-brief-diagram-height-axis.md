@@ -50,17 +50,29 @@ The width cut loses a **contiguous tail**: the right-hand end of every line. The
 loss is one-sided, it is marked once per line, and `needs N cols` tells the
 reader exactly what would restore it.
 
-A vertical fold loses the **middle**, and the middle of a diagram is usually the
-body — the part carrying the topology. The conclusion is often the bottom, which
-a head-only cap would also lose. So the two axes are not the same problem wearing
-different clothes, and "do what we did for width" is not an argument:
+The structural reason that is *acceptable* is **scoped doubt**: a marker
+disclaims the row it sits on and thereby licenses belief in the rows it does
+not. A right-hand cut preserves a contiguous, readable prefix on every row, so
+the marker scopes exactly the doubt and the remainder is whole.
 
-| policy | what the reader gets | what is lost |
-|---|---|---|
-| **fold** (head … tail, `⋮ N lines elided ⋮`) | both ends, one gap | the body: usually the point |
-| **cap and refuse** | a one-line receipt | everything — this is exactly the mistake `2a11837` made on the *other* axis, reversed the same day |
-| **no policy** (today) | all of it | nothing, but the document's rhythm |
-| **scroll is the answer** | all of it | nothing — but 309 lines of art between two paragraphs is a structural failure of the *document*, not of the renderer |
+**A vertical fold cannot do that.** It removes a band, leaving two pieces
+neither of which is a readable diagram — the top half of a flowchart is not
+half a flowchart, it is a set of boxes whose arrows leave the frame. The marker
+would have to disclaim both remainders at once, which is the same licence
+failure as marking rows with nothing to mark: doubt spread over everything
+means the artefact earns trust for nothing. This is a sharper objection than
+"the middle is usually the point", and it is the one that makes the two axes
+different problems wearing similar clothes:
+
+| policy | what the reader gets | what is lost | marker's licence |
+|---|---|---|---|
+| **fold** (head … tail, `⋮ N lines elided ⋮`) | both ends, one gap | the body — and the legibility of both remainders | **none**: neither piece stands alone |
+| **cap and refuse** | a one-line receipt | everything — exactly the mistake `2a11837` made on the *other* axis, reversed the same day | n/a: nothing to trust, nothing to doubt |
+| **no policy** (today) | all of it | nothing, but the document's rhythm | n/a |
+| **scroll is the answer** | all of it | nothing — but 309 lines of art between two paragraphs is a structural failure of the *document*, not of the renderer | n/a |
+
+So the constraint any answer must satisfy is not "keep it short" but **leave a
+remainder that can be believed on its own terms**.
 
 ## The question the brief poses, and refuses to answer
 

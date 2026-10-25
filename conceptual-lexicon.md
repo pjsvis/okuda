@@ -122,6 +122,46 @@ Protocol mechanics (locus tags, wrap-up) and the protocol-wide terms live in `sy
   because the silo is where it was earned and the only file this silo may
   write. Flagged, not silently localised.
 
+* **Scoped doubt**: an elision marker is a **disclaimer, not a report**. Its
+  work is not to announce a loss but to *bound* the untrustworthy region — and
+  bounding it is what licenses belief in everything else. A block with no
+  markers implicitly claims completeness; a block with markers claims
+  completeness **for the unmarked part**, which is a claim it can honour. This
+  is the real reason a marked fragment beats a refusal: not that half a diagram
+  is better than nothing, but that **a scoped doubt is worth more than a blanket
+  one**. Stating a loss is a transfer of trust, not only a confession.
+  * **The converse is the expensive direction.** Doubt spreads where there is
+    nothing to doubt and the marker stops meaning anything: a `…` printed on
+    rows whose visible cells hold only padding did not merely add noise, it
+    revoked the authority the marked rows had earned, and so cast doubt on the
+    rows that were whole. **Over-marking spends the licence.** Measured
+    2026-10-25: eight unmarked-in-view rows out of thirteen in a 241-column
+    diagram, in a 60-column pane.
+  * **Test:** from the artefact alone, can a reader tell of *each* claim whether
+    it is whole or partial? A partial block with no marker is an **unpaid
+    claim** in rendered form — it asserts a completeness it does not have. A
+    whole block sprinkled with markers fails the test in the other direction:
+    it teaches the reader to distrust what is intact.
+  * **The receipt is the address, and the fact is one.** Where a marker scopes
+    doubt, the receipt scopes the *action*, and states it as a measurement
+    rather than an instruction: `needs 121 cols` is read by the reader as
+    *widen* and by the author as *reshape*, and neither is told which. One
+    fact, two parties, two actions — the renderer states the requirement and
+    never the remedy, which is what keeps it out of window management.
+  * **Prior art:** *state the fact, infer the action* (the CSN rule,
+    `BRF-MERMAID-HARD`); **every projection loss is said**
+    (`BRF-PROJECTION-LOSSES`); **audit surface** and **attributable structure**
+    (the rendered form of the same discipline); the style guide's *never fake a
+    fit* — “a faked fit is marked with nothing, which is the difference between
+    a reader who widens and a reader who is misled”.
+  * **Named 2026-10-25** from the operator's observation that the markers say
+    *do not read or believe this row*, "which makes the non-elided lines
+    readable and believable". Earned in `ADR-PANE-NOT-CANVAS-069`; the height
+    axis is where the licence is hardest to hold, because a fold's marker would
+    disclaim the *middle* — see `BRF-DIAGRAM-HEIGHT-AXIS`.
+  * **Promotion owed:** general by this file's test — any renderer, any
+    partial artefact. Recorded here for the same reason as the entry above.
+
 ---
 
 ## Register open — the gathering
