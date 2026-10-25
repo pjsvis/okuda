@@ -22,7 +22,7 @@ import { cloneArgs, editArgs, resolveEditor } from "./clone";
 import { frameBounds, headingLines, pageStep, paragraphStarts, snapFrame } from "./frames";
 import { readOnlyActive, splitKeyEvents, verbFor, type Verb } from "./keygrammar";
 import { loadPalette, type Palette } from "./palette";
-import { renderDocument, wrapWholeFile, regionsForFile } from "./render";
+import { MIN_RENDER_WIDTH, renderDocument, wrapWholeFile, regionsForFile } from "./render";
 import { isWithinRoot } from "./root";
 import { basename, dirname, isAbsolute, join, resolve } from "node:path";
 import { appendFileSync, existsSync } from "node:fs";
@@ -252,6 +252,32 @@ export function viewport(
   const maxScroll = Math.max(0, lines.length - height);
   const s = Math.min(Math.max(0, scroll), maxScroll);
   return { visible: lines.slice(s, s + height), maxScroll, scroll: s };
+}
+
+/** Fill the viewport when the document is held for width. Pure.
+ *
+ *  Below the renderer's floor there is no document on screen — one receipt line
+ *  and then nothing, because the frame was cleared. The chrome survives (the
+ *  separator and the badge are the host's), so the pane reads as a document that
+ *  has *gone* rather than one that is *held*. It hasn't gone: the space to fill
+ *  is the viewport, not the document, and the viewport is the TUI's to fill.
+ *
+ *  A column of `…` to the last content row, one per row — NOT one every ten.
+ *  Every row of the withheld document is elided by definition, so every row earns
+ *  a mark; a sparse sprinkle would assert that the unmarked rows are empty, which
+ *  is the one thing that is certainly false. (The inverse of this morning's
+ *  diagram stripe, where the rows were blank *in view* and the marks had no
+ *  referent: same rule, opposite verdict, because the referent differs.) And a
+ *  column with no visible end is the message: the pane's edge is not the
+ *  document's edge.
+ *
+ *  Marks the same column as the body — the renderer's 2-column margin — clamped so
+ *  the mark itself can never exceed a one-column pane. */
+export function heldViewport(visible: string[], height: number, cols: number): string[] {
+  const pad = height - visible.length;
+  if (pad <= 0) return visible;
+  const indent = " ".repeat(Math.max(0, Math.min(2, cols - 1)));
+  return [...visible, ...Array.from({ length: pad }, () => `${indent}\u2026`)];
 }
 
 /** The hints row. Budget-bound: it must fit 80 columns and still
@@ -900,8 +926,16 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // whole, bracketed so the terminal composites it atomically. The
     // clear strategy is unchanged in this brief — the bracket masks the
     // blank gap on the wire; removing it is option 1, deferred.
+    // Below the floor the renderer withholds the document and states the
+    // requirement; the viewport is ours, so we say the other half — that the
+    // content is here and continues past the bottom edge. Conditioned on the
+    // SAME constant the renderer used (MIN_RENDER_WIDTH), so the fill appears for
+    // exactly the panes where the document was held and the two cannot drift.
+    // Paint-time only: the marks never enter `lines`, so scroll, the content gate
+    // and the re-anchor keep reasoning about the document and not about texture.
+    const shown = cols < MIN_RENDER_WIDTH ? heldViewport(view.visible, height, cols) : view.visible;
     let frame = "\x1b[2J\x1b[H"; // clear + home
-    frame += view.visible.join("\n");
+    frame += shown.join("\n");
     const held = runBuffer !== null && !runBuffer.spent ? runBuffer.keys : undefined;
     const footer = footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined, held === undefined ? undefined : pendingMark(held));
     // Chrome geometry (BRF-FOOTER-SEPARATOR): the badge owns the BOTTOM

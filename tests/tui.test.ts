@@ -8,6 +8,7 @@ import {
   footerLine,
   pendingMark,
   viewport,
+  heldViewport,
   contentHeight,
   geometryOf,
   needsRepaint,
@@ -147,6 +148,50 @@ describe("tui — decodeKey (escape sequences)", () => {
     expect(decodeKey(buf(0x1b, 0x4f, 0x36, 0x7e))).toBe("page-down");
     expect(decodeKey(buf(0x1b, 0x4f, 0x35))).toBeNull(); // ESC O 5 (no tilde)
     expect(decodeKey(buf(0x1b, 0x4f, 0x43))).toBeNull(); // ESC O C — right, unbound
+  });
+});
+
+describe("tui — the held viewport (a document withheld for width)", () => {
+  // Below the renderer's floor there is one receipt line and then nothing, while
+  // the chrome survives — so the pane reads as a document that has GONE rather
+  // than one that is HELD. The space to fill is the viewport, not the document.
+  const receipt = ["  \u22ee needs 20 cols \u00b7 13 here"];
+
+  test("fills to the viewport height, so the frame is exactly as tall as the pane", () => {
+    const height = 22;
+    const shown = heldViewport(receipt, height, 13);
+    expect(shown.length).toBe(height);
+    expect(shown[0]).toBe(receipt[0]); // the receipt is untouched
+  });
+
+  test("one mark per row, every row — not one every ten", () => {
+    // Every row of the withheld document is elided by definition, so every row
+    // earns a mark. A sparse sprinkle would assert the unmarked rows are empty,
+    // which is the one thing certainly false. (Inverse of the diagram stripe:
+    // there the rows were blank in view and the marks had no referent.)
+    const shown = heldViewport(receipt, 12, 13);
+    expect(shown.slice(1).every((l) => l.trim() === "\u2026")).toBe(true);
+  });
+
+  test("the column runs to the last row — the pane's edge is not the document's edge", () => {
+    const shown = heldViewport(receipt, 20, 13);
+    expect(shown[shown.length - 1]!.trim()).toBe("\u2026");
+  });
+
+  test("every mark fits the pane, down to one column", () => {
+    for (const cols of [1, 2, 3, 5, 13, 19]) {
+      const shown = heldViewport(receipt, 10, cols);
+      for (const l of shown.slice(1)) {
+        // Columns are bytes here — the mark is one grapheme, the indent spaces.
+        expect(l.length, `cols=${cols}: ${JSON.stringify(l)}`).toBeLessThanOrEqual(cols);
+      }
+    }
+  });
+
+  test("a full viewport is returned untouched, so the helper cannot shorten a document", () => {
+    const full = Array.from({ length: 8 }, (_, i) => `line ${i}`);
+    expect(heldViewport(full, 8, 13)).toEqual(full);
+    expect(heldViewport(full, 4, 13)).toEqual(full); // never trims
   });
 });
 

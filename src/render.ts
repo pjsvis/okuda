@@ -546,8 +546,18 @@ export async function renderDocument(
   // itself — the same fit lesson as the diagram receipt, where `needs 60 cols`
   // had to survive a 26-column pane (BRF-DIAGRAM-WIDTH-HANDOFF).
   if (opts.width < MIN_RENDER_WIDTH) {
-    const glyph = styler.roleBold("state-parked", "\u25b8");
-    const note = ` ${MIN_RENDER_WIDTH} cols minimum · ${opts.width} here`;
+    // `⋮`, not `▸`: this is elision, not failure — the same word the diagram
+    // receipts use for content withheld with its requirement stated. `▸` sits in
+    // the failure class ("no art at all") and would put the pane's narrowness
+    // there. The requirement leads, as it does in `needs 241 cols`, because on a
+    // 13-column pane the number is the only thing that survives the cut.
+    const glyph = styler.roleBold("state-parked", "\u22ee");
+    // The NUMBER leads, verb second — the diagram receipt can afford `needs 241
+    // cols` because it fires in a 100-column pane; this one fires only below 20,
+    // where the verb is the first thing the cut takes and the number is the last
+    // thing that can go. `20 cols · 8 here` keeps the contrast that makes it
+    // readable as a requirement rather than a report of the pane.
+    const note = ` ${MIN_RENDER_WIDTH} cols · ${opts.width} here`;
     return "\n  " + elideToWidth(`${glyph}${styler.role("muted", note)}`, Math.max(1, opts.width - 2)) + "\n";
   }
 

@@ -963,11 +963,15 @@ describe("render — the glass invariant: no emitted line is wider than the decl
       expect(lines.length, `width ${w} should be one receipt, got ${JSON.stringify(out)}`).toBe(1);
       expect(displayWidth(lines[0]!).valueOf()).toBeLessThanOrEqual(w);
       // The REQUIREMENT is the last thing to survive the cut — at eight columns
-      // the receipt is `▸ 20 …`, which still says what the pane needs. The unit
-      // and the word follow as room appears. (Same fit lesson as the diagram
-      // receipt: `needs 60 cols` had to survive a 26-column pane.)
+      // the receipt is `⋮ 20 …`, which still says what the pane needs. The unit
+      // and the second number follow as room appears. Measured ladder, and the
+      // reason the verb is absent: this receipt only ever fires below 20 columns,
+      // where `needs` would have cost the number its place (first draft read
+      // `⋮ nee…` at eight columns).
       expect(stripANSI(lines[0]!)).toContain(`${MIN_RENDER_WIDTH}`);
+      if (w >= 9) expect(stripANSI(lines[0]!)).toContain("c");
       if (w >= 13) expect(stripANSI(lines[0]!)).toContain("cols");
+      if (w >= 17) expect(stripANSI(lines[0]!)).toContain(`${w}`);
     }
   });
 
