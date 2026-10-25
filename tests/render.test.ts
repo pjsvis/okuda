@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { renderDocument } from "../src/render";
+import { MIN_RENDER_WIDTH, renderDocument } from "../src/render";
 import { DRACULA_PALETTE } from "../src/palette";
 import { displayWidth, stripANSI } from "../src/width";
 
@@ -934,12 +934,40 @@ describe("render — the glass invariant: no emitted line is wider than the decl
   // so it is the emitter an author cannot shorten by editing.
   const ID = { silo: "okuda", callsign: "BRF-DIAGRAM-WIDTH-HANDOFF", file: "docs/2026-10-25-a-deliberately-long-document-name.md" };
 
-  test("every line fits, from 20 columns to 120", async () => {
+  // The ladder starts AT the declared floor (MIN_RENDER_WIDTH), because below it
+  // the document is not composed at all — there is no line to be wider than the
+  // glass. That is the policy this test exists to hold: a floor you do not test
+  // is a floor that drifts.
+  //
+  // Measured 2026-10-25, which is also how the ellipsis myth died: of 280
+  // over-width lines at 10-12 columns, ONE contained an ellipsis, and every one of
+  // them began at 8 or 10 columns of indent. The `…` was a victim, not a cause —
+  // when a line overruns, the terminal wraps it and the marker (being last) lands
+  // alone on the next line, which reads as "the ellipsis is not breakable".
+  test("every line fits, from the floor to 120", async () => {
     for (const w of [20, 24, 28, 32, 36, 40, 48, 60, 72, 100, 120]) {
       const out = await renderDocument(DOC, { width: w, color: "none", ...ID });
       for (const l of out.split("\n")) {
         expect(displayWidth(l), `width ${w}: ${JSON.stringify(l)}`).toBeLessThanOrEqual(w);
       }
+    }
+  });
+
+  test("below the floor the document is not composed: one receipt, and it fits", async () => {
+    // Three dishonest options (overflow; flatten the nesting; one grapheme per
+    // line) and one honest one: say the number. The number leads so it survives
+    // the elision the narrow glass forces on the receipt itself.
+    for (const w of [8, 10, 13, 16, 19]) {
+      const out = await renderDocument(DOC, { width: w, color: "none", ...ID });
+      const lines = out.split("\n").filter((l) => l.trim() !== "");
+      expect(lines.length, `width ${w} should be one receipt, got ${JSON.stringify(out)}`).toBe(1);
+      expect(displayWidth(lines[0]!).valueOf()).toBeLessThanOrEqual(w);
+      // The REQUIREMENT is the last thing to survive the cut — at eight columns
+      // the receipt is `▸ 20 …`, which still says what the pane needs. The unit
+      // and the word follow as room appears. (Same fit lesson as the diagram
+      // receipt: `needs 60 cols` had to survive a 26-column pane.)
+      expect(stripANSI(lines[0]!)).toContain(`${MIN_RENDER_WIDTH}`);
+      if (w >= 13) expect(stripANSI(lines[0]!)).toContain("cols");
     }
   });
 

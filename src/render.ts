@@ -321,6 +321,26 @@ export function elideCanvasRow(painted: string, budget: number): string {
  *  regains authority over a preformatted block. */
 const LAYOUT_CANVAS = 2048;
 
+/** The narrowest glass this renderer will compose for, in columns.
+ *
+ *  Not a taste, an arithmetic result: a list item is list-indent 2 + nested
+ *  shift 2 + marker 2-3 + text, so the indentation stack alone approaches ten
+ *  columns before a word is placed. Below twenty there is no composition that is
+ *  both inside the glass and readable — measured 2026-10-25, the invariant held
+ *  to 12 and failed below it, on indented lines only.
+ *
+ *  Faced with that, the renderer has three dishonest options (overflow and let the
+ *  terminal soft-wrap our bytes; flatten the nesting and lie about the topology;
+ *  squeeze the text to one grapheme per line) and one honest one: **say the
+ *  number.** So below this width the document is not rendered at all — the frame
+ *  becomes one receipt in the same vocabulary as a diagram that cannot fit
+ *  (`▸ needs 241 cols · 116 here`): the fact and the requirement, no instruction.
+ *
+ *  `--width` has refused below 20 since 2026-08; the TUI and the streaming path
+ *  did not, which is how a 13-column pane came to render eleven-column prose with
+ *  filenames split at their extension. One floor, every door. */
+export const MIN_RENDER_WIDTH = 20;
+
 /** Engine output, keyed by binary + source. Bounded, because a viewer outlives
  *  documents.
  *
@@ -520,13 +540,31 @@ export async function renderDocument(
   const color = opts.color ?? "truecolor";
   const palette = opts.palette ?? loadPalette();
   const styler = makeStyler(palette, color);
+
+  // Below the declared floor, do not compose: state the requirement. The number
+  // leads so it survives the elision a narrower glass forces on the receipt
+  // itself — the same fit lesson as the diagram receipt, where `needs 60 cols`
+  // had to survive a 26-column pane (BRF-DIAGRAM-WIDTH-HANDOFF).
+  if (opts.width < MIN_RENDER_WIDTH) {
+    const glyph = styler.roleBold("state-parked", "\u25b8");
+    const note = ` ${MIN_RENDER_WIDTH} cols minimum · ${opts.width} here`;
+    return "\n  " + elideToWidth(`${glyph}${styler.role("muted", note)}`, Math.max(1, opts.width - 2)) + "\n";
+  }
+
   const ctx: Ctx = {
     // Content width reserves a 2-char left + 2-char right margin (Glow
     // Document margin). Wrap, hr, and table-fit all respect this;
     // raw blocks (code/diagrams) elide to the same right edge rather
     // than wrap (ADR-UNIVERSAL-ELISION-050 — the "art is art" gutter
     // exemption repealed).
-    width: Math.max(10, opts.width - 4),
+    // The content width tracks the glass EXACTLY — a floor here is a floor that
+    // exceeds the glass at the bottom of the range, and a line wider than the
+    // glass is the terminal soft-wrapping okuda's bytes (ADR-004). Measured
+    // 2026-10-25: `Math.max(10, width - 4)` emitted 12-column lines into a
+    // 10-column terminal, 2735 of them in one document. Declared minimum is 20
+    // (what `--width` already refuses below); under that the TUI still renders,
+    // best effort, and the glass invariant is not claimed.
+    width: Math.max(4, opts.width - 4),
     fullWidth: opts.width,
     styler,
     color,
@@ -1836,7 +1874,12 @@ function renderList(
     // flatten equivalent at the depth cap). Budget it here, at wrap
     // time, so every emitted line lands inside the terminal (ADR-004:
     // okuda owns every \n; nested overflow was the violation).
-    const avail = Math.max(4, width - 4 * depth - textCol - LIST_INDENT);
+    // Floor of 1, not 4: a floor of 4 plus the marker and the list indent is a
+    // composed line that exceeds a small glass, and an over-wide composed line is
+    // the terminal soft-wrapping us (same class as the content floor above).
+    // Measured: `Math.max(4, ...)` overflowed a 10-12 column glass on every
+    // indented line; at 1 the composed line lands exactly on the budget.
+    const avail = Math.max(1, width - 4 * depth - textCol - LIST_INDENT);
     const contIndent = " ".repeat(textCol);
 
     const parts = splitNested(item);

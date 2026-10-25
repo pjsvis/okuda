@@ -13,7 +13,7 @@
 
 import { detectColorMode } from "./ansi";
 import { loadPalette } from "./palette";
-import { renderDocument, wrapWholeFile, regionsForFile } from "./render";
+import { MIN_RENDER_WIDTH, renderDocument, wrapWholeFile, regionsForFile } from "./render";
 import { runTui, displayPath } from "./tui";
 import { runLauncher, invokedAsGloam, rankedShortlistEntries } from "./launcher";
 import {
@@ -82,8 +82,11 @@ function parseArgs(argv: string[]): Args {
     else if (a === "--width") {
       const raw = argv[++i] ?? "";
       const n = parseInt(raw, 10);
-      if (!Number.isFinite(n) || n < 20) {
-        process.stderr.write(`okuda: --width wants a column count of 20 or more, got ${raw === "" ? "nothing" : `'${raw}'`}\n`);
+      // One floor, and it is the renderer's (`MIN_RENDER_WIDTH`): this door and
+      // the TUI must not disagree about the narrowest glass a document can be
+      // composed for — they did, and a 13-column pane rendered eleven-column prose.
+      if (!Number.isFinite(n) || n < MIN_RENDER_WIDTH) {
+        process.stderr.write(`okuda: --width wants a column count of ${MIN_RENDER_WIDTH} or more, got ${raw === "" ? "nothing" : `'${raw}'`}\n`);
         process.exit(1);
       }
       args.width = n;
