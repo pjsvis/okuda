@@ -125,6 +125,3 @@ No single book fills that exact slot — a prescriptive usage guide to Irish sla
 - **Stan Carey's column** "What does 'feck' really mean?" in The Journal (2012) — traces the etymology, gives literary examples from Amanda Whittington, Peter Murphy, and Martin McDonagh, and lands somewhere between a usage guide and a Myles na Gopál column. It's the closest thing to a modern *Usage & Abusage* entry for a single word.
 
 **The honest answer:** nobody has written a *Usage & Abusage* for Irish slang. The gap exists. Dolan's dictionary has the content but not the voice; O'Brien has the voice but only in fragments. If you're writing one, the brief is clear: take Dolan's entries, run them through Myles na Gopál's filter, and you've got the book.
-
-
-

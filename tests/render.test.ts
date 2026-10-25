@@ -893,3 +893,65 @@ describe("render — stream identity header (BRF-STREAM-IDENTITY-HEADER)", () =>
     expect(lines(out)[1]).toBe("");
   });
 });
+
+describe("render — the glass invariant: no emitted line is wider than the declared width", () => {
+  // Every other width test in this file checks ONE block type, on a document
+  // built to exercise it. So a block could outgrow the glass and only its own
+  // test would notice — and the stream identity header had no such test at all.
+  // Measured 2026-10-25: at a declared width of 40 the header rendered 42
+  // columns, because `silo · callsign · file` was concatenated and never
+  // elided; the terminal soft-wrapped it, which is the one thing okuda must
+  // never make it do (ADR-004, ADR-UNIVERSAL-ELISION-050).
+  //
+  // This is the whole-document property instead: every emitter, one document,
+  // a width ladder that crosses the failure. It is the invariant, not an
+  // example of it.
+  const DOC = [
+    "## A heading that is long enough to need wrapping at narrow widths",
+    "",
+    "A paragraph of prose with a reasonably long line and a [link](https://example.com/x) and inline `code`.",
+    "",
+    "- a list item long enough to wrap when the glass is narrow",
+    "  - a nested item, also long enough to wrap at narrow widths",
+    "  - a second nested item",
+    "",
+    "| Column one | Column two |",
+    "|---|---|",
+    "| a cell with some width to it | another cell here |",
+    "",
+    "```ts",
+    "const x = 'a code line long enough to be elided at narrow widths';",
+    "```",
+    "",
+    "> A quoted aside long enough to wrap inside the pipe column at narrow widths.",
+    "",
+    "---",
+    "",
+    "Inline math $\\Delta t$ and a state glyph ✓ in prose.",
+    "",
+  ].join("\n");
+  // A filename long enough to be the failure: the identity header is generated,
+  // so it is the emitter an author cannot shorten by editing.
+  const ID = { silo: "okuda", callsign: "BRF-DIAGRAM-WIDTH-HANDOFF", file: "docs/2026-10-25-a-deliberately-long-document-name.md" };
+
+  test("every line fits, from 20 columns to 120", async () => {
+    for (const w of [20, 24, 28, 32, 36, 40, 48, 60, 72, 100, 120]) {
+      const out = await renderDocument(DOC, { width: w, color: "none", ...ID });
+      for (const l of out.split("\n")) {
+        expect(displayWidth(l), `width ${w}: ${JSON.stringify(l)}`).toBeLessThanOrEqual(w);
+      }
+    }
+  });
+
+  test("and the identity header is the case that bites: it elides like every other receipt", async () => {
+    // The generated line an author cannot shorten. It must elide, not wrap —
+    // and it must keep its margin, which is not part of the budget.
+    const out = await renderDocument("# T\n\nBody\n", { width: 40, color: "none", ...ID });
+    // Line 0: the header is prepended above the body, and `finalize`'s leading
+    // blank belongs to the body, not to the header.
+    const first = out.split("\n")[0]!;
+    expect(stripANSI(first).startsWith("  okuda · ")).toBe(true);
+    expect(displayWidth(first)).toBeLessThanOrEqual(40);
+    expect(stripANSI(first).endsWith("…")).toBe(true);
+  });
+});

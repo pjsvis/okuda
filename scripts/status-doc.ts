@@ -131,5 +131,9 @@ function stanceText(): string {
 }
 
 if (import.meta.main) {
-  console.log(composeDoc(collect(), stanceText()));
+  // `write`, not `log`: `composeDoc` already ends with one newline, and
+  // `console.log` appends its own — which is where NOW.md's trailing slack came
+  // from and how the class would come back after every `just island`
+  // (see `scripts/tree-lint.sh` rule 3).
+  process.stdout.write(composeDoc(collect(), stanceText()));
 }

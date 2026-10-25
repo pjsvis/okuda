@@ -348,9 +348,3 @@ gantt
     Inspect live page :crit, inspect, after release, 1d
     Review feedback   :feedback, after inspect, 1d
 ```
-
-
-
-
-
-

@@ -41,7 +41,33 @@ if [ -n "$nm" ]; then
   fail=1
 fi
 
+# 3. At most one trailing newline in a tracked .md.
+#
+#    The nit the operator observed: docs/2026-10-25-test-diagrams.md ended with
+#    seven. The renderer collapses them (`.replace(/\n+$/, "\n\n")`), so nothing
+#    reached the glass — the cost is not visual. The cost is that a file whose end
+#    is invisible is a file whose end nobody checks, and the slack is inherited by
+#    every diff, every concatenation and every `cat`. Ten files carried it.
+#
+#    Scoped to the EXCESS on purpose. The mirror class — a file ending with no
+#    newline at all, i.e. mid-line — is larger in this corpus (~120 tracked docs,
+#    mostly frozen: .archive/, decisions/, early docs/). Repairing those would
+#    churn a hundred files of history for a convention no reader can see, so it is
+#    recorded as a task rather than executed here; what this gate holds is that
+#    nobody ADDS slack to a file that already ends properly.
+tail_bad=$(
+  git ls-files '*.md' | while IFS= read -r f; do
+    [ -f "$f" ] || continue
+    python3 scripts/trailing-newlines.py "$f"
+  done
+)
+if [ -n "$tail_bad" ]; then
+  echo "tree-lint: FAIL — a tracked .md must not end with more than one newline:"
+  printf '%s\n' "$tail_bad"
+  fail=1
+fi
+
 if [ "$fail" -eq 0 ]; then
-  echo "tree-lint: OK (no tracked symlinks, no node_modules)"
+  echo "tree-lint: OK (no tracked symlinks, no node_modules, no trailing-newline slack)"
 fi
 exit "$fail"

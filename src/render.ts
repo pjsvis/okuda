@@ -179,6 +179,21 @@ async function spawnMermaid(
     : MERMAID_BIN_CANDIDATES;
   let reason = "mermaid-to-md not found";
   for (const bin of candidates) {
+    // The art is a function of the DIAGRAM, not the pane (`ADR-PANE-NOT-CANVAS-069`:
+    // the canvas is the fixed `LAYOUT_CANVAS`, never the declared width), so a
+    // resize cannot change it — and a resize is when recomputing it hurts most.
+    // Measured on the twelve-diagram fixture: one render is ~61 ms and ~92% of
+    // that is subprocess spawn, so a drag held stale-width content on screen for
+    // the whole render and the terminal soft-wrapped it. With the art cached a
+    // resize re-render costs the elision only.
+    //
+    // The binary is part of the key because the tests inject different engines
+    // for the same source, and a cache that ignored it would let a working run
+    // answer for a deliberately broken one. Successes only: a failure is cheap
+    // to retry and must keep failing.
+    const key = `${bin}\u0000${source}`;
+    const hit = ENGINE_ART_CACHE.get(key);
+    if (hit !== undefined) return { ok: true, out: hit };
     try {
       const proc = Bun.spawn([bin], {
         stdin: "pipe",
@@ -197,7 +212,10 @@ async function spawnMermaid(
       proc.stdin.end();
       const [out, err] = await Promise.all([outP, errP]);
       const code = await proc.exited;
-      if (code === 0 && out.trim().length > 0) return { ok: true, out };
+      if (code === 0 && out.trim().length > 0) {
+        rememberEngineArt(key, out);
+        return { ok: true, out };
+      }
       reason = code !== 0
         ? `mermaid-to-md exit ${code}${firstLineOf(err)}`
         : "mermaid-to-md produced no art";
@@ -302,6 +320,26 @@ export function elideCanvasRow(painted: string, budget: number): string {
  *  natural width). So one number buys both properties, and the pane never
  *  regains authority over a preformatted block. */
 const LAYOUT_CANVAS = 2048;
+
+/** Engine output, keyed by binary + source. Bounded, because a viewer outlives
+ *  documents.
+ *
+ *  This exists because `LAYOUT_CANVAS` is constant: the same fence, rendered
+ *  again, produces the same art — so the only thing a resize changes is where
+ *  okuda elides. Re-spawning per geometry change is what made an aggressive
+ *  drag hold stale-width content long enough for the terminal to soft-wrap it.
+ *  Successes only; the key carries the binary so an injected engine cannot be
+ *  answered by a cached one. */
+const ENGINE_ART_CACHE_MAX = 256;
+const ENGINE_ART_CACHE = new Map<string, string>();
+
+function rememberEngineArt(key: string, out: string): void {
+  if (ENGINE_ART_CACHE.size >= ENGINE_ART_CACHE_MAX) {
+    const oldest = ENGINE_ART_CACHE.keys().next().value;
+    if (oldest !== undefined) ENGINE_ART_CACHE.delete(oldest);
+  }
+  ENGINE_ART_CACHE.set(key, out);
+}
 
 /** Pipe mermaid source to diagram-describe for a prose description
  *  (BRF-DIAGRAM-DESCRIBE). Same contract as spawnMermaid: source in,
@@ -577,7 +615,15 @@ export async function renderDocument(
     (s): s is string => typeof s === "string" && s !== "",
   );
   if (identity.length === 0) return body;
-  return "  " + styler.role("muted", identity.join(" \u00b7 ")) + "\n" + body;
+  // The one generated line in the document — the author cannot shorten a
+  // filename, and a callsign is what it is. So it elides at the content budget
+  // like every other receipt (ADR-UNIVERSAL-ELISION-050), at the same right
+  // edge as the prose (`ctx.width`, the margin is not part of the budget).
+  // Found by the glass invariant below: at a declared width of 40 this line
+  // rendered 42 columns and the terminal soft-wrapped it — a generated line is
+  // no more entitled to wrap than an authored one.
+  const named = elideToWidth(styler.role("muted", identity.join(" \u00b7 ")), ctx.width);
+  return "  " + named + "\n" + body;
 }
 
 /**

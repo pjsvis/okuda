@@ -72,4 +72,3 @@ Operational reviews and architectural alignment meetings follow a standardized e
 - [ ] Implement automated telemetry tracking edge-vs-core churn metrics to dynamically trigger Tidy-First gates and Cell Division reviews.  
 - [ ] Standardize the agent initialization prompt harness to generate machine-readable boundary manifests upon workspace entry.  
 - [ ] Review current primary repositories against Core Entropy thresholds to establish baseline refactoring queues.
-

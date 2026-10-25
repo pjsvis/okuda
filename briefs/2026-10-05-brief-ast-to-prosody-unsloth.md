@@ -58,4 +58,3 @@ Design and specify an AST-to-Prosody intermediate representation (IR) that decou
 * Apple `say` uses WorldBet / Apple Phonetic Alphabet, not standard IPA; ensure the phonemic translation table adheres to Apple's phoneme specifications.
 * Avoid introducing trailing pauses before cliticized pronouns like *he* in the `AppleSayBackend`, as the Moira voice treats isolated pronouns with abrupt, unnatural lexical stress.
 * Keep the IR format completely decoupled from the backends so additional speech synthesizers (e.g., ONNX/Piper, ElevenLabs) can be implemented later without revising the AST extractor.
-

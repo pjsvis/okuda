@@ -802,4 +802,3 @@ By constraining links to:
 3.  A strict 2-state latch (Primary Reference),
 
 GLoam remains predictable, keyboard-driven, fast to synthesize for audio, and impossible to get lost in.
-

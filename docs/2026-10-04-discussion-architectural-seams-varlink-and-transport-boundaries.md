@@ -56,4 +56,3 @@ Applying the Three-Beat Heuristic (Setup, Execution, Teardown) exposes the failu
 
 * **Incorporate:** Formally document that Okuda remains an edge-rendered projection engine. Remote integration must be achieved via byte transport (SSH exec pipe, SFTP stream, or future Varlink bridge) rather than interactive remote TTY shells.  
 * **Implement Test Fixtures:** Ensure Okuda's CLI cleanly accepts `stdin` pipelines for remote stream ingestion without expecting a direct local file descriptor.
-

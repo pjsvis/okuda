@@ -87,4 +87,3 @@ Requires: okuda on PATH, herdr (a running session or its server), an
 $EDITOR that resolves to a real binary. AeroSpace merely tiles whatever
 Ghostty windows exist — the pair works with or without it, locally or
 over `herdr --remote`.
-
