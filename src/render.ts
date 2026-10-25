@@ -538,6 +538,28 @@ export async function renderDocument(
     listSeq: 0,
   };
 
+  // Pre-pass 0: the read boundary tops and tails. A file arrives from a
+  // filesystem that has been written by many hands — an editor that adds a
+  // final newline, one that does not, a Windows tool that emits CRLF, an
+  // exporter that leaves a BOM, a generator with trailing slack, a paste with
+  // leading blank lines. **None of that is content**, and the renderer is the
+  // only party that can normalise it without asking anyone to edit a file.
+  //
+  // Measured 2026-10-25: every one of those hazards already renders identically
+  // to its clean equivalent — Bun's parser normalises line endings per CommonMark
+  // (a line ending is LF, CR, or CRLF) and swallows a BOM, `finalize` trims the
+  // head and tail. `tests/render.test.ts` pins the equivalence, because "it
+  // works" and "it is meant to work" are different states and only one of them
+  // survives a dependency bump.
+  //
+  // Consequence, and the reason this comment lives here rather than in a lint:
+  // **a file's ending is not a property this renderer requires.** A corpus rule
+  // about trailing newlines polices bytes with no consumer — and the store of
+  // files that violate it is mostly frozen history, so such a rule can only ever
+  // record permanent debt. Own the read instead; tolerate the input.
+  // (Whitespace that carries MEANING is untouched: two trailing spaces are a
+  // CommonMark hard break, and indentation decides fences, lists and code.)
+  //
   // Pre-pass 1: elide YAML front matter (document-start `---\n…\n---`).
   // CommonMark parses this as setext h2 (the keys promoted to a heading)
   // because the closing `---` is an h2 underline. Front matter is provenance,

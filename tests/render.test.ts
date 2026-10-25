@@ -955,3 +955,75 @@ describe("render — the glass invariant: no emitted line is wider than the decl
     expect(stripANSI(first).endsWith("…")).toBe(true);
   });
 });
+
+describe("render — the read boundary tops and tails (a file's ending is not a contract)", () => {
+  // The operator's question, 2026-10-25: "do we even need to fix the files in
+  // place? we get the file from the file system so we have an opportunity to top
+  // and tail it." We do, and it already happens — but "it works" and "it is meant
+  // to work" are different states, and only one survives a dependency bump. So
+  // the equivalence is pinned rather than assumed.
+  //
+  // This replaces a corpus lint about trailing newlines. A rule over file bytes
+  // polices a property with no consumer: the renderer collapses them, no tool
+  // reads the tail, and the files violating it are mostly frozen history, so the
+  // rule could only ever record permanent debt. The contract belongs at the
+  // boundary, where it is true and where it can be tested.
+  const CLEAN = [
+    "# Title",
+    "",
+    "A paragraph with",
+    "two source lines.",
+    "",
+    "```ts",
+    "const a = 1;",
+    "```",
+    "",
+    "| Col | Val |",
+    "|---|---|",
+    "| a | 1 |",
+    "",
+  ].join("\n");
+
+  const render = (source: string) =>
+    renderDocument(source, { width: 60, color: "none", silo: "okuda", file: "docs/x.md" });
+
+  const HAZARDS: [string, string][] = [
+    ["a UTF-8 BOM", "\uFEFF" + CLEAN],
+    ["CRLF line endings", CLEAN.replace(/\n/g, "\r\n")],
+    ["lone CR line endings (classic Mac)", CLEAN.replace(/\n/g, "\r")],
+    ["four leading blank lines", "\n\n\n\n" + CLEAN],
+    ["seven trailing newlines", CLEAN.replace(/\n$/, "\n\n\n\n\n\n\n")],
+    ["no final newline", CLEAN.replace(/\n$/, "")],
+  ];
+
+  for (const [name, dirty] of HAZARDS) {
+    test(`${name} renders identically to the clean source`, async () => {
+      expect(await render(dirty)).toBe(await render(CLEAN));
+    });
+  }
+
+  test("prose line endings are already insignificant, which is WHY this is safe", async () => {
+    // A hard break (`one  \n`), a soft break (`one\ntwo`) and a single line all
+    // render to the same sentence — not because this normalisation ate the
+    // syntax, but because okuda retired break-honouring in prose on 2026-08-24
+    // (`ADR-007` amendment, the foxtrot oscar principle: soft returns were an
+    // author-side hack against renderers that collapsed whitespace, and the hack
+    // breaks the layout on resize). Which is the wrap law applied to the INPUT
+    // rather than the output: in prose the break is insignificant, so normalising
+    // it loses nothing.
+    const flat = await render("one two\n");
+    expect(await render("one  \ntwo\n")).toBe(flat);
+    expect(await render("one\ntwo\n")).toBe(flat);
+  });
+
+  test("but whitespace that DECIDES STRUCTURE is untouched", async () => {
+    // Indentation is structure: four spaces make a code block, three do not, and
+    // the boundary must not trim either.
+    expect(await render("    not fenced: this is an indented code block\n")).toContain("not fenced");
+    expect(await render("# Title\n\n    code\n")).toContain("code");
+    // (A blank line between blocks is NOT load-bearing here: an ATX heading
+    // already ends at its newline, so `# Title\nBody` and `# Title\n\nBody` are
+    // the same document by the spec. Block separation is the parser's business,
+    // not the boundary's — which is the point of leaving it alone.)
+  });
+});
