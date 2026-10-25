@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-25 | DBF-DIAGRAM-WIDTH-HANDOFF | done | Debrief: The diagram pipe had a second opinion about width | 2026-10-25-debrief-diagram-width-handoff.md |
 | 2026-10-22 | DBF-TOOLCHAIN-TRUTH | done | Debrief: Four claims, one instrument each — and the cross-platform reading | 2026-10-22-debrief-four-claims-one-instrument-each.md |
 | 2026-10-22 | DBF-PLATFORM-GATE | done | Debrief: The gate names its format — okuda builds on Omarchy | 2026-10-22-debrief-the-gate-names-its-format.md |
 | 2026-10-22 | DBF-OMARCHY-TOOLCHAIN | done | Debrief: The toolchain answers — and the diagram pipe was already dead | 2026-10-22-debrief-the-toolchain-answers.md |

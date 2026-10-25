@@ -2,9 +2,34 @@ import { describe, expect, test } from "bun:test";
 import { renderDocument } from "../src/render";
 import { DRACULA_PALETTE } from "../src/palette";
 import { displayWidth, stripANSI } from "../src/width";
-import { existsSync } from "node:fs";
+import { existsSync, chmodSync, mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const W = 64;
+
+/** Write an executable stub engine that prints `art` and ignores both stdin
+ *  and `$COLUMNS`. The real engine is given okuda's budget and refuses rather
+ *  than overrun it (`BRF-DIAGRAM-WIDTH-HANDOFF`), so a fence whose art is
+ *  wider than the budget can only be produced by an engine that ignores the
+ *  canvas. okuda's elision is a net for exactly that engine, and a net has to
+ *  be tested by something that falls into it. Returns null when the platform
+ *  will not take the script (the test then reports nothing rather than
+ *  failing for the wrong reason). */
+function stubEngine(art: string): string | null {
+  try {
+    // Per-process, per-call: the script must outlive the render that spawns
+    // it, so the directory is left for the OS to reap rather than removed
+    // here. The name carries the pid so parallel test runs cannot collide.
+    const dir = mkdtempSync(join(tmpdir(), `okuda-stub-engine-${process.pid}-`));
+    const path = join(dir, "mermaid-to-md");
+    writeFileSync(path, `#!/bin/sh\ncat >/dev/null\ncat <<'ART'\n${art}ART\n`);
+    chmodSync(path, 0o755);
+    return path;
+  } catch {
+    return null;
+  }
+}
 
 describe("render — tables (uniform presentation policy)", () => {
   test("header cyan+bold, rule kept, amber first column, loose rows", async () => {
@@ -144,6 +169,15 @@ describe("render — tables (uniform presentation policy)", () => {
 // ── Mermaid ───────────────────────────────────────────────────────────
 
 const MERMAID_SRC = "flowchart LR\n  A[Input v2.0] --> B[Render]\n";
+
+/** A diagram whose canvas is 60 columns: it renders at a canvas of 60 and is
+ *  refused at 59. The number is exact, which is what makes it usable as the
+ *  expected value in the receipt's provenance test. */
+const MERMAID_WIDE =
+  "flowchart LR\n  A[Alpha] --> B[Beta] --> C[Gamma] --> B[Delta] --> E[Epsilon] --> F[Zeta] --> G[Eta]";
+
+/** A family the engine does not draw — it returns the source in a box. */
+const MERMAID_UNSUPPORTED = "gantt\n  title Plan\n  section S\n  Task :a, 2026-01-01, 1d\n";
 
 describe("render — menu tables (ADR-022 right-anchored role fit, td-b81597)", () => {
   const row = (slug: string, cs: string, n: string, f: string) =>
@@ -299,14 +333,20 @@ describe("render — mermaid pipe + colour classification", () => {
     for (const l of art) expect(l.endsWith("\x1b[0m")).toBe(true);
   });
 
-  test("art elides at the fence budget — never wraps (ADR-UNIVERSAL-ELISION-050)", async () => {
-    // Narrow glass, real pipe: the art is wider than the budget, every
-    // line must still fit whole — the cut is ours (…) never the
-    // terminal's (soft-wrap). A cut in the art is a loss the indicator
-    // states (projection-losses, extended to the art itself).
-    const out = await renderDocument("```mermaid\n" + MERMAID_SRC + "```\n", {
+  test("an engine that overruns its canvas is elided, never wrapped (ADR-UNIVERSAL-ELISION-050)", async () => {
+    // okuda's elision is now a NET, not the normal path: the real engine is
+    // given okuda's budget and refuses rather than overrun (the test below
+    // this one), so art wide enough to cut can only come from an engine that
+    // ignores `$COLUMNS`. That engine is stubbed here, which is the honest
+    // way to test a net — it cannot be reached by asking nicely.
+    const stubborn = stubEngine(
+      "╭─flowchart───────╮\n│ A ⟶ B ⟶ C ⟶ D ⟶ E ⟶ F ⟶ G ⟶ H ⟶ I │\n╰────────────────╯\n",
+    );
+    if (!stubborn) return;
+    const out = await renderDocument("```mermaid\nflowchart LR\n  A-->B\n```\n", {
       width: 20,
       palette: DRACULA_PALETTE,
+      mermaidBin: stubborn,
     });
     for (const l of out.split("\n")) {
       expect(displayWidth(l)).toBeLessThanOrEqual(20);
@@ -319,9 +359,14 @@ describe("render — mermaid pipe + colour classification", () => {
   });
 
   test("a cut coloured line closes its SGR before the marker — hygiene holds at the cut", async () => {
-    const out = await renderDocument("```mermaid\n" + MERMAID_SRC + "```\n", {
+    const stubborn = stubEngine(
+      "╭─flowchart───────╮\n│ A ⟶ B ⟶ C ⟶ D ⟶ E ⟶ F ⟶ G ⟶ H ⟶ I │\n╰────────────────╯\n",
+    );
+    if (!stubborn) return;
+    const out = await renderDocument("```mermaid\nflowchart LR\n  A-->B\n```\n", {
       width: 20,
       palette: DRACULA_PALETTE,
+      mermaidBin: stubborn,
     });
     const cut = out.split("\n").filter((l) => l.includes("38;2;") && l.endsWith("…"));
     expect(cut.length).toBeGreaterThan(0);
@@ -409,22 +454,97 @@ describe("render — mermaid pipe + colour classification", () => {
     }
   });
 
-  test("diagram elides when wider than terminal — never wraps (ADR-UNIVERSAL-ELISION-050)", async () => {
-    // A naturally-wide LR flowchart whose ASCII art is one long line.
-    const wide =
-      "flowchart LR\n  A[Alpha] --> B[Beta] --> C[Gamma] --> B[Delta] --> E[Epsilon] --> F[Zeta] --> G[Eta]";
-    const out = await renderDocument("```mermaid\n" + wide + "```\n", {
+  test("a diagram wider than the pane is stated, never cut (BRF-DIAGRAM-WIDTH-HANDOFF)", async () => {
+    const out = await renderDocument("```mermaid\n" + MERMAID_WIDE + "```\n", {
       width: 30,
       palette: DRACULA_PALETTE,
+      color: "none",
     });
-    // The old policy let art overflow ("art is art") and the terminal
-    // soft-wrapped it — the lie the ADR repeals. Now: every line fits
-    // whole, the cut is okuda's (…), and the receipt says so.
+    // The engine is given okuda's budget, so a layout that does not fit
+    // REFUSES rather than overrunning: there is no art left for okuda to
+    // cut, and nothing reaches elision. Before the width handoff the engine
+    // laid out to the ambient `$COLUMNS` and okuda cut the result, so this
+    // fence's render depended on the shell that launched the viewer.
     for (const l of out.split("\n")) {
       expect(displayWidth(l)).toBeLessThanOrEqual(30);
     }
-    expect(out).toContain("…");
-    expect(out).toContain("art elided");
+    expect(out).not.toContain("art elided");
+    expect(out).toContain("too wide");
+    // The source box is the OTHER refusal and must not stand in for this
+    // one: a bordered listing of a diagram that would have rendered is a
+    // wrapped diagram wearing a border (MERMAID_WIDE fits a 60-column pane,
+    // and this render has 26).
+    expect(out).not.toContain("A[Alpha]");
+    expect(out).not.toContain("mermaid source elided");
+  });
+
+  test("the too-wide receipt names the requirement, and the requirement is real", async () => {
+    // 40 columns of pane, 36 of budget, against a layout whose canvas is 60:
+    // the miss is small and exact, which is what a number is for.
+    const W2 = 40;
+    const out = await renderDocument("```mermaid\n" + MERMAID_WIDE + "```\n", {
+      width: W2,
+      color: "none",
+    });
+    const m = /too wide · needs (\d+) cols · (\d+) here/.exec(out);
+    expect(m).not.toBeNull();
+    const need = Number(m![1]);
+    const here = Number(m![2]);
+    expect(here).toBe(W2 - 4); // the art budget, not the terminal
+    expect(need).toBeGreaterThan(here);
+    // PROVENANCE: the number is the layout's, not a guess. Given exactly that
+    // canvas the engine draws the diagram, and the art is exactly that wide.
+    const proc = Bun.spawn([
+      `${process.env.HOME ?? ""}/.local/bin/mermaid-to-md`,
+    ], {
+      stdin: "pipe",
+      stdout: "pipe",
+      env: { ...process.env, COLUMNS: String(need) },
+    });
+    proc.stdin.write(MERMAID_WIDE);
+    proc.stdin.end();
+    const raw = await new Response(proc.stdout).text();
+    await proc.exited;
+    const art = raw.match(/```text\n([\s\S]*?)\n?```/)?.[1] ?? "";
+    expect(art).not.toContain("too wide");
+    const widest = art.split("\n").reduce((a, l) => Math.max(a, displayWidth(l)), 0);
+    expect(widest).toBe(need);
+  });
+
+  test("the ambient $COLUMNS never reaches the art (one width, one source)", async () => {
+    // The defect this closes: the engine's canvas defaulted to the ambient
+    // `$COLUMNS` (the shell's width) or 80 (when absent), while okuda elided
+    // at its own. Same document, same pane, two answers — the inconsistency
+    // the whole brief is about.
+    const before = process.env.COLUMNS;
+    const render = async () => {
+      const out = await renderDocument("```mermaid\n" + MERMAID_WIDE + "```\n", {
+        width: 120,
+        color: "none",
+      });
+      return out;
+    };
+    process.env.COLUMNS = "200";
+    const wide = await render();
+    process.env.COLUMNS = "40";
+    const narrow = await render();
+    if (before === undefined) delete process.env.COLUMNS;
+    else process.env.COLUMNS = before;
+    expect(narrow).toBe(wide);
+  });
+
+  test("a source-only fence says the source is SHOWN, not elided", async () => {
+    // The receipt used to read `⋮ mermaid source elided` above a box that was
+    // displaying the source — a false claim printed over its own counter-
+    // example, and the class ADR-027 calls the one failure worse than
+    // saying nothing.
+    const out = await renderDocument("```mermaid\n" + MERMAID_UNSUPPORTED + "```\n", {
+      width: W,
+      color: "none",
+    });
+    expect(out).toContain("source shown");
+    expect(out).toContain("gantt"); // the type is named, from the box's title
+    expect(out).not.toContain("mermaid source elided");
   });
 
   test("missing binary: the fence says why, the document renders", async () => {

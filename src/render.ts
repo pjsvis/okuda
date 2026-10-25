@@ -154,10 +154,25 @@ const MERMAID_BIN_CANDIDATES = [
 ];
 
 /** Run the mermaid binary. Returns the art, or the reason there is none —
- *  the reason reaches the reader, so it must be a fact and not a shrug. */
+ *  the reason reaches the reader, so it must be a fact and not a shrug.
+ *
+ *  `width` is the canvas the engine lays out to, and it is **okuda's own
+ *  budget**, passed on the channel the engine documents:
+ *  `mermaid-tui --help` — `-w, --width <N>  Canvas width in columns
+ *  (default: $COLUMNS, else 80)` (`mermaid-to-md/src/main.rs:67-70`). The
+ *  wrapper accepts no width flag, so the env var is the whole interface, and
+ *  it must be set explicitly: an inherited `$COLUMNS` is the *shell's* width
+ *  and an absent one is 80, neither of which is the width okuda is drawing
+ *  into (BRF-DIAGRAM-WIDTH-HANDOFF). The engine treats it as a hard bound —
+ *  a canvas that exceeds it returns `Oversize::Width`
+ *  (`mermaid-to-md/src/mermaid.rs:1903`, `:3385`) — so art composed at
+ *  okuda's budget fits okuda's budget by construction, and the elision
+ *  below becomes a net for a misbehaving engine rather than the normal
+ *  path. */
 async function spawnMermaid(
   source: string,
   opts: RenderOptions,
+  width: number,
 ): Promise<{ ok: true; out: string } | { ok: false; reason: string }> {
   const candidates = opts.mermaidBin
     ? [opts.mermaidBin]
@@ -169,6 +184,10 @@ async function spawnMermaid(
         stdin: "pipe",
         stdout: "pipe",
         stderr: "pipe",
+        // The engine's canvas. Spread first: `env` replaces the child's
+        // whole environment, and the wrapper is a shell script that needs
+        // PATH to find `mermaid-tui`.
+        env: { ...process.env, COLUMNS: String(width) },
       });
       // Drain both streams before waiting: a child that fills the stderr
       // pipe buffer blocks in write() and the exit is never reached.
@@ -195,6 +214,63 @@ async function spawnMermaid(
 function firstLineOf(text: string): string {
   const line = text.trim().split("\n")[0] ?? "";
   return line === "" ? "" : ` · ${line}`;
+}
+
+/** The engine's refusal, as it appears in the art fence: `mermaid-to-md`
+ *  flattens `too_wide` into the bordered source box and appends this line
+ *  (`mermaid-to-md/src/mermaid.rs:3521`), so the hint string is the *only*
+ *  channel okuda has for the flag — the playbook's `okuda sees the flag`
+ *  claimed a channel that does not exist. One constant, so the coupling is
+ *  named once and `DEPENDENCIES.md` is its referent.
+ *
+ *  Two characters short on purpose: the hint is WRAPPED to the canvas, so the
+ *  full sentence `too wide to display` is not a substring at narrow budgets
+ *  (it renders as `too wide` / `to display here — open the` / `image…`). The
+ *  short phrase is the join, and `RE_SOURCE_BOX` is the anchor that keeps a
+ *  node label reading "too wide" from being mistaken for a refusal. */
+const ENGINE_TOO_WIDE = "too wide";
+
+/** The engine's other refusal: source it will not draw — an unsupported
+ *  family (gantt, pie, mindmap) or `Oversize::Cells`. `fallback()` titles
+ *  the box `╭ mermaid: <first word> …╮` (`:3526-3540`); real art never does,
+ *  because the title is the fallback's alone. Captures the first word, which
+ *  is the type name only when the source opens with one — a fence led by an
+ *  `%%{init:…}%%` directive yields `%%{init:`, so the caller gates on the
+ *  shape of a word before calling it a type. */
+const RE_SOURCE_BOX = /^\u256d mermaid: (\S+)/;
+/** A bare identifier — the only shape a Mermaid diagram-type token takes. */
+const RE_TYPE_WORD = /^[a-z][A-Za-z0-9]*$/;
+
+/** Display width of the widest art line — the layout's own measurement. */
+function artWidth(art: string): number {
+  return art.split("\n").reduce((a, l) => Math.max(a, displayWidth(l)), 0);
+}
+
+/** How wide does this diagram *want* to be? Only asked of a fence the engine
+ *  refused, and only after it refused, so the common case pays nothing.
+ *
+ *  A canvas that stretches to fill its pane can never exceed it, so it can
+ *  never bail; therefore every bailed layout is fixed-size, and the art it
+ *  produces on a generous canvas *is* its requirement — no estimate, no
+ *  guess. The ladder doubles from the budget and stops at the first canvas
+ *  that renders, which is at most a handful of spawns and usually two.
+ *
+ *  Returns `null` when no rung renders, which is the honest answer for a
+ *  diagram whose refusal is not about width at all. */
+async function measureDiagramWidth(
+  source: string,
+  opts: RenderOptions,
+  budget: number,
+): Promise<number | null> {
+  for (let w = budget * 2; w <= 2048; w *= 2) {
+    const r = await spawnMermaid(source, opts, w);
+    if (!r.ok) return null;
+    const art = extractDiagramArt(r.out);
+    if (art.includes(ENGINE_TOO_WIDE)) continue;
+    if (RE_SOURCE_BOX.test(art)) continue; // not art — keep looking
+    return artWidth(art);
+  }
+  return null;
 }
 
 /** Pipe mermaid source to diagram-describe for a prose description
@@ -331,6 +407,9 @@ function newTableState(): TableState {
  *  because the placeholder handler cannot invent a diagnosis. */
 type DiagramEntry =
   | { art: string; title?: string | null }
+  /** The engine laid it out and the layout did not fit. `needs` is measured
+   *  (null when no canvas rendered it) and is a fact, not a shrug. */
+  | { tooWide: number | null; title?: string | null }
   | { failure: string; title?: string | null };
 
 interface Ctx {
@@ -628,16 +707,32 @@ async function interceptMermaid(
         if (prose === "") return null;
         return { described: true, prose, title: f.title };
       }
-      const r = await spawnMermaid(f.code, opts);
-      return r.ok
-        ? { described: false, art: extractDiagramArt(r.out), title: f.title }
-        : { described: false, failure: r.reason, title: f.title };
+      const r = await spawnMermaid(f.code, opts, ctx.width);
+      if (!r.ok) return { described: false, failure: r.reason, title: f.title };
+      const art = extractDiagramArt(r.out);
+      // The engine gave up rather than overrun the canvas it was given. That
+      // is a fact about the diagram, not a failure of the pipe, and it is
+      // stated with the requirement the layout actually has. A refusal is
+      // the source box *plus* the hint; the box alone is the other refusal.
+      if (art.includes(ENGINE_TOO_WIDE) && RE_SOURCE_BOX.test(art)) {
+        return {
+          described: false,
+          tooWide: await measureDiagramWidth(f.code, opts, ctx.width),
+          title: f.title,
+        };
+      }
+      return { described: false, art, title: f.title };
     }),
   );
   for (const [i, entry] of results.entries()) {
     if (entry === null) continue;
     if (entry.described) {
       ctx.described.set(String(i), { prose: entry.prose!, title: entry.title });
+    } else if ("tooWide" in entry) {
+      ctx.mermaid.set(String(i), {
+        tooWide: entry.tooWide ?? null,
+        title: entry.title,
+      });
     } else if (entry.failure !== undefined) {
       ctx.mermaid.set(String(i), { failure: entry.failure, title: entry.title });
     } else {
@@ -975,9 +1070,31 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       if (m) {
         const entry = ctx.mermaid.get(m[1]!);
         if (entry === undefined) return ""; // no fence captured for this token
-        return "failure" in entry
-          ? diagramUnavailableBlock(entry.failure, ctx, entry.title)
-          : diagramBlock(entry.art, ctx, entry.title);
+        if ("failure" in entry) {
+          return diagramReceipt(
+            `diagram unavailable \u00b7 ${entry.failure}`,
+            ctx,
+            entry.title,
+          );
+        }
+        if ("tooWide" in entry) {
+          // The requirement is a number and the budget is a number — say both,
+          // and say nothing whose remedy does not exist here. The engine's own
+          // hint offers "open the image", which is advice for a medium okuda
+          // is not in. `cols`, not `columns`: the receipt is elided to the
+          // budget, and at 36 columns the long word cost the budget its own
+          // number — a receipt that gets cut before it states the fact it
+          // exists to state has failed at its one job.
+          const need = entry.tooWide === null
+            ? "wider than any canvas the engine would draw it on"
+            : `needs ${entry.tooWide} cols`;
+          return diagramReceipt(
+            `too wide \u00b7 ${need} \u00b7 ${ctx.width} here`,
+            ctx,
+            entry.title,
+          );
+        }
+        return diagramBlock(entry.art, ctx, entry.title);
       }
       // Described diagram placeholder → prose block (BRF-DIAGRAM-DESCRIBE).
       const d = children.trim().match(RE_DESCRIBED_TOKEN);
@@ -1425,7 +1542,23 @@ function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   // control among the art.
   const glyph = ctx.styler.roleBold("state-parked", "⋮");
   const note = elided > 0 ? " · art elided" : "";
-  const base = title ? " " + title + " · source elided" : " mermaid source elided";
+  // A fence whose "art" is the engine's bordered SOURCE box — an unsupported
+  // family, or `Oversize::Cells` — is not art, and the standing clause would
+  // be a false claim printed above the thing it denies: `source elided` over
+  // the source. The box is kept (for a gantt or mindmap fence it is the only
+  // rendering there will ever be), and the receipt says what is actually on
+  // screen and why. (A *too wide* bail never reaches here — it is routed to
+  // `diagramReceipt` with its measured requirement.)
+  const sourceBox = art.match(RE_SOURCE_BOX);
+  const type = sourceBox && RE_TYPE_WORD.test(sourceBox[1]!) ? sourceBox[1] : null;
+  const core = sourceBox
+    ? type
+      ? `source shown · ${type} not drawn by the engine`
+      : "source shown · not drawn by the engine"
+    : title
+      ? "source elided"
+      : "mermaid source elided";
+  const base = title ? " " + title + " · " + core : " " + core;
   const fits = (s: string) => displayWidth(glyph + ctx.styler.role("muted", s)) <= budget;
   // Fit ladder: the receipt's claims outrank the caption — the title is
   // first to go, then the standing source clause; the art loss is the
@@ -1433,7 +1566,7 @@ function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   // rung fits and the branch bytes are unchanged (the 36-fence
   // byte-stability claim holds where it always applied).
   let text = base + note;
-  if (!fits(text) && title) text = " source elided" + note;
+  if (!fits(text) && title) text = " " + core + note;
   if (!fits(text) && note) text = note;
   const stmt = ctx.styler.role("muted", text);
   const indOpen = tagRawOpen("diagramsrc");
@@ -1441,22 +1574,28 @@ function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   return `${open}${lines.join("\n")}${TAG_RAW_CLOSE}\n${indOpen}${indicator}${TAG_RAW_CLOSE}\n\n`;
 }
 
-/** No diagram, and the reason — one muted line where the art would have
- *  been. The counterpart of `diagramBlock`'s `⋮ source elided` receipt, and
- *  the same discipline: a projection loss is *said* (BRF-PROJECTION-LOSSES).
+/** No art, and the reason — one muted line where the art would have been.
+ *  The counterpart of `diagramBlock`'s `⋮ source elided` receipt, and the
+ *  same discipline: a projection loss is *said* (BRF-PROJECTION-LOSSES).
  *  The glyph is `▸`, not `⋮` — `⋮` means "elided into a further question",
- *  and this is not elision, it is failure. RAW-wrapped so the notice can
- *  never be re-wrapped by a later pass, and elided to the same budget as the
- *  art it stands in for. Under NO_COLOR the attributes survive, as they do
- *  for every other receipt. */
-function diagramUnavailableBlock(
-  failure: string,
+ *  and this is not elision: the diagram was asked for and not drawn. Two
+ *  statements share the shape — `diagram unavailable · <reason>` when the
+ *  pipe failed, and `too wide · needs N columns · M here` when the engine's
+ *  layout would not fit the canvas it was given (BRF-DIAGRAM-WIDTH-HANDOFF).
+ *  The second is the one that makes the class legible: the requirement is a
+ *  constant and the budget is the variable, so a reader can see that the
+ *  fix is a wider pane or a smaller diagram, not a retry.
+ *  RAW-wrapped so the notice can never be re-wrapped by a later pass, and
+ *  elided to the same budget as the art it stands in for. Under NO_COLOR the
+ *  attributes survive, as they do for every other receipt. */
+function diagramReceipt(
+  statement: string,
   ctx: Ctx,
   title?: string | null,
 ): string {
   const glyph = ctx.styler.roleBold("state-parked", "▸");
   const caption = title ? ` ${title} ·` : "";
-  const base = `${caption} diagram unavailable · ${failure}`;
+  const base = `${caption} ${statement}`;
   const open = tagRawOpen("diagram");
   const indOpen = tagRawOpen("diagramsrc");
   const line = elideToWidth(`${glyph}${ctx.styler.role("muted", base)}`, ctx.width);

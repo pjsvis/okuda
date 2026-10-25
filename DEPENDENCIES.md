@@ -81,12 +81,30 @@ name and package name differ. The origin doc's `spacex-mermaid` is stale;
   boxes, which the renderer *does* draw as containers — its native shape.
   Don't ask the state grammar for nesting it flattens; ask the flowchart
   grammar, which draws what it parses.
-- **Width guard.** A diagram whose rendered ASCII exceeds the binary's
-  internal width budget is emitted as the mermaid source in a bordered
-  box ("This diagram is too wide to display here") instead of ASCII art.
-  This is upstream elision — the binary gives up before okuda does.
-  Wide `flowchart LR` with long node labels hits this; short labels at the
-  same node count do not. (`docs/diagram-monster.md` is the live exhibit.)
+- **Width guard.** The engine's canvas is taken from `-w`, else `$COLUMNS`,
+  else 80 (`src/main.rs:67-70`). The wrapper passes no `-w`, so **okuda sets
+  `COLUMNS` to its own diagram budget** (`src/render.ts`, `spawnMermaid`)
+  — without it the canvas would be the shell's width or 80, and the art
+  would be composed for a width okuda is not drawing into
+  (`BRF-DIAGRAM-WIDTH-HANDOFF`). Given a canvas the engine **never overruns
+  it**: a layout whose canvas exceeds it returns `Oversize::Width`
+  (`src/mermaid.rs:1903`, `:3385`) and `render()` maps that to
+  `fallback(…, too_wide = true)` (`:132-137`), which emits the source in a
+  bordered box plus *"This diagram is too wide to display here — open the
+  image to view it in full."* okuda consumes that as a receipt of its own
+  (`▸ too wide · needs N cols · M here`), with N measured by re-rendering on
+  a doubled canvas: a layout that stretches to fill its pane can never
+  exceed it and so never bails, which makes every bailed layout fixed-size
+  and its art width on a generous canvas its exact requirement.
+- **The refusal is not flagged on the pipe.** `mermaid-to-md` flattens
+  `too_wide` into the text fence, so okuda detects it from the shape of the
+  output — the `╭ mermaid: ` box title (never present in art) plus the
+  hint. Coupling to the hint string is the cost of a wrapper with no
+  structured exit; if the wrapper ever grows one, this is what changes.
+- **`Oversize::Cells` is indistinguishable from an unsupported type**
+  (`src/mermaid.rs:133-136`: both emit `fallback(…, too_wide = false)`). A
+  diagram too *large* therefore reads as *"this family is not drawn"*.
+  Upstream's gap, not okuda's; no receipt here can tell them apart.
 
 The pair (`rg`, `fzf`) serves the `gloam` launcher (see
 `src/launcher.ts`, ADR-016; BRF-CONTENT-SHORTLIST). `gloam` (no arg)

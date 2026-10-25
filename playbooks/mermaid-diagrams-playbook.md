@@ -55,10 +55,33 @@ Yes, at three levels — two shipped, one proposed:
    over-cap content is silently dropped and flagged internally
    (`over_cap`). The diagram still renders — a *truncated* diagram.
 2. **Layout-level refusal (shipped).** If the computed canvas exceeds
-   `MAX_CANVAS_CELLS` or the width cannot fit, the layout returns
-   `Oversize::Width` / `Oversize::Cells`, and the renderer falls back to
-   the source listing with a `too_wide` flag — okuda sees the flag and
-   paints accordingly.
+   `MAX_CANVAS_CELLS` or the canvas the engine was given, the layout
+   returns `Oversize::Cells` / `Oversize::Width`, and the renderer falls
+   back to a bordered listing of the source. **There is no flag on the
+   pipe**: `mermaid-to-md` is a shell wrapper that flattens the refusal
+   into a ```` ```text ```` fence, so the only channel is the shape of
+   what comes back — a `╭ mermaid: ` box title (never present in real art)
+   plus, for `Oversize::Width` only, the appended hint. okuda reads both
+   and states which refusal it was. The two are indistinguishable for
+   `Oversize::Cells`, which is a gap upstream, not here.
+
+   **The canvas is okuda's budget** (`BRF-DIAGRAM-WIDTH-HANDOFF`).
+   `mermaid-tui` takes its canvas from `-w`, else `$COLUMNS`, else 80, and
+   the wrapper passes no `-w` — so okuda sets `COLUMNS` to the width it
+   will draw into. Given that number the engine never overruns it; it
+   refuses instead. Which means:
+
+   - a diagram that fits is drawn in full, never cut;
+   - a diagram that does not fit is *not* drawn, and the render says
+     `▸ too wide · needs 241 cols · 116 here` — the layout's canvas is a
+     **fixed number**, so the receipt can state it, and widening the pane
+     either crosses it or tells you it never will.
+
+   Before this, the engine laid out to the ambient `$COLUMNS` — the
+   *shell's* width, or 80 when absent — while okuda cut at its own, and the
+   same diagram in the same pane rendered differently depending on which
+   shell launched the viewer. If you see art with a `…` in it, the engine
+   overran its canvas, which the shipped one does not do: that is a bug.
 3. **CSN diagnostics (proposed, unshipped).** `BRF-MERMAID-HARD` reserves
    standard diagnostic strings (`CSN: too wide`, `CSN: too complex`) so
    okuda can paint a *stated* boundary instead of a silent truncation —
@@ -68,19 +91,28 @@ Yes, at three levels — two shipped, one proposed:
 ## Authoring workflow
 
 ```bash
-# fast iteration on one diagram
-mermaid-to-md < diagram.mmd
+# fast iteration on one diagram — at the canvas you actually have
+COLUMNS=120 mermaid-to-md < diagram.mmd
 
 # full render, the way the silo will see it
 ./okuda docs/your-doc.md
 
-# verification: does the diagram parse as an intended type?
-./okuda docs/your-doc.md | grep -m1 "mermaid:"   # a hit means fallback fired
+# does it need a wider pane than this one? (the number, not a guess)
+./okuda docs/your-doc.md | grep "too wide"
 ```
 
-A ` mermaid: flowchart ` title line in the render means the diagram
-**fell back** — the type was unsupported or the source didn't parse.
-That grep is the smoke test.
+A ` mermaid: flowchart ` **box title** in the render means the diagram
+**fell back** — the type was unsupported or the source didn't parse. That
+grep is the smoke test.
+
+**Budget rule.** A diagram's canvas is fixed; the pane is not. Before
+committing a diagram to a document, render it at the narrowest width the
+document is expected to be read at. A `flowchart LR` with three subgraphs
+and phrase-length labels is a 241-column diagram, and no amount of pane
+will make it a 120-column one (`docs/2026-10-25-test-diagrams.md` holds
+one, and the receipt names it). The fix for "too wide" is a narrower
+diagram — fewer columns of rank, shorter labels, split by view — never a
+wider pane.
 
 ## Related
 

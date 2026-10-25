@@ -165,6 +165,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-DARWIN-CLOSE-OUT | · open | The darwin close-out — turn one promise into a measurement, and stop two paths guessing | — |
 | BRF-AUTHORING-CONVENTION | · open | Authoring Convention — Route Agents to the Style Guide | — |
 | BRF-PROBES-TIER | · open | Establish Registered `probes/` Tier for Exploratory Python Scripts | — |
+| BRF-DIAGRAM-WIDTH-HANDOFF | · open | One width, or two? — the diagram pipe's second opinion | — |
 
 ## Parked / deferred
 
