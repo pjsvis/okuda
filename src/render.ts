@@ -72,6 +72,47 @@ function stripVector(children: string): { slug: string; num: string; live: boole
   return { slug, num: m[1]!, live: vec !== null };
 }
 
+/** A paragraph that is nothing but an annotated reference: `path \u00a7NN`, or
+ *  `\u00a7NN path` when the token was authored before the slug. Anchored at both
+ *  ends, so `see path \u00a7NN for the reasoning` stays prose. */
+const RE_ADDRESS_LINE = /^(?:\u00a7(\d{1,2})\s+(\S+)|(\S+)\s+\u00a7(\d{1,2}))$/u;
+
+/** Render a paragraph that is only an address, or null when it is prose.
+ *
+ *  An address ELIDES rather than wraps. `wrapANSI` breaks a long token after a
+ *  delimiter — the right call for a URL in a table (BRF-TABLE-GLASS-FIT) — but for
+ *  a path it asserts a name that does not exist: measured 2026-10-25, a 60-column
+ *  pane rendered the fixture's reference as `…-width-handoff.` / `md \u00a712`,
+ *  splitting the extension from the basename and stranding the badge on the last
+ *  line. The wrap law decides it: the break IS significant here, so the line is
+ *  cut, not re-flowed.
+ *
+ *  This is the intent the `stripVector` branch in `paragraph` already had and
+ *  could never reach — post-order means `text()` runs first and replaces the token
+ *  with the painted badge, so no `%okuda-vector:NN%` survives to be matched. The
+ *  predicate therefore reads the RENDERED form, and reconstructs the two painted
+ *  pieces, because the badge is the actuation point and must survive the cut
+ *  whole while the path takes it.
+ *
+ *  Returns null when the line fits, so a document that already fits keeps its
+ *  exact bytes and this cannot regress the common case. */
+function addressLine(children: string, ctx: Ctx): string | null {
+  const flat = stripANSI(children).trim();
+  const m = RE_ADDRESS_LINE.exec(flat);
+  if (m === null) return null;
+  if (displayWidth(flat) <= ctx.width) return null;
+  const badge = m[1] ?? m[4]!;
+  const path = m[2] ?? m[3]!;
+  // The badge renders as `\u00a7` + digits: one more column than the capture.
+  const avail = Math.max(1, ctx.width - badge.length - 2);
+  const cut = elideToWidth(path, avail);
+  // `text()` paints a whole-token .md path gold; anything else stays plain, so
+  // this reconstruction cannot invent a colour the author's render did not have.
+  const body = /\.md$/.test(path) ? ctx.styler.role("doc-ref", cut) : cut;
+  const mark = ctx.styler.roleBold("vector", `\u00a7${badge}`);
+  return (m[1] !== undefined ? `${mark} ${body}` : `${body} ${mark}`) + "\n\n";
+}
+
 /** The closed state-glyph vocabulary — lexicon-applied, not author-editable.
  *  The renderer colours a ✓ green because ✓ is in this set, not because
  *  an author can tag arbitrary text green. Extends ADR-015's alert
@@ -1255,6 +1296,12 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         const body = elideToWidth(slugLines.join(" "), avail);
         return body + " " + styler.roleBold("vector", badge) + "\n\n";
       }
+      // An address is not prose: it elides, keeping the badge whole. (The
+      // predicate reads the RENDERED form — `text()` has already painted the
+      // token into `\u00a7NN` by the time a post-order parent sees it, which is why
+      // `stripVector`'s paragraph branch below never fires.)
+      const address = addressLine(children, ctx);
+      if (address !== null) return address;
       const lines = wrapBlock(stripHtml(children));
       return lines.join("\n") + "\n\n";
     },

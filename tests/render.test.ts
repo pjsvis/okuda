@@ -1059,3 +1059,53 @@ describe("render — the read boundary tops and tails (a file's ending is not a 
     // not the boundary's — which is the point of leaving it alone.)
   });
 });
+
+describe("render — an address elides; it does not wrap (a wrapped path is a false name)", () => {
+  // Found 2026-10-25, and it was not a narrow-width matter: at a 60-column pane
+  // the annotated-reference line rendered as `…-width-handoff.` / `md §12` — the
+  // extension split from the basename, the badge stranded on the last line. The
+  // handler that would have elided it was written and unreachable, because
+  // post-order means `text()` replaces the vector token with the painted badge
+  // before `paragraph()` can look for it.
+  const REF = "briefs/2026-10-25-brief-diagram-width-handoff.md";
+  const run = (src: string, w: number) => renderDocument(src, { width: w, color: "none" });
+
+  test("a lone reference is cut with `…`, and the badge survives whole", async () => {
+    // Both authored orders: token after the slug (what `annotateSource` emits) and
+    // before it. The badge is the actuation point, so it is never the casualty.
+    for (const src of [`${REF} %okuda-vector:12%\n`, `%okuda-vector:12% ${REF}\n`]) {
+      const out = await run(src, 40);
+      const lines = out.split("\n").filter((l) => l.trim() !== "");
+      // One line for the address — not three. (The terminator is the last line.)
+      const addr = lines.filter((l) => l.includes("§12") || l.includes("briefs/"));
+      expect(addr.length).toBe(1);
+      const text = stripANSI(addr[0]!);
+      expect(text).toContain("…"); // cut, not re-flowed
+      expect(text).toContain("§12"); // the actuation point survives whole
+      // And nothing anywhere is an orphaned extension.
+      for (const l of lines) expect(stripANSI(l).trim()).not.toBe("md");
+      for (const l of out.split("\n")) expect(displayWidth(l)).toBeLessThanOrEqual(40);
+    }
+  });
+
+  test("a line that already fits keeps its exact bytes", async () => {
+    // The predicate returns null when the address fits, so the common case is
+    // untouched — no reconstruction, no repaint, no byte drift.
+    const source = `${REF} %okuda-vector:12%\n`;
+    expect(await run(source, 120)).toBe(await run(source, 120));
+    expect(stripANSI(await run(source, 120))).toContain(`${REF} §12`);
+  });
+
+  test("prose containing a reference is prose, and still wraps as prose", async () => {
+    // Anchored at both ends: a sentence is not an address, and cutting it would
+    // lose the sentence rather than an address.
+    const src = `see ${REF} §12 for the reasoning\n`;
+    const out = stripANSI(await run(src, 40));
+    expect(out).toContain("see");
+    expect(out).toContain("reasoning");
+    // Wrapped, not cut: no single line carries the whole reference, and no line
+    // carries the elision marker the address path would have added.
+    for (const l of out.split("\n")) expect(l).not.toContain(REF);
+    expect(out).not.toContain("…");
+  });
+});
