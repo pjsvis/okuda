@@ -6,7 +6,81 @@ callsign: BRF-DIAGRAM-WIDTH-HANDOFF
 # Brief: One width, or two? — the diagram pipe's second opinion
 
 **Date:** 2026-10-25
-**Status:** Open
+**Status:** In progress — **P1 shipped and was superseded the same day.**
+`2a11837` implemented the four changes below; the amendment at the head of this
+document reverses the width policy and voids two of the Rejections. P2 (the
+fix) is not yet written — steps 1–7 are in the amendment. Read the amendment
+first; the body is kept as the record of the position it replaced.
+
+## Amendment 2026-10-25 — the width was the wrong question
+
+**P1** (`2a11837`) gave the engine *okuda's* budget as its canvas, so a diagram
+that did not fit was **refused** and replaced by a one-line receipt. Determinism
+was the goal and it was reached. The operator then named the cost, and it is
+larger than the cost P1 removed:
+
+> *Our preference is that the vertical rhythm is maintained without things
+> being added or removed from the flow.*
+
+Measured on `docs/2026-10-25-test-diagrams.md` under P1:
+
+| pane | 80 | 100 | 120 | 160 | 200 |
+|---|---|---|---|---|---|
+| **P1** document lines | 268 | 374 | 431 | 467 | 467 |
+| diagrams drawn / refused | 4 / 6 | 7 / 3 | 8 / 2 | 9 / 1 | 9 / 1 |
+
+**A document with five shapes**, 199 lines of reflow between an 80-column pane
+and a 160-column one. Under P2 the same document is 467 lines at every width and
+only the cut point moves.
+
+### P2 — the policy this document now proposes
+
+1. **The canvas is generous and fixed — never the pane.** 2048 columns, derived:
+the engine's own `MAX_NODES` is 128 and its LR layouts spend ~15 columns per
+node (measured: a 127-node chain lays out at 1929 columns; 100 nodes already
+refuse a 1024 canvas). The pane is not an input to layout.
+2. **Preformatted content is elided at the glass, never re-flowed.** Diagrams,
+code fences, tables and source listings all obey one law: **wrapping is a claim
+that the break is insignificant.** In prose that is true; in a code line, a box
+edge or a rank it is false, and the break asserts a structure the author did not
+write.
+3. **A cut diagram says what widening would buy.** The requirement is the art's
+own width — free, once art exists: `⋮ … · art elided · needs 241 cols`.
+4. **`▸` stays reserved for *no art at all*.** The `▸ too wide` shape leaves the
+normal path; the number moves to where the loss is, on the `⋮` receipt.
+5. **A document's line count is invariant under pane width.** That is the
+guarantee, and it is narrower than "the line count never changes": a 61-node
+`flowchart TB` is 303 lines of art and **okuda has no height policy at all**. The
+guarantee is about resize, not about authoring. The height axis is out of scope
+here and gets its own brief.
+
+### What the amendment deletes from the body
+
+- **The measurement probe (§2, `measureDiagramWidth`).** Orbitted: the doubling
+ladder existed to find a canvas the engine would accept, and under P2 the art's
+width *is* that number. One less moving part, and one less spawn.
+- **A second spawn for source boxes.** Planned during design and withdrawn: the
+engine's fallback box wraps **only because its canvas is narrower than its
+content** (measured, `d11`: canvas 64 → 29 lines wrapped; canvas 2048 → 25
+lines at natural width). The generous canvas removes the wrap, so no special
+class is needed, and the pane never gets its authority back.
+
+### Void Rejections
+
+- *"Retry at natural width, then elide"* — **adopted as P2.** The reasoning that
+rejected it (`a cut diagram pretends hardest`) does not survive the `…` marker:
+a marked fragment plus a receipt that names the requirement is more information
+than a receipt alone, and `ADR-TABLE-EDGE-CUT-055` already asserts this policy
+for tables in as many words (*"the same policy a diagram line gets"*).
+- *"Give the engine a generous bound always, keep eliding"* — **adopted as P2's
+1 and 2.** The objection was that it "keeps two widths"; it does not, once the
+bound is fixed rather than ambient. That was the defect all along.
+
+### Not in this brief
+
+The exclusions declaration (which families are not drawn, and how the render
+says so) is a separate step with its own commit — it is a claim about the
+engine, not about width.
 
 ## Context
 
@@ -95,8 +169,7 @@ wrapped.
 
 | # | Change | Where | Fails by |
 |---|---|---|---|
-| 1 | `spawnMermaid` sets `COLUMNS = ctx.width` on the child — the engine's documented width channel | `src/render.ts:159-190` | a diagram elided in a pane with room |
-| 2 | a bailed fence becomes okuda's own receipt, `▸ too wide · needs 241+ columns (116 here)`, with the requirement *measured*, not guessed | `diagramBlock` / `diagramUnavailableBlock` | a receipt with no number, or a number that is not the engine's |
+| 1 | `spawnMermaid` sets `COLUMNS = ctx.width` on the child — the engine's documented width channel | `src/render.ts:159-190` | a diagram elided in a pane with room || 2 | a bailed fence becomes okuda's own receipt, `▸ too wide · needs 241+ columns (116 here)`, with the requirement *measured*, not guessed | `diagramBlock` / `diagramUnavailableBlock` | a receipt with no number, or a number that is not the engine's |
 | 3 | when the extracted "art" *is* the source box (bail or unsupported type), the `source elided` clause is suppressed — the source is on screen | `diagramBlock` | "source elided" printed above the source again |
 | 4 | the playbook's unpaid claim is replaced by what is true, and the width channel is named in `DEPENDENCIES.md` | `playbooks/…`, `DEPENDENCIES.md` | a future session looking for a flag that is not there |
 
@@ -108,13 +181,17 @@ probe, and the spawns stay inside the existing `Promise.all`.
 
 ## Rejections
 
-- **Retry at natural width, then elide.** Produces a diagram that is true on
-  its left half and a `…` where its conclusion was. ADR-UNIVERSAL-ELISION-050
-  exists to stop okuda pretending; a cut diagram pretends hardest of all,
-  because the visible part still parses.
-- **Give the engine a generous bound always, keep eliding.** This is today's
-  behaviour with a different constant. It keeps two widths and keeps the
-  inconsistency, and it renders 241 columns of art to throw 125 of them away.
+- **Retry at natural width, then elide.** *(Superseded — the amendment adopts
+  this as P2.)* Produces a diagram that is true on its left half and a `…`
+  where its conclusion was. ADR-UNIVERSAL-ELISION-050 exists to stop okuda
+  pretending; a cut diagram pretends hardest of all, because the visible part
+  still parses.
+- **Give the engine a generous bound always, keep eliding.** *(Superseded — the
+  amendment adopts this as P2 §1–2. The objection below is only true of an
+  **ambient** bound; a **fixed** one keeps a single width, which was the whole
+  defect.)* This is today's behaviour with a different constant. It keeps two
+  widths and keeps the inconsistency, and it renders 241 columns of art to
+  throw 125 of them away.
 - **Add `--width` to `mermaid-to-md` and pass it.** Correct, but it is a change
   in *another silo* (the seam rule: a crossing declares itself). `$COLUMNS` is
   the engine's documented default and needs no crossing. If upstream grows a
