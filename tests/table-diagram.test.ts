@@ -2,34 +2,9 @@ import { describe, expect, test } from "bun:test";
 import { renderDocument } from "../src/render";
 import { DRACULA_PALETTE } from "../src/palette";
 import { displayWidth, stripANSI } from "../src/width";
-import { existsSync, chmodSync, mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { existsSync } from "node:fs";
 
 const W = 64;
-
-/** Write an executable stub engine that prints `art` and ignores both stdin
- *  and `$COLUMNS`. The real engine is given okuda's budget and refuses rather
- *  than overrun it (`BRF-DIAGRAM-WIDTH-HANDOFF`), so a fence whose art is
- *  wider than the budget can only be produced by an engine that ignores the
- *  canvas. okuda's elision is a net for exactly that engine, and a net has to
- *  be tested by something that falls into it. Returns null when the platform
- *  will not take the script (the test then reports nothing rather than
- *  failing for the wrong reason). */
-function stubEngine(art: string): string | null {
-  try {
-    // Per-process, per-call: the script must outlive the render that spawns
-    // it, so the directory is left for the OS to reap rather than removed
-    // here. The name carries the pid so parallel test runs cannot collide.
-    const dir = mkdtempSync(join(tmpdir(), `okuda-stub-engine-${process.pid}-`));
-    const path = join(dir, "mermaid-to-md");
-    writeFileSync(path, `#!/bin/sh\ncat >/dev/null\ncat <<'ART'\n${art}ART\n`);
-    chmodSync(path, 0o755);
-    return path;
-  } catch {
-    return null;
-  }
-}
 
 describe("render — tables (uniform presentation policy)", () => {
   test("header cyan+bold, rule kept, amber first column, loose rows", async () => {
@@ -333,20 +308,17 @@ describe("render — mermaid pipe + colour classification", () => {
     for (const l of art) expect(l.endsWith("\x1b[0m")).toBe(true);
   });
 
-  test("an engine that overruns its canvas is elided, never wrapped (ADR-UNIVERSAL-ELISION-050)", async () => {
-    // okuda's elision is now a NET, not the normal path: the real engine is
-    // given okuda's budget and refuses rather than overrun (the test below
-    // this one), so art wide enough to cut can only come from an engine that
-    // ignores `$COLUMNS`. That engine is stubbed here, which is the honest
-    // way to test a net — it cannot be reached by asking nicely.
-    const stubborn = stubEngine(
-      "╭─flowchart───────╮\n│ A ⟶ B ⟶ C ⟶ D ⟶ E ⟶ F ⟶ G ⟶ H ⟶ I │\n╰────────────────╯\n",
-    );
-    if (!stubborn) return;
-    const out = await renderDocument("```mermaid\nflowchart LR\n  A-->B\n```\n", {
+  test("a diagram wider than the glass is drawn and cut, never refused (BRF-DIAGRAM-WIDTH-HANDOFF)", async () => {
+    // The engine is always given a generous canvas, so this diagram exists at
+    // its natural 60 columns and the 20-column pane cuts it. The policy that
+    // preceded this one refused it instead — reached determinism by making the
+    // diagram's existence a function of window width, and cost the document
+    // its vertical rhythm (measured: 268 / 374 / 431 / 467 lines at
+    // 80 / 100 / 120 / 160 columns).
+    const out = await renderDocument("```mermaid\n" + MERMAID_WIDE + "```\n", {
       width: 20,
       palette: DRACULA_PALETTE,
-      mermaidBin: stubborn,
+      color: "none",
     });
     for (const l of out.split("\n")) {
       expect(displayWidth(l)).toBeLessThanOrEqual(20);
@@ -356,17 +328,15 @@ describe("render — mermaid pipe + colour classification", () => {
     // cannot fit, but the art loss is the new fact and holds the last
     // rung — the receipt never elides the very thing it exists to say.
     expect(out).toContain("art elided");
+    // NO refusal: `▸` is reserved for "no art at all", and here there is art.
+    expect(out).not.toContain("▸");
+    expect(out).not.toMatch(/too wide/);
   });
 
   test("a cut coloured line closes its SGR before the marker — hygiene holds at the cut", async () => {
-    const stubborn = stubEngine(
-      "╭─flowchart───────╮\n│ A ⟶ B ⟶ C ⟶ D ⟶ E ⟶ F ⟶ G ⟶ H ⟶ I │\n╰────────────────╯\n",
-    );
-    if (!stubborn) return;
-    const out = await renderDocument("```mermaid\nflowchart LR\n  A-->B\n```\n", {
+    const out = await renderDocument("```mermaid\n" + MERMAID_WIDE + "```\n", {
       width: 20,
       palette: DRACULA_PALETTE,
-      mermaidBin: stubborn,
     });
     const cut = out.split("\n").filter((l) => l.includes("38;2;") && l.endsWith("…"));
     expect(cut.length).toBeGreaterThan(0);
@@ -454,31 +424,7 @@ describe("render — mermaid pipe + colour classification", () => {
     }
   });
 
-  test("a diagram wider than the pane is stated, never cut (BRF-DIAGRAM-WIDTH-HANDOFF)", async () => {
-    const out = await renderDocument("```mermaid\n" + MERMAID_WIDE + "```\n", {
-      width: 30,
-      palette: DRACULA_PALETTE,
-      color: "none",
-    });
-    // The engine is given okuda's budget, so a layout that does not fit
-    // REFUSES rather than overrunning: there is no art left for okuda to
-    // cut, and nothing reaches elision. Before the width handoff the engine
-    // laid out to the ambient `$COLUMNS` and okuda cut the result, so this
-    // fence's render depended on the shell that launched the viewer.
-    for (const l of out.split("\n")) {
-      expect(displayWidth(l)).toBeLessThanOrEqual(30);
-    }
-    expect(out).not.toContain("art elided");
-    expect(out).toContain("too wide");
-    // The source box is the OTHER refusal and must not stand in for this
-    // one: a bordered listing of a diagram that would have rendered is a
-    // wrapped diagram wearing a border (MERMAID_WIDE fits a 60-column pane,
-    // and this render has 26).
-    expect(out).not.toContain("A[Alpha]");
-    expect(out).not.toContain("mermaid source elided");
-  });
-
-  test("the too-wide receipt names the requirement, and the requirement is real", async () => {
+  test("a cut diagram states what widening would buy — and the number is the art's", async () => {
     // 40 columns of pane, 36 of budget, against a layout whose canvas is 60:
     // the miss is small and exact, which is what a number is for.
     const W2 = 40;
@@ -486,14 +432,12 @@ describe("render — mermaid pipe + colour classification", () => {
       width: W2,
       color: "none",
     });
-    const m = /too wide · needs (\d+) cols · (\d+) here/.exec(out);
+    const m = /art elided · needs (\d+) cols/.exec(out);
     expect(m).not.toBeNull();
     const need = Number(m![1]);
-    const here = Number(m![2]);
-    expect(here).toBe(W2 - 4); // the art budget, not the terminal
-    expect(need).toBeGreaterThan(here);
-    // PROVENANCE: the number is the layout's, not a guess. Given exactly that
-    // canvas the engine draws the diagram, and the art is exactly that wide.
+    expect(need).toBeGreaterThan(W2 - 4);
+    // PROVENANCE: the number is the layout's, not a guess. Give the engine
+    // that canvas and it draws the diagram — and the art is exactly that wide.
     const proc = Bun.spawn([
       `${process.env.HOME ?? ""}/.local/bin/mermaid-to-md`,
     ], {
@@ -509,6 +453,69 @@ describe("render — mermaid pipe + colour classification", () => {
     expect(art).not.toContain("too wide");
     const widest = art.split("\n").reduce((a, l) => Math.max(a, displayWidth(l)), 0);
     expect(widest).toBe(need);
+  });
+
+  test("the vertical rhythm is invariant under pane width (the gate for BRF-DIAGRAM-WIDTH-HANDOFF)", async () => {
+    // The guarantee the whole policy exists for: resizing the window moves the
+    // cut, never the content. A diagram is drawn at its own canvas, so its
+    // height is a property of the diagram; the pane only decides how much of
+    // each line you see.
+    //
+    // Note what the invariant is NOT: the document's total line count. Prose
+    // reflows, that is what prose is for, and a paragraph legitimately takes
+    // six lines at 60 columns and three at 160. Measured on the fixture
+    // document, totals run 484/484/484/483/481/481 — the drift is prose. So the
+    // claim is about the BLOCKS: the sequence of prose-run, art-run and receipt
+    // must not change, and art-run lengths must not change. Prose runs may.
+    const doc = [
+      "# Rhythm\n",
+      "Intro prose that is long enough to wrap differently at different widths, " +
+        "because a paragraph which never reflows would hide the distinction this " +
+        "test is drawing.\n",
+      "```mermaid\n" + MERMAID_SRC + "```\n",
+      "Middle prose, also long enough to reflow under a narrow pane and fold into " +
+        "a single line under a wide one, so that a prose run changes length while " +
+        "every diagram keeps its own.\n",
+      "```mermaid\n" + MERMAID_WIDE + "```\n",
+      "```mermaid\n" + MERMAID_UNSUPPORTED + "```\n",
+      "Tail prose.\n",
+    ].join("\n");
+    /** Collapse a classification string into runs: "PPPAARPP" → "P:A:R:P". */
+    const runs = (s: string): string => {
+      const out: string[] = [];
+      let cur = "";
+      let n = 0;
+      for (const c of s) {
+        if (c === cur) { n++; continue; }
+        if (cur) out.push(`${cur}${n}`);
+        cur = c;
+        n = 1;
+      }
+      if (cur) out.push(`${cur}${n}`);
+      return out.join(":");
+    };
+    const shapes: string[] = [];
+    for (const w of [60, 80, 100, 120, 160, 200]) {
+      const out = await renderDocument(doc, { width: w, color: "none" });
+      const lines = out.split("\n").map((l) => l.replace(/[ ]+$/, ""));
+      shapes.push(
+        runs(
+          lines
+            .map((l) =>
+              /^\s*(⋮|▸)/.test(l) ? "R" : l.trim() === "" ? "B" : /[─│┌┐└┘├┤┬┴┼╭╮╰╯]/.test(l) ? "A" : "P",
+            )
+            .join(""),
+        ),
+      );
+    }
+    // Art runs and receipts identical at every width — the diagram keeps its
+    // block. Prose runs are allowed to differ in length (P6 vs P3), so compare
+    // the sequence with prose lengths normalised away.
+    const blocks = (s: string) => s.replace(/P\d+/g, "P").replace(/B\d+/g, "B");
+    for (const s of shapes) expect(blocks(s)).toBe(blocks(shapes[0]!));
+    // and the art's own footprint, stated plainly: same letter-run, same length
+    const artRuns = (s: string) => s.split(":").filter((r) => r.startsWith("A"));
+    for (const s of shapes) expect(artRuns(s)).toEqual(artRuns(shapes[0]!));
   });
 
   test("the ambient $COLUMNS never reaches the art (one width, one source)", async () => {

@@ -241,37 +241,36 @@ const RE_SOURCE_BOX = /^\u256d mermaid: (\S+)/;
 /** A bare identifier — the only shape a Mermaid diagram-type token takes. */
 const RE_TYPE_WORD = /^[a-z][A-Za-z0-9]*$/;
 
-/** Display width of the widest art line — the layout's own measurement. */
+/** Display width of the widest art line — the layout's own measurement, and
+ *  under BRF-DIAGRAM-WIDTH-HANDOFF's amendment the number the receipt
+ *  reports: what widening the pane would buy. */
 function artWidth(art: string): number {
   return art.split("\n").reduce((a, l) => Math.max(a, displayWidth(l)), 0);
 }
 
-/** How wide does this diagram *want* to be? Only asked of a fence the engine
- *  refused, and only after it refused, so the common case pays nothing.
+/** The canvas every fence is laid out on, in columns.
  *
- *  A canvas that stretches to fill its pane can never exceed it, so it can
- *  never bail; therefore every bailed layout is fixed-size, and the art it
- *  produces on a generous canvas *is* its requirement — no estimate, no
- *  guess. The ladder doubles from the budget and stops at the first canvas
- *  that renders, which is at most a handful of spawns and usually two.
+ *  **Never the pane.** The pane is not an input to layout: making it one is
+ *  what made a diagram's *existence* a function of window width, and cost the
+ *  document its vertical rhythm (the fixture was 268 / 374 / 431 / 467 lines
+ *  at 80 / 100 / 120 / 160 columns under the pane-bound policy). Layout is a
+ *  property of the diagram; the pane only decides where to cut.
  *
- *  Returns `null` when no rung renders, which is the honest answer for a
- *  diagram whose refusal is not about width at all. */
-async function measureDiagramWidth(
-  source: string,
-  opts: RenderOptions,
-  budget: number,
-): Promise<number | null> {
-  for (let w = budget * 2; w <= 2048; w *= 2) {
-    const r = await spawnMermaid(source, opts, w);
-    if (!r.ok) return null;
-    const art = extractDiagramArt(r.out);
-    if (art.includes(ENGINE_TOO_WIDE)) continue;
-    if (RE_SOURCE_BOX.test(art)) continue; // not art — keep looking
-    return artWidth(art);
-  }
-  return null;
-}
+ *  The number is derived from the engine's own ceiling rather than chosen:
+ *  `MAX_NODES` is 128 and its LR layouts spend about 15 columns per node — a
+ *  127-node chain lays out at 1929 columns, and a 100-node chain already
+ *  refuses a 1024 canvas. 2048 clears every diagram the parser will admit. A
+ *  canvas wider than any legal layout is indistinguishable from "no bound at
+ *  all", with the one difference that matters: it is a number, so a refusal
+ *  can cite it. Cost measured: twelve fences take 16.2 ms at `-w 76` and
+ *  16.7 ms at `-w 1024` — spawn dominates, canvas is free.
+ *
+ *  A canvas this wide also stops the engine's *fallback* from wrapping: the
+ *  bordered source box wraps only when its canvas is narrower than its
+ *  content (measured, a 272-column source: 29 lines at canvas 64, 25 at
+ *  natural width). So one number buys both properties, and the pane never
+ *  regains authority over a preformatted block. */
+const LAYOUT_CANVAS = 2048;
 
 /** Pipe mermaid source to diagram-describe for a prose description
  *  (BRF-DIAGRAM-DESCRIBE). Same contract as spawnMermaid: source in,
@@ -407,9 +406,6 @@ function newTableState(): TableState {
  *  because the placeholder handler cannot invent a diagnosis. */
 type DiagramEntry =
   | { art: string; title?: string | null }
-  /** The engine laid it out and the layout did not fit. `needs` is measured
-   *  (null when no canvas rendered it) and is a fact, not a shrug. */
-  | { tooWide: number | null; title?: string | null }
   | { failure: string; title?: string | null };
 
 interface Ctx {
@@ -707,20 +703,25 @@ async function interceptMermaid(
         if (prose === "") return null;
         return { described: true, prose, title: f.title };
       }
-      const r = await spawnMermaid(f.code, opts, ctx.width);
+      const r = await spawnMermaid(f.code, opts, LAYOUT_CANVAS);
       if (!r.ok) return { described: false, failure: r.reason, title: f.title };
       const art = extractDiagramArt(r.out);
-      // The engine gave up rather than overrun the canvas it was given. That
-      // is a fact about the diagram, not a failure of the pipe, and it is
-      // stated with the requirement the layout actually has. A refusal is
-      // the source box *plus* the hint; the box alone is the other refusal.
+      // The engine would not lay it out even on the generous canvas — a
+      // diagram past the parser's own ceiling, not one that is too wide for
+      // this pane. It is stated as the layout refusal it is; `▸` is reserved
+      // for exactly this (no art at all), and no width is claimed here
+      // because none was measured.
       if (art.includes(ENGINE_TOO_WIDE) && RE_SOURCE_BOX.test(art)) {
         return {
           described: false,
-          tooWide: await measureDiagramWidth(f.code, opts, ctx.width),
+          failure: `engine will not lay it out at ${LAYOUT_CANVAS} cols`,
           title: f.title,
         };
       }
+      // Everything else is art, including the source box for a family the
+      // engine does not draw — drawn at its natural width now (the generous
+      // canvas means the fallback has nothing to wrap), and elided at the
+      // glass downstream like any other preformatted block.
       return { described: false, art, title: f.title };
     }),
   );
@@ -728,11 +729,6 @@ async function interceptMermaid(
     if (entry === null) continue;
     if (entry.described) {
       ctx.described.set(String(i), { prose: entry.prose!, title: entry.title });
-    } else if ("tooWide" in entry) {
-      ctx.mermaid.set(String(i), {
-        tooWide: entry.tooWide ?? null,
-        title: entry.title,
-      });
     } else if (entry.failure !== undefined) {
       ctx.mermaid.set(String(i), { failure: entry.failure, title: entry.title });
     } else {
@@ -1073,23 +1069,6 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         if ("failure" in entry) {
           return diagramReceipt(
             `diagram unavailable \u00b7 ${entry.failure}`,
-            ctx,
-            entry.title,
-          );
-        }
-        if ("tooWide" in entry) {
-          // The requirement is a number and the budget is a number — say both,
-          // and say nothing whose remedy does not exist here. The engine's own
-          // hint offers "open the image", which is advice for a medium okuda
-          // is not in. `cols`, not `columns`: the receipt is elided to the
-          // budget, and at 36 columns the long word cost the budget its own
-          // number — a receipt that gets cut before it states the fact it
-          // exists to state has failed at its one job.
-          const need = entry.tooWide === null
-            ? "wider than any canvas the engine would draw it on"
-            : `needs ${entry.tooWide} cols`;
-          return diagramReceipt(
-            `too wide \u00b7 ${need} \u00b7 ${ctx.width} here`,
             ctx,
             entry.title,
           );
@@ -1516,7 +1495,11 @@ function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   const budget = ctx.width;
   let elided = 0;
   const lines = art.split("\n").map((l) => {
-    if (l === "") return "";
+    // A row of padding is a blank row. The engine emits `""` for those today,
+    // but a canvas that pads would emit spaces, and eliding a line whose whole
+    // content was padding would put a `…` on the glass reporting a loss that
+    // did not happen — the one thing a receipt must never do.
+    if (l.trim() === "") return "";
     const painted =
       ctx.color === "none"
         ? l
@@ -1541,14 +1524,23 @@ function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   // SGR 1 — colour drops, attributes survive); the `⋮` reads as a
   // control among the art.
   const glyph = ctx.styler.roleBold("state-parked", "⋮");
-  const note = elided > 0 ? " · art elided" : "";
-  // A fence whose "art" is the engine's bordered SOURCE box — an unsupported
-  // family, or `Oversize::Cells` — is not art, and the standing clause would
-  // be a false claim printed above the thing it denies: `source elided` over
-  // the source. The box is kept (for a gantt or mindmap fence it is the only
-  // rendering there will ever be), and the receipt says what is actually on
-  // screen and why. (A *too wide* bail never reaches here — it is routed to
-  // `diagramReceipt` with its measured requirement.)
+  // The loss note carries the *requirement*, because under the width policy
+  // (BRF-DIAGRAM-WIDTH-HANDOFF amendment) a cut is the normal case rather
+  // than a failure: the diagram was drawn at its natural width and the glass
+  // fell short. `needs N cols` is what widening buys, it is measured from the
+  // art itself (no probe, no estimate), and it makes the operator's rule —
+  // "if the terminal is too narrow then make it wider" — actionable rather
+  // than a slogan. `cols` not `columns`: the note is elided to the budget,
+  // and the long word cost a 36-column pane the number it was reporting.
+  const note = elided > 0 ? ` · art elided · needs ${artWidth(art)} cols` : "";
+  // A fence whose "art" is the engine's bordered SOURCE box — a family it
+  // does not draw, or `Oversize::Cells` — is not art, and the standing clause
+  // would be a false claim printed above the thing it denies: `source elided`
+  // over the source. The box is kept (for a gantt or mindmap fence it is the
+  // only rendering there will ever be), drawn at its natural width because
+  // the canvas is generous, and elided at the glass like any other
+  // preformatted block — a listing is not re-flowed to the pane, because
+  // re-flowing it is the wrap this renderer does not do.
   const sourceBox = art.match(RE_SOURCE_BOX);
   const type = sourceBox && RE_TYPE_WORD.test(sourceBox[1]!) ? sourceBox[1] : null;
   const core = sourceBox

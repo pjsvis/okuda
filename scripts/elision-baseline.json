@@ -1,8 +1,13 @@
 {
-  "note": "The accepted residue of the recoverability invariant's widest rung (scripts/elision-monotone.ts --strict, 160 columns). Each entry is a document that still loses content at that width, with the columns it would need. The baseline MAY ONLY SHRINK: a document that no longer loses content must be dropped, and a new one fails the gate. Reshaping these is an authoring call, not a renderer one — both are embedded payloads whose code lines run past 200 characters, and a code fence has no cap, so widening repairs them.",
-  "measured": "2026-10-13",
+  "note": "The accepted residue of the recoverability invariant's widest rung (scripts/elision-monotone.ts --strict, 160 columns). Each entry is a document that still loses content at that width, with the columns it would need. The baseline MAY ONLY SHRINK: a document that no longer loses content must be dropped, and a new one fails the gate. Reshaping these is an authoring call, not a renderer one. The first two are embedded payloads whose code lines run past 200 characters — a code fence has no cap, so widening repairs them. The last two are diagrams, and they grew here on 2026-10-25 for a reason that is NOT an authoring regression: the width policy changed (BRF-DIAGRAM-WIDTH-HANDOFF, amendment) so that a diagram too wide for the glass is DRAWN AND CUT rather than REFUSED OUTRIGHT. A refused fence cut zero lines because it emitted none; a shown one cuts every line past the glass. Measured before and after on both documents: 0 art-elided lines each, now 14 and 13. The invariant the gate exists for is untouched — no document's cut count rises at a wider rung, and the corpus totals still fall monotonically with width. These two were added because a receipt is a larger loss than a marked fragment, not because the renderer got worse; the remedy for each (split the diagram, or widen) is named in playbooks/mermaid-diagrams-playbook.md.",
+  "measured": "2026-10-25",
   "rung": 160,
   "accepted": {
+    "docs/2026-10-25-test-diagrams.md": {
+      "cuts": 14,
+      "needs": 250,
+      "reason": "An instrument, not a document: twelve fences chosen to stress every diagram family and shape, one of which is a 241-column layout. It is supposed to lose content at 160."
+    },
     "docs/2026-10-08-ai-human-development-workflow-06.md": {
       "cuts": 4,
       "needs": 250
@@ -10,6 +15,11 @@
     "docs/2026-10-08-ai-human-development-workflow-08.md": {
       "cuts": 6,
       "needs": 320
+    },
+    "docs/diagram-monster.md": {
+      "cuts": 13,
+      "needs": 600,
+      "reason": "Self-declared hostile: one fence is a 414-column layout the engine will draw and no pane will hold."
     }
   }
 }
