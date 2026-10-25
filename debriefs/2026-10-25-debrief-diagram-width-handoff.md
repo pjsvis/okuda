@@ -7,9 +7,13 @@ briefs: [BRF-DIAGRAM-WIDTH-HANDOFF]
 # Debrief: The diagram pipe had a second opinion about width
 
 **Date:** 2026-10-25
-**Status:** Done — one width source shipped. `just check` green, `bun test`
-815/0. One upstream gap recorded in `DEPENDENCIES.md` (*known limits*) and
-owned on the board, not worked around here.
+**Status:** Done — the width handoff shipped. **Superseded within the day:** the
+policy below (the engine's canvas = okuda's budget) made a diagram's *existence*
+a function of the window, and was reversed the same afternoon
+(`ADR-PANE-NOT-CANVAS-069`, `81074bb`). Read the entries marked *reversed* as the
+record of a position, not as advice. What survived is the part that was right: two
+widths became one, the false receipts died, and the receipt that names a
+requirement is now the normal path rather than the failure path.
 
 ## What was asked
 
@@ -130,8 +134,10 @@ draw. Twelve fences, four receipts, each stating its own cause.
 
 ## What was declined
 
-- **Retry at natural width, then elide.** A diagram true on its left half and a
-  `…` where its conclusion was. ADR-UNIVERSAL-ELISION-050 exists to stop okuda
+- **Retry at natural width, then elide.** *(Reversed the same day — adopted as
+  the policy in `ADR-PANE-NOT-CANVAS-069`; `81074bb` implemented it.)* A
+diagram true on its left half and a `…` where its conclusion was.
+  ADR-UNIVERSAL-ELISION-050 exists to stop okuda
   pretending, and a cut diagram pretends hardest — the visible part still
   parses.
 - **Give the engine a generous bound and keep cutting.** Today's behaviour with

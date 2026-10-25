@@ -10,7 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-10-25 | BRF-DIAGRAM-HEIGHT-AXIS | parked | The height axis has no policy at all | 2026-10-25-brief-diagram-height-axis.md |
-| 2026-10-25 | BRF-DIAGRAM-WIDTH-HANDOFF | in_progress | One width, or two? — the diagram pipe's second opinion | 2026-10-25-brief-diagram-width-handoff.md |
+| 2026-10-25 | BRF-DIAGRAM-WIDTH-HANDOFF | done | One width, or two? — the diagram pipe's second opinion | 2026-10-25-brief-diagram-width-handoff.md |
 | 2026-10-22 | BRF-DARWIN-CLOSE-OUT | open | The darwin close-out — turn one promise into a measurement, and stop two paths guessing | 2026-10-22-brief-darwin-close-out.md |
 | 2026-10-22 | BRF-PLATFORM-GATE | done | The gate names its format — building okuda on Omarchy | 2026-10-22-brief-platform-gate.md |
 | 2026-10-22 | BRF-TOOLCHAIN-TRUTH | done | Four claims that could not prove themselves | 2026-10-22-brief-toolchain-truth.md |

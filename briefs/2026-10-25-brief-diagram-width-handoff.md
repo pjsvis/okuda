@@ -6,11 +6,13 @@ callsign: BRF-DIAGRAM-WIDTH-HANDOFF
 # Brief: One width, or two? — the diagram pipe's second opinion
 
 **Date:** 2026-10-25
-**Status:** In progress — **P1 shipped and was superseded the same day.**
-`2a11837` implemented the four changes below; the amendment at the head of this
-document reverses the width policy and voids two of the Rejections. P2 (the
-fix) is not yet written — steps 1–7 are in the amendment. Read the amendment
-first; the body is kept as the record of the position it replaced.
+**Status:** Done — **P1 shipped and was superseded the same day; P2 is the
+policy.** All seven amendment steps landed on 2026-10-25: `3384d4f` (the
+decision), `81074bb` (the fix: generous canvas, elide everywhere, ladder
+deleted), `415f4e4` (`ADR-069`, the record), `3c185cd` (the exclusions
+declared), `3d313ca` (the wrap law), `1438309` (the height axis, parked with
+numbers). `just check` green, `bun test` 815/0. Read the amendment first; the
+body is kept as the record of the position it replaced.
 
 ## Amendment 2026-10-25 — the width was the wrong question
 
