@@ -156,7 +156,11 @@ draw. Twelve fences, four receipts, each stating its own cause.
   *"this family is not drawn"*. Upstream's gap; no receipt here can tell them
   apart. Stated in `DEPENDENCIES.md` and carried on the board rather than
   absorbed into a comment — a deferral with no owner is a wish.
-- The four `flowchart LR` subgraph exhibits in `docs/diagram-monster.md` and
-  friends will now render as `▸ too wide` receipts rather than as elided art.
-  That is the intended trade — a refusal is legible, a cut diagram lies — but
-  it will look like a regression to a reader who liked the left half.
+- **The visible change to existing documents.** Of the four fences in
+  `docs/diagram-monster.md`, the one the author labels *deliberately hostile*
+  needs 414 columns. It used to render as a bordered copy of its own source
+  under a `⋮ mermaid source elided` receipt — the source, shown, declared
+  absent. It now states `▸ too wide · needs 414 cols · 116 here`, in every
+  environment. Everywhere else in the silo's documents the change is
+  invisible: the diagrams that fit, fit; the art that used to be cut was the
+  art composed at a width nobody chose.
