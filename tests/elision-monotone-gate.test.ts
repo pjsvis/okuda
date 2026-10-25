@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { risesIn, totalsMonotone, residueAgainst } from "../scripts/elision-monotone";
+import { risesIn, totalsMonotone, residueAgainst, measureUnit } from "../scripts/elision-monotone";
 
 /** The gate's OWN judgement, asserted by constructing the counts.
  *
@@ -38,6 +38,64 @@ describe("elision-monotone — cut counts never rise as the glass widens", () =>
   test("the corpus totals obey the same rule", () => {
     expect(totalsMonotone(new Map([[60, 100], [80, 50], [120, 50], [160, 0]]), LADDER)).toBe(true);
     expect(totalsMonotone(new Map([[60, 100], [80, 101], [120, 50], [160, 0]]), LADDER)).toBe(false);
+  });
+
+  test("a document with a cut diagram is measured by its cut diagrams, not its marker lines", () => {
+    // The hump this rule exists for, with the real numbers: `diagram-monster`'s
+    // marker lines go 3 at 80 → 15 at 120 because the same rows are blank in
+    // view at 80 and in view at 120. Measured as cut lines that is a hide; the
+    // number of its cut diagrams went 1 → 1, which is the truth.
+    const perDoc = new Map([
+      [
+        "monster.md",
+        new Map([
+          [60, { cuts: 9, art: 3 }],
+          [80, { cuts: 3, art: 1 }],
+          [120, { cuts: 15, art: 1 }],
+          [160, { cuts: 11, art: 1 }],
+        ]),
+      ],
+    ]);
+    // the marker count would have been flagged
+    expect(risesIn(new Map([["monster.md", new Map([[60, 9], [80, 3], [120, 15], [160, 11]])]]), LADDER).length).toBeGreaterThan(0);
+    // the unit choice silences it, because the unit is monotone
+    expect(risesIn(measureUnit(perDoc), LADDER)).toEqual([]);
+    expect([...measureUnit(perDoc).get("monster.md")!.values()]).toEqual([3, 1, 1, 1]);
+  });
+
+  test("the unit is chosen per document, never per rung", () => {
+    // A per-rung choice would compare marker lines at one width with cut
+    // diagrams at the next — two different units across one step — and invent a
+    // rise where a document's last diagram stops being cut. Such a document
+    // takes cut diagrams at EVERY rung, zeros included.
+    const perDoc = new Map([
+      [
+        "fades.md",
+        new Map([
+          [60, { cuts: 20, art: 2 }],
+          [80, { cuts: 9, art: 1 }],
+          [120, { cuts: 0, art: 0 }],
+          [160, { cuts: 0, art: 0 }],
+        ]),
+      ],
+    ]);
+    expect([...measureUnit(perDoc).get("fades.md")!.values()]).toEqual([2, 1, 0, 0]);
+    expect(risesIn(measureUnit(perDoc), LADDER)).toEqual([]);
+  });
+
+  test("a document with no diagrams is measured by its cut lines, as it always was", () => {
+    const perDoc = new Map([
+      [
+        "code.md",
+        new Map([
+          [60, { cuts: 40, art: 0 }],
+          [80, { cuts: 12, art: 0 }],
+          [120, { cuts: 3, art: 0 }],
+          [160, { cuts: 0, art: 0 }],
+        ]),
+      ],
+    ]);
+    expect([...measureUnit(perDoc).get("code.md")!.values()]).toEqual([40, 12, 3, 0]);
   });
 });
 

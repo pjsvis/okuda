@@ -144,6 +144,42 @@ export function totalsMonotone(cuts: Map<number, number>, ladder: number[]): boo
   return ladder.every((w, i) => i === 0 || cuts.get(w)! <= cuts.get(ladder[i - 1]!)!);
 }
 
+/** **The unit a document is measured in.** Marker lines, or cut diagrams?
+ *
+ *  A cut line is measured by its `…`, and that worked while every overflowing
+ *  line carried one. It no longer does: a canvas row whose visible prefix is
+ *  padding carries no marker (there is nothing in view to mark —
+ *  `elideCanvasRow`, `ADR-PANE-NOT-CANVAS-069`). So the marker count of a
+ *  document with sparse-canvas diagrams is a **hump, not a measure**: one
+ *  diagram's rows are unmarked at 80 columns (content starts at column 91,
+ *  past the glass) and marked at 120 (same rows, content now in view) —
+ *  measured on `docs/diagram-monster.md`, 3 marker lines at 80 and 15 at 120
+ *  while the number of its cut diagrams fell 1 → 1.
+ *
+ *  The monotone quantity is **how many of a document's diagrams lose content**
+ *  — it falls as the glass widens, always, because a diagram that fits at a
+ *  width fits at every wider one. Measured on the same document: 3, 3, 1, 1, 1,
+ *  1 across 60/74/80/100/120/160; on the fixture, 9, 8, 6, 3, 2, 1.
+ *
+ *  So: a document that contains a cut diagram anywhere in the ladder is
+ *  measured by its cut diagrams at every rung; a document with none is measured
+ *  by its cut lines, as before. The choice is per DOCUMENT, not per rung — a
+ *  per-rung choice would compare two different units at the step where a
+ *  document's last diagram starts or stops being cut, and invent a rise. Pure. */
+export function measureUnit(
+  perDoc: Map<string, Map<number, { cuts: number; art: number }>>,
+): Map<string, Map<number, number>> {
+  const out = new Map<string, Map<number, number>>();
+  for (const [file, byWidth] of perDoc) {
+    const hasArt = [...byWidth.values()].some((r) => r.art > 0);
+    out.set(
+      file,
+      new Map([...byWidth].map(([w, r]) => [w, hasArt ? r.art : r.cuts])),
+    );
+  }
+  return out;
+}
+
 /** What the residue check found. Pure: the shell renders the sentences. */
 export interface Residue {
   grown: string[];
@@ -284,12 +320,14 @@ async function main(): Promise<void> {
 
   const { cuts, docs, art, perDoc } = await sweep(LADDER);
 
-  // `risesIn` takes cut counts; the sweep holds Readings. Derived here, once.
-  const cutDoc = new Map<string, Map<number, number>>(
-    [...perDoc].map(([f, m]) => [f, new Map([...m].map(([w, r]) => [w, r.cuts]))]),
+  // The monotone unit per document: cut diagrams where it has any, cut lines
+  // otherwise (see `measureUnit` — the marker is no longer a monotone proxy).
+  const measured = measureUnit(perDoc);
+  const rises = risesIn(measured, LADDER);
+  const measuredTotals = new Map<number, number>(
+    LADDER.map((w) => [w, [...measured.values()].reduce((a, m) => a + (m.get(w) ?? 0), 0)]),
   );
-  const rises = risesIn(cutDoc, LADDER);
-  const totalMono = totalsMonotone(cuts, LADDER);
+  const totalMono = totalsMonotone(measuredTotals, LADDER);
 
   /** **The residue is not the irreducible set, and the difference matters.**
    *  `ADR-TABLE-EDGE-CUT-055`'s irreducible set is a *floor the cap cannot hold* —

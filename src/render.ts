@@ -248,6 +248,33 @@ function artWidth(art: string): number {
   return art.split("\n").reduce((a, l) => Math.max(a, displayWidth(l)), 0);
 }
 
+/** Elide one **canvas row** at the glass — and only mark it where there is
+ *  something in view to mark.
+ *
+ *  **A marker sits beside the content it truncates.** A canvas row can be
+ *  entirely padding across the visible columns while its content sits far to the
+ *  right: `d01` is 241 columns wide, its second and third subgraphs start at
+ *  column 176, and at a 60-column budget eight of its thirteen rows are blank in
+ *  view. Marking those put a vertical stripe of `…` down the block — a marker
+ *  176 columns from the thing it marks, telling the reader nothing they can use,
+ *  and *diluting* the marker: a `…` that sometimes means "this line is cut" and
+ *  sometimes "this block is cut" stops being trusted for the first meaning. The
+ *  block's own receipt (`art elided · needs 241 cols`) already states the loss;
+ *  the per-row marker exists to **localise** it, and there is nothing to
+ *  localise on a row that is empty in view.
+ *
+ *  Code fences keep marking every overflowing line, deliberately: a blank row on
+ *  a diagram canvas is a fact about the *view* (nothing is drawn there), while a
+ *  blank line in a fence would be a claim about the *source* (there is no
+ *  statement there) — and that claim would be false. */
+export function elideCanvasRow(painted: string, budget: number): string {
+  // The prefix the cut would keep, marker-free. `elideToWidth` is reused rather
+  // than hand-slicing so the ANSI bookkeeping stays in one place; the trailing
+  // reset it may append is stripped before the blankness test.
+  if (stripANSI(elideToWidth(painted, budget, "")).trim() === "") return "";
+  return elideToWidth(painted, budget);
+}
+
 /** The canvas every fence is laid out on, in columns.
  *
  *  **Never the pane.** The pane is not an input to layout: making it one is
@@ -1506,7 +1533,7 @@ function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
         : classifyDiagramLine(l, ctx.palette, ctx.color) + "\x1b[0m";
     if (displayWidth(painted) <= budget) return painted;
     elided++;
-    return elideToWidth(painted, budget);
+    return elideCanvasRow(painted, budget);
   });
   // Indicator line: the diagram's caption. A leading `title: <caption>`
   // in the mermaid fence (extracted pre-pipe by interceptMermaid) lands
@@ -1557,9 +1584,14 @@ function diagramBlock(art: string, ctx: Ctx, title?: string | null): string {
   // NEW fact and holds to the last rung. At comfortable widths every
   // rung fits and the branch bytes are unchanged (the 36-fence
   // byte-stability claim holds where it always applied).
+  //
+  // The last rung drops the note's leading separator with its clause: `⋮ · art
+  // elided` is a `·` with nothing on its left, and an unexplained mark is the
+  // thing *attributable structure* fails on. The separator belongs to the
+  // clause it joined, not to the note.
   let text = base + note;
   if (!fits(text) && title) text = " " + core + note;
-  if (!fits(text) && note) text = note;
+  if (!fits(text) && note) text = note.replace(/^ · /, " ");
   const stmt = ctx.styler.role("muted", text);
   const indOpen = tagRawOpen("diagramsrc");
   const indicator = elideToWidth(`${glyph}${stmt}`, budget);

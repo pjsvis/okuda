@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { renderDocument } from "../src/render";
+import { elideCanvasRow, renderDocument } from "../src/render";
 import { DRACULA_PALETTE } from "../src/palette";
 import { displayWidth, stripANSI } from "../src/width";
 import { existsSync } from "node:fs";
@@ -153,6 +153,22 @@ const MERMAID_WIDE =
 
 /** A family the engine does not draw — it returns the source in a box. */
 const MERMAID_UNSUPPORTED = "gantt\n  title Plan\n  section S\n  Task :a, 2026-01-01, 1d\n";
+
+/** Six nodes in LR: 65 columns wide, nine rows — and rows 1, 2, 6, 7 put their
+ *  first glyph at column 32, so at a narrow budget they are *blank in view*
+ *  while carrying content far to the right. That is the shape of the defect the
+ *  marker rule exists for, and it is why a fixture whose art starts at column 0
+ *  cannot see it. */
+const MERMAID_CHAIN = [
+  "flowchart LR",
+  "  A[Alpha] --> B[Beta]",
+  "  B --> C[Cee]",
+  "  C --> D[Dee]",
+  "  C --> E[Eee]",
+  "  E --> F[Eff]",
+  "  F --> G[Gee]",
+  "",
+].join("\n");
 
 describe("render — menu tables (ADR-022 right-anchored role fit, td-b81597)", () => {
   const row = (slug: string, cs: string, n: string, f: string) =>
@@ -422,6 +438,59 @@ describe("render — mermaid pipe + colour classification", () => {
     for (const artLine of trimmed.split("\n")) {
       if (artLine.trim() !== "") expect(plain).toContain(artLine);
     }
+  });
+
+  test("a marker sits beside the content it truncates — never on a row blank in view", async () => {
+    // The observed defect: `d01` is 241 columns wide and its second and third
+    // subgraphs start at column 176, so at a 60-column budget eight of its
+    // thirteen rows are *blank in view* while carrying content far right. The
+    // renderer marked every one of them, putting a vertical stripe of `…` down
+    // the block — a marker 176 columns from the thing it marked, and a marker
+    // that now means two different things ("this line is cut" and "this block
+    // is cut"), which is how a receipt stops being trusted.
+    //
+    // Tested on the instrument rather than inferred from the bytes, the same
+    // reason `tableSlots` is exported: the rule is not observable in the output
+    // when the output is what is wrong (BRF-TABLE-SLOT-INSTRUMENT's argument).
+
+    // A row that fits is untouched.
+    expect(elideCanvasRow("│ Cee ├───▶│ Dee │", 40)).toBe("│ Cee ├───▶│ Dee │");
+
+    // A row with content at the cut loses it, and says so at the cut.
+    const withContent = elideCanvasRow("│ Cee ├───▶│ Dee ├───▶│ Eee │", 20);
+    expect(withContent).toContain("…");
+    expect(displayWidth(withContent)).toBeLessThanOrEqual(20);
+    expect(stripANSI(withContent).trimEnd().startsWith("│ Cee ├")).toBe(true);
+
+    // A row whose visible prefix is only padding is blank, not marked: nothing
+    // is drawn there, so there is nothing to mark. The block's receipt carries
+    // the loss.
+    expect(elideCanvasRow(" ".repeat(32) + "┌─────┐", 20)).toBe("");
+
+    // And the render, end to end: no line is a bare marker.
+    for (const w of [30, 34, 40, 44]) {
+      const out = await renderDocument("```mermaid\n" + MERMAID_CHAIN + "```\n", {
+        width: w,
+        color: "none",
+      });
+      for (const l of out.split("\n")) {
+        expect(stripANSI(l)).not.toMatch(/^\s*…\s*$/);
+      }
+    }
+  });
+
+  test("the receipt drops a separator only with the clause it joined", async () => {
+    // At 34 columns the fit ladder keeps the note and drops the standing source
+    // clause. It used to leave the clause's leading `·` behind: `⋮ · art
+    // elided · needs 65 cols` — a mark with nothing on its left, which is the
+    // thing *attributable structure* fails on.
+    const out = await renderDocument("```mermaid\n" + MERMAID_CHAIN + "```\n", {
+      width: 34,
+      color: "none",
+    });
+    const receipt = out.split("\n").find((l) => l.includes("art elided"))!;
+    expect(stripANSI(receipt)).not.toMatch(/⋮\s+·/);
+    expect(stripANSI(receipt)).toContain("art elided · needs");
   });
 
   test("a cut diagram states what widening would buy — and the number is the art's", async () => {

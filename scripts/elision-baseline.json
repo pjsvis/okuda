@@ -4,7 +4,7 @@
   "rung": 160,
   "accepted": {
     "docs/2026-10-25-test-diagrams.md": {
-      "cuts": 14,
+      "cuts": 6,
       "needs": 250,
       "reason": "An instrument, not a document: twelve fences chosen to stress every diagram family and shape, one of which is a 241-column layout. It is supposed to lose content at 160."
     },
@@ -17,7 +17,7 @@
       "needs": 320
     },
     "docs/diagram-monster.md": {
-      "cuts": 13,
+      "cuts": 11,
       "needs": 600,
       "reason": "Self-declared hostile: one fence is a 414-column layout the engine will draw and no pane will hold."
     }
