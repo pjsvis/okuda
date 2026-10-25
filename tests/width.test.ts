@@ -200,3 +200,41 @@ describe("the width frame declaration (docs/2026-10-13-the-width-frame-declarati
     expect(graphemeWidth("\u0BA4\u0BCD")).toBe(1);
   });
 });
+
+describe("width — the telemetry glyph bands (a contract another silo depends on)", () => {
+  // A generator outside this silo (BRF-OMARCHY-DUAL-DATASET-LUT, filed in
+  // docs/) emits magnitude bars from eighth-blocks and texture from Braille
+  // density. Both are *geometry*: the generator assumes one column per glyph,
+  // and a bar that measures 2 columns silently shears every row it appears in.
+  //
+  // Nothing in okuda draws these today, which is exactly why the contract needs
+  // pinning here rather than being discovered later: the first party to emit
+  // them will be a compositor, and it cannot see this measurer.
+  test("every eighth-block element is one column (U+2580–U+259F)", () => {
+    for (let cp = 0x2580; cp <= 0x259f; cp++) {
+      const ch = String.fromCodePoint(cp);
+      expect(graphemeWidth(ch), `U+${cp.toString(16).toUpperCase()} must measure 1`).toBe(1);
+    }
+  });
+
+  test("every Braille pattern is one column (U+2800–U+28FF)", () => {
+    for (let cp = 0x2800; cp <= 0x28ff; cp++) {
+      const ch = String.fromCodePoint(cp);
+      expect(graphemeWidth(ch), `U+${cp.toString(16).toUpperCase()} must measure 1`).toBe(1);
+    }
+  });
+
+  test("a bar of N cells measures N — the strings a LUT will actually emit", () => {
+    // The composed case, which is what the generator's arithmetic depends on:
+    // partial cell + full cells, and a texture run alongside it.
+    expect(displayWidth("▏")).toBe(1);
+    expect(displayWidth("▏███")).toBe(4);
+    expect(displayWidth("▉▉▉▉▉▉▉▉▉▉")).toBe(10);
+    expect(displayWidth("⣿⣶⣤⣀")).toBe(4);
+    // and mixed with prose, which is how it reaches the glass
+    // (12 counted twice: c p u ␣ ▏ █ █ █ ␣ 7 5 % — the first draft of this
+    // line said 13, which is the case for asserting the composed string rather
+    // than reasoning about it)
+    expect(displayWidth("cpu ▏███ 75%")).toBe(12);
+  });
+});
