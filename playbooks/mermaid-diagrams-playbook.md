@@ -23,11 +23,43 @@ it and paints the returned ASCII verbatim.
 | `erDiagram` | `parse_er` | `render_class` |
 | `sequenceDiagram` | `parse_sequence` | `layout_sequence` |
 
-**Everything else falls back cleanly**: gantt, pie, journey, mindmap,
-gitgraph, timelines — an unsupported or unparseable diagram renders its
-*source* as a chunked plain block under a ` mermaid: <type> ` title
-(the `fallback` function). No garbage, no crash — but no diagram. Author
-within the five families.
+**Everything else falls back cleanly**: an unsupported or unparseable diagram
+renders its *source* as a bordered plain block under a ` mermaid: <type> `
+title (the `fallback` function). No garbage, no crash — but no diagram.
+**The list below is the whole of what we do not draw**, and it is the
+renderer's to keep: okuda holds no type whitelist of its own, because a
+second copy of the engine's dispatch chain is a store that drifts
+(`ADR-PANE-NOT-CANVAS-069`, and the *derived, not specified* rule).
+
+## Not supported — and what it looks like
+
+One closed dispatch chain (`src/mermaid.rs`, five families above) decides
+what is drawn. Everything else is a **declared exclusion**, not a defect we
+are working toward. Three classes, three remedies — the taxonomy matters
+because they do not look alike in the render:
+
+| class | in the render | what is true | the author's remedy |
+|---|---|---|---|
+| **not a family we draw** — `gantt`, `pie`, `journey`, `mindmap`, `gitGraph`, `timeline`, `quadrantChart`, `sankey-beta`, `xychart-beta`, `block-beta`, `packet-beta`, `requirementDiagram`, `C4Context`, `architecture-beta`, `kanban`, `treemap` | source box + `⋮ source shown · gantt not drawn by the engine` | parsed or not, never laid out | write it as a `flowchart` — the grammar that draws what it parses |
+| **too large for the engine** — a legal fence whose canvas exceeds `MAX_CANVAS_CELLS` | the *same* source box, *without* the `too large` distinction | refused before layout | split it; no pane will help |
+| **wider than the glass** — any diagram past the pane | art, cut at the right edge with `…`, receipt names `needs N cols` | drawn at its natural width, shown partly | widen the pane, or narrow the diagram (`ADR-PANE-NOT-CANVAS-069`) |
+
+Two honesty gaps live in the first two rows and are **upstream's**, not
+okuda's to repair:
+
+- `Oversize::Cells` and "no parser matched" share one fallback
+  (`src/mermaid.rs:133-136`), so a diagram too *large* is indistinguishable
+  from a family we do not draw. Both arrive as a source box; only the absence
+  of the `too wide` hint separates them from a width refusal.
+- Beyond `MAX_NODES` and `MAX_EDGES` the parser **drops content silently**
+  (`over_cap` is set and never surfaced), so an over-cap diagram renders as a
+  *truncated* diagram that looks whole. `BRF-MERMAID-HARD` owns this; nothing
+  in okuda can see it.
+
+If you are choosing a diagram syntax for a document that will be read here,
+**choose from the five**. If what you want is a picture rather than a
+topology — a release calendar, a pie chart, a roadmap — it is prose, a table,
+or an image link, and none of those are the engine's business.
 
 ## Authoring rules (from the renderer's constants)
 
@@ -65,23 +97,26 @@ Yes, at three levels — two shipped, one proposed:
    and states which refusal it was. The two are indistinguishable for
    `Oversize::Cells`, which is a gap upstream, not here.
 
-   **The canvas is okuda's budget** (`BRF-DIAGRAM-WIDTH-HANDOFF`).
-   `mermaid-tui` takes its canvas from `-w`, else `$COLUMNS`, else 80, and
-   the wrapper passes no `-w` — so okuda sets `COLUMNS` to the width it
-   will draw into. Given that number the engine never overruns it; it
-   refuses instead. Which means:
+   **The canvas is a constant, and it is never the pane**
+   (`ADR-PANE-NOT-CANVAS-069`). `mermaid-tui` takes its canvas from `-w`,
+   else `$COLUMNS`, else 80, and the wrapper passes no `-w` — so okuda sets
+   `COLUMNS` to `LAYOUT_CANVAS` (2048, derived from `MAX_NODES`), and the
+   pane is not an input to layout at all. What follows from that:
 
-   - a diagram that fits is drawn in full, never cut;
-   - a diagram that does not fit is *not* drawn, and the render says
-     `▸ too wide · needs 241 cols · 116 here` — the layout's canvas is a
-     **fixed number**, so the receipt can state it, and widening the pane
-     either crosses it or tells you it never will.
+   - a diagram is drawn at its **natural width** wherever it is read; the
+     glass decides only where to cut;
+   - a cut says `⋮ … · art elided · needs 241 cols` — the number is the art's
+     own width, and it is what widening the pane would buy;
+   - `▸` means *no art at all*, and only two things reach it: a broken pipe,
+     and a diagram the engine will not lay out even at 2048 columns.
 
-   Before this, the engine laid out to the ambient `$COLUMNS` — the
-   *shell's* width, or 80 when absent — while okuda cut at its own, and the
-   same diagram in the same pane rendered differently depending on which
-   shell launched the viewer. If you see art with a `…` in it, the engine
-   overran its canvas, which the shipped one does not do: that is a bug.
+   Two earlier policies are recorded and dead: the **ambient** canvas (the
+   shell's width, or 80 in a pipe — the same diagram rendered differently
+   depending on which shell launched the viewer), and the **pane-bound**
+   canvas (a diagram too wide for the window vanished into a receipt, so
+   resizing the terminal added and removed content from the document).
+   If you see art with a `…` in it, that is the cut, and it is correct. If
+   you see a diagram *refused* for width, the renderer has regressed.
 3. **CSN diagnostics (proposed, unshipped).** `BRF-MERMAID-HARD` reserves
    standard diagnostic strings (`CSN: too wide`, `CSN: too complex`) so
    okuda can paint a *stated* boundary instead of a silent truncation —
@@ -105,14 +140,21 @@ A ` mermaid: flowchart ` **box title** in the render means the diagram
 **fell back** — the type was unsupported or the source didn't parse. That
 grep is the smoke test.
 
-**Budget rule.** A diagram's canvas is fixed; the pane is not. Before
-committing a diagram to a document, render it at the narrowest width the
-document is expected to be read at. A `flowchart LR` with three subgraphs
-and phrase-length labels is a 241-column diagram, and no amount of pane
-will make it a 120-column one (`docs/2026-10-25-test-diagrams.md` holds
-one, and the receipt names it). The fix for "too wide" is a narrower
-diagram — fewer columns of rank, shorter labels, split by view — never a
-wider pane.
+**Budget rule.** A diagram's width is fixed; the pane is not. Before
+committing one to a document, look at it at the narrowest width the
+document will be read at. A `flowchart LR` with three subgraphs and
+phrase-length labels is a 241-column diagram and no pane will make it a
+120-column one (`docs/2026-10-25-test-diagrams.md` holds one, and the
+receipt names its 241).
+
+There are two remedies and they are not interchangeable. **Widening the
+pane** shows more of the diagram you have — the right first move, because
+the diagram is already drawn and the only thing missing is glass. **Narrowing
+the diagram** — fewer columns of rank, shorter labels, split by view — is the
+one that helps every reader, including the ones who cannot widen. Do not
+widen to avoid reshaping a diagram that was too wide for its job; the
+receipt staying at `needs 241 cols` in a 200-column pane is that diagram
+telling you it is the wrong shape.
 
 ## Related
 

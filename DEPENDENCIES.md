@@ -81,30 +81,47 @@ name and package name differ. The origin doc's `spacex-mermaid` is stale;
   boxes, which the renderer *does* draw as containers — its native shape.
   Don't ask the state grammar for nesting it flattens; ask the flowchart
   grammar, which draws what it parses.
+- **What it draws is a closed set of five families** — `flowchart`/`graph`,
+  `stateDiagram`, `classDiagram`, `erDiagram`, `sequenceDiagram`
+  (`src/mermaid.rs` dispatch chain). Everything else is a **declared
+  exclusion**, not a gap we are closing: `gantt`, `pie`, `journey`, `mindmap`,
+  `gitGraph`, `timeline`, `quadrantChart`, `sankey-beta`, `xychart-beta`,
+  `block-beta`, `packet-beta`, `requirementDiagram`, `C4Context`,
+  `architecture-beta`, `kanban`, `treemap` all return the source in a box.
+  The list lives here and in `playbooks/mermaid-diagrams-playbook.md` and
+  **nowhere in code**: okuda keeps no type whitelist, because a second copy
+  of the engine's dispatch chain is a store that drifts (*derived, not
+  specified*; `ADR-PANE-NOT-CANVAS-069`).
 - **Width guard.** The engine's canvas is taken from `-w`, else `$COLUMNS`,
   else 80 (`src/main.rs:67-70`). The wrapper passes no `-w`, so **okuda sets
-  `COLUMNS` to its own diagram budget** (`src/render.ts`, `spawnMermaid`)
-  — without it the canvas would be the shell's width or 80, and the art
-  would be composed for a width okuda is not drawing into
-  (`BRF-DIAGRAM-WIDTH-HANDOFF`). Given a canvas the engine **never overruns
-  it**: a layout whose canvas exceeds it returns `Oversize::Width`
+  `COLUMNS` to a fixed `LAYOUT_CANVAS` (2048)** — derived from `MAX_NODES`
+  (128 nodes × ~15 columns; a 127-node chain lays out at 1929), and never
+  the pane (`ADR-PANE-NOT-CANVAS-069`). Given a canvas the engine **never
+  overruns it**: a layout whose canvas exceeds it returns `Oversize::Width`
   (`src/mermaid.rs:1903`, `:3385`) and `render()` maps that to
   `fallback(…, too_wide = true)` (`:132-137`), which emits the source in a
   bordered box plus *"This diagram is too wide to display here — open the
-  image to view it in full."* okuda consumes that as a receipt of its own
-  (`▸ too wide · needs N cols · M here`), with N measured by re-rendering on
-  a doubled canvas: a layout that stretches to fill its pane can never
-  exceed it and so never bails, which makes every bailed layout fixed-size
-  and its art width on a generous canvas its exact requirement.
+  image to view it in full."* The generous canvas also stops the fallback
+  box from **wrapping**: it re-flows its source only when the canvas is
+  narrower than the content (a 272-column source: 29 lines at canvas 64, 25
+  at natural width), which is why no special case is needed for listings.
 - **The refusal is not flagged on the pipe.** `mermaid-to-md` flattens
   `too_wide` into the text fence, so okuda detects it from the shape of the
   output — the `╭ mermaid: ` box title (never present in art) plus the
-  hint. Coupling to the hint string is the cost of a wrapper with no
-  structured exit; if the wrapper ever grows one, this is what changes.
+  `too wide` hint, matched two words short because the hint itself is
+  wrapped to the canvas at narrow widths. Coupling to the hint string is the
+  cost of a wrapper with no structured exit; if the wrapper ever grows one,
+  this is what changes.
 - **`Oversize::Cells` is indistinguishable from an unsupported type**
   (`src/mermaid.rs:133-136`: both emit `fallback(…, too_wide = false)`). A
   diagram too *large* therefore reads as *"this family is not drawn"*.
   Upstream's gap, not okuda's; no receipt here can tell them apart.
+- **Over-cap content is dropped silently.** Past `MAX_NODES` (128) and
+  `MAX_EDGES` (512) the parser discards the excess and sets an `over_cap`
+  flag it never surfaces, so an over-cap diagram renders as a *truncated*
+  diagram that looks whole — the one failure mode with no receipt anywhere.
+  Measured: a 129-node chain collapses to 29 columns of art. `BRF-MERMAID-HARD`
+  owns the diagnostics; okuda cannot see it.
 
 The pair (`rg`, `fzf`) serves the `gloam` launcher (see
 `src/launcher.ts`, ADR-016; BRF-CONTENT-SHORTLIST). `gloam` (no arg)
