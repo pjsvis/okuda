@@ -324,7 +324,7 @@ mindmap
       Release notes
 ```
 
-## Documentation Release Plan
+## Documentation Release Plan (unsupported)
 
 ```mermaid
 gantt
