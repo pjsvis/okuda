@@ -179,6 +179,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-SEARCH-SURFACE | ↓ parked | the search state machine and the invariant audit | — |
 | BRF-TELEVISION-PREVIEW | ↓ parked | okuda as the renderer, OKUDA_WIDTH as the knob | — |
 | BRF-TERMINAL-CELL-GRID | ↓ parked | 2D terminal cell grid architecture | — |
+| BRF-DIAGRAM-HEIGHT-AXIS | ↓ parked | The height axis has no policy at all | — |
 
 ## Debriefs without briefs
 
