@@ -22,6 +22,7 @@ import {
   findAnchor,
   proportionalScroll,
   reanchoredScroll,
+  frameAcrossRender,
   gateFetch,
   renderEqual,
   type Fetch,
@@ -31,6 +32,7 @@ import {
   CHROME_JITTER,
 } from "../src/tui";
 import { makeStyler } from "../src/ansi";
+import { MIN_RENDER_WIDTH } from "../src/render";
 import { DRACULA_PALETTE } from "../src/palette";
 import { displayWidth, stripANSI } from "../src/width";
 import { tmpdir } from "node:os";
@@ -455,6 +457,55 @@ describe("tui — reanchoredScroll (the one repaint path: reload / resize / watc
   test("scroll clamps to the new max when the doc shrinks hard", () => {
     const tiny = ["  only", "  lines"];
     expect(reanchoredScroll(doc, tiny, 10, 6)).toBe(0); // maxScroll 0
+  });
+});
+
+describe("tui — frameAcrossRender (the anchor survives a withheld frame)", () => {
+  // The Hopper bug, 2026-10-26: narrow below MIN_RENDER_WIDTH and the renderer
+  // returns one receipt instead of a document. Stored as `lines`, three things
+  // broke at once — the document was lost, `maxScroll` collapsed to 0, and paint
+  // wrote the clamped scroll back as 0 — so widening restored nothing and the
+  // reader was back at the top.
+  const doc = Array.from({ length: 200 }, (_, i) => `  line-${i}`);
+  const receipt = ["", "  ▸ 20 cols · 8 here", ""];
+  const height = 20;
+
+  test("below the floor the document passes through and the receipt is held apart", () => {
+    const f = frameAcrossRender(doc, 137, receipt, 8, height);
+    expect(f.lines).toEqual(doc);
+    expect(f.held).toEqual(receipt);
+    expect(f.scroll).toBe(137); // untouched: not re-anchored, not clamped to 0
+  });
+
+  test("at or above the floor the receipt is released and the anchor re-applies", () => {
+    const widened = Array.from({ length: 200 }, (_, i) => `  wider-line-${i}`);
+    const f = frameAcrossRender(doc, 137, widened, 120, height);
+    expect(f.held).toBeNull();
+    expect(f.lines).toEqual(widened);
+    // The anchor line-147 (scroll 137 + mid 10) sits at the same index, so the
+    // scroll is preserved rather than reset — the property the bug destroyed.
+    expect(f.scroll).toBe(137);
+  });
+
+  test("narrow, widen, narrow again — the position never drifts", () => {
+    let lines = doc;
+    let scroll = 90;
+    let held: string[] | null = null;
+    for (const cols of [8, 120, 12, 200, 6, 120]) {
+      const r = frameAcrossRender(lines, scroll, cols < 20 ? receipt : doc, cols, height);
+      ({ lines, held } = r);
+      scroll = r.scroll;
+      expect(lines).toEqual(doc); // never replaced by a receipt
+      expect(cols < 20 ? held : null).toEqual(cols < 20 ? receipt : null);
+      expect(scroll).toBe(90);
+    }
+  });
+
+  test("the floor is the renderer's constant, not a second one", () => {
+    // 19 holds, 20 does not: conditioned on MIN_RENDER_WIDTH so the receipt and
+    // its handling cannot drift apart.
+    expect(frameAcrossRender(doc, 50, receipt, MIN_RENDER_WIDTH - 1, height).held).toEqual(receipt);
+    expect(frameAcrossRender(doc, 50, doc, MIN_RENDER_WIDTH, height).held).toBeNull();
   });
 });
 

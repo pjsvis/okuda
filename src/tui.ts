@@ -313,6 +313,42 @@ export function reanchoredScroll(
   return Math.min(oldScroll, maxScroll);
 }
 
+/** The document's frame state across one render, and the one place a withheld
+ *  frame is distinguished from a document. Pure.
+ *
+ *  Below `MIN_RENDER_WIDTH` the renderer does not compose: it returns one
+ *  receipt, `▸ 20 cols · 8 here` (`src/render.ts:589`). That receipt is a
+ *  **requirement, not a document**, and it must therefore be painted *over* the
+ *  document rather than stored *as* it. Storing it was the defect, measured
+ *  2026-10-26: `lines` became three receipt rows, `maxScroll` collapsed to 0,
+ *  `paint` wrote the clamped `scroll` back as 0, and by the time the pane widened
+ *  again the anchor it needed to restore had already been destroyed. Narrow to
+ *  8 and widen, and the reader is at the top of the document.
+ *
+ *  So the held frame is returned separately, and the document's `lines` and
+ *  `scroll` pass through untouched — the whole of the fix. `scroll` is the
+ *  reader's position *in the document*, so it is document state, and nothing
+ *  that is not the document may write it.
+ *
+ *  A different document arriving at a held width is not this case: `present`
+ *  replaces `lines` outright, because a new document has no anchor to keep. */
+export function frameAcrossRender(
+  prevLines: string[],
+  prevScroll: number,
+  next: string[],
+  cols: number,
+  height: number,
+): { lines: string[]; held: string[] | null; scroll: number } {
+  if (cols < MIN_RENDER_WIDTH) {
+    return { lines: prevLines, held: next, scroll: prevScroll };
+  }
+  return {
+    lines: next,
+    held: null,
+    scroll: reanchoredScroll(prevLines, next, prevScroll, height),
+  };
+}
+
 /** Fetch outcome: the read path never coerces failure to empty success
  *  (brief: fetch-state-stamp). A vanished source reported as `""` rendered
  *  blank and the gate read `changed`; now failure is a distinct state the
@@ -818,6 +854,10 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     : [];
   const init = gateFetch(null, initialFetch, initialRender);
   let lines: string[] = init.lines;
+  /** The withheld-frame receipt, when the glass is below `MIN_RENDER_WIDTH`.
+   *  Painted over `lines`, never stored as it — see `frameAcrossRender`. Null
+   *  whenever what is on screen is the document itself. */
+  let heldLines: string[] | null = null;
   let fetchState: FetchState = init.state; // footer stamp reads this (brief: fetch-state-stamp)
   let scroll = 0;
   /** The geometry the glass currently holds — the frame's second input
@@ -917,10 +957,15 @@ export async function runTui(opts: TuiOptions): Promise<void> {
   const paint = (): void => {
     const { rows, cols } = dims();
     const height = contentHeight(rows); // separator row + badge row (BRF-FOOTER-SEPARATOR)
-    let view = viewport(lines, scroll, height);
-    if (scroll > view.maxScroll) {
+    // Paint from the withheld frame when there is one, and clamp `scroll` only
+    // against the DOCUMENT: a three-row receipt has `maxScroll` 0, so clamping
+    // against it would write the reader's position back as 0 and lose the anchor
+    // before the pane widens (the Hopper bug, 2026-10-26).
+    const source = heldLines ?? lines;
+    let view = viewport(source, heldLines === null ? scroll : 0, height);
+    if (heldLines === null && scroll > view.maxScroll) {
       scroll = view.maxScroll;
-      view = viewport(lines, scroll, height);
+      view = viewport(source, scroll, height);
     }
     // One frame, one write (BRF-SYNC-OUTPUT): assembled whole, emitted
     // whole, bracketed so the terminal composites it atomically. The
@@ -931,8 +976,11 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     // content is here and continues past the bottom edge. Conditioned on the
     // SAME constant the renderer used (MIN_RENDER_WIDTH), so the fill appears for
     // exactly the panes where the document was held and the two cannot drift.
-    // Paint-time only: the marks never enter `lines`, so scroll, the content gate
-    // and the re-anchor keep reasoning about the document and not about texture.
+    // Paint-time only: neither the receipt (`heldLines`) nor the marks enter
+    // `lines`, so scroll, the content gate and the re-anchor keep reasoning about
+    // the document and not about texture. Both halves matter — the receipt used
+    // to be written into `lines` by the render path, and that is what took the
+    // anchor with it.
     const shown = cols < MIN_RENDER_WIDTH ? heldViewport(view.visible, height, cols) : view.visible;
     let frame = "\x1b[2J\x1b[H"; // clear + home
     frame += shown.join("\n");
@@ -1074,8 +1122,12 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       return;
     }
     const oldLines = lines;
-    lines = decision.lines;
-    scroll = reanchoredScroll(oldLines, lines, scroll, height);
+    const oldScroll = scroll;
+    ({
+      lines,
+      held: heldLines,
+      scroll,
+    } = frameAcrossRender(oldLines, oldScroll, decision.lines, cols, height));
     paint();
   };
 
@@ -1087,6 +1139,10 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  prev=null semantics apply: the new doc always reads `changed`). The
    *  caller has already verified fetch.ok and pushed the backstack. */
   const present = (fetch: Fetch, next: string[], nextScroll: number): void => {
+    // A different document replaces the anchor it would otherwise restore, so
+    // any withheld frame from the previous one is released here: a new document
+    // opened at a held width has no position to keep.
+    heldLines = null;
     lines = next;
     fetchState = fetch.ok ? "changed" : "failed";
     scroll = nextScroll;
