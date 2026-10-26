@@ -11,9 +11,13 @@ briefs: [BRF-PROSE-MEASURE]
 # Debrief: The measure — the renderer had an opinion about everything but the text
 
 **Date:** 2026-10-26
-**Status:** Done — `PROSE_MEASURE` shipped, `ADR-PROSE-MEASURE-070` recorded, the
-fence receipt refused on the operator's word, `just check` green at **852 tests**.
-Two parked siblings and one filed finding remain; none of them blocks.
+**Status:** Done, and then **reversed** — `PROSE_MEASURE` shipped, `ADR-PROSE-MEASURE-070`
+recorded, the fence receipt refused on the operator's word, `just check` green at
+**852 tests**; and within the hour the operator dogfooded it and the measure was
+reverted (`ADR-PROSE-MEASURE-071`). The parts of this session that stand are the
+conception below, the explainer and the census; the measure does not. Read the
+reversal addendum at the end for what the failed decision cost, and for the one
+finding worth more than it: **the control was never run.**
 
 ## What was asked
 
@@ -118,6 +122,12 @@ that for *blocks*; the measure bought it for *lines*, and nobody was aiming at i
 That is the argument for banding the last unbanded class: the invariant generalised
 itself.
 
+> **Reversed 2026-10-26 — this reading should have been red, and was read as a
+> prize.** The invariant *is* the defect: a render that cannot tell 120 from 1000
+> columns is a renderer that has stopped reading the glass. The numbers were in
+> hand, at the right width, in this session — the instrument was built and pointed
+> the wrong way. That is the costliest sentence in the file. (`ADR-PROSE-MEASURE-071`)
+
 ## The gates that bit, and were right
 
 - **The One-Way Valve** — I put six td IDs in a persisted brief. *The ephemeral may
@@ -207,3 +217,48 @@ all found by using the thing rather than describing it.
 A fifth instance of the ladder, ideally from a case not already solved, which is
 the only honest test of whether it is a law or a nice sentence. The lexicon stays
 alone until one of us breaks the claim.
+
+## Addendum 2026-10-26 (second) — the reversal, and the control that was never run
+
+The measure is gone. `ADR-PROSE-MEASURE-071` reverses `ADR-PROSE-MEASURE-070`; the
+code, the test file and the style-guide passages are reverted, and prose wraps at
+the glass again. The debrief keeps its conception section because the reasoning was
+sound *and wrong*, which is the more useful record of the two.
+
+**The dogfood line.** *"I have dogfooded this and it's like a return to Glow."* A
+paragraph stopped at 76 columns in a 200-column pane, and the rest of the frame was
+margin. That is what glamour does, and the shape had been imported with the number.
+
+**Why 862 green tests said nothing.** Nine of them were written to the cap and
+pinned it. An instrument that encodes a decision can only confirm it — and the
+suite grew exactly as fast as the decision needed. This is not a test-coverage gap;
+it is the wrong kind of instrument, and the reversal ships the right one
+(`tests/prose-glass.test.ts`: prose follows the glass, measured as width, not as
+bytes; verified by reinstating the cap and watching all three fail).
+
+**The control was one command away and was never run.** The protocol already says a
+detector needs a control and the control passes first. The control here was *the
+tool this one replaced*, installed on the same machine, renderable in the same
+session. The rule the next session should carry: **before an ADR about how the
+product reads, render the same document in the predecessor.** The probe is a
+finder; dogfood is the judge; the predecessor is the control.
+
+**Two claims the record made that were not true.** `ADR-070` §3 said the dial was
+*"parked (td, under `BRF-PROSE-MEASURE`)"* and this file counted "two parked
+siblings and one filed finding". `td list --all | grep -i measure` returns **zero**
+— the park was prose-only, which is the wish-versus-ticket failure rule 7 names,
+found in the document that elsewhere warned about unpaid claims. And the finding
+that *was* filed died with the measure: the conspicuous table slack was caused by
+the cap, so there is nothing left to open.
+
+**What the session still owns.** The explainer (`explainers/causation.md`) and the
+census (`scripts/seams.ts`) are untouched by the reversal and keep their debt: a
+fifth rung instance from a case not already solved. `ADR-071` also hands the tooling
+one finding it did not fix — `citation-census --strict` passes over a dangling
+`Enforced by:` target, which is how an ADR can cite a test that no longer exists.
+
+**The cost, plainly.** Half a session, three documents, nine tests and one style
+guide, written and withdrawn inside an hour. Cheap at the price: it bought a
+reversed decision recorded as a reversal, a guard test that catches the next person
+who reaches for a constant, and one sentence in the style guide that teaches the
+boundary (*a wide paragraph's remedy is the pane or the fence, never a cap*).

@@ -7,10 +7,13 @@ date: 2026-10-26
 # Brief: Text takes the measure, art takes the glass — prose gets a band, and a fence says only *that* it was cut
 
 **Date:** 2026-10-26
-**Status:** Done — all three steps shipped: the measure (`PROSE_MEASURE`,
-`Ctx.measure`), the refusal recorded with its guard test, the style guide amended.
-`ADR-PROSE-MEASURE-070` is the decision record. `bun test` 852 pass, `just check`
-green
+**Status:** Rejected — the measure was **reversed the same day it shipped**
+(`ADR-PROSE-MEASURE-071`). All three steps did ship — `PROSE_MEASURE`,
+`Ctx.measure`, the refusal with its guard test, the amended style guide — and then
+the operator dogfooded it: *"it's like a return to Glow."* The implementation is
+gone; the fence-receipt refusal survives, because a cut line's marker is still the
+whole of what a reader needs. Read the reasoning below for what was tried and why
+it failed on scope rather than on numbers.
 **Refuses:** a requirement receipt for fences — see *Change 2*. `ADR-PANE-NOT-CANVAS-069`
 §5 therefore stands unamended; the block sequence and the line count stay invariant
 under pane width.
