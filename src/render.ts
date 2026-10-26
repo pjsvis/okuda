@@ -508,22 +508,6 @@ function colorFg(hex: string, text: string): string {
  *  mid-glass (ADR-ROLE-LAYOUT-022). */
 export const BAND_CONTENT = 116;
 
-/** The prose measure, in **content** columns (80 with the 2+2 document margin).
- *
- *  Prose is the one class with no band until now, so a 300-column pane wrapped
- *  a paragraph to 296 — the readline length no one reads at. The number is not
- *  new: `BAND_CONTENT`'s comment authorises it for tables (*"authored to fit 80
- *  columns (content 76)"*), and the hints row is budget-bound to the same 80
- *  (`src/tui.ts` `hintsLine`). Three families, one number.
- *
- *  **It is a no-op at and below 80 columns**, where content width is 76 and
- *  `min` returns it unchanged — so the common pane, the 80-column `--width` and
- *  every phone glass render byte-identically. Above 80 it also *improves* the
- *  resize contract: prose stops re-flowing entirely and only art's cut point
- *  moves (ADR-PANE-NOT-CANVAS-069). Left-anchored, never centred: the left edge
- *  is the rail the eye scans down, and a moved rail is a different document. */
-export const PROSE_MEASURE = 76;
-
 /** Where a token may wrap: after a delimiter a reader already parses as a
  *  separator. A URL or path is therefore not atomic — its floor is the
  *  longest segment between delimiters (BRF-TABLE-GLASS-FIT). */
@@ -563,28 +547,7 @@ type DiagramEntry =
   | { failure: string; title?: string | null };
 
 interface Ctx {
-  /** The glass's content width (glass − 4). The **art** class's budget: a code
-   *  line, a box edge or a rank may not be re-flowed, so those elide here.
-   *  Never prose — see `measure`. */
   width: number;
-  /** The **text** class's budget: `min(width, PROSE_MEASURE)`.
-   *
-   *  Prose has no natural width, so the glass's width is the wrong one to give
-   *  it: a break inside a sentence is insignificant, which means the width is a
-   *  *reading* parameter and the eye's range is 40–80 columns. Past that, the
-   *  measure is what the reader's eye wants, not what the panel offers.
-   *
-   *  Two classes, one rule — **text takes the measure, art takes the glass**:
-   *  prose, headings, list text, blockquotes, diagram descriptions, the
-   *  thematic rule, the H1 rail and the badge that rides prose read `measure`;
-   *  code fences, diagrams, tables (their own 116 band), role surfaces and the
-   *  identity header read `width`/`fullWidth`. A cap only ever narrows, so the
-   *  glass invariant (ADR-004) is untouched, and below 80 columns the two are
-   *  equal — the measure is a no-op exactly where the old behaviour was right.
-   *
-   *  A literal, never a dial: a live measure would be a third geometry input
-   *  and `needsRepaint` is deliberately two (ADR-RESIZE-GEOMETRY-046). */
-  measure: number;
   /** Full terminal width (opts.width), for header chip placement at the
    *  extreme right column. Body wraps at `width` (content); the header chip
    *  eats the 2-col right margin so it sits at the visible right edge. */
@@ -653,7 +616,6 @@ export async function renderDocument(
     // (what `--width` already refuses below); under that the TUI still renders,
     // best effort, and the glass invariant is not claimed.
     width: Math.max(4, opts.width - 4),
-    measure: Math.min(Math.max(4, opts.width - 4), PROSE_MEASURE),
     fullWidth: opts.width,
     styler,
     color,
@@ -749,7 +711,7 @@ export async function renderDocument(
   // plain `█` chips.
   let out = rendered;
   if (stripTags(rendered).trim() !== "") {
-    const rail = ctx.measure - 4; // chip + space + rail + space + chip = measure
+    const rail = ctx.width - 4; // chip + space + rail + space + chip = width
     out = rendered + styler.headingChip() + " " + styler.rule(rail) + " " + styler.headingChip() + "\n";
   }
   const body = finalize(out, ctx.styler);
@@ -1205,11 +1167,11 @@ export function regionsForFile(
 
 /** Build the Bun.markdown handler set. */
 function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => string | null> {
-  const { styler, width, measure } = ctx;
+  const { styler, width } = ctx;
 
   const wrapBlock = (text: string, indent = ""): string[] =>
     wrapANSI(text, {
-      width: measure,
+      width,
       indent,
       firstIndent: "",
     });
@@ -1241,7 +1203,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       const markers = "#".repeat(level);
       const badgeW = markers.length + 1; // badge + the space after it
       const indent = " ".repeat(badgeW);
-      const wrapW = measure - 2;
+      const wrapW = width - 2;
       // Guest paints (silcrows, doc-refs, state glyphs) close with a full
       // reset; the heading re-opens after each one — the enclosing style
       // owns the run, the guest borrows and hands it back (td-290433).
@@ -1330,7 +1292,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         if (!v.live) return wrapBlock(stripHtml(v.slug)).join("\n") + "\n\n";
         const badge = `\u00a7${v.num}`;
         const slugLines = wrapBlock(stripHtml(v.slug));
-        const avail = Math.max(measure - 2 - badge.length - 1, 8);
+        const avail = Math.max(width - 2 - badge.length - 1, 8);
         const body = elideToWidth(slugLines.join(" "), avail);
         return body + " " + styler.roleBold("vector", badge) + "\n\n";
       }
@@ -1438,7 +1400,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
     },
 
     hr() {
-      return styler.rule(measure) + "\n\n";
+      return styler.rule(width) + "\n\n";
     },
 
     code(children: string) {
@@ -1700,10 +1662,10 @@ function describedBlock(
   ctx: Ctx,
   title?: string | null,
 ): string {
-  const { styler, measure } = ctx;
+  const { styler, width } = ctx;
   const indent = "  ";
   const pipe = styler.quotePipe();
-  const wrapped = wrapANSI(prose, { width: measure - 2, indent, firstIndent: "" });
+  const wrapped = wrapANSI(prose, { width: width - 2, indent, firstIndent: "" });
   const lines = wrapped.map((l) => `${pipe}${l}`);
   let out = lines.join("\n");
   if (title) {
@@ -1873,9 +1835,9 @@ function diagramReceipt(
   return `${open}${indOpen}${line}${TAG_RAW_CLOSE}${TAG_RAW_CLOSE}\n\n`;
 }
 
-/** Blockquote: single-level pipe prefix, muted, re-wrapped at measure-2. */
+/** Blockquote: single-level pipe prefix, muted, re-wrapped at width-2. */
 function quoteBlock(children: string, ctx: Ctx): string {
-  const { styler, measure } = ctx;
+  const { styler, width } = ctx;
   // Strip any inner quote pipes (single-level normalisation); the pipe
   // may carry ANSI colour, so allow optional SGR around it.
   const inner = children
@@ -1901,7 +1863,7 @@ function quoteBlock(children: string, ctx: Ctx): string {
     // NO_COLOR) so parity holds.
     const reset = styler.reset();
     const italicOpen = styler.roleItalic("emphasis", "").replace(/\x1b\[0m$/, "");
-    const lines = wrapANSI(seg.text, { width: measure - 2 });
+    const lines = wrapANSI(seg.text, { width: width - 2 });
     for (const line of lines) {
       if (line === "") { out.push(""); continue; }
       // Re-open italic after every reset so inline spans compose instead
@@ -1946,7 +1908,7 @@ function renderList(
   meta: { ordered: boolean; start?: number },
   ctx: Ctx,
 ): string {
-  const { measure } = ctx;
+  const { width } = ctx;
   // Nesting depth from the probe pass (0 = top-level), drawn in the
   // same call order the probe recorded it.
   const depth = ctx.listDepths?.[ctx.listSeq++] ?? 0;
@@ -1974,7 +1936,7 @@ function renderList(
     // the terminal soft-wrapping us (same class as the content floor above).
     // Measured: `Math.max(4, ...)` overflowed a 10-12 column glass on every
     // indented line; at 1 the composed line lands exactly on the budget.
-    const avail = Math.max(1, measure - 4 * depth - textCol - LIST_INDENT);
+    const avail = Math.max(1, width - 4 * depth - textCol - LIST_INDENT);
     const contIndent = " ".repeat(textCol);
 
     const parts = splitNested(item);

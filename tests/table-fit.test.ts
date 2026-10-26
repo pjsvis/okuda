@@ -21,18 +21,11 @@ const SURFACED =
   "| Machine code unique by construction, ugly by design | COSPAR 1977-084A; VGR 77-1 | Butrica (1998); Wikipedia (Voyager program) | filenames + frontmatter |\n";
 
 /** Below-cap goldens, captured before BRF-WRAP-AT-CAP — the fit path and the
- *  narrow-glass cut must be byte-identical, asserted not assumed.
- *
- *  `GOLDEN_B120` carries one delta from its 2026-10-26 capture and it is the
- *  intended one: the H1 rail now follows the **prose measure** (76 content)
- *  rather than the glass, so at a 120-column glass the rail is 72 dashes, not
- *  112. The tables in both goldens are untouched — that is what this test is
- *  about. At and below 80 columns the measure equals the content width and the
- *  bytes are unchanged, which `GOLDEN_A30` still proves. */
+ *  narrow-glass cut must be byte-identical, asserted not assumed. */
 const GOLDEN_A30 =
   "\n  \u001b[1mElement\u001b[0m  │ \u001b[1mChannel\u001b[0m    │ \u001b[1mR\u001b[0m…\n  ──────────────────────────\n\n  \u001b[1mheading\u001b[0m    structural   p…\n\n  \u001b[1memphasis\u001b[0m   emphasis     y…\n\n  ──────────────────────────\n\n  █ ────────────────────── █\n";
 const GOLDEN_B120 =
-  "\n  \u001b[1ma\u001b[0m       │ \u001b[1mb\u001b[0m\n  ────────────────────\n\n  \u001b[1mone two\u001b[0m   three four\n\n  ────────────────────\n\n  █ ──────────────────────────────────────────────────────────────────────── █\n";
+  "\n  \u001b[1ma\u001b[0m       │ \u001b[1mb\u001b[0m\n  ────────────────────\n\n  \u001b[1mone two\u001b[0m   three four\n\n  ────────────────────\n\n  █ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────── █\n";
 const BELOW_A =
   "| Element | Channel | Role |\n|---|---|---|\n" +
   "| heading | structural | purple bold |\n| emphasis | emphasis | yellow italic |\n";
@@ -47,9 +40,7 @@ const PILOT =
 describe("the table at the cap (BRF-WRAP-AT-CAP)", () => {
   test("below the cap is byte-identical — the fit path is untouched", async () => {
     // A table that fits whole at 120, and one cut at a narrow glass: both are
-    // the pre-wrap bytes, so the branch did not disturb the two old ones. The
-    // 120 golden's H1 rail follows the prose measure (72 dashes at a 76 measure)
-    // — the table bytes are what this test pins. At 30 the measure is a no-op.
+    // the pre-wrap bytes, so the branch did not disturb the two old ones.
     expect(await renderDocument(BELOW_B, { width: 120, color: "none" })).toBe(GOLDEN_B120);
     expect(await renderDocument(BELOW_A, { width: 30, color: "none" })).toBe(GOLDEN_A30);
   });

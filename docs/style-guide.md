@@ -91,15 +91,15 @@ right edge, marked `…`, and — where the block can say how wide it wanted to
 be — the receipt carries the number (`art elided · needs 241 cols`). Nothing
 is re-flowed into a shape it did not have.
 
-**Prose also has a measure, and it is not the pane.** A break inside a sentence
-is insignificant, and that cuts both ways: a paragraph running 296 columns is as
-unread as one cut at 40. So text stops at **76 content columns** (80 with the
-margin) however wide the glass, while art takes the glass — two measures in one
-frame, deliberately: *text takes the measure, art takes the glass*
-(`ADR-PROSE-MEASURE-070`). The margin to the right of a wide paragraph is the
-page, not a fault. The test for any new block type: *does the output contain a
-line break the source did not?* For prose, that is the point. For anything else,
-the block is wrong. (`ADR-PANE-NOT-CANVAS-069`.)
+**A cap is not the remedy.** A paragraph running 296 columns is as unread as one
+cut at 40, and the renderer is not the party to fix it. Where the text sits and
+how wide the page is belongs to the host's pane, or to a boot value the reader
+chose — a width the renderer imposes on prose is compositing inside the
+renderer, which the three-owner rule forbids (`ADR-PROSE-MEASURE-071`).
+
+The test for any new block type: *does the output contain a line break the
+source did not?* For prose, that is the point. For anything else, the block
+is wrong. (`ADR-PANE-NOT-CANVAS-069`.)
 
 
 ## Diagrams: shape the eye can trace
@@ -133,11 +133,6 @@ or agent, gets wrong by default.
   shape, but a cut one — `…` at the glass and `needs N cols` on the receipt.
   That receipt is the diagram telling you its size; believe it and reshape, or
   widen and read the rest.
-- **The measure.** Prose reads at 76 content columns at any pane width; tables
-  keep their 116 band; fences and diagrams take the glass. Do not hand-wrap
-  prose to the measure — the renderer does that, and hand-wrapping is a break
-  you asserted. If you want a layout wider than the measure, it is a **fence**:
-  an authored wall, never a paragraph.
 - **Split by view, not by scissors.** Two halves of one graph contradict each
   other within a month. A context view and a sequence view of the same system
   do not, because they answer different questions.
