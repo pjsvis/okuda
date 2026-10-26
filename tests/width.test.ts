@@ -30,6 +30,15 @@ describe("width — contract: graphemes, EAW, combining, escapes, tabs", () => {
     expect(displayWidth("👨‍👩‍👦")).toBe(2);
   });
 
+  test("a regional-indicator flag is one 2-column grapheme", () => {
+    // Two codepoints, one cluster, two cells. Measured 1 until 2026-10-26: the
+    // wide table is a hand-maintained subset and regional indicators are absent
+    // from the EAW table, so nothing inherited them. Every column after a flag
+    // drifted by one.
+    expect(displayWidth("🇯🇵")).toBe(2);
+    expect(displayWidth("🇬🇧 okuda")).toBe(8);
+  });
+
   test("combining diacritics add 0 columns", () => {
     expect(displayWidth("e\u0301")).toBe(1);
     expect(displayWidth("cafe\u0301")).toBe(4);

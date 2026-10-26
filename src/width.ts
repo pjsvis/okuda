@@ -62,6 +62,12 @@ const EAW_WIDE: Array<[number, number]> = [
   [0x1f0cf, 0x1f0cf],
   [0x1f18e, 0x1f18e],
   [0x1f191, 0x1f19a],
+  // Regional indicators: a flag is a PAIR of them, segmented as one grapheme, and
+  // the pair renders two cells wide. Missing until 2026-10-26, so every flag
+  // measured 1 and every column after it drifted by one — the one defect a
+  // script sweep found (regional indicators are absent from the EAW table, which
+  // is why they were not inherited with the emoji ranges).
+  [0x1f1e6, 0x1f1ff],
   [0x1f200, 0x1f202],
   [0x1f210, 0x1f23b],
   [0x1f240, 0x1f248],
