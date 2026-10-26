@@ -22,6 +22,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 
 | Brief | State | Narrative | Debrief |
 |---|---|---|---|
+| BRF-PROSE-MEASURE | ✓ done | text takes the measure (76), art takes the glass; the fence receipt refused — ADR-070 | [debrief](debriefs/2026-10-26-debrief-the-measure.md) |
 | BRF-ELISION-PRIMITIVE | ✓ done | elision primitive; [ADR-TABLE-ELISION-014](decisions/014-table-elision-over-shrink-wrap.md) closed | [debrief](debriefs/2026-08-30-debrief-elision-primitive.md) |
 | BRF-INDEX-JUMP | ✓ done | ephemeral index + numeric jump | [debrief](debriefs/2026-08-29-debrief-index-and-jump.md) |
 | BRF-OKF-CALLSIGN | ✓ done | OKF conformance + callsign layer | [debrief](debriefs/2026-08-29-debrief-okf-callsign-migration.md) |
@@ -166,7 +167,6 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-AUTHORING-CONVENTION | · open | Authoring Convention — Route Agents to the Style Guide | — |
 | BRF-PROBES-TIER | · open | Establish Registered `probes/` Tier for Exploratory Python Scripts | — |
 | BRF-DIAGRAM-WIDTH-HANDOFF | · open | One width, or two? — the diagram pipe's second opinion | — |
-| BRF-PROSE-MEASURE | ✓ landed | text takes the measure (76), art takes the glass; the fence receipt refused — ADR-070; debrief owed | — |
 
 ## Parked / deferred
 
