@@ -130,6 +130,11 @@ Five sub-rulings, each load-bearing:
 - `PROSE_MEASURE` must never be derived from the pane, the environment, or a file.
   A future width bug will arrive looking like a sensible convenience ("let the
   reader set the measure").
+- **Three width rules, and no fourth.** Prose (76), tables (116), art (the glass).
+  The operator's ceiling, 2026-10-26: *"three rules is not excessive but is the
+  max before a rethink."* A fourth width family is not a missing constant — it is
+  evidence the taxonomy is wrong, and it needs a rethink of the classes rather
+  than another number. The count is part of the decision, not a remark about it.
 
 ## Related
 
