@@ -473,6 +473,11 @@ new-silo dir name desc:
 cadence:
     @bun scripts/cadence.ts --write
 
+# Tempo reading, printed
+[group('registries')]
+cadence-read:
+    @bun scripts/cadence.ts
+
 # List briefs
 [group('registries')]
 reg-briefs:

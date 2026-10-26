@@ -22,33 +22,33 @@ prose above is the editor's.
 
 *Derived by `scripts/cadence.ts --write`; do not hand-edit. Regenerate: `just cadence`.*
 
-**Instrument:** `briefs/INDEX.jsonl`, `debriefs/INDEX.jsonl`, `decisions/INDEX.jsonl`, `playbooks/REGISTRY.jsonl`, `advisories/INDEX.jsonl`, `.archive/briefs/INDEX.jsonl` — plus the callsign citation graph over 434 scanned documents.
+**Instrument:** `briefs/INDEX.jsonl`, `debriefs/INDEX.jsonl`, `decisions/INDEX.jsonl`, `playbooks/REGISTRY.jsonl`, `advisories/INDEX.jsonl`, `.archive/briefs/INDEX.jsonl` — plus the callsign citation graph over 469 scanned documents.
 
 ### Tier cadence (by claimed date)
 
 | Tier | Docs | Span | Rate |
 |---|---|---|---|
-| briefs | 97 | 2026-08-25 .. 2026-10-10 | ≈ 14.8/wk |
-| decisions | 59 | 2026-08-20 .. 2026-10-10 | ≈ 8.1/wk |
-| debriefs | 42 | 2026-08-20 .. 2026-10-10 | ≈ 5.8/wk |
-| playbooks | 19 | 2026-08-20 .. 2026-10-10 | ≈ 2.6/wk |
-| advisories | 6 | 2026-09-05 .. 2026-09-30 | ≈ 1.7/wk |
-| .archive/briefs | 42 | 2026-08-20 .. 2026-10-08 | ≈ 6.0/wk |
+| briefs | 82 | 2026-08-25 .. 2026-10-26 | ≈ 9.3/wk |
+| decisions | 70 | 2026-08-20 .. 2026-10-26 | ≈ 7.3/wk |
+| debriefs | 55 | 2026-08-20 .. 2026-10-26 | ≈ 5.7/wk |
+| playbooks | 20 | 2026-08-20 .. 2026-10-12 | ≈ 2.6/wk |
+| advisories | 7 | 2026-09-05 .. 2026-10-13 | ≈ 1.3/wk |
+| .archive/briefs | 75 | 2026-08-20 .. 2026-10-14 | ≈ 9.5/wk |
 
 ### Brief latency (brief date → the date of the Thing that cites it)
 
-n=79 · min 0d · median 0d · p90 18d · max 35d
+n=75 · min 0d · median 0d · p90 30d · max 46d
 
 ### Derivation coverage (a decision/debrief citing a brief)
 
 | Tier | Citing | Coverage |
 |---|---|---|
-| decisions | 32/59 | 54% |
-| debriefs | 23/42 | 55% |
+| decisions | 33/70 | 47% |
+| debriefs | 20/55 | 36% |
 
 ### In flight (briefs not settled)
 
-open 81 · parked 10
+open 64 · parked 9
 
 **What would give this meaning:** a band in the latency line, stable over weeks — or nothing. Both are results.
 
