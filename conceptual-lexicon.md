@@ -226,8 +226,14 @@ Protocol mechanics (locus tags, wrap-up) and the protocol-wide terms live in `sy
   * **Prior art:** `docs/style-guide.md` (the three rules in paragraphs, before the
     epigraph tied them); **test-bearing** (below); `ADR-PANE-NOT-CANVAS-069`
     (*nothing is re-flowed into a shape it did not have*).
-  * **Promotion owed:** general by this file's test — every renderer, every silo.
-    Recorded here first because that is where it was cited.
+  * **Promotion owed:** the **term** — headword, definition and test — is general
+    by this file's own test (*every renderer, every silo*) and belongs in
+    `system.md`'s general lexicon, and from there in the deployed `AGENTS.md`.
+    **Not this entry**: a promoted term is a *copy adapted to the general register*
+    (the seam rule — the receiver owns it and may reshape it), so the silo keeps
+    this entry, append-only, annotated when the copy lands, and the general lexicon
+    acquires no dependency on `ADR-PROSE-MEASURE-071`, the style guide or
+    `BRF-IRONY-MARK`. Recorded here first because that is where it was cited.
 
 * **Eulogy for a missing corpse**: a retirement ceremony for something that was
   **never what the documents said it was**. The obituary is accurate about the
