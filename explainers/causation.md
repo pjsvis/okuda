@@ -150,7 +150,6 @@ certainty, priced in an assumption the reader can audit.
 
 Two limits on the whole frame, stated because a slogan is what this section is
 for avoiding.
-
 **Internal confounders exist.** The palimpsest is one: two writers producing
 one observable, one of them a ghost, and a model that carries only one
 (`playbooks/decisions-playbook.md:114`). That is confounding inside the
@@ -162,6 +161,33 @@ cost shapes what we observe and nothing we do — measurement error. A different
 emulator changing the *size* of a cost without changing what identifies it —
 transportability. A confounder is the unowned influence with arrows into both
 ends, and telling them apart is the whole of the reading.
+
+### The census is the instrument
+
+The ladder is not advice; it is a table with a gate on it. `just seams`
+(`scripts/seams.ts`) reads `src/` with its comments stripped and lists **every
+inbound crossing** — thirty-seven of them on 2026-10-26, across five classes: the
+environment, the glass, the filesystem's notifications, other processes, and
+signals — each with its rung and one clause of why. The gate fails on three
+things:
+
+- a crossing with **no rung** — a new ambient read arrived unnamed;
+- a rung naming a crossing that is **gone** — the arrow was cut and the record
+  still describes air;
+- a **refused arrow that stopped refusing** — a pattern that must not appear in
+  `src/`, checked, so the refusal is a lint rather than a memory.
+
+The `cut` rung has no rows and never will: a cut crossing is not in the census,
+because it is not in the code. It lives in the refusals instead, where the
+ambient `$COLUMNS` is held by a verifier that fails the day the shell's width
+can compose a diagram again. The strongest move in the ladder is the one the
+ladder cannot count.
+
+And the instrument is tested like any other (`tests/seams.test.ts`): both of its
+failure directions are pinned — counting a *comment* about a read, and missing a
+read spelled through an alias (`const out = process.stdout; out.columns`). A
+census that mis-counts is worse than none, so it earns the same treatment as a
+gate.
 
 ## The conventions here
 
