@@ -103,12 +103,12 @@ flowchart LR
 ```
 
 `focus` is outside the silo. No arrow drawn from in here will ever include
-it, and the remedy is not a bigger diagram — it is a **declared frame**:
-say which deviations you are conditioning on, so a reader can see whether
-the derivation is adjusted for the right thing. The silo's seam *is* its
-confounding set. Every confounder we have met lives on the far side of a
-boundary we do not control, which is why the host's behaviour keeps
-arriving as a surprise.
+it, and the remedy is not a bigger diagram — a diagram cannot hold an edge
+whose writer you do not own. It is one of four moves, and declaration is the
+last of them: the ladder below. The silo's seam is its **ineliminable**
+confounding set, the part of the confounders that reading code cannot close.
+Every confounder we have met lives on the far side of a boundary we do not
+control, which is why the host's behaviour keeps arriving as a surprise.
 
 **It fails at the clock.** A diagram has no time axis. The frame trace is a
 *sequence*, and half of our diagnoses needed the order: render before
@@ -123,6 +123,45 @@ Draw the first approximation anyway. The value of a wrong diagram is that
 it names *which axis it is missing* — boundary, clock, or scale — and that
 is the next diagram's brief. A diagram that has never failed has never been
 tested.
+
+## What to do about a confounder you do not own
+
+Statistics conditions on confounders because it cannot delete them. We
+mostly can, and that changes the order of the moves. Try them top down; the
+last is the one you take when you have given up on the first three.
+
+| move | when it is right | our instance |
+|---|---|---|
+| cut the crossing | the signal was never needed | `$COLUMNS` → a fixed canvas |
+| control with a second instrument | you need the reading and can measure it twice | Bun's `columns=0` → `tput` |
+| lag — refuse to act on it | you cannot tell its signal from noise | the widening hold |
+| declare it | you can remove it neither from the actor nor the observable | frame declaration |
+| adjust — condition and infer | never, while a rung above is available | — |
+
+Each rung costs more than the one above it. **Cut** removes the arrow and
+with it the question: `$COLUMNS` stopped composing diagrams the day the canvas
+became a constant, and nothing has been adjusted for since. **Control** admits
+the influence but refuses to trust one instrument: two independent readings
+that must agree, where a disagreement is itself the finding. **Lag** does not
+identify anything — it declines to act, because a one-column widening you
+cannot distinguish from chrome jitter is not a signal you are entitled to
+obey. **Declare** buys the weakest thing in the table and says so: conditional
+certainty, priced in an assumption the reader can audit.
+
+Two limits on the whole frame, stated because a slogan is what this section is
+for avoiding.
+
+**Internal confounders exist.** The palimpsest is one: two writers producing
+one observable, one of them a ghost, and a model that carries only one
+(`playbooks/decisions-playbook.md:114`). That is confounding inside the
+boundary, and the Palimpsest Protocol is the de-confounding procedure. So the
+seam narrows the search; it does not bound it.
+
+**Unowned influence is not the same as confounding.** The terminal's own paint
+cost shapes what we observe and nothing we do — measurement error. A different
+emulator changing the *size* of a cost without changing what identifies it —
+transportability. A confounder is the unowned influence with arrows into both
+ends, and telling them apart is the whole of the reading.
 
 ## The conventions here
 
