@@ -6,9 +6,9 @@
 The **silcrow**: a red `§`, section sign,
 followed by two digits, like ADR-045. 
 
-Unless you are in a de-refrenced document, 
+Unless you are in a de-referenced document, 
 where the silcrows are suppressed, so you will not see the 
-rose `§12` silcrow.
+rose `§12` silcrow, which you just actuated by pressing `1` and `2`
 
 Rose is the medieval rubricator's ink (`rubric` = *ruber*, red): for navigation marks.
 
@@ -98,7 +98,6 @@ is the guard — keep it that way.
 - **NN** — actuate: dereference, render clean
 - **u** — unwind: back to the main document
 - **99** — promote: clone into a new instance as main
-- **type** — the live search dereferences too; the callsign is the query
 
 The silcrow marks the reference; the number is the address; the
 terminal is the document.
