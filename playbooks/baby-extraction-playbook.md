@@ -60,6 +60,28 @@ The cycle is a *regular occurrence* in this silo, not an accident:
   doesn't re-grow the decoration — because the decoration is on the
   record as FO'd, with reasons.
 
+### Then test the baby against what killed the bathwater
+
+Extraction makes the kernel *clean*; it does not make it *viable*. The constraint
+that justified the FO has not gone away because the decoration has — so the last
+move is a re-test against that same constraint, before the kernel is re-homed: the
+**scope** that refused it, the **volume** it would cost, the **instrument** that
+would have to change to carry it.
+
+Worked instance (2026-10-26, the measure). The kernel extracted from the prose cap
+was the diagnosis — *a 296-column paragraph is as unread as one cut at 40* — and it
+survived extraction intact. What did not survive re-testing was the remedy: a width
+the renderer imposes on prose is **compositing**, and compositing belongs to the
+environment and the host (`okuda/AGENTS.md`, *three concerns, three owners*). Same
+constraint that killed the bathwater, still there. So the baby that actually landed
+was a **rule**, not a feature: one sentence in `docs/style-guide.md` about the pane
+and the fence, and nothing at all in `src/` (`ADR-PROSE-MEASURE-071`).
+
+The failure mode this prevents is the expensive one: extract a clean kernel, re-home
+it in a new brief, and six weeks later discover the same constraint refusing the same
+idea wearing better tailoring. That is not a new idea; it is a re-litigation with the
+decoration re-grown.
+
 ## When the carrier is fluent
 
 The pattern above assumes the bathwater is **visible** — an over-engineered plan,
@@ -85,6 +107,28 @@ yap.
 What the measurement did that reading could not: it named *which sentence* was
 false. A reader can only say "this feels like too much"; a stopwatch says
 "this optimises the minor term".
+
+### The dogfood is a measurement, and the predecessor is its control
+
+There is a class the stopwatch cannot reach: a document about how the thing *reads*.
+No timing refutes a fluent argument that prose should stop at 76 columns; the
+instrument is a **human looking at the artefact at a real size**, and the comparator
+is the tool it replaced.
+
+Worked instance (2026-10-26, same day, same session): the prose cap arrived with an
+ADR, a brief, a debrief, a style-guide amendment and 862 green tests — a fluent
+carrier in every respect, and nothing fired. The refutation was the operator
+rendering a real document at 200 columns: *"it's like a return to Glow."* One
+sentence, no stopwatch, and it named the false premise exactly — the shape had been
+imported from the predecessor while the number was local.
+
+**The control is the point.** Glow was installed, on the same machine, renderable in
+the same session at the same width, and was never run. The protocol already says a
+detector needs a control and the control passes first; the fluent carrier defeats
+that rule because nothing *feels* like a detector. So the standing habit is cheap
+and specific: **before an ADR about how the product reads, render the same document
+in the predecessor and compare.** The probe is a finder; the dogfood is the judge;
+the predecessor is the control.
 
 ## The tell that you got it right
 
