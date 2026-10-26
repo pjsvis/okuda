@@ -121,6 +121,12 @@ The header opens the render — badge left, title, chip right, spanning the widt
 
 ## Authoring contract
 
+> **Free in prose, careful in art, never lying in a state.** Three clauses, three
+> readers: the human reading for meaning, the human reading for shape, and both of
+> them plus the machine reading the codepoint. Every rule below is one of these
+> three, and each states its own failure — which is the only reason it is a rule
+> rather than a preference.
+
 The numbers and rules the guide states nowhere else — the ones an author, human
 or agent, gets wrong by default.
 

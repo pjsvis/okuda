@@ -204,6 +204,51 @@ Protocol mechanics (locus tags, wrap-up) and the protocol-wide terms live in `sy
   right edge is reporting; `ADR-PANE-NOT-CANVAS-069` (the frame's edges as
   information).
 
+* **Free in prose, careful in art, never lying in a state**: the three-clause law
+  of rendered text — one clause per reader, three readers in total. **Prose** is
+  read for meaning, and a break inside a sentence is insignificant, so wrapping is
+  honest; the failure it names is a *cap*, which made prose unread at scale
+  (`ADR-PROSE-MEASURE-071`). **Art** is read for shape, and a wrapped box edge
+  asserts a topology nobody drew, so art elides and never re-wraps; the failure it
+  names is the *wrap* (`ADR-UNIVERSAL-ELISION-050`). **State** is read by humans
+  *and* machines, and an unread mark costs nothing while a misread one costs
+  everything; the failures it names are the mark that mirrors, the colour that
+  collapses under deuteranopia, and the comment that outlives its system
+  (`BRF-IRONY-MARK`).
+  * **Test:** each clause must state the observation that would show it violated.
+    A maxim whose clauses cannot be falsified is a slogan; this one is admissible
+    only because all three can be.
+  * **Why one sentence and not three rules:** it is the same question — *what may
+    I do to the glass?* — answered for three readers. Split across separate
+    documents, it is how a cap was argued as a typography preference and passed
+    (`ADR-PROSE-MEASURE-070`). The epigraph of `docs/style-guide.md`'s authoring
+    contract is this sentence.
+  * **Prior art:** `docs/style-guide.md` (the three rules in paragraphs, before the
+    epigraph tied them); **test-bearing** (below); `ADR-PANE-NOT-CANVAS-069`
+    (*nothing is re-flowed into a shape it did not have*).
+  * **Promotion owed:** general by this file's test — every renderer, every silo.
+    Recorded here first because that is where it was cited.
+
+* **Eulogy for a missing corpse**: a retirement ceremony for something that was
+  **never what the documents said it was**. The obituary is accurate about the
+  *funeral* and wrong about the *deceased*: `⋮` was retired from the state
+  vocabulary on 2026-10-26, and the autopsy — `unicodedata.category` — returned
+  `Sm`, a mathematical operator. It had never been punctuation, let alone a state;
+  the coffin was never occupied.
+  * **Test:** before a retirement, ask what the thing actually *is*. If the answer
+    surprises, the documents were describing a referent that never existed — and
+    the defect class is larger than the artefact. It is the same family as the
+    comment that outlives its system: `paint`'s receipt invariant, `ADR-070`'s
+    `Enforced by:` naming a deleted test, the palette's *traffic-lamp colours*
+    falsified by an aubergine.
+  * **Named** in conversation 2026-10-26 by the operator, on reading the glyph's
+    Unicode category alongside the law above; the phrase is the operator's, the
+    autopsy is `BRF-IRONY-MARK`'s.
+  * **Prior art:** the name rule — *a designation must not lie about its referent*
+    (`docs/2026-08-30-naming-like-nasa.md`); the **unpaid claim**; the palimpsest
+    protocol (`playbooks/decisions-playbook.md`), whose step 1 is this question
+    asked deliberately rather than at the funeral.
+
 ---
 
 ## Register open — the gathering
