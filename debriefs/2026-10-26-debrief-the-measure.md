@@ -168,3 +168,42 @@ is arithmetic, `just check` is a confirmation rather than a hope.
 **The renderer had an opinion about every class but the one it renders most of.**
 That is the shape of most of this silo's findings: not a missing capability, but an
 exception nobody had named, discovered by asking where the rule *didn't* apply.
+
+## Addendum 2026-10-26 — the explainer, and the census
+
+Written after the record above, in the same sitting: the session kept going
+because a book was open on the table, and the doctrine it produced was worth
+more than the width rule it followed. Annotated here rather than rewritten, per
+the rule this section is about to describe.
+
+**What landed after the debrief's first write.** `c4dc5d6` — `explainers/causation.md`,
+*Causation, indoors*: the ladder in our own work, three diagrams that each decide
+something, the boundary where the confounder lives, and the conventions —
+solid is a writer, dotted is a refusal, a diagram is dated, supersede by
+annotation, declare every omission. `63085e6` — the ladder, cut → control → lag
+→ declare, with *adjust* at the bottom and each rung carrying its instance from
+our own history. `b373391` — `scripts/seams.ts`: every inbound crossing in `src/`
+must name its rung, gated in `just check`, with `tests/seams.test.ts` pinning both
+of the detector's failure directions.
+
+**The finding that mattered most.** The top rung is invisible to a census. A cut
+crossing is not in the code, so a list of what exists can never show it; the
+strongest move in the ladder is the one the ladder cannot count. So cuts live in
+the census as **refused arrows with verifiers** — a pattern that must not appear in
+`src/`, failing the day the arrow comes back. `$COLUMNS` is held that way, and so
+is "the render never reads the clock or randomness", which is the real reason a
+document renders byte-identically: not discipline, but no arrow.
+
+**Building an instrument about instruments found three defects in itself.** A naive
+comment stripper desyncs on a regex literal containing a quote (`/['"]/`), stops
+reading the file and reports *nothing* — silently. `cli.ts` is the file that
+watches the filesystem, not `tui.ts`, and it binds `watch` by destructuring a
+dynamic import. And `$COLUMNS` is cut in the only form the census can see it: an
+override handed to a child, not an absent read. Three instruments, three errors,
+all found by using the thing rather than describing it.
+
+**Owed, with owners.** The explainers register — nine documents, the README's own
+~8 trigger fired, filed in td rather than decided as a side effect of a commit.
+A fifth instance of the ladder, ideally from a case not already solved, which is
+the only honest test of whether it is a law or a nice sentence. The lexicon stays
+alone until one of us breaks the claim.
