@@ -3,12 +3,16 @@
 **Date:** 2026-09-04
 **Type:** explainer
 
-The **silcrow**: `§`, the section sign,
-followed by two digits like ADR-045 and ADR-049
+The **silcrow**: a red `§`, section sign,
+followed by two digits, like ADR-045. 
+
+Unless you are in a de-refrenced document, 
+where the silcrows are suppressed, so you will not see the 
+rose `§12` silcrow.
 
 Rose is the medieval rubricator's ink (`rubric` = *ruber*, red): for navigation marks.
 
-Press the number keys to view the reference.
+Press `1` then `2` to view the reference.
 
 ## The glyph
 

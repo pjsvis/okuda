@@ -23,7 +23,10 @@ claim and this one owes its evidence.
 
 `⋮` (U+22EE **vertical ellipsis** — called the *vertical silcrow* in conversation,
 which is retired here too: the silcrow is `§`, and a nickname that misnames its
-referent is the defect the name rule forbids) is doing three jobs:
+referent is the defect the name rule forbids) is doing three jobs.
+Unicode files it as category **Sm — a mathematical symbol**, in the operators block
+(Unicode 16.0.0, `unicodedata.category`). It was never punctuation, let alone a
+state; it is a maths operator that wandered into a workflow vocabulary:
 
 | where | what it means | line |
 |---|---|---|
@@ -115,9 +118,15 @@ tolerates (14.5 vs 14.3 today); and it improves the surviving axis by 5.6×.
   the flourish** — the state must remain readable as colour when the mark is a box.
   Explicit non-goal: no font detection, no fallback glyph. The font is the one input
   the renderer cannot see (`docs/style-guide.md:139`).
-- **`Bidi_Mirrored` is unverified.** If U+2E2E mirrors, an RTL frame may present it
-  as an ordinary `?`. Check before landing; accept or refuse on the record, do not
-  assume.
+- **`Bidi_Mirrored` — checked, and it passes.** Unicode 16.0.0 reports
+  `mirrored('⸮') == 0`, bidi class `ON`, East Asian Width `N`. So no terminal will
+  flip it into an ordinary `?`: the irony mark survives an RTL frame, and it
+  measures one cell. The residual RTL risk is not the glyph but its **context** — a
+  neutral adopts the paragraph direction, so in RTL it sits at the logical position
+  and may flip sides against adjacent Latin; and the greater exposure is art, where
+  a table's reordered cell moves under a box edge that does not
+  (`docs/style-guide.md`, *BiDi is the second input the renderer cannot see*). The
+  state family's real RTL exposure is tables, not glyphs.
 - **The joke has a floor.** At 9pt in a font that lacks the glyph, `⸮` is a box in
   aubergine. That is acceptable only because the box is still *orange-free* and
   still in the right column — which is the whole argument for redundancy.
