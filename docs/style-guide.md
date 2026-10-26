@@ -140,6 +140,20 @@ or agent, gets wrong by default.
   takes any script. Column alignment depends on the reader's font covering the
   glyphs, and the font is the one input the renderer cannot see. Prose needs no
   alignment, so prose is free.
+- **BiDi is the second input the renderer cannot see.** okuda emits *logical*
+  order and never reorders; the terminal's UAX #9 pass decides the visual result.
+  That is not a gap — a renderer that reordered would be reversed a second time by
+  every bidi-capable emulator. The consequence for an author: a right-to-left
+  paragraph mirrors its inset and ragged edge on its own, so write it plainly; but
+  **a right-to-left label inside art is not safe**, because art is laid out by
+  visual column and a bidi terminal reorders the run while the box stays put —
+  which is the rule above, with the reason stated.
+- **Never tidy the right edge.** In a wide pane the ragged edge and the line
+  count are the *scan channel*: one-line blocks read short, three-line blocks read
+  long, and the eye runs down the left rail instead of along the text. Anything
+  that equalises line lengths destroys the signal — justification, uniform
+  padding, a fixed measure, a reflowed table that pads every cell to the longest.
+  A ragged right edge is the document telling you how long each thing is.
 - **Never fake a fit.** No hand-wrapping, no hand-padding to simulate a width
   the renderer would have elided. Elision is marked with `…`; a faked fit is
   marked with nothing, which is the difference between a reader who widens and

@@ -162,6 +162,48 @@ Protocol mechanics (locus tags, wrap-up) and the protocol-wide terms live in `sy
   * **Promotion owed:** general by this file's test — any renderer, any
     partial artefact. Recorded here for the same reason as the entry above.
 
+* **Collapse** (a block *collapses*): a block that renders on **one line** at the
+  current glass. The unit of a wide pane's value, and the thing the eye is
+  actually buying when it widens: fewer lines, each one a complete thought, so the
+  document becomes a column of block-starts rather than a flow to be read through.
+  * **Test:** the **collapse share** — the fraction of blocks rendering on one
+  line — must rise with the glass. If it does not, the wrap is not following the
+  width. Measured 2026-10-26 on four documents: `docs/2026-08-20-origin-doc.md`
+  20% at 80 → 46% at 120 → 60% at 200 → 77% at 320 columns, its height falling
+  861 → 659 lines; `docs/showcase.md` 38% → 65% → 74% → 83%.
+  * **What forbids it:** any fixed measure. `ADR-PROSE-MEASURE-070` held the line
+  count constant at 120 / 200 / 400 / 1000 columns, so collapse could not happen
+  above 80 at all — this is the property that clamp removed, and the reason its
+  reversal (`ADR-PROSE-MEASURE-071`) needed no new mechanism.
+  * **Named 2026-10-26** from the operator's reading of a wide pane: *"all our
+  paras and list items become single lines. nearly, mostly, sometimes, enough…"*
+  — a 60/40 property at 200 columns, not a law, which is why the hedge is part of
+  the entry.
+  * **Prior art:** **progressive engagement** (the same artefact read at several
+  distances, each reading complete); `docs/2026-10-12-the-squint-test.md`.
+
+* **Scan channel**: the two edges of a rendered frame that carry structure rather
+  than text — the **left rail** (every block starts in one column) and the
+  **ragged right edge** read together with the **line count** (a one-line block is
+  short, a three-line block is long, and the raggedness says so without reading a
+  word). The wide pane's whole payoff: the eye runs *down* the rail instead of
+  *along* the text.
+  * **Test:** without reading, can you say where each block starts and roughly how
+  long it is? If a change moves the rail or equalises line lengths, the channel is
+  broken — and justification, uniform cell padding, centring and a fixed measure
+  are one defect class, not four.
+  * **Why the rail is load-bearing:** it is the single edge the eye tracks down a
+  document, so a moved rail reads as a different document. `ADR-PROSE-MEASURE-070`
+  refused centring for exactly this reason, and that refusal is the part of it
+  that survived its reversal.
+  * **Named 2026-10-26** from the operator's practice of enlarging the pane until
+  the cascade still reads — the pane set by *scan quality*, not by line length,
+  which is why the width question was never the renderer's to answer.
+  * **Prior art:** the squint ladder's element-class survival
+  (`docs/2026-10-12-the-squint-test.md`); **collapse** (above), which is what the
+  right edge is reporting; `ADR-PANE-NOT-CANVAS-069` (the frame's edges as
+  information).
+
 ---
 
 ## Register open — the gathering
