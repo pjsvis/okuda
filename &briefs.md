@@ -71,6 +71,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-PERIMETER-GATE | · ready | the report that becomes a gate; lands first | — |
 | BRF-PERIMETER-RUNNER | · ready | the tuning recipes and artifacts leave | — |
 | BRF-PERIMETER-SILO | · ready | the doctrine and the records leave | — |
+| BRF-IRONY-MARK | ▸ ready | The irony mark takes the parked state, and the vertical ellipsis goes back to elision | — |
 
 ## In flight — partially landed, has commits
 

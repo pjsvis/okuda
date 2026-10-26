@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-26 | BRF-IRONY-MARK | ready | The irony mark takes the parked state, and the vertical ellipsis goes back to elision | 2026-10-26-brief-irony-mark.md |
 | 2026-10-26 | BRF-PROSE-MEASURE | rejected | Text takes the measure, art takes the glass — prose gets a band, and a fence states its requirement | 2026-10-26-brief-prose-measure.md |
 | 2026-10-25 | BRF-DIAGRAM-HEIGHT-AXIS | parked | The height axis has no policy at all | 2026-10-25-brief-diagram-height-axis.md |
 | 2026-10-25 | BRF-DIAGRAM-WIDTH-HANDOFF | done | One width, or two? — the diagram pipe's second opinion | 2026-10-25-brief-diagram-width-handoff.md |
