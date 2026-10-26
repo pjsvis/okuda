@@ -166,7 +166,7 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-AUTHORING-CONVENTION | · open | Authoring Convention — Route Agents to the Style Guide | — |
 | BRF-PROBES-TIER | · open | Establish Registered `probes/` Tier for Exploratory Python Scripts | — |
 | BRF-DIAGRAM-WIDTH-HANDOFF | · open | One width, or two? — the diagram pipe's second opinion | — |
-| BRF-PROSE-MEASURE | · open | Text takes the measure, art takes the glass — prose gets a band, and a fence states its requirement | — |
+| BRF-PROSE-MEASURE | ✓ landed | text takes the measure (76), art takes the glass; the fence receipt refused — ADR-070; debrief owed | — |
 
 ## Parked / deferred
 

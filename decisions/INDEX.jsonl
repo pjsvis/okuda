@@ -66,3 +66,4 @@
 {"file":"067-the-principal-and-the-clerk.md","date":"2026-10-14","status":"Accepted","summary":"The principal and the clerk — the two parties, named by their standing","meta":{},"callsign":"ADR-PRINCIPAL-CLERK-067"}
 {"file":"068-the-environment-answers-first.md","date":"2026-10-17","status":"Accepted","summary":"The environment answers first — declare, then convention, then refuse by name","meta":{},"callsign":"ADR-ENVIRONMENT-ANSWERS-068"}
 {"file":"069-the-pane-is-not-a-canvas.md","date":"2026-10-25","status":"Accepted","summary":"The pane is not a canvas — layout at the diagram's width, elide at the glass","meta":{},"callsign":"ADR-PANE-NOT-CANVAS-069"}
+{"file":"070-prose-measure.md","date":"2026-10-26","status":"Accepted","summary":"Text takes the measure, art takes the glass","meta":{},"callsign":"ADR-PROSE-MEASURE-070"}
