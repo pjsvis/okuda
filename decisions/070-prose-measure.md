@@ -7,14 +7,25 @@ date: 2026-10-26
 # Decision: Text takes the measure, art takes the glass
 
 **Date:** 2026-10-26
-**Status:** Accepted — implemented in `src/render.ts` (`PROSE_MEASURE`,
-`Ctx.measure`); tested by `tests/prose-measure.test.ts`. The record is written
-after the code because an ADR written first is a proposal wearing a decision's
-clothes (`ADR-PANE-NOT-CANVAS-069`, whose width policy this completes).
-**Enforced by:** `tests/prose-measure.test.ts` — the measure holds and fills at
-wide glasses, is a **no-op at and below 80 columns**, art keeps its own band, the
-rule and the H1 rail follow the text, an elided fence carries `…` and no receipt,
-and a document's line count is invariant under the glass.
+**Status:** Superseded — 2026-10-26, by `ADR-PROSE-MEASURE-071`, within the hour.
+This was a **reversal, not a replacement**: the decision was withdrawn, not improved
+on. The measure was implemented in `src/render.ts` (`PROSE_MEASURE`, `Ctx.measure`)
+and reverted the same day on the operator's dogfood report (*"it's like a return
+to Glow"*); `PROSE_MEASURE`, `Ctx.measure` and `tests/prose-measure.test.ts` are
+gone, and prose wraps at the glass again. Read this record for the reasoning that
+was tried and the scope error it contained — a renderer-side page width is
+compositing, which belongs to the host — not for the law.
+**Superseded by:** `decisions/071-prose-takes-the-glass.md`
+<!-- The `Enforced by:` line below named a test that the reversal deleted, and
+     every gate passed over it: `citation-census --strict` does not resolve
+     `Enforced by:` targets. Kept as written, with the status line above as the
+     correction, because an ADR is a historical record (see the playbook). -->
+**Enforced by:** `tests/prose-measure.test.ts` **(deleted 2026-10-26 — see Status;
+now `tests/prose-glass.test.ts`, which asserts the opposite property)** — the
+measure held and filled at wide glasses, was a **no-op at and below 80 columns**,
+art kept its own band, the rule and the H1 rail followed the text, an elided fence
+carried `…` and no receipt, and a document's line count was invariant under the
+glass.
 
 ## Context
 
@@ -40,6 +51,10 @@ width we could keep text readable on the same terminal as a wide diagram"* — a
 the second half of the same conversation refused the controller.
 
 ## Decision
+
+> **Reversed 2026-10-26** (`ADR-PROSE-MEASURE-071`). The decision below no longer
+> holds; prose takes the glass. The one clause worth carrying forward: if a
+> measure is ever wanted it is §3's **boot value**, never a constant.
 
 **Prose is banded at `PROSE_MEASURE = 76` content columns (80 with the 2+2
 document margin), and the band is a constant, not a dial.**
@@ -96,7 +111,10 @@ Five sub-rulings, each load-bearing:
 - **The document has one shape above the measure.** Measured line counts at
   120 / 200 / 400 / 1000 columns: `2026-08-20-origin-doc.md` 852 / 852 / 852 / 852;
   `showcase.md` 400 / 400 / 400 / 400; `069-the-pane-is-not-a-canvas.md`
-  229 / 229 / 229 / 229. Prose stops re-flowing once the glass passes 80, so only
+  229 / 229 / 229 / 229. <!-- Reversed 2026-10-26: this is the defect written as a
+  virtue. A render identical at 120 and at 1000 columns is a renderer that has
+  stopped reading the glass — the operator's dogfood report, and the ground of
+  ADR-PROSE-MEASURE-071. --> Prose stops re-flowing once the glass passes 80, so only
   art's cut point moves — ADR-069's goal, reached for prose.
 - **Wide panes became usable.** At 200 columns a paragraph reads at 78 and a table
   at 118 in the same frame; the margin to the right is the page (`ADR-WIDENING-LAG-054`
