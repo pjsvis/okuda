@@ -478,6 +478,14 @@ cadence:
 cadence-read:
     @bun scripts/cadence.ts
 
+# The decision loop
+[group('registries')]
+decide:
+    @just reg-sync-fix
+    @bun scripts/amp-briefs.ts --write
+    @bun scripts/brief-queue.ts --write
+    @bun scripts/brief-queue.ts --gate
+
 # List briefs
 [group('registries')]
 reg-briefs:

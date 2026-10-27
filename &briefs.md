@@ -23,6 +23,67 @@ because a table you have to scroll to the bottom of is a table you stop
 deciding from. Membership is the registry's; the sections and notes are the
 editor's (`ADR-DERIVED-AMP-TABLE-058`)._
 
+<!-- decide:begin (derived — do not hand-edit) -->
+
+*Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
+
+**72 live · 85 archived · 120 tabled** — 0 to move · 0 disagreeing · 0 phantom · 5 editorial · 35 silent · 1 ticketed. *Converged: nothing to reconcile, only decisions left.*
+
+### Editorial glyphs — the editor's own marks, not comparable to a status
+
+Listed, never gated: the glyph cell is the editor's surface. If a mark here is meant to *mean* a status, map it in `amp-briefs.ts` so the reconciliation can read it.
+
+BRF-MERMAID-HARD `◆` (open) · BRF-JUMP-DEMO `◆` (open) · BRF-STATE-GLYPH-2 `◆` (open) · BRF-OKLCH-TUNING `◆` (open) · BRF-SSH-SERVED `◆` (parked)
+
+### Silent — no ticket, no citation, live
+
+Nothing waits on these and no Thing records them. The question per row is **what would tell us this mattered?** — a citation, a ticket, or a date. Silence is a judgement, so nothing here is gated.
+
+| brief | age | asks |
+|---|---|---|
+| BRF-REGISTRY-MARKDOWN | 62d | Registry-aware markdown browser — the silo dashboard |
+| BRF-HERDR-DASHBOARD | 61d | Herdr Dashboard — the Build's Exhaust, Composed |
+| BRF-DOCUMENT-SEARCH | 61d | In-Document Search and Outlining — Fast Navigation in Gloa |
+| BRF-TELEMETRY-CONVENTIONS | 61d | Telemetry Conventions — Markdown as Message Bus |
+| BRF-TTY-REVERSE | 61d | TTY Reverse-Print — Land at the Top |
+| BRF-ARTPACK-AESTHETICS | 60d | Plundered artpack aesthetics & high-SNR dark terminal rend |
+| BRF-DENSE-DYNAMIC | 60d | Dense terminal visual primitives for dynamic telemetry |
+| BRF-JUMP-DEMO | 59d | jump-demo honesty — slug derivation + state-glyph signal |
+| BRF-STATE-GLYPH-2 | 59d | State-glyph vocabulary — colour + bold, the closed lexicon |
+| BRF-RESTICTED-GRAMMAR | 58d | Okuda Markdown AST to W3C SSML Mapping Investigation |
+| BRF-TERMINAL-SPEECH | 58d | Terminal Speech Pipeline Easter Egg |
+| BRF-MERMAID-HARD | 58d | Mermaid Rendering Hard Boundary State Machine (CSN Diagnos |
+| BRF-IPAD-MINI | 57d | 2026-08-30-ipad-mini-demo |
+| BRF-DIAGRAM-INGESTION | 49d | The diagram ingestion pipeline — mermaid-to-md as the show |
+| BRF-CONCEPTUAL-LEXICON | 42d | Extract the Conceptual Lexicon from system.md |
+| BRF-CAPABILITIES-DOC | 37d | The capabilities doc — a snapshot inventory, not a changel |
+| BRF-PALETTE-AUDIT | 37d | The palette audit — review the colours before the brightne |
+| BRF-FENCE-DISCIPLINE | 26d | One fence rule — five scanners, four disciplines, one of t |
+| BRF-DOC-SEARCH-FERMATA | 23d | The doc→search fermata — a held frame at the reading/searc |
+| BRF-STICKY-HEADING-STEPPER | 22d | The sticky-heading pager — step through a document section |
+| BRF-AST-PROSODY | 21d | AST-to-Prosody Intermediate Representation for Speech Rend |
+| BRF-KINDLE-PORCH | 20d | The Kindle porch — the silo on an e-ink glass, over ssh, n |
+| BRF-FRAME-INDEX | 19d | The frame index — an address two parties can both name |
+| BRF-REG-CLI | 18d | `reg` — the silo maintenance CLI, one entry point, one art |
+| BRF-REGISTRY-DISCOVERY | 18d | One map from the territory — the registry discovers its ow |
+| BRF-SILO-LEXICON | 18d | Gather the silo's terms of art into `conceptual-lexicon.md |
+| BRF-COMPLETE-BLOCKS | 17d | The viewport holds complete blocks — cut at boundaries, in |
+| BRF-AMP-CELL | 16d | The state cell derives — a status change reaches the table |
+| BRF-LEAK-FENCE | 16d | The leak gate's fence exemption — anchor on the source, no |
+| BRF-READ-ACTUATOR | 16d | Read actuator — the current document, handed to the voice |
+| BRF-RENDER-DEFECTS | 16d | Render defects — the stack map's four findings, and how th |
+| BRF-ALIGN-ACROSS-TABLES | 13d | The align meta is misattributed across tables — a later ta |
+| BRF-SEARCH-ROW | 10d | The search row — the contract, frozen by the probe |
+| BRF-PROBES-TIER | 5d | Establish Registered `probes/` Tier for Exploratory Python |
+| BRF-IRONY-MARK | 0d | The irony mark takes the parked state, and the vertical el |
+
+### Ticketed, live — the load-bearing set
+
+BRF-CONCORDANCE-PREFILTER
+
+
+<!-- decide:end -->
+
 ## Open queue
 
 | Brief | State | Narrative | Debrief |
@@ -30,12 +91,12 @@ editor's (`ADR-DERIVED-AMP-TABLE-058`)._
 | BRF-REGISTRY-MARKDOWN | · open | silo dashboard | — |
 | BRF-DENSE-DYNAMIC | · open | telemetry visual primitives | — |
 | BRF-FETCH-STATE | · open | fetch stamp; fixes the empty-doc lie | — |
-| BRF-HERDR-DASHBOARD | · open | the build's exhaust, composed | — |
+| BRF-HERDR-DASHBOARD | ▸ ready | the build's exhaust, composed | — |
 | BRF-LAUNCHER-FUT | ✓ landed | session-scoped alt-screen — registry: done, archived | — |
 | BRF-IPAD-MINI | · open | demo brief | — |
-| BRF-TELEMETRY-CONVENTIONS | · open | markdown as message bus | — |
+| BRF-TELEMETRY-CONVENTIONS | ▸ ready | markdown as message bus | — |
 | BRF-NOTIFICATION-STYLE | ✓ landed | ADR-020 landed; impl pending — registry: done, archived | — |
-| BRF-AI-DOC | · open | inline ask-the-doc, local SSH | — |
+| BRF-AI-DOC | ↓ parked | inline ask-the-doc, local SSH | — |
 | BRF-ARTPACK-AESTHETICS | · open | high-SNR dark rendering | — |
 | BRF-AUDIO-STYLE | · open | audio-first style guide + lint | — |
 | BRF-RESTICTED-GRAMMAR | · open | AST → SSML mapping | — |
@@ -63,7 +124,7 @@ editor's (`ADR-DERIVED-AMP-TABLE-058`)._
 | BRF-SILCROW-PATHS | · open | the gate grows a second substrate | — |
 | BRF-FENCE-DISCIPLINE | · open | one fence rule — five scanners | — |
 | BRF-READING-FRACTION | · open | a meter for the glass, from state the glass already holds | — |
-| BRF-DEMO-SANDBOX | · open | the public demo room — two access modes, one grammar | — |
+| BRF-DEMO-SANDBOX | ↓ parked | the public demo room — two access modes, one grammar | — |
 | BRF-DOC-SEARCH-FERMATA | · open | a held frame at the reading/searching boundary | — |
 | BRF-STICKY-HEADING-STEPPER | · open | step by section, heading as anchor, never truncate | — |
 | BRF-AST-PROSODY | · open | AST to prosody — the intermediate representation | — |
@@ -108,17 +169,17 @@ editor's (`ADR-DERIVED-AMP-TABLE-058`)._
 | BRF-STATE-GLYPH-2 | ◆ partial | vocabulary — closed lexicon | — |
 | BRF-OKLCH-TUNING | ◆ partial | td-b4bae8 ready-to-start | — |
 | BRF-PAGED-OKUDAGRAM | ✓ landed | the frame — a portioning rule — registry: done, archived | — |
-| BRF-TTY-REVERSE | · open | land at the top | — |
+| BRF-TTY-REVERSE | ▸ ready | land at the top | — |
 
 ## SSH family — feasibility debriefed, build pending
 
 | Brief | State | Narrative | Debrief |
 |---|---|---|---|
 | BRF-SSH-SERVED | ◆ feasibility ✓ | ForceCommand feasibility on file | [debrief](debriefs/2026-08-27-debrief-ssh-forcecommand-feasibility.md) |
-| BRF-SSH-BLOG | · open | gopher-serve v1 | — |
-| BRF-SSH-SERVED-2 | · open | dynamic portal | — |
-| BRF-SSH-TUI | · open | escape protocol integration | — |
-| BRF-SSH-HOST | · open | landing the ADR-013 reading room where SSH gives a shell | — |
+| BRF-SSH-BLOG | ↓ parked | gopher-serve v1 | — |
+| BRF-SSH-SERVED-2 | ↓ parked | dynamic portal | — |
+| BRF-SSH-TUI | ↓ parked | escape protocol integration | — |
+| BRF-SSH-HOST | ↓ parked | landing the ADR-013 reading room where SSH gives a shell | — |
 
 ## Open — fresh
 
@@ -129,7 +190,7 @@ editor's (`ADR-DERIVED-AMP-TABLE-058`)._
 
 | Brief | State | Narrative | Debrief |
 |---|---|---|---|
-| BRF-DOCUMENT-SEARCH | ↓ deferred | deferred by the live search; host owns ctrl+f | — |
+| BRF-DOCUMENT-SEARCH | · open | deferred by the live search; host owns ctrl+f | — |
 | BRF-TELEVISION-PREVIEW | ↓ parked | okuda as the renderer, OKUDA_WIDTH as the knob | — |
 | BRF-DIAGRAM-HEIGHT-AXIS | ↓ parked | The height axis has no policy at all | — |
 
