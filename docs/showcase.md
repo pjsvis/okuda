@@ -195,20 +195,21 @@ one line:
 | Wrap engine | ✓ | grapheme-true; CJK and emoji widths verified |
 | Mermaid intercept | ✓ | art on show; source omitted, a `⋮` renderer statement names what was elided |
 | Autolink pass | ✗ | rejected — URL detection is the terminal's job |
-| OSC 8 hyperlinks | ⋮ | parked under Pass C; reopen on terminal evidence |
+| OSC 8 hyperlinks | ⸮ | parked under Pass C; reopen on terminal evidence |
 | Lexer EAW audit | ☐ | next: token widths against the width table |
 
-Key: ☐ to do · ✓ done · ✗ rejected · ⋮ parked — elided into a further question.
+Key: ☐ to do · ✓ done · ✗ rejected · ⸮ parked — a comment on the plan, not a
+verdict on it. (`⋮` is elision: vertical, it says *continues below*.)
 
 The same flags lead a list, carrying state the bullet cannot — ☐ to do,
-✓ done, ✗ rejected, and ⋮ elided: parked pending a question. The irony
-is the point — the elided item has not vanished, it has elided into a
-further question:
+✓ done, ✗ rejected, and ⸮ parked: a question left open on purpose. The
+irony is the point — a parked item has not vanished, it has become a
+remark in the margin while the text goes on without it:
 
 - ☐ **Lexer audit.** Token widths against the EAW table — not yet checked.
 - ✓ **Wrap engine.** Grapheme segmentation verified on CJK, emoji, combining marks.
 - ✗ **Autolink pass.** Rejected — URL detection is the terminal's job.
-- ⋮ **OSC 8.** Parked under Pass C; reopen only if a terminal test demands clickability.
+- ⸮ **OSC 8.** Parked under Pass C; reopen only if a terminal test demands clickability.
 
 Declare the legend once, trust it after. And note the boundary: an item
 with an owner or a date belongs in the task tracker — glyphs carry

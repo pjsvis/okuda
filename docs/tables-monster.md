@@ -22,7 +22,7 @@ not in the abstract.
 widths — narrow (~80, the stress) and wide (~140, the relief). At narrow,
 every table below overflows; at wide, most breathe. The gap between the
 two is the elision's job. Status glyphs follow the lexicon: `☐` to do,
-`✓` done/shipped, `✗` rejected, `⋮` parked/elided; `◆` marks the row
+`✓` done/shipped, `✗` rejected, `⸮` parked; `◆` marks the row
 that reframes how you read the rest. No evaluation glyphs — opinion
 lives in the notes column as text, not as a minted mark. (See the
 showcase's "one glyph, one job" doctrine.)
@@ -44,7 +44,7 @@ load-bearing row that changes how you read the matrix.
 | width | width.ts | — | ✓ | ses_a66534 | 95 | — | none | display columns; Intl.Segmenter + EAW |
 | ansi | ansi.ts | 006 | ✓ | ses_d0509c | 180 | palette | palette roles | styler + NO_COLOR parity |
 | palette | palette.ts | 006,011 | ✓ | ses_d0509c | 70 | — | palette def | Dracula default, okuda identity |
-| grammar | grammar.ts | — | ⋮ | — | 0 | — | — | parked; Bun.markdown owns the grammar |
+| grammar | grammar.ts | — | ⸮ | — | 0 | — | — | parked; Bun.markdown owns the grammar |
 | cli | cli.ts | 016 | ✓ | ses_b0d27c | 60 | all | none | entry point; argv[0] → gloam dispatch |
 
 ◆ The wrap engine is the invariant: every other subsystem assumes lines
@@ -73,7 +73,7 @@ columns.
 | 011 | 2026-08-26 | Default palette is okuda identity | ✓ | — | — | main | palette |
 | 012 | 2026-08-26 | Structural probe for list depth | ✓ | — | — | main | render |
 | 013 | 2026-08-26 | SSH serving forcecommand | ✓ | — | — | main | ssh |
-| ◆ 014 | 2026-08-27 | Table elision over shrink-wrap | ⋮ | — | — | main | render |
+| ◆ 014 | 2026-08-27 | Table elision over shrink-wrap | ⸮ | — | — | main | render |
 | 015 | 2026-08-27 | Alert palette role (#ff5555) | ✓ | — | — | feat/gloam-launcher | palette, ansi |
 | 016 | 2026-08-27 | argv[0] launcher dispatch — gloam entry point | ✓ | — | — | feat/gloam-launcher | launcher, cli |
 | 017 | 2026-08-28 | Session handoffs are not briefs | ✓ | — | — | feat/gloam-launcher | docs |
@@ -128,7 +128,7 @@ crueller is what a stinker deserves.
 ## 5. The glyph garden — state axis, not evaluation
 
 A table whose only purpose is to exercise the state-glyph column under
-load. `☐ ✓ ✗ ⋮` only — no evaluation glyphs (no "neat," no "good"; the
+load. `☐ ✓ ✗ ⸮` only — no evaluation glyphs (no "neat," no "good"; the
 lexicon refuses to bless an opinion axis). `◆` in the notes column, not
 the state column, marks the load-bearing row. The point: the existing
 vocabulary covers the cases; minting new glyphs for evaluation would
@@ -141,7 +141,7 @@ reader couldn't tell which axis a row is on.
 | tui | ✓ | shipped; control plane |
 | launcher | ✓ | shipped; ADR-016 |
 | wrap | ✓ | shipped; the invariant |
-| grammar | ⋮ | parked; Bun.markdown owns it |
+| grammar | ⸮ | parked; Bun.markdown owns it |
 | OSC 8 | ✗ | rejected; URL detection is the terminal's job |
 | ◆ elision | ☐ | this doc's brief, `td-b81597`; the gap ADR-014 names |
 | light mode | ⋮ | parked; gated on a real brightness itch |

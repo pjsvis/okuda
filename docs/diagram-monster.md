@@ -29,7 +29,7 @@ earn its keep or fire its reversal.
 `==>` thick `━▶` = would-rather-not / rejected. Three classes by shape
 alone — the Rust binary maps edge style to distinct ASCII glyphs before
 okuda ever sees them. **Node state via label glyph** (also free): `✓`
-shipped, `⋮` parked, `☐` todo, `✗` rejected, passed through as node
+shipped, `⸮` parked, `☐` todo, `✗` rejected, passed through as node
 label text. Two orthogonal layers, one job each: line style = path
 desirability, node glyph = node state. No edge glyphs — edge style is
 the edge's marker; a glyph on top duplicates structure (the scratchpad's
@@ -37,7 +37,7 @@ named sin).
 
 **How to read it:** `okuda docs/diagram-monster.md --tui` at two
 widths. At narrow, the wide diagrams overflow; at wide, they breathe.
-The gap is the question. Glyphs follow the lexicon (`☐ ✓ ✗ ⋮`); edge
+The gap is the question. Glyphs follow the lexicon (`☐ ✓ ✗ ⸮`); edge
 style carries the path axis. See the showcase's "one glyph, one job"
 doctrine.
 
@@ -95,7 +95,7 @@ of parking and refusing, not just its happy path.
 
 ## 3. The node-state exhibit — glyphs on every node
 
-Every node carries a state glyph in its label: `✓` shipped, `⋮` parked,
+Every node carries a state glyph in its label: `✓` shipped, `⸮` parked,
 `☐` todo, `✗` rejected. The path axis is edge style; the state axis is
 node glyph. Two independent axes, one diagram — the test is whether the
 eye can read both without collision. If `✗` on a node reads as "this
@@ -108,7 +108,7 @@ flowchart LR
   B --> C["✓I"]
   C --> D["✓A"]
   D ==>|rejected| E["✗M"]
-  A -.->|parked| F["⋮O"]
+  A -.->|parked| F["⸮O"]
   F -.-> C
 ```
 
