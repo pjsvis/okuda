@@ -120,12 +120,27 @@ the day's own lesson in the instrument that reports it (*a reading is only as ho
 part of the source it agrees to look at*). The real board was **139 issues, 136 open, 20
 epics**, and nothing reconciled it: the same disease, one ledger over.
 
-Reconciled the same evening, by the same method — derived, then applied, then read back:
-**60 issues closed** (14 epics whose brief was refused on 2026-10-27, plus their 46 stories),
-leaving **79 issues, 6 epics**. Twelve orphans that cite only a refused brief were *held
-back* for a human, because a refused-brief mention in a description does not make the task
-about that brief — the explainers register cites the measure's brief and is live work. That
-distinction is the whole argument for deriving the reconciliation and deciding it separately.
+Reconciled the same evening, by the same method — derived, then applied, then read back —
+and then twice, because the operator's rule was sharper than my first pass:
+
+**Pass one, by derivation (60 closed).** 14 epics whose brief was refused on 2026-10-27,
+plus their 46 stories, each closure carrying the reason and the refused callsign. Twelve
+orphans that cite only a refused brief were *held back*: a refused-brief mention in a
+description does not make the task about that brief — the explainers register cites the
+measure's brief and is live work.
+
+**Pass two, by the operator's rule — keep what has a live referent (59 more closed).** *The
+td database is ephemeral*; the record is the repository. So: a live brief, a parent epic with
+a kept story, or a finding carried from the day. One correction to the rule was needed in
+practice — **an epic must be kept when any of its stories is**, or closing the root orphans
+live work: the perimeter epic names its briefs by *path*, not callsign, so the referent rule
+alone would have closed it out from under three live stories.
+
+**139 → 19 issues. 20 epics → 2.** Seventeen open, two in review: the P1, the perimeter
+epic and its three stories, principal-and-clerk, search-row, six snags, four carried
+findings, and the two reviews. A board a person can hold, which is the only size at which
+it gets read — the same argument as the brief queue, one ledger over, settled by the same
+method and in the same evening.
 
 ## The line
 
