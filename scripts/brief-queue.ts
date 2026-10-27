@@ -120,8 +120,12 @@ export function report(): Report {
       : [];
   }).queue;
 
-  const doc = existsSync(join(ROOT, DOC)) ? readFileSync(join(ROOT, DOC), "utf8") : "";
-  const glyphs = tabledGlyphs(doc);
+  const raw = existsSync(join(ROOT, DOC)) ? readFileSync(join(ROOT, DOC), "utf8") : "";
+  // Strip the derived region before parsing: its own tables carry rows shaped
+  // like the editor's (`| BRF-X | ◆ | open |`), so leaving it in makes the reading
+  // count itself — measured 2026-10-27, 120 tabled became 38 and the count then
+  // oscillated between the write and the gate in the same run.
+  const glyphs = tabledGlyphs(stripRegion(raw));
 
   const graph = textOf("decisions") + "\n" + textOf("debriefs");
   const cited = new Set(live.filter((b) => graph.includes(b.callsign)).map((b) => b.callsign));
@@ -166,13 +170,13 @@ const age = (date: string): string => {
 export function renderRegion(r: Report): string {
   const out: string[] = [];
   const converged = r.move.length === 0 && r.disagree.length === 0 && r.phantom.length === 0;
-  out.push(`*Derived by \`scripts/brief-queue.ts --write\`; do not hand-edit. Regenerate: \`just decide\`.*\n`);
   out.push(
     `**${r.live.length} live · ${r.archived} archived · ${r.tabled} tabled** — ` +
       `${r.move.length} to move · ${r.disagree.length} disagreeing · ${r.phantom.length} phantom · ` +
       `${r.editorial.length} editorial · ${r.silent.length} silent · ${r.ticketed.length} ticketed. ` +
       (converged ? `*Converged: nothing to reconcile, only decisions left.*` : `**Not converged — the three defects below want a fix before the judgements.**`),
   );
+  out.push(`\n*Derived by \`scripts/brief-queue.ts --write\`; do not hand-edit. Regenerate: \`just decide\`.*`);
 
   if (r.move.length) {
     out.push(`\n### Settled, still in the live tier — move, then archive\n`);
@@ -230,12 +234,25 @@ function writeRegion(region: string): void {
     writeFileSync(p, doc.slice(0, i) + block + doc.slice(j + END.length));
     return;
   }
-  // No region yet: place it at the top of the body, above the first section —
-  // a queue that has to be installed by hand is a queue that does not exist.
-  const at = doc.indexOf("\n## ");
-  const head = at < 0 ? doc : doc.slice(0, at);
-  const rest = at < 0 ? "" : doc.slice(at);
-  writeFileSync(p, `${head}\n${block}\n${rest}`);
+  // Place it directly under the H1 — above the preamble, not below it. Measured
+  // 2026-10-27 in a 44-column pane: the preamble alone filled the first screen, so
+  // "decisions first" was true of the file and false of the view. The queue is the
+  // document's job; the prose about the document can follow it.
+  const h1 = doc.match(/^# .*$/m);
+  if (!h1 || h1.index === undefined) {
+    writeFileSync(p, `${block}\n\n${doc}`);
+    return;
+  }
+  const end = h1.index + h1[0].length;
+  writeFileSync(p, `${doc.slice(0, end)}\n\n${block}\n${doc.slice(end).replace(/^\n+/, "\n")}`);
+}
+
+/** The document with its derived region removed. Pure. */
+export function stripRegion(doc: string): string {
+  const i = doc.indexOf(BEGIN);
+  const j = doc.indexOf(END);
+  if (i < 0 || j < 0) return doc;
+  return doc.slice(0, i) + doc.slice(j + END.length);
 }
 
 /** The region currently in the document, or null when there is none. Pure. */

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { renderRegion, tabledGlyphs } from "../scripts/brief-queue";
+import { renderRegion, stripRegion, tabledGlyphs } from "../scripts/brief-queue";
 
 /** The decision loop's two pure halves: what the table says, and what the
  *  reading says about it. The corpus walk is exercised by `just decide` itself
@@ -27,6 +27,40 @@ describe("brief-queue — the tabled glyphs", () => {
 
   test("an unmapped glyph is captured, not dropped — it is a dialect, not noise", () => {
     expect(tabledGlyphs(doc).get("BRF-FOUR")).toBe("◆");
+  });
+});
+
+describe("brief-queue — the reading does not read itself", () => {
+  // Measured 2026-10-27: the region's own tables are row-shaped like the editor's
+  // (`| BRF-X | ◆ | open |`), so parsing the document whole made the reading count
+  // itself — 120 tabled became 38, and the number then differed between the
+  // `--write` and the `--gate` in the same run, failing the staleness check.
+  const doc = [
+    "# &briefs",
+    "",
+    "<!-- decide:begin (derived — do not hand-edit) -->",
+    "",
+    "**1 live**",
+    "",
+    "| brief | glyph | registry says |",
+    "|---|---|---|",
+    "| BRF-IN-REGION | `◆` | open |",
+    "",
+    "<!-- decide:end -->",
+    "",
+    "| Brief | State | Narrative |",
+    "|---|---|---|",
+    "| BRF-REAL | · open | the editor's row |",
+  ].join("\n");
+
+  test("the region is stripped before rows are read", () => {
+    const g = tabledGlyphs(stripRegion(doc));
+    expect(g.has("BRF-IN-REGION")).toBe(false);
+    expect(g.get("BRF-REAL")).toBe("·");
+  });
+
+  test("without the strip the region would pollute the reading — the guard's reason", () => {
+    expect(tabledGlyphs(doc).has("BRF-IN-REGION")).toBe(true);
   });
 });
 

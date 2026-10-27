@@ -1,15 +1,10 @@
 # &briefs — the state table
 
-**Decisions first, history last** — a table you have to scroll to the bottom of is a
-table you stop deciding from. Rows and their states are the registry's; sections and
-notes are the editor's (`ADR-DERIVED-AMP-TABLE-058`). A row's callsign is its
-reference: actuate the amber vector to dereference, `u` unwinds, `99` promotes.
-
 <!-- decide:begin (derived — do not hand-edit) -->
 
-*Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
-
 **72 live · 85 archived · 120 tabled** — 0 to move · 0 disagreeing · 0 phantom · 5 editorial · 35 silent · 1 ticketed. *Converged: nothing to reconcile, only decisions left.*
+
+*Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
 ### Editorial glyphs — the editor's own marks, not comparable to a status
 
@@ -17,9 +12,9 @@ Listed, never gated: the glyph cell is the editor's surface. If a mark here is m
 
 | brief | glyph | registry says |
 |---|---|---|
+| BRF-MERMAID-HARD | `◆` | open |
 | BRF-JUMP-DEMO | `◆` | open |
 | BRF-STATE-GLYPH-2 | `◆` | open |
-| BRF-MERMAID-HARD | `◆` | open |
 | BRF-OKLCH-TUNING | `◆` | open |
 | BRF-SSH-SERVED | `◆` | parked |
 
@@ -76,6 +71,11 @@ this table is waiting on it.
 
 
 <!-- decide:end -->
+
+**Decisions first, history last** — a table you have to scroll to the bottom of is a
+table you stop deciding from. Rows and their states are the registry's; sections and
+notes are the editor's (`ADR-DERIVED-AMP-TABLE-058`). A callsign is its reference:
+actuate the amber vector to dereference, `u` unwinds, `99` promotes.
 
 ## Open queue
 
