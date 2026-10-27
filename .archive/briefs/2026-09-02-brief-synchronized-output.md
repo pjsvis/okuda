@@ -6,7 +6,7 @@ callsign: BRF-SYNC-OUTPUT
 # Brief: Synchronized output — deliver each paint as one frame
 
 **Date:** 2026-09-02
-**Status:** Open
+**Status:** Landed — shipped: DECSET 2026 atomicity, one frame one write (ADR-028's first rung). Status corrected 2026-10-26 from `Open`, which is what cadence was reading.
 **Branch:** feat/sync-output-frame
 
 ## Context

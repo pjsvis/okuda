@@ -34,7 +34,9 @@
 {"file":"2026-08-31-brief-citty-cli.md","date":"2026-08-31","status":"rejected","summary":"the CLI contract — adopting citty for the okuda/gloam surface","meta":{},"callsign":"BRF-CITTY-CLI"}
 {"file":"2026-09-01-brief-flow-wrap.md","date":"2026-09-01","status":"rejected","summary":"Flow wrap — internal break opportunities so paths flow as text","meta":{},"callsign":"BRF-FLOW-WRAP"}
 {"file":"2026-09-01-brief-mermaid-source-omitted.md","date":"2026-09-01","status":"done","summary":"Omit the mermaid source from the render","meta":{},"callsign":"BRF-MERMAID-SOURCE-OMITTED"}
+{"file":"2026-09-02-brief-synchronized-output.md","date":"2026-09-02","status":"done","summary":"Synchronized output — deliver each paint as one frame","meta":{},"callsign":"BRF-SYNC-OUTPUT"}
 {"file":"2026-09-04-brief-porch-matrix.md","date":"2026-09-04","status":"rejected","summary":"The porch matrix — click a URL, land in a terminal, read the silo","meta":{},"callsign":"BRF-PORCH-MATRIX"}
+{"file":"2026-09-04-brief-working-copy.md","date":"2026-09-04","status":"done","summary":"The working copy — vector render mode, 99 clone, honest actuator","meta":{},"callsign":"BRF-WORKING-COPY"}
 {"file":"2026-09-05-brief-stream-identity-header.md","date":"2026-09-05","status":"done","summary":"Stream identity header — name the document for the unknown destination","meta":{},"callsign":"BRF-STREAM-IDENTITY-HEADER"}
 {"file":"2026-09-07-brief-okudagram-step.md","date":"2026-09-07","status":"done","summary":"The okudagram step — no gaps in coverage","meta":{},"callsign":"BRF-OKUDAGRAM-STEP"}
 {"file":"2026-09-07-brief-onion-search-grammar.md","date":"2026-09-07","status":"done","summary":"The onion search grammar — staged filtering, path/content separation","meta":{},"callsign":"BRF-ONION-SEARCH-GRAMMAR"}
@@ -71,5 +73,10 @@
 {"file":"2026-10-10-brief-table-gutter.md","date":"2026-10-10","status":"rejected","summary":"The table's gutter — the separator is chrome, and the cap pays for it","meta":{},"callsign":"BRF-TABLE-GUTTER"}
 {"file":"2026-10-12-brief-code-silcrows.md","date":"2026-10-12","status":"done","summary":"Code-comment silcrows — a rendered code file is a document for its prose","meta":{},"callsign":"BRF-CODE-SILCROWS"}
 {"file":"2026-10-12-brief-table-glass-fit.md","date":"2026-10-12","status":"done","summary":"Table fit — wrap to the glass, elide only the floor","meta":{},"callsign":"BRF-TABLE-GLASS-FIT"}
+{"file":"2026-10-13-brief-table-slot-instrument.md","date":"2026-10-13","status":"done","summary":"The slot instrument — the table's columns made observable, and header/body alignment pinned","meta":{},"callsign":"BRF-TABLE-SLOT-INSTRUMENT"}
 {"file":"2026-10-14-brief-idea-ledger.md","date":"2026-10-14","status":"done","summary":"Close the funnel — the idea ledger, and the record's linkage","meta":{},"callsign":"BRF-IDEA-LEDGER"}
 {"file":"2026-10-14-brief-retire-okudagram.md","date":"2026-10-14","status":"done","summary":"Retire the okudagram term — the render, the frame, and the diagram","meta":{},"callsign":"BRF-RETIRE-OKUDAGRAM"}
+{"file":"2026-10-22-brief-platform-gate.md","date":"2026-10-22","status":"done","summary":"The gate names its format — building okuda on Omarchy","meta":{},"callsign":"BRF-PLATFORM-GATE"}
+{"file":"2026-10-22-brief-toolchain-truth.md","date":"2026-10-22","status":"done","summary":"Four claims that could not prove themselves","meta":{},"callsign":"BRF-TOOLCHAIN-TRUTH"}
+{"file":"2026-10-25-brief-diagram-width-handoff.md","date":"2026-10-25","status":"done","summary":"One width, or two? — the diagram pipe's second opinion","meta":{},"callsign":"BRF-DIAGRAM-WIDTH-HANDOFF"}
+{"file":"2026-10-26-brief-prose-measure.md","date":"2026-10-26","status":"rejected","summary":"Text takes the measure, art takes the glass — prose gets a band, and a fence says only *that* it was cut","meta":{},"callsign":"BRF-PROSE-MEASURE"}

@@ -6,7 +6,7 @@ callsign: BRF-WORKING-COPY
 # Brief: The working copy — vector render mode, 99 clone, honest actuator
 
 **Date:** 2026-09-04
-**Status:** Open
+**Status:** Landed — shipped: vector render mode, the 99 clone, the honest actuator (ADR-031). Status corrected 2026-10-26 from `Open`.
 
 ## Context
 

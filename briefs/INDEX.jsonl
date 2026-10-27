@@ -22,8 +22,6 @@
 {"file":"2026-08-30-brief-refresh-off-disk.md","date":"2026-08-30","status":"open","summary":"refresh off disk — the resize race + the R placebo","meta":{},"callsign":"BRF-REFRESH-OFF-DISK"}
 {"file":"2026-08-30-ipad-mini-demo.md","date":"2026-08-30","status":"open","summary":"2026-08-30-ipad-mini-demo","meta":{},"callsign":"BRF-IPAD-MINI"}
 {"file":"2026-09-02-brief-scroll-region-repaint.md","date":"2026-09-02","status":"open","summary":"One line per scroll — scroll-region repaint for the TUI","meta":{},"callsign":"BRF-SCROLL-REPAINT"}
-{"file":"2026-09-02-brief-synchronized-output.md","date":"2026-09-02","status":"open","summary":"Synchronized output — deliver each paint as one frame","meta":{},"callsign":"BRF-SYNC-OUTPUT"}
-{"file":"2026-09-04-brief-working-copy.md","date":"2026-09-04","status":"open","summary":"The working copy — vector render mode, 99 clone, honest actuator","meta":{},"callsign":"BRF-WORKING-COPY"}
 {"file":"2026-09-06-brief-concordance-prefilter.md","date":"2026-09-06","status":"open","summary":"The concordance pre-filter — `|`, `!`, and case at the silo's seam","meta":{},"callsign":"BRF-CONCORDANCE-PREFILTER"}
 {"file":"2026-09-06-brief-tts-dogfood.md","date":"2026-09-06","status":"open","summary":"Coupled-frame TTS dogfood (mac `say`)","meta":{},"callsign":"BRF-TTS-DOGFOOD"}
 {"file":"2026-09-07-brief-diagram-ingestion.md","date":"2026-09-07","status":"open","summary":"The diagram ingestion pipeline — mermaid-to-md as the show/elide/hide gate","meta":{},"callsign":"BRF-DIAGRAM-INGESTION"}
@@ -68,15 +66,10 @@
 {"file":"2026-10-10-brief-read-actuator.md","date":"2026-10-10","status":"open","summary":"Read actuator — the current document, handed to the voice","meta":{},"callsign":"BRF-READ-ACTUATOR"}
 {"file":"2026-10-10-brief-render-defects.md","date":"2026-10-10","status":"open","summary":"Render defects — the stack map's four findings, and how they stop recurring","meta":{},"callsign":"BRF-RENDER-DEFECTS"}
 {"file":"2026-10-13-brief-align-across-tables.md","date":"2026-10-13","status":"open","summary":"The align meta is misattributed across tables — a later table un-aligns an earlier one","meta":{},"callsign":"BRF-ALIGN-ACROSS-TABLES"}
-{"file":"2026-10-13-brief-table-slot-instrument.md","date":"2026-10-13","status":"done","summary":"The table's columns are unobservable — a slot instrument, and a header/body alignment test","meta":{},"callsign":"BRF-TABLE-SLOT-INSTRUMENT"}
 {"file":"2026-10-14-brief-principal-and-clerk.md","date":"2026-10-14","status":"open","summary":"The principal and the clerk — the three-way triage","meta":{},"callsign":"BRF-PRINCIPAL-CLERK"}
 {"file":"2026-10-16-brief-search-row.md","date":"2026-10-16","status":"open","summary":"The search row — the contract, frozen by the probe","meta":{},"callsign":"BRF-SEARCH-ROW"}
 {"file":"2026-10-21-brief-authoring-convention.md","date":"2026-10-21","status":"open","summary":"Authoring Convention — Route Agents to the Style Guide","meta":{},"callsign":"BRF-AUTHORING-CONVENTION"}
 {"file":"2026-10-21-brief-registered-probes-tier.md","date":"2026-10-21","status":"open","summary":"Establish Registered `probes/` Tier for Exploratory Python Scripts","meta":{},"callsign":"BRF-PROBES-TIER"}
 {"file":"2026-10-22-brief-darwin-close-out.md","date":"2026-10-22","status":"open","summary":"The darwin close-out — turn one promise into a measurement, and stop two paths guessing","meta":{},"callsign":"BRF-DARWIN-CLOSE-OUT"}
-{"file":"2026-10-22-brief-platform-gate.md","date":"2026-10-22","status":"done","summary":"The gate names its format — building okuda on Omarchy","meta":{},"callsign":"BRF-PLATFORM-GATE"}
-{"file":"2026-10-22-brief-toolchain-truth.md","date":"2026-10-22","status":"done","summary":"Four claims that could not prove themselves","meta":{},"callsign":"BRF-TOOLCHAIN-TRUTH"}
 {"file":"2026-10-25-brief-diagram-height-axis.md","date":"2026-10-25","status":"parked","summary":"The height axis has no policy at all","meta":{},"callsign":"BRF-DIAGRAM-HEIGHT-AXIS"}
-{"file":"2026-10-25-brief-diagram-width-handoff.md","date":"2026-10-25","status":"done","summary":"One width, or two? — the diagram pipe's second opinion","meta":{},"callsign":"BRF-DIAGRAM-WIDTH-HANDOFF"}
 {"file":"2026-10-26-brief-irony-mark.md","date":"2026-10-26","status":"ready","summary":"The irony mark takes the parked state, and the vertical ellipsis goes back to elision","meta":{},"callsign":"BRF-IRONY-MARK"}
-{"file":"2026-10-26-brief-prose-measure.md","date":"2026-10-26","status":"rejected","summary":"Text takes the measure, art takes the glass — prose gets a band, and a fence states its requirement","meta":{},"callsign":"BRF-PROSE-MEASURE"}

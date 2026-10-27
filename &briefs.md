@@ -35,6 +35,11 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-TABLE-GLASS-FIT | ✓ done | Table fit — wrap to the glass, elide only the floor | [debrief](debriefs/2026-10-12-debrief-table-glass-fit.md) |
 | BRF-IDEA-LEDGER | ✓ landed 2026-10-14 | the intake gate — ideas stage, promises are promoted; and a debrief declares its briefs | [debrief](debriefs/2026-10-14-debrief-the-funnel.md) |
 | BRF-RETIRE-OKUDAGRAM | ✓ landed 2026-10-14 | the fan-word term retired — the render, the frame, and a diagram; a gate holds the line | [debrief](debriefs/2026-10-14-debrief-the-barnacle.md) |
+| BRF-SEAM-AUDIT | ✓ landed | the seam audit — the run buffer generalised, `]]`/`[[` fire across reads, the read-boundary test added (landed same day) — archived 2026-10-26 | — |
+| BRF-TABLE-SLOT-INSTRUMENT | ✓ landed | The table's columns are unobservable — a slot instrument, and a header/body alignment test — archived 2026-10-26 | — |
+| BRF-PLATFORM-GATE | ✓ landed | The gate names its format — building okuda on Omarchy — archived 2026-10-26 | — |
+| BRF-TOOLCHAIN-TRUTH | ✓ landed | Four claims that could not prove themselves — archived 2026-10-26 | — |
+| BRF-DIAGRAM-WIDTH-HANDOFF | ✓ landed | One width, or two? — the diagram pipe's second opinion — archived 2026-10-26 | — |
 
 ## Landed today — ADR-031, the working copy
 
@@ -154,20 +159,15 @@ Editorial surface: the **sections and notes** are the editor's; the
 | BRF-READ-ACTUATOR | · open | 77 calls the speech function (epic) | — |
 | BRF-RENDER-DEFECTS | · open | the stack map's four findings (epic) | — |
 | BRF-BOUNDARY-MARK | · open | The boundary mark — the receipt elides the addresses the cap never realised | — |
-| BRF-SEAM-AUDIT | ✓ done | the seam audit — the run buffer generalised, `]]`/`[[` fire across reads, the read-boundary test added (landed same day) | — |
 | BRF-AMP-CELL | · open | The state cell derives — a status change reaches the table | — |
 | BRF-HISTORY-PREFACE | · open | the header is Date + Status — the history preface and the `TD` field out, with a lint for both | — |
 | BRF-LEAK-FENCE | · open | The leak gate's fence exemption — anchor on the source, not a rendered match | — |
-| BRF-TABLE-SLOT-INSTRUMENT | · open | The table's columns are unobservable — a slot instrument, and a header/body alignment test | — |
 | BRF-ALIGN-ACROSS-TABLES | · open | The align meta is misattributed across tables — a later table un-aligns an earlier one | — |
 | BRF-PRINCIPAL-CLERK | · open | The principal and the clerk — the three-way triage | — |
 | BRF-SEARCH-ROW | · open | The search row — the contract, frozen by the probe | — |
-| BRF-PLATFORM-GATE | · open | The gate names its format — building okuda on Omarchy | — |
-| BRF-TOOLCHAIN-TRUTH | · open | Four claims that could not prove themselves | — |
 | BRF-DARWIN-CLOSE-OUT | · open | The darwin close-out — turn one promise into a measurement, and stop two paths guessing | — |
 | BRF-AUTHORING-CONVENTION | · open | Authoring Convention — Route Agents to the Style Guide | — |
 | BRF-PROBES-TIER | · open | Establish Registered `probes/` Tier for Exploratory Python Scripts | — |
-| BRF-DIAGRAM-WIDTH-HANDOFF | · open | One width, or two? — the diagram pipe's second opinion | — |
 
 ## Parked / deferred
 

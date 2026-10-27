@@ -10,18 +10,13 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-10-26 | BRF-IRONY-MARK | ready | The irony mark takes the parked state, and the vertical ellipsis goes back to elision | 2026-10-26-brief-irony-mark.md |
-| 2026-10-26 | BRF-PROSE-MEASURE | rejected | Text takes the measure, art takes the glass — prose gets a band, and a fence states its requirement | 2026-10-26-brief-prose-measure.md |
 | 2026-10-25 | BRF-DIAGRAM-HEIGHT-AXIS | parked | The height axis has no policy at all | 2026-10-25-brief-diagram-height-axis.md |
-| 2026-10-25 | BRF-DIAGRAM-WIDTH-HANDOFF | done | One width, or two? — the diagram pipe's second opinion | 2026-10-25-brief-diagram-width-handoff.md |
 | 2026-10-22 | BRF-DARWIN-CLOSE-OUT | open | The darwin close-out — turn one promise into a measurement, and stop two paths guessing | 2026-10-22-brief-darwin-close-out.md |
-| 2026-10-22 | BRF-PLATFORM-GATE | done | The gate names its format — building okuda on Omarchy | 2026-10-22-brief-platform-gate.md |
-| 2026-10-22 | BRF-TOOLCHAIN-TRUTH | done | Four claims that could not prove themselves | 2026-10-22-brief-toolchain-truth.md |
 | 2026-10-21 | BRF-AUTHORING-CONVENTION | open | Authoring Convention — Route Agents to the Style Guide | 2026-10-21-brief-authoring-convention.md |
 | 2026-10-21 | BRF-PROBES-TIER | open | Establish Registered `probes/` Tier for Exploratory Python Scripts | 2026-10-21-brief-registered-probes-tier.md |
 | 2026-10-16 | BRF-SEARCH-ROW | open | The search row — the contract, frozen by the probe | 2026-10-16-brief-search-row.md |
 | 2026-10-14 | BRF-PRINCIPAL-CLERK | open | The principal and the clerk — the three-way triage | 2026-10-14-brief-principal-and-clerk.md |
 | 2026-10-13 | BRF-ALIGN-ACROSS-TABLES | open | The align meta is misattributed across tables — a later table un-aligns an earlier one | 2026-10-13-brief-align-across-tables.md |
-| 2026-10-13 | BRF-TABLE-SLOT-INSTRUMENT | done | The table's columns are unobservable — a slot instrument, and a header/body alignment test | 2026-10-13-brief-table-slot-instrument.md |
 | 2026-10-10 | BRF-AMP-CELL | open | The state cell derives — a status change reaches the table | 2026-10-10-brief-amp-cell.md |
 | 2026-10-10 | BRF-COMMISSION-BLANDINGS | open | Commission the Blandings silo — and the procedure that makes the next one routine | 2026-10-10-brief-commission-blandings.md |
 | 2026-10-10 | BRF-LEAK-FENCE | open | The leak gate's fence exemption — anchor on the source, not a rendered match | 2026-10-10-brief-leak-fence.md |
@@ -65,9 +60,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-07 | BRF-DIAGRAM-INGESTION | open | The diagram ingestion pipeline — mermaid-to-md as the show/elide/hide gate | 2026-09-07-brief-diagram-ingestion.md |
 | 2026-09-06 | BRF-CONCORDANCE-PREFILTER | open | The concordance pre-filter — `\|`, `!`, and case at the silo's seam | 2026-09-06-brief-concordance-prefilter.md |
 | 2026-09-06 | BRF-TTS-DOGFOOD | open | Coupled-frame TTS dogfood (mac `say`) | 2026-09-06-brief-tts-dogfood.md |
-| 2026-09-04 | BRF-WORKING-COPY | open | The working copy — vector render mode, 99 clone, honest actuator | 2026-09-04-brief-working-copy.md |
 | 2026-09-02 | BRF-SCROLL-REPAINT | open | One line per scroll — scroll-region repaint for the TUI | 2026-09-02-brief-scroll-region-repaint.md |
-| 2026-09-02 | BRF-SYNC-OUTPUT | open | Synchronized output — deliver each paint as one frame | 2026-09-02-brief-synchronized-output.md |
 | 2026-08-30 | BRF-REFRESH-OFF-DISK | open | refresh off disk — the resize race + the R placebo | 2026-08-30-brief-refresh-off-disk.md |
 | 2026-08-30 | BRF-IPAD-MINI | open | 2026-08-30-ipad-mini-demo | 2026-08-30-ipad-mini-demo.md |
 | 2026-08-29 | BRF-AUDIO-STYLE | open | Audio-First Style Guide and Linting Heuristics | 2026-08-29-audio-style-guide.md |

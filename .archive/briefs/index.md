@@ -9,8 +9,13 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-26 | BRF-PROSE-MEASURE | rejected | Text takes the measure, art takes the glass — prose gets a band, and a fence says only *that* it was cut | 2026-10-26-brief-prose-measure.md |
+| 2026-10-25 | BRF-DIAGRAM-WIDTH-HANDOFF | done | One width, or two? — the diagram pipe's second opinion | 2026-10-25-brief-diagram-width-handoff.md |
+| 2026-10-22 | BRF-PLATFORM-GATE | done | The gate names its format — building okuda on Omarchy | 2026-10-22-brief-platform-gate.md |
+| 2026-10-22 | BRF-TOOLCHAIN-TRUTH | done | Four claims that could not prove themselves | 2026-10-22-brief-toolchain-truth.md |
 | 2026-10-14 | BRF-IDEA-LEDGER | done | Close the funnel — the idea ledger, and the record's linkage | 2026-10-14-brief-idea-ledger.md |
 | 2026-10-14 | BRF-RETIRE-OKUDAGRAM | done | Retire the okudagram term — the render, the frame, and the diagram | 2026-10-14-brief-retire-okudagram.md |
+| 2026-10-13 | BRF-TABLE-SLOT-INSTRUMENT | done | The slot instrument — the table's columns made observable, and header/body alignment pinned | 2026-10-13-brief-table-slot-instrument.md |
 | 2026-10-12 | BRF-CODE-SILCROWS | done | Code-comment silcrows — a rendered code file is a document for its prose | 2026-10-12-brief-code-silcrows.md |
 | 2026-10-12 | BRF-TABLE-GLASS-FIT | done | Table fit — wrap to the glass, elide only the floor | 2026-10-12-brief-table-glass-fit.md |
 | 2026-10-10 | BRF-BOUNDARY-MARK | done | The boundary mark — the receipt elides the addresses the cap never realised | 2026-10-10-brief-boundary-mark.md |
@@ -48,6 +53,8 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-07 | BRF-ONION-SEARCH-GRAMMAR | done | The onion search grammar — staged filtering, path/content separation | 2026-09-07-brief-onion-search-grammar.md |
 | 2026-09-05 | BRF-STREAM-IDENTITY-HEADER | done | Stream identity header — name the document for the unknown destination | 2026-09-05-brief-stream-identity-header.md |
 | 2026-09-04 | BRF-PORCH-MATRIX | rejected | The porch matrix — click a URL, land in a terminal, read the silo | 2026-09-04-brief-porch-matrix.md |
+| 2026-09-04 | BRF-WORKING-COPY | done | The working copy — vector render mode, 99 clone, honest actuator | 2026-09-04-brief-working-copy.md |
+| 2026-09-02 | BRF-SYNC-OUTPUT | done | Synchronized output — deliver each paint as one frame | 2026-09-02-brief-synchronized-output.md |
 | 2026-09-01 | BRF-FLOW-WRAP | rejected | Flow wrap — internal break opportunities so paths flow as text | 2026-09-01-brief-flow-wrap.md |
 | 2026-09-01 | BRF-MERMAID-SOURCE-OMITTED | done | Omit the mermaid source from the render | 2026-09-01-brief-mermaid-source-omitted.md |
 | 2026-08-31 | BRF-CITTY-CLI | rejected | the CLI contract — adopting citty for the okuda/gloam surface | 2026-08-31-brief-citty-cli.md |
