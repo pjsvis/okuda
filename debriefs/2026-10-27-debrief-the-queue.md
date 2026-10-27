@@ -114,10 +114,18 @@ record (the one-way valve):
 5. the `⋮` reservation either used by a fold brief or released;
 6. every `N of M` claim in the corpus audited — two were stale today by accident.
 
-And the observation that sets up the next session: **the td board is 50 open issues, 9
-epics, and nothing reconciles it.** Same disease, one ledger over. The snagging session
-should run the reconciliation there first, or it will spend itself fixing what is already
-fixed.
+And the observation that sets up the next session: **the td board is not 50 issues.** That
+figure came from `td list`'s default row cap — 50 of 139 — which is the fourth appearance of
+the day's own lesson in the instrument that reports it (*a reading is only as honest as the
+part of the source it agrees to look at*). The real board was **139 issues, 136 open, 20
+epics**, and nothing reconciled it: the same disease, one ledger over.
+
+Reconciled the same evening, by the same method — derived, then applied, then read back:
+**60 issues closed** (14 epics whose brief was refused on 2026-10-27, plus their 46 stories),
+leaving **79 issues, 6 epics**. Twelve orphans that cite only a refused brief were *held
+back* for a human, because a refused-brief mention in a description does not make the task
+about that brief — the explainers register cites the measure's brief and is live work. That
+distinction is the whole argument for deriving the reconciliation and deciding it separately.
 
 ## The line
 
