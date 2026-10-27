@@ -6,7 +6,7 @@ callsign: BRF-MERMAID-HARD
 # Brief: Mermaid Rendering Hard Boundary State Machine (CSN Diagnostics)
 
 **Date:** 2026-08-29[cite: 1]
-**Status:** Open[cite: 1]
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 
 NOTE: CSN === Computer Says NO
 

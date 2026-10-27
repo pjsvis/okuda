@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**72 live · 85 archived · 120 tabled** — 0 to move · 0 disagreeing · 0 phantom · 5 editorial · 35 silent · 1 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**54 live · 103 archived · 120 tabled** — 0 to move · 0 disagreeing · 0 phantom · 3 editorial · 17 silent · 1 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -10,7 +10,7 @@
 
 Listed, never gated: the glyph cell is the editor's surface. If a mark here is meant to *mean* a status, map it in `amp-briefs.ts` so the reconciliation can read it.
 
-- **`◆ partial`** — 4 briefs: BRF-MERMAID-HARD (open) · BRF-JUMP-DEMO (open) · BRF-STATE-GLYPH-2 (open) · BRF-OKLCH-TUNING (open)
+- **`◆ partial`** — 2 briefs: BRF-STATE-GLYPH-2 (open) · BRF-OKLCH-TUNING (open)
 - **`◆ feasibility ✓`** — 1 brief: BRF-SSH-SERVED (parked)
 
 ### Silent — no ticket, no citation, live
@@ -19,31 +19,13 @@ Nothing waits on these and no Thing records them. The question per row is **what
 
 | brief | age | asks |
 |---|---|---|
-| BRF-REGISTRY-MARKDOWN | 62d | Registry-aware markdown browser — the silo dashboard |
-| BRF-HERDR-DASHBOARD | 61d | Herdr Dashboard — the Build's Exhaust, Composed |
-| BRF-DOCUMENT-SEARCH | 61d | In-Document Search and Outlining — Fast Navigation in Gloa |
-| BRF-TELEMETRY-CONVENTIONS | 61d | Telemetry Conventions — Markdown as Message Bus |
-| BRF-TTY-REVERSE | 61d | TTY Reverse-Print — Land at the Top |
 | BRF-ARTPACK-AESTHETICS | 60d | Plundered artpack aesthetics & high-SNR dark terminal rend |
 | BRF-DENSE-DYNAMIC | 60d | Dense terminal visual primitives for dynamic telemetry |
-| BRF-JUMP-DEMO | 59d | jump-demo honesty — slug derivation + state-glyph signal |
 | BRF-STATE-GLYPH-2 | 59d | State-glyph vocabulary — colour + bold, the closed lexicon |
 | BRF-RESTICTED-GRAMMAR | 58d | Okuda Markdown AST to W3C SSML Mapping Investigation |
 | BRF-TERMINAL-SPEECH | 58d | Terminal Speech Pipeline Easter Egg |
-| BRF-MERMAID-HARD | 58d | Mermaid Rendering Hard Boundary State Machine (CSN Diagnos |
-| BRF-IPAD-MINI | 57d | 2026-08-30-ipad-mini-demo |
-| BRF-DIAGRAM-INGESTION | 49d | The diagram ingestion pipeline — mermaid-to-md as the show |
-| BRF-CONCEPTUAL-LEXICON | 42d | Extract the Conceptual Lexicon from system.md |
-| BRF-CAPABILITIES-DOC | 37d | The capabilities doc — a snapshot inventory, not a changel |
-| BRF-PALETTE-AUDIT | 37d | The palette audit — review the colours before the brightne |
-| BRF-FENCE-DISCIPLINE | 26d | One fence rule — five scanners, four disciplines, one of t |
 | BRF-DOC-SEARCH-FERMATA | 23d | The doc→search fermata — a held frame at the reading/searc |
 | BRF-STICKY-HEADING-STEPPER | 22d | The sticky-heading pager — step through a document section |
-| BRF-AST-PROSODY | 21d | AST-to-Prosody Intermediate Representation for Speech Rend |
-| BRF-KINDLE-PORCH | 20d | The Kindle porch — the silo on an e-ink glass, over ssh, n |
-| BRF-FRAME-INDEX | 19d | The frame index — an address two parties can both name |
-| BRF-REG-CLI | 18d | `reg` — the silo maintenance CLI, one entry point, one art |
-| BRF-REGISTRY-DISCOVERY | 18d | One map from the territory — the registry discovers its ow |
 | BRF-SILO-LEXICON | 18d | Gather the silo's terms of art into `conceptual-lexicon.md |
 | BRF-COMPLETE-BLOCKS | 17d | The viewport holds complete blocks — cut at boundaries, in |
 | BRF-AMP-CELL | 16d | The state cell derives — a status change reaches the table |
@@ -76,13 +58,13 @@ actuate the amber vector to dereference, `u` unwinds, `99` promotes.
 
 | Brief | State | Narrative | Debrief |
 |---|---|---|---|
-| BRF-REGISTRY-MARKDOWN | · open | silo dashboard | — |
+| BRF-REGISTRY-MARKDOWN | ✗ rejected | silo dashboard — registry: rejected, archived | — |
 | BRF-DENSE-DYNAMIC | · open | telemetry visual primitives | — |
 | BRF-FETCH-STATE | · open | fetch stamp; fixes the empty-doc lie | — |
-| BRF-HERDR-DASHBOARD | ▸ ready | the build's exhaust, composed | — |
+| BRF-HERDR-DASHBOARD | ✗ rejected | the build's exhaust, composed — registry: rejected, archived | — |
 | BRF-LAUNCHER-FUT | ✓ landed | session-scoped alt-screen — registry: done, archived | — |
-| BRF-IPAD-MINI | · open | demo brief | — |
-| BRF-TELEMETRY-CONVENTIONS | ▸ ready | markdown as message bus | — |
+| BRF-IPAD-MINI | ✗ rejected | demo brief — registry: rejected, archived | — |
+| BRF-TELEMETRY-CONVENTIONS | ✗ rejected | markdown as message bus — registry: rejected, archived | — |
 | BRF-NOTIFICATION-STYLE | ✓ landed | ADR-020 landed; impl pending — registry: done, archived | — |
 | BRF-AI-DOC | ↓ parked | inline ask-the-doc, local SSH | — |
 | BRF-ARTPACK-AESTHETICS | · open | high-SNR dark rendering | — |
@@ -92,35 +74,35 @@ actuate the amber vector to dereference, `u` unwinds, `99` promotes.
 | BRF-SCROLL-REPAINT | · open | one line per scroll — scroll-region repaint for the TUI | — |
 | BRF-CONCORDANCE-PREFILTER | · open | the concordance pre-filter — the pipe, the bang, and case at the seam | — |
 | BRF-TTS-DOGFOOD | · open | coupled-frame TTS dogfood (mac say) | — |
-| BRF-DIAGRAM-INGESTION | · open | mermaid-to-md as the show/elide/hide gate | — |
+| BRF-DIAGRAM-INGESTION | ✗ rejected | mermaid-to-md as the show/elide/hide gate — registry: rejected, archived | — |
 | BRF-TTS-TEMPORAL | · open | temporal punctuation — markdown prosody for say | — |
 | BRF-TTS-STEPPER | · open | the TTS stepper — frame-as-para, prosody-as-colour | — |
 | BRF-CENSUS-MODE | · open | the mentions-inclusive map, as a reader's opt-in | — |
 | BRF-AUDIO-DISCOVERY | · open | the actuator grammar, heard (epic) | — |
 | BRF-PROLONGED-PRESS | · open | three gestures, one actuation, no leak (epic) | — |
 | BRF-ADDRESS-CAP | ✓ landed | the invariant is the destination — registry: done, archived | — |
-| BRF-CONCEPTUAL-LEXICON | · open | extract the lexicon from system.md | — |
+| BRF-CONCEPTUAL-LEXICON | ✗ rejected | extract the lexicon from system.md — registry: rejected, archived | — |
 | BRF-JUMP-LIST | · open | the jump list — the search screen as its projection | — |
 | BRF-SPEECH-STRIDE | · open | the arrows given to the ear, the unit heard | — |
 | BRF-CALLSIGN-EVERY-DOC | · open | the name and the address are orthogonal | — |
 | BRF-SPOKEN-BLOCK-GRAMMAR | · open | announce the kind, enumerate, never elide silently; stays for ADR-037 | — |
 | BRF-GLYPH-LEAD | · open | the state glyph is emitted twice on a list lead | — |
-| BRF-CAPABILITIES-DOC | · open | a snapshot inventory, not a changelog | — |
+| BRF-CAPABILITIES-DOC | ✗ rejected | a snapshot inventory, not a changelog — registry: rejected, archived | — |
 | BRF-GLOAM-OWNS-LOOP | · open | the search TUI retires the fzf dependency | — |
-| BRF-PALETTE-AUDIT | · open | review the colours before the brightness controller scales them | — |
+| BRF-PALETTE-AUDIT | ✗ rejected | review the colours before the brightness controller scales them — registry: rejected, archived | — |
 | BRF-SRC-LINE-LEDGER | · open | the 10 edit lands the editor at the eye | — |
 | BRF-SILCROW-PATHS | · open | the gate grows a second substrate | — |
-| BRF-FENCE-DISCIPLINE | · open | one fence rule — five scanners | — |
+| BRF-FENCE-DISCIPLINE | ✗ rejected | one fence rule — five scanners — registry: rejected, archived | — |
 | BRF-READING-FRACTION | · open | a meter for the glass, from state the glass already holds | — |
 | BRF-DEMO-SANDBOX | ↓ parked | the public demo room — two access modes, one grammar | — |
 | BRF-DOC-SEARCH-FERMATA | · open | a held frame at the reading/searching boundary | — |
 | BRF-STICKY-HEADING-STEPPER | · open | step by section, heading as anchor, never truncate | — |
-| BRF-AST-PROSODY | · open | AST to prosody — the intermediate representation | — |
-| BRF-KINDLE-PORCH | · open | the silo on an e-ink glass, over ssh, nothing on the device | — |
-| BRF-FRAME-INDEX | · open | an address two parties can both name | — |
+| BRF-AST-PROSODY | ✗ rejected | AST to prosody — the intermediate representation — registry: rejected, archived | — |
+| BRF-KINDLE-PORCH | ✗ rejected | the silo on an e-ink glass, over ssh, nothing on the device — registry: rejected, archived | — |
+| BRF-FRAME-INDEX | ✗ rejected | an address two parties can both name — registry: rejected, archived | — |
 | BRF-DOCUMENT-LIFECYCLE | ✓ landed | ephemeral, record, addressed, retired (in review) — registry: done, archived | — |
-| BRF-REG-CLI | · open | the silo maintenance CLI, one entry point | — |
-| BRF-REGISTRY-DISCOVERY | · open | one map from the territory — the registry discovers its tiers | — |
+| BRF-REG-CLI | ✗ rejected | the silo maintenance CLI, one entry point — registry: rejected, archived | — |
+| BRF-REGISTRY-DISCOVERY | ✗ rejected | one map from the territory — the registry discovers its tiers — registry: rejected, archived | — |
 | BRF-SILO-LEXICON | · open | gather the silo's terms of art | — |
 | BRF-COMPLETE-BLOCKS | · open | the viewport holds complete blocks — cut at boundaries | — |
 | BRF-DOCS-LEDGER | · open | a prune ledger, not a registry | — |
@@ -151,13 +133,13 @@ actuate the amber vector to dereference, `u` unwinds, `99` promotes.
 
 | Brief | State | Narrative | Debrief |
 |---|---|---|---|
-| BRF-MERMAID-HARD | ◆ partial | CSN diagnostics landed; boundary machine pending | — |
-| BRF-JUMP-DEMO | ◆ partial | demo + honesty pass | — |
+| BRF-MERMAID-HARD | ✗ rejected | CSN diagnostics landed; boundary machine pending — registry: rejected, archived | — |
+| BRF-JUMP-DEMO | ✗ rejected | demo + honesty pass — registry: rejected, archived | — |
 | BRF-STATE-GLYPH | ✓ landed | render path + showcase environment — registry: done, archived | — |
 | BRF-STATE-GLYPH-2 | ◆ partial | vocabulary — closed lexicon | — |
 | BRF-OKLCH-TUNING | ◆ partial | td-b4bae8 ready-to-start | — |
 | BRF-PAGED-OKUDAGRAM | ✓ landed | the frame — a portioning rule — registry: done, archived | — |
-| BRF-TTY-REVERSE | ▸ ready | land at the top | — |
+| BRF-TTY-REVERSE | ✗ rejected | land at the top — registry: rejected, archived | — |
 
 ## SSH family — feasibility debriefed, build pending
 
@@ -178,7 +160,7 @@ actuate the amber vector to dereference, `u` unwinds, `99` promotes.
 
 | Brief | State | Narrative | Debrief |
 |---|---|---|---|
-| BRF-DOCUMENT-SEARCH | · open | deferred by the live search; host owns ctrl+f | — |
+| BRF-DOCUMENT-SEARCH | ✗ rejected | deferred by the live search; host owns ctrl+f — registry: rejected, archived | — |
 | BRF-TELEVISION-PREVIEW | ↓ parked | okuda as the renderer, OKUDA_WIDTH as the knob | — |
 | BRF-DIAGRAM-HEIGHT-AXIS | ↓ parked | The height axis has no policy at all | — |
 

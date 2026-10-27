@@ -4,6 +4,8 @@ callsign: BRF-IPAD-MINI
 ---
 # iPad Mini Demo
 
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. The demo it was written for is in `docs/`.
+
 An on-device iPad Mini demo is the ultimate **tactile proof of concept**.
 
 The iPad Mini has the exact form factor of a physical field notebook or flight kneeboard. Running a self-contained, zero-network Gloam viewer on that piece of glass completely strips away any accusation that this stack is "just a toy terminal script."

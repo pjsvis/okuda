@@ -6,7 +6,7 @@ callsign: BRF-AST-PROSODY
 # Brief: AST-to-Prosody Intermediate Representation for Speech Rendering
 
 **Date:** 2026-10-05
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 
 ---
 

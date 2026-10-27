@@ -6,7 +6,7 @@ callsign: BRF-HERDR-DASHBOARD
 # Brief: Herdr Dashboard — the Build's Exhaust, Composed
 
 **Date:** 2026-08-26
-**Status:** Ready (v0 config-not-code; premium path gated)
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 
 ## Depends on
 

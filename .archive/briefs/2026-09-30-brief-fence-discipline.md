@@ -7,7 +7,7 @@ date: 2026-09-30
 # Brief: One fence rule — five scanners, four disciplines, one of them fixed
 
 **Created:** 2026-09-30
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 **TD:** td-da237f (epic) — td-a9de44 the scanner, td-81faf8 the seams, td-1b2d25 the tests and records
 **Branch:** feat/fence-discipline
 

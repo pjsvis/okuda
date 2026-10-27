@@ -6,7 +6,7 @@ callsign: BRF-REGISTRY-DISCOVERY
 # Brief: One map from the territory — the registry discovers its own tiers
 
 **Date:** 2026-10-08
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 
 ## Context
 

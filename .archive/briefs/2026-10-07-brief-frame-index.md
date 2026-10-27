@@ -6,7 +6,7 @@ callsign: BRF-FRAME-INDEX
 # Brief: The frame index — an address two parties can both name
 
 **Date:** 2026-10-07
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 
 ## Context
 

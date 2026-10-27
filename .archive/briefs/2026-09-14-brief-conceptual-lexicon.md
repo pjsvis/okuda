@@ -5,7 +5,7 @@ callsign: BRF-CONCEPTUAL-LEXICON
 
 # Brief: Extract the Conceptual Lexicon from system.md
 
-**Status:** Draft — for TD decomposition
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Its load-bearing half landed: the split into `conceptual-lexicon.md` on 2026-10-08, and the gathering continues live under `BRF-SILO-LEXICON`.
 **Date:** 2026-XX-XX
 **Origin:** Review of system.md v1.1.0 (Edinburgh Protocol)
 **Predecessor:** none

@@ -6,7 +6,7 @@ callsign: BRF-KINDLE-PORCH
 # Brief: The Kindle porch — the silo on an e-ink glass, over ssh, nothing on the device
 
 **Date:** 2026-10-06
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 
 ## Context
 

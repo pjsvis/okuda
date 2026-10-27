@@ -6,7 +6,7 @@ callsign: BRF-DOCUMENT-SEARCH
 # Brief: In-Document Search and Outlining — Fast Navigation in Gloam
 
 **Date:** 2026-08-26
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 
 ---
 

@@ -6,7 +6,7 @@ callsign: BRF-REGISTRY-MARKDOWN
 # Brief: Registry-aware markdown browser — the silo dashboard
 
 **Date:** 2026-08-25
-**Status:** Open (the next moat move; not started)
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 **Context:** blue-sky riff during td-96c759 review wait. The strongest moat extension on the table.
 
 ## What

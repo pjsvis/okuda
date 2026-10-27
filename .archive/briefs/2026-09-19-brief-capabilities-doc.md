@@ -7,7 +7,7 @@ date: 2026-09-19
 # Brief: The capabilities doc — a snapshot inventory, not a changelog
 
 **Created:** 2026-09-19
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 **TD:** td-8f49bd
 
 ## Lineage

@@ -6,7 +6,7 @@ callsign: BRF-REG-CLI
 # Brief: `reg` — the silo maintenance CLI, one entry point, one artifact
 
 **Date:** 2026-10-08
-**Status:** open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 
 ## Lineage
 

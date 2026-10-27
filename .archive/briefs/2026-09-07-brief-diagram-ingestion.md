@@ -6,7 +6,7 @@ callsign: BRF-DIAGRAM-INGESTION
 # Brief: The diagram ingestion pipeline — mermaid-to-md as the show/elide/hide gate
 
 **Date:** 2026-09-07
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 
 ## Lineage
 

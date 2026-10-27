@@ -6,7 +6,7 @@ callsign: BRF-TELEMETRY-CONVENTIONS
 # Brief: Telemetry Conventions — Markdown as Message Bus
 
 **Date:** 2026-08-26
-**Status:** Ready (small; contracts, not code)
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 **Feeds:** `2026-08-26-brief-herdr-dashboard.md`; generalises to any producer
 
 ## What

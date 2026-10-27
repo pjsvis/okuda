@@ -762,14 +762,14 @@ describe("tui — resolveJumpTarget (a relative target anchors to the main docum
   test("a relative target resolves against the main document's directory", () => {
     process.chdir("/tmp"); // a foreign cwd — the anchor is the document
     try {
-      const got = resolveJumpTarget(
-        main,
-        "briefs/2026-09-19-brief-capabilities-doc.md",
-        () => null,
-      );
+      // The fixture is a document that does not move when the ledger is swept.
+      // It was a brief until 2026-10-27: the brief was archived, its path changed,
+      // and this test failed — a fixture taken from the mutable registry is a
+      // fixture that breaks on housekeeping (which is not a defect being caught).
+      const got = resolveJumpTarget(main, "docs/2026-08-20-origin-doc.md", () => null);
       expect(got).not.toBeNull();
       expect(existsSync(got!)).toBe(true);
-      expect(got!.endsWith("briefs/2026-09-19-brief-capabilities-doc.md")).toBe(true);
+      expect(got!.endsWith("docs/2026-08-20-origin-doc.md")).toBe(true);
     } finally {
       process.chdir(home);
     }

@@ -7,7 +7,7 @@ callsign: BRF-JUMP-DEMO
 
 **Created:** 2026-08-28
 **TD:** td-okuda-jump-demo-honesty
-**Status:** open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 
 ## What
 

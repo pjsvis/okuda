@@ -6,7 +6,7 @@ callsign: BRF-TTY-REVERSE
 # Brief: TTY Reverse-Print — Land at the Top
 
 **Date:** 2026-08-26
-**Status:** Ready (small; independently shippable)
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on.
 **td:** unassigned
 
 ## What
