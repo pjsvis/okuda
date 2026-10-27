@@ -9,7 +9,6 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
-| 2026-10-26 | BRF-IRONY-MARK | ready | The irony mark takes the parked state, and the vertical ellipsis goes back to elision | 2026-10-26-brief-irony-mark.md |
 | 2026-10-21 | BRF-AUTHORING-CONVENTION | open | Authoring Convention — Route Agents to the Style Guide | 2026-10-21-brief-authoring-convention.md |
 | 2026-10-21 | BRF-PROBES-TIER | open | Establish Registered `probes/` Tier for Exploratory Python Scripts | 2026-10-21-brief-registered-probes-tier.md |
 | 2026-10-16 | BRF-SEARCH-ROW | open | The search row — the contract, frozen by the probe | 2026-10-16-brief-search-row.md |

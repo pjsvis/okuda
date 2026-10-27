@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**9 live · 148 archived · 9 tabled** — 0 to move · 0 disagreeing · 0 phantom · 1 editorial · 3 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**8 live · 149 archived · 8 tabled** — 0 to move · 0 disagreeing · 0 phantom · 1 editorial · 2 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -20,7 +20,6 @@ Nothing waits on these and no Thing records them. The question per row is **what
 |---|---|---|
 | BRF-SEARCH-ROW | 10d | The search row — the contract, frozen by the probe |
 | BRF-PROBES-TIER | 5d | Establish Registered `probes/` Tier for Exploratory Python |
-| BRF-IRONY-MARK | 0d | The irony mark takes the parked state, and the vertical el |
 
 ### Ticketed, live — the load-bearing set
 
@@ -54,7 +53,6 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 | BRF-PERIMETER-GATE | · ready | the report that becomes a gate; lands first | — |
 | BRF-PERIMETER-RUNNER | · ready | the tuning recipes and artifacts leave | — |
 | BRF-PERIMETER-SILO | · ready | the doctrine and the records leave | — |
-| BRF-IRONY-MARK | ▸ ready | The irony mark takes the parked state, and the vertical ellipsis goes back to elision | — |
 
 ## In flight — partially landed, has commits
 
