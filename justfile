@@ -478,6 +478,11 @@ cadence:
 cadence-read:
     @bun scripts/cadence.ts
 
+# The state table
+[group('registries')]
+briefs:
+    @./okuda '&briefs.md'
+
 # The decision loop
 [group('registries')]
 decide:
