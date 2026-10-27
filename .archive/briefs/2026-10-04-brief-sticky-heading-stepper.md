@@ -6,7 +6,7 @@ callsign: BRF-STICKY-HEADING-STEPPER
 # Brief: The sticky-heading stepper — walk a document frame by frame, heading as anchor
 
 **Date:** 2026-10-04
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted, so it can be **replundered** if the need returns; the idea is not being judged, only the queue position.
 **TD:** (to create)
 
 ## Lineage

@@ -7,7 +7,7 @@ date: 2026-10-13
 # Brief: The align meta is misattributed across tables — a later table un-aligns an earlier one
 
 **Date:** 2026-10-13
-**Status:** Open — reproduced in raw Bun, **filed upstream as `oven-sh/bun#45175`**, workaround undecided
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted, so it can be **replundered** if the need returns; the idea is not being judged, only the queue position.
 **Lineage:** the operator's reading of the rendered `docs/tables.md`, 2026-10-13 — *"the tables.md test showed all columns left aligned"* — while checking the slot-instrument work (BRF-TABLE-SLOT-INSTRUMENT).
 
 ## The observation

@@ -32,11 +32,14 @@
 {"file":"2026-08-28-brief-launcher-fut.md","date":"2026-08-28","status":"done","summary":"Launcher FUT — session-scoped alt-screen","meta":{},"callsign":"BRF-LAUNCHER-FUT"}
 {"file":"2026-08-28-brief-notification-style.md","date":"2026-08-28","status":"done","summary":"011-zero-notification-stillness-and-decoupled-inbox-watchers","meta":{},"callsign":"BRF-NOTIFICATION-STYLE"}
 {"file":"2026-08-28-brief-state-glyph-render-path.md","date":"2026-08-28","status":"done","summary":"State-glyph render path — the showcase environment + first cut","meta":{},"callsign":"BRF-STATE-GLYPH"}
+{"file":"2026-08-28-brief-state-glyph-vocabulary.md","date":"2026-08-28","status":"rejected","summary":"State-glyph vocabulary — colour + bold, the closed lexicon","meta":{},"callsign":"BRF-STATE-GLYPH-2"}
 {"file":"2026-08-28-silo-mnemonics.md","date":"2026-08-28","status":"rejected","summary":"Rooted Gloam — silo badge and document callsigns","meta":{},"callsign":"BRF-SILO-MNEMONICS"}
 {"file":"2026-08-29-brief-fzf-owns-the-loop.md","date":"2026-08-29","status":"rejected","summary":"fzf owns the loop (cursor-preserve experiment)","meta":{},"callsign":"BRF-FZF-OWNS-LOOP"}
 {"file":"2026-08-29-brief-menu-templates-deferred.md","date":"2026-08-29","status":"rejected","summary":"Menu templates (deferred — fires on the second menu kind)","meta":{},"callsign":"BRF-MENU-TEMPLATES"}
 {"file":"2026-08-29-brief-okf-callsign-migration.md","date":"2026-08-29","status":"done","summary":"OKF conformance migration and the callsign layer","meta":{},"callsign":"BRF-OKF-CALLSIGN"}
 {"file":"2026-08-29-brief-okudagram-frame.md","date":"2026-08-29","status":"done","summary":"The okudagram frame — a portioning rule","meta":{},"callsign":"BRF-PAGED-OKUDAGRAM"}
+{"file":"2026-08-29-brief-resticted-grammar-speech.md","date":"2026-08-29","status":"rejected","summary":"Okuda Markdown AST to W3C SSML Mapping Investigation","meta":{},"callsign":"BRF-RESTICTED-GRAMMAR"}
+{"file":"2026-08-29-brief-terminal-speech.md","date":"2026-08-29","status":"rejected","summary":"Terminal Speech Pipeline Easter Egg","meta":{},"callsign":"BRF-TERMINAL-SPEECH"}
 {"file":"2026-08-29-mermaid-hard-boundary-CSN.md","date":"2026-08-29","status":"rejected","summary":"Mermaid Rendering Hard Boundary State Machine (CSN Diagnostics)","meta":{},"callsign":"BRF-MERMAID-HARD"}
 {"file":"2026-08-30-brief-content-shortlist.md","date":"2026-08-30","status":"done","summary":"content shortlist — rg as the discovery source","meta":{},"callsign":"BRF-CONTENT-SHORTLIST"}
 {"file":"2026-08-30-brief-refresh-off-disk.md","date":"2026-08-30","status":"rejected","summary":"refresh off disk — the resize race + the R placebo","meta":{},"callsign":"BRF-REFRESH-OFF-DISK"}
@@ -76,7 +79,9 @@
 {"file":"2026-10-02-brief-td-id-lint.md","date":"2026-10-02","status":"done","summary":"The valve lint — td-ID citations in persisted documents fail the gate","meta":{},"callsign":"BRF-VALVE-LINT"}
 {"file":"2026-10-03-brief-archive-resolution-tier.md","date":"2026-10-03","status":"done","summary":"The archive resolution tier — citations must survive the archive move","meta":{},"callsign":"BRF-ARCHIVE-RESOLUTION"}
 {"file":"2026-10-03-brief-diagram-describe.md","date":"2026-10-03","status":"rejected","summary":"Prose descriptions of mermaid diagrams via an external binary","meta":{},"callsign":"BRF-DIAGRAM-DESCRIBE"}
+{"file":"2026-10-03-brief-doc-search-fermata.md","date":"2026-10-03","status":"rejected","summary":"The doc→search fermata — a held frame at the reading/searching boundary","meta":{},"callsign":"BRF-DOC-SEARCH-FERMATA"}
 {"file":"2026-10-03-brief-heading-ansi-strip.md","date":"2026-10-03","status":"done","summary":"Strip ANSI from heading children — the heading role owns every byte of colour","meta":{},"callsign":"BRF-HEADING-ANSI-STRIP"}
+{"file":"2026-10-04-brief-sticky-heading-stepper.md","date":"2026-10-04","status":"rejected","summary":"The sticky-heading stepper — walk a document frame by frame, heading as anchor","meta":{},"callsign":"BRF-STICKY-HEADING-STEPPER"}
 {"file":"2026-10-05-brief-ast-to-prosody-unsloth.md","date":"2026-10-05","status":"rejected","summary":"AST-to-Prosody Intermediate Representation for Speech Rendering","meta":{},"callsign":"BRF-AST-PROSODY"}
 {"file":"2026-10-06-brief-kindle-porch.md","date":"2026-10-06","status":"rejected","summary":"The Kindle porch — the silo on an e-ink glass, over ssh, nothing on the device","meta":{},"callsign":"BRF-KINDLE-PORCH"}
 {"file":"2026-10-07-brief-frame-index.md","date":"2026-10-07","status":"rejected","summary":"The frame index — an address two parties can both name","meta":{},"callsign":"BRF-FRAME-INDEX"}
@@ -85,15 +90,22 @@
 {"file":"2026-10-08-brief-document-lifecycle.md","date":"2026-10-08","status":"done","summary":"The document lifecycle — ephemeral, record, addressed, retired","meta":{},"callsign":"BRF-DOCUMENT-LIFECYCLE"}
 {"file":"2026-10-08-brief-reg-cli.md","date":"2026-10-08","status":"rejected","summary":"`reg` — the silo maintenance CLI, one entry point, one artifact","meta":{},"callsign":"BRF-REG-CLI"}
 {"file":"2026-10-08-brief-registry-discovery.md","date":"2026-10-08","status":"rejected","summary":"One map from the territory — the registry discovers its own tiers","meta":{},"callsign":"BRF-REGISTRY-DISCOVERY"}
+{"file":"2026-10-08-brief-silo-lexicon.md","date":"2026-10-08","status":"rejected","summary":"Gather the silo's terms of art into `conceptual-lexicon.md`","meta":{},"callsign":"BRF-SILO-LEXICON"}
 {"file":"2026-10-08-brief-wrap-at-cap.md","date":"2026-10-08","status":"done","summary":"Wrap at the cap — the third branch","meta":{},"callsign":"BRF-WRAP-AT-CAP"}
+{"file":"2026-10-09-brief-complete-blocks.md","date":"2026-10-09","status":"rejected","summary":"The viewport holds complete blocks — cut at boundaries, in the printer and the frame","meta":{},"callsign":"BRF-COMPLETE-BLOCKS"}
 {"file":"2026-10-09-brief-paper-rung.md","date":"2026-10-09","status":"done","summary":"The paper rung — the same render, printed","meta":{},"callsign":"BRF-PAPER-RUNG"}
+{"file":"2026-10-10-brief-amp-cell.md","date":"2026-10-10","status":"rejected","summary":"The state cell derives — a status change reaches the table","meta":{},"callsign":"BRF-AMP-CELL"}
 {"file":"2026-10-10-brief-boundary-mark.md","date":"2026-10-10","status":"done","summary":"The boundary mark — the receipt elides the addresses the cap never realised","meta":{},"callsign":"BRF-BOUNDARY-MARK"}
 {"file":"2026-10-10-brief-history-preface.md","date":"2026-10-10","status":"done","summary":"The header is Date and Status — the history preface and the TD field, out","meta":{},"callsign":"BRF-HISTORY-PREFACE"}
+{"file":"2026-10-10-brief-leak-fence.md","date":"2026-10-10","status":"rejected","summary":"The leak gate's fence exemption — anchor on the source, not a rendered match","meta":{},"callsign":"BRF-LEAK-FENCE"}
 {"file":"2026-10-10-brief-protocol-update.md","date":"2026-10-10","status":"done","summary":"The protocol update — self-contained documents, and a deploy that crosses the seam honestly","meta":{},"callsign":"BRF-PROTOCOL-UPDATE"}
+{"file":"2026-10-10-brief-read-actuator.md","date":"2026-10-10","status":"rejected","summary":"The speech actuator — 77 calls the speech function","meta":{},"callsign":"BRF-READ-ACTUATOR"}
+{"file":"2026-10-10-brief-render-defects.md","date":"2026-10-10","status":"rejected","summary":"Render defects — the stack map's four findings, and how they stop recurring","meta":{},"callsign":"BRF-RENDER-DEFECTS"}
 {"file":"2026-10-10-brief-seam-audit.md","date":"2026-10-10","status":"done","summary":"The seam audit — the input path, where a run was mistaken for a spelling","meta":{},"callsign":"BRF-SEAM-AUDIT"}
 {"file":"2026-10-10-brief-table-gutter.md","date":"2026-10-10","status":"rejected","summary":"The table's gutter — the separator is chrome, and the cap pays for it","meta":{},"callsign":"BRF-TABLE-GUTTER"}
 {"file":"2026-10-12-brief-code-silcrows.md","date":"2026-10-12","status":"done","summary":"Code-comment silcrows — a rendered code file is a document for its prose","meta":{},"callsign":"BRF-CODE-SILCROWS"}
 {"file":"2026-10-12-brief-table-glass-fit.md","date":"2026-10-12","status":"done","summary":"Table fit — wrap to the glass, elide only the floor","meta":{},"callsign":"BRF-TABLE-GLASS-FIT"}
+{"file":"2026-10-13-brief-align-across-tables.md","date":"2026-10-13","status":"rejected","summary":"The align meta is misattributed across tables — a later table un-aligns an earlier one","meta":{},"callsign":"BRF-ALIGN-ACROSS-TABLES"}
 {"file":"2026-10-13-brief-table-slot-instrument.md","date":"2026-10-13","status":"done","summary":"The slot instrument — the table's columns made observable, and header/body alignment pinned","meta":{},"callsign":"BRF-TABLE-SLOT-INSTRUMENT"}
 {"file":"2026-10-14-brief-idea-ledger.md","date":"2026-10-14","status":"done","summary":"Close the funnel — the idea ledger, and the record's linkage","meta":{},"callsign":"BRF-IDEA-LEDGER"}
 {"file":"2026-10-14-brief-retire-okudagram.md","date":"2026-10-14","status":"done","summary":"Retire the okudagram term — the render, the frame, and the diagram","meta":{},"callsign":"BRF-RETIRE-OKUDAGRAM"}

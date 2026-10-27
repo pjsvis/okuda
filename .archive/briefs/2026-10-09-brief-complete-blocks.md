@@ -6,7 +6,7 @@ callsign: BRF-COMPLETE-BLOCKS
 # Brief: The viewport holds complete blocks — cut at boundaries, in the printer and the frame
 
 **Date:** 2026-10-09
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted, so it can be **replundered** if the need returns; the idea is not being judged, only the queue position.
 **TD:** (to create when claimed)
 
 ## The rule, in one line

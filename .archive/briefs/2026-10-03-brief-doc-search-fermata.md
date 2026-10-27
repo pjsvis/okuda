@@ -6,7 +6,7 @@ callsign: BRF-DOC-SEARCH-FERMATA
 # Brief: The doc→search fermata — a held frame at the reading/searching boundary
 
 **Date:** 2026-10-03
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted, so it can be **replundered** if the need returns; the idea is not being judged, only the queue position.
 **TD:** (to create)
 
 ## Lineage

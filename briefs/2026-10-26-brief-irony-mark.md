@@ -9,6 +9,7 @@ date: 2026-10-26
 **Date:** 2026-10-26
 **Status:** Ready — specified, not started. The glyph choice is the operator's (*"its got
 to be U+2E2E"*); the colour choice is measured below. Nothing in `src/` has changed.
+**Supersedes:** `BRF-STATE-GLYPH-2` — refused 2026-10-27 rather than extended. This brief closes the vocabulary at four states and moves the parked mark; it does not grow the set.
 **Refuses:** a fifth state and a "doubted" state — the renderer's state set stays
 four, and the `⸮ → ‽ → !` sequence is a **presentation device**, not machine state.
 Also refuses re-rendering the two receipt uses of `⋮`: they are elision, which is

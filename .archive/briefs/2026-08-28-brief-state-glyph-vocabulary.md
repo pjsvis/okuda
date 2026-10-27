@@ -6,7 +6,7 @@ callsign: BRF-STATE-GLYPH-2
 # Brief: State-glyph vocabulary — colour + bold, the closed lexicon
 
 **Date:** 2026-08-28
-**Status:** Open (dogfood-fired; the glyphs are plain text today, colourless)
+**Status:** Rejected — 2026-10-27, the operator's call: **superseded by `BRF-IRONY-MARK`**, which refuses this vocabulary rather than extending it. The glyph set stays four; the parked state's mark is the irony mark in aubergine. Archived, and replunderable if the vocabulary ever needs reopening.
 **Branch:** feat/gloam-launcher
 
 ## Context

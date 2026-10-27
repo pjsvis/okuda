@@ -7,10 +7,7 @@
 {"file":"2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md","date":"2026-08-28","status":"parked","summary":"Inline Ask-the-Doc and Local SSH Transport","meta":{},"callsign":"BRF-AI-DOC"}
 {"file":"2026-08-28-brief-oklch-tuning.md","date":"2026-08-28","status":"open","summary":"OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling","meta":{},"callsign":"BRF-OKLCH-TUNING"}
 {"file":"2026-08-28-brief-ssh-served-dynamic-markdown-portal.md","date":"2026-08-28","status":"parked","summary":"2026-08-28-brief-ssh-served-dynamic-markdown-portal","meta":{},"callsign":"BRF-SSH-SERVED-2"}
-{"file":"2026-08-28-brief-state-glyph-vocabulary.md","date":"2026-08-28","status":"open","summary":"State-glyph vocabulary — colour + bold, the closed lexicon","meta":{},"callsign":"BRF-STATE-GLYPH-2"}
 {"file":"2026-08-29-audio-style-guide.md","date":"2026-08-29","status":"open","summary":"Audio-First Style Guide and Linting Heuristics","meta":{},"callsign":"BRF-AUDIO-STYLE"}
-{"file":"2026-08-29-brief-resticted-grammar-speech.md","date":"2026-08-29","status":"open","summary":"Okuda Markdown AST to W3C SSML Mapping Investigation","meta":{},"callsign":"BRF-RESTICTED-GRAMMAR"}
-{"file":"2026-08-29-brief-terminal-speech.md","date":"2026-08-29","status":"open","summary":"Terminal Speech Pipeline Easter Egg","meta":{},"callsign":"BRF-TERMINAL-SPEECH"}
 {"file":"2026-09-02-brief-scroll-region-repaint.md","date":"2026-09-02","status":"open","summary":"One line per scroll — scroll-region repaint for the TUI","meta":{},"callsign":"BRF-SCROLL-REPAINT"}
 {"file":"2026-09-06-brief-concordance-prefilter.md","date":"2026-09-06","status":"open","summary":"The concordance pre-filter — `|`, `!`, and case at the silo's seam","meta":{},"callsign":"BRF-CONCORDANCE-PREFILTER"}
 {"file":"2026-09-06-brief-tts-dogfood.md","date":"2026-09-06","status":"open","summary":"Coupled-frame TTS dogfood (mac `say`)","meta":{},"callsign":"BRF-TTS-DOGFOOD"}
@@ -34,17 +31,8 @@
 {"file":"2026-09-30-brief-television-preview.md","date":"2026-09-30","status":"parked","summary":"Television Preview — okuda as the renderer, OKUDA_WIDTH as the width knob","meta":{},"callsign":"BRF-TELEVISION-PREVIEW"}
 {"file":"2026-10-01-brief-reading-fraction.md","date":"2026-10-01","status":"open","summary":"The reading fraction — a meter for the glass, from the state the glass already holds","meta":{},"callsign":"BRF-READING-FRACTION"}
 {"file":"2026-10-02-brief-demo-sandbox.md","date":"2026-10-02","status":"parked","summary":"The public demo room — two access modes, one sandbox grammar","meta":{},"callsign":"BRF-DEMO-SANDBOX"}
-{"file":"2026-10-03-brief-doc-search-fermata.md","date":"2026-10-03","status":"open","summary":"The doc→search fermata — a held frame at the reading/searching boundary (BRF-DOC-SEARCH-FERMATA)","meta":{},"callsign":"BRF-DOC-SEARCH-FERMATA"}
-{"file":"2026-10-04-brief-sticky-heading-stepper.md","date":"2026-10-04","status":"open","summary":"The sticky-heading pager — step through a document section by section, heading as anchor, never truncate (BRF-STICKY-HEADING-STEPPER)","meta":{},"callsign":"BRF-STICKY-HEADING-STEPPER"}
-{"file":"2026-10-08-brief-silo-lexicon.md","date":"2026-10-08","status":"open","summary":"Gather the silo's terms of art into `conceptual-lexicon.md`","meta":{},"callsign":"BRF-SILO-LEXICON"}
-{"file":"2026-10-09-brief-complete-blocks.md","date":"2026-10-09","status":"open","summary":"The viewport holds complete blocks — cut at boundaries, in the printer and the frame","meta":{},"callsign":"BRF-COMPLETE-BLOCKS"}
 {"file":"2026-10-09-brief-docs-ledger.md","date":"2026-10-09","status":"open","summary":"The docs/ ledger — a prune ledger, not a registry","meta":{},"callsign":"BRF-DOCS-LEDGER"}
-{"file":"2026-10-10-brief-amp-cell.md","date":"2026-10-10","status":"open","summary":"The state cell derives — a status change reaches the table","meta":{},"callsign":"BRF-AMP-CELL"}
 {"file":"2026-10-10-brief-commission-blandings.md","date":"2026-10-10","status":"open","summary":"Commission the Blandings silo — and the procedure that makes the next one routine","meta":{},"callsign":"BRF-COMMISSION-BLANDINGS"}
-{"file":"2026-10-10-brief-leak-fence.md","date":"2026-10-10","status":"open","summary":"The leak gate's fence exemption — anchor on the source, not a rendered match","meta":{},"callsign":"BRF-LEAK-FENCE"}
-{"file":"2026-10-10-brief-read-actuator.md","date":"2026-10-10","status":"open","summary":"Read actuator — the current document, handed to the voice","meta":{},"callsign":"BRF-READ-ACTUATOR"}
-{"file":"2026-10-10-brief-render-defects.md","date":"2026-10-10","status":"open","summary":"Render defects — the stack map's four findings, and how they stop recurring","meta":{},"callsign":"BRF-RENDER-DEFECTS"}
-{"file":"2026-10-13-brief-align-across-tables.md","date":"2026-10-13","status":"open","summary":"The align meta is misattributed across tables — a later table un-aligns an earlier one","meta":{},"callsign":"BRF-ALIGN-ACROSS-TABLES"}
 {"file":"2026-10-14-brief-principal-and-clerk.md","date":"2026-10-14","status":"open","summary":"The principal and the clerk — the three-way triage","meta":{},"callsign":"BRF-PRINCIPAL-CLERK"}
 {"file":"2026-10-16-brief-search-row.md","date":"2026-10-16","status":"open","summary":"The search row — the contract, frozen by the probe","meta":{},"callsign":"BRF-SEARCH-ROW"}
 {"file":"2026-10-21-brief-authoring-convention.md","date":"2026-10-21","status":"open","summary":"Authoring Convention — Route Agents to the Style Guide","meta":{},"callsign":"BRF-AUTHORING-CONVENTION"}

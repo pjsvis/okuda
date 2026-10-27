@@ -6,7 +6,7 @@ callsign: BRF-READ-ACTUATOR
 # Brief: The speech actuator — 77 calls the speech function
 
 **Date:** 2026-10-10
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted, so it can be **replundered** if the need returns; the idea is not being judged, only the queue position.
 **TD:** (epic tracked by callsign)
 
 ## Context

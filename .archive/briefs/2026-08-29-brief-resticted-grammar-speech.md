@@ -6,7 +6,7 @@ callsign: BRF-RESTICTED-GRAMMAR
 # Brief: Okuda Markdown AST to W3C SSML Mapping Investigation
 
 **Date:** 2026-08-29
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted, so it can be **replundered** if the need returns; the idea is not being judged, only the queue position.
 
 ---
 

@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**54 live · 103 archived · 120 tabled** — 0 to move · 0 disagreeing · 0 phantom · 3 editorial · 17 silent · 1 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**42 live · 115 archived · 120 tabled** — 0 to move · 0 disagreeing · 0 phantom · 2 editorial · 5 silent · 1 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -10,7 +10,7 @@
 
 Listed, never gated: the glyph cell is the editor's surface. If a mark here is meant to *mean* a status, map it in `amp-briefs.ts` so the reconciliation can read it.
 
-- **`◆ partial`** — 2 briefs: BRF-STATE-GLYPH-2 (open) · BRF-OKLCH-TUNING (open)
+- **`◆ partial`** — 1 brief: BRF-OKLCH-TUNING (open)
 - **`◆ feasibility ✓`** — 1 brief: BRF-SSH-SERVED (parked)
 
 ### Silent — no ticket, no citation, live
@@ -21,18 +21,6 @@ Nothing waits on these and no Thing records them. The question per row is **what
 |---|---|---|
 | BRF-ARTPACK-AESTHETICS | 60d | Plundered artpack aesthetics & high-SNR dark terminal rend |
 | BRF-DENSE-DYNAMIC | 60d | Dense terminal visual primitives for dynamic telemetry |
-| BRF-STATE-GLYPH-2 | 59d | State-glyph vocabulary — colour + bold, the closed lexicon |
-| BRF-RESTICTED-GRAMMAR | 58d | Okuda Markdown AST to W3C SSML Mapping Investigation |
-| BRF-TERMINAL-SPEECH | 58d | Terminal Speech Pipeline Easter Egg |
-| BRF-DOC-SEARCH-FERMATA | 23d | The doc→search fermata — a held frame at the reading/searc |
-| BRF-STICKY-HEADING-STEPPER | 22d | The sticky-heading pager — step through a document section |
-| BRF-SILO-LEXICON | 18d | Gather the silo's terms of art into `conceptual-lexicon.md |
-| BRF-COMPLETE-BLOCKS | 17d | The viewport holds complete blocks — cut at boundaries, in |
-| BRF-AMP-CELL | 16d | The state cell derives — a status change reaches the table |
-| BRF-LEAK-FENCE | 16d | The leak gate's fence exemption — anchor on the source, no |
-| BRF-READ-ACTUATOR | 16d | Read actuator — the current document, handed to the voice |
-| BRF-RENDER-DEFECTS | 16d | Render defects — the stack map's four findings, and how th |
-| BRF-ALIGN-ACROSS-TABLES | 13d | The align meta is misattributed across tables — a later ta |
 | BRF-SEARCH-ROW | 10d | The search row — the contract, frozen by the probe |
 | BRF-PROBES-TIER | 5d | Establish Registered `probes/` Tier for Exploratory Python |
 | BRF-IRONY-MARK | 0d | The irony mark takes the parked state, and the vertical el |
@@ -69,8 +57,8 @@ actuate the amber vector to dereference, `u` unwinds, `99` promotes.
 | BRF-AI-DOC | ↓ parked | inline ask-the-doc, local SSH | — |
 | BRF-ARTPACK-AESTHETICS | · open | high-SNR dark rendering | — |
 | BRF-AUDIO-STYLE | · open | audio-first style guide + lint | — |
-| BRF-RESTICTED-GRAMMAR | · open | AST → SSML mapping | — |
-| BRF-TERMINAL-SPEECH | · open | speech pipeline easter egg | — |
+| BRF-RESTICTED-GRAMMAR | ✗ rejected | AST → SSML mapping — registry: rejected, archived | — |
+| BRF-TERMINAL-SPEECH | ✗ rejected | speech pipeline easter egg — registry: rejected, archived | — |
 | BRF-SCROLL-REPAINT | · open | one line per scroll — scroll-region repaint for the TUI | — |
 | BRF-CONCORDANCE-PREFILTER | · open | the concordance pre-filter — the pipe, the bang, and case at the seam | — |
 | BRF-TTS-DOGFOOD | · open | coupled-frame TTS dogfood (mac say) | — |
@@ -95,25 +83,25 @@ actuate the amber vector to dereference, `u` unwinds, `99` promotes.
 | BRF-FENCE-DISCIPLINE | ✗ rejected | one fence rule — five scanners — registry: rejected, archived | — |
 | BRF-READING-FRACTION | · open | a meter for the glass, from state the glass already holds | — |
 | BRF-DEMO-SANDBOX | ↓ parked | the public demo room — two access modes, one grammar | — |
-| BRF-DOC-SEARCH-FERMATA | · open | a held frame at the reading/searching boundary | — |
-| BRF-STICKY-HEADING-STEPPER | · open | step by section, heading as anchor, never truncate | — |
+| BRF-DOC-SEARCH-FERMATA | ✗ rejected | a held frame at the reading/searching boundary — registry: rejected, archived | — |
+| BRF-STICKY-HEADING-STEPPER | ✗ rejected | step by section, heading as anchor, never truncate — registry: rejected, archived | — |
 | BRF-AST-PROSODY | ✗ rejected | AST to prosody — the intermediate representation — registry: rejected, archived | — |
 | BRF-KINDLE-PORCH | ✗ rejected | the silo on an e-ink glass, over ssh, nothing on the device — registry: rejected, archived | — |
 | BRF-FRAME-INDEX | ✗ rejected | an address two parties can both name — registry: rejected, archived | — |
 | BRF-DOCUMENT-LIFECYCLE | ✓ landed | ephemeral, record, addressed, retired (in review) — registry: done, archived | — |
 | BRF-REG-CLI | ✗ rejected | the silo maintenance CLI, one entry point — registry: rejected, archived | — |
 | BRF-REGISTRY-DISCOVERY | ✗ rejected | one map from the territory — the registry discovers its tiers — registry: rejected, archived | — |
-| BRF-SILO-LEXICON | · open | gather the silo's terms of art | — |
-| BRF-COMPLETE-BLOCKS | · open | the viewport holds complete blocks — cut at boundaries | — |
+| BRF-SILO-LEXICON | ✗ rejected | gather the silo's terms of art — registry: rejected, archived | — |
+| BRF-COMPLETE-BLOCKS | ✗ rejected | the viewport holds complete blocks — cut at boundaries — registry: rejected, archived | — |
 | BRF-DOCS-LEDGER | · open | a prune ledger, not a registry | — |
 | BRF-COMMISSION-BLANDINGS | · open | commission the Blandings silo, and the procedure | — |
-| BRF-READ-ACTUATOR | · open | 77 calls the speech function (epic) | — |
-| BRF-RENDER-DEFECTS | · open | the stack map's four findings (epic) | — |
+| BRF-READ-ACTUATOR | ✗ rejected | 77 calls the speech function (epic) — registry: rejected, archived | — |
+| BRF-RENDER-DEFECTS | ✗ rejected | the stack map's four findings (epic) — registry: rejected, archived | — |
 | BRF-BOUNDARY-MARK | ✓ landed | The boundary mark — the receipt elides the addresses the cap never realised — registry: done, archived | — |
-| BRF-AMP-CELL | · open | The state cell derives — a status change reaches the table | — |
+| BRF-AMP-CELL | ✗ rejected | The state cell derives — a status change reaches the table — registry: rejected, archived | — |
 | BRF-HISTORY-PREFACE | ✓ landed | the header is Date + Status — the history preface and the `TD` field out, with a lint for both — registry: done, archived | — |
-| BRF-LEAK-FENCE | · open | The leak gate's fence exemption — anchor on the source, not a rendered match | — |
-| BRF-ALIGN-ACROSS-TABLES | · open | The align meta is misattributed across tables — a later table un-aligns an earlier one | — |
+| BRF-LEAK-FENCE | ✗ rejected | The leak gate's fence exemption — anchor on the source, not a rendered match — registry: rejected, archived | — |
+| BRF-ALIGN-ACROSS-TABLES | ✗ rejected | The align meta is misattributed across tables — a later table un-aligns an earlier one — registry: rejected, archived | — |
 | BRF-PRINCIPAL-CLERK | · open | The principal and the clerk — the three-way triage | — |
 | BRF-SEARCH-ROW | · open | The search row — the contract, frozen by the probe | — |
 | BRF-DARWIN-CLOSE-OUT | · open | The darwin close-out — turn one promise into a measurement, and stop two paths guessing | — |
@@ -136,7 +124,7 @@ actuate the amber vector to dereference, `u` unwinds, `99` promotes.
 | BRF-MERMAID-HARD | ✗ rejected | CSN diagnostics landed; boundary machine pending — registry: rejected, archived | — |
 | BRF-JUMP-DEMO | ✗ rejected | demo + honesty pass — registry: rejected, archived | — |
 | BRF-STATE-GLYPH | ✓ landed | render path + showcase environment — registry: done, archived | — |
-| BRF-STATE-GLYPH-2 | ◆ partial | vocabulary — closed lexicon | — |
+| BRF-STATE-GLYPH-2 | ✗ rejected | vocabulary — closed lexicon — registry: rejected, archived | — |
 | BRF-OKLCH-TUNING | ◆ partial | td-b4bae8 ready-to-start | — |
 | BRF-PAGED-OKUDAGRAM | ✓ landed | the frame — a portioning rule — registry: done, archived | — |
 | BRF-TTY-REVERSE | ✗ rejected | land at the top — registry: rejected, archived | — |

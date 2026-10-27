@@ -15,26 +15,35 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-10-22 | BRF-TOOLCHAIN-TRUTH | done | Four claims that could not prove themselves | 2026-10-22-brief-toolchain-truth.md |
 | 2026-10-14 | BRF-IDEA-LEDGER | done | Close the funnel — the idea ledger, and the record's linkage | 2026-10-14-brief-idea-ledger.md |
 | 2026-10-14 | BRF-RETIRE-OKUDAGRAM | done | Retire the okudagram term — the render, the frame, and the diagram | 2026-10-14-brief-retire-okudagram.md |
+| 2026-10-13 | BRF-ALIGN-ACROSS-TABLES | rejected | The align meta is misattributed across tables — a later table un-aligns an earlier one | 2026-10-13-brief-align-across-tables.md |
 | 2026-10-13 | BRF-TABLE-SLOT-INSTRUMENT | done | The slot instrument — the table's columns made observable, and header/body alignment pinned | 2026-10-13-brief-table-slot-instrument.md |
 | 2026-10-12 | BRF-CODE-SILCROWS | done | Code-comment silcrows — a rendered code file is a document for its prose | 2026-10-12-brief-code-silcrows.md |
 | 2026-10-12 | BRF-TABLE-GLASS-FIT | done | Table fit — wrap to the glass, elide only the floor | 2026-10-12-brief-table-glass-fit.md |
+| 2026-10-10 | BRF-AMP-CELL | rejected | The state cell derives — a status change reaches the table | 2026-10-10-brief-amp-cell.md |
 | 2026-10-10 | BRF-BOUNDARY-MARK | done | The boundary mark — the receipt elides the addresses the cap never realised | 2026-10-10-brief-boundary-mark.md |
 | 2026-10-10 | BRF-HISTORY-PREFACE | done | The header is Date and Status — the history preface and the TD field, out | 2026-10-10-brief-history-preface.md |
+| 2026-10-10 | BRF-LEAK-FENCE | rejected | The leak gate's fence exemption — anchor on the source, not a rendered match | 2026-10-10-brief-leak-fence.md |
 | 2026-10-10 | BRF-PROTOCOL-UPDATE | done | The protocol update — self-contained documents, and a deploy that crosses the seam honestly | 2026-10-10-brief-protocol-update.md |
+| 2026-10-10 | BRF-READ-ACTUATOR | rejected | The speech actuator — 77 calls the speech function | 2026-10-10-brief-read-actuator.md |
+| 2026-10-10 | BRF-RENDER-DEFECTS | rejected | Render defects — the stack map's four findings, and how they stop recurring | 2026-10-10-brief-render-defects.md |
 | 2026-10-10 | BRF-SEAM-AUDIT | done | The seam audit — the input path, where a run was mistaken for a spelling | 2026-10-10-brief-seam-audit.md |
 | 2026-10-10 | BRF-TABLE-GUTTER | rejected | The table's gutter — the separator is chrome, and the cap pays for it | 2026-10-10-brief-table-gutter.md |
+| 2026-10-09 | BRF-COMPLETE-BLOCKS | rejected | The viewport holds complete blocks — cut at boundaries, in the printer and the frame | 2026-10-09-brief-complete-blocks.md |
 | 2026-10-09 | BRF-PAPER-RUNG | done | The paper rung — the same render, printed | 2026-10-09-brief-paper-rung.md |
 | 2026-10-08 | BRF-DATE-INVARIANT | done | The date is a claim — the invariant, the lint, and the time document | 2026-10-08-brief-date-invariant.md |
 | 2026-10-08 | BRF-DOCUMENT-LIFECYCLE | done | The document lifecycle — ephemeral, record, addressed, retired | 2026-10-08-brief-document-lifecycle.md |
 | 2026-10-08 | BRF-REG-CLI | rejected | `reg` — the silo maintenance CLI, one entry point, one artifact | 2026-10-08-brief-reg-cli.md |
 | 2026-10-08 | BRF-REGISTRY-DISCOVERY | rejected | One map from the territory — the registry discovers its own tiers | 2026-10-08-brief-registry-discovery.md |
+| 2026-10-08 | BRF-SILO-LEXICON | rejected | Gather the silo's terms of art into `conceptual-lexicon.md` | 2026-10-08-brief-silo-lexicon.md |
 | 2026-10-08 | BRF-WRAP-AT-CAP | done | Wrap at the cap — the third branch | 2026-10-08-brief-wrap-at-cap.md |
 | 2026-10-07 | BRF-FRAME-INDEX | rejected | The frame index — an address two parties can both name | 2026-10-07-brief-frame-index.md |
 | 2026-10-07 | BRF-TABLE-LADDER | rejected | The band and the ladder — the table fit, from a design width of 80 | 2026-10-07-brief-table-allocator-ladder.md |
 | 2026-10-06 | BRF-KINDLE-PORCH | rejected | The Kindle porch — the silo on an e-ink glass, over ssh, nothing on the device | 2026-10-06-brief-kindle-porch.md |
 | 2026-10-05 | BRF-AST-PROSODY | rejected | AST-to-Prosody Intermediate Representation for Speech Rendering | 2026-10-05-brief-ast-to-prosody-unsloth.md |
+| 2026-10-04 | BRF-STICKY-HEADING-STEPPER | rejected | The sticky-heading stepper — walk a document frame by frame, heading as anchor | 2026-10-04-brief-sticky-heading-stepper.md |
 | 2026-10-03 | BRF-ARCHIVE-RESOLUTION | done | The archive resolution tier — citations must survive the archive move | 2026-10-03-brief-archive-resolution-tier.md |
 | 2026-10-03 | BRF-DIAGRAM-DESCRIBE | rejected | Prose descriptions of mermaid diagrams via an external binary | 2026-10-03-brief-diagram-describe.md |
+| 2026-10-03 | BRF-DOC-SEARCH-FERMATA | rejected | The doc→search fermata — a held frame at the reading/searching boundary | 2026-10-03-brief-doc-search-fermata.md |
 | 2026-10-03 | BRF-HEADING-ANSI-STRIP | done | Strip ANSI from heading children — the heading role owns every byte of colour | 2026-10-03-brief-heading-ansi-strip.md |
 | 2026-10-02 | BRF-CALLSIGN-CHECKSUM | done | The callsign checksum — citations that resolve nowhere fail the gate | 2026-10-02-brief-callsign-checksum.md |
 | 2026-10-02 | BRF-ROOT-CONTAINMENT | done | Root containment — existence is not permission | 2026-10-02-brief-root-containment.md |
@@ -76,6 +85,8 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-29 | BRF-MENU-TEMPLATES | rejected | Menu templates (deferred — fires on the second menu kind) | 2026-08-29-brief-menu-templates-deferred.md |
 | 2026-08-29 | BRF-OKF-CALLSIGN | done | OKF conformance migration and the callsign layer | 2026-08-29-brief-okf-callsign-migration.md |
 | 2026-08-29 | BRF-PAGED-OKUDAGRAM | done | The okudagram frame — a portioning rule | 2026-08-29-brief-okudagram-frame.md |
+| 2026-08-29 | BRF-RESTICTED-GRAMMAR | rejected | Okuda Markdown AST to W3C SSML Mapping Investigation | 2026-08-29-brief-resticted-grammar-speech.md |
+| 2026-08-29 | BRF-TERMINAL-SPEECH | rejected | Terminal Speech Pipeline Easter Egg | 2026-08-29-brief-terminal-speech.md |
 | 2026-08-29 | BRF-MERMAID-HARD | rejected | Mermaid Rendering Hard Boundary State Machine (CSN Diagnostics) | 2026-08-29-mermaid-hard-boundary-CSN.md |
 | 2026-08-28 | BRF-ELISION-PRIMITIVE | done | Elision primitive — close ADR-014, fix the code-fence soft-wrap lie | 2026-08-28-brief-elision-primitive.md |
 | 2026-08-28 | BRF-INDEX-JUMP | done | Ephemeral Index Generation and Numeric Jump Navigation | 2026-08-28-brief-index-and-jump.md |
@@ -83,6 +94,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-28 | BRF-LAUNCHER-FUT | done | Launcher FUT — session-scoped alt-screen | 2026-08-28-brief-launcher-fut.md |
 | 2026-08-28 | BRF-NOTIFICATION-STYLE | done | 011-zero-notification-stillness-and-decoupled-inbox-watchers | 2026-08-28-brief-notification-style.md |
 | 2026-08-28 | BRF-STATE-GLYPH | done | State-glyph render path — the showcase environment + first cut | 2026-08-28-brief-state-glyph-render-path.md |
+| 2026-08-28 | BRF-STATE-GLYPH-2 | rejected | State-glyph vocabulary — colour + bold, the closed lexicon | 2026-08-28-brief-state-glyph-vocabulary.md |
 | 2026-08-28 | BRF-SILO-MNEMONICS | rejected | Rooted Gloam — silo badge and document callsigns | 2026-08-28-silo-mnemonics.md |
 | 2026-08-27 | BRF-NECKBEARD-FZF | done | gloam-finder: Wrapper to launch fzf with hardened interactive semantics | 2026-08-27-brief-neckbeard-fzf-assimilation.md |
 | 2026-08-27 | BRF-PANEL-LIBRARY | rejected | The Panel Library — Chunk-Addressable Okudagrams | 2026-08-27-brief-panel-library.md |
