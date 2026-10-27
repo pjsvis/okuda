@@ -64,7 +64,11 @@ Read that paragraph twice — once for the glyphs' plain shape today, once imagi
 
 ## The ANSI bytes — what the renderer should emit
 
-The contract test pins these byte-exactly. This code fence is the on-screen-now exhibit of what `styleStateGlyph` will emit for each glyph under truecolor — colour + bold in one SGR sequence:
+The exhibit is painted above and in the tables, because those are ordinary prose and the
+renderer colours them. The fence below is the **bytes quoted**, and a fence is code:
+nothing inside it is painted, so every glyph there reads in the code colour — a property
+of the fence, not of the glyph. The contract test pins these byte-exactly: colour + bold
+in one SGR sequence.
 
 ```text
 state-ok     ✓   \x1b[38;2;95;211;95;1m✓\x1b[0m      green + bold

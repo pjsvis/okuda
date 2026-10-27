@@ -46,9 +46,19 @@ meaning. (The ADR-015 invariant, extended.)
 
 ## The ANSI bytes (the contract the test pins)
 
-The contract test asserts these byte-exactly. This code fence is the
-on-screen-now exhibit of what the renderer emits for each glyph under
-truecolor — colour + bold in one SGR:
+The exhibit, painted — these four lines are ordinary prose, so the
+renderer colours them as it colours any standalone state glyph:
+
+✓ shipped · ☐ pending · ⸮ parked · ✗ refused
+
+Below is the **same thing quoted as bytes**, and a fence is code: nothing
+inside it is painted, so every glyph there reads in the code colour. That
+is a property of the fence, not of the glyph — a distinction worth making
+because this fence used to call itself "the on-screen-now exhibit", and a
+reader looking for the irony mark found it white and reasonably called it a
+bug. The glyph's colour is the line above; the bytes are here.
+
+The contract test asserts these byte-exactly — colour + bold in one SGR:
 
 ```text
 state-ok     ✓   \x1b[38;2;95;211;95;1m✓\x1b[0m      green + bold
