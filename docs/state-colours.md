@@ -10,7 +10,7 @@ The live rendered exhibit of the state-glyph vocabulary, in the wild, inside the
 |-------|-------|------|------|
 | ✓ | done / shipped | `state-ok` | recede (expected) |
 | ☐ | todo / pending | `state-todo` | watch (forward-looking) |
-| ⸮ | parked — a comment on the plan | `state-parked` | commentary (aubergine) |
+| ⸮ | parked — a comment on the plan | `state-parked` | commentary — `#a06fa8` (aubergine) |
 | ✗ | rejected / failed | `state-failed` | alarm (= `alert`) |
 | ◆ | load-bearing | — (heading/strong) | priority, not state |
 

@@ -119,7 +119,7 @@ function addressLine(children: string, ctx: Ctx): string | null {
  *  discipline to the full traffic lamp. ◆ is NOT here — priority, not
  *  state; colouring it would collapse two axes. (brief:
  *  state-glyph-render-path.) */
-const STATE_GLYPH_ROLE: Record<string, keyof Palette> = {
+export const STATE_GLYPH_ROLE: Record<string, keyof Palette> = {
   "\u2713": "state-ok",      // ✓ done/shipped — green
   "\u2610": "state-todo",    // ☐ todo/pending — yellow
   // ⸮ U+2E2E, the irony mark: the one state that is a *comment* on the plan rather

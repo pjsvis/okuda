@@ -63,7 +63,7 @@ The contract test asserts these byte-exactly — colour + bold in one SGR:
 ```text
 state-ok     ✓   \x1b[38;2;95;211;95;1m✓\x1b[0m      green + bold
 state-todo   ☐   \x1b[38;2;255;224;102;1m☐\x1b[0m    yellow + bold
-state-parked  ⸮   \x1b[38;2;160;111;168;1m⸮\x1b[0m     aubergine + bold
+state-parked ⸮   \x1b[38;2;160;111;168;1m⸮\x1b[0m     aubergine + bold
 state-failed ✗   \x1b[38;2;255;85;85;1m✗\x1b[0m      red + bold  (= alert)
 ```
 
