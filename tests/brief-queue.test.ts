@@ -58,6 +58,17 @@ describe("brief-queue — the reading", () => {
     expect(out).toContain("Silence is a judgement");
   });
 
+  test("a pipe in prose does not end the row", () => {
+    // The corpus writes `|` constantly — a shell grammar, a table, a probe. An
+    // unescaped one turns a generated row into two broken cells.
+    const b = { ...row("BRF-A"), summary: "the `|`, `!`, and case at the silo" };
+    const out = renderRegion({ ...base, silent: [b], ticketed: [b] });
+    for (const line of out.split("\n").filter((l) => l.startsWith("| BRF-A"))) {
+      const cells = line.split(/(?<!\\)\|/).length - 2; // leading + trailing pipes
+      expect(cells).toBe(3);
+    }
+  });
+
   test("an editorial glyph is listed apart from a contradiction", () => {
     const out = renderRegion({ ...base, editorial: [{ callsign: "BRF-B", glyph: "◆", status: "open" }] });
     expect(out).toContain("Editorial glyphs");

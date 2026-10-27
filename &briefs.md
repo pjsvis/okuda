@@ -1,27 +1,9 @@
 # &briefs — the state table
 
-Every brief, grouped by *assessed* state (not registry status). Each
-row's callsign is its reference — actuate the amber vector to
-dereference, `u` unwinds, `99` promotes to a new terminal. Debrief
-paths linked where a debrief exists — 7 of 16 debriefs have no brief
-counterpart (infra and theme work that never briefed; listed at the
-bottom).
-
-Built 2026-08-30; amended 2026-09-04 (the wiring retired — references
-are text; the shortlist landed; the porch and working-copy rows added);
-amended 2026-09-30 (the step-inventory row — assessed `· open`, the
-epic's logs are empty); amended 2026-10-04 (the diagram-describe row —
-assessed `· open`, its render-path design refused); amended 2026-10-10
-(the ledger reconciliation — the row set is derived: `just amp-regen`
-appends any live brief the table is missing to its status's section, and
-`just amp` fails while one is unfiled).
-Editorial surface: the **sections and notes** are the editor's; the
-**membership** is the registry's — ADR-DERIVED-AMP-TABLE-058.
-
-_Order: **decisions first, history last**. The queue is the top of the file
-because a table you have to scroll to the bottom of is a table you stop
-deciding from. Membership is the registry's; the sections and notes are the
-editor's (`ADR-DERIVED-AMP-TABLE-058`)._
+**Decisions first, history last** — a table you have to scroll to the bottom of is a
+table you stop deciding from. Rows and their states are the registry's; sections and
+notes are the editor's (`ADR-DERIVED-AMP-TABLE-058`). A row's callsign is its
+reference: actuate the amber vector to dereference, `u` unwinds, `99` promotes.
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
@@ -33,7 +15,13 @@ editor's (`ADR-DERIVED-AMP-TABLE-058`)._
 
 Listed, never gated: the glyph cell is the editor's surface. If a mark here is meant to *mean* a status, map it in `amp-briefs.ts` so the reconciliation can read it.
 
-BRF-MERMAID-HARD `◆` (open) · BRF-JUMP-DEMO `◆` (open) · BRF-STATE-GLYPH-2 `◆` (open) · BRF-OKLCH-TUNING `◆` (open) · BRF-SSH-SERVED `◆` (parked)
+| brief | glyph | registry says |
+|---|---|---|
+| BRF-JUMP-DEMO | `◆` | open |
+| BRF-STATE-GLYPH-2 | `◆` | open |
+| BRF-MERMAID-HARD | `◆` | open |
+| BRF-OKLCH-TUNING | `◆` | open |
+| BRF-SSH-SERVED | `◆` | parked |
 
 ### Silent — no ticket, no citation, live
 
@@ -79,7 +67,12 @@ Nothing waits on these and no Thing records them. The question per row is **what
 
 ### Ticketed, live — the load-bearing set
 
-BRF-CONCORDANCE-PREFILTER
+A row here is the only kind with an owner already: something outside
+this table is waiting on it.
+
+| brief | age | asks |
+|---|---|---|
+| BRF-CONCORDANCE-PREFILTER | 50d | The concordance pre-filter — `\|`, `!`, and case at the sil |
 
 
 <!-- decide:end -->

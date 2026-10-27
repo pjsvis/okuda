@@ -152,6 +152,10 @@ export function report(): Report {
   };
 }
 
+/** A markdown table cell: a pipe inside prose would end the row, and the corpus
+ *  is full of them (shell grammar, table syntax, this very script). Pure. */
+const cell = (s: string): string => s.replace(/\|/g, "\\|");
+
 const age = (date: string): string => {
   if (!date) return "—";
   const d = Math.round((Date.parse("2026-10-26") - Date.parse(date)) / 86_400_000);
@@ -185,7 +189,9 @@ export function renderRegion(r: Report): string {
   if (r.editorial.length) {
     out.push(`\n### Editorial glyphs — the editor's own marks, not comparable to a status\n`);
     out.push(`Listed, never gated: the glyph cell is the editor's surface. If a mark here is meant to *mean* a status, map it in \`amp-briefs.ts\` so the reconciliation can read it.\n`);
-    out.push(r.editorial.map((e) => `${e.callsign} \`${e.glyph}\` (${e.status})`).join(" · "));
+    out.push(`| brief | glyph | registry says |`);
+    out.push(`|---|---|---|`);
+    for (const e of r.editorial) out.push(`| ${e.callsign} | \`${e.glyph}\` | ${e.status} |`);
   }
   if (r.phantom.length) {
     out.push(`\n### Phantom rows — tabled, resolving to nothing\n`);
@@ -198,12 +204,17 @@ export function renderRegion(r: Report): string {
   else {
     out.push(`| brief | age | asks |`);
     out.push(`|---|---|---|`);
-    for (const b of r.silent) out.push(`| ${b.callsign} | ${age(b.date)} | ${b.summary.slice(0, 58)} |`);
+    for (const b of r.silent) out.push(`| ${b.callsign} | ${age(b.date)} | ${cell(b.summary.slice(0, 58))} |`);
   }
 
   out.push(`\n### Ticketed, live — the load-bearing set\n`);
   if (r.ticketed.length === 0) out.push(`_none_`);
-  else out.push(r.ticketed.map((b) => `${b.callsign}`).join(" · "));
+  else {
+    out.push(`A row here is the only kind with an owner already: something outside\nthis table is waiting on it.\n`);
+    out.push(`| brief | age | asks |`);
+    out.push(`|---|---|---|`);
+    for (const b of r.ticketed) out.push(`| ${b.callsign} | ${age(b.date)} | ${cell(b.summary.slice(0, 58))} |`);
+  }
   out.push("");
   return out.join("\n");
 }
@@ -227,11 +238,35 @@ function writeRegion(region: string): void {
   writeFileSync(p, `${head}\n${block}\n${rest}`);
 }
 
+/** The region currently in the document, or null when there is none. Pure. */
+export function regionIn(doc: string): string | null {
+  const i = doc.indexOf(BEGIN);
+  const j = doc.indexOf(END);
+  if (i < 0 || j < 0) return null;
+  return doc.slice(i + BEGIN.length, j);
+}
+
 function main(): void {
   const r = report();
+  const gate = process.argv.includes("--gate");
+  if (gate && existsSync(join(ROOT, DOC))) {
+    const current = regionIn(readFileSync(join(ROOT, DOC), "utf8"));
+    const fresh = ` (derived — do not hand-edit) -->\n\n${renderRegion(r)}\n\n`;
+    if (current !== null && current !== fresh) {
+      console.error("decide: the region is stale — the corpus moved and the table did not. Run `just decide`.");
+      process.exit(1);
+    }
+  }
   if (process.argv.includes("--write")) {
     writeRegion(renderRegion(r));
     console.log(`brief-queue: region written to ${DOC} — ${r.live.length} live · ${r.move.length} to move · ${r.disagree.length} disagreeing · ${r.phantom.length} phantom · ${r.silent.length} silent`);
+  } else if (gate) {
+    // A gate is a verdict, not a reading: the region stands above it in the
+    // document, and forty lines of table in a gate run is noise in a gate run.
+    console.log(
+      `decide: converged — ${r.live.length} live · ${r.move.length} to move · ${r.disagree.length} disagreeing · ` +
+        `${r.phantom.length} phantom · ${r.silent.length} silent (judgement, ungated) · ${r.ticketed.length} ticketed`,
+    );
   } else {
     console.log(renderRegion(r));
   }
