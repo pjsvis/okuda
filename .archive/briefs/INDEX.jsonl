@@ -20,6 +20,8 @@
 {"file":"2026-08-26-brief-in-document-search-and-outlining.md","date":"2026-08-26","status":"rejected","summary":"In-Document Search and Outlining — Fast Navigation in Gloam","meta":{},"callsign":"BRF-DOCUMENT-SEARCH"}
 {"file":"2026-08-26-brief-palette-lightness-knob.md","date":"2026-08-26","status":"rejected","summary":"Palette Lightness Knob — Global Brightness, Hue Preserved (parked)","meta":{},"callsign":"BRF-PALETTE-LIGHTNESS"}
 {"file":"2026-08-26-brief-resize-content-anchor.md","date":"2026-08-26","status":"done","summary":"Resize content-anchor — keep the line under the eye","meta":{},"callsign":"BRF-RESIZE-CONTENT"}
+{"file":"2026-08-26-brief-ssh-blog-feed.md","date":"2026-08-26","status":"rejected","summary":"SSH Blog Feed — the Gopher-Serve v1","meta":{},"callsign":"BRF-SSH-BLOG"}
+{"file":"2026-08-26-brief-ssh-served-markdown.md","date":"2026-08-26","status":"rejected","summary":"SSH-served markdown — option 1 (OpenSSH ForceCommand)","meta":{},"callsign":"BRF-SSH-SERVED"}
 {"file":"2026-08-26-brief-telemetry-conventions.md","date":"2026-08-26","status":"rejected","summary":"Telemetry Conventions — Markdown as Message Bus","meta":{},"callsign":"BRF-TELEMETRY-CONVENTIONS"}
 {"file":"2026-08-26-brief-tty-reverse-print.md","date":"2026-08-26","status":"rejected","summary":"TTY Reverse-Print — Land at the Top","meta":{},"callsign":"BRF-TTY-REVERSE"}
 {"file":"2026-08-26-brief-tui-live-documents.md","date":"2026-08-26","status":"rejected","summary":"TUI live documents — fs.watch → anchored re-render","meta":{},"callsign":"BRF-TUI-LIVE"}
@@ -29,12 +31,14 @@
 {"file":"2026-08-27-brief-fetch-state-stamp.md","date":"2026-08-27","status":"rejected","summary":"Fetch-state stamp — `checked <time>` + changed/same/failed","meta":{},"callsign":"BRF-FETCH-STATE"}
 {"file":"2026-08-27-brief-neckbeard-fzf-assimilation.md","date":"2026-08-27","status":"done","summary":"gloam-finder: Wrapper to launch fzf with hardened interactive semantics","meta":{},"callsign":"BRF-NECKBEARD-FZF"}
 {"file":"2026-08-27-brief-panel-library.md","date":"2026-08-27","status":"rejected","summary":"The Panel Library — Chunk-Addressable Okudagrams","meta":{},"callsign":"BRF-PANEL-LIBRARY"}
+{"file":"2026-08-27-brief-ssh-tui-integration.md","date":"2026-08-27","status":"rejected","summary":"Modern terminal escape protocol integration for SSH TUI delivery","meta":{},"callsign":"BRF-SSH-TUI"}
 {"file":"2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md","date":"2026-08-28","status":"rejected","summary":"Inline Ask-the-Doc and Local SSH Transport","meta":{},"callsign":"BRF-AI-DOC"}
 {"file":"2026-08-28-brief-elision-primitive.md","date":"2026-08-28","status":"done","summary":"Elision primitive — close ADR-014, fix the code-fence soft-wrap lie","meta":{},"callsign":"BRF-ELISION-PRIMITIVE"}
 {"file":"2026-08-28-brief-index-and-jump.md","date":"2026-08-28","status":"done","summary":"Ephemeral Index Generation and Numeric Jump Navigation","meta":{},"callsign":"BRF-INDEX-JUMP"}
 {"file":"2026-08-28-brief-jump-demo-honesty.md","date":"2026-08-28","status":"rejected","summary":"jump-demo honesty — slug derivation + state-glyph signal","meta":{},"callsign":"BRF-JUMP-DEMO"}
 {"file":"2026-08-28-brief-launcher-fut.md","date":"2026-08-28","status":"done","summary":"Launcher FUT — session-scoped alt-screen","meta":{},"callsign":"BRF-LAUNCHER-FUT"}
 {"file":"2026-08-28-brief-notification-style.md","date":"2026-08-28","status":"done","summary":"011-zero-notification-stillness-and-decoupled-inbox-watchers","meta":{},"callsign":"BRF-NOTIFICATION-STYLE"}
+{"file":"2026-08-28-brief-ssh-served-dynamic-markdown-portal.md","date":"2026-08-28","status":"rejected","summary":"SSH-served portal — the ADR-013 Option-2 gate probe","meta":{},"callsign":"BRF-SSH-SERVED-2"}
 {"file":"2026-08-28-brief-state-glyph-render-path.md","date":"2026-08-28","status":"done","summary":"State-glyph render path — the showcase environment + first cut","meta":{},"callsign":"BRF-STATE-GLYPH"}
 {"file":"2026-08-28-brief-state-glyph-vocabulary.md","date":"2026-08-28","status":"rejected","summary":"State-glyph vocabulary — colour + bold, the closed lexicon","meta":{},"callsign":"BRF-STATE-GLYPH-2"}
 {"file":"2026-08-28-silo-mnemonics.md","date":"2026-08-28","status":"rejected","summary":"Rooted Gloam — silo badge and document callsigns","meta":{},"callsign":"BRF-SILO-MNEMONICS"}
@@ -91,9 +95,11 @@
 {"file":"2026-09-29-brief-fence-colour.md","date":"2026-09-29","status":"done","summary":"Fence colour — chroma at the mermaid seam, the terminal's palette as the theme","meta":{},"callsign":"BRF-FENCE-COLOUR"}
 {"file":"2026-09-29-brief-projection-losses.md","date":"2026-09-29","status":"done","summary":"Projection losses — two surfaces that drop content they mean to keep","meta":{},"callsign":"BRF-PROJECTION-LOSSES"}
 {"file":"2026-09-29-brief-silcrow-paths.md","date":"2026-09-29","status":"rejected","summary":"Silcrow paths — the gate grows a second substrate","meta":{},"callsign":"BRF-SILCROW-PATHS"}
+{"file":"2026-09-29-brief-ssh-host.md","date":"2026-09-29","status":"rejected","summary":"SSH host — landing the ADR-013 reading room where SSH gives a shell","meta":{},"callsign":"BRF-SSH-HOST"}
 {"file":"2026-09-30-brief-fence-discipline.md","date":"2026-09-30","status":"rejected","summary":"One fence rule — five scanners, four disciplines, one of them fixed","meta":{},"callsign":"BRF-FENCE-DISCIPLINE"}
 {"file":"2026-09-30-brief-root-climb.md","date":"2026-09-30","status":"done","summary":"The root climb — the silo is the repo, not the cwd","meta":{},"callsign":"BRF-ROOT-CLIMB"}
 {"file":"2026-09-30-brief-step-inventory.md","date":"2026-09-30","status":"rejected","summary":"The stride inventory — what steps, what compounds, what is missing","meta":{},"callsign":"BRF-STEP-INVENTORY"}
+{"file":"2026-09-30-brief-television-preview.md","date":"2026-09-30","status":"rejected","summary":"Television Preview — okuda as the renderer, OKUDA_WIDTH as the width knob","meta":{},"callsign":"BRF-TELEVISION-PREVIEW"}
 {"file":"2026-09-30-brief-terminal-cell-grid.md","date":"2026-09-30","status":"rejected","summary":"2D Terminal Cell Grid Architecture (parked)","meta":{},"callsign":"BRF-TERMINAL-CELL-GRID"}
 {"file":"2026-10-01-brief-reading-fraction.md","date":"2026-10-01","status":"rejected","summary":"The reading fraction — a meter for the glass, from the state the glass already holds","meta":{},"callsign":"BRF-READING-FRACTION"}
 {"file":"2026-10-02-brief-callsign-checksum.md","date":"2026-10-02","status":"done","summary":"The callsign checksum — citations that resolve nowhere fail the gate","meta":{},"callsign":"BRF-CALLSIGN-CHECKSUM"}
@@ -137,5 +143,6 @@
 {"file":"2026-10-22-brief-darwin-close-out.md","date":"2026-10-22","status":"rejected","summary":"The darwin close-out — turn one promise into a measurement, and stop two paths guessing","meta":{},"callsign":"BRF-DARWIN-CLOSE-OUT"}
 {"file":"2026-10-22-brief-platform-gate.md","date":"2026-10-22","status":"done","summary":"The gate names its format — building okuda on Omarchy","meta":{},"callsign":"BRF-PLATFORM-GATE"}
 {"file":"2026-10-22-brief-toolchain-truth.md","date":"2026-10-22","status":"done","summary":"Four claims that could not prove themselves","meta":{},"callsign":"BRF-TOOLCHAIN-TRUTH"}
+{"file":"2026-10-25-brief-diagram-height-axis.md","date":"2026-10-25","status":"rejected","summary":"The height axis has no policy at all","meta":{},"callsign":"BRF-DIAGRAM-HEIGHT-AXIS"}
 {"file":"2026-10-25-brief-diagram-width-handoff.md","date":"2026-10-25","status":"done","summary":"One width, or two? — the diagram pipe's second opinion","meta":{},"callsign":"BRF-DIAGRAM-WIDTH-HANDOFF"}
 {"file":"2026-10-26-brief-prose-measure.md","date":"2026-10-26","status":"rejected","summary":"Text takes the measure, art takes the glass — prose gets a band, and a fence says only *that* it was cut","meta":{},"callsign":"BRF-PROSE-MEASURE"}

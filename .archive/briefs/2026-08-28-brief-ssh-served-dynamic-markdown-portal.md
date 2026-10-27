@@ -6,7 +6,7 @@ callsign: BRF-SSH-SERVED-2
 # Brief: SSH-served portal — the ADR-013 Option-2 gate probe
 
 **Created:** 2026-08-28 (rewritten from the first draft: re-cast as the gate probe; the embedded-daemon approach re-adjudicated against ADR-013)
-**Status:** parked — gate not yet fired
+**Status:** Rejected — 2026-10-27, the operator's call: the SSH transports are a shelf we are not reaching for. Parked is a holding pen, and this one is being let go of rather than deferred again. Archived and replunderable — the reasoning stays, only the queue position ends.
 
 ## What
 

@@ -7,7 +7,7 @@ callsign: BRF-SSH-TUI
 
 **Created:** 2026-08-26
 **TD:** td-00842
-**Status:** parked — the SSH family is parked pending a decision on what remote is for (2026-10-13)
+**Status:** Rejected — 2026-10-27, the operator's call: the SSH transports are a shelf we are not reaching for. Parked is a holding pen, and this one is being let go of rather than deferred again. Archived and replunderable — the reasoning stays, only the queue position ends.
 
 ## What
 Integrate modern terminal wire protocols into the Okuda SSH rendering pipeline to achieve atomic, tear-free frame updates and predictable client capability negotiation.

@@ -10,6 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-10-26 | BRF-PROSE-MEASURE | rejected | Text takes the measure, art takes the glass — prose gets a band, and a fence says only *that* it was cut | 2026-10-26-brief-prose-measure.md |
+| 2026-10-25 | BRF-DIAGRAM-HEIGHT-AXIS | rejected | The height axis has no policy at all | 2026-10-25-brief-diagram-height-axis.md |
 | 2026-10-25 | BRF-DIAGRAM-WIDTH-HANDOFF | done | One width, or two? — the diagram pipe's second opinion | 2026-10-25-brief-diagram-width-handoff.md |
 | 2026-10-22 | BRF-DARWIN-CLOSE-OUT | rejected | The darwin close-out — turn one promise into a measurement, and stop two paths guessing | 2026-10-22-brief-darwin-close-out.md |
 | 2026-10-22 | BRF-PLATFORM-GATE | done | The gate names its format — building okuda on Omarchy | 2026-10-22-brief-platform-gate.md |
@@ -56,11 +57,13 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-30 | BRF-FENCE-DISCIPLINE | rejected | One fence rule — five scanners, four disciplines, one of them fixed | 2026-09-30-brief-fence-discipline.md |
 | 2026-09-30 | BRF-ROOT-CLIMB | done | The root climb — the silo is the repo, not the cwd | 2026-09-30-brief-root-climb.md |
 | 2026-09-30 | BRF-STEP-INVENTORY | rejected | The stride inventory — what steps, what compounds, what is missing | 2026-09-30-brief-step-inventory.md |
+| 2026-09-30 | BRF-TELEVISION-PREVIEW | rejected | Television Preview — okuda as the renderer, OKUDA_WIDTH as the width knob | 2026-09-30-brief-television-preview.md |
 | 2026-09-30 | BRF-TERMINAL-CELL-GRID | rejected | 2D Terminal Cell Grid Architecture (parked) | 2026-09-30-brief-terminal-cell-grid.md |
 | 2026-09-29 | BRF-CODE-SHELF | done | Code shelf — a dir predicate scopes the tier | 2026-09-29-brief-code-shelf.md |
 | 2026-09-29 | BRF-FENCE-COLOUR | done | Fence colour — chroma at the mermaid seam, the terminal's palette as the theme | 2026-09-29-brief-fence-colour.md |
 | 2026-09-29 | BRF-PROJECTION-LOSSES | done | Projection losses — two surfaces that drop content they mean to keep | 2026-09-29-brief-projection-losses.md |
 | 2026-09-29 | BRF-SILCROW-PATHS | rejected | Silcrow paths — the gate grows a second substrate | 2026-09-29-brief-silcrow-paths.md |
+| 2026-09-29 | BRF-SSH-HOST | rejected | SSH host — landing the ADR-013 reading room where SSH gives a shell | 2026-09-29-brief-ssh-host.md |
 | 2026-09-24 | BRF-SELF-IDENTICAL-LINK | done | The self-identical link — when the label is the address, say it once | 2026-09-24-brief-self-identical-link.md |
 | 2026-09-24 | BRF-SRC-LINE-LEDGER | rejected | The source-line ledger — `10` edit lands the editor at the eye | 2026-09-24-brief-source-line-ledger.md |
 | 2026-09-24 | BRF-VALIDATED-SILCROWS | done | Validated silcrows — the shape scan consults the registry it stands on | 2026-09-24-brief-validated-silcrows.md |
@@ -116,6 +119,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-28 | BRF-JUMP-DEMO | rejected | jump-demo honesty — slug derivation + state-glyph signal | 2026-08-28-brief-jump-demo-honesty.md |
 | 2026-08-28 | BRF-LAUNCHER-FUT | done | Launcher FUT — session-scoped alt-screen | 2026-08-28-brief-launcher-fut.md |
 | 2026-08-28 | BRF-NOTIFICATION-STYLE | done | 011-zero-notification-stillness-and-decoupled-inbox-watchers | 2026-08-28-brief-notification-style.md |
+| 2026-08-28 | BRF-SSH-SERVED-2 | rejected | SSH-served portal — the ADR-013 Option-2 gate probe | 2026-08-28-brief-ssh-served-dynamic-markdown-portal.md |
 | 2026-08-28 | BRF-STATE-GLYPH | done | State-glyph render path — the showcase environment + first cut | 2026-08-28-brief-state-glyph-render-path.md |
 | 2026-08-28 | BRF-STATE-GLYPH-2 | rejected | State-glyph vocabulary — colour + bold, the closed lexicon | 2026-08-28-brief-state-glyph-vocabulary.md |
 | 2026-08-28 | BRF-SILO-MNEMONICS | rejected | Rooted Gloam — silo badge and document callsigns | 2026-08-28-silo-mnemonics.md |
@@ -124,12 +128,15 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-27 | BRF-FETCH-STATE | rejected | Fetch-state stamp — `checked <time>` + changed/same/failed | 2026-08-27-brief-fetch-state-stamp.md |
 | 2026-08-27 | BRF-NECKBEARD-FZF | done | gloam-finder: Wrapper to launch fzf with hardened interactive semantics | 2026-08-27-brief-neckbeard-fzf-assimilation.md |
 | 2026-08-27 | BRF-PANEL-LIBRARY | rejected | The Panel Library — Chunk-Addressable Okudagrams | 2026-08-27-brief-panel-library.md |
+| 2026-08-27 | BRF-SSH-TUI | rejected | Modern terminal escape protocol integration for SSH TUI delivery | 2026-08-27-brief-ssh-tui-integration.md |
 | 2026-08-26 | BRF-DOCUMENT-LINKS | rejected | Document Links — Gopher Hypertext in the Reader | 2026-08-26-brief-document-links.md |
 | 2026-08-26 | BRF-GLOAM-LAUNCHER | done | Gloam Launcher Promotion — argv[0] No-Arg Mode (parked) | 2026-08-26-brief-gloam-launcher-promotion.md |
 | 2026-08-26 | BRF-HERDR-DASHBOARD | rejected | Herdr Dashboard — the Build's Exhaust, Composed | 2026-08-26-brief-herdr-dashboard.md |
 | 2026-08-26 | BRF-DOCUMENT-SEARCH | rejected | In-Document Search and Outlining — Fast Navigation in Gloam | 2026-08-26-brief-in-document-search-and-outlining.md |
 | 2026-08-26 | BRF-PALETTE-LIGHTNESS | rejected | Palette Lightness Knob — Global Brightness, Hue Preserved (parked) | 2026-08-26-brief-palette-lightness-knob.md |
 | 2026-08-26 | BRF-RESIZE-CONTENT | done | Resize content-anchor — keep the line under the eye | 2026-08-26-brief-resize-content-anchor.md |
+| 2026-08-26 | BRF-SSH-BLOG | rejected | SSH Blog Feed — the Gopher-Serve v1 | 2026-08-26-brief-ssh-blog-feed.md |
+| 2026-08-26 | BRF-SSH-SERVED | rejected | SSH-served markdown — option 1 (OpenSSH ForceCommand) | 2026-08-26-brief-ssh-served-markdown.md |
 | 2026-08-26 | BRF-TELEMETRY-CONVENTIONS | rejected | Telemetry Conventions — Markdown as Message Bus | 2026-08-26-brief-telemetry-conventions.md |
 | 2026-08-26 | BRF-TTY-REVERSE | rejected | TTY Reverse-Print — Land at the Top | 2026-08-26-brief-tty-reverse-print.md |
 | 2026-08-26 | BRF-TUI-LIVE | rejected | TUI live documents — fs.watch → anchored re-render | 2026-08-26-brief-tui-live-documents.md |

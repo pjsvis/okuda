@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**16 live · 141 archived · 16 tabled** — 0 to move · 0 disagreeing · 0 phantom · 2 editorial · 3 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**9 live · 148 archived · 9 tabled** — 0 to move · 0 disagreeing · 0 phantom · 1 editorial · 3 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -11,7 +11,6 @@
 Listed, never gated: the glyph cell is the editor's surface. If a mark here is meant to *mean* a status, map it in `amp-briefs.ts` so the reconciliation can read it.
 
 - **`◆ partial`** — 1 brief: BRF-OKLCH-TUNING (open)
-- **`◆ feasibility ✓`** — 1 brief: BRF-SSH-SERVED (parked)
 
 ### Silent — no ticket, no citation, live
 
@@ -63,27 +62,10 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 |---|---|---|---|
 | BRF-OKLCH-TUNING | ◆ partial | td-b4bae8 ready-to-start | — |
 
-## SSH family — feasibility debriefed, build pending
-
-| Brief | State | Narrative | Debrief |
-|---|---|---|---|
-| BRF-SSH-SERVED | ◆ feasibility ✓ | ForceCommand feasibility on file | [debrief](debriefs/2026-08-27-debrief-ssh-forcecommand-feasibility.md) |
-| BRF-SSH-BLOG | ↓ parked | gopher-serve v1 | — |
-| BRF-SSH-SERVED-2 | ↓ parked | dynamic portal | — |
-| BRF-SSH-TUI | ↓ parked | escape protocol integration | — |
-| BRF-SSH-HOST | ↓ parked | landing the ADR-013 reading room where SSH gives a shell | — |
-
 ## Open — fresh
 
 | Brief | State | Narrative | Debrief |
 |---|---|---|---|
-
-## Parked / deferred
-
-| Brief | State | Narrative | Debrief |
-|---|---|---|---|
-| BRF-TELEVISION-PREVIEW | ↓ parked | okuda as the renderer, OKUDA_WIDTH as the knob | — |
-| BRF-DIAGRAM-HEIGHT-AXIS | ↓ parked | The height axis has no policy at all | — |
 
 ## Debriefs without briefs
 

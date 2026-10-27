@@ -6,7 +6,7 @@ callsign: BRF-SSH-SERVED
 # Brief: SSH-served markdown — option 1 (OpenSSH ForceCommand)
 
 **Date:** 2026-08-26
-**Status:** parked — the SSH family is parked pending a decision on what remote is for (2026-10-13)
+**Status:** Rejected — 2026-10-27, the operator's call: the SSH transports are a shelf we are not reaching for. Parked is a holding pen, and this one is being let go of rather than deferred again. Archived and replunderable — the reasoning stays, only the queue position ends.
 **Branch:** feat/rhs-chip-headers → feat/ssh-deploy
 
 ## Context

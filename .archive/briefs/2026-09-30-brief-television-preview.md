@@ -6,7 +6,7 @@ callsign: BRF-TELEVISION-PREVIEW
 # Brief: Television Preview — okuda as the renderer, OKUDA_WIDTH as the width knob
 
 **Date:** 2026-09-30
-**Status:** Parked — the pin lives on `feat/television-preview` (7bb3e7c), deliberately off main (owner decision 2026-09-30, reaffirmed 2026-10-03: a workaround for a foreign gap has a scheduled death date). Gate: television #999 (fzf-style pane envs) — on landing, the pin is obsolete and the branch dies unmerged. The channel recipe works today at fallback 80. Review: td-c05892, approved 2026-10-03.
+**Status:** Rejected — 2026-10-27, the operator's call: the television preview is a parked experiment, not next work. Parked is a holding pen, and this one is being let go of rather than deferred again. Archived and replunderable — the reasoning stays, only the queue position ends.
 
 ---
 

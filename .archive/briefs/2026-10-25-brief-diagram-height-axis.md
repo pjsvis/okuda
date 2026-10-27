@@ -6,7 +6,7 @@ callsign: BRF-DIAGRAM-HEIGHT-AXIS
 # Brief: The height axis has no policy at all
 
 **Date:** 2026-10-25
-**Status:** Parked — the defect is measured and real, and **nothing in the silo
+**Status:** Rejected — 2026-10-27, the operator's call: the height axis keeps its stated policy gap; nothing is waiting on it. Parked is a holding pen, and this one is being let go of rather than deferred again. Archived and replunderable — the reasoning stays, only the queue position ends.
 is currently hurt by it**. Parked deliberately, with the numbers below, so that
 the next session does not rediscover it as a surprise or invent a policy for it
 without them.

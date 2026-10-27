@@ -1,16 +1,9 @@
-{"file":"2026-08-26-brief-ssh-blog-feed.md","date":"2026-08-26","status":"parked","summary":"SSH Blog Feed — the Gopher-Serve v1","meta":{},"callsign":"BRF-SSH-BLOG"}
-{"file":"2026-08-26-brief-ssh-served-markdown.md","date":"2026-08-26","status":"parked","summary":"SSH-served markdown — option 1 (OpenSSH ForceCommand)","meta":{},"callsign":"BRF-SSH-SERVED"}
-{"file":"2026-08-27-brief-ssh-tui-integration.md","date":"2026-08-27","status":"parked","summary":"Modern terminal escape protocol integration for SSH TUI delivery","meta":{},"callsign":"BRF-SSH-TUI"}
 {"file":"2026-08-28-brief-oklch-tuning.md","date":"2026-08-28","status":"open","summary":"OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling","meta":{},"callsign":"BRF-OKLCH-TUNING"}
-{"file":"2026-08-28-brief-ssh-served-dynamic-markdown-portal.md","date":"2026-08-28","status":"parked","summary":"2026-08-28-brief-ssh-served-dynamic-markdown-portal","meta":{},"callsign":"BRF-SSH-SERVED-2"}
 {"file":"2026-09-18-brief-perimeter-gate.md","date":"2026-09-18","status":"open","summary":"The perimeter gate — the moira group holds only recipes that invoke okuda","meta":{},"callsign":"BRF-PERIMETER-GATE"}
 {"file":"2026-09-18-brief-perimeter-runner.md","date":"2026-09-18","status":"open","summary":"The perimeter runner — the tuning recipes and their artifacts leave the task runner","meta":{},"callsign":"BRF-PERIMETER-RUNNER"}
 {"file":"2026-09-18-brief-perimeter-silo.md","date":"2026-09-18","status":"open","summary":"The perimeter silo — the speech doctrine and its records leave okuda","meta":{},"callsign":"BRF-PERIMETER-SILO"}
-{"file":"2026-09-29-brief-ssh-host.md","date":"2026-09-29","status":"parked","summary":"SSH host — landing the ADR-013 reading room where SSH gives a shell","meta":{},"callsign":"BRF-SSH-HOST"}
-{"file":"2026-09-30-brief-television-preview.md","date":"2026-09-30","status":"parked","summary":"Television Preview — okuda as the renderer, OKUDA_WIDTH as the width knob","meta":{},"callsign":"BRF-TELEVISION-PREVIEW"}
 {"file":"2026-10-14-brief-principal-and-clerk.md","date":"2026-10-14","status":"open","summary":"The principal and the clerk — the three-way triage","meta":{},"callsign":"BRF-PRINCIPAL-CLERK"}
 {"file":"2026-10-16-brief-search-row.md","date":"2026-10-16","status":"open","summary":"The search row — the contract, frozen by the probe","meta":{},"callsign":"BRF-SEARCH-ROW"}
 {"file":"2026-10-21-brief-authoring-convention.md","date":"2026-10-21","status":"open","summary":"Authoring Convention — Route Agents to the Style Guide","meta":{},"callsign":"BRF-AUTHORING-CONVENTION"}
 {"file":"2026-10-21-brief-registered-probes-tier.md","date":"2026-10-21","status":"open","summary":"Establish Registered `probes/` Tier for Exploratory Python Scripts","meta":{},"callsign":"BRF-PROBES-TIER"}
-{"file":"2026-10-25-brief-diagram-height-axis.md","date":"2026-10-25","status":"parked","summary":"The height axis has no policy at all","meta":{},"callsign":"BRF-DIAGRAM-HEIGHT-AXIS"}
 {"file":"2026-10-26-brief-irony-mark.md","date":"2026-10-26","status":"ready","summary":"The irony mark takes the parked state, and the vertical ellipsis goes back to elision","meta":{},"callsign":"BRF-IRONY-MARK"}
