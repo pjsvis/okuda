@@ -75,14 +75,21 @@ function registry(dir: string, index: string): Row[] {
     });
 }
 
-/** The tabled rows: callsign → the glyph its state cell begins with. Pure. */
-export function tabledGlyphs(doc: string): Map<string, string> {
+/** The tabled rows: callsign → the whole state cell (`✓ landed 2026-09-14`,
+ *  `◆ partial`). The mark alone is half a claim; the word after it is the half
+ *  that says what the mark means. Pure. */
+export function tabledStates(doc: string): Map<string, string> {
   const out = new Map<string, string>();
   for (const line of doc.split("\n")) {
     const m = line.match(/^\| (BRF-[A-Z0-9-]+) \| ([^|]+) \|/);
-    if (m) out.set(m[1]!, m[2]!.trim().charAt(0));
+    if (m) out.set(m[1]!, m[2]!.trim());
   }
   return out;
+}
+
+/** The marks, as the house map sees them: the first character of each state. */
+export function tabledGlyphs(doc: string): Map<string, string> {
+  return new Map([...tabledStates(doc)].map(([cs, state]) => [cs, state.charAt(0)]));
 }
 
 const textOf = (dir: string): string =>
@@ -99,6 +106,8 @@ interface Report {
    *  e.g. `◆`). Listed, never gated: the glyph cell is the editor's surface, so
    *  an unmapped mark is a dialect, not a contradiction. */
   editorial: Array<{ callsign: string; glyph: string; status: string }>;
+  /** The same rows, grouped by the mark they carry, with the word that explains it. */
+  marks: Array<{ mark: string; briefs: Array<{ callsign: string; status: string }> }>;
   phantom: string[];
   silent: Row[];
   ticketed: Row[];
@@ -134,6 +143,7 @@ export function report(): Report {
 
   const disagree: Report["disagree"] = [];
   const editorial: Report["editorial"] = [];
+  const states = tabledStates(stripRegion(raw));
   const phantom: string[] = [];
   const known_glyphs = new Set(Object.values(GLYPH));
   const known = new Set([...live.map((b) => b.callsign), ...registry(".archive/briefs", "INDEX.jsonl").map((b) => b.callsign)]);
@@ -150,8 +160,13 @@ export function report(): Report {
     .filter((b) => !ticketed.has(b.callsign) && !cited.has(b.callsign));
   const ticketedRows = live.filter((b) => ticketed.has(b.callsign) && (b.status === "open" || b.status === "ready"));
 
+  const marks = [...new Set(editorial.map((e) => states.get(e.callsign) ?? e.glyph))].map((mark) => ({
+    mark,
+    briefs: editorial.filter((e) => (states.get(e.callsign) ?? e.glyph) === mark).map((e) => ({ callsign: e.callsign, status: e.status })),
+  }));
+
   return {
-    live, archived, move: queue, disagree, editorial, phantom, silent,
+    live, archived, move: queue, disagree, editorial, marks, phantom, silent,
     ticketed: ticketedRows, tabled: glyphs.size,
   };
 }
@@ -190,12 +205,17 @@ export function renderRegion(r: Report): string {
     out.push(`|---|---|---|`);
     for (const d of r.disagree) out.push(`| ${d.callsign} | \`${d.glyph}\` | ${d.status} |`);
   }
-  if (r.editorial.length) {
+  if (r.marks.length || r.editorial.length) {
     out.push(`\n### Editorial glyphs — the editor's own marks, not comparable to a status\n`);
     out.push(`Listed, never gated: the glyph cell is the editor's surface. If a mark here is meant to *mean* a status, map it in \`amp-briefs.ts\` so the reconciliation can read it.\n`);
-    out.push(`| brief | glyph | registry says |`);
-    out.push(`|---|---|---|`);
-    for (const e of r.editorial) out.push(`| ${e.callsign} | \`${e.glyph}\` | ${e.status} |`);
+    // Grouped by mark: five rows reading `◆` is a column repeating a constant,
+    // which is a caption wearing a column's clothes. One row per mark says the
+    // same thing once, and answers the question the table provokes — *what does
+    // this mark mean?* — with the word the editor wrote beside it.
+    for (const m of r.marks) {
+      const briefs = m.briefs.map((b) => `${b.callsign} (${b.status})`).join(" · ");
+      out.push(`- **\`${m.mark}\`** — ${m.briefs.length} brief${m.briefs.length === 1 ? "" : "s"}: ${briefs}`);
+    }
   }
   if (r.phantom.length) {
     out.push(`\n### Phantom rows — tabled, resolving to nothing\n`);

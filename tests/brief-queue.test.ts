@@ -69,7 +69,7 @@ describe("brief-queue — the reading", () => {
     ({ callsign, file: `${callsign}.md`, date, status, summary: "a summary" });
   const base = {
     live: [row("BRF-A"), row("BRF-B")], archived: 3, tabled: 2,
-    move: [], disagree: [], editorial: [], phantom: [], silent: [], ticketed: [],
+    move: [], disagree: [], editorial: [], marks: [], phantom: [], silent: [], ticketed: [],
   };
 
   test("converged says so, and says what is left", () => {
@@ -101,6 +101,21 @@ describe("brief-queue — the reading", () => {
       const cells = line.split(/(?<!\\)\|/).length - 2; // leading + trailing pipes
       expect(cells).toBe(3);
     }
+  });
+
+  test("marks are grouped, and the word beside the mark is what distinguishes them", () => {
+    // Measured 2026-10-27: five rows all rendered `◆` because the instrument kept
+    // only the first character of the cell. The editor had written `◆ partial` and
+    // `◆ feasibility ✓` — two meanings the reading was throwing away.
+    const marks = [
+      { mark: "◆ partial", briefs: [{ callsign: "BRF-A", status: "open" }, { callsign: "BRF-B", status: "open" }] },
+      { mark: "◆ feasibility ✓", briefs: [{ callsign: "BRF-C", status: "parked" }] },
+    ];
+    const out = renderRegion({ ...base, editorial: [], marks });
+    expect(out).toContain("`◆ partial`");
+    expect(out).toContain("2 briefs");
+    expect(out).toContain("`◆ feasibility ✓`");
+    expect(out).toContain("1 brief:");
   });
 
   test("an editorial glyph is listed apart from a contradiction", () => {

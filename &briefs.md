@@ -10,13 +10,8 @@
 
 Listed, never gated: the glyph cell is the editor's surface. If a mark here is meant to *mean* a status, map it in `amp-briefs.ts` so the reconciliation can read it.
 
-| brief | glyph | registry says |
-|---|---|---|
-| BRF-MERMAID-HARD | `◆` | open |
-| BRF-JUMP-DEMO | `◆` | open |
-| BRF-STATE-GLYPH-2 | `◆` | open |
-| BRF-OKLCH-TUNING | `◆` | open |
-| BRF-SSH-SERVED | `◆` | parked |
+- **`◆ partial`** — 4 briefs: BRF-MERMAID-HARD (open) · BRF-JUMP-DEMO (open) · BRF-STATE-GLYPH-2 (open) · BRF-OKLCH-TUNING (open)
+- **`◆ feasibility ✓`** — 1 brief: BRF-SSH-SERVED (parked)
 
 ### Silent — no ticket, no citation, live
 
