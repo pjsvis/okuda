@@ -35,7 +35,6 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-10-02 | BRF-DEMO-SANDBOX | parked | The public demo room — two access modes, one sandbox grammar | 2026-10-02-brief-demo-sandbox.md |
 | 2026-10-01 | BRF-READING-FRACTION | open | The reading fraction — a meter for the glass, from the state the glass already holds | 2026-10-01-brief-reading-fraction.md |
 | 2026-09-30 | BRF-FENCE-DISCIPLINE | open | One fence rule — five scanners, four disciplines, one of them fixed | 2026-09-30-brief-fence-discipline.md |
-| 2026-09-30 | BRF-STEP-INVENTORY | open | The stride inventory — what steps, what compounds, what is missing | 2026-09-30-brief-step-inventory.md |
 | 2026-09-30 | BRF-TELEVISION-PREVIEW | parked | Television Preview — okuda as the renderer, OKUDA_WIDTH as the width knob | 2026-09-30-brief-television-preview.md |
 | 2026-09-29 | BRF-SILCROW-PATHS | open | Silcrow paths — the gate grows a second substrate | 2026-09-29-brief-silcrow-paths.md |
 | 2026-09-29 | BRF-SSH-HOST | parked | SSH host — landing the ADR-013 reading room where SSH gives a shell | 2026-09-29-brief-ssh-host.md |
@@ -61,7 +60,6 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-06 | BRF-CONCORDANCE-PREFILTER | open | The concordance pre-filter — `\|`, `!`, and case at the silo's seam | 2026-09-06-brief-concordance-prefilter.md |
 | 2026-09-06 | BRF-TTS-DOGFOOD | open | Coupled-frame TTS dogfood (mac `say`) | 2026-09-06-brief-tts-dogfood.md |
 | 2026-09-02 | BRF-SCROLL-REPAINT | open | One line per scroll — scroll-region repaint for the TUI | 2026-09-02-brief-scroll-region-repaint.md |
-| 2026-08-30 | BRF-REFRESH-OFF-DISK | open | refresh off disk — the resize race + the R placebo | 2026-08-30-brief-refresh-off-disk.md |
 | 2026-08-30 | BRF-IPAD-MINI | open | 2026-08-30-ipad-mini-demo | 2026-08-30-ipad-mini-demo.md |
 | 2026-08-29 | BRF-AUDIO-STYLE | open | Audio-First Style Guide and Linting Heuristics | 2026-08-29-audio-style-guide.md |
 | 2026-08-29 | BRF-RESTICTED-GRAMMAR | open | Okuda Markdown AST to W3C SSML Mapping Investigation | 2026-08-29-brief-resticted-grammar-speech.md |
@@ -72,7 +70,6 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-28 | BRF-OKLCH-TUNING | open | OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling | 2026-08-28-brief-oklch-tuning.md |
 | 2026-08-28 | BRF-SSH-SERVED-2 | parked | 2026-08-28-brief-ssh-served-dynamic-markdown-portal | 2026-08-28-brief-ssh-served-dynamic-markdown-portal.md |
 | 2026-08-28 | BRF-STATE-GLYPH-2 | open | State-glyph vocabulary — colour + bold, the closed lexicon | 2026-08-28-brief-state-glyph-vocabulary.md |
-| 2026-08-28 | BRF-SILO-MNEMONICS | open | Rooted Gloam — silo badge and document callsigns | 2026-08-28-silo-mnemonics.md |
 | 2026-08-27 | BRF-ARTPACK-AESTHETICS | open | Plundered artpack aesthetics & high-SNR dark terminal rendering | 2026-08-27-brief-artpack-aesthetics.md |
 | 2026-08-27 | BRF-DENSE-DYNAMIC | open | Dense terminal visual primitives for dynamic telemetry | 2026-08-27-brief-dense-dynamic-displays.md |
 | 2026-08-27 | BRF-FETCH-STATE | open | Fetch-state stamp: checked-time + changed/same/failed in footer; fixes the empty-doc-on-fetch-failure lie; LCARS colouring with a new alert palette role; obeys the first temporal directive (fetch-time, not doc-time) | 2026-08-27-brief-fetch-state-stamp.md |

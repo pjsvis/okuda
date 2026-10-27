@@ -35,6 +35,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-10-02 | BRF-ROOT-CONTAINMENT | done | Root containment — existence is not permission | 2026-10-02-brief-root-containment.md |
 | 2026-10-02 | BRF-VALVE-LINT | done | The valve lint — td-ID citations in persisted documents fail the gate | 2026-10-02-brief-td-id-lint.md |
 | 2026-09-30 | BRF-ROOT-CLIMB | done | The root climb — the silo is the repo, not the cwd | 2026-09-30-brief-root-climb.md |
+| 2026-09-30 | BRF-STEP-INVENTORY | rejected | The stride inventory — what steps, what compounds, what is missing | 2026-09-30-brief-step-inventory.md |
 | 2026-09-30 | BRF-TERMINAL-CELL-GRID | rejected | 2D Terminal Cell Grid Architecture (parked) | 2026-09-30-brief-terminal-cell-grid.md |
 | 2026-09-29 | BRF-CODE-SHELF | done | Code shelf — a dir predicate scopes the tier | 2026-09-29-brief-code-shelf.md |
 | 2026-09-29 | BRF-FENCE-COLOUR | done | Fence colour — chroma at the mermaid seam, the terminal's palette as the theme | 2026-09-29-brief-fence-colour.md |
@@ -59,6 +60,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-09-01 | BRF-MERMAID-SOURCE-OMITTED | done | Omit the mermaid source from the render | 2026-09-01-brief-mermaid-source-omitted.md |
 | 2026-08-31 | BRF-CITTY-CLI | rejected | the CLI contract — adopting citty for the okuda/gloam surface | 2026-08-31-brief-citty-cli.md |
 | 2026-08-30 | BRF-CONTENT-SHORTLIST | done | content shortlist — rg as the discovery source | 2026-08-30-brief-content-shortlist.md |
+| 2026-08-30 | BRF-REFRESH-OFF-DISK | rejected | refresh off disk — the resize race + the R placebo | 2026-08-30-brief-refresh-off-disk.md |
 | 2026-08-29 | BRF-FZF-OWNS-LOOP | rejected | fzf owns the loop (cursor-preserve experiment) | 2026-08-29-brief-fzf-owns-the-loop.md |
 | 2026-08-29 | BRF-MENU-TEMPLATES | rejected | Menu templates (deferred — fires on the second menu kind) | 2026-08-29-brief-menu-templates-deferred.md |
 | 2026-08-29 | BRF-OKF-CALLSIGN | done | OKF conformance migration and the callsign layer | 2026-08-29-brief-okf-callsign-migration.md |
@@ -68,6 +70,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-28 | BRF-LAUNCHER-FUT | done | Launcher FUT — session-scoped alt-screen | 2026-08-28-brief-launcher-fut.md |
 | 2026-08-28 | BRF-NOTIFICATION-STYLE | done | 011-zero-notification-stillness-and-decoupled-inbox-watchers | 2026-08-28-brief-notification-style.md |
 | 2026-08-28 | BRF-STATE-GLYPH | done | State-glyph render path — the showcase environment + first cut | 2026-08-28-brief-state-glyph-render-path.md |
+| 2026-08-28 | BRF-SILO-MNEMONICS | rejected | Rooted Gloam — silo badge and document callsigns | 2026-08-28-silo-mnemonics.md |
 | 2026-08-27 | BRF-NECKBEARD-FZF | done | gloam-finder: Wrapper to launch fzf with hardened interactive semantics | 2026-08-27-brief-neckbeard-fzf-assimilation.md |
 | 2026-08-27 | BRF-PANEL-LIBRARY | rejected | The Panel Library — Chunk-Addressable Okudagrams | 2026-08-27-brief-panel-library.md |
 | 2026-08-26 | BRF-DOCUMENT-LINKS | rejected | Document Links — Gopher Hypertext in the Reader | 2026-08-26-brief-document-links.md |

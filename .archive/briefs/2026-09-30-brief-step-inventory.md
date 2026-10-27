@@ -7,7 +7,7 @@ date: 2026-09-30
 # Brief: The stride inventory — what steps, what compounds, what is missing
 
 **Created:** 2026-09-30
-**Status:** Open
+**Status:** Rejected — 2026-10-26, the operator's call. The work it described landed on 2026-09-30 (the stepper shipped); the *record* it wanted drifted, and reconstructing a stride inventory from a drifted record is the archaeology this silo declines. Nothing cites the brief, which is the evidence that it stopped being an intent and became a wish.
 
 ## TD
 

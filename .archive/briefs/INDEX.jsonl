@@ -26,11 +26,13 @@
 {"file":"2026-08-28-brief-launcher-fut.md","date":"2026-08-28","status":"done","summary":"Launcher FUT — session-scoped alt-screen","meta":{},"callsign":"BRF-LAUNCHER-FUT"}
 {"file":"2026-08-28-brief-notification-style.md","date":"2026-08-28","status":"done","summary":"011-zero-notification-stillness-and-decoupled-inbox-watchers","meta":{},"callsign":"BRF-NOTIFICATION-STYLE"}
 {"file":"2026-08-28-brief-state-glyph-render-path.md","date":"2026-08-28","status":"done","summary":"State-glyph render path — the showcase environment + first cut","meta":{},"callsign":"BRF-STATE-GLYPH"}
+{"file":"2026-08-28-silo-mnemonics.md","date":"2026-08-28","status":"rejected","summary":"Rooted Gloam — silo badge and document callsigns","meta":{},"callsign":"BRF-SILO-MNEMONICS"}
 {"file":"2026-08-29-brief-fzf-owns-the-loop.md","date":"2026-08-29","status":"rejected","summary":"fzf owns the loop (cursor-preserve experiment)","meta":{},"callsign":"BRF-FZF-OWNS-LOOP"}
 {"file":"2026-08-29-brief-menu-templates-deferred.md","date":"2026-08-29","status":"rejected","summary":"Menu templates (deferred — fires on the second menu kind)","meta":{},"callsign":"BRF-MENU-TEMPLATES"}
 {"file":"2026-08-29-brief-okf-callsign-migration.md","date":"2026-08-29","status":"done","summary":"OKF conformance migration and the callsign layer","meta":{},"callsign":"BRF-OKF-CALLSIGN"}
 {"file":"2026-08-29-brief-okudagram-frame.md","date":"2026-08-29","status":"done","summary":"The okudagram frame — a portioning rule","meta":{},"callsign":"BRF-PAGED-OKUDAGRAM"}
 {"file":"2026-08-30-brief-content-shortlist.md","date":"2026-08-30","status":"done","summary":"content shortlist — rg as the discovery source","meta":{},"callsign":"BRF-CONTENT-SHORTLIST"}
+{"file":"2026-08-30-brief-refresh-off-disk.md","date":"2026-08-30","status":"rejected","summary":"refresh off disk — the resize race + the R placebo","meta":{},"callsign":"BRF-REFRESH-OFF-DISK"}
 {"file":"2026-08-31-brief-citty-cli.md","date":"2026-08-31","status":"rejected","summary":"the CLI contract — adopting citty for the okuda/gloam surface","meta":{},"callsign":"BRF-CITTY-CLI"}
 {"file":"2026-09-01-brief-flow-wrap.md","date":"2026-09-01","status":"rejected","summary":"Flow wrap — internal break opportunities so paths flow as text","meta":{},"callsign":"BRF-FLOW-WRAP"}
 {"file":"2026-09-01-brief-mermaid-source-omitted.md","date":"2026-09-01","status":"done","summary":"Omit the mermaid source from the render","meta":{},"callsign":"BRF-MERMAID-SOURCE-OMITTED"}
@@ -54,6 +56,7 @@
 {"file":"2026-09-29-brief-fence-colour.md","date":"2026-09-29","status":"done","summary":"Fence colour — chroma at the mermaid seam, the terminal's palette as the theme","meta":{},"callsign":"BRF-FENCE-COLOUR"}
 {"file":"2026-09-29-brief-projection-losses.md","date":"2026-09-29","status":"done","summary":"Projection losses — two surfaces that drop content they mean to keep","meta":{},"callsign":"BRF-PROJECTION-LOSSES"}
 {"file":"2026-09-30-brief-root-climb.md","date":"2026-09-30","status":"done","summary":"The root climb — the silo is the repo, not the cwd","meta":{},"callsign":"BRF-ROOT-CLIMB"}
+{"file":"2026-09-30-brief-step-inventory.md","date":"2026-09-30","status":"rejected","summary":"The stride inventory — what steps, what compounds, what is missing","meta":{},"callsign":"BRF-STEP-INVENTORY"}
 {"file":"2026-09-30-brief-terminal-cell-grid.md","date":"2026-09-30","status":"rejected","summary":"2D Terminal Cell Grid Architecture (parked)","meta":{},"callsign":"BRF-TERMINAL-CELL-GRID"}
 {"file":"2026-10-02-brief-callsign-checksum.md","date":"2026-10-02","status":"done","summary":"The callsign checksum — citations that resolve nowhere fail the gate","meta":{},"callsign":"BRF-CALLSIGN-CHECKSUM"}
 {"file":"2026-10-02-brief-root-containment.md","date":"2026-10-02","status":"done","summary":"Root containment — existence is not permission","meta":{},"callsign":"BRF-ROOT-CONTAINMENT"}

@@ -70,7 +70,12 @@ function loadRows(): Row[] {
 
 function report(): Report {
   const rows = loadRows();
-  const briefs = rows.filter((r) => r.tier === "briefs" && r.callsign);
+  // Live AND archived briefs: the claim being measured is "is this decision
+  // anchored to an intent?", and the intent's archive status is irrelevant. Live
+  // only made a healthy archive sweep read as lost coverage — measured 2026-10-26,
+  // 33/70 -> 29/70 for archiving seven settled briefs. The reading names its scope
+  // in `renderMarkdown` so the two definitions cannot be confused again.
+  const briefs = rows.filter((r) => (r.tier === "briefs" || r.tier === ".archive/briefs") && r.callsign);
   const derived = rows.filter((r) => r.tier === "decisions" || r.tier === "debriefs");
 
   const lags: number[] = [];

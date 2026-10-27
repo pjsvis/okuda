@@ -7,7 +7,7 @@ callsign: BRF-REFRESH-OFF-DISK
 
 **Date:** 2026-08-30
 **Amended:** 2026-09-30 — fault 3 added; fault 2's mechanism corrected (ADR-RESIZE-GEOMETRY-046)
-**Status:** Open
+**Status:** Rejected — 2026-10-26, the operator's call. The resize race it diagnosed was settled structurally elsewhere (`ADR-RESIZE-GEOMETRY-046`: content and geometry are the two inputs of a repaint, and the gate compares both), so what remained here was a second path to the same behaviour. Refused for that reason, recorded rather than deleted.
 **Branch:** fix/resize-height (fault 3); `feat/gloam-launcher` no longer exists
 
 ## Context

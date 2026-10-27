@@ -7,7 +7,7 @@ callsign: BRF-SILO-MNEMONICS
 
 **Created:** 2026-08-28 (rewritten from the first draft: badge placement, callsign ownership, and the rooted/unrooted axis revised after review)
 **TD:** td-okuda-silo-mnemonics
-**Status:** open (amended 2026-08-30 — see Amendment below, ADR-024)
+**Status:** Rejected — 2026-10-26, the operator's call. Its load-bearing claim landed and is now law: callsigns live in frontmatter and resolve (`ADR-CALLSIGNS-ARE-DATA-024`), and the badge renders `silo · callsign` in the footer. The residual scope is refused; the brief is kept for the amendment trail, not for the work.
 
 > **Amendment (2026-08-30, ADR-024).** `BRF-CONTENT-SHORTLIST` changed the
 > calculus two days after this brief was written: callsigns live in
