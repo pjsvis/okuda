@@ -7,7 +7,7 @@ date: 2026-10-01
 # Brief: The reading fraction — a meter for the glass, from the state the glass already holds
 
 **Created:** 2026-10-01
-**Status:** Open — brief only; the task is written when the work starts (the operator's method, unchanged from BRF-SILCROW-PATHS: *"each step has its own wrinkles, that we have not discerned yet"*).
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted — replunder if the need returns. The idea is not judged, only its queue position.
 
 ## Lineage
 

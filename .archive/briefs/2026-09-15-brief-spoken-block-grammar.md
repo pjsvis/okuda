@@ -7,7 +7,7 @@ date: 2026-09-15
 # Brief: The spoken block grammar — announce the kind, enumerate the elements, never elide silently
 
 **Created:** 2026-09-15
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted — replunder if the need returns. The idea is not judged, only its queue position.
 **TD:** td-fb5059 (stream A — the silo's flattener) · td-615253 (stream B — the surface's cursor)
 
 ## Lineage

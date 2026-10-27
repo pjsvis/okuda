@@ -6,7 +6,7 @@ callsign: BRF-COMMISSION-BLANDINGS
 # Brief: Commission the Blandings silo — and the procedure that makes the next one routine
 
 **Date:** 2026-10-10
-**Status:** open
+**Status:** Landed — 2026-10-27. The voice work moved to the blandings silo and the migration is complete; this silo no longer carries the speech pipeline. Archived as finished, not refused.
 **Origin:** the entertainment/work-product split (this session). Companion to
 the repertory company doc (Blandings) and `playbooks/ear-playbook.md`.
 

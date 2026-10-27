@@ -29,3 +29,4 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-20 | PLY-DOC | canonical | The Process Playbook — the knowledge system (tiers, answers, lifetimes), the route through it, and how to write a playbook | playbooks-playbook.md |
 | 2026-08-20 | PLY-SILO | canonical | Minimum viable silo: playbooks-first structure, on-demand folders, justfile lexicon, system.md constitution, .archive scaling | silo-playbook.md |
 | 2026-08-20 | PLY-TD | canonical | td task management: session startup, claiming work, pre-commit gate, branch hygiene | td-playbook.md |
+|  | PLY-DATA-DISPLAY | canonical | The Data Display Playbook | data-display-playbook.md |

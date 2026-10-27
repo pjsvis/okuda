@@ -6,7 +6,7 @@ callsign: BRF-DARWIN-CLOSE-OUT
 # Brief: The darwin close-out — turn one promise into a measurement, and stop two paths guessing
 
 **Date:** 2026-10-22
-**Status:** Open — **P1 done on a Mac, 2026-10-17** (evidence below); **P2 decided
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted — replunder if the need returns. The idea is not judged, only its queue position.
 and implemented** (`ADR-ENVIRONMENT-ANSWERS-068`, `9c686df`); **P3 open**, and it
 belongs to the Linux box because the measurement was taken there. Written on the
 Omarchy box, which cannot execute any of P1.

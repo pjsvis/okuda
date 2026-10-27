@@ -7,7 +7,7 @@ date: 2026-09-15
 # Brief: A callsign for every document — the name and the address are orthogonal
 
 **Created:** 2026-09-15
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted — replunder if the need returns. The idea is not judged, only its queue position.
 
 ## TD
 

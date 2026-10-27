@@ -15,7 +15,7 @@ callsign: BRF-AI-DOC
 
 **Created:** 2026-08-28
 **TD:** td-okuda-ai-ssh
-**Status:** parked
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted — replunder if the need returns. The idea is not judged, only its queue position.
 
 ## What
 Adds an in-TUI modal triggered by `?` to execute semantic queries and on-the-fly document summarization against the active document AST, and introduces a local SSH transport daemon to serve Okuda as a zero-dependency local service interface.

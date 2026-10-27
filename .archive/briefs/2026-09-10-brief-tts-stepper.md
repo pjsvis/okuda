@@ -6,7 +6,7 @@ callsign: BRF-TTS-STEPPER
 # Brief: The TTS channel — a configuration of the render/egress pipeline
 
 **Date:** 2026-09-10
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted — replunder if the need returns. The idea is not judged, only its queue position.
 
 ## Lineage
 

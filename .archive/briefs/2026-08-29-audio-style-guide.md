@@ -6,7 +6,7 @@ callsign: BRF-AUDIO-STYLE
 # Brief: Audio-First Style Guide and Linting Heuristics
 
 **Date:** 2026-08-29
-**Status:** Open (partially superseded 2026-09-06)
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted — replunder if the need returns. The idea is not judged, only its queue position.
 
 ---
 

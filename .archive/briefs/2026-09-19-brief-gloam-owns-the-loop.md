@@ -7,7 +7,7 @@ date: 2026-09-19
 # Brief: GLoam owns the search TUI — the fzf dependency retires
 
 **Created:** 2026-09-19
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted — replunder if the need returns. The idea is not judged, only its queue position.
 
 ## TD
 

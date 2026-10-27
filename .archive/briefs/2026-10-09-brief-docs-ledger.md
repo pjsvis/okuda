@@ -6,7 +6,7 @@ callsign: BRF-DOCS-LEDGER
 # Brief: The docs/ ledger — a prune ledger, not a registry
 
 **Date:** 2026-10-09
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted — replunder if the need returns. The idea is not judged, only its queue position.
 **TD:** (to create when claimed)
 **Context:** Phase 4's prune ran with its precondition unmet. `BRF-DOCUMENT-LIFECYCLE`
 carries it as a checkbox — *"`docs/` is enumerated (the census). You cannot

@@ -6,7 +6,7 @@ callsign: BRF-PROLONGED-PRESS
 # Brief: The prolonged press — three gestures, one actuation, no leak
 
 **Date:** 2026-09-13
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted — replunder if the need returns. The idea is not judged, only its queue position.
 
 ## TD
 

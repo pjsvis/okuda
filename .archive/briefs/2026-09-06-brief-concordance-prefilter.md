@@ -6,7 +6,7 @@ callsign: BRF-CONCORDANCE-PREFILTER
 # Brief: The concordance pre-filter — `|`, `!`, and case at the silo's seam
 
 **Date:** 2026-09-06
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: **superseded by `BRF-SEARCH-ROW`**, which froze the search contract from the probe. The pre-filter's rules are in the shipped search, not in this brief.
 
 ## Lineage
 

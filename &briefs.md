@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**42 live · 115 archived · 42 tabled** — 0 to move · 0 disagreeing · 0 phantom · 2 editorial · 5 silent · 1 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**16 live · 141 archived · 16 tabled** — 0 to move · 0 disagreeing · 0 phantom · 2 editorial · 3 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -19,20 +19,13 @@ Nothing waits on these and no Thing records them. The question per row is **what
 
 | brief | age | asks |
 |---|---|---|
-| BRF-ARTPACK-AESTHETICS | 60d | Plundered artpack aesthetics & high-SNR dark terminal rend |
-| BRF-DENSE-DYNAMIC | 60d | Dense terminal visual primitives for dynamic telemetry |
 | BRF-SEARCH-ROW | 10d | The search row — the contract, frozen by the probe |
 | BRF-PROBES-TIER | 5d | Establish Registered `probes/` Tier for Exploratory Python |
 | BRF-IRONY-MARK | 0d | The irony mark takes the parked state, and the vertical el |
 
 ### Ticketed, live — the load-bearing set
 
-A row here is the only kind with an owner already: something outside
-this table is waiting on it.
-
-| brief | age | asks |
-|---|---|---|
-| BRF-CONCORDANCE-PREFILTER | 50d | The concordance pre-filter — `\|`, `!`, and case at the sil |
+_none_
 
 
 <!-- decide:end -->
@@ -50,34 +43,8 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 
 | Brief | State | Narrative | Debrief |
 |---|---|---|---|
-| BRF-DENSE-DYNAMIC | · open | telemetry visual primitives | — |
-| BRF-FETCH-STATE | · open | fetch stamp; fixes the empty-doc lie | — |
-| BRF-AI-DOC | ↓ parked | inline ask-the-doc, local SSH | — |
-| BRF-ARTPACK-AESTHETICS | · open | high-SNR dark rendering | — |
-| BRF-AUDIO-STYLE | · open | audio-first style guide + lint | — |
-| BRF-SCROLL-REPAINT | · open | one line per scroll — scroll-region repaint for the TUI | — |
-| BRF-CONCORDANCE-PREFILTER | · open | the concordance pre-filter — the pipe, the bang, and case at the seam | — |
-| BRF-TTS-DOGFOOD | · open | coupled-frame TTS dogfood (mac say) | — |
-| BRF-TTS-TEMPORAL | · open | temporal punctuation — markdown prosody for say | — |
-| BRF-TTS-STEPPER | · open | the TTS stepper — frame-as-para, prosody-as-colour | — |
-| BRF-CENSUS-MODE | · open | the mentions-inclusive map, as a reader's opt-in | — |
-| BRF-AUDIO-DISCOVERY | · open | the actuator grammar, heard (epic) | — |
-| BRF-PROLONGED-PRESS | · open | three gestures, one actuation, no leak (epic) | — |
-| BRF-JUMP-LIST | · open | the jump list — the search screen as its projection | — |
-| BRF-SPEECH-STRIDE | · open | the arrows given to the ear, the unit heard | — |
-| BRF-CALLSIGN-EVERY-DOC | · open | the name and the address are orthogonal | — |
-| BRF-SPOKEN-BLOCK-GRAMMAR | · open | announce the kind, enumerate, never elide silently; stays for ADR-037 | — |
-| BRF-GLYPH-LEAD | · open | the state glyph is emitted twice on a list lead | — |
-| BRF-GLOAM-OWNS-LOOP | · open | the search TUI retires the fzf dependency | — |
-| BRF-SRC-LINE-LEDGER | · open | the 10 edit lands the editor at the eye | — |
-| BRF-SILCROW-PATHS | · open | the gate grows a second substrate | — |
-| BRF-READING-FRACTION | · open | a meter for the glass, from state the glass already holds | — |
-| BRF-DEMO-SANDBOX | ↓ parked | the public demo room — two access modes, one grammar | — |
-| BRF-DOCS-LEDGER | · open | a prune ledger, not a registry | — |
-| BRF-COMMISSION-BLANDINGS | · open | commission the Blandings silo, and the procedure | — |
 | BRF-PRINCIPAL-CLERK | · open | The principal and the clerk — the three-way triage | — |
 | BRF-SEARCH-ROW | · open | The search row — the contract, frozen by the probe | — |
-| BRF-DARWIN-CLOSE-OUT | · open | The darwin close-out — turn one promise into a measurement, and stop two paths guessing | — |
 | BRF-AUTHORING-CONVENTION | · open | Authoring Convention — Route Agents to the Style Guide | — |
 | BRF-PROBES-TIER | · open | Establish Registered `probes/` Tier for Exploratory Python Scripts | — |
 

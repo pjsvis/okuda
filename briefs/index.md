@@ -11,43 +11,17 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 |---|---|---|---|---|
 | 2026-10-26 | BRF-IRONY-MARK | ready | The irony mark takes the parked state, and the vertical ellipsis goes back to elision | 2026-10-26-brief-irony-mark.md |
 | 2026-10-25 | BRF-DIAGRAM-HEIGHT-AXIS | parked | The height axis has no policy at all | 2026-10-25-brief-diagram-height-axis.md |
-| 2026-10-22 | BRF-DARWIN-CLOSE-OUT | open | The darwin close-out — turn one promise into a measurement, and stop two paths guessing | 2026-10-22-brief-darwin-close-out.md |
 | 2026-10-21 | BRF-AUTHORING-CONVENTION | open | Authoring Convention — Route Agents to the Style Guide | 2026-10-21-brief-authoring-convention.md |
 | 2026-10-21 | BRF-PROBES-TIER | open | Establish Registered `probes/` Tier for Exploratory Python Scripts | 2026-10-21-brief-registered-probes-tier.md |
 | 2026-10-16 | BRF-SEARCH-ROW | open | The search row — the contract, frozen by the probe | 2026-10-16-brief-search-row.md |
 | 2026-10-14 | BRF-PRINCIPAL-CLERK | open | The principal and the clerk — the three-way triage | 2026-10-14-brief-principal-and-clerk.md |
-| 2026-10-10 | BRF-COMMISSION-BLANDINGS | open | Commission the Blandings silo — and the procedure that makes the next one routine | 2026-10-10-brief-commission-blandings.md |
-| 2026-10-09 | BRF-DOCS-LEDGER | open | The docs/ ledger — a prune ledger, not a registry | 2026-10-09-brief-docs-ledger.md |
-| 2026-10-02 | BRF-DEMO-SANDBOX | parked | The public demo room — two access modes, one sandbox grammar | 2026-10-02-brief-demo-sandbox.md |
-| 2026-10-01 | BRF-READING-FRACTION | open | The reading fraction — a meter for the glass, from the state the glass already holds | 2026-10-01-brief-reading-fraction.md |
 | 2026-09-30 | BRF-TELEVISION-PREVIEW | parked | Television Preview — okuda as the renderer, OKUDA_WIDTH as the width knob | 2026-09-30-brief-television-preview.md |
-| 2026-09-29 | BRF-SILCROW-PATHS | open | Silcrow paths — the gate grows a second substrate | 2026-09-29-brief-silcrow-paths.md |
 | 2026-09-29 | BRF-SSH-HOST | parked | SSH host — landing the ADR-013 reading room where SSH gives a shell | 2026-09-29-brief-ssh-host.md |
-| 2026-09-24 | BRF-SRC-LINE-LEDGER | open | The source-line ledger — `10` edit lands the editor at the eye | 2026-09-24-brief-source-line-ledger.md |
-| 2026-09-19 | BRF-GLOAM-OWNS-LOOP | open | GLoam owns the search TUI — the fzf dependency retires | 2026-09-19-brief-gloam-owns-the-loop.md |
-| 2026-09-18 | BRF-GLYPH-LEAD | open | The state glyph is emitted twice on a list lead | 2026-09-18-brief-glyph-lead.md |
 | 2026-09-18 | BRF-PERIMETER-GATE | open | The perimeter gate — the moira group holds only recipes that invoke okuda | 2026-09-18-brief-perimeter-gate.md |
 | 2026-09-18 | BRF-PERIMETER-RUNNER | open | The perimeter runner — the tuning recipes and their artifacts leave the task runner | 2026-09-18-brief-perimeter-runner.md |
 | 2026-09-18 | BRF-PERIMETER-SILO | open | The perimeter silo — the speech doctrine and its records leave okuda | 2026-09-18-brief-perimeter-silo.md |
-| 2026-09-15 | BRF-CALLSIGN-EVERY-DOC | open | A callsign for every document — the name and the address are orthogonal | 2026-09-15-brief-callsign-every-document.md |
-| 2026-09-15 | BRF-SPOKEN-BLOCK-GRAMMAR | open | The spoken block grammar — announce the kind, enumerate the elements, never elide silently | 2026-09-15-brief-spoken-block-grammar.md |
-| 2026-09-14 | BRF-JUMP-LIST | open | The jump list — the search screen as its projection | 2026-09-14-brief-jump-list.md |
-| 2026-09-14 | BRF-SPEECH-STRIDE | open | The speech stride — the arrows given to the ear, the unit heard | 2026-09-14-brief-speech-stride.md |
-| 2026-09-13 | BRF-AUDIO-DISCOVERY | open | Audio discovery — the actuator grammar, heard | 2026-09-13-brief-audio-discovery.md |
-| 2026-09-13 | BRF-PROLONGED-PRESS | open | The prolonged press — three gestures, one actuation, no leak | 2026-09-13-brief-prolonged-press.md |
-| 2026-09-12 | BRF-CENSUS-MODE | open | Census mode — the mentions-inclusive map, as a reader's opt-in | 2026-09-12-brief-census-mode.md |
-| 2026-09-10 | BRF-TTS-STEPPER | open | The TTS stepper — frame-as-para, prosody-as-colour | 2026-09-10-brief-tts-stepper.md |
-| 2026-09-09 | BRF-TTS-TEMPORAL | open | Temporal punctuation — markdown prosody for say (the boundary-to-pause extractor) | 2026-09-09-brief-tts-temporal-punctuation.md |
-| 2026-09-06 | BRF-CONCORDANCE-PREFILTER | open | The concordance pre-filter — `\|`, `!`, and case at the silo's seam | 2026-09-06-brief-concordance-prefilter.md |
-| 2026-09-06 | BRF-TTS-DOGFOOD | open | Coupled-frame TTS dogfood (mac `say`) | 2026-09-06-brief-tts-dogfood.md |
-| 2026-09-02 | BRF-SCROLL-REPAINT | open | One line per scroll — scroll-region repaint for the TUI | 2026-09-02-brief-scroll-region-repaint.md |
-| 2026-08-29 | BRF-AUDIO-STYLE | open | Audio-First Style Guide and Linting Heuristics | 2026-08-29-audio-style-guide.md |
-| 2026-08-28 | BRF-AI-DOC | parked | Inline Ask-the-Doc and Local SSH Transport | 2026-08-28-brief-ai-and-in-doc-ask-local-ssh.md |
 | 2026-08-28 | BRF-OKLCH-TUNING | open | OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling | 2026-08-28-brief-oklch-tuning.md |
 | 2026-08-28 | BRF-SSH-SERVED-2 | parked | 2026-08-28-brief-ssh-served-dynamic-markdown-portal | 2026-08-28-brief-ssh-served-dynamic-markdown-portal.md |
-| 2026-08-27 | BRF-ARTPACK-AESTHETICS | open | Plundered artpack aesthetics & high-SNR dark terminal rendering | 2026-08-27-brief-artpack-aesthetics.md |
-| 2026-08-27 | BRF-DENSE-DYNAMIC | open | Dense terminal visual primitives for dynamic telemetry | 2026-08-27-brief-dense-dynamic-displays.md |
-| 2026-08-27 | BRF-FETCH-STATE | open | Fetch-state stamp: checked-time + changed/same/failed in footer; fixes the empty-doc-on-fetch-failure lie; LCARS colouring with a new alert palette role; obeys the first temporal directive (fetch-time, not doc-time) | 2026-08-27-brief-fetch-state-stamp.md |
 | 2026-08-27 | BRF-SSH-TUI | parked | Modern terminal escape protocol integration for SSH TUI delivery | 2026-08-27-brief-ssh-tui-integration.md |
 | 2026-08-26 | BRF-SSH-BLOG | parked | SSH Blog Feed — the Gopher-Serve v1 | 2026-08-26-brief-ssh-blog-feed.md |
 | 2026-08-26 | BRF-SSH-SERVED | parked | SSH-served markdown — option 1 (OpenSSH ForceCommand) | 2026-08-26-brief-ssh-served-markdown.md |

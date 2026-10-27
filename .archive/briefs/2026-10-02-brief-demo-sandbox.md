@@ -7,7 +7,7 @@ date: 2026-10-02
 # Brief: The public demo room — two access modes, one sandbox grammar
 
 **Created:** 2026-10-02
-**Status:** parked — remote-shaped (an SSH-hosted demo service); parked with the SSH family pending a decision on what remote is for (2026-10-14).
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted — replunder if the need returns. The idea is not judged, only its queue position.
 
 ## Lineage
 

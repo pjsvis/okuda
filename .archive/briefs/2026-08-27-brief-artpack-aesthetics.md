@@ -7,7 +7,7 @@ callsign: BRF-ARTPACK-AESTHETICS
 
 **Created:** 2026-08-26
 **TD:** td-00844
-**Status:** draft
+**Status:** Rejected — 2026-10-27, the operator's call. Its kernel was **extracted, not discarded**: the dense-display rules now live in `playbooks/data-display-playbook.md` (`PLY-DATA-DISPLAY`), where they are attached to the width tests that make them true rather than to an ambition. Archived and replunderable.
 
 ## What
 Define a visual specification and rendering pass for Okuda that fuses 1990s ANSI artpack primitives (CP437 block dithering, high-density shading) with a 2026 protocol ceiling (24-bit TrueColor, Mode 2026 sync), locked exclusively to an ultra-high-contrast dark theme with a binary 7-bit ASCII fallback.

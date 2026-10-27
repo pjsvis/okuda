@@ -6,7 +6,7 @@ callsign: BRF-SCROLL-REPAINT
 # Brief: One line per scroll — scroll-region repaint for the TUI
 
 **Date:** 2026-09-02
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted — replunder if the need returns. The idea is not judged, only its queue position.
 **Branch:** brief-first; implementation branch follows
 
 ## Context

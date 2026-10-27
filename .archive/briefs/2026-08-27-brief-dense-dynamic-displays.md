@@ -7,7 +7,7 @@ callsign: BRF-DENSE-DYNAMIC
 
 **Created:** 2026-08-26
 **TD:** td-00843
-**Status:** draft
+**Status:** Rejected — 2026-10-27, the operator's call, and the same kernel as its twin: extracted into `playbooks/data-display-playbook.md` (`PLY-DATA-DISPLAY`). Two draft briefs proposing one thing in two vocabularies is a sign the thing was a principle, not a plan.
 
 ## What
 Catalog, benchmark, and standardize high-density Unicode/ASCII glyph sets and ANSI attribute strategies for rendering sparklines, gauges, progress indicators, and status matrices inside the Okuda layout engine.

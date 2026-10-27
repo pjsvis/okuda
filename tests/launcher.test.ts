@@ -390,13 +390,15 @@ describe("launcher — conformance smoke: the search the operator runs", () => {
   });
 
   test("'load bearing' surfaces corpus documents (hyphenated in the prose)", async () => {
+    // Fixture is a docs/ page, not a brief: a brief's path moves when the ledger
+    // is swept, and this test is about hyphenation, not about that brief.
     const entries = rankedShortlistEntries("load bearing", process.cwd());
-    const hit = entries.find((e) => pathOf(e) === "briefs/2026-09-19-brief-gloam-owns-the-loop.md");
+    const hit = entries.find((e) => pathOf(e) === "docs/state-glyphs.md");
     expect(hit).toBeDefined();
     expect(hit).toContain("load-bearing"); // evidence: the hyphenated row
     // And through the real matcher: the phrase query must surface it.
     const matches = await fzfFilter("load bearing", entries);
-    expect(matches).toContain("briefs/2026-09-19-brief-gloam-owns-the-loop.md");
+    expect(matches.some((m) => m.startsWith("docs/state-glyphs.md"))).toBe(true);
   });
 });
 
@@ -643,11 +645,14 @@ describe("launcher — the onion search grammar (BRF-ONION-SEARCH-GRAMMAR)", () 
   });
 
   test("doc tier queries are unchanged by the widening", () => {
-    // briefs/ is all-md, so the widened corpus narrows to the same set
-    // it always had — the load-bearing smoke path, asserted here.
+    // The property is the PATH PREDICATE, not a particular document: briefs/ is
+    // all-md, so the widened corpus narrows to briefs/ and nothing else. Naming a
+    // brief here made the test fail the day that brief was archived (2026-10-27);
+    // the scope is the contract, so the scope is what is asserted.
     const entries = rankedShortlistEntries("briefs/ load bearing", process.cwd());
     const paths = entries.map((e) => e.split("\t")[0]!);
-    expect(paths).toContain("briefs/2026-09-19-brief-gloam-owns-the-loop.md");
+    expect(paths.length).toBeGreaterThan(0);
+    expect(paths.every((p) => p.startsWith("briefs/"))).toBe(true);
   });
 
   test("src/ alone lists the directory's files", () => {

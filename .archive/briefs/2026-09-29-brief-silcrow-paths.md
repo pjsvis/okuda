@@ -7,7 +7,7 @@ date: 2026-09-29
 # Brief: Silcrow paths — the gate grows a second substrate
 
 **Created:** 2026-09-29
-**Status:** Open — Step 3 shipped 2026-10-01 (DBF-SILCROW-RING-B) — Ring B + the legibility exile (ADR-049), 512/512, on `feat/silcrow-ring-b` awaiting merge. Ring A shipped 2026-09-29, reviewed and closed on main 2026-10-01 (503/503). Ring C parked with its census; the epic stays open until the operator's glass pass and the W5 drift list are dispositioned.
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted — replunder if the need returns. The idea is not judged, only its queue position.
 
 ## TD
 

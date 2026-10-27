@@ -6,7 +6,7 @@ callsign: BRF-CENSUS-MODE
 # Brief: Census mode — the mentions-inclusive map, as a reader's opt-in
 
 **Date:** 2026-09-12
-**Status:** Open
+**Status:** Rejected — 2026-10-27, the operator's call: too old, and the corpus has moved on. Archived rather than deleted — replunder if the need returns. The idea is not judged, only its queue position.
 **TD:** td-39ce31
 
 ## Lineage
