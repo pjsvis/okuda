@@ -116,15 +116,17 @@ export const DRACULA_PALETTE: Palette = {
   "diagram-arrow": "#00af5f",
   "diagram-text": "#d7d7d7",
   alert: "#ff5555", // Dracula red — the fetch-state `failed` channel (ADR-015)
-  // State-glyph vocabulary — traffic-lamp colours, preset-independent
+  // State-glyph vocabulary — three lamps and one that is off the ladder by
+  // design (aubergine: parked is a comment, not a rung). Preset-independent.
   // (alarm/success-universality extends ADR-015). state-failed === alert.
   // Distinct from document channels: the justification table in the brief
   // names why each existing channel fails, so the hexes must not reuse them —
-  // green ≠ code-text (#50fa7b), yellow ≠ emphasis (#f1fa8c), orange ≠ strong
-  // (#ffb86c). state-failed === alert is the one allowed collision.
+  // green ≠ code-text (#50fa7b), yellow ≠ emphasis (#f1fa8c), aubergine ≠
+  // table-header (#bd93f9) and ≠ strong (#ffb86c). state-failed === alert is the
+  // one allowed collision.
   "state-ok": "#5fd35f",
   "state-todo": "#ffe066",
-  "state-parked": "#ff9933",
+  "state-parked": "#a06fa8", // aubergine — off the lamp by design (BRF-IRONY-MARK): the parked state is a comment on the plan, not a rung on it. Measured: min ΔE 14.5 to the family, and 16.3 on the deuteranopia-safe (L,b) axis against the old orange's 2.9.
   "state-failed": "#ff5555",
   "doc-ref": "#e8c44a",
   "vector": "#fb7185", // ADR-031: the reserved vector paint — ROSE, the rubricator's ink (rubric = ruber, red); rose-end, not crimson (the alarm channel); distinct from link-text #ff79c6 and every author-addressable role

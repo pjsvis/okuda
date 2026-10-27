@@ -122,9 +122,25 @@ function addressLine(children: string, ctx: Ctx): string | null {
 const STATE_GLYPH_ROLE: Record<string, keyof Palette> = {
   "\u2713": "state-ok",      // ✓ done/shipped — green
   "\u2610": "state-todo",    // ☐ todo/pending — yellow
-  "\u22ee": "state-parked",  // ⋮ parked/elided — orange
+  // ⸮ U+2E2E, the irony mark: the one state that is a *comment* on the plan rather
+  // than a rung on the lamp — hence aubergine, a shade off the ladder by design
+  // (ADR-PROSE-MEASURE-071's neighbour: `BRF-IRONY-MARK`). `⋮` is NOT here any
+  // more: the vertical ellipsis means *continues below*, which is elision's
+  // meaning, and it is now reserved for the fold (the rent receipts still use the
+  // state-parked ROLE for their colour, which is what aubergine is good for).
+  "\u2e2e": "state-parked",  // ⸮ parked — ironic, aubergine
   "\u2717": "state-failed",  // ✗ rejected/failed — red (= alert)
 };
+
+/** The prose matcher's glyph class, DERIVED from the map above: three copies of
+ *  this list existed by 2026-10-27 (the map and two literals), and the brief that
+ *  moved the parked mark found that fixing the map silently left `⋮` colouring as a
+ *  state it no longer was — an undefined role that took the whole render down. One
+ *  source, one class. */
+const STATE_GLYPH_RE = new RegExp(
+  "(^|\\s)([" + Object.keys(STATE_GLYPH_ROLE).join("") + "])(?=\\s|$)",
+  "g",
+);
 
 /** If `text` begins with a state glyph (the closed set), colour + bold
  *  that leading glyph via its lexicon role; leave the rest unchanged.
@@ -1223,7 +1239,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
         styler.roleBold("vector", `\u00a7${n}`));
       // Re-apply state-glyph paint: standalone state glyphs
       clean = clean.replace(
-        /(^|\s)([\u2713\u2610\u22ee\u2717])(?=\s|$)/g,
+        STATE_GLYPH_RE,
         (_whole, pre: string, g: string) =>
           pre + styler.roleBold(STATE_GLYPH_ROLE[g]!, g),
       );
@@ -1331,7 +1347,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // glyph (standalone, not embedded). The lexicon is consistent
       // everywhere. (brief: state-glyph-vocab.)
       out = out.replace(
-        /(^|\s)([\u2713\u2610\u22ee\u2717])(?=\s|$)/g,
+        STATE_GLYPH_RE,
         (_whole, pre: string, g: string) =>
           pre + styler.roleBold(STATE_GLYPH_ROLE[g]!, g),
       );

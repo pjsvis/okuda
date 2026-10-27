@@ -5,7 +5,7 @@ glance — green/yellow/orange/red, bold. If the glyphs don't read at 3×
 distance with colour + bold, the vocabulary fails its job and the lexicon
 is a list, not a moat.
 
-**What this is:** the four state glyphs (`☐ ✓ ⋮ ✗`) with their traffic-
+**What this is:** the four state glyphs (`☐ ✓ ⸮ ✗`) with their traffic-
 lamp colours, pinned by contract test (`tests/ansi-palette.test.ts`,
 brief: `briefs/2026-08-28-brief-state-glyph-vocabulary.md`). The colours
 are **lexicon-applied**, not author-editable — the renderer colours a
@@ -20,7 +20,7 @@ lexicon's glyphs.
 |-------|-------|------|-----|---------|----------|
 | ✓ | done / shipped | `state-ok` | `#5fd35f` | success | "this works" |
 | ☐ | todo / pending | `state-todo` | `#ffe066` | waiting | "not yet" |
-| ⋮ | parked / elided | `state-parked` | `#ff9933` | caution | "deferred" |
+| ⸮ | parked — a comment on the plan | `state-parked` | `#a06fa8` | commentary | "deferred, ironically" |
 | ✗ | rejected / failed | `state-failed` | `#ff5555` | alarm | "no" |
 | ◆ | load-bearing | — (heading/strong) | — | priority, not state | "read this first" |
 
@@ -53,7 +53,7 @@ truecolor — colour + bold in one SGR:
 ```text
 state-ok     ✓   \x1b[38;2;95;211;95;1m✓\x1b[0m      green + bold
 state-todo   ☐   \x1b[38;2;255;224;102;1m☐\x1b[0m    yellow + bold
-state-parked  ⋮   \x1b[38;2;255;153;51;1m⋮\x1b[0m     orange + bold
+state-parked  ⸮   \x1b[38;2;160;111;168;1m⸮\x1b[0m     aubergine + bold
 state-failed ✗   \x1b[38;2;255;85;85;1m✗\x1b[0m      red + bold  (= alert)
 ```
 
@@ -68,9 +68,9 @@ The glyphs lead a list, carrying state the bullet cannot — one glyph,
 one job, one channel:
 
 - ✓ **Wrap engine.** Grapheme segmentation verified on CJK, emoji, combining marks.
-- ✓ **Mermaid intercept.** Art on show; source omitted, a `⋮` renderer statement names what was elided.
+- ✓ **Mermaid intercept.** Art on show; source omitted, a `⋮` elision mark names what was elided — `⋮` is the elision glyph (`…` turned vertical), and it is the state vocabulary's *ex*-glyph.
 - ☐ **Lexer EAW audit.** Token widths against the EAW table — not yet checked.
-- ⋮ **OSC 8.** Parked under Pass C; reopen on terminal evidence.
+- ⸮ **OSC 8.** Parked under Pass C; reopen on terminal evidence.
 - ✗ **Autolink pass.** Rejected — URL detection is the terminal's job.
 - ◆ **Elision primitive.** The load-bearing row — the gap ADR-014 names; `td-b81597` closes it.
 
@@ -92,12 +92,12 @@ before it is read, and the key beneath teaches the dialect in one line:
 | tui | ✓ | control plane; the game loop |
 | launcher | ✓ | ADR-016; argv[0] dispatch |
 | wrap | ✓ | grapheme-true hard-wrap; the invariant |
-| grammar | ⋮ | parked; Bun.markdown owns the grammar |
+| grammar | ⸮ | parked (the irony mark); Bun.markdown owns the grammar |
 | OSC 8 | ✗ | rejected; URL detection is the terminal's job |
 | ◆ elision | ☐ | `td-b81597`; the gap ADR-014 names |
 | in-doc search | ☐ | brief open; the length axis earns its vector |
 
-Key: ☐ to do · ✓ done · ✗ rejected · ⋮ parked. ◆ in the notes column
+Key: ☐ to do · ✓ done · ✗ rejected · ⸮ parked. ◆ in the notes column
 marks the row that reframes the table.
 
 ---

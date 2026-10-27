@@ -386,14 +386,17 @@ describe("render — mermaid pipe + colour classification", () => {
 
     // Colour mode: the glyph keeps its weight (state-parked + SGR 1), the
     // caption rides the muted register, and both close with a full reset.
+    // Aubergine since 2026-10-27 (BRF-IRONY-MARK): the receipt and the parked
+    // state share the ink because they share the meaning — *this is a comment on
+    // the document*, not part of it. The glyphs differ (⋮ continues, ⸮ asks).
     const titledTC = await renderDocument(titled, { width: W, palette: DRACULA_PALETTE });
     expect(line(titledTC)).toBe(
-      "  \x1b[38;2;255;153;51;1m⋮\x1b[0m\x1b[38;2;88;88;88m" +
+      "  \x1b[38;2;160;111;168;1m⋮\x1b[0m\x1b[38;2;88;88;88m" +
         " The cycle · source elided\x1b[0m",
     );
     const untitledTC = await renderDocument(untitled, { width: W, palette: DRACULA_PALETTE });
     expect(line(untitledTC)).toBe(
-      "  \x1b[38;2;255;153;51;1m⋮\x1b[0m\x1b[38;2;88;88;88m" +
+      "  \x1b[38;2;160;111;168;1m⋮\x1b[0m\x1b[38;2;88;88;88m" +
         " mermaid source elided\x1b[0m",
     );
   });

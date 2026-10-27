@@ -762,15 +762,19 @@ describe("render — state glyphs colour in prose (the lexicon leap)", () => {
     const out = await render("✗ rejected — out of scope");
     expect(out).toContain("\x1b[38;2;255;85;85;1m✗\x1b[0m");
   });
-  test("⋮ colours state-parked orange bold", async () => {
-    const out = await render("⋮ parked — gate not fired");
-    expect(out).toContain("\x1b[38;2;255;153;51;1m⋮\x1b[0m");
+  test("⸮ colours state-parked aubergine bold, and ⋮ no longer claims the state", async () => {
+    // BRF-IRONY-MARK: the irony mark takes the parked state; the vertical ellipsis
+    // goes back to elision and must not be coloured as a state any more.
+    const out = await render("⸮ parked — gate not fired");
+    expect(out).toContain("\x1b[38;2;160;111;168;1m⸮\x1b[0m");
+    const old = await render("⋮ parked — gate not fired");
+    expect(old).not.toContain("\x1b[38;2;160;111;168;1m⋮\x1b[0m");
   });
   test("every standalone glyph in a legend line colours, not just the first", async () => {
     // The status key at the bottom of a menu: all four glyphs colour.
-    const out = await render("☐ open · ⋮ parked · ✗ rejected · ✓ accepted");
+    const out = await render("☐ open · ⸮ parked · ✗ rejected · ✓ accepted");
     expect(out).toContain("\x1b[38;2;255;224;102;1m☐\x1b[0m");
-    expect(out).toContain("\x1b[38;2;255;153;51;1m⋮\x1b[0m");
+    expect(out).toContain("\x1b[38;2;160;111;168;1m⸮\x1b[0m");
     expect(out).toContain("\x1b[38;2;255;85;85;1m✗\x1b[0m");
     expect(out).toContain("\x1b[38;2;95;211;95;1m✓\x1b[0m");
   });

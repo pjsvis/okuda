@@ -184,7 +184,7 @@ describe("palette — dracula contract + override loader", () => {
     for (const p of [DRACULA_PALETTE, okuda]) {
       expect(p["state-ok"]).toBe("#5fd35f");      // green
       expect(p["state-todo"]).toBe("#ffe066");    // yellow
-      expect(p["state-parked"]).toBe("#ff9933");  // orange
+      expect(p["state-parked"]).toBe("#a06fa8");  // aubergine — off the lamp
       expect(p["state-failed"]).toBe("#ff5555");  // red
     }
   });
@@ -214,6 +214,40 @@ describe("palette — dracula contract + override loader", () => {
     }
   });
 
+  test("state-parked is off the lamp, and measurably distinguishable", () => {
+    // BRF-IRONY-MARK: parked stopped being a traffic-lamp rung and became a
+    // comment on the plan, so its hue left the red-green ramp. Two floors keep
+    // that honest — the second is the one that matters, because the old orange
+    // measured 2.9 from `state-ok` in the plane that survives red-green
+    // deficiency, i.e. parked and done were the same colour to ~8% of men.
+    const oklab = (hex: string): [number, number, number] => {
+      const lin = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+      const [r, g, b] = [1, 3, 5].map((i) => lin(parseInt(hex.slice(i, i + 2), 16) / 255)) as [number, number, number];
+      const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+      const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+      const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+      return [
+        0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+        1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+        0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
+      ];
+    };
+    const dE = (a: string, b: string) => {
+      const [x, y, z] = oklab(a), [p, q, r] = oklab(b);
+      return Math.hypot(x - p, y - q, z - r) * 100;
+    };
+    const safe = (a: string, b: string) => { // (L, b) only: what survives deuteranopia
+      const [x, , z] = oklab(a), [p, , r] = oklab(b);
+      return Math.hypot(x - p, z - r) * 100;
+    };
+    for (const p of [DRACULA_PALETTE, okudaPreset as Record<string, string>]) {
+      for (const other of ["state-ok", "state-todo", "state-failed"]) {
+        expect(dE(p["state-parked"]!, p[other]!)).toBeGreaterThan(12);
+        expect(safe(p["state-parked"]!, p[other]!)).toBeGreaterThan(12);
+      }
+    }
+  });
+
   test("state colours do not collide with the document channels they'd corrupt", () => {
     // The ADR-006 justification test, enforced: each state colour must
     // differ from the document channel it would corrupt if reused.
@@ -226,6 +260,8 @@ describe("palette — dracula contract + override loader", () => {
       expect(p["state-todo"]).not.toBe(p["table-key"]);
       expect(p["state-parked"]).not.toBe(p.strong);
       expect(p["state-parked"]).not.toBe(p["badge-bg"]);
+      expect(p["state-parked"]).not.toBe(p["table-header"]); // lavender, the nearest
+      // aubergine in okuda: close, and distinguishable — see the ΔE floor test
       // state-failed === alert is the one allowed collision (by design).
     }
   });

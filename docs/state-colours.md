@@ -10,7 +10,7 @@ The live rendered exhibit of the state-glyph vocabulary, in the wild, inside the
 |-------|-------|------|------|
 | ✓ | done / shipped | `state-ok` | recede (expected) |
 | ☐ | todo / pending | `state-todo` | watch (forward-looking) |
-| ⋮ | parked / elided | `state-parked` | recede (expected) |
+| ⸮ | parked — a comment on the plan | `state-parked` | commentary (aubergine) |
 | ✗ | rejected / failed | `state-failed` | alarm (= `alert`) |
 | ◆ | load-bearing | — (heading/strong) | priority, not state |
 
@@ -30,12 +30,12 @@ A glyph column compresses state to a glance. Each row is assessed before it is r
 | tui | ✓ | control plane; the game loop |
 | launcher | ✓ | ADR-016; argv[0] dispatch |
 | wrap | ✓ | grapheme-true hard-wrap; the invariant |
-| grammar | ⋮ | parked; Bun.markdown owns the grammar |
+| grammar | ⸮ | parked (the irony mark); Bun.markdown owns the grammar |
 | OSC 8 | ✗ | rejected; URL detection is the terminal's job |
 | ◆ elision | ☐ | `td-b81597`; the gap ADR-014 names |
 | in-doc search | ☐ | brief open; the length axis earns its vector |
 
-Key: ☐ to do · ✓ done · ✗ rejected · ⋮ parked. ◆ in the notes column marks the row that reframes the table.
+Key: ☐ to do · ✓ done · ✗ rejected · ⸮ parked. ◆ in the notes column marks the row that reframes the table.
 
 ---
 
@@ -44,9 +44,9 @@ Key: ☐ to do · ✓ done · ✗ rejected · ⋮ parked. ◆ in the notes colum
 The glyphs lead, carrying state the bullet cannot. One glyph, one job, one channel:
 
 - ✓ **Wrap engine.** Grapheme segmentation verified on CJK, emoji, combining marks.
-- ✓ **Mermaid intercept.** Art on show; source omitted, a `⋮` renderer statement names what was elided.
+- ✓ **Mermaid intercept.** Art on show; source omitted, a `⋮` elision mark names what was elided.
 - ☐ **Lexer EAW audit.** Token widths against the EAW table — not yet checked.
-- ⋮ **OSC 8.** Parked under Pass C; reopen on terminal evidence.
+- ⸮ **OSC 8.** Parked under Pass C; reopen on terminal evidence.
 - ✗ **Autolink pass.** Rejected — URL detection is the terminal's job.
 - ◆ **Elision primitive.** The load-bearing row — the gap ADR-014 names; `td-b81597` closes it.
 
@@ -56,7 +56,7 @@ The glyphs lead, carrying state the bullet cannot. One glyph, one job, one chann
 
 Glyphs inline in sentences carry the same state, compressed to one cell. This is the contentious path — the first cut colours glyphs in tables and lists; inline-prose colouring is deferred (P2.1) until the first cut lands and this section is judged. Today these are plain:
 
-The render plane is ✓ shipped; the launcher loop is ✓ shipped (ADR-016); the fetch-state stamp is ⋮ parked; the autolink pass is ✗ rejected. The elision primitive is ☐ todo — the one productive attention state. ◆ marks the load-bearing note: the elision gap is the governance gap ADR-014 names.
+The render plane is ✓ shipped; the launcher loop is ✓ shipped (ADR-016); the fetch-state stamp is ⸮ parked; the autolink pass is ✗ rejected. The elision primitive is ☐ todo — the one productive attention state. ◆ marks the load-bearing note: the elision gap is the governance gap ADR-014 names.
 
 Read that paragraph twice — once for the glyphs' plain shape today, once imagining them coloured. Does the colour read as the viewer honouring the lexicon, or as the viewer editorialising prose? That is the P2.1 question.
 
@@ -69,7 +69,7 @@ The contract test pins these byte-exactly. This code fence is the on-screen-now 
 ```text
 state-ok     ✓   \x1b[38;2;95;211;95;1m✓\x1b[0m      green + bold
 state-todo   ☐   \x1b[38;2;255;224;102;1m☐\x1b[0m    yellow + bold
-state-parked ⋮   \x1b[38;2;255;153;51;1m⋮\x1b[0m     orange + bold
+state-parked ⸮   \x1b[38;2;160;111;168;1m⸮\x1b[0m     aubergine + bold
 state-failed ✗   \x1b[38;2;255;85;85;1m✗\x1b[0m      red + bold  (= alert)
 ```
 
