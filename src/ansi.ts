@@ -133,9 +133,11 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
       // attributes under the same rule, and the voice path is colourless
       // (`justfile:110`), so an emphasis written as italics is otherwise
       // invisible to the ear (BRF-PROJECTION-LOSSES).
-      roleBold: (_n, text) => `\x1b[1m${text}${RESET}`,
-      roleItalic: (_n, text) => `\x1b[3m${text}${RESET}`,
-      roleBoldItalic: (_n, text) => `\x1b[1;3m${text}${RESET}`,
+      // none mode keeps the weight channel, and owes the same re-open: a nested
+      // bold run closes with RESET and would leave the enclosing bold behind.
+      roleBold: (_n, text) => `\x1b[1m${text.replaceAll(RESET, `${RESET}\x1b[1m`)}${RESET}`,
+      roleItalic: (_n, text) => `\x1b[3m${text.replaceAll(RESET, `${RESET}\x1b[3m`)}${RESET}`,
+      roleBoldItalic: (_n, text) => `\x1b[1;3m${text.replaceAll(RESET, `${RESET}\x1b[1;3m`)}${RESET}`,
       // Underline stays plain here, and the reason is not parity of
       // attributes: a link's cue is its address, and the `link` emitter
       // below still shows it in this mode. Same for `bold`/`strike` — a
@@ -164,7 +166,16 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     };
   }
 
-  const wrap = (prefix: string, text: string) => `${prefix}${text}${RESET}`;
+  /** Wrap, and hand the style back after any INNER reset.
+   *
+   *  A nested role — a state glyph's `roleBold`, or any styled run inside a cell,
+   *  lead or sentence — closes with `RESET`, which strips the enclosing style for
+   *  the whole tail: `**✗ rejected inside strong**` rendered "strong" plain after
+   *  the glyph. Re-opens the prefix after every inner reset, which is the
+   *  `keepHeading` fix generalised from headings to every role (td-1dec86).
+   *  Pure. */
+  const wrap = (prefix: string, text: string) =>
+    `${prefix}${text.replaceAll(RESET, RESET + prefix)}${RESET}`;
   return {
     mode,
     role: (name, text) => wrap(fg(palette[name]), text),

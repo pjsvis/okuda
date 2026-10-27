@@ -1221,12 +1221,10 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       const indent = " ".repeat(badgeW);
       const wrapW = width - 2;
       // Guest paints (silcrows, doc-refs, state glyphs) close with a full
-      // reset; the heading re-opens after each one — the enclosing style
-      // owns the run, the guest borrows and hands it back (td-290433).
-      // Reset-then-reopen keeps the wrap state machine's invariant: runs
-      // open with full resets only, never partial ones.
-      const reopen = styler.roleBoldOpen("heading");
-      const keepHeading = (l: string) => l.replace(/\x1b\[0m/g, `\x1b[0m${reopen}`);
+      // The re-open that used to live here (`keepHeading`, td-290433) moved into
+      // the styler's `wrap` on 2026-10-27 (td-1dec86): every role now hands the
+      // enclosing style back after an inner reset, so headings are no longer the
+      // only place that survives a guest. Doing both double-emits the open SGR.
       // Bun pre-renders inline formatting (e.g. `**text**`) into
       // ANSI-coloured children — strong/emphasis colours leak into the
       // heading. stripANSI removes all of it, then we re-apply guest
@@ -1253,7 +1251,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
             // badge is repainted here at the same column and width (badgeW).
             const text = i === 0 ? l.slice(markers.length) : " " + l.slice(badgeW);
             const body = styler.headingBadge(markers) +
-              styler.roleBold("heading", keepHeading(text));
+              styler.roleBold("heading", text);
             // wrapW + the gap column + the chip = `width`; the gap guarantees
             // the text never butts against the chip on a full line.
             return padDisplay(body, wrapW) + " " + styler.headingChip();

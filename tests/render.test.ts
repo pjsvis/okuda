@@ -1113,3 +1113,27 @@ describe("render — an address elides; it does not wrap (a wrapped path is a fa
     expect(out).not.toContain("…");
   });
 });
+
+describe("a nested role hands the enclosing style back (td-1dec86)", () => {
+  // A state glyph paints in its own role and closes with a full RESET, which
+  // strips the enclosing run for the whole tail: `**⸮ parked inside strong**`
+  // rendered the words after the glyph plain. The heading handler had re-opened
+  // since td-290433; list leads, table cells and inline spans had not. The
+  // re-open now lives in the styler's wrap, so every role owes it.
+  test("inline strong: the tail is styled again after the glyph", async () => {
+    const out = await render("**⸮ parked inside strong**", 70);
+    expect(out).toContain("\x1b[38;2;160;111;168;1m⸮\x1b[0m\x1b[38;2;255;184;108;1m parked inside strong");
+  });
+
+  test("list lead and table cell: same handoff, not just headings", async () => {
+    const lead = await render("- **⸮ parked as a lead**", 70);
+    expect(lead).toContain("\x1b[38;2;255;184;108;1m parked as a lead");
+    const cell = await render("| a | b |\n|---|---|\n| **⸮ closed** | x |", 70);
+    expect(cell).toContain("\x1b[38;2;255;184;108;1m closed");
+  });
+
+  test("none mode: the weight channel hands back too", async () => {
+    const out = await render("**⸮ parked**", 60, "none");
+    expect(out).toContain("\x1b[1m⸮\x1b[0m\x1b[1m parked");
+  });
+});
