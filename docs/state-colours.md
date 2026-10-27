@@ -2,7 +2,18 @@
 
 The live rendered exhibit of the state-glyph vocabulary, in the wild, inside the frame. Every glyph in every content path: table cells, list leads, prose. The chrome — H1 badge + RHS chip on the header, two-chip bookend terminator on the close — comes from the renderer, not the author; it is a system invariant, and this document is its watchdog. If the chrome ever drifts (the terminator stops closing, the chip misaligns), this doc catches it.
 
-**Today:** the glyphs render plain. The palette contract (`td-28a3e6`) pins four state roles — `state-ok`, `state-todo`, `state-parked`, `state-failed` — and six tests assert their hexes, but the render path does not yet apply them to glyphs in content. This document is the gap made legible in the renderer: the glyphs are here, the chrome is intact, the colours are absent. When the render-path application lands (`td-af9959` P2), the same document shows the colours — proof of the fix, unchanged.
+**Landed, and now a watchdog.** The palette pins four state roles — `state-ok`,
+`state-todo`, `state-parked`, `state-failed` — and the render path applies them to
+standalone state glyphs in every content path: table cells, list leads, inline prose.
+This document was written as the gap made legible (*the glyphs are here, the colours are
+absent*); the gap closed, and what is left is the exhibit plus the checks. Read it by
+looking, then read `--no-color`: the state is in the glyph, the colour is the glance,
+and losing the colour must not lose the state.
+
+A document about the vocabulary is the last place allowed to teach a retired one, so it
+is now checked: `tests/doc-vocabulary.test.ts` derives the glyphs from the renderer's own
+map and asserts this file against it — the four marks, their hexes, and the alignment of
+the byte fence below.
 
 **The vocabulary:**
 
@@ -54,15 +65,23 @@ The glyphs lead, carrying state the bullet cannot. One glyph, one job, one chann
 
 ## In prose — the inline glyphs
 
-Glyphs inline in sentences carry the same state, compressed to one cell. This is the contentious path — the first cut colours glyphs in tables and lists; inline-prose colouring is deferred (P2.1) until the first cut lands and this section is judged. Today these are plain:
+Glyphs inline in sentences carry the same state, compressed to one cell. This was the
+last path to be coloured, and the argument against it was that colouring prose
+*editorialises* it — the viewer appearing to have an opinion about the author's sentence.
+The judgement made: the glyph is standalone, the lexicon is closed, and the colour follows
+the mark rather than the author's whim, so what the reader sees is the vocabulary being
+applied, not a reading being imposed. It reads as the lexicon. Judge it here:
 
 The render plane is ✓ shipped; the launcher loop is ✓ shipped (ADR-016); the fetch-state stamp is ⸮ parked; the autolink pass is ✗ rejected. The elision primitive is ☐ todo — the one productive attention state. ◆ marks the load-bearing note: the elision gap is the governance gap ADR-014 names.
 
-Read that paragraph twice — once for the glyphs' plain shape today, once imagining them coloured. Does the colour read as the viewer honouring the lexicon, or as the viewer editorialising prose? That is the P2.1 question.
+Read that paragraph twice — once in colour, once under `--no-color`. In colour: does it
+read as the lexicon being honoured, or as the viewer editorialising the sentence? Under
+`--no-color`: do the states survive on shape alone? The answers are the P2.1 verdict, and
+they have to hold together: a mark that needs its colour to mean something is decoration.
 
 ---
 
-## The ANSI bytes — what the renderer should emit
+## The ANSI bytes — what the renderer emits
 
 The exhibit is painted above and in the tables, because those are ordinary prose and the
 renderer colours them. The fence below is the **bytes quoted**, and a fence is code:
@@ -84,8 +103,8 @@ state-failed ✗   \x1b[38;2;255;85;85;1m✗\x1b[0m      red + bold  (= alert)
 ## What to judge
 
 1. **Does the chrome hold?** The H1 badge + chip on the header, the two-chip bookend at the foot. If the terminator stops closing or the chip misaligns, the system invariant broke — foxtrot oscar. This doc is the watchdog.
-2. **Do the glyphs read plain today?** They should — the render path doesn't apply state colours yet. If they're already coloured, the application landed without this doc noticing.
-3. **After P2, do the glyphs read at 3× distance?** With colour + bold, a `✓` should scan as "done" before the row is read. If you have to read the glyph to know the state, the colour isn't earning its place.
+2. **Does every content path colour?** Table cells, list leads, inline prose. A path that stays plain is a hole in a closed lexicon, and the one place a second vocabulary can start.
+3. **Do the glyphs read at 3× distance?** With colour + bold, a `✓` should scan as "done" before the row is read. If you have to read the glyph to know the state, the colour isn't earning its place.
 4. **Do `◆` and the state glyphs stay on separate axes?** `◆` should read as a different *kind* of mark — priority, not lifecycle. If it reads as a fifth state, the lexicon has leaked.
 5. **Does NOCOLOR survive?** `okuda docs/state-colours.md --no-color` — the glyphs are shape-only; the states still distinguish. The colour is the glance; the glyph is the meaning.
 
