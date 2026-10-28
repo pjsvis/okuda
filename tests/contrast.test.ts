@@ -64,15 +64,23 @@ describe("the ground page — pinned against its instrument (ADR-GLASS-INK-073)"
     for (const r of rows()) expect(r.ruleShare).toBeLessThan(1);
   });
 
-  test("the refused rung is refused by measurement, not by taste", () => {
-    // The page says "the rules erode". That claim is checked: the refused pair
-    // must have the weakest `muted` contrast of any ground in the set, which is
-    // the mechanism the prose names.
+  test("the refused rung is refused by its own ground, and corroborated by its rules", () => {
+    // The page says the lifted ground reads as emitted light. That is a claim
+    // about the *ground*, so it is checked on the ground: the refused rung must
+    // be the lightest in the set — the only one above the control, which was
+    // already too bright. Its weakest-in-set `rules` value is the corroboration
+    // the instrument can offer, not the reason (the reader's report is).
     const all = rows();
     const refused = all.filter((r) => r.refused);
     expect(refused).toHaveLength(1);
+    const lightest = all.reduce((a, b) => (a.lBg >= b.lBg ? a : b));
+    expect(refused[0]!.n).toBe(lightest.n);
     const weakest = all.reduce((a, b) => (a.watched["muted"]! <= b.watched["muted"]! ? a : b));
     expect(refused[0]!.n).toBe(weakest.n);
+    // And above the control's ground: lifting past the page's own base is the
+    // mechanism the page names.
+    const control = all.find((r) => r.n === 0)!;
+    expect(refused[0]!.lBg).toBeGreaterThan(control.lBg);
   });
 
   test("the refusal's number is on the page", () => {

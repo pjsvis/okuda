@@ -51,8 +51,17 @@ export const PAIRS: Pair[] = [
     name: "lifted ground — do not use",
     bg: "#343a45",
     fg: "#d4d8de",
-    refused: "the rules erode: `muted` falls to 1.49 against the ground",
+    // Refused on a report from the glass, not from this script: the ground
+    // reads as an *emitted light* — "glowing background sitting over the
+    // viewport like a glare reflection". On an emissive display a large area of
+    // grey is a lit rectangle, not an absence of light, and lifting it toward
+    // the surround makes it figure instead of ground. The rules measurement is
+    // the corroboration, not the cause: this is also the weakest structure in
+    // the set (`muted` 1.49, the ground-to-muted gap the smallest of any rung).
+    refused: "the ground reads as emitted light — a lit rectangle over the viewport; its rules are also the weakest in the set (1.49)",
   },
+  { n: 8, name: "ground deeper still — best so far", bg: "#221f1c", fg: "#d6cfc4" },
+  { n: 9, name: "deeper again — the floor test", bg: "#1c1a17", fg: "#d6cfc4" },
 ];
 
 const hex2rgb = (h: string): [number, number, number] => {
@@ -168,7 +177,10 @@ export function configFile(pairs: Pair[] = PAIRS): string {
   out.push("# Uncommenting two pairs does not compare them: the later key wins silently");
   out.push("# and you will judge the wrong rung. A bare `foreground =` resets to default.");
   out.push("#");
-  out.push("# Try 1, then 4, then 5. Stop when it stops bothering you.");
+  out.push("# The ground is the lever, not the ink. Every ink-only rung (1-3) was");
+  out.push("# rejected as the prose receding; every deepened ground was kept. 8 is the");
+  out.push("# best so far. Ground L below ~0.27 stops reading as a lit panel; above");
+  out.push("# ~0.29 it competes with the room, which is why 7 glows.");
   out.push("#");
   out.push("#   n  bg / fg                ratio    L       rules   what it is");
   for (const r of rs) {
@@ -181,8 +193,8 @@ export function configFile(pairs: Pair[] = PAIRS): string {
   }
   out.push("#");
   out.push("# rules = the `muted` role (#445566 — horizontal rules, table pipes)");
-  out.push("# against that ground. It is the binding constraint: a lighter ground");
-  out.push("# erases the structure while prose stays legible, which is why 7 is out.");
+  out.push("# against that ground: structure, and the corroborating measure.");
+  out.push("# 7 is refused because the ground *glows* — see the note on its line.");
   out.push("# why:   docs/2026-10-28-the-ground-you-read-on.md");
   out.push("# made:  scripts/contrast.ts (`just contrast`) · ADR-GLASS-INK-073");
   out.push("#");
