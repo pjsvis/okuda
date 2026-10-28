@@ -24,6 +24,11 @@ okuda
 # VMark editor state (local, per-directory)
 .vmark/
 
+# Atuin shell-history permissions — written by the agent runtime on use, so it
+# changes under the operator's feet and no commit can own it. Local state, not a
+# record (ADR-DOCUMENT-LIFECYCLE-057's ephemeral tier).
+.atuin/
+
 # Island (ephemeral, regenerated — never registered)
 NOW.md
 STANCE.md

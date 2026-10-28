@@ -1373,6 +1373,13 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // token paints as ONE affordance, because a citation half in the register
       // and half in plain prose is neither actable nor a lie you can see. The
       // coordinate is dereferenced, never rendered: no gutters (ADR-074).
+      //
+      //
+      // KNOWN GAP (td-a11y-ish, filed the same day): this runs pre-order on the
+      // text node, so a citation inside a codespan is painted too — the codespan
+      // handler has not wrapped it yet. Making backticks an opt-out means moving
+      // the paint to a pass that runs after the inline spans are composed, which
+      // is a design decision about wrap order, not a patch.
       out = out.replace(RE_CITED_PATH, (m) => styler.role("doc-ref", m));
       // A standalone state glyph colours in prose — the vocabulary's
       // "colour + bold" intent applies wherever the glyph appears as a
