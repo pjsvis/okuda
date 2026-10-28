@@ -421,6 +421,11 @@ palette-swatch:
 contrast:
     @bun scripts/contrast.ts
 
+# Ground pairs, pasteable
+[group('build')]
+ground:
+    @cat docs/2026-10-28-ghostty-ground.conf
+
 # Ground page
 [group('build')]
 contrast-doc:

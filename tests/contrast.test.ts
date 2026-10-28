@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { configBlock, oklchL, ratio, rows, rungLine } from "../scripts/contrast";
+import { configFile, oklchL, ratio, rows, rungLine } from "../scripts/contrast";
 
 // The page is a claim set — every ratio on it is arithmetic, so every ratio on it
 // can be checked. This file is what makes `docs/2026-10-28-the-ground-you-read-on.md`
@@ -15,13 +15,39 @@ const DOC = join(
   "docs",
   "2026-10-28-the-ground-you-read-on.md",
 );
+const CONF = join(import.meta.dir, "..", "docs", "2026-10-28-ghostty-ground.conf");
 const page = (): string => readFileSync(DOC, "utf8");
+const conf = (): string => readFileSync(CONF, "utf8");
 
 describe("the ground page — pinned against its instrument (ADR-GLASS-INK-073)", () => {
-  test("the paste block is verbatim from the instrument, so a pair cannot drift", () => {
-    // The block is rendered from PAIRS, never hand-typed twice: a rung added to
-    // the instrument and forgotten in the page is the drift this catches.
-    expect(page()).toContain(configBlock());
+  test("the pasteable file is the instrument's output, byte for byte", () => {
+    // The `.conf` is the thing a principal pastes. It is generated, not typed,
+    // so the only way it can be wrong is if it is stale — which this catches.
+    expect(conf()).toBe(configFile() + "\n");
+  });
+
+  test("the pasteable file is inert: every line is a comment", () => {
+    // Pasting must be a no-op until a pair is chosen. An active line here would
+    // change the reader's terminal the moment they pasted it, before they had
+    // decided anything — the whole point of the block's being commented out.
+    const active = conf()
+      .split("\n")
+      .filter((l) => l.trim() !== "" && !l.trimStart().startsWith("#"));
+    expect(active).toEqual([]);
+  });
+
+  test("the page's fence and the file are the same bytes", () => {
+    // Two renderings, one source. The page must stand alone for a reader without
+    // the repo; the file must paste without markdown fences. Neither may drift.
+    expect(page()).toContain("```ini\n" + configFile() + "\n```");
+  });
+
+  test("every rung is one uncomment away: a bg line and an fg line", () => {
+    // The dogfood loop is "uncomment two lines, reload". That only works if each
+    // rung offers exactly one of each, adjacent, and none of them is active.
+    for (const r of rows()) {
+      expect(conf()).toContain(`# background = ${r.bg}\n# foreground = ${r.fg}\n`);
+    }
   });
 
   test("every rung on the page is the instrument's own line, verbatim", () => {

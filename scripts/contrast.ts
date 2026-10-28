@@ -153,18 +153,44 @@ export function rungLine(r: Row): string {
   );
 }
 
-/** The paste block: every rung, commented, so a reader uncomments exactly one
- *  pair and reloads. Rendered from PAIRS — the doc is checked against this. */
-export function configBlock(pairs: Pair[] = PAIRS): string {
+/** The paste block: a whole Ghostty fragment, every line commented, so pasting
+ *  it is a no-op until the reader uncomments exactly one pair. Rendered from
+ *  PAIRS — the page and the `.conf` are both checked against this, so there is
+ *  one source and two renderings, never two hand-typed copies. */
+export function configFile(pairs: Pair[] = PAIRS): string {
+  const pad = (s: string, n: number): string => s.padEnd(n);
+  const rs = rows();
   const out: string[] = [];
-  out.push("# ── okuda: the ground you read on ─────────────────────────────");
-  out.push("# Uncomment ONE pair, then reload the config.");
-  out.push("# macOS: cmd+shift+,   Linux: ctrl+shift+,   (action: reload_config)");
-  out.push("# A bare value resets to the terminal's default.");
+  out.push("# ── okuda · the ground you read on ─────────────────────────────────");
+  out.push("# Nothing here is active: every line is a comment. Uncomment exactly ONE");
+  out.push("# pair — the two lines `background` and `foreground` — then reload:");
+  out.push("#   macOS  cmd+shift+,      Linux  ctrl+shift+,      (action: reload_config)");
+  out.push("# Uncommenting two pairs does not compare them: the later key wins silently");
+  out.push("# and you will judge the wrong rung. A bare `foreground =` resets to default.");
+  out.push("#");
+  out.push("# Try 1, then 4, then 5. Stop when it stops bothering you.");
+  out.push("#");
+  out.push("#   n  bg / fg                ratio    L       rules   what it is");
+  for (const r of rs) {
+    out.push(
+      `#   ${pad(String(r.n), 3)}${pad(`${r.bg} / ${r.fg}`, 22)}` +
+        `${pad(`${r.ratio.toFixed(1)}:1`, 8)}${pad(r.lFg.toFixed(3), 8)}` +
+        `${pad((r.watched["muted"] ?? 0).toFixed(2), 8)}${r.name}` +
+        (r.refused ? " ✗" : ""),
+    );
+  }
+  out.push("#");
+  out.push("# rules = the `muted` role (#445566 — horizontal rules, table pipes)");
+  out.push("# against that ground. It is the binding constraint: a lighter ground");
+  out.push("# erases the structure while prose stays legible, which is why 7 is out.");
+  out.push("# why:   docs/2026-10-28-the-ground-you-read-on.md");
+  out.push("# made:  scripts/contrast.ts (`just contrast`) · ADR-GLASS-INK-073");
+  out.push("#");
+  out.push("# Second dial, and it is okuda's rather than the terminal's: prose weight");
+  out.push('# relative to the accents — { "body": "#cfd3d8" } in ~/.config/okuda/palette.json');
   for (const p of pairs) {
     out.push("");
-    const tag = p.refused ? " ✗" : "";
-    out.push(`# ${p.n} — ${p.name}${tag}`);
+    out.push(`# ${p.n} — ${p.name}${p.refused ? " ✗" : ""}`);
     if (p.refused) out.push(`#     ${p.refused}`);
     out.push(`# background = ${p.bg}`);
     out.push(`# foreground = ${p.fg}`);

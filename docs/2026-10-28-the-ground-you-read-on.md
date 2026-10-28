@@ -55,14 +55,44 @@ accents included: deepening the ground *raises* the loudest accents (amber reach
 
 ## The paste block
 
-Into `~/.config/ghostty/config.ghostty` (or `~/Library/Application Support/com.mitchellh.ghostty/config.ghostty`;
-both are loaded, the macOS one last). Uncomment **one** pair and reload.
+Two ways, one source. Paste the block below into
+`~/.config/ghostty/config.ghostty` (or `~/Library/Application Support/com.mitchellh.ghostty/config.ghostty`;
+both are loaded, the macOS one last) — or take the file itself, which carries no
+markdown fences: `just ground` prints it, and it lives at
+`docs/2026-10-28-ghostty-ground.conf`.
+
+Every line is a comment, so pasting is a no-op until you uncomment exactly one
+pair. That is the whole dogfood loop: **uncomment two lines, reload, look** —
+comment them again, uncomment the next pair, reload.
 
 ```ini
-# ── okuda: the ground you read on ─────────────────────────────
-# Uncomment ONE pair, then reload the config.
-# macOS: cmd+shift+,   Linux: ctrl+shift+,   (action: reload_config)
-# A bare value resets to the terminal's default.
+# ── okuda · the ground you read on ─────────────────────────────────
+# Nothing here is active: every line is a comment. Uncomment exactly ONE
+# pair — the two lines `background` and `foreground` — then reload:
+#   macOS  cmd+shift+,      Linux  ctrl+shift+,      (action: reload_config)
+# Uncommenting two pairs does not compare them: the later key wins silently
+# and you will judge the wrong rung. A bare `foreground =` resets to default.
+#
+# Try 1, then 4, then 5. Stop when it stops bothering you.
+#
+#   n  bg / fg                ratio    L       rules   what it is
+#   0  #282c34 / #ffffff     14.0:1  1.000   1.82    control — Ghostty's default
+#   1  #282c34 / #dcdfe4     10.5:1  0.903   1.82    ink off-white
+#   2  #282c34 / #cfd3d8     9.3:1   0.865   1.82    ink softer
+#   3  #282c34 / #b8bcc2     7.3:1   0.794   1.82    ink grey, evening only
+#   4  #23272e / #c8ccd4     9.3:1   0.844   1.95    ground deeper
+#   5  #1b1e24 / #a9aeb8     7.5:1   0.750   2.18    deep and dim, night or OLED
+#   6  #262320 / #d6cfc4     10.1:1  0.857   2.04    warm ground, cream ink
+#   7  #343a45 / #d4d8de     8.0:1   0.881   1.49    lifted ground — do not use ✗
+#
+# rules = the `muted` role (#445566 — horizontal rules, table pipes)
+# against that ground. It is the binding constraint: a lighter ground
+# erases the structure while prose stays legible, which is why 7 is out.
+# why:   docs/2026-10-28-the-ground-you-read-on.md
+# made:  scripts/contrast.ts (`just contrast`) · ADR-GLASS-INK-073
+#
+# Second dial, and it is okuda's rather than the terminal's: prose weight
+# relative to the accents — { "body": "#cfd3d8" } in ~/.config/okuda/palette.json
 
 # 0 — control — Ghostty's default
 # background = #282c34
