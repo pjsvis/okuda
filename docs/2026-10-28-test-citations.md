@@ -70,9 +70,16 @@ word for it is *a wrapped path is a false name* (src/render.ts:78). Same defect
 class as the one above: the affordance has no protection against the context it
 is painted in.
 
-## What a reader should be able to do
+## What a reader can do today — and cannot
 
-Select a citation whole and paste it somewhere that resolves it — a search, an
-editor, a host `link` rule. If a citation cannot be selected whole, the affordance
-has failed regardless of how it looks, and the two gaps above are exactly that
-failure: one paints where it should not, one breaks what it paints.
+**Can:** select a citation whole and paste it somewhere that resolves it. The gold
+means *this is an address, not prose*, and the two known gaps above are where even
+that fails.
+
+**Cannot:** click it and jump. There is no dereference built, and none is available
+from the host: Ghostty's `link` regex option is unimplemented (`parseCLI` returns
+`NotImplemented`), so click matching covers URLs and OSC 8 hyperlinks only, and
+okuda emits neither. `cmd+click` on a citation does nothing, by construction and by
+the record (`ADR-ADDRESS-NOT-COORDINATE-074`). A jump is a keystroke's grammar away
+in the TUI — which already spawns the editor for the current document — and it is
+filed, not wished.

@@ -55,18 +55,30 @@ file, the editor and the citation, and does not need to appear in the margin.
 | A gutter in whole-file mode only, behind a flag | The only version that would be *true*, and the one to reopen if the affordance fails. Refused now because it is a want, not a need: nobody has been blocked verifying a citation in the render, and the flag spends the code's own columns. The mode split is the reusable part, and it is recorded here. |
 | Leave citations as prose | 310 addresses that the reader must trust. The half-actable case is worse than either extreme: `src/render.ts` gilds while `:274` does not, so the address looks resolvable and is not. |
 | Widen `doc-ref` to every extension | The sweep's false positives are the evidence: version strings (`v1.2:3`) and ports (`example.com:8080`) gild under a permissive match. The list is closed and corpus-derived. |
+| Emit OSC 8 with an editor URL scheme (`vscode://file/…:274`) so `cmd+click` jumps | Would work in Ghostty 1.4 today, via `link-osc8`. Refused: it reverses the long-standing no-OSC-8 refusal for links, and it puts an *editor's name and URL grammar* inside the renderer — an environment opinion in the byte stream, which is `ADR-GLASS-INK-073`'s boundary crossed in the other direction. One scheme per editor, and a document becomes unportable between machines. Recorded because it is the fastest route and the least house-shaped. |
 
 ## Consequences
 
 **What became easier:**
 
 - **The citation resolves at a glance.** `src/render.ts:274` is one gold token in
-  the affordance register, so it can be selected whole, matched by a terminal
-  `link` rule, or read into a search — the dereference belongs to the host, which
-  is the same boundary `ADR-GLASS-INK-073` drew for ink: the renderer asserts the
-  address, the environment opens it.
+  the affordance register, so it can be selected whole and read into a search or
+  an editor. That is the whole of what this decision delivers.
 - **The record and the render agree.** Documents already cite this way; the
   renderer now colours what they cite rather than half of it.
+
+**What this does NOT deliver — corrected 2026-10-28, hours after the fact, on a
+report from the glass.** This record first claimed the token could be "matched by a
+terminal `link` rule", and that is false for the terminal in use. Ghostty's `link`
+regex option is **unimplemented** — `Config.zig`'s `parseCLI` for it returns
+`error.NotImplemented`, and the shipped surface is `link-url`, `link-osc8`,
+`link-previews`. So click matching covers URLs and OSC 8 hyperlinks, and okuda
+emits neither: **there is no host-side dereference available today**, and
+`cmd+click` on a citation does nothing. The gold means *this is an address, not
+prose*; it does not mean *this is a link*. An actable jump is unbuilt, filed as a
+task, and its route is in-silo — the TUI already spawns the editor for the current
+document (`88`), so opening a citation at its line is a keystroke's worth of
+grammar rather than a host protocol.
 
 **What became harder:**
 
