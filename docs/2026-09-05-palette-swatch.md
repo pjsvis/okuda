@@ -41,11 +41,12 @@ table roles live inside `| ... |` — header row and left column:
 
 | Role | Hex | Where seen |
 |------|-----|------------|
+| `body` | `""` (empty) | prose, list text, table cells — no ink shipped; the glass's own foreground, or the principal's override |
 | `badge-bg` | #ffaa00 | TUI footer badge background (chrome) |
 | `badge-fg` | #000000 | TUI footer badge foreground (chrome) |
 | `state-ok` | #5fd35f | state glyph ✓ — done (state-colours.md) |
 | `state-todo` | #ffe066 | state glyph ☐ — todo (state-colours.md) |
-| `state-parked` | #ff9933 | state glyph ⋮ — parked (state-colours.md) |
+| `state-parked` | #a06fa8 | state glyph ⋮ — parked (state-colours.md) |
 | `state-failed` | #ff5555 | state glyph ✗ — failed (state-colours.md) |
 | `link` | #66ddff | legacy override-compat; not painted — link-text/link-url used instead |
 | `alert` | #ff5555 | fetch-state `failed` channel (ADR-015); === state-failed |

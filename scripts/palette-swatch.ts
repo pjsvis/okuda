@@ -56,6 +56,11 @@ const addressable: string[] = [
 // so no swatch is possible in markdown. Hex from the palette; "where
 // seen" points at the chrome home.
 const chrome: [string, string, string][] = [
+  // The ground. Not author-addressable by design: no markdown construct paints
+  // it, because a body hex is right or unreadable depending on the glass's
+  // background — which the renderer cannot query. It ships empty (inherit) and
+  // the principal declares it in `~/.config/okuda/palette.json` (ADR-BODY-INK-072).
+  ["body", hex("body") || '`""` (empty)', "prose, list text, table cells — no ink shipped; the glass's own foreground, or the principal's override"],
   ["badge-bg", hex("badge-bg"), "TUI footer badge background (chrome)"],
   ["badge-fg", hex("badge-fg"), "TUI footer badge foreground (chrome)"],
   ["state-ok", hex("state-ok"), "state glyph ✓ — done (state-colours.md)"],
@@ -78,7 +83,6 @@ const chromeRows = chrome
 
 const out = `---
 type: Reference
-callsign: REF-PALETTE-SWATCH
 ---
 
 # Palette Swatches — the colour in context

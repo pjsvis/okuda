@@ -7,6 +7,8 @@ type: Reference
 **Created:** 2026-09-05
 **Anchors:** `briefs/2026-08-26-brief-palette-lightness-knob.md` (parked),
 `briefs/2026-08-28-brief-oklch-tuning.md` (pending), `decisions/011-default-palette-okuda-identity.md`
+**Companion:** `docs/2026-09-05-palette-swatch.md` — the same roles rendered in
+context, generated from the preset rather than analysed.
 **Status:** reference — the spec the brightness/colour-mode translation functions derive from
 
 > The okuda preset (`src/palettes/okuda.json`) is the canonical palette. This
