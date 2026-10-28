@@ -76,9 +76,10 @@ regex option is **unimplemented** — `Config.zig`'s `parseCLI` for it returns
 emits neither: **there is no host-side dereference available today**, and
 `cmd+click` on a citation does nothing. The gold means *this is an address, not
 prose*; it does not mean *this is a link*. An actable jump is unbuilt, filed as a
-task, and its route is in-silo — the TUI already spawns the editor for the current
-document (`88`), so opening a citation at its line is a keystroke's worth of
-grammar rather than a host protocol.
+task, and its route is in-silo — **a render, not an editor hand-off**: okuda already
+renders code files (`wrapWholeFile`), so a wired target that names a code file and
+a line arrives with that line at the top of the frame. The editor's job is
+editing (`88`); navigating is reading (`BRF-CITED-JUMP`).
 
 **What became harder:**
 

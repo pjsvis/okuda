@@ -3,45 +3,40 @@ type: Brief
 callsign: BRF-CITED-JUMP
 ---
 
-# Brief: Cited jump — go to the line, never show it
+# Brief: Cited jump — the render starts at the line, and never shows it
 
-**Date:** 2026-10-28 · **amended the same day** (the operator's spec: actuation is
-the silcrow's own; a bare address goes to the top; **code files only**)
+**Date:** 2026-10-28 · **amended the same day**, twice: the operator's spec
+deleted the first draft's editor hand-off and its cursor. What remains is smaller
+and is the tool's own mechanism.
 **Status:** Open
 
 ---
 
 ## Context
 
-`ADR-ADDRESS-NOT-COORDINATE-074` made a citation an address: `src/render.ts:274`
-paints as one `doc-ref` token, so the reader can see it is an address and not
-prose. It also claimed the terminal could then act on it, and **that was false**.
-Ghostty's `link` regex option is unimplemented (`Config.zig` `parseCLI` →
-`error.NotImplemented`; what ships is `link-url`, `link-osc8`, `link-previews`), so
-click matching covers URLs and OSC 8 hyperlinks, and okuda emits neither. The
-operator built, shipped, and `cmd+click`ed a citation: nothing happened, because
-nothing exists to happen.
+`ADR-ADDRESS-NOT-COORDINATE-074` made a citation an address — `src/render.ts:274`
+paints as one `doc-ref` token — and its first version claimed the *terminal* could
+act on it. That was false (Ghostty's `link` regex is unimplemented), which is now
+recorded. What follows is the verb, and the operator has specified it precisely
+enough that most of the first draft is deleted:
 
-This brief builds the missing verb, and it builds it where the tool already has
-one. The TUI spawns the editor for the *current* document (`88`, `editArgs` in
-`src/clone.ts`) and already carries a jump grammar for `§NN` tokens. Opening a
-cited path at its line is a new act in a grammar that has the verb; the missing
-part is where the cursor's address comes from, not how to open things.
+> **"no cursors"** · **"our current silcrow is actuated by a two digit number which
+> dereferences a document"** · **"if the document is a code file and a line number
+> is specified then set the top of the render at that line number"**
+
+The insight is that this is not a hand-off. **okuda already renders code files** —
+`wrapWholeFile` turns `okuda src/render.ts` into a single fence, chroma colours it,
+and the fence *is* the file. So dereferencing a code address at a line is a
+**render**, not an editor spawn: the same jump, arriving at a different offset. The
+first draft specified an editor spawn, an `editArgs` line-argument column and a
+rule for "which citation the gesture acts on". All three are gone; there is no
+cursor and nothing to select, because **the two-digit number is the actuator**.
 
 ## Warrant
 
-The operator's call, in their words — six sentences that settle the whole shape:
-
-> **"goto line but do not show line numbers."**
-> **"actuated the same as any other silcrow — if there is no line number we goto
-> the top of the file; if a line number is specified we go to that line number —
-> but only for code files."**
-
-Navigation is a verb; display is not, so **no gutter** (`ADR-074`). A bare address
-is still an address, so it goes to the **top of the file** — refusing it would be
-pedantry about a coordinate the reader never claimed. And the act is **the
-silcrow's act**, not a new one, applied only where the gap is: a **code** file,
-which okuda cannot render and therefore hands to the editor.
+The operator's call. Navigation is a verb, display is not — so no gutter, no line
+numbers on screen (`ADR-074`) — and the act is the silcrow's own, so a reader who
+has learned to dereference `§12` has learned this.
 
 ## Evidence
 
@@ -49,121 +44,95 @@ which okuda cannot render and therefore hands to the editor.
 | :--- | :--- |
 | `cmd+click` on a gold citation | does nothing — reported from the glass, 2026-10-28 |
 | Ghostty custom link rules | not settable (`error.NotImplemented`) |
-| `file:NN` citations in this repo | 310 (sweep, 2026-10-28) |
-| The TUI's editor spawn | exists: `88`, `editArgs`, `resolveEditor`, `src/clone.ts` |
-| The TUI's jump grammar | exists: `§NN` tokens via `extractJumps`, `jumpTo` |
-| Line argument in `editArgs` | absent — it takes a path only |
+| `extractJumps` target | `.md` only: the regex is `/\S+\.md/g` (`src/tui.ts`) |
+| `jumpTo` arrival | `present(fetch, next, 0)` — always the top |
+| Code rendering | exists: `wrapWholeFile`, `isWholeFileFence` (`src/render.ts`) |
+| Vertical elision in a code path | **none** — lines are elided horizontally only, so the count is exact |
+| Rendered index of file line 1 | **measured, not derived**: CLI shows the identity header at 0 and the fence body from 2; the TUI has no header (ADR-020) so the offset differs. The test measures it. |
 
 ## Objective
 
-The silcrow's gesture, applied to a code citation: open the cited file in the
-declared editor, at the cited line, or at the top when the address names no line.
-No gutter, no OSC 8, no URL scheme, no mouse.
-
-**The split is renderable vs not.** A `.md` address is okuda's own material and
-already has an actuation — documents open in the viewer, and the silcrow jump and
-the search both reach them. A code address has none, because a code file is not
-something okuda renders: the editor owns it, exactly as `88` already assumes. So
-this brief builds the half that is missing and leaves the other half alone.
+A jump target may name a **code file** and a **line**. Arriving there renders that
+file with the cited line at the top of the viewport. A `.md` target behaves exactly
+as it does today.
 
 ## Scope
 
 **In:**
 
-- A key (candidate: `go`/`gl`-style mnemonic or an unclaimed actuator — the keymap
-  decides) that reads the citation under the cursor and opens it.
-- The token's source: the **rendered line at the cursor**, stripped of ANSI and
-  matched with the same `RE_CITED_PATH` the renderer paints with. One regex, one
-  source of truth; a citation the renderer colours is a citation this finds.
-- Path resolution: relative to the current document, then contained in the silo
-  root (`BRF-ROOT-CONTAINMENT` — the same gate jumps use, refusing to escape).
-- The line argument in `editArgs`, as an editor-family column: `+N` (vi family),
-  `-g path:N` (code), `path:N` (zed and friends), none (editors that cannot).
-- **Dispatch by extension.** The citation's suffix decides the act: a code
-  extension from the closed list (`ts`, `rs`, `sh`, `py`) goes to the editor; `md`
-  is left to the existing document path and is explicitly inert here.
-- `flash` on every failure: no citation on the line, path outside the root, path
-  absent, editor unknown. No silent no-ops — the flash idiom already exists.
-- The keymap doc (`docs/keymap.md`) and the key grammar tests updated.
-- `tests/clone.test.ts` gains the line-argument cases; `tests/keygrammar.test.ts`
-  gains the actuator.
+- `extractJumps` accepts a code target with an optional line — `src/render.ts:274`,
+  `a.rs:1123-1142` — using the closed extension list the renderer already cites
+  (`RE_CITED_PATH`, `src/render.ts`), not a second list. A range arrives at its
+  opening line.
+- The target becomes `{ path, line? }` (or the string is parsed once at the jump
+  boundary — one of the two, chosen for how the map is consumed).
+- `jumpTo` passes the line as the **initial scroll** instead of `0`.
+- **The offset is measured.** File line N → content index *k*, where *k* is
+  whatever the TUI's frame actually puts there. The fixture: a three-line file, a
+  jump to line 3, and the test asserts the third line is the first non-blank row.
+- A line past EOF clamps to the end rather than blanking the pane.
+- `back()` is untouched: it restores the main document at its stored scroll.
 
 **Out:**
 
-- A gutter, any line numbers on screen, any config to enable them (`ADR-074`).
-- OSC 8 and editor URL schemes (`vscode://…`) — refused in `ADR-074`; recorded
-  there because it works today and is the wrong shape.
-- Mouse handling, and the streaming (non-TUI) render, which has no cursor.
-- **A `.md` citation jumping anywhere.** It is already reachable; adding an editor
-  spawn for it would hand a renderable document to a text editor, which is the
-  wrong owner.
-- **Numbering citations so they enter the jump table.** It is the literal reading
-  of "the same as any other silcrow" and it is refused: numbers would have to be
-  assigned by enumeration order, so reordering a document would silently retarget
-  the jumps, and authored numbers would collide with the reserved vector paint
-  (`ADR-031`) — the one number in a document that is visibly ours.
-- Opening citations from a document's *jump table* (`§NN` menu rows) — separate
-  reading, if it ever generalises.
-- Editing anything: the editor owns the write, as `88` already assumes.
+- Cursors of any kind, and a rule for "which citation the gesture acts on" — there
+  is no gesture on a citation; the number is the actuator.
+- An editor spawn, `editArgs` line arguments, or anything that hands a code file to
+  something that is not okuda. okuda renders code; the editor *edits* it (`88`).
+- Numbering prose citations so they enter the jump table. It is the literal reading
+  of "the same as any other silcrow" and it is refused: enumeration-order numbers
+  silently retarget when a document reorders, and authored numbers collide with the
+  reserved vector paint (`ADR-031`).
+- Gutters, OSC 8, editor URL schemes, mouse.
+
+## The consequence to state plainly
+
+**A prose citation is a mark, not a jump.** The silcrow numbers come from the
+compositor's wiring (`%%okuda-rhs:NN%%` sharing a line with its target). A bare
+`src/render.ts:274` in a paragraph has no number, so nothing can actuate it, and
+this brief does not invent one. What becomes jumpable is a **wired** target — the
+menu row, the index line — which is where the compositor already writes addresses.
 
 ## Design questions to settle in the work
 
-1. **Which citation does the gesture act on, and where does "here" come from?**
-   The TUI has no text cursor — it has a scroll position and an **anchor line**
-   (`anchorFor`: the stripped text of the non-blank line at the top of the
-   viewport, which already survives reflow). Candidate rule, and the one this
-   brief recommends: **the first code citation on the anchor line**, else flash.
-   It needs no new UI, is deterministic, and matches what the reader is looking at
-   at the top of the pane. The alternatives are a movable line cursor (new keys,
-   new frame painting — a different feature) and enumerating citations into the
-   jump table (refused above). A line holding two: the leftmost wins, and the rule
-   goes in the code comment because a reader will test it by hand.
-2. **Rendered or source?** Rendered is chosen above (one regex, and it matches what
-   the reader sees). The cost is named in **Risks**: a wrapped citation is not
-   found, because it is not one token on the line.
-3. **What counts as a line?** `path:NN` and `path:NN-MM` — for a range, the opening
-   line. A bare `path` goes to the **top of the file**: settled by the operator, and
-   the right call — the address is still an address, and refusing a coordinate the
-   reader never claimed is pedantry in place of an act.
+1. **The offset.** Measure it in the TUI (leading blank line from `finalize`, no
+   identity header). The CLI's numbers are not the TUI's — measured 2026-10-28, a
+   three-line file renders with the header at index 0 in streaming mode. Assume
+   nothing; the test is the instrument.
+2. **An `.md` target with a `:NN`.** Ignore the line, or flash that a document has
+   no line? Candidate: ignore — a `.md` line number has no meaning in a render that
+   wraps prose, and a flash would be noise about a coordinate nobody will read.
+3. **Two-digit ceiling.** Tokens are `\d{1,2}`. A line number is not a token, so
+   this bounds nothing here — noted only so a later reader does not mistake
+   `:274` for an actuator.
 
 ## Risks
 
-- **A wrapped citation cannot be jumped.** The known gap in
-  `docs/2026-10-28-test-citations.md` (an inline address longer than the line
-  breaks mid-token) is inherited: the feature finds what the renderer keeps whole,
-  and the narrow pane is where it fails. Report the failure as a flash, not a
-  guess.
-- **Key collision.** The TUI's grammar is dense; a new actuator must not shadow a
-  buffer prefix (`j`/`k` strides, `]]`, two-digit jump buffer).
-- **Editor variance.** The line-argument column is a table of exceptions; an
-  unknown editor must degrade to "open the file" or refuse, never to a silently
-  mangled argument.
+- **The compositor must write the address.** Nothing in the renderer can make a
+  prose citation jumpable without numbering it, so the benefit lands wherever
+  wiring exists. If that turns out to be nowhere, the finding is about the
+  compositor, not this brief.
+- **Elision is horizontal only**, so a code line cut at the glass still occupies one
+  index — the mapping survives. A future vertical budget would break it, and the
+  test is what would catch that.
+- **The render is not the file for `.md`**, which is why the line applies only to
+  code: prose wraps, so its rendered line numbers are the renderer's invention.
 
 ## Acceptance criteria
 
-- A unit test for the *spec builder* — cursor line + editor → argv — with no spawn,
-  in the shape `clone.test.ts` already uses for `editArgs`.
-- A test that a citation inside a codespan is not picked up… **no**: the codespan
-  gap (`src/render.ts`, filed) means it currently is picked up. The test asserts
-  what the render does today and links the filed defect, rather than encoding a
-  wish.
-- A containment test: a citation resolving outside the root flashes and spawns
-  nothing.
-- A dispatch test: a `md` citation is inert here; a code citation produces a spec;
-  a bare code path produces a spec with no line argument.
-- `just check` green; `bun test` green; keymap doc and `keygrammar` in step.
-- Dogfood: `okuda docs/2026-10-28-test-citations.md --tui`, jump each citation in
-  it, and the gold token becomes a verb.
+- `extractJumps` accepts `path:NN` and `path:NN-MM` for the cited code extensions,
+  and still accepts the `.md` form unchanged (existing `tests/tui.test.ts` cases
+  must stay green).
+- A jump to a fixture's line 3 renders that line at the top: asserted, not eyeballed.
+- A `.md` target renders exactly as before, at scroll 0.
+- A line past EOF clamps; a target outside the root still refuses
+  (`BRF-ROOT-CONTAINMENT`).
+- `just check` green; `bun test` green.
 
 ## Notes
 
-- **The mark already lands.** Nothing here changes what is painted; `ADR-074` is
-  untouched. This brief adds the act, and the operator's principle governs it:
-  *goto line, never show line.*
-- **One gesture, one meaning.** The act is the silcrow's, so a reader who has
-  learned to dereference `§12` has learned this. The cost of the reuse is that the
-  key has to be found on a line rather than on a badge — that is design question 1,
-  and it is the only part of this brief that is genuinely new.
-- **The corpus is the test bed.** `docs/2026-10-28-test-citations.md` was written
-  to expose the affordance's failures; it is also the natural manual test for
-  this, one citation at a time.
+- **The mark already lands.** `ADR-074` is untouched by this brief: nothing here
+  changes what is painted.
+- **Dogfood:** wire a row in a scratch document to `docs/2026-10-28-test-citations.md`
+  with a line, jump it, and confirm the render starts there. The corpus page was
+  built to break the affordance; this is the same trick applied to the verb.
