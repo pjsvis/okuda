@@ -18,6 +18,9 @@ In an agentic paired-terminal workflow (agent on the left, live preview on the r
 * **Soft returns honored** — line breaks without trailing double spaces
 * **Mermaid → ASCII** — ```mermaid fences piped to the `mermaid-to-md` Rust CLI
 * **Loose tables** — semantic color, breathing room, no box-drawing fatigue
+* **Your terminal's ink** — okuda sets no body colour; a measured set of
+  foreground/background pairs to try is in
+  [docs/2026-10-28-the-ground-you-read-on.md](docs/2026-10-28-the-ground-you-read-on.md)
 * **Terminal-width wrapping** — bypassed on raw ASCII diagrams
 * **Zero runtime deps** — a single `bun build --compile` executable
 

@@ -416,6 +416,16 @@ state-colours:
 palette-swatch:
     @bun scripts/palette-swatch.ts > docs/2026-09-05-palette-swatch.md
 
+# Ground pairs, measured
+[group('build')]
+contrast:
+    @bun scripts/contrast.ts
+
+# Ground page
+[group('build')]
+contrast-doc:
+    @./okuda docs/2026-10-28-the-ground-you-read-on.md --tui
+
 # Palette swatch viewer
 [group('build')]
 palette-swatch-doc:
