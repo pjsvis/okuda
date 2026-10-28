@@ -49,6 +49,9 @@ has learned to dereference `§12` has learned this.
 | Code rendering | exists: `wrapWholeFile`, `isWholeFileFence` (`src/render.ts`) |
 | Vertical elision in a code path | **none** — lines are elided horizontally only, so the count is exact |
 | Rendered index of file line 1 | **measured, not derived**: CLI shows the identity header at 0 and the fence body from 2; the TUI has no header (ADR-020) so the offset differs. The test measures it. |
+| Two references to one file, different lines | **collapse today**: `buildJumpMap` skips a repeated target — `if (seen.has(ref.target)) continue; // one destination, one silcrow` (`src/vectors.ts:271`). Correct under the old grammar, wrong the moment an address can name a line. |
+| A silcrow placed inside a range | **fails silently**: `path:1123 §14-1142` gilds `path:1123` and leaves ` §14-1142` as prose (probed 2026-10-28). `path:1123-1142 §14` gilds whole. |
+| An authored `§14` | inert — the badge is painted from the wire, never from text (`ADR-031`). The silcrow is the compositor's, not the author's. |
 
 ## Objective
 
@@ -95,16 +98,31 @@ menu row, the index line — which is where the compositor already writes addres
 
 ## Design questions to settle in the work
 
-1. **The offset.** Measure it in the TUI (leading blank line from `finalize`, no
-   identity header). The CLI's numbers are not the TUI's — measured 2026-10-28, a
-   three-line file renders with the header at index 0 in streaming mode. Assume
-   nothing; the test is the instrument.
+1. **The offset, as a pure function.** Measure it in the TUI (leading blank line
+   from `finalize`, no identity header). The CLI's numbers are not the TUI's —
+   measured 2026-10-28, a three-line file renders with the header at index 0 in
+   streaming mode. Expose the mapping as a pure `scrollForLine(lines, n)` in the
+   shape `anchorFor`/`reanchoredScroll` already have (`src/tui.ts`, tested in
+   `tests/tui.test.ts`), so the probe runs headless rather than through a
+   terminal. Assume nothing; the function is the instrument.
 2. **An `.md` target with a `:NN`.** Ignore the line, or flash that a document has
    no line? Candidate: ignore — a `.md` line number has no meaning in a render that
    wraps prose, and a flash would be noise about a coordinate nobody will read.
 3. **Two-digit ceiling.** Tokens are `\d{1,2}`. A line number is not a token, so
    this bounds nothing here — noted only so a later reader does not mistake
    `:274` for an actuator.
+4. **One ADDRESS, one silcrow.** The dedupe in `buildJumpMap` must key on the
+   address (path **and** line), not on the path: two references to one file at
+   different lines are two destinations and therefore two silcrows. The same
+   applies to the truncation fact in `deriveReferences`, which counts
+   `new Set(refs.map((r) => r.target)).size` — counting paths would let a document
+   of a hundred addresses in one file read as one destination, and the receipt
+   would state a fullness that is not there. Both sites, one rule.
+5. **The canonical authoring form.** `path:NN-MM §TT` — the token last, after the
+   whole range. The interleaved `path:NN §TT-MM` is probed above and fails
+   silently, splitting the range's tail into prose: the compositor writes both
+   halves, so it never interleaves, and the style guide states the form so an
+   author does not.
 
 ## Risks
 
@@ -125,8 +143,13 @@ menu row, the index line — which is where the compositor already writes addres
   must stay green).
 - A jump to a fixture's line 3 renders that line at the top: asserted, not eyeballed.
 - A `.md` target renders exactly as before, at scroll 0.
+- **Two references to one file at different lines get two silcrows**, and each
+  arrives at its own line — the dedupe test, and the one this brief would fail
+  today.
 - A line past EOF clamps; a target outside the root still refuses
   (`BRF-ROOT-CONTAINMENT`).
+- The offset mapping is asserted through a pure function, not through a spawned
+  terminal.
 - `just check` green; `bun test` green.
 
 ## Notes
