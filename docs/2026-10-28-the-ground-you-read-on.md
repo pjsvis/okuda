@@ -67,6 +67,49 @@ Which yields the one rule this set actually earns, and it is not the ratio:
 
 **And a limit on this instrument.** A contrast ratio is a luminance-only measure, so it could not rank these: rung 2 (9.3:1) was too dim and rung 8 (10.6:1) is the best so far, while rung 3 (7.3:1) and rung 5 (7.5:1) — 0.2 apart — were rejected and kept respectively. What separated them was the ground and its hue. Read the ratio as the **legibility floor** (below ~7 is where prose stops being read as prose) and the `L` column as the **comfort axis**. They are different questions, and this set was ranked by the wrong one first.
 
+## Walking the ladder — the method, recorded before the verdicts
+
+The band this set brackets is narrow, and the ladder is **not a ramp**: every step
+deeper raises the prose's contrast (the ink is held, the ground darkens) and raises
+the rules and the amber in lockstep. Going past the band does not relax the page,
+it rebuilds the glare you started with on a blacker ground.
+
+| rung | `L_bg` | prose | rules | amber |
+|---|---|---|---|---|
+| 0 | 0.293 | 14.0:1 | 1.82 | 10.7 |
+| 6 | 0.258 | 10.1:1 | 2.04 | 12.0 |
+| 8 | 0.242 | 10.6:1 | 2.14 | 12.6 |
+| 9 | 0.219 | 11.2:1 | 2.26 | 13.3 |
+
+**The stop rule, stated in advance.** Stop when prose ratio re-passes about
+**12:1**, or ground L approaches **0.20** — whichever comes first. Below that
+band you are not gaining comfort, you are gaining contrast against a darker
+ground. The comfort band is **ground L 0.24–0.26 at 10–11:1**; rungs 1–3 miss it
+by lowering contrast, rung 9 and beyond miss it by raising it.
+
+**Walk one rung a day, not per sitting.** Consecutive rungs are 0.016–0.023 apart
+in ground L, and the eye's reference drifts by more over an evening — the first
+reader saw rung 6 "seem a bit much" within minutes and then settle. A fast walk
+compares against memory and reports nothing. The alternative that costs nothing:
+compare each rung against a **fixed reference** (the control, or the rung you
+settled on), never against the step you just came from.
+
+**Watch the amber, not the prose.** `state-todo` crosses 13:1 before anything on
+the page *looks* wrong, because deepening raises every role's contrast at once.
+When the amber reads hotter than the heading, you are past the band.
+
+**One item is coupled to where you stop.** `muted` is hue **249°** — a cool blue
+— against a warm ground (~67°) and a warm ink (~79°). Nothing fails, but as the
+ground deepens that role gets *more* conspicuous (1.82 → 2.26 across the set), so
+the decision about its hue belongs at whatever ground you settle on, not before.
+`#5a4f45` is the same lightness family, warm; it is the one remaining variable
+that is okuda's rather than the terminal's.
+
+The verdicts land in **The result** above as they arrive. This section is the
+method, not a finding: the record is written for an experiment that has not
+finished, and that is the one thing an ADR cannot do (`ADR-PANE-NOT-CANVAS-069`:
+a record written first is a proposal wearing a decision's clothes).
+
 ## The paste block
 
 Two ways, one source. Paste the block below into

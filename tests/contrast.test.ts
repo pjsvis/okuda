@@ -50,6 +50,32 @@ describe("the ground page — pinned against its instrument (ADR-GLASS-INK-073)"
     }
   });
 
+  test("the ladder table on the page is the instrument's arithmetic", () => {
+    // The stop rule is a judgement ("about 12:1", "0.20"), but the figures it
+    // judges are computed — so the four rows it rests on are pinned. Change a
+    // pair or a palette hex and the rule's premise is republished or fails.
+    const all = rows();
+    for (const n of [0, 6, 8, 9]) {
+      const r = all.find((x) => x.n === n)!;
+      const line =
+        `| ${n} | ${r.lBg.toFixed(3)} | ${r.ratio.toFixed(1)}:1 | ` +
+        `${(r.watched["muted"] ?? 0).toFixed(2)} | ${(r.watched["state-todo"] ?? 0).toFixed(1)} |`;
+      expect(page()).toContain(line);
+    }
+  });
+
+  test("walking the ladder is deeper, and deeper raises contrast — the U, checked", () => {
+    // The page's central warning: going deeper does not keep relaxing the page.
+    // Asserted as a property of the set, so a future rung cannot quietly break
+    // it without the sentence that depends on it being revisited.
+    const all = rows();
+    const ladder = [6, 8, 9].map((n) => all.find((r) => r.n === n)!);
+    for (let i = 1; i < ladder.length; i++) {
+      expect(ladder[i]!.lBg).toBeLessThan(ladder[i - 1]!.lBg);        // deeper
+      expect(ladder[i]!.ratio).toBeGreaterThan(ladder[i - 1]!.ratio); // and higher contrast
+    }
+  });
+
   test("every rung on the page is the instrument's own line, verbatim", () => {
     // One line per rung, rendered by the instrument and asserted here: the page
     // cannot drift from the measurement, and a number cannot wrap mid-value —

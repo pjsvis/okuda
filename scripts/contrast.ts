@@ -218,20 +218,27 @@ function main(): void {
     return;
   }
   const pad = (s: string, n: number): string => s.padEnd(n);
+  // L_bg is the comfort axis (the ground's own lightness) and amber is the
+  // early-warning channel: deepening the ground raises every role's contrast in
+  // lockstep, and amber crosses 13:1 before anything on the page *looks* wrong.
   console.log(
     pad("", 3), pad("pair", 30), pad("bg", 9), pad("fg", 9),
-    pad("ratio", 7), pad("L_fg", 6), pad("rules", 6), pad("heading", 8), "share",
+    pad("ratio", 7), pad("L_bg", 6), pad("L_fg", 6),
+    pad("rules", 6), pad("amber", 6), "share",
   );
   for (const r of rs) {
     console.log(
       pad(String(r.n), 3), pad(r.name, 30), pad(r.bg, 9), pad(r.fg, 9),
-      pad(`${r.ratio.toFixed(1)}:1`, 7), pad(r.lFg.toFixed(3), 6),
+      pad(`${r.ratio.toFixed(1)}:1`, 7), pad(r.lBg.toFixed(3), 6),
+      pad(r.lFg.toFixed(3), 6),
       pad((r.watched["muted"] ?? 0).toFixed(2), 6),
-      pad((r.watched["heading"] ?? 0).toFixed(2), 8),
+      pad((r.watched["state-todo"] ?? 0).toFixed(1), 6),
       r.ruleShare.toFixed(2),
     );
   }
   console.log("\nshare = muted ÷ ink. Above 1.00 a rule out-shouts prose: refused.");
+  console.log("comfort band: ground L 0.24–0.26 at 10–11:1. Below it, or above it, the");
+  console.log("page is high-contrast again — the ladder is a U, not a ramp.");
 }
 
 if (import.meta.main) main();
