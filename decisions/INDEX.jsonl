@@ -71,3 +71,4 @@
 {"file":"072-body-ink.md","date":"2026-10-28","status":"Accepted","summary":"Prose gets a role — and it ships empty","meta":{},"callsign":"ADR-BODY-INK-072"}
 {"file":"073-the-glass-owns-its-ink.md","date":"2026-10-28","status":"Accepted","summary":"The glass owns its ink — okuda owns only the relations between its roles","meta":{},"callsign":"ADR-GLASS-INK-073"}
 {"file":"074-the-address-not-the-coordinate.md","date":"2026-10-28","status":"Accepted","summary":"The address, not the coordinate — citations dereference, they do not print","meta":{},"callsign":"ADR-ADDRESS-NOT-COORDINATE-074"}
+{"file":"075-the-dereference-mark.md","date":"2026-10-28","status":"Accepted","summary":"The dereference mark — a bare silcrow in the chrome","meta":{},"callsign":"ADR-DEREFERENCE-MARK-075"}

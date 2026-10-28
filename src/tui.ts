@@ -685,6 +685,10 @@ export function footerLine(
    *  PRESS). MUTED and beside the affordance, because state shares the
    *  perimeter with the affordance (BRF-READING-FRACTION ruling 2: rose+bold is
    *  the control channel, reserved for what is actuable — this is state).
+   *  NARROWED 2026-10-28 by ADR-DEREFERENCE-MARK-075: the rose may also carry the
+   *  ADDRESS channel in chrome (a bare `§` marking a dereferenced render). The
+   *  ruling still governs everything else — a future rose mark needs that
+   *  argument quoted, not this precedent cited.
    *  Conditional, and its APPEARANCE reports its condition (*Attributable
    *  structure*): the mark is on screen exactly while a tap waits. Absent →
    *  nothing, never an empty slot. */
