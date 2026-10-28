@@ -11,6 +11,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 |---|---|---|---|---|
 | 2026-10-28 | ADR-BODY-INK-072 | Accepted | Prose gets a role — and it ships empty | 072-body-ink.md |
 | 2026-10-28 | ADR-GLASS-INK-073 | Accepted | The glass owns its ink — okuda owns only the relations between its roles | 073-the-glass-owns-its-ink.md |
+| 2026-10-28 | ADR-ADDRESS-NOT-COORDINATE-074 | Accepted | The address, not the coordinate — citations dereference, they do not print | 074-the-address-not-the-coordinate.md |
 | 2026-10-26 | ADR-PROSE-MEASURE-070 | Superseded | Text takes the measure, art takes the glass | 070-prose-measure.md |
 | 2026-10-26 | ADR-PROSE-MEASURE-071 | Accepted | Prose takes the glass — the measure is reversed | 071-prose-takes-the-glass.md |
 | 2026-10-25 | ADR-PANE-NOT-CANVAS-069 | Accepted | The pane is not a canvas — layout at the diagram's width, elide at the glass | 069-the-pane-is-not-a-canvas.md |

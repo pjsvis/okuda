@@ -731,6 +731,48 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
     expect(out).toContain("\x1b[38;2;232;196;74mdocs/essay.md\x1b[0m");
   });
 
+  describe("a citation is one affordance — the line is dereferenced, not rendered (ADR-074)", () => {
+    const GOLD = "\x1b[38;2;232;196;74m";
+
+    test("path:line paints as ONE token, suffix included", async () => {
+      // Half an address in the register and half in plain prose is neither
+      // actable nor visibly wrong: the reason the suffix is inside the role.
+      const out = await render("see src/render.ts:274 for the read.");
+      expect(out).toContain(`${GOLD}src/render.ts:274\x1b[0m`);
+      expect(out).not.toContain(`${GOLD}src/render.ts\x1b[0m:274`);
+    });
+
+    test("a range is one token too — a citation states its extent", async () => {
+      const out = await render("the sweep is src/render.ts:1123-1142 today.");
+      expect(out).toContain(`${GOLD}src/render.ts:1123-1142\x1b[0m`);
+    });
+
+    test("every extension in the corpus is cited: ts, md, rs, sh, py", async () => {
+      for (const p of ["a.ts:1", "a.md:2", "a.rs:3", "a.sh:4", "a.py:5"]) {
+        expect(await render(`see ${p} here`)).toContain(`${GOLD}${p}\x1b[0m`);
+      }
+    });
+
+    test("the closed list holds: a version string and a port are prose", async () => {
+      // The sweep's own false positives, kept as the guard. A permissive
+      // `[a-z]+` extension match gilds `v1.2:3`; a `path:port` gilds hosts.
+      const out = await render("version v1.2:3 at example.com:8080 stays prose.");
+      expect(out).not.toContain(GOLD);
+    });
+
+    test("an uncited extension stays prose until something cites it", async () => {
+      // Corpus-derived and append-only: `json` has no `file:line` evidence in
+      // this repo, so it is not in the list. It arrives when it is needed.
+      expect(await render("see a.json:1 here")).not.toContain(GOLD);
+    });
+
+    test("NO_COLOR parity: the citation is the same characters", async () => {
+      const out = await render("see src/render.ts:274 here", 70, "none");
+      expect(out).toContain("src/render.ts:274");
+      expect(out).not.toContain("\x1b[38;2;");
+    });
+  });
+
   test("a non-digit strong run keeps the amber strong colour (not white)", async () => {
     const out = await render("**not-a-number**");
     // strong #ffb86c → 255;184;108 ; bold (1). The digits-only rule is

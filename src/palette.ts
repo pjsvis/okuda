@@ -56,6 +56,10 @@ export type Role =
   // Experimental (brief: index-and-jump): a greedy heuristic — colours
   // any .md mention in prose, not just index lines. The leap; learn the
   // reach by seeing it over-reach.
+  // Amended 2026-10-28 (ADR-ADDRESS-NOT-COORDINATE-074): the address may carry
+  // its line — `path:NN`, `path:NN-MM` — and the whole token paints in this
+  // role, because a citation half gilded is neither actable nor visibly wrong.
+  // The coordinate is dereferenced, not rendered: no gutters, in any mode.
   | "doc-ref"
   // The vector paint (ADR-031): the numbered jump badges the main
   // document's render projects from the in-memory jump map. Reserved —

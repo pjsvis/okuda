@@ -969,6 +969,19 @@ async function interceptMermaid(
 
 // ── Chroma pipe (BRF-FENCE-COLOUR) ───────────────────────────────────
 
+/** The extensions a cited address may carry, and its optional line.
+ *
+ *  Corpus-derived and closed — the MATH_GLYPHS rule, applied to paths: an entry
+ *  arrives with grep evidence, never with anticipation. Measured 2026-10-28 over
+ *  this repo's own citations: ts 166, md 127, rs 12, sh 5, py 1. The same sweep's
+ *  false positives were version strings (`v1.2:3`) and ports (`host:8080`) — so
+ *  the list is closed rather than `[a-z]+`, and an unfamiliar extension shows up
+ *  as prose until someone has cited it. Append-only on evidence.
+ *
+ *  The line is optional and may be a range: `path:274`, `path:1123-1142`. A bare
+ *  path keeps the exact behaviour it had before lines were allowed. */
+const RE_CITED_PATH = /\b([\w][\w/.-]*\.(?:ts|md|rs|sh|py))(?::(\d+)(?:-(\d+))?)?\b/g;
+
 /** A fence tag we will forward: one conservative word (ts, c++, c#,
  * objective-c). Anything else is not a language claim. */
 const RE_FENCE_TAG = /^[A-Za-z0-9][A-Za-z0-9_+#.-]*$/;
@@ -1348,14 +1361,19 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       out = out.replace(/%{1,2}okuda-vector:(\d{1,2})%{1,2}/g, (_m, n: string) =>
         " " + styler.roleBold("vector", `§${n}`));
       out = out.replace(/%{1,2}okuda-(?:vector|rhs):\d{1,2}%{1,2}/g, "");
-      // Bare .md-path tokens in prose are affordances, not provenance
+      // Bare path tokens in prose are affordances, not provenance
       // (amended 2026-09-12 — the 2026-08-28 gloaming called them far by
       // location; the test is by function). An actable path lifts to
       // the doc-ref gold: visible, subordinate to the rose vector
       // paint — the silcrow is the actuation point, the path is the
       // address. Type it in the search and it resolves.
-      out = out.replace(/\b([\w][\w/.-]*\.md)\b/g, (m) =>
-        styler.role("doc-ref", m));
+      //
+      // Amended 2026-10-28 (ADR-ADDRESS-NOT-COORDINATE-074): the address may
+      // carry its line — `src/render.ts:274`, `a.rs:1123-1142` — and the whole
+      // token paints as ONE affordance, because a citation half in the register
+      // and half in plain prose is neither actable nor a lie you can see. The
+      // coordinate is dereferenced, never rendered: no gutters (ADR-074).
+      out = out.replace(RE_CITED_PATH, (m) => styler.role("doc-ref", m));
       // A standalone state glyph colours in prose — the vocabulary's
       // "colour + bold" intent applies wherever the glyph appears as a
       // glyph (standalone, not embedded). The lexicon is consistent
