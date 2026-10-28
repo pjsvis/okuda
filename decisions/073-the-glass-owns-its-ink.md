@@ -123,6 +123,53 @@ That advice is this decision, from the terminal's author rather than from us.
   and it does not belong in a renderer that is a pure function of source, width
   and palette.
 
+## The process finding, which outlives the decision
+
+**Ask whose value it is before asking whether the idea is good.** *"Could the
+answer be written in the principal's own config file?"* If yes, say so first —
+then argue the mechanism, and say what the argument is for. The failure signal is
+a count: **artefacts produced against settings changed.** This family's reading
+is six commits and two ADRs for two hexes, and the sentence that ended it was
+available in round one.
+
+Why the count runs away, in the order it did here:
+
+- **A complaint arrives with a mechanism attached, and the mechanism captures
+  the frame.** *My eyes hurt* came as *compute line density*. Refusing the
+  proposal still leaves the argument inside the proposer's coordinate system,
+  and questions that only exist there — line counts, fill ratios — get answered
+  at length. The ownership question costs one line and dissolves the frame
+  instead of contesting it.
+- **The right diagnosis can come out of the wrong hole.** Prose having no role
+  was true, worth fixing, and *adjacent rather than causal* — the complaint was
+  about a foreground whose owner is the terminal. Interesting findings arrive
+  first and feel like progress; the protocol's own *"interesting is evidence
+  against"* is what this looks like when it bites.
+- **Abstention is not a signpost.** Shipping no body ink was correct and left a
+  **blank** where a dial should be, and a blank gets filled by whatever
+  machinery the renderer has. Perfect abstention plus silence is a user reaching
+  for density thresholds. Saying *where the value lives* is a separate act from
+  declining to set it, and only the first was done — until this record.
+- **Every refusal is local; the frame is global.** Four correct verdicts — block
+  attenuation, `OSC 10`/`OSC 11`, the lightness scale, the OKLCH scale — and the
+  frame survived all of them, because refusing a mechanism does not touch a
+  frame. Only a **scope decision** does. That is why this record is worth more
+  than the four refusals it contains.
+
+**What this does not license.** Less rigour. The refusals here were evidenced
+rather than tasteful, and what came out — a page and a paste file that fail the
+suite if a hex drifts — is not reachable from *"just set two colours in your
+terminal."* The machinery that over-elaborated is the machinery that made the
+answer checkable. Put the ownership question at the top; do not put the
+machinery away.
+
+**And the honest accounting:** most of this record is book-keeping, not solving.
+`ADR-073` did not produce the ruling — it recorded one sentence of the
+principal's, four rounds after it would have been decisive. Recording is worth
+doing and is dangerously easy to mistake for thinking, because it yields
+documents shaped like conclusions. The solving was four moves: one refusal, one
+true-but-adjacent diagnosis, one sentence from the principal, one measurement.
+
 ## Related
 
 - `ADR-BODY-INK-072` — the declaration point this decision leaves standing, and
