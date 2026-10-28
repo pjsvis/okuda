@@ -276,6 +276,36 @@ to set; the renderer owns only the **relations** among its own roles.
   Discipline*); `ADR-PROSE-MEASURE-071` (the same boundary on width);
   `docs/glow-vs-okuda.md` (*no light mode; light is a palette file we don't ship*).
 
+* **The shrinking draft**: a constraint is real only if the plan gets **smaller**
+when it lands. A pass that *grows* the plan — a new mechanism, a new column, a new
+actor — is evidence that the boundary has not been found yet, not evidence of
+thoroughness. The measurement is not how good the draft reads; it is whether
+something was deleted. 
+  * **Test:** compare the plan before and after the pass; count
+  mechanisms added and removed. Above zero added means the pass supplied a
+  *preference*, not a *fact*. 
+  * **The diagnostic pair:** reviews that shorten a plan
+  supply a **fact about the territory** (the tool has no cursor; the actuator is
+  already the silcrow; that is a class of thing) — reviews that lengthen it supply
+  a **preference about the map**. Only facts subtract, which is why only facts
+  collapse a problem space. 
+  * **Failure it names:** *gloop* — rigour spent
+  elaborating a mechanism the boundary question would have deleted. The worked
+  instance is `BRF-CITED-JUMP`'s first draft: an editor spawn, a line-argument
+  column and a cursor rule, all three invented, all three deleted by one sentence
+  each — *no cursors*; *the silcrow dereferences a document*; *code files only*.
+  
+  * **The limitation, so the test is not misused:** *falsification* passes are not
+  avoidable. A widened grammar's breakages are **discovered, not enumerated** —
+  `buildJumpMap`'s path-keyed dedupe was correct until an address could name a
+  line. Those passes add a test and no mechanism, and they are the ones worth
+  paying for. 
+  * **Prior art:** **subtraction as discovery** (removal is an instrument;
+  **verifiability is downstream of subtraction**); `ADR-GLASS-INK-073`'s process
+  finding (*ask whose value it is before asking whether the idea is good*);
+  `briefs/2026-10-28-brief-cited-jump.md` (four drafts, each smaller);
+  `ADR-ADDRESS-NOT-COORDINATE-074` (the gutter deleted by one constraint).
+
 ---
 
 ## Register open — the gathering
