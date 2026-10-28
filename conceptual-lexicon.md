@@ -255,6 +255,27 @@ Protocol mechanics (locus tags, wrap-up) and the protocol-wide terms live in `sy
     protocol (`playbooks/decisions-playbook.md`), whose step 1 is this question
     asked deliberately rather than at the funeral.
 
+* **The glass owns its ink**: absolute luminance and contrast are the terminal's
+to set; the renderer owns only the **relations** among its own roles. 
+  * **Test:** does the proposal change how bright the *page* is,
+  or how its *parts* read against each other? The first is the glass's, and a
+  renderer that sets it is wearing the host's coat; the second is ours, and must
+  be **authored** — declared by the principal, never derived from length, density
+  or viewport. 
+  * **Failure it names:** the renderer-side brightness dial in every
+  costume it has worn here — per-block attenuation keyed on line count, a global
+  lightness scale, the same knot in OKLCH with a live keybind, and `OSC 10`/`11`
+  setting the glass's defaults at runtime. Four proposals, two days, one request.
+  
+  * **The licensed exception:** a role whose value is a *relation* and which
+  ships empty, so no absolute colour is asserted (`body`, `ADR-BODY-INK-072`). The
+  terminal cannot express it: prose, a heading and an emphasis are all its
+  foreground. 
+  * **Prior art:** `decisions/073-the-glass-owns-its-ink.md` (the
+  record and the refused family); the three owners (`AGENTS.md`, *Scope
+  Discipline*); `ADR-PROSE-MEASURE-071` (the same boundary on width);
+  `docs/glow-vs-okuda.md` (*no light mode; light is a palette file we don't ship*).
+
 ---
 
 ## Register open — the gathering
