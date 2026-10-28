@@ -58,7 +58,7 @@ export const PAIRS: Pair[] = [
     // the surround makes it figure instead of ground. The rules measurement is
     // the corroboration, not the cause: this is also the weakest structure in
     // the set (`muted` 1.49, the ground-to-muted gap the smallest of any rung).
-    refused: "the ground reads as emitted light — a lit rectangle over the viewport; its rules are also the weakest in the set (1.49)",
+    refused: "reads as emitted light — rules 1.49, the weakest here",
   },
   { n: 8, name: "ground deeper still — best so far", bg: "#221f1c", fg: "#d6cfc4" },
   { n: 9, name: "deeper again — the floor test", bg: "#1c1a17", fg: "#d6cfc4" },
@@ -168,38 +168,43 @@ export function rungLine(r: Row): string {
  *  one source and two renderings, never two hand-typed copies. */
 export function configFile(pairs: Pair[] = PAIRS): string {
   const pad = (s: string, n: number): string => s.padEnd(n);
-  const rs = rows();
   const out: string[] = [];
-  out.push("# ── okuda · the ground you read on ─────────────────────────────────");
-  out.push("# Nothing here is active: every line is a comment. Uncomment exactly ONE");
-  out.push("# pair — the two lines `background` and `foreground` — then reload:");
-  out.push("#   macOS  cmd+shift+,      Linux  ctrl+shift+,      (action: reload_config)");
-  out.push("# Uncommenting two pairs does not compare them: the later key wins silently");
-  out.push("# and you will judge the wrong rung. A bare `foreground =` resets to default.");
+  // Every line is kept to PASTE_LINE columns. A config file is pasted, not read,
+  // and a code fence ELIDES at the glass — so a long comment line arrives in the
+  // reader's editor with its tail replaced by `…`. Measured 2026-10-28: the
+  // operator copied this block out of a render and the comments came back elided.
+  // The mark of damage was honest; the shape was wrong. A narrow artefact cannot
+  // be damaged at any sane pane width, so the shape is the fix, not a warning.
+  out.push("# okuda · the ground you read on");
   out.push("#");
-  out.push("# The ground is the lever, not the ink. Every ink-only rung (1-3) was");
-  out.push("# rejected as the prose receding; every deepened ground was kept. 8 is the");
-  out.push("# best so far. Ground L below ~0.27 stops reading as a lit panel; above");
-  out.push("# ~0.29 it competes with the room, which is why 7 glows.");
+  out.push("# PASTE ME: `just ground` — not a copy of a render.");
+  out.push("# Every line here is a comment; uncomment exactly ONE pair");
+  out.push("# (`background` + `foreground`), then reload:");
+  out.push("#   macOS  cmd+shift+,    Linux  ctrl+shift+,");
+  out.push("# Two pairs do not compare: the later key wins silently.");
+  out.push("# `foreground =` with no value resets to the default.");
   out.push("#");
-  out.push("#   n  bg / fg                ratio    L       rules   what it is");
-  for (const r of rs) {
+  out.push("# The ground is the lever, not the ink: every ink-only rung");
+  out.push("# (1-3) was rejected as the prose receding; every deepened");
+  out.push("# ground was kept. 8 is the best so far. Ground L below");
+  out.push("# ~0.27 stops reading as a lit panel; above ~0.29 it competes");
+  out.push("# with the room, which is why 7 glows.");
+  out.push("#");
+  out.push("# figures for every rung: just contrast");
+  out.push("#   n  bg / fg                 what it is");
+  for (const r of rows()) {
     out.push(
-      `#   ${pad(String(r.n), 3)}${pad(`${r.bg} / ${r.fg}`, 22)}` +
-        `${pad(`${r.ratio.toFixed(1)}:1`, 8)}${pad(r.lFg.toFixed(3), 8)}` +
-        `${pad((r.watched["muted"] ?? 0).toFixed(2), 8)}${r.name}` +
+      `#   ${pad(String(r.n), 3)}${pad(`${r.bg} / ${r.fg}`, 22)}${r.name}` +
         (r.refused ? " ✗" : ""),
     );
   }
   out.push("#");
-  out.push("# rules = the `muted` role (#445566 — horizontal rules, table pipes)");
-  out.push("# against that ground: structure, and the corroborating measure.");
-  out.push("# 7 is refused because the ground *glows* — see the note on its line.");
-  out.push("# why:   docs/2026-10-28-the-ground-you-read-on.md");
-  out.push("# made:  scripts/contrast.ts (`just contrast`) · ADR-GLASS-INK-073");
+  out.push("# why:  docs/2026-10-28-the-ground-you-read-on.md");
+  out.push("# made: scripts/contrast.ts (just contrast)");
+  out.push("#       ADR-GLASS-INK-073");
   out.push("#");
-  out.push("# Second dial, and it is okuda's rather than the terminal's: prose weight");
-  out.push('# relative to the accents — { "body": "#cfd3d8" } in ~/.config/okuda/palette.json');
+  out.push("# Second dial, and it is okuda's, not the terminal's:");
+  out.push('# { "body": "#cfd3d8" } in ~/.config/okuda/palette.json');
   for (const p of pairs) {
     out.push("");
     out.push(`# ${p.n} — ${p.name}${p.refused ? " ✗" : ""}`);

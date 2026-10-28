@@ -26,6 +26,18 @@ describe("the ground page — pinned against its instrument (ADR-GLASS-INK-073)"
     expect(conf()).toBe(configFile() + "\n");
   });
 
+  test("every line fits a narrow pane, so a fence cannot elide it", () => {
+    // A config file is pasted, not read, and a code fence ELIDES at the glass. A
+    // comment line longer than the fence budget arrives in the reader's editor with
+    // its tail replaced by `…` — which is exactly what happened on 2026-10-28 when
+    // the first reader copied this block out of a render. The mark of damage was
+    // honest; the shape was wrong. 64 columns survives any sane pane (the fence
+    // budget is glass − 6), and this test is what keeps it that way.
+    for (const line of configFile().split("\n")) {
+      expect(line.length).toBeLessThanOrEqual(64);
+    }
+  });
+
   test("the pasteable file is inert: every line is a comment", () => {
     // Pasting must be a no-op until a pair is chosen. An active line here would
     // change the reader's terminal the moment they pasted it, before they had

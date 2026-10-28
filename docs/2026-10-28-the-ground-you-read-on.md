@@ -122,39 +122,46 @@ Every line is a comment, so pasting is a no-op until you uncomment exactly one
 pair. That is the whole dogfood loop: **uncomment two lines, reload, look** —
 comment them again, uncomment the next pair, reload.
 
+The block is reflowed to 64 columns so a code fence cannot elide it: an elided
+comment arrives in your editor with its tail replaced by `…`, which is how the
+first reader lost half of it. If you copy from a render, widen first — or take the
+file, which is what it is for.
+
 ```ini
-# ── okuda · the ground you read on ─────────────────────────────────
-# Nothing here is active: every line is a comment. Uncomment exactly ONE
-# pair — the two lines `background` and `foreground` — then reload:
-#   macOS  cmd+shift+,      Linux  ctrl+shift+,      (action: reload_config)
-# Uncommenting two pairs does not compare them: the later key wins silently
-# and you will judge the wrong rung. A bare `foreground =` resets to default.
+# okuda · the ground you read on
 #
-# The ground is the lever, not the ink. Every ink-only rung (1-3) was
-# rejected as the prose receding; every deepened ground was kept. 8 is the
-# best so far. Ground L below ~0.27 stops reading as a lit panel; above
-# ~0.29 it competes with the room, which is why 7 glows.
+# PASTE ME: `just ground` — not a copy of a render.
+# Every line here is a comment; uncomment exactly ONE pair
+# (`background` + `foreground`), then reload:
+#   macOS  cmd+shift+,    Linux  ctrl+shift+,
+# Two pairs do not compare: the later key wins silently.
+# `foreground =` with no value resets to the default.
 #
-#   n  bg / fg                ratio    L       rules   what it is
-#   0  #282c34 / #ffffff     14.0:1  1.000   1.82    control — Ghostty's default
-#   1  #282c34 / #dcdfe4     10.5:1  0.903   1.82    ink off-white
-#   2  #282c34 / #cfd3d8     9.3:1   0.865   1.82    ink softer
-#   3  #282c34 / #b8bcc2     7.3:1   0.794   1.82    ink grey, evening only
-#   4  #23272e / #c8ccd4     9.3:1   0.844   1.95    ground deeper
-#   5  #1b1e24 / #a9aeb8     7.5:1   0.750   2.18    deep and dim, night or OLED
-#   6  #262320 / #d6cfc4     10.1:1  0.857   2.04    warm ground, cream ink
-#   7  #343a45 / #d4d8de     8.0:1   0.881   1.49    lifted ground — do not use ✗
-#   8  #221f1c / #d6cfc4     10.6:1  0.857   2.14    ground deeper still — best so far
-#   9  #1c1a17 / #d6cfc4     11.2:1  0.857   2.26    deeper again — the floor test
+# The ground is the lever, not the ink: every ink-only rung
+# (1-3) was rejected as the prose receding; every deepened
+# ground was kept. 8 is the best so far. Ground L below
+# ~0.27 stops reading as a lit panel; above ~0.29 it competes
+# with the room, which is why 7 glows.
 #
-# rules = the `muted` role (#445566 — horizontal rules, table pipes)
-# against that ground: structure, and the corroborating measure.
-# 7 is refused because the ground *glows* — see the note on its line.
-# why:   docs/2026-10-28-the-ground-you-read-on.md
-# made:  scripts/contrast.ts (`just contrast`) · ADR-GLASS-INK-073
+# figures for every rung: just contrast
+#   n  bg / fg                 what it is
+#   0  #282c34 / #ffffff     control — Ghostty's default
+#   1  #282c34 / #dcdfe4     ink off-white
+#   2  #282c34 / #cfd3d8     ink softer
+#   3  #282c34 / #b8bcc2     ink grey, evening only
+#   4  #23272e / #c8ccd4     ground deeper
+#   5  #1b1e24 / #a9aeb8     deep and dim, night or OLED
+#   6  #262320 / #d6cfc4     warm ground, cream ink
+#   7  #343a45 / #d4d8de     lifted ground — do not use ✗
+#   8  #221f1c / #d6cfc4     ground deeper still — best so far
+#   9  #1c1a17 / #d6cfc4     deeper again — the floor test
 #
-# Second dial, and it is okuda's rather than the terminal's: prose weight
-# relative to the accents — { "body": "#cfd3d8" } in ~/.config/okuda/palette.json
+# why:  docs/2026-10-28-the-ground-you-read-on.md
+# made: scripts/contrast.ts (just contrast)
+#       ADR-GLASS-INK-073
+#
+# Second dial, and it is okuda's, not the terminal's:
+# { "body": "#cfd3d8" } in ~/.config/okuda/palette.json
 
 # 0 — control — Ghostty's default
 # background = #282c34
@@ -185,7 +192,7 @@ comment them again, uncomment the next pair, reload.
 # foreground = #d6cfc4
 
 # 7 — lifted ground — do not use ✗
-#     the ground reads as emitted light — a lit rectangle over the viewport; its rules are also the weakest in the set (1.49)
+#     reads as emitted light — rules 1.49, the weakest here
 # background = #343a45
 # foreground = #d4d8de
 
@@ -208,8 +215,8 @@ ones touching the GPU pipeline or the font (`background-opacity` on macOS,
 Two corpora, because a ground interacts with each differently:
 
 ```bash
-okuda docs/style-guide.md --tui    # prose-heavy, and the demo of itself
-okuda '&briefs.md'                 # tables, amber keys, state glyphs, rules
+okuda docs/style-guide.md --tui  # prose, the demo of itself
+okuda '&briefs.md'               # tables, amber keys, rules
 ```
 
 Three failure signs, in the order they appear:
