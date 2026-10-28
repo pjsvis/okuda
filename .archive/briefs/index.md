@@ -120,6 +120,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-28 | BRF-JUMP-DEMO | rejected | jump-demo honesty — slug derivation + state-glyph signal | 2026-08-28-brief-jump-demo-honesty.md |
 | 2026-08-28 | BRF-LAUNCHER-FUT | done | Launcher FUT — session-scoped alt-screen | 2026-08-28-brief-launcher-fut.md |
 | 2026-08-28 | BRF-NOTIFICATION-STYLE | done | 011-zero-notification-stillness-and-decoupled-inbox-watchers | 2026-08-28-brief-notification-style.md |
+| 2026-08-28 | BRF-OKLCH-TUNING | rejected | OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling | 2026-08-28-brief-oklch-tuning.md |
 | 2026-08-28 | BRF-SSH-SERVED-2 | rejected | SSH-served portal — the ADR-013 Option-2 gate probe | 2026-08-28-brief-ssh-served-dynamic-markdown-portal.md |
 | 2026-08-28 | BRF-STATE-GLYPH | done | State-glyph render path — the showcase environment + first cut | 2026-08-28-brief-state-glyph-render-path.md |
 | 2026-08-28 | BRF-STATE-GLYPH-2 | rejected | State-glyph vocabulary — colour + bold, the closed lexicon | 2026-08-28-brief-state-glyph-vocabulary.md |

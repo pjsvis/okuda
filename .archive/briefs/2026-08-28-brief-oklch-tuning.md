@@ -6,8 +6,13 @@ callsign: BRF-OKLCH-TUNING
 # brief: OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling
 
 **Created:** 2026-08-28
-**TD:** td-okuda-oklch-brightness
-**Status:** pending
+**Status:** rejected 2026-10-28 — archived. Absolute luminance is the glass's to
+set, not the renderer's: `ADR-GLASS-INK-073` (which also rejects its sibling
+`BRF-PALETTE-LIGHTNESS`, and says why the two contradicted each other for two
+months). The OKLCH analysis in `docs/2026-09-05-palette-page.md` survives for
+tuning *relative* luminance within the palette; what it may not be used for is a
+page-level dial. Kept, per the keep-class: what was refused is the expensive
+thing to re-decide.
 
 ## What
 Implements a single global brightness scalar over a strictly fixed OKLCH palette reference, mathematically deriving 24-bit TrueColor ANSI escape sequences and hex codes at runtime without introducing theme customization or hue distortion.

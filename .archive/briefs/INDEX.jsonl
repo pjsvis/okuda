@@ -38,6 +38,7 @@
 {"file":"2026-08-28-brief-jump-demo-honesty.md","date":"2026-08-28","status":"rejected","summary":"jump-demo honesty — slug derivation + state-glyph signal","meta":{},"callsign":"BRF-JUMP-DEMO"}
 {"file":"2026-08-28-brief-launcher-fut.md","date":"2026-08-28","status":"done","summary":"Launcher FUT — session-scoped alt-screen","meta":{},"callsign":"BRF-LAUNCHER-FUT"}
 {"file":"2026-08-28-brief-notification-style.md","date":"2026-08-28","status":"done","summary":"011-zero-notification-stillness-and-decoupled-inbox-watchers","meta":{},"callsign":"BRF-NOTIFICATION-STYLE"}
+{"file":"2026-08-28-brief-oklch-tuning.md","date":"2026-08-28","status":"rejected","summary":"OKLCH Palette Lightness Tuning & Dynamic ANSI Scaling","meta":{},"callsign":"BRF-OKLCH-TUNING"}
 {"file":"2026-08-28-brief-ssh-served-dynamic-markdown-portal.md","date":"2026-08-28","status":"rejected","summary":"SSH-served portal — the ADR-013 Option-2 gate probe","meta":{},"callsign":"BRF-SSH-SERVED-2"}
 {"file":"2026-08-28-brief-state-glyph-render-path.md","date":"2026-08-28","status":"done","summary":"State-glyph render path — the showcase environment + first cut","meta":{},"callsign":"BRF-STATE-GLYPH"}
 {"file":"2026-08-28-brief-state-glyph-vocabulary.md","date":"2026-08-28","status":"rejected","summary":"State-glyph vocabulary — colour + bold, the closed lexicon","meta":{},"callsign":"BRF-STATE-GLYPH-2"}

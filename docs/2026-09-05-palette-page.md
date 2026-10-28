@@ -5,8 +5,13 @@ type: Reference
 # The Palette Page
 
 **Created:** 2026-09-05
-**Anchors:** `briefs/2026-08-26-brief-palette-lightness-knob.md` (parked),
-`briefs/2026-08-28-brief-oklch-tuning.md` (pending), `decisions/011-default-palette-okuda-identity.md`
+**Anchors:** `decisions/011-default-palette-okuda-identity.md`; the two brightness
+briefs that produced this analysis (`BRF-PALETTE-LIGHTNESS`,
+`BRF-OKLCH-TUNING`) are **rejected** and archived — `ADR-GLASS-INK-073`.
+**Settled 2026-10-28:** absolute luminance is the glass's, not the renderer's.
+What this page is still the reference for is the *relative* axis: L held as
+identity across our own roles, so a role is tuned against its neighbours rather
+than against a page dial.
 **Companion:** `docs/2026-09-05-palette-swatch.md` — the same roles rendered in
 context, generated from the preset rather than analysed.
 **Status:** reference — the spec the brightness/colour-mode translation functions derive from
@@ -22,8 +27,12 @@ Two briefs touch palette brightness and they disagree on ground truth:
 
 | Brief | Ground truth | The dial |
 |-------|--------------|----------|
-| `BRF-PALETTE-LIGHTNESS` (parked) | hex (authored, hand-tuned) | `k` scales L at load; hex stays truth |
-| `BRF-OKLCH-TUNING` (pending) | OKLCH `{l,c,h}` triples | scalar `α` scales L; RGB derived at runtime |
+| `BRF-PALETTE-LIGHTNESS` (rejected) | hex (authored, hand-tuned) | `k` scales L at load; hex stays truth |
+| `BRF-OKLCH-TUNING` (rejected) | OKLCH `{l,c,h}` triples | scalar `α` scales L; RGB derived at runtime |
+
+Both were rejected on 2026-10-28 and archived: the argument below is sound about
+the *relative* axis and was used to justify a *page-level* dial, which is the
+glass's (`ADR-GLASS-INK-073`).
 
 That is a **ground-truth migration** (hex → OKLCH) and it has not been
 recorded as a decision. The palimpsest protocol (ADR rule 8) applies the
@@ -233,6 +242,12 @@ brief's pipeline, unchanged.
 
 ## 7. Next
 
+**Refused 2026-10-28 — kept as the refused design, not as a plan.** The four
+steps below are what the family would have built; `ADR-GLASS-INK-073` declines
+it at the first line, because a page-level `α` is absolute luminance and that is
+the terminal's to set. Nothing here is a task; the numbering is the shape the
+refusal took.
+
 1. **ADR — hex → OKLCH ground truth.** Records the reversal of
    `BRF-PALETTE-LIGHTNESS`'s "hex stays ground truth" position. The page
    is the evidence; the ADR is the decision.
@@ -244,4 +259,6 @@ brief's pipeline, unchanged.
 4. **Test the no-op:** `α=1.0` must be byte-identical to today's hex output
    (the parked brief's invariant, carried forward).
 
-The page is the spec; the ADR is the gate; the function is the work.
+The page is the spec; the ADR is the gate; the function is the work — and the
+work was refused. What survives is the analysis: how each role's L sits against
+its neighbours, which is the question a palette tune actually asks.

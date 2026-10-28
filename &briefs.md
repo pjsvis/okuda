@@ -2,15 +2,9 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**8 live · 149 archived · 8 tabled** — 0 to move · 0 disagreeing · 0 phantom · 1 editorial · 2 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**7 live · 150 archived · 8 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 2 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
-
-### Editorial glyphs — the editor's own marks, not comparable to a status
-
-Listed, never gated: the glyph cell is the editor's surface. If a mark here is meant to *mean* a status, map it in `amp-briefs.ts` so the reconciliation can read it.
-
-- **`◆ partial`** — 1 brief: BRF-OKLCH-TUNING (open)
 
 ### Silent — no ticket, no citation, live
 

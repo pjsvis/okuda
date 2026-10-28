@@ -108,6 +108,9 @@ next role that wants to say "no ink" needs no code.
   empty default keeps that true, since `""` is not a hex.
 - `ADR-PROSE-MEASURE-071` — the reversal this decision is a consequence of, and
   the source of the *declaration, not a cap* rule.
+- `ADR-GLASS-INK-073` — the division of labour this role is the one licensed
+  exception to: the terminal owns absolute ink, okuda owns the relation. `body`
+  ships empty for exactly that reason, and must not grow a default.
 - `ADR-PRINCIPAL-CLERK-067` — the principal is whoever must read; the dial is
   theirs.
 - Code: `src/palette.ts` (`Role`, `loadPalette`), `src/ansi.ts` (`role`'),
