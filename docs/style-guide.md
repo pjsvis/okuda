@@ -55,6 +55,31 @@ The colour register has one principle: *is this near or far?* **Near** is the co
 
 A bare `.md` path in prose — `decisions/010-bounded-anchor-proportional-fallback.md` — lifts to the doc-ref gold (amended 2026-09-12: it receded to muted for one day too many — 2026-08-28 wired the gold, 2026-08-28 dimmed it, both same afternoon). The recession was by location, and location is the wrong test. The path is an affordance before it is provenance: in a silo where the filesystem is the message bus, a filename is an act — type it in the search and it resolves. So the near/far question gains its third term, answered by *what the text does*, not where it sits: content is near, provenance is far, and affordances — actable paths, keybinding hints — lift out of the gloaming into a register of their own: visible, subordinate to the rose vector paint (the silcrow is the actuation point; the path is the address). Put it last on a line, where the eye lands after the title has done its work. **An address may carry its line** — `src/render.ts:274`, `a.rs:1123-1142` — and the suffix lifts with it, as one token, because half an address in the register and half in plain prose is neither actable nor visibly wrong. The line is dereferenced, never rendered: there are no gutters on code, in any mode (`ADR-ADDRESS-NOT-COORDINATE-074`). The renderer cannot resolve the line for you and does not pretend to; it makes the address one thing you can select, search, or hand to the host. If the gold shouts against the emphasis register, dim by lightness (OKLCH L down, hue and chroma held) — never by guessing a new hue.
 
+### Cheap precision is a licence to spend it — and prose still has to be worth reading
+
+Once an address costs the reader two keystrokes instead of a trip, citations get
+cheap, and cheap things get overused. A paragraph that is mostly gold is a
+paragraph with no sentences in it: the register that *earns* attention by being
+rare stops meaning anything the moment it is everywhere.
+
+So the rules that were already here become load-bearing rather than decorative:
+
+- **The address goes last on the line**, after the claim has done its work. An
+  address that interrupts a sentence is a footnote placed mid-clause.
+- **One address per claim.** Two citations for one assertion usually means the
+  assertion is doing two jobs.
+- **The prose must stand without the gold.** Check it: render with `--no-color`,
+  or read the paragraph aloud. If it stops making sense when the addresses are
+  plain text, the sentence was carried by the colour rather than by its argument.
+  This is the same test the state glyphs get — *the state is in the glyph, the
+  colour is the glance* — and the same failure it names: a signal that only exists
+  in a channel a reader may not have.
+
+A document dense with addresses should read as **prose with its evidence
+attached**, not as an index with prose in the gaps. The gold is not the point; it
+is what lets the point be checked.
+
+
 
 ## The frame that wraps
 
