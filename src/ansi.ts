@@ -178,7 +178,13 @@ export function makeStyler(palette: Palette, mode: ColorMode): Styler {
     `${prefix}${text.replaceAll(RESET, RESET + prefix)}${RESET}`;
   return {
     mode,
-    role: (name, text) => wrap(fg(palette[name]), text),
+    // An empty role emits nothing: the run inherits whatever is already in it —
+    // the terminal's own foreground, or the enclosing body ink. `body` ships
+    // empty for exactly this (a body hex is right or catastrophic depending on
+    // a background the renderer cannot see), and `code-background` guards its
+    // own "" at `codeLine`. Guarding here rather than at every call site keeps
+    // an undeclared role from emitting `38;2;NaN;NaN;NaN`.
+    role: (name, text) => (palette[name] ? wrap(fg(palette[name]), text) : text),
     roleBold: (name, text) => wrap(sgr(fgParams(palette[name]), "1"), text),
     roleItalic: (name, text) => wrap(sgr(fgParams(palette[name]), "3"), text),
     roleBoldItalic: (name, text) => wrap(sgr(fgParams(palette[name]), "1", "3"), text),

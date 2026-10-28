@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-28 | ADR-BODY-INK-072 | Accepted | Prose gets a role — and it ships empty | 072-body-ink.md |
 | 2026-10-26 | ADR-PROSE-MEASURE-070 | Superseded | Text takes the measure, art takes the glass | 070-prose-measure.md |
 | 2026-10-26 | ADR-PROSE-MEASURE-071 | Accepted | Prose takes the glass — the measure is reversed | 071-prose-takes-the-glass.md |
 | 2026-10-25 | ADR-PANE-NOT-CANVAS-069 | Accepted | The pane is not a canvas — layout at the diagram's width, elide at the glass | 069-the-pane-is-not-a-canvas.md |

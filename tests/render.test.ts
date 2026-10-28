@@ -1137,3 +1137,56 @@ describe("a nested role hands the enclosing style back (td-1dec86)", () => {
     expect(out).toContain("\x1b[1m⸮\x1b[0m\x1b[1m parked");
   });
 });
+
+describe("body ink — a role for the ground, empty by default (td-eca2ef)", () => {
+  // Prose was the only class with no role: paragraphs, list text and table
+  // cells inherited whatever foreground the glass happened to have. That is not
+  // neutrality — it is an unfilled role, and a principal who finds the default
+  // too bright had no way to say so from inside okuda. The role ships EMPTY so
+  // the renderer holds no opinion about a background it cannot query; the
+  // override file is the dial (`~/.config/okuda/palette.json`).
+  const BODY = "#8a8a84"; // 138,138,132 — a dogfood value, not a default
+  const inked = (src: string) =>
+    renderDocument(src, { width: W, color: "truecolor", palette: { ...DRACULA_PALETTE, body: BODY } });
+
+  test("default: no ink at all — prose inherits the glass's foreground", async () => {
+    const out = await render("Plain prose, no emphasis, no codespan.");
+    const line = out.split("\n").find((l) => l.includes("Plain prose"))!;
+    expect(line).toBe("  Plain prose, no emphasis, no codespan.");
+  });
+
+  test("a declared hex paints prose, a list lead, and a table cell", async () => {
+    const prose = await inked("Dimmed prose reads as body text.");
+    expect(prose).toContain("\x1b[38;2;138;138;132mDimmed prose reads as body text.");
+    const list = await inked("- a lead\n- second");
+    expect(list).toContain("\x1b[38;2;138;138;132m• a lead\x1b[0m");
+    const table = await inked("| a | b |\n|---|---|\n| one | two |");
+    // the key column keeps table-key amber; the plain cell takes body ink
+    expect(table).toContain("\x1b[38;2;255;255;135;1mone\x1b[0m");
+    expect(table).toContain("\x1b[38;2;138;138;132mtwo\x1b[0m");
+  });
+
+  test("a menu row's callsign and number take the ground; the slug stays the key", async () => {
+    const out = await inked("| slug | CS | %%okuda-rhs:1%% |\n|---|---|---|\n| a doc | AB | 01 |");
+    expect(out).toContain("\x1b[38;2;255;255;135;1ma doc\x1b[0m");
+    expect(out).toContain("\x1b[38;2;138;138;132mAB\x1b[0m");
+    expect(out).toContain("\x1b[38;2;138;138;132m01\x1b[0m");
+  });
+
+  test("body is the enclosing run: an inner role keeps its ink and hands the ground back", async () => {
+    // The composition that matters — dim prose must not dim the emphasis the
+    // author wrote, and the tail must return to the ground, not to plain.
+    const out = await inked("prose with **strong** and a tail");
+    expect(out).toContain(
+      "\x1b[38;2;138;138;132mprose with \x1b[38;2;255;184;108;1mstrong\x1b[0m\x1b[38;2;138;138;132m and a tail",
+    );
+  });
+
+  test("NO_COLOR parity: an inked body changes no visible character", async () => {
+    const plain = await render("prose with **strong** and a tail", W, "none");
+    const withInk = await renderDocument("prose with **strong** and a tail", {
+      width: W, color: "none", palette: { ...DRACULA_PALETTE, body: BODY },
+    });
+    expect(withInk).toBe(plain);
+  });
+});

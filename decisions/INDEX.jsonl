@@ -68,3 +68,4 @@
 {"file":"069-the-pane-is-not-a-canvas.md","date":"2026-10-25","status":"Accepted","summary":"The pane is not a canvas — layout at the diagram's width, elide at the glass","meta":{},"callsign":"ADR-PANE-NOT-CANVAS-069"}
 {"file":"070-prose-measure.md","date":"2026-10-26","status":"Superseded","summary":"Text takes the measure, art takes the glass","meta":{},"callsign":"ADR-PROSE-MEASURE-070"}
 {"file":"071-prose-takes-the-glass.md","date":"2026-10-26","status":"Accepted","summary":"Prose takes the glass — the measure is reversed","meta":{},"callsign":"ADR-PROSE-MEASURE-071"}
+{"file":"072-body-ink.md","date":"2026-10-28","status":"Accepted","summary":"Prose gets a role — and it ships empty","meta":{},"callsign":"ADR-BODY-INK-072"}

@@ -14,6 +14,14 @@ import { existsSync, readFileSync } from "node:fs";
 import okudaPreset from "./palettes/okuda.json";
 
 export type Role =
+  // The ground the other roles paint over: prose, list text, table cells. The
+  // one role whose right value is *relative to a surface okuda cannot see* —
+  // the glass's own background — so it ships empty, which means "emit nothing,
+  // inherit the terminal's foreground". Same contract as `code-background`,
+  // one role over. A principal who wants dimmer prose declares a hex in
+  // `~/.config/okuda/palette.json`; the renderer ships no opinion about their
+  // eyes (ADR-PROSE-MEASURE-071: a declaration, not a cap).
+  | "body"
   | "heading"
   | "code-text"
   | "code-background"
@@ -65,6 +73,10 @@ export type Palette = Record<Role, string>;
  *
  * SGR emission order is colour-then-attribute (\x1b[38;2;R;G;B;3m),
  * matching glow. Hex values:
+ *   body     ""  (no ink)              — prose inherits the glass's own
+ *             foreground. glow parity, and the only defensible default: a
+ *             body hex is correct or catastrophic depending on a background
+ *             the renderer cannot query.
  *   heading  #00afff  (39, bright blue)   — Glow H2-H6
  *   heading  #bd93f9  (Dracula purple) — converged 2026-08-24 (was #00afff blue, wrong source)
  *   strong   #ffb86c  (Dracula orange) — converged 2026-08-24 (was #ffd700 gold, ungrounded)
@@ -98,6 +110,7 @@ export type Palette = Record<Role, string>;
  * the remaining bg options once before the idea is pronounced dead.
  */
 export const DRACULA_PALETTE: Palette = {
+  body: "",
   heading: "#bd93f9",
   "code-text": "#50fa7b",
   "code-background": "",
@@ -174,8 +187,11 @@ export const RESET = "\x1b[0m";
  *
  * Malformed override files and invalid values are ignored — the base
  * palette (default or preset) applies. Unknown roles are ignored.
- * `code-background` may be the empty string ("" = no bg, glow parity) or
- * a valid hex (panel emitted).
+ * **Any role may be the empty string**, which means "no ink": the run
+ * inherits whatever is already in it. `body` uses this (`""` = the glass's
+ * own foreground, the default), and so does `code-background` (`""` = no
+ * bg, glow parity). The override file is therefore how a principal dims
+ * their prose without the renderer holding an opinion.
  */
 export function loadPalette(
   opts?: { name?: string; path?: string },
@@ -195,15 +211,13 @@ export function loadPalette(
       for (const [key, value] of Object.entries(
         parsed as Record<string, unknown>,
       )) {
-        // code-background may be "" (no bg) or a hex; other roles must be hex.
-        const ok =
-          key === "code-background"
-            ? value === "" || RE_HEX.test(value)
-            : RE_HEX.test(value);
+        // "" = no ink (inherit), or a hex. Every role, not just the two
+        // that ship empty — a special case here would have to be extended
+        // with the next role that wants to say "nothing", and the rule is
+        // one rule: an empty role emits nothing.
+        const ok = value === "" || RE_HEX.test(value);
         if (key in merged && typeof value === "string" && ok) {
-          merged[key as Role] = key === "code-background"
-            ? (value as string)
-            : (value as string).toLowerCase();
+          merged[key as Role] = (value as string).toLowerCase();
         }
       }
     }

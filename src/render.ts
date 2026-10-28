@@ -589,6 +589,22 @@ interface Ctx {
   listSeq: number;
 }
 
+/** Body ink — the ground the roles paint over.
+ *
+ *  Applied to composed BODY TEXT only: prose, list text, table cells, an
+ *  address, a described diagram's sentences. Never to a heading, a fence, the
+ *  art, or an aside — each carries its own role and would be repainted at its
+ *  resets, which is the noise this helper exists to avoid (hence per-line at
+ *  the leaf, not once around a block that may contain a raw one).
+ *
+ *  `body` ships empty, so this is a no-op by default: the run inherits the
+ *  glass's own foreground and the bytes are unchanged from before the role
+ *  existed. It becomes a decision only when the principal declares a hex — and
+ *  because it is applied as the ENCLOSING run, every inner role hands it back
+ *  after its own reset (`ansi.ts` `wrap`), so a `**strong**` inside dimmed prose
+ *  stays amber and the tail returns to the body ink. */
+const bodyInk = (text: string, ctx: Ctx): string => ctx.styler.role("body", text);
+
 /** Render a closed-grammar markdown document to ANSI lines. */
 export async function renderDocument(
   source: string,
@@ -1303,21 +1319,21 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // the authored numbers are not honored).
       const v = stripVector(children);
       if (v) {
-        if (!v.live) return wrapBlock(stripHtml(v.slug)).join("\n") + "\n\n";
+        if (!v.live) return bodyInk(wrapBlock(stripHtml(v.slug)).join("\n"), ctx) + "\n\n";
         const badge = `\u00a7${v.num}`;
         const slugLines = wrapBlock(stripHtml(v.slug));
         const avail = Math.max(width - 2 - badge.length - 1, 8);
         const body = elideToWidth(slugLines.join(" "), avail);
-        return body + " " + styler.roleBold("vector", badge) + "\n\n";
+        return bodyInk(body, ctx) + " " + styler.roleBold("vector", badge) + "\n\n";
       }
       // An address is not prose: it elides, keeping the badge whole. (The
       // predicate reads the RENDERED form — `text()` has already painted the
       // token into `\u00a7NN` by the time a post-order parent sees it, which is why
       // `stripVector`'s paragraph branch below never fires.)
       const address = addressLine(children, ctx);
-      if (address !== null) return address;
+      if (address !== null) return bodyInk(address, ctx);
       const lines = wrapBlock(stripHtml(children));
-      return lines.join("\n") + "\n\n";
+      return bodyInk(lines.join("\n"), ctx) + "\n\n";
     },
 
     text(children: string) {
@@ -1680,7 +1696,7 @@ function describedBlock(
   const indent = "  ";
   const pipe = styler.quotePipe();
   const wrapped = wrapANSI(prose, { width: width - 2, indent, firstIndent: "" });
-  const lines = wrapped.map((l) => `${pipe}${l}`);
+  const lines = wrapped.map((l) => `${pipe}${bodyInk(l, ctx)}`);
   let out = lines.join("\n");
   if (title) {
     // Title in the diagram-text role, indented to match the left border.
@@ -1959,7 +1975,12 @@ function renderList(
     for (const part of parts) {
       if (part.nested !== null) {
         const block = part.level >= 1
-          ? flattenNested(part.nested) // beyond cap: continuation text
+          // Beyond cap: continuation text. The flatten drops the leading ink with
+          // the marker and indent it preceded, so the caller re-inks the line —
+          // otherwise the flattened tail of a deeply nested item is the one
+          // bright run left in a dimmed paragraph.
+          ? flattenNested(part.nested).split("\n")
+            .map((l) => (l === "" ? "" : bodyInk(l, ctx))).join("\n")
           : part.nested.split("\n").map((l) => (l === "" ? "" : "  " + l)).join("\n");
         // Loose fit at the parent→first-child seam. Every other pair of
         // blocks in a list gets the blank line from `itemBlocks.join("\n\n")`;
@@ -1984,14 +2005,14 @@ function renderList(
           // The glyph is content the author chose; the colour honours
           // the lexicon. `◆` is NOT a state role — it stays on the
           // heading/strong channel (priority, not lifecycle).
-          lines.push(markerPrefix + styleStateGlyph(line, ctx.styler));
+          lines.push(bodyInk(markerPrefix + styleStateGlyph(line, ctx.styler), ctx));
           firstLine = false;
         } else {
-          lines.push(contIndent + line);
+          lines.push(bodyInk(contIndent + line, ctx));
         }
       }
     }
-    if (lines.length === 0) lines.push(markerPrefix.trimEnd());
+    if (lines.length === 0) lines.push(bodyInk(markerPrefix.trimEnd(), ctx));
     itemBlocks.push(lines.join("\n"));
   });
 
@@ -2008,12 +2029,18 @@ function renderList(
 /** Strip list markers and indent as continuation text (cap flatten). The
  *  line's own wrap-indent is removed too (trimStart): a marker line and its
  *  continuation must share one base column, or the flattened item tears —
- *  the first line at the parent's indent, the tail eight columns deeper. */
+ *  the first line at the parent's indent, the tail eight columns deeper.
+ *
+ *  The leading run may be escapes as well as spaces: a nested list's leaves
+ *  carry body ink, and the ink sits before the indent, so a marker strip that
+ *  saw only whitespace would leave `•` welded to the flattened line. Strip the
+ *  leading escapes and the marker together; the escapes go with the indent they
+ *  preceded, and inner runs (a bold lead, a glyph) are untouched. */
 function flattenNested(body: string): string {
   return body
     .split("\n")
     .map((l) => {
-      const stripped = l.replace(/^\s*(?:•|\d+\.)\s+/, "").trimStart();
+      const stripped = l.replace(/^(?:\x1b\[[0-9;]*m|\s)*(?:•|\d+\.)\s+/, "").trimStart();
       return stripped === "" ? "" : "  " + stripped;
     })
     .join("\n");
@@ -2226,7 +2253,7 @@ function renderTable(t: TableState, ctx: Ctx): string {
       const styled = i === 0 ? raw : styleStateGlyph(raw, styler);
       const cell: Cell = i === 0
         ? { text: styler.roleBold("table-key", r[0]?.text ?? ""), align: r[0]?.align }
-        : { text: styled, align: r[i]?.align };
+        : { text: bodyInk(styled, ctx), align: r[i]?.align };
       const slot = slots[i]!;
       const lines = wrap && slot > 0 && displayWidth(cell.text) > slot
         ? wrapANSI(cell.text, { width: slot })
@@ -2330,8 +2357,8 @@ function renderMenuTable(t: TableState, ctx: Ctx): string {
     out.push(styler.rule(width));
   }
   for (const r of rows) {
-    const num = r[2]?.text ?? "";
-    const cs = r[1]?.text ?? "";
+    const num = bodyInk(r[2]?.text ?? "", ctx);
+    const cs = bodyInk(r[1]?.text ?? "", ctx);
     let line: string;
     if (!floorFits) {
       // Degenerate: the floor itself overruns — elide the callsign, the
