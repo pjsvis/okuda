@@ -10,11 +10,12 @@ needs nothing.
 A pipe collates a frame and hands it to a terminal that runs okuda on it. No file,
 no session, no references. Push frames as slowly or as quickly as the data allows.
 
-**Silcrows are excluded, and that is the class change, not a restriction.** A
-document is somewhere you can go; an instrument is something you look at. Remove the
-address and what remains is a state — which is what makes the frame stateless, and a
-stateless frame is why it cannot lag, cannot drift, and cannot have anything move
-under the reader. There is no `back` because there is no history to pop.
+**Silcrows are excluded — the `§NN` addresses — and that is the class change, not a
+restriction.** A document is somewhere you can go; an instrument is something you
+look at. Remove the address and what remains is a state — which is what makes the
+frame stateless, and a stateless frame is why there is no backlog to fall behind,
+nothing to drift, and nothing to move under the reader. There is no `back` because
+there is no history to pop.
 
 ## Why it is free — the count, not the claim
 
@@ -50,7 +51,14 @@ style:
   ladder of widths, with damage marked. Measured over 515 documents at
   79/61/43/31 columns — classes survive at 100/100/100/90 per cent while the mark of
   damage rises from 92 to 287 documents. **An instrument that loses a class at 31
-  columns is not an instrument.** Adopt the gate verbatim.
+  columns is not an instrument.**
+
+  Adopt the gate verbatim, and declare the boundary of the numbers: those classes are
+  *heading, rule, diagram, prose* (ladder rungs, `docs/2026-10-12-the-squint-test.md:102-116`),
+  and an instrument frame has prose deleted and no headings. The **ladder** transfers
+  as a method; the **figures** do not transfer as a prediction. The instrument's own
+  classes — value, glyph, label, receipt — have to be named before the gate means
+  anything, and that is the first measurement any build owes for itself.
 
 The one requirement that is new, and it is new because a document never had a second
 frame:
@@ -59,8 +67,21 @@ frame:
 > its neighbours. In a document that costs nothing; in an instrument it turns a
 > glance into a search.
 
-Right-anchored numerics and fixed slots give this for free — which is the reason to
-inherit `ADR-022` rather than invent a frame layout.
+Right-anchoring is half of it, and it is not the half the renderer can supply.
+`colWidth` is derived *per frame* from that frame's own body (`src/render.ts:2153`
+takes each column's widest cell, `src/render.ts:2157` folds in the header's longest
+word), and the table is then summed left-anchored (`src/render.ts:2173`). A slot
+width is therefore a function of the current content: `9 → 10` widens its column and
+everything to its right moves by one. Nothing holds a slot open across frames, and
+nothing can — the renderer holds no previous frame, which is refusal #1 applied to
+geometry rather than prose.
+
+So the field width belongs to the pipe: emit fixed-width fields (`printf "%4d"`) and
+`bodyNat` stops varying, `colWidth` stops varying, and the neighbours never move.
+`ADR-022` then supplies what it does own — the anchoring and the order of the slots.
+The requirement is new to the **compositor**, never to the renderer, which makes the
+count below stronger rather than weaker: the one thing that looked like new renderer
+work turns out to be the frame's.
 
 ## What this mode must refuse
 
@@ -74,6 +95,81 @@ inherit `ADR-022` rather than invent a frame layout.
 - **New roles.** The temptation of an instrument is a colour-coded threshold. The
   vocabulary has state glyphs, `alert`, `table-key` and `muted`; an instrument that
   needs a new colour is a proposal, not a frame.
+
+## The second channel — texture, and two datasets in one cell
+
+The silo already owns the vocabulary for a figure. The artpack primitives were
+**extracted rather than discarded** — they live in `playbooks/data-display-playbook.md`
+(`PLY-DATA-DISPLAY`): dither blocks, eighth-bars, and the whole Braille band, each
+**one column by contract**, asserted across the range rather than spot-checked
+(`tests/width.test.ts:229-247`). A compositor outside this silo has already counted
+what they buy: **81 magnitude states** from eighth-blocks and **256 texture states**
+from a 2×4 dot matrix (`docs/2026-10-23-brief-omarchy-dual-dataset-lut-engine.md:26-32`).
+Nothing in okuda draws those glyphs, and nothing needs to: they are text, and text is
+the one thing the renderer already handles.
+
+**A cell has two channels, and an instrument can spend both.** The dot pattern is the
+first; the colour behind it is the second. So a Braille texture block over a coloured
+ground carries a *figure against a field* — dots for the series that has shape
+(density, occupancy, where the mass sits), ground for the series that is slow and
+scalar (a band, a load, a proportion). Two measurements in one cell, no new glyph, no
+second row.
+
+That is the compositor's construction, and the count stays zero: guest SGR passes
+through untouched — a table cell holding `\x1b[48;5;236m⣿⣿⣿\x1b[0m` renders with its
+background — so the ground is the pipe's to paint.
+
+Three lines keep it a texture instead of a frame language:
+
+- **One ground.** `src/ansi.ts:203` records the house position — *the rule is the
+  user's: one background, no more*. An instrument adds no second one.
+- **Foreground invents no state.** `docs/state-colours.md` is the vocabulary; a
+  textured frame needing a new colour is a proposal, not a frame.
+- **The fallback is the pipe's, and it must be written.** Colour-off strips the
+  renderer's own SGR (`src/ansi.ts:54-55`) and, verified today, *not* the guest's — so
+  a frame whose second dataset lives in the ground keeps it under `--no-color`. Emit
+  the figure so the dots alone still read, and say what the ground meant.
+
+## History as a character
+
+The one history an instrument frame can hold honestly is the one it draws in cells,
+because there is no previous frame to diff against: **one character is one time
+step**, and the pipe owns the buffer the window came from.
+
+- **A sparkline is the whole idea at minimum cost** — a row of eighth-blocks, one
+  sample per cell, no store, no trend beyond the width you gave it. The width *is* the
+  retention policy: as many samples as there are columns, and nothing behind the first.
+- **Braille buys four steps per cell.** A 2×4 matrix means a Braille row resolves four
+  time steps vertically inside a single character cell, without spending a column.
+- **The dots are one budget.** Sub-cell resolution and a second dataset come out of the
+  same eight dots: spend them on time, or on the overlay, not both. The frame says
+  which.
+
+What it refuses: **a trend that remembers.** A moving average carried across frames
+is state the frame does not have; a frame that borrows it is a graph wearing an
+instrument's clothes.
+
+## Sources already on stdout
+
+The frame is free, and so are most of the producers. Each of these writes text to
+stdout today and needs no adapter to become one:
+
+| source | command | what it emits |
+|---|---|---|
+| vitals | `bash scripts/orient.sh` | branch, drift, last commit, binary freshness, corpus counts — six lines, already a frame |
+| the island | `bun scripts/status-doc.ts` | `NOW.md`: derived git/registry/td state plus the hand-written stance — document-shaped, and the prose is what the frame deletes |
+| tempo | `bun scripts/cadence.ts` | tier cadence and brief latency — its `Rate` renders `≈ 8.1/wk`, variable width (`scripts/cadence.ts:124`) |
+| task state | `td status --json` | what is in flight, what awaits review — the json is the pipe's business, not the renderer's |
+| ref namespace | `bun scripts/ref-census.ts` | every branch's staleness against `main` — the reading `just check` had no opinion about |
+| frame probe | `bun scripts/frame-probe.ts` | the bracket contract, boundary blanks — an instrument that measures frames |
+| squint ladder | `bun scripts/squint-probe.ts` | element-class survival across widths — the gate, monitoring itself |
+
+The pattern worth naming: **the silo already derives its vitals to stdout; what is
+missing is a frame that does not scroll away.** And the discipline is already in the
+building — `scripts/cadence.ts:156` pads its columns for a terminal while
+`scripts/cadence.ts:124` writes the same numbers into a markdown table unpadded. The
+two paths differ by exactly the width rule above, inside the file that already knows
+it.
 
 ## The thesis, and its test
 
@@ -94,6 +190,9 @@ inherit `ADR-022` rather than invent a frame layout.
 - **No throughput figure.** Not measured. The shape suggests a floor set by process
   spawns — `spawnChroma` runs per fence, and `chroma --list` is parsed once per
   process — but a number would need a benchmark, and there is none.
+- **No texture renderer.** Nothing in okuda draws eighth-blocks or Braille; the
+  one-column contract is pinned (`tests/width.test.ts:229-247`) and unspent. A frame
+  that shows texture is a compositor using text the renderer was already correct about.
 - **No flag exists** for framing, clearing or cadence, and none is proposed here.
 - **If someone builds this**, the brief comes first, as it does for anything that
   touches the byte stream. This page exists so the brief starts from the conventions
@@ -105,6 +204,10 @@ inherit `ADR-022` rather than invent a frame layout.
   and the damage mark an instrument inherits.
 - `docs/state-colours.md`, `docs/2026-10-12-the-squint-test.md` — the vocabulary and
   the gate.
+- `playbooks/data-display-playbook.md`, `tests/width.test.ts:229-247` — the texture
+  vocabulary, its one-column contract, and its degradation floor.
+- `docs/2026-10-23-brief-omarchy-dual-dataset-lut-engine.md` — the 81/256 state count,
+  filed here as related reading rather than as authority.
 - `AGENTS.md` (*three owners*) — compositing, windowing and rendering, which is why
   framing, clearing and cadence are named here as refusals rather than as features.
 - `ADR-GLASS-INK-073`, `ADR-ADDRESS-NOT-COORDINATE-074` — the same boundary drawn
