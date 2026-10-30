@@ -23,7 +23,7 @@ import { extractCallsigns } from "./callsign-lint";
 import { REGISTRIES } from "./reg-sync";
 
 interface Row { tier: string; file: string; date: string; status: string; callsign?: string }
-interface Report {
+export interface Report {
   instrument: string[]; scanned: number;
   tiers: Array<{ tier: string; n: number; first: string; last: string; rate: number | null }>;
   latency: { n: number; min: number; median: number; p90: number; max: number } | null;
@@ -113,6 +113,21 @@ function report(): Report {
     coverage: ["decisions", "debriefs"].flatMap((t) => (cov.has(t) ? [{ tier: t, ...cov.get(t)! }] : [])), flight };
 }
 
+/** A blank that holds its column. Markdown trims ASCII whitespace inside a
+ *  cell, so a space pad is eaten and the field's width drifts when a digit
+ *  arrives: `≈ 8.1/wk` beside `≈ 10.4/wk` widened the Rate column, and because
+ *  the renderer derives every column width from the frame's own content,
+ *  everything to the right — and the table's rule — moved by a column.
+ *
+ *  A no-break space is content: it survives the trim, occupies one column, and
+ *  is invisible. This is a fixed FIELD, not a faked fit (`docs/style-guide.md`,
+ *  *never fake a fit*): no value is elided or rounded into its neighbour, the
+ *  digits are the measurement and only the slot is declared. */
+const FIELD = "\u00A0";
+function field(value: string, width: number): string {
+  return value.padStart(width, FIELD);
+}
+
 /** The derived region — markdown, tables the reader's eye can take. Pure. */
 export function renderMarkdown(r: Report): string {
   const out: string[] = [];
@@ -121,7 +136,7 @@ export function renderMarkdown(r: Report): string {
   out.push(`### Tier cadence (by claimed date)\n`);
   out.push(`| Tier | Docs | Span | Rate |`);
   out.push(`|---|---|---|---|`);
-  for (const t of r.tiers) out.push(`| ${t.tier} | ${t.n} | ${t.first} .. ${t.last} | ${t.rate ? `≈ ${t.rate.toFixed(1)}/wk` : "—"} |`);
+  for (const t of r.tiers) out.push(`| ${t.tier} | ${field(String(t.n), 3)} | ${t.first} .. ${t.last} | ${t.rate ? field(`≈ ${t.rate.toFixed(1)}/wk`, 9) : "—"} |`);
   out.push(`\n### Brief latency (brief date → the date of the Thing that cites it)\n`);
   out.push(r.latency
     ? `n=${r.latency.n} · min ${r.latency.min}d · median ${r.latency.median}d · p90 ${r.latency.p90}d · max ${r.latency.max}d\n`
@@ -129,7 +144,7 @@ export function renderMarkdown(r: Report): string {
   out.push(`### Derivation coverage (a decision/debrief citing a brief)\n`);
   out.push(`| Tier | Citing | Coverage |`);
   out.push(`|---|---|---|`);
-  for (const c of r.coverage) out.push(`| ${c.tier} | ${c.hit}/${c.total} | ${c.total ? Math.round((100 * c.hit) / c.total) : 0}% |`);
+  for (const c of r.coverage) out.push(`| ${c.tier} | ${field(`${c.hit}/${c.total}`, 7)} | ${field(`${c.total ? Math.round((100 * c.hit) / c.total) : 0}%`, 4)} |`);
   out.push(`\n### In flight (briefs not settled)\n`);
   out.push(`open ${r.flight.open} · parked ${r.flight.parked}\n`);
   out.push(`**What would give this meaning:** a band in the latency line, stable over weeks — or nothing. Both are results.`);
