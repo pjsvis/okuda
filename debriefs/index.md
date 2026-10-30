@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-30 | DBF-FRAME-AND-GRAMMAR | done | Debrief: The frame and the grammar — one design that needed nothing, one that needed 18 lines | 2026-10-30-debrief-the-frame-and-the-grammar.md |
 | 2026-10-28 | DBF-GLASS-INK | done | Debrief — the glass owns its ink | 2026-10-28-debrief-the-glass-owns-its-ink.md |
 | 2026-10-27 | DBF-THE-QUEUE | done | Debrief: The queue — forty-two briefs became eight, and the instrument was a command | 2026-10-27-debrief-the-queue.md |
 | 2026-10-26 | DBF-PROSE-MEASURE | done | Debrief: The measure — the renderer had an opinion about everything but the text | 2026-10-26-debrief-the-measure.md |
