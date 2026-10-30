@@ -28,12 +28,41 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
     expect(mathGlyphs("$O(\\text{arithmetic})$")).toBe("O(arithmetic)");
   });
 
+  describe("script digits", () => {
+    test("digits are a total mapping, so they may be pretty", () => {
+      expect(mathGlyphs("$\\sigma_1^2$")).toBe("σ₁²");
+      expect(mathGlyphs("$\\mu^{-1}$")).toBe("μ⁻¹");
+      expect(mathGlyphs("$\\mu^{10}$")).toBe("μ¹⁰");
+      expect(mathGlyphs("$\\text{H}_2\\text{O}$")).toBe("H₂O");
+      expect(mathGlyphs("$15+\\text{ g/cm}^2$")).toBe("15+ g/cm²");
+    });
+
+    test("letters are not: a partial alphabet works once and fails later", () => {
+      expect(mathGlyphs("$\\tau_{max}$")).toBe("τ_{max}");
+      expect(mathGlyphs("$\\mu^{n}$")).toBe("μ^{n}");
+    });
+
+    test("an escaped underline is prose, not a subscript", () => {
+      expect(mathGlyphs("$\\text{model\\_2}$")).toBe("model_2");
+    });
+
+    test("a command-free span is still left alone — the guard, not the gap", () => {
+      expect(mathGlyphs("$T^4$")).toBe("$T^4$");
+    });
+
+    test("the composed strings measure what they look like", () => {
+      expect(displayWidth(mathGlyphs("$\\text{H}_2\\text{O}$"))).toBe(3);
+      expect(displayWidth(mathGlyphs("$\\mu^{10}$"))).toBe(3);
+      expect(displayWidth(mathGlyphs("$\\frac{3\\mu}{2R^3}$"))).toBe(8); // 3μ/(2R³)
+    });
+  });
+
   test("the fraction restores the grouping LaTeX had, and only where it must", () => {
     // The asymmetry: a numerator needs no brackets unless it holds a loose
     // operator; a denominator must also be a single FACTOR, because `a/2R`
     // continues multiplying outside the fraction under left-associativity.
     expect(mathGlyphs("$\\frac{F}{A}$")).toBe("F/A");
-    expect(mathGlyphs("$\\frac{3\\mu}{2R^3}$")).toBe("3μ/(2R^3)");
+    expect(mathGlyphs("$\\frac{3\\mu}{2R^3}$")).toBe("3μ/(2R³)");
     expect(mathGlyphs("$\\frac{a+b}{c}$")).toBe("(a+b)/c");
     expect(mathGlyphs("$\\frac{x}{y z}$")).toBe("x/(y z)");
     expect(mathGlyphs("$\\frac{x}{(a+b)}$")).toBe("x/(a+b)"); // already a group
@@ -86,7 +115,7 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
       expect(mathGlyphs("$E \\approx 450\\text{ GPa}$")).toBe("E ≈ 450 GPa");
       expect(mathGlyphs("$M \\gg m \\propto \\pm \\sim \\times$")).toBe("M ≫ m ∝ ± ∼ ×");
       expect(mathGlyphs("$77^\\circ\\text{C}$")).toBe("77^°C");
-      expect(mathGlyphs("$34\\%\\text{ O}_2$")).toBe("34% O_2");
+      expect(mathGlyphs("$34\\%\\text{ O}_2$")).toBe("34% O₂");
       expect(mathGlyphs("$a \\longrightarrow b$")).toBe("a ⟶ b");
     });
 
@@ -110,7 +139,7 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
       // not an operand — the terminator rule only fires on `[A-Za-z0-9]`.
       expect(mathGlyphs("$\\sum \\vec{F}_{\\text{int}} = 0$")).toBe("∑ F⃗_{int} = 0");
       expect(mathGlyphs("$\\tau_{gg} = \\frac{3\\mu}{2R^3}(I_{\\text{max}} - I_{\\text{min}})\\sin(2\\theta)$"))
-        .toBe("τ_{gg} = 3μ/(2R^3)(I_{max} - I_{min})sin(2θ)");
+        .toBe("τ_{gg} = 3μ/(2R³)(I_{max} - I_{min})sin(2θ)");
     });
   });
 
@@ -172,6 +201,6 @@ describe("math glyphs — in the render", () => {
 
   test("the tranche, in the render: a table cell carries a governing equation", async () => {
     const out = await text("| inv | eq |\n| --- | --- |\n| 3 | $P_{\\text{in}} + Q_{\\text{gen}} = \\epsilon \\sigma A_{\\text{rad}} T^4$ |");
-    expect(out).toContain("P_{in} + Q_{gen} = ε σA_{rad} T^4");
+    expect(out).toContain("P_{in} + Q_{gen} = ε σA_{rad} T⁴");
   });
 });

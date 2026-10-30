@@ -1675,6 +1675,37 @@ const RE_MATH_TERMINATED = /(\\[A-Za-z]+)( ?)(?=[A-Za-z0-9])/g;
  *  list here would be the copy that drifts — `\%` sat unsubstituted behind
  *  a `\\_`-only alternative until the 2026-10-30 tranche. */
 const RE_MATH_TOKEN = /\\[A-Za-z]+|\\[^A-Za-z]|\{,\}|--/g;
+/** Script digits — the one prettiness that costs no meaning, because the
+ *  mapping is TOTAL over its domain: a numeral has a superscript and a
+ *  subscript form (U+2070/U+00B9/U+00B2/U+00B3/U+2074–2079, U+2080–2089) and
+ *  every one of them measures one column. Letters do not: `ₘ ₐ ₓ` exist, so
+ *  `_{max}` is tempting, but `b c d f g j q w y z` have no subscript form, and
+ *  a partial alphabet works on the first equation and fails on the fourth —
+ *  a failure that reads as a rendering bug rather than as a policy. So digits
+ *  only, and an expression (`^{n}`, `_{max}`) stays as written.
+ *
+ *  The lookbehind keeps an escaped underline out of it: `\_2` is a literal
+ *  underscore in prose, not a subscript, and the token pass has not yet
+ *  dissolved the backslash at this point in the chain. */
+const MATH_SUP: Readonly<Record<string, string>> = {
+  "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴",
+  "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹", "-": "⁻",
+};
+const MATH_SUB: Readonly<Record<string, string>> = {
+  "0": "₀", "1": "₁", "2": "₂", "3": "₃", "4": "₄",
+  "5": "₅", "6": "₆", "7": "₇", "8": "₈", "9": "₉",
+};
+/** A script is one braced run or one bare token (LaTeX binds a single token,
+ *  so `a^23` is a² then 3, and this must not swallow the 3). */
+const RE_MATH_SCRIPT = /(?<!\\)([\^_])(?:\{([^{}]*)\}|(-?\d))/g;
+function mathScript(whole: string, kind: string, braced?: string, bare?: string): string {
+  const body = braced ?? bare ?? "";
+  const table = kind === "^" ? MATH_SUP : MATH_SUB;
+  const total = kind === "^" ? /^-?\d+$/ : /^\d+$/;
+  if (!total.test(body)) return whole; // letters, expressions, a negative subscript
+  return [...body].map((c) => table[c]!).join("");
+}
+
 const RE_MATH_FRAC = /\\frac\{([^{}]*)\}\{([^{}]*)\}/g;
 /** Why a fraction needs brackets at all: `\frac{3\mu}{2R^3}` flattened to
  *  `3μ/2R^3` reads as `(3μ/2)·R^3` under left-associativity, so the equation
@@ -1737,6 +1768,7 @@ function mathSpanBody(body: string): string | null {
   // alone would re-form the command (`\Delta t` → `\Deltat`), which is how
   // this pass first shipped wrong.
   const substituted = body
+    .replace(RE_MATH_SCRIPT, mathScript)
     .replace(RE_MATH_TERMINATED, (whole: string, cmd: string, space: string) =>
       // A rewrite-only command is consumed by its own braces, never by the
       // terminator rule: `\frac F A` must reach the second gate intact, not
