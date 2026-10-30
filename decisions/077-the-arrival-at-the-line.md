@@ -59,8 +59,8 @@ and its rendered rows are the renderer's invention.
 Three rules fall out, and they are the durable part:
 
 - **The gate is asked about the path, never the coordinate.** `resolves` (ADR-045) is
-  a filesystem question, and `src/vectors.ts:133` is not a filename. One split —
-  `parseAddress` (`src/vectors.ts:133`) — so the gate, the actuator and the dedupe
+  a filesystem question, and `src/vectors.ts:138` is not a filename. One split —
+  `parseAddress` (`src/vectors.ts:138`) — so the gate, the actuator and the dedupe
   cannot disagree about what an address is.
 - **The dedupe key is the address, and the receipt counts addresses.** Both sites,
   one rule: `buildJumpMap` (the map) and `deriveReferences` (the truncation fact). A
@@ -77,7 +77,7 @@ Three rules fall out, and they are the durable part:
 |---|---|
 | An editor spawn — `vim +N`, `zed path:N`, `code -g path:N` | The brief's first draft. Refused because okuda **renders** code and the editor **edits** it (`88`): a line argument in `editArgs` puts an editor's name and invocation grammar inside the viewer, and makes navigation depend on a thing being installed. |
 | OSC 8 with an editor URL scheme (`vscode://file/…:274`) | Works in Ghostty 1.4 today via `link-osc8`, and was refused in `ADR-074`: one scheme per editor, a document unportable between machines, and an environment opinion in the byte stream. It is also the route that *looks* finished the fastest. |
-| Keep the path-level dedupe (status quo) | `buildJumpMap`'s `if (seen.has(ref.target)) continue` (`src/vectors.ts:299`) collapses two lines of one file into one silcrow, so the second address has no actuator at all — the feature would land on exactly one line per file. Its mirror defect is in the receipt: counting paths lets a hundred addresses read as one destination. |
+| Keep the path-level dedupe (status quo) | `buildJumpMap`'s `if (seen.has(ref.target)) continue` (`src/vectors.ts:305`) collapses two lines of one file into one silcrow, so the second address has no actuator at all — the feature would land on exactly one line per file. Its mirror defect is in the receipt: counting paths lets a hundred addresses read as one destination. |
 | A `.md` line — jump prose to a rendered row | Prose wraps, so a rendered row is the renderer's invention; the line would be a coordinate nobody wrote and nobody can verify. Ignored rather than flashed: a flash about a coordinate no reader will consult is noise. |
 | A cursor, or a click target on a citation | There is no cursor in this TUI and nothing to select; both would need the "which citation does the gesture act on" rule the brief deleted. The two-digit number is already the actuator, and the compositor already writes addresses where the wiring goes. |
 | Number prose citations so they enter the jump table | Enumeration-order numbers silently retarget when a document reorders, and authored numbers collide with the reserved vector paint (ADR-031). Out of scope in the brief, and the wiring is the compositor's job. |

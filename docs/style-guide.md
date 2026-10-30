@@ -87,6 +87,12 @@ Three authoring consequences, and they are the whole of the rule:
   stale the moment the file moves (it is checkable now, in two keystrokes, where a
   month ago it was invisible). So: real addresses cite real lines, and a *form*
   shown for its shape is written `path:NN`.
+- **Name the referent before the address where you can.** `wrapWholeFile`
+  (`src/render.ts:1164`) is checkable — a finder can see whether that line still
+  holds the symbol — while an address alone is a claim the reader must take on
+  trust. It is not a rule (a citation to a line rather than a definition has no
+  symbol to name), but it is the difference between a citation a machine can
+  defend and one only the author can.
 - **`.md` carries no line.** Prose wraps, so a rendered row is the renderer's
   invention; `docs/x.md:42` jumps to the top of the document, and the line is
   prose the reader will read as a promise the tool did not keep.

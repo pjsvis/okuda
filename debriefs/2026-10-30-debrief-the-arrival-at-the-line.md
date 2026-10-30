@@ -135,6 +135,42 @@ minted as another (the bare path), so the paint promised a coordinate the jump c
 not reach. The bound is now `\d+` in both rings — the same shape, because they are
 the same list.
 
+## The finder, built and stopped there
+
+The operator's next question was the right one: *how do we prevent drift from the
+target lines when the source files change?* The measurement came before the design,
+and it reframed the job. Over the corpus the other lints walk (336 citations carrying
+a line): **6 land on a symbol the sentence names (13% of the 45 that name one)**,
+34 have moved, 5 name something the file no longer holds, 8 sit past EOF, 12 on a
+blank line, 56 name a path that is not here — and **214 name nothing a machine can
+check.**
+
+That last number is the finding: **a linter of citations has no opinion without an
+expectation**, and a citation does not carry one. Three substrates exist — the ident
+the sentence names (free, no second store), the line's content at write time (a
+ledger, refused), git (`blame -L` then follow the hunk: exact about moved-vs-changed,
+deliberate, never a gate) — and only the first is cheap enough for `just check`.
+
+So `scripts/citation-drift.ts` (`just citation-drift`) ships as a **finder**:
+`ok` / `moved` (with a proposed line, definition-shaped ranked first) / `gone` /
+`unnamed` / `blank` / `missing` / `past-eof`. `--gate` fires on past-EOF alone,
+because that is the one verdict that is not a judgement about intent — a coordinate
+beyond the file cannot hold a claim. It is deliberately **not** in `just check`: the
+rung has defects, one of them deliberate (this morning's dogfood page demonstrates
+the clamp), and a declared-exception channel does not exist yet.
+
+**No fixer, on purpose.** Re-anchoring is a claim about intent, and a script that
+rewrites lines turns *wrong* into *plausible* — ADR-027's misleading ledger, one tier
+over, with a citation as the ledger. The proposals print; a human takes the diff.
+
+It paid for itself in its first run: it found three stale citations in **this
+session's own records** (written an hour earlier, before a comment edit moved the
+lines — the exact drift it exists for), and a real grammar defect: `RE_CITED_PATH`
+starts at a word character, so `.archive/briefs/…` is read as `archive/briefs/…` and
+three citations that resolve on disk cannot gild or jump. Recorded, not fixed: the
+grammar is the address decision's, and the operator's instruction was to stop at the
+finder.
+
 ## What is left, and it is not a defect in this work
 
 - **The compositor must write the address** for a *wired* row to name a
@@ -148,10 +184,16 @@ the same list.
   first half and leaves ` §14-1142` as prose. Nothing in the renderer can fix a
   compositor that writes two halves in that order; the style guide states the form
   so an author does not.
+- **The finder is a reading, not a gate** — and the two things that would make it a
+  gate are a ratchet (a baseline of today's structural defects, so new drift pays)
+  and the authoring rule the coverage depends on: a citation that names its referent
+  is checkable, one that names nothing is a citation a reader must trust.
 - **A stale line is now checkable in two keystrokes**, which is new. Two of the
-  guide's own examples were stale when this landed (`src/render.ts:274` pointed at
-  the end of a function, not the text handler); they were corrected, and the
-  guide now says an example shown for its shape is written `path:NN`.
+  guide's own examples were stale when this landed — its paint-site citation
+  pointed at `return { ok: true, out };` rather than the text handler; they were
+  corrected, and the guide now says an example shown for its shape is written
+  `path:NN`. The finder below then found the same class of defect in this
+  session's own records, which is the shortest possible dogfood.
 
 ## Related
 
