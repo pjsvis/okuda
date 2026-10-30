@@ -11,7 +11,7 @@ briefs: [BRF-MATH-GLYPHS]
 # Debrief: The frame and the grammar — one design that needed nothing, one that needed 18 lines
 
 **Date:** 2026-10-30
-**Status:** Done — 8 commits, 926 tests, `just check` rc=0. One follow-on task open by
+**Status:** Done — 11 commits, 934 tests, `just check` rc=0. One follow-on task open by
 choice (the declined-span mark), one decision landed (`ADR-MATH-GRAMMAR-076`), and the
 tranche's two children landed with it.
 
@@ -43,7 +43,7 @@ a corpus.
 | spans translated in the evidence document | 97 / 124 | **119 / 124** |
 | relation-bearing spans translated | 9 / 23 | **23 / 23** |
 | `MATH_GLYPHS` rows | 17 | **38** |
-| tests | 912 | **926** |
+| tests | 912 | **934** |
 | new dependencies | — | **0** |
 | packages installed to answer the question | 2 | **0** (both removed) |
 
@@ -142,6 +142,35 @@ Two corrections to what this file said before that work: the table is **38** row
 37, and the `src/render.ts` line numbers in the ADR moved with the code — both fixed in
 the same commit as this section, because a citation that resolves is not yet a citation
 that means.
+
+## The authoring half, which the code alone could not say
+
+Two more corrections landed after the section above, and both were about what an
+author sees rather than what the pass emits.
+
+**Whitespace is syntax.** The gaps were arbitrary: a command's trailing space
+survived when another command followed and vanished when an operand did, so
+`\Delta \rho g L^2` rendered `Δ ρg L²` — a gap where the author typed two commands
+and none where they typed a command and an operand. In LaTeX that space typesets as
+nothing. A run now survives only beside a relation or operator, so `ΔρgL²`, `μσρ`,
+`εσA_{rad}T⁴`, while `M ≫ M`, `α ∈ [0.2, 1.2]` and `I_max - I_min` keep theirs — and a
+gap is never invented (`μ+Q` stays tight). `\text{}` bodies and `\_` are masked during
+the strip, so `65 m³` keeps the ISO value–unit space and `a \_ b` keeps its word gaps.
+
+**A word script needs no braces.** `τ_gg`, `I_max`, `μ^n`; the braces stay only where
+they delimit — a letter after the closing brace (`A_{rad}T⁴`, because `A_radT⁴` is a
+subscript nobody wrote) or a body that is not a bare word (`μ^{n+1}`). `^{\circ}`
+turned out to be the degree sign, not a superscripted composition operator, so
+`77^\circ\text{C}` now reads `77°C`. A nested fraction side parses too, which it never
+did: `\frac{x}{I_{\text{max}}}` was `[^{}]*` and fell back to literal, and is now
+`x/I_max`.
+
+**And the guide carries the author's half.** `docs/style-guide.md` gains *Maths: what
+renders, and what you write instead* — the classes that work, a table of what does not
+with the linear form to write, and the four defaults an author gets wrong: an equation
+in a table cell, whitespace treated as content, the command-free span that keeps its
+dollars, and the literal fallback that is honest rather than broken. The code states
+what happens; only the guide can state what to do instead.
 
 ## What's left
 
