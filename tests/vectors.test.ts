@@ -10,6 +10,7 @@ import {
   jumpMapFor,
   deriveReferences,
   annotateSource,
+  parseAddress,
   referencesSection,
   referencesCovered,
   appendReferences,
@@ -162,6 +163,16 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
     expect(deriveReferences(of(81)).map.size).toBe(MAX_ADDRESSES);
     // Repetition is not truncation: one destination cited eighty times.
     expect(deriveReferences(Array.from({ length: 80 }, () => "ADR-030").join(" ")).truncated).toBe(false);
+  });
+
+  test("a hundred addresses in one file is not one destination", () => {
+    // The receipt's fullness is a fact about ADDRESSES (ADR-CITED-JUMP-077):
+    // keyed on the path this reads as one destination, and the mark is silent
+    // about eighty destinations the reader has.
+    const src = Array.from({ length: MAX_ADDRESSES + 1 }, (_, i) => `src/tui.ts:${i + 1}`).join(", ");
+    const { map, truncated } = deriveReferences(src);
+    expect(map.size).toBe(MAX_ADDRESSES);
+    expect(truncated).toBe(true);
   });
 
   test("the pocket Set's invariant: exactly the doubled pairs in range", () => {
@@ -511,19 +522,36 @@ describe("vectors — Ring A: code-file mentions (BRF-SILCROW-PATHS)", () => {
     ]);
   });
 
-  test("W2: the :NNN suffix is swallowed into the span, stripped from the target", () => {
+  test("W2: the :NNN suffix is swallowed into the span and KEPT in the target", () => {
     const src = "the edit brief is wired at src/tui.ts:756 today.";
     const refs = scanReferences(src);
     expect(refs.length).toBe(1);
-    expect(refs[0]!.target).toBe("src/tui.ts"); // the silcrow is file-level
+    expect(refs[0]!.target).toBe("src/tui.ts:756"); // the address includes its line
     expect(src.slice(refs[0]!.pos, refs[0]!.end)).toBe("src/tui.ts:756"); // paint covers the mention
   });
 
-  test("W2: suffixed and plain mentions share the vector (one destination, one silcrow)", () => {
+  test("W2: two lines of one file are two addresses, two silcrows", () => {
+    // ADR-CITED-JUMP-077 amends the path-level rule: they arrive in different
+    // places, so they are different destinations.
     const resolves = (t: string) => t === "src/tui.ts";
-    const map = jumpMapFor("see src/tui.ts:756, then src/tui.ts plain.", resolves);
-    expect([...map.values()]).toEqual(["src/tui.ts"]);
-    expect(map.size).toBe(1);
+    const map = jumpMapFor("see src/tui.ts:756, then src/tui.ts:1161.", resolves);
+    expect([...map.values()]).toEqual(["src/tui.ts:756", "src/tui.ts:1161"]);
+    expect(map.size).toBe(2);
+  });
+
+  test("W2: a range is one span and one address — the arrival is its opening line", () => {
+    const src = "the sweep is src/render.ts:1123-1142 today.";
+    const refs = scanReferences(src);
+    expect(refs.length).toBe(1);
+    expect(src.slice(refs[0]!.pos, refs[0]!.end)).toBe("src/render.ts:1123-1142");
+    expect(parseAddress(refs[0]!.target)).toEqual({ path: "src/render.ts", line: 1123 });
+  });
+
+  test("the gate is asked about the path, never the coordinate", () => {
+    const asked: string[] = [];
+    const resolves = (t: string) => (asked.push(t), true);
+    scanReferences("see src/tui.ts:756 and docs/help.md:42.", resolves);
+    expect(asked).toEqual(["src/tui.ts", "docs/help.md"]);
   });
 
   test("W1: paint inside the codespan — the badge lands before the closing backtick", () => {

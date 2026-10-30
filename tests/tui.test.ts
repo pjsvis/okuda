@@ -3,6 +3,8 @@ import {
   decodeKey,
   digitOf,
   extractJumps,
+  arrivalScroll,
+  scrollForLine,
   resolveJumpTarget,
   advanceNumBuffer,
   footerLine,
@@ -31,8 +33,9 @@ import {
   frameTrace,
   CHROME_JITTER,
 } from "../src/tui";
+import { deriveReferences, parseAddress } from "../src/vectors";
 import { makeStyler } from "../src/ansi";
-import { MIN_RENDER_WIDTH } from "../src/render";
+import { MIN_RENDER_WIDTH, renderDocument, wrapWholeFile } from "../src/render";
 import { DRACULA_PALETTE } from "../src/palette";
 import { displayWidth, stripANSI } from "../src/width";
 import { tmpdir } from "node:os";
@@ -699,6 +702,123 @@ describe("tui — extractJumps (scan source for %%okuda-rhs:NN%% + path.md)", ()
   });
   test("empty source → empty map", () => {
     expect(extractJumps("").size).toBe(0);
+  });
+
+  test("a wired code address keeps its line — the actuator's half", () => {
+    // The address list is the renderer's (`RE_CITED_PATH`), so what gilds is
+    // what jumps. A coordinate rides along; a bare path is unchanged.
+    const src = [
+      "*Foo* %%okuda-rhs:01%% <!-- src/render.ts:274 -->",
+      "*Bar* %%okuda-rhs:02%% <!-- a.rs:1123-1142 -->",
+      "*Baz* %%okuda-rhs:03%% <!-- docs/help.md -->",
+    ].join("\n");
+    const j = extractJumps(src);
+    expect(j.get(1)).toBe("src/render.ts:274");
+    expect(j.get(2)).toBe("a.rs:1123-1142");
+    expect(j.get(3)).toBe("docs/help.md");
+  });
+
+  test("an extension the paint does not gild is not a jump target", () => {
+    // One list, not two: `data.json:12` stays prose in the render, so wiring it
+    // must not mint an address the reader can never see.
+    expect(extractJumps("*X* %%okuda-rhs:01%% <!-- data.json:12 -->").size).toBe(0);
+  });
+});
+
+describe("tui — scrollForLine / arrivalScroll (a code address arrives at its line)", () => {
+  // The frame is the renderer's, not a hand-built array: the offset this module
+  // hard-codes is a MEASUREMENT of `wrapWholeFile` + the TUI's headerless render.
+  const frame = async (text: string, width = 80): Promise<string[]> =>
+    (await renderDocument(wrapWholeFile("/tmp/fixture.ts", text), { width, color: "none" })).split("\n");
+  const FIXTURE = "first line\nsecond line\nthird line\n";
+
+  test("file line 1 sits at row 1 — the frame's leading blank is the offset", async () => {
+    const lines = await frame(FIXTURE);
+    const top = viewport(lines, scrollForLine(lines, 1, 2), 2).visible[0]!;
+    expect(top.trim()).toBe("first line");
+  });
+
+  test("a jump to line 3 puts the third line at the top of the viewport", async () => {
+    // Height 2, because a three-line file in a tall viewport has maxScroll 0:
+    // the line CANNOT reach the top without blanking the pane, and the clamp
+    // below is the rule that says so. The viewport here is small enough that
+    // the mapping is what is measured, not the clamp.
+    const lines = await frame(FIXTURE);
+    const visible = viewport(lines, scrollForLine(lines, 3, 2), 2).visible;
+    expect(visible[0]!.trim()).toBe("third line");
+    expect(visible[0]).not.toBe(""); // the first row is content, not a gap
+  });
+
+  test("arrival is exact down a longer file — nothing skipped, nothing doubled", async () => {
+    const text = Array.from({ length: 12 }, (_, i) => `line ${i + 1}`).join("\n") + "\n";
+    const lines = await frame(text);
+    for (const n of [1, 5, 9, 12]) {
+      const visible = viewport(lines, scrollForLine(lines, n, 4), 4).visible;
+      expect(visible[0]!.trim()).toBe(`line ${n}`);
+    }
+  });
+
+  test("a line past EOF clamps to the last screenful rather than blanking", async () => {
+    const lines = await frame(FIXTURE);
+    const maxScroll = viewport(lines, 0, 20).maxScroll;
+    expect(scrollForLine(lines, 4000, 20)).toBe(maxScroll);
+    expect(viewport(lines, scrollForLine(lines, 4000, 20), 20).visible.length).toBeGreaterThan(0);
+  });
+
+  test("the offset is the same at another width — horizontal elision keeps one row per line", async () => {
+    const narrow = await frame(FIXTURE, 40);
+    const visible = viewport(narrow, scrollForLine(narrow, 3, 2), 2).visible;
+    expect(visible[0]!.trim()).toBe("third line");
+  });
+
+  test("a range arrives at its opening line; a .md address arrives at the top", async () => {
+    const lines = await frame(FIXTURE);
+    expect(arrivalScroll(lines, "fixture.ts:2", 20)).toBe(scrollForLine(lines, 2, 20));
+    expect(arrivalScroll(lines, "a.rs:1-9", 20)).toBe(scrollForLine(lines, 1, 20));
+    expect(arrivalScroll(lines, "docs/help.md", 20)).toBe(0);
+    expect(arrivalScroll(lines, "docs/help.md:42", 20)).toBe(0); // no line survives discovery
+  });
+});
+
+describe("tui — the cited jump, end to end (discovery → actuator, no terminal)", () => {
+  test("a prose citation gives a silcrow whose jump starts at the cited line", async () => {
+    // The whole verb, minus the tty: a document cites a code address, discovery
+    // mints the silcrow, the actuator resolves the path and arrives at the line.
+    // Nothing here spawns a terminal, an editor, or a glass.
+    const dir = mkdtempSync(join(tmpdir(), "okuda-cited-jump-"));
+    try {
+      mkdirSync(join(dir, "sub"));
+      const code = join(dir, "sub", "fixture.ts");
+      writeFileSync(code, "one\ntwo\nthree\nfour\n");
+      const docPath = join(dir, "doc.md");
+      writeFileSync(docPath, "the read is at sub/fixture.ts:3 today.\n");
+      const { map } = deriveReferences(
+        await Bun.file(docPath).text(),
+        (t) => existsSync(join(dir, t)),
+      );
+      const [token, address] = [...map][0]!;
+      expect(token).toBeGreaterThanOrEqual(12);
+      expect(address).toBe("sub/fixture.ts:3");
+
+      const path = resolveJumpTarget(docPath, parseAddress(address).path);
+      expect(path).toBe(code);
+      const frame = (
+        await renderDocument(wrapWholeFile(path!, await Bun.file(path!).text()), { width: 80, color: "none" })
+      ).split("\n");
+      const visible = viewport(frame, arrivalScroll(frame, address, 2), 2).visible;
+      expect(visible[0]!.trim()).toBe("three");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("a target outside the root still refuses (BRF-ROOT-CONTAINMENT)", () => {
+    const root = mkdtempSync(join(tmpdir(), "okuda-root-"));
+    try {
+      expect(resolveJumpTarget(join(root, "doc.md"), "/etc/hosts", undefined, root)).toBeNull();
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 });
 

@@ -23,10 +23,11 @@
  *   - code-file mentions — `dir/name.ext`, non-md (BRF-SILCROW-PATHS
  *     Ring A) — gated like callsigns; for paths the gate's substrate is
  *     the filesystem (ADR-045): a phantom, a typo, or a URL never paints.
- *     A `:NNN` line suffix (`src/tui.ts:756`) is swallowed into the
- *     occurrence span — the badge paints after the whole mention — and
- *     stripped from the target: the silcrow is file-level, the line is
- *     BRF-SRC-LINE-LEDGER's verb, unclaimed here
+ *     A `:NNN` line suffix (`src/tui.ts:634`) is part of the **address**:
+ *     swallowed into the occurrence span (the badge paints after the whole
+ *     mention) and kept in the target, because a line is where a code render
+ *     starts and therefore what the silcrow actuates (ADR-CITED-JUMP-077).
+ *     Two lines of one file are two addresses; the gate still sees the path
  *   - named md paths — `dir/name.md` (BRF-SILCROW-PATHS Ring B) — gated
  *     like Ring A, same substrate, same suffix rule; a target inside
  *     explicit link syntax is excluded (the link already minted its
@@ -104,18 +105,39 @@ export const CALLSIGN_SHAPE = /^[A-Z]{3}(-[A-Z0-9]+)+$/;
 const RE_MD_LINK = /\[[^\]\n]*\]\((\S+?\.md)\)/g;
 const RE_CALLSIGN = /\b[A-Z]{3}(?:-[A-Z0-9]+)+\b/g;
 /** Code-file mentions (BRF-SILCROW-PATHS Ring A): at least one `/`, a
- *  non-md extension, optional `:NNN` line suffix (W2: swallowed into the
- *  span, stripped from the target). The slash is near-proof of intent —
- *  `UTF-8` and `OSC-8` carry none. `.md` is excluded here: named md
- *  paths are Ring B's own regex (RE_MD_PATH), same step's commit. */
-const RE_CODE_PATH = /\b[\w@&.-]+(?:\/[\w@&.-]+)+\.(?!md\b)[A-Za-z0-9]{1,5}(?::\d{1,4})?\b/g;
+ *  non-md extension, optional `:NNN` line suffix, and optionally a range
+ *  (`:NNN-MMM`) — one span either way. The suffix rides into the target
+ *  as part of the address (ADR-CITED-JUMP-077); the gate is asked about
+ *  the path. The slash is near-proof of intent — `UTF-8` and `OSC-8` carry
+ *  none. `.md` is excluded here: named md paths are Ring B's own regex
+ *  (RE_MD_PATH), same step's commit. */
+const RE_CODE_PATH =
+  /\b[\w@&.-]+(?:\/[\w@&.-]+)+\.(?!md\b)[A-Za-z0-9]{1,5}(?::\d{1,4}(?:-\d{1,4})?)?\b/g;
 /** Named md paths (BRF-SILCROW-PATHS Ring B): `dir/name.md`, optional
  *  `:NNN` — same shape as Ring A with the md exclusion lifted. The
  *  corpus's own convention: 1,192 free-standing mentions, 1 inside link
  *  syntax (the P-1 probe). Gated on the same `resolves` predicate as
  *  every inferred reference; explicit links mint their own occurrence,
- *  so a hit inside a link span is skipped (one claim, one badge). */
-const RE_MD_PATH = /\b[\w@&.-]+(?:\/[\w@&.-]+)+\.md(?::\d{1,4})?\b/g;
+ *  so a hit inside a link span is skipped (one claim, one badge).
+ *
+ *  The `:NNN` is **swallowed and dropped** here, unlike Ring A: prose wraps,
+ *  so a document's rendered rows are the renderer's invention and a line into
+ *  one would be a false coordinate. A document is addressed by its name. */
+const RE_MD_PATH = /\b[\w@&.-]+(?:\/[\w@&.-]+)+\.md(?::\d{1,4}(?:-\d{1,4})?)?\b/g;
+
+/** The two halves of an address: the path a jump resolves, and the line it
+ *  arrives at. The address is the whole thing — `src/vectors.ts:133` and
+ *  `src/vectors.ts` name different arrivals, so they are different destinations
+ *  (ADR-CITED-JUMP-077) — and this is the one place the split is decided, so
+ *  the gate, the actuator and the dedupe cannot disagree about what an address
+ *  is. A range arrives at its opening line: the span is the citation's, the
+ *  arrival is the reader's. Pure. */
+export function parseAddress(address: string): { path: string; line?: number } {
+  const m = /^(.*?):(\d+)(?:-(\d+))?$/.exec(address);
+  if (!m) return { path: address };
+  return { path: m[1]!, line: Number(m[2]) };
+}
+
 /** The legibility denylist (ADR-049): extensions whose deref is a
  *  render the silcrow cannot keep honest. `.jsonl` is horizontal data —
  *  one record per line, multi-kilobyte — and `wrapWholeFile` wraps it
@@ -221,16 +243,17 @@ export function scanReferences(
   // filesystem (ADR-045's second substrate) and exiled by extension
   // (ADR-049's legibility criterion — the exile applies ungated: an
   // exiled target can never enter the map, so it can never paint).
-  // The gate sees the stripped path — the suffix is presentation, not
-  // target. One destination, one silcrow: `src/tui.ts:756` and
-  // `src/tui.ts` share the vector.
+  // The gate sees the path — the line is where the render starts, not what
+  // the filesystem is asked about. Two lines of one file are two addresses
+  // (ADR-CITED-JUMP-077), so the suffix rides into the target.
   for (const m of source.matchAll(RE_CODE_PATH)) {
     const i = m.index!;
-    const target = m[0]!.replace(/:\d{1,4}$/, "");
-    const ext = /\.([A-Za-z0-9]{1,5})$/.exec(target)?.[1]?.toLowerCase();
+    const address = m[0]!;
+    const { path } = parseAddress(address); // the gate's substrate is the file
+    const ext = /\.([A-Za-z0-9]{1,5})$/.exec(path)?.[1]?.toLowerCase();
     if (ext && EXILED_EXTS.has(ext)) continue; // ADR-049: never a vector
-    if (ok(i) && (!resolves || resolves(target))) {
-      hits.push({ pos: i, end: i + m[0]!.length, target });
+    if (ok(i) && (!resolves || resolves(path))) {
+      hits.push({ pos: i, end: i + address.length, target: address });
     }
   }
   // Ring B (BRF-SILCROW-PATHS step 3): the named md path — the corpus's
@@ -245,7 +268,7 @@ export function scanReferences(
   const inLink = (pos: number) => linkSpans.some(([a, b]) => pos >= a && pos < b);
   for (const m of source.matchAll(RE_MD_PATH)) {
     const i = m.index!;
-    const target = m[0]!.replace(/:\d{1,4}$/, "");
+    const target = parseAddress(m[0]!).path; // a document is addressed by name
     if (ok(i) && !inLink(i) && (!resolves || resolves(target))) {
       hits.push({ pos: i, end: i + m[0]!.length, target });
     }
@@ -255,13 +278,21 @@ export function scanReferences(
 }
 
 /** The jump map — the in-memory translation table: vector number →
- *  filename, **one destination, one silcrow**. A destination cited
+ *  **address**, one destination, one silcrow. A destination cited
  *  repeatedly carries one number, reused at every mention (the citation
  *  convention: IEEE reprints, legal §-cross-references). First
  *  occurrence assigns; numbers ascend in reading order; capped at
  *  MAX_ADDRESSES — the cap is the map's invariant, and it is the *address*
  *  space, never discovery. Rebuilt on every render —
- *  re-derivation replaces invalidation. */
+ *  re-derivation replaces invalidation.
+ *
+ *  **The dedupe key is the address, and the address includes its line.**
+ *  `src/vectors.ts:133` and `src/vectors.ts:299` arrive in different places, so
+ *  they are two destinations with two silcrows; a bare path and a lined one differ
+ *  too, for the same reason. Keying on the path alone made a document that
+ *  cites a hundred lines of one file read as one destination — and the
+ *  References receipt would state a fullness that is not there
+ *  (ADR-CITED-JUMP-077, amending ADR-031's path-level rule). */
 export function buildJumpMap(refs: RefOccurrence[]): Map<number, string> {
   const map = new Map<number, string>();
   let n = VECTOR_MIN;
@@ -300,7 +331,7 @@ export function deriveReferences(
 ): DerivedMap {
   const refs = scanReferences(source, resolves, regions);
   const map = buildJumpMap(refs);
-  const distinct = new Set(refs.map((r) => r.target)).size;
+  const distinct = new Set(refs.map((r) => r.target)).size; // addresses, not paths
   return { map, truncated: distinct > map.size };
 }
 

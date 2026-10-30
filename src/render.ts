@@ -986,8 +986,14 @@ async function interceptMermaid(
  *  as prose until someone has cited it. Append-only on evidence.
  *
  *  The line is optional and may be a range: `path:274`, `path:1123-1142`. A bare
- *  path keeps the exact behaviour it had before lines were allowed. */
-const RE_CITED_PATH = /\b([\w][\w/.-]*\.(?:ts|md|rs|sh|py))(?::(\d+)(?:-(\d+))?)?\b/g;
+ *  path keeps the exact behaviour it had before lines were allowed.
+ *
+ *  Exported because the jump wiring reads the **same** list rather than a second
+ *  one: the paint and the actuator must agree about which strings are addresses,
+ *  or a citation gilds and does not jump (ADR-CITED-JUMP-077). Read it through
+ *  `matchAll`, which clones the regex — the shared `lastIndex` of a `/g` literal
+ *  is why this is not to be used with `.test`/`.exec` across modules. */
+export const RE_CITED_PATH = /\b([\w][\w/.-]*\.(?:ts|md|rs|sh|py))(?::(\d+)(?:-(\d+))?)?\b/g;
 
 /** A fence tag we will forward: one conservative word (ts, c++, c#,
  * objective-c). Anything else is not a language claim. */

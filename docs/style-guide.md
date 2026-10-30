@@ -67,9 +67,34 @@ The path is an affordance before it is provenance: in a silo where the filesyste
 
 So the near/far question gains its third term, answered by *what the text does*, not where it sits: content is near, provenance is far, and affordances — actable paths, keybinding hints — lift out of the gloaming into a register of their own: visible, subordinate to the rose vector paint (the silcrow is the actuation point; the path is the address).
 
-Put it last on a line, where the eye lands after the title has done its work. **An address may carry its line** — `src/render.ts:274`, `a.rs:1123-1142` — and the suffix lifts with it, as one token, because half an address in the register and half in plain prose is neither actable nor visibly wrong. The line is dereferenced, never rendered: there are no gutters on code, in any mode (`ADR-ADDRESS-NOT-COORDINATE-074`).
+Put it last on a line, where the eye lands after the title has done its work. **An address may carry its line** — `src/render.ts:1396`, `a.rs:1123-1142` — and the suffix lifts with it, as one token, because half an address in the register and half in plain prose is neither actable nor visibly wrong. The line is dereferenced, never rendered: there are no gutters on code, in any mode (`ADR-ADDRESS-NOT-COORDINATE-074`).
 
-The renderer cannot resolve the line for you and does not pretend to; it makes the address one thing you can select, search, or hand to the host. If the gold shouts against the emphasis register, dim by lightness (OKLCH L down, hue and chroma held) — never by guessing a new hue.
+**A wired address jumps; a bare one is a mark.** Two digits and a number is
+the actuator — `12` — and a code address arrives with the cited line at the top of
+the render, because okuda renders code files rather than handing them to an editor
+(`ADR-ARRIVAL-AT-LINE-077`). The renderer resolves nothing from prose: an address
+with no silcrow is a well-formed marker and one keystroke short of a jump, and that
+is the compositor's half of the work, not the author's to fake.
+
+Three authoring consequences, and they are the whole of the rule:
+
+- **Write the range whole, token last:** `path:NN-MM §12`. The interleaved
+  `path:1123 §14-1142` gilds the first half and leaves `-1142` as prose, because
+  the paint matches the address, not the intent.
+- **A coordinate on a real file is a checkable claim.** `a.rs:1123-1142` above
+  is inert — no such file, so no silcrow, nothing to jump to. Change it to a file
+  that exists and every reader can be sent to the row, which is a claim that goes
+  stale the moment the file moves (it is checkable now, in two keystrokes, where a
+  month ago it was invisible). So: real addresses cite real lines, and a *form*
+  shown for its shape is written `path:NN`.
+- **`.md` carries no line.** Prose wraps, so a rendered row is the renderer's
+  invention; `docs/x.md:42` jumps to the top of the document, and the line is
+  prose the reader will read as a promise the tool did not keep.
+
+The renderer cannot show the line for you and does not pretend to; it makes the
+address one thing you can select, search, jump, or hand to the host. If the gold
+shouts against the emphasis register, dim by lightness (OKLCH L down, hue and
+chroma held) — never by guessing a new hue.
 
 ### Cheap precision is a licence to spend it — and prose still has to be worth reading
 

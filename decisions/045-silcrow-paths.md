@@ -52,12 +52,15 @@ reference invisible to the resolver, hiding for weeks).
    entirely (Ring C, parked): no slash, no intent; resolution-is-search,
    not lookup.
 
-3. **The `:NNN` line suffix (`src/tui.ts:756`) is swallowed into the
-   occurrence span and stripped from the target** — the badge paints
-   after the whole mention, the map carries the file path. The silcrow
-   is file-level; line-jump is BRF-SRC-LINE-LEDGER's verb, unclaimed
-   here. Suffixed and plain mentions of one file share the vector
-   (one destination, one silcrow).
+3. **The `:NNN` line suffix (`src/tui.ts:634`) is swallowed into the
+   occurrence span and kept in the target** — the badge paints after the
+   whole mention, and the map carries the address. ~~Line-jump is
+   BRF-SRC-LINE-LEDGER's verb, unclaimed here; suffixed and plain
+   mentions of one file share the vector.~~ *Annotated 2026-10-30 —
+   falsified by `ADR-ARRIVAL-AT-LINE-077`: the line is claimed, and two
+   lines of one file are two addresses, two silcrows. The span rule is
+   unchanged; the target rule is reversed, and the reason is in that
+   decision.*
 
 4. **The badge paints inside the codespan** — 98% of code mentions are
    backtick-wrapped, and the glass probe (2026-09-29) confirmed the

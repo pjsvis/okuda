@@ -73,3 +73,4 @@
 {"file":"074-the-address-not-the-coordinate.md","date":"2026-10-28","status":"Accepted","summary":"The address, not the coordinate — citations dereference, they do not print","meta":{},"callsign":"ADR-ADDRESS-NOT-COORDINATE-074"}
 {"file":"075-the-dereference-mark.md","date":"2026-10-28","status":"Accepted","summary":"The dereference mark — a bare silcrow in the chrome","meta":{},"callsign":"ADR-DEREFERENCE-MARK-075"}
 {"file":"076-a-grammar-not-an-engine.md","date":"2026-10-30","status":"Accepted","summary":"A grammar, not an engine — the maths okuda declines","meta":{},"callsign":"ADR-MATH-GRAMMAR-076"}
+{"file":"077-the-arrival-at-the-line.md","date":"2026-10-30","status":"Accepted","summary":"The arrival at the line — an address includes its coordinate, and the jump is a render","meta":{},"callsign":"ADR-ARRIVAL-AT-LINE-077"}
