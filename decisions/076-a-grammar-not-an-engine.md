@@ -7,8 +7,11 @@ date: 2026-10-30
 # Decision: A grammar, not an engine — the maths okuda declines
 
 **Date:** 2026-10-30
-**Status:** Accepted — and landed. The tranche is `4ca324f`; the vocabulary is
-still append-only, so this decision constrains every row that follows it.
+**Status:** Accepted — and landed. The vocabulary is `4ca324f`; the fraction's
+grouping `fbbec50`, the script digits `5dead49`, the whitespace rule `8e1fd1d` and
+the word-script braces `5c0ad6a` followed it, each as an application of the three
+rules below rather than a change to them. The vocabulary is still append-only, so
+this decision constrains every row that follows it.
 **Enforced by:** `tests/math-glyphs.test.ts` — the all-or-nothing gate (`:39`, an
 unknown command keeps the whole span literal) and the one-column assertion (`:60`).
 The *no second door* rule below is **advice**: nothing in `just check` fails if a

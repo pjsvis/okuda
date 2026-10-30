@@ -139,6 +139,52 @@ flowchart LR
 Orientation is a semantic choice. A cycle reads across; a pipeline reads down. Same renderer, two shapes — pick the one that matches the system.
 
 
+## Maths: what renders, and what you write instead
+
+An inline `$…$` span is **transliterated, not typeset**: a closed table of 38
+entries maps LaTeX to the Unicode character it denotes, and a span holding even
+one unknown command is left **exactly as written**, `$` and all
+(`ADR-MATH-GRAMMAR-076`). Nothing is half-translated, no engine is involved, and
+the literal fallback is the renderer declining rather than a rendering fault.
+
+**What renders.** Greek (`\pi \mu \sigma \rho \tau \theta \Omega \zeta`),
+the common relations and operators (`\le \ge \neq \in \approx \gg \propto
+\pm \cdot \sum \circ \%`), the arrows, `\sin`, the accents (`\vec{v}` →
+`v⃗`, `\dot{m}` → `ṁ`), digits as scripts (`T^4` → `T⁴`, `H_2O` → `H₂O`),
+fractions with their grouping restored (`\frac{3\mu}{2R^3}` → `3μ/(2R³)`), and
+`^{\circ}` as the degree sign rather than a superscript.
+
+**What does not, and the linear form to write instead.**
+
+| you want | write |
+|---|---|
+| display maths (`$$…$$`) | inline spans, one relation per span, each on its own line |
+| a letter as a *typographic* script | it renders linearly: `I_{max}` → `I_max`, `x^{n}` → `x^n`. Unicode has no subscript `max` — `ₘ ₐ ₓ` exist and `b c d f g j q w y z` do not — and a partial alphabet works once and fails on the fourth equation, so letters keep their size on purpose |
+| a root, a limit, an integral | the linear form: `√2` is a character, `√(x+1)` is bracketed; `∑ i=1..n x_i` reads without a limit stack |
+| composition (`f \circ g`) | keep it out of a span; `\circ` renders the degree sign here, and the two meanings must not collapse |
+| a matrix, a case split, an aligned system | a `mermaid` fence, or prose. Two dimensions is the diagram door, and there is only one of them |
+
+**Four things an author gets wrong by default.**
+
+- **An equation does not belong in a table cell.** At 80 columns the cell wraps
+  mid-relation and the elision ladder cuts the tokens that carried the meaning.
+  A governing relation gets its own line, in prose, with the implementation
+  beside it as a sentence.
+- **Whitespace inside a span is syntax, not content.** It closes up; a gap
+  survives only beside a relation or operator (`α ∈ [0.2, 1.2]`, `M ≫ M`), and
+  a gap is never invented (`μ+Q` stays tight). Where you need a real space — the
+  one between a value and its unit — write it inside a text group:
+  `$65\text{ m}^3$` renders `65 m³`, and `$65m^3$` renders `65m³`.
+- **A command-free span is left alone.** `$T^4$` shows its dollars, because the
+  currency guard fires on evidence (`\`) and not on a guess about intent — the
+  same guard that keeps `costs $5 and $10` from becoming `costs ⁵ and ¹⁰`. In
+  prose, write `T⁴` directly.
+- **The literal fallback is honest, not broken.** `$\oint$` rendering as
+  `$\oint$` is the renderer saying *I declined*. It is visible today and
+  unlabelled (painting it in the source register is an open proposal); do not
+  work around it by hand-transliterating inside the span, which produces
+  decorated Stuff that no gate can check.
+
 ## The closing bookends
 
 The header opens the render — badge left, title, chip right, spanning the width. The closer mirrors it: a muted chip at the badge's column, a muted chip at the heading chip's column, a rule between. Openings announce; closings release. A document that doesn't know it's done reads as a broken frame.
