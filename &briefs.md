@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**8 live · 150 archived · 9 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 2 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**7 live · 151 archived · 9 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 2 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -39,7 +39,7 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 | BRF-SEARCH-ROW | · open | The search row — the contract, frozen by the probe | — |
 | BRF-AUTHORING-CONVENTION | · open | Authoring Convention — Route Agents to the Style Guide | — |
 | BRF-PROBES-TIER | · open | Establish Registered `probes/` Tier for Exploratory Python Scripts | — |
-| BRF-CITED-JUMP | · open | Cited jump — go to the line, never show it | — |
+| BRF-CITED-JUMP | ✓ landed 2026-10-30 | Cited jump — go to the line, never show it | — |
 
 ## Ready — specced, next up
 

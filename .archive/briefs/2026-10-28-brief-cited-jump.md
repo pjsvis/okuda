@@ -8,13 +8,19 @@ callsign: BRF-CITED-JUMP
 **Date:** 2026-10-28 · **amended the same day**, twice: the operator's spec
 deleted the first draft's editor hand-off and its cursor. What remains is smaller
 and is the tool's own mechanism.
-**Status:** Open
+**Status:** Landed 2026-10-30 — the verb is built (`ADR-ARRIVAL-AT-LINE-077`):
+an address keeps its line, and a jump *renders* the code file at it. Two claims
+below were falsified by the landing and are annotated in place; two addresses were
+pointed at nothing measurable and are corrected. Measured the day it shipped, this
+page carried six silcrows, and one landed on `return { ok: true, out };` while
+another landed 34 rows from its referent — which is why the landing came with a
+dogfood page that a test holds still.
 
 ---
 
 ## Context
 
-`ADR-ADDRESS-NOT-COORDINATE-074` made a citation an address — `src/render.ts:274`
+`ADR-ADDRESS-NOT-COORDINATE-074` made a citation an address — `src/render.ts:1396`
 paints as one `doc-ref` token — and its first version claimed the *terminal* could
 act on it. That was false (Ghostty's `link` regex is unimplemented), which is now
 recorded. What follows is the verb, and the operator has specified it precisely
@@ -44,12 +50,12 @@ has learned to dereference `§12` has learned this.
 | :--- | :--- |
 | `cmd+click` on a gold citation | does nothing — reported from the glass, 2026-10-28 |
 | Ghostty custom link rules | not settable (`error.NotImplemented`) |
-| `extractJumps` target | `.md` only: the regex is `/\S+\.md/g` (`src/tui.ts`) |
+| `extractJumps` target | `.md` only: the regex *was* `/\S+\.md/g` (`src/tui.ts:660`). **Landed:** it reads the renderer's `RE_CITED_PATH` — one list, not two |
 | `jumpTo` arrival | `present(fetch, next, 0)` — always the top |
-| Code rendering | exists: `wrapWholeFile`, `isWholeFileFence` (`src/render.ts`) |
+| Code rendering | exists: `wrapWholeFile` (`src/render.ts:1164`), `isWholeFileFence` |
 | Vertical elision in a code path | **none** — lines are elided horizontally only, so the count is exact |
 | Rendered index of file line 1 | **measured, not derived**: CLI shows the identity header at 0 and the fence body from 2; the TUI has no header (ADR-020) so the offset differs. The test measures it. |
-| Two references to one file, different lines | **collapse today**: `buildJumpMap` skips a repeated target — `if (seen.has(ref.target)) continue; // one destination, one silcrow` (`src/vectors.ts:271`). Correct under the old grammar, wrong the moment an address can name a line. |
+| Two references to one file, different lines | **collapse today**: `buildJumpMap` skips a repeated target — `if (seen.has(ref.target)) continue; // one destination, one silcrow` (`src/vectors.ts:305`). Correct under the old grammar, wrong the moment an address can name a line. |
 | A silcrow placed inside a range | **fails silently**: `path:1123 §14-1142` gilds `path:1123` and leaves ` §14-1142` as prose (probed 2026-10-28). `path:1123-1142 §14` gilds whole. |
 | An authored `§14` | inert — the badge is painted from the wire, never from text (`ADR-031`). The silcrow is the compositor's, not the author's. |
 
@@ -63,9 +69,9 @@ as it does today.
 
 **In:**
 
-- `extractJumps` accepts a code target with an optional line — `src/render.ts:274`,
+- `extractJumps` accepts a code target with an optional line — `src/render.ts:1396`,
   `a.rs:1123-1142` — using the closed extension list the renderer already cites
-  (`RE_CITED_PATH`, `src/render.ts`), not a second list. A range arrives at its
+  (`RE_CITED_PATH`, `src/render.ts:996`), not a second list. A range arrives at its
   opening line.
 - The target becomes `{ path, line? }` (or the string is parsed once at the jump
   boundary — one of the two, chosen for how the map is consumed).
@@ -92,9 +98,20 @@ as it does today.
 
 **A prose citation is a mark, not a jump.** The silcrow numbers come from the
 compositor's wiring (`%%okuda-rhs:NN%%` sharing a line with its target). A bare
-`src/render.ts:274` in a paragraph has no number, so nothing can actuate it, and
+`src/render.ts:1396` in a paragraph has no number, so nothing can actuate it, and
 this brief does not invent one. What becomes jumpable is a **wired** target — the
 menu row, the index line — which is where the compositor already writes addresses.
+
+*Annotated 2026-10-30 — the premise is half false, and the half that is false is the
+half that mattered.* The TUI's map is derived from the **source**
+(`deriveReferences`), not from the wiring tokens, so a bare citation in a paragraph
+does get a number: `scanReferences` mints one for every address it discovers
+(ADR-045's Ring A), and the paint was already putting a silcrow beside it. What the
+wiring adds is the number *beside a menu row*; what it never did was gate
+actuation. So the benefit is not confined to wired targets — every citation on the
+glass is actuable — and the compositor's remaining half is naming a *coordinate*
+in the wiring, not making a jump possible at all. The sentence above is left as
+written because it is what the work believed on 2026-10-28.
 
 ## Design questions to settle in the work
 
@@ -102,7 +119,7 @@ menu row, the index line — which is where the compositor already writes addres
    from `finalize`, no identity header). The CLI's numbers are not the TUI's —
    measured 2026-10-28, a three-line file renders with the header at index 0 in
    streaming mode. Expose the mapping as a pure `scrollForLine(lines, n)` in the
-   shape `anchorFor`/`reanchoredScroll` already have (`src/tui.ts`, tested in
+   shape `anchorFor` (`src/tui.ts:187`)/`reanchoredScroll` already have, tested in
    `tests/tui.test.ts`), so the probe runs headless rather than through a
    terminal. Assume nothing; the function is the instrument.
 2. **An `.md` target with a `:NN`.** Ignore the line, or flash that a document has
@@ -129,7 +146,10 @@ menu row, the index line — which is where the compositor already writes addres
 - **The compositor must write the address.** Nothing in the renderer can make a
   prose citation jumpable without numbering it, so the benefit lands wherever
   wiring exists. If that turns out to be nowhere, the finding is about the
-  compositor, not this brief.
+  compositor, not this brief. *Landed 2026-10-30: the risk was overstated for the
+  reason in the annotation above — prose citations mint their own numbers, so the
+  benefit landed everywhere at once. What the compositor owes is a **line** in the
+  wiring, and the dogfood page is the worked example.*
 - **Elision is horizontal only**, so a code line cut at the glass still occupies one
   index — the mapping survives. A future vertical budget would break it, and the
   test is what would catch that.
@@ -159,3 +179,9 @@ menu row, the index line — which is where the compositor already writes addres
 - **Dogfood:** wire a row in a scratch document to `docs/2026-10-28-test-citations.md`
   with a line, jump it, and confirm the render starts there. The corpus page was
   built to break the affordance; this is the same trick applied to the verb.
+  *Landed 2026-10-30 — this prescription would have proved nothing:* the target is
+  a `.md`, so the line is dropped at discovery (design question 2, as ruled), and
+  the jump lands at the top exactly as it would without one. The landed dogfood is
+  `docs/2026-10-30-dogfood-cited-jump.md` — seven wired rows on **code** targets,
+  each arrival asserted by `tests/cited-jump-dogfood.test.ts`, so the page cannot
+  agree with a stale line.

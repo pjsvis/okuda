@@ -101,6 +101,40 @@ arrive.
 The function's signature on the top row, from a silcrow printed in a document two
 directories away. That is the verb.
 
+## The dogfood page, added the same day on the operator's report
+
+*"has jumps but not to real targets"* — measured, and true. The brief carried six
+silcrows; one landed on `return { ok: true, out };` and another 34 rows from its
+referent, because the addresses were written against a file that then moved. That is
+the corpus's standing tax, and it is invisible until something dereferences it, which
+is exactly what this verb adds: a stale line is now two keystrokes from discovery.
+
+So the repair ships with the instrument. `docs/2026-10-30-dogfood-cited-jump.md`
+(`just dogfood-jump`) is seven wired rows on real code targets, and
+`tests/cited-jump-dogfood.test.ts` asserts three things the page can rot in: the
+table's displayed number against the map's, each address's line against the text the
+row promises, and each arrival against the top row of a rendered frame. The past-EOF
+row asserts the clamp; the `.md` rows assert that a document is entered at the top and
+that its suffix is dropped; `a.rs:1123-1142` asserts that a shape the paint gilds can
+still mint nothing.
+
+Two things this closed that the first pass left open:
+
+- **The brief's own addresses are corrected** and its two falsified claims annotated
+  in place — the "a prose citation is a mark, not a jump" paragraph is now annotated
+  rather than silently contradicted, because the landing found that the map is
+  derived from the *source*, so a prose citation mints its own number. The compositor
+  owes a line in the wiring, not the jump's existence.
+- **The brief is archived, not left "Open"** — status settled, `git mv` to
+  `.archive/briefs/`, the editorial glyph to `✓ landed`, the queue converged at 7 live.
+  A landed brief that still says Open is the stale-ledger failure in miniature.
+
+**One defect found by writing the page.** Ring A capped a line suffix at `\d{1,4}`
+while `RE_CITED_PATH` allowed `\d+`: a five-digit line gilded as one address and
+minted as another (the bare path), so the paint promised a coordinate the jump could
+not reach. The bound is now `\d+` in both rings — the same shape, because they are
+the same list.
+
 ## What is left, and it is not a defect in this work
 
 - **The compositor must write the address** for a *wired* row to name a

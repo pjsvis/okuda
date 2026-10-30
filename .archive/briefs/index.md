@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-10-28 | BRF-CITED-JUMP | done | Cited jump — the render starts at the line, and never shows it | 2026-10-28-brief-cited-jump.md |
 | 2026-10-26 | BRF-IRONY-MARK | done | The irony mark takes the parked state, and the vertical ellipsis goes back to elision | 2026-10-26-brief-irony-mark.md |
 | 2026-10-26 | BRF-PROSE-MEASURE | rejected | Text takes the measure, art takes the glass — prose gets a band, and a fence says only *that* it was cut | 2026-10-26-brief-prose-measure.md |
 | 2026-10-25 | BRF-DIAGRAM-HEIGHT-AXIS | rejected | The height axis has no policy at all | 2026-10-25-brief-diagram-height-axis.md |

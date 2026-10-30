@@ -303,7 +303,7 @@ something was deleted.
   * **Prior art:** **subtraction as discovery** (removal is an instrument;
   **verifiability is downstream of subtraction**); `ADR-GLASS-INK-073`'s process
   finding (*ask whose value it is before asking whether the idea is good*);
-  `briefs/2026-10-28-brief-cited-jump.md` (four drafts, each smaller);
+  `.archive/briefs/2026-10-28-brief-cited-jump.md` (four drafts, each smaller);
   `ADR-ADDRESS-NOT-COORDINATE-074` (the gutter deleted by one constraint).
 
 ---
