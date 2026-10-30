@@ -1737,7 +1737,11 @@ function mathScript(whole: string, kind: string, braced?: string, bare?: string)
   return [...body].map((c) => table[c]!).join("");
 }
 
-const RE_MATH_FRAC = /\\frac\{([^{}]*)\}\{([^{}]*)\}/g;
+/** A fraction side, allowing ONE level of nesting — `\frac{x}{I_{\text{max}}}`
+ *  is a fraction whose denominator is a symbol with a subscript, and the flat
+ *  `[^{}]*` made it unparseable, so the whole span fell back to literal. */
+const FRAC_SIDE = String.raw`((?:[^{}]|\{[^{}]*\})*)`;
+const RE_MATH_FRAC = new RegExp(String.raw`\\frac\{${FRAC_SIDE}\}\{${FRAC_SIDE}\}`, "g");
 /** Why a fraction needs brackets at all: `\frac{3\mu}{2R^3}` flattened to
  *  `3μ/2R^3` reads as `(3μ/2)·R^3` under left-associativity, so the equation
  *  was only true for a reader who already knew the physics. LaTeX's grouping
@@ -1754,7 +1758,7 @@ const RE_MATH_FRAC = /\\frac\{([^{}]*)\}\{([^{}]*)\}/g;
  *  it contains no loose operator. Juxtaposition is the trap: it binds
  *  tighter than nothing and looser than the slash. */
 const RE_MATH_TERM = /^[^\s+\-=<>·×*/\\,()]+$/;
-const RE_MATH_FACTOR = /^(?:\d+(?:\.\d+)?|[^\s+\-=<>·×*/\\,()\d^_]+)(?:[\^_](?:\{[^{}]*\}|[-\d]+))?$/;
+const RE_MATH_FACTOR = /^(?:\d+(?:\.\d+)?|[^\s+\-=<>·×*/\\,()\d^_]+)(?:[\^_](?:\{[^{}]*\}|[-\d]+|[A-Za-z][A-Za-z0-9]*))?$/;
 function balancedParens(s: string): boolean {
   let depth = 0;
   for (const c of s) {
@@ -1779,6 +1783,23 @@ const RE_MATH_PROTECT = /\\text\{[^{}]*\}|\s*\\_\s*/g;
 const MATH_MASK = "\u0001";
 const RE_MATH_MASK = /\u0001(\d+)\u0001/g;
 /** The accents: braces mandatory, mark appended to the operand. */
+/** A word script needs no braces: the caret or the underscore already marks
+ *  it, so `\tau_{gg}` is `τ_gg` and `I_{\text{max}}` is `I_max`. Two cases keep
+ *  their braces, and both are the same reason — the braces are a *delimiter*
+ *  there: a body that is not a bare word (`x^{n+1}`), and a letter or digit
+ *  immediately after the closing brace, because `A_{rad}T^4` without them is
+ *  `A_radT⁴`, a subscript nobody wrote. A single character is its own
+ *  delimiter, which is what lets `77^{\circ}` become `77^°`.
+ *
+ *  Runs after the `\text` rewrite (so the body is a word rather than a
+ *  command) and after the digit scripts (so numerals never reach it). */
+const RE_MATH_WORD_SCRIPT = /([\^_])\{([^\s{}]|[A-Za-z][A-Za-z0-9]*)\}(?![A-Za-z0-9])/g;
+/** `^{\circ}` is the DEGREE SIGN, not a superscripted composition operator:
+ *  `77^\circ\text{C}` means 77 °C, and `77^°C` says the same thing with one
+ *  less syntax. Only the superscripted form — a bare `\circ` stays a glyph,
+ *  since composition (`f \circ g`) is a different meaning we have no evidence
+ *  for and must not flatten into a degree. */
+const RE_MATH_DEGREE = /\^\{\\circ\}|\^\\circ/g;
 const RE_MATH_VEC = /\\vec\{([^{}]*)\}/g;
 const RE_MATH_DOT = /\\dot\{([^{}]*)\}/g;
 /** An inline span: no `$` inside, no newline (display math is out of
@@ -1813,6 +1834,7 @@ function mathSpanBody(body: string): string | null {
     (whole) => `${MATH_MASK}${protectedGroups.push(whole) - 1}${MATH_MASK}`,
   );
   const substituted = masked
+    .replace(RE_MATH_DEGREE, "°")
     .replace(RE_MATH_SCRIPT, mathScript)
     .replace(RE_MATH_TERMINATED, (whole: string, cmd: string, space: string) =>
       // A rewrite-only command is consumed by its own braces, never by the
@@ -1827,11 +1849,14 @@ function mathSpanBody(body: string): string | null {
     );
   const out = stripMathSpace(substituted)
     .replace(RE_MATH_MASK, (_m, i: string) => protectedGroups[Number(i)]!)
-    .replace(RE_MATH_FRAC, (_m, num: string, den: string) => `${fracSide(num, true)}/${fracSide(den, false)}`)
+    // `\text` first: a fraction side is then a word rather than a command, so
+    // `\frac{x}{I_{\text{max}}}` is `x/I_max` and not `x/(I_{max})`.
     .replace(RE_MATH_TEXT, "$1")
+    .replace(RE_MATH_FRAC, (_m, num: string, den: string) => `${fracSide(num, true)}/${fracSide(den, false)}`)
     .replace(/\\_/g, "_")
     .replace(RE_MATH_VEC, "$1\u20D7")
-    .replace(RE_MATH_DOT, "$1\u0307");
+    .replace(RE_MATH_DOT, "$1\u0307")
+    .replace(RE_MATH_WORD_SCRIPT, "$1$2");
   // A recognised-but-unconsumed rewrite survives here (`\vec v`, `\frac F A`,
   // an unclosed `\text{oops`), and that is the only way a span can be
   // half-translated. Reject it whole rather than emit half an equation.

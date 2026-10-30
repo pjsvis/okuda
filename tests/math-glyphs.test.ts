@@ -39,8 +39,8 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
     test("a relation or operator keeps its gap", () => {
       expect(mathGlyphs("$\\alpha \\in [0.2, 1.2]$")).toBe("α ∈ [0.2, 1.2]");
       expect(mathGlyphs("$M_{\\text{anchor}} \\gg M_{\\text{worker}}$"))
-        .toBe("M_{anchor} ≫ M_{worker}");
-      expect(mathGlyphs("$I_{\\text{max}} - I_{\\text{min}}$")).toBe("I_{max} - I_{min}");
+        .toBe("M_anchor ≫ M_worker");
+      expect(mathGlyphs("$I_{\\text{max}} - I_{\\text{min}}$")).toBe("I_max - I_min");
       expect(mathGlyphs("$\\sin x$")).toBe("sin x");
       expect(mathGlyphs("$E \\approx 450\\text{ GPa}$")).toBe("E ≈ 450 GPa");
     });
@@ -64,6 +64,25 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
     });
   });
 
+  describe("a word script needs no braces", () => {
+    test("the caret already marks it, so the braces go", () => {
+      expect(mathGlyphs("$\\tau_{gg}$")).toBe("τ_gg");
+      expect(mathGlyphs("$I_{\\text{max}}$")).toBe("I_max");
+      expect(mathGlyphs("$\\mu^{n}$")).toBe("μ^n");
+    });
+
+    test("two cases keep them, and for the same reason: the braces delimit", () => {
+      // A letter after the closing brace: `A_radT⁴` is a subscript nobody wrote.
+      expect(mathGlyphs("$\\epsilon\\sigma A_{\\text{rad}}T^4$")).toBe("εσA_{rad}T⁴");
+      // A body that is not a bare word.
+      expect(mathGlyphs("$\\mu^{n+1}$")).toBe("μ^{n+1}");
+    });
+
+    test("a nested fraction side parses, and keeps its factor bare", () => {
+      expect(mathGlyphs("$\\frac{x}{I_{\\text{max}}}$")).toBe("x/I_max");
+    });
+  });
+
   describe("script digits", () => {
     test("digits are a total mapping, so they may be pretty", () => {
       expect(mathGlyphs("$\\sigma_1^2$")).toBe("σ₁²");
@@ -74,8 +93,13 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
     });
 
     test("letters are not: a partial alphabet works once and fails later", () => {
-      expect(mathGlyphs("$\\tau_{max}$")).toBe("τ_{max}");
-      expect(mathGlyphs("$\\mu^{n}$")).toBe("μ^{n}");
+      // Letters never get a typographic form — but the braces are another
+      // question, and a word script loses them when nothing follows.
+      expect(mathGlyphs("$\\tau_{max}$")).toBe("τ_max");
+      expect(mathGlyphs("$\\mu_{ab}c$")).toBe("μ_{ab}c"); // a letter follows: braces stay
+      // Braces are a different question (see the word-script block): the
+      // letter gains no typographic form, and `μ^n` is what the author wrote.
+      expect(mathGlyphs("$\\mu^{n}$")).toBe("μ^n");
     });
 
     test("an escaped underline is prose, not a subscript", () => {
@@ -151,7 +175,7 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
     test("relations and operators", () => {
       expect(mathGlyphs("$E \\approx 450\\text{ GPa}$")).toBe("E ≈ 450 GPa");
       expect(mathGlyphs("$M \\gg m \\propto \\pm \\sim \\times$")).toBe("M ≫ m ∝ ± ∼ ×");
-      expect(mathGlyphs("$77^\\circ\\text{C}$")).toBe("77^°C");
+      expect(mathGlyphs("$77^\\circ\\text{C}$")).toBe("77°C"); // the degree sign, not a superscript
       expect(mathGlyphs("$34\\%\\text{ O}_2$")).toBe("34% O₂");
       expect(mathGlyphs("$a \\longrightarrow b$")).toBe("a ⟶ b");
     });
@@ -172,9 +196,9 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
     });
 
     test("a governing equation now resolves whole", () => {
-      expect(mathGlyphs("$\\sum \\vec{F}_{\\text{int}} = 0$")).toBe("∑F⃗_{int} = 0");
+      expect(mathGlyphs("$\\sum \\vec{F}_{\\text{int}} = 0$")).toBe("∑F⃗_int = 0");
       expect(mathGlyphs("$\\tau_{gg} = \\frac{3\\mu}{2R^3}(I_{\\text{max}} - I_{\\text{min}})\\sin(2\\theta)$"))
-        .toBe("τ_{gg} = 3μ/(2R³)(I_{max} - I_{min})sin(2θ)");
+        .toBe("τ_gg = 3μ/(2R³)(I_max - I_min)sin(2θ)");
     });
   });
 
@@ -236,6 +260,6 @@ describe("math glyphs — in the render", () => {
 
   test("the tranche, in the render: a table cell carries a governing equation", async () => {
     const out = await text("| inv | eq |\n| --- | --- |\n| 3 | $P_{\\text{in}} + Q_{\\text{gen}} = \\epsilon \\sigma A_{\\text{rad}} T^4$ |");
-    expect(out).toContain("P_{in} + Q_{gen} = εσA_{rad}T⁴");
+    expect(out).toContain("P_in + Q_gen = εσA_{rad}T⁴");
   });
 });
