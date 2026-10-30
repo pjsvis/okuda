@@ -28,6 +28,42 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
     expect(mathGlyphs("$O(\\text{arithmetic})$")).toBe("O(arithmetic)");
   });
 
+  describe("whitespace is syntax", () => {
+    test("commands close up — the terminator is not content", () => {
+      expect(mathGlyphs("$\\Delta \\rho g L^2$")).toBe("ΔρgL²");
+      expect(mathGlyphs("$\\mu \\sigma \\rho$")).toBe("μσρ");
+      expect(mathGlyphs("$\\epsilon \\sigma A_{\\text{rad}} T^4$")).toBe("εσA_{rad}T⁴");
+      expect(mathGlyphs("$\\Delta\\rho$")).toBe("Δρ");
+    });
+
+    test("a relation or operator keeps its gap", () => {
+      expect(mathGlyphs("$\\alpha \\in [0.2, 1.2]$")).toBe("α ∈ [0.2, 1.2]");
+      expect(mathGlyphs("$M_{\\text{anchor}} \\gg M_{\\text{worker}}$"))
+        .toBe("M_{anchor} ≫ M_{worker}");
+      expect(mathGlyphs("$I_{\\text{max}} - I_{\\text{min}}$")).toBe("I_{max} - I_{min}");
+      expect(mathGlyphs("$\\sin x$")).toBe("sin x");
+      expect(mathGlyphs("$E \\approx 450\\text{ GPa}$")).toBe("E ≈ 450 GPa");
+    });
+
+    test("a gap is never invented — tight stays tight", () => {
+      expect(mathGlyphs("$\\mu+Q$")).toBe("μ+Q");
+      expect(mathGlyphs("$\\mu = Q$")).toBe("μ = Q");
+      expect(mathGlyphs("$a\\to b$")).toBe("a→ b");
+    });
+
+    test("the value–unit space is the author's, and it survives", () => {
+      // ISO 80000-1: value and unit separated. The space lives inside
+      // \text{}, which the strip masks, so it is content rather than syntax.
+      expect(mathGlyphs("$65\\text{ m}^3$")).toBe("65 m³");
+      expect(mathGlyphs("$9.5\\text{ t}$")).toBe("9.5 t");
+      expect(mathGlyphs("$15+\\text{ g/cm}^2$")).toBe("15+ g/cm²");
+    });
+
+    test("a literal underscore is prose: its word gaps stay", () => {
+      expect(mathGlyphs("$a \\_ b \\to c$")).toBe("a _ b → c");
+    });
+  });
+
   describe("script digits", () => {
     test("digits are a total mapping, so they may be pretty", () => {
       expect(mathGlyphs("$\\sigma_1^2$")).toBe("σ₁²");
@@ -64,7 +100,7 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
     expect(mathGlyphs("$\\frac{F}{A}$")).toBe("F/A");
     expect(mathGlyphs("$\\frac{3\\mu}{2R^3}$")).toBe("3μ/(2R³)");
     expect(mathGlyphs("$\\frac{a+b}{c}$")).toBe("(a+b)/c");
-    expect(mathGlyphs("$\\frac{x}{y z}$")).toBe("x/(y z)");
+    expect(mathGlyphs("$\\frac{x}{2R}$")).toBe("x/(2R)"); // a product denominator
     expect(mathGlyphs("$\\frac{x}{(a+b)}$")).toBe("x/(a+b)"); // already a group
     expect(mathGlyphs("$\\frac{F \\times d}{A}$")).toBe("(F × d)/A");
   });
@@ -107,8 +143,9 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
     });
 
     test("Greek", () => {
+      // No gaps: a command terminator is syntax, and nothing here is a relation.
       expect(mathGlyphs("$\\mu \\sigma \\rho \\tau \\theta \\Omega \\zeta$"))
-        .toBe("μ σ ρ τ θ Ω ζ");
+        .toBe("μσρτθΩζ");
     });
 
     test("relations and operators", () => {
@@ -135,9 +172,7 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
     });
 
     test("a governing equation now resolves whole", () => {
-      // The space after `∑` survives because the next character is a command,
-      // not an operand — the terminator rule only fires on `[A-Za-z0-9]`.
-      expect(mathGlyphs("$\\sum \\vec{F}_{\\text{int}} = 0$")).toBe("∑ F⃗_{int} = 0");
+      expect(mathGlyphs("$\\sum \\vec{F}_{\\text{int}} = 0$")).toBe("∑F⃗_{int} = 0");
       expect(mathGlyphs("$\\tau_{gg} = \\frac{3\\mu}{2R^3}(I_{\\text{max}} - I_{\\text{min}})\\sin(2\\theta)$"))
         .toBe("τ_{gg} = 3μ/(2R³)(I_{max} - I_{min})sin(2θ)");
     });
@@ -201,6 +236,6 @@ describe("math glyphs — in the render", () => {
 
   test("the tranche, in the render: a table cell carries a governing equation", async () => {
     const out = await text("| inv | eq |\n| --- | --- |\n| 3 | $P_{\\text{in}} + Q_{\\text{gen}} = \\epsilon \\sigma A_{\\text{rad}} T^4$ |");
-    expect(out).toContain("P_{in} + Q_{gen} = ε σA_{rad} T⁴");
+    expect(out).toContain("P_{in} + Q_{gen} = εσA_{rad}T⁴");
   });
 });

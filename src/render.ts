@@ -1658,6 +1658,37 @@ const MATH_SPACED = new Set([
   // is not `sinx`. Greek and operators stay out — their space is a terminator.
   "\\sin",
 ]);
+/** The output forms of MATH_SPACED — the glyphs whose gap the reader needs.
+ *  Derived from the set rather than written twice, so the two cannot drift. */
+const MATH_GAP_WORDS: readonly string[] = [...MATH_SPACED].map(
+  (cmd) => MATH_LOOKUP.get(cmd) ?? cmd,
+);
+/** Relations and operators the author typed as literal characters, which never
+ *  passed through the table: `=` and `-` and `,` are as load-bearing as `∈`
+ *  and `≫` when the eye has to find where one term stops. A gap is kept beside
+ *  them, never inserted — `a+b` stays tight because the author wrote it tight. */
+const MATH_GAP_CHARS = new Set("=<>+-×÷·±,≤≥≠≈∝∼≫→⟶∈");
+
+/** Whitespace inside a math span is SYNTAX, not content: in LaTeX it ends a
+ *  command name and typesets as nothing. Keeping it made the gaps arbitrary —
+ *  `\Delta \rho g L^2` rendered `Δ ρg L²`, a gap where the author typed two
+ *  commands and none where they typed a command and an operand. So a run is
+ *  removed unless a gap word sits on one side of it: relations and operators
+ *  keep their single space, everything else closes up. A space is never
+ *  invented, only kept or dropped. */
+function stripMathSpace(s: string): string {
+  return s.replace(/\s+/g, (run: string, offset: number, whole: string) => {
+    const start = offset + run.length;
+    const endsWithGap =
+      MATH_GAP_CHARS.has(whole[offset - 1] ?? "") ||
+      MATH_GAP_WORDS.some((w) => whole.slice(Math.max(0, offset - w.length), offset) === w);
+    const startsWithGap =
+      MATH_GAP_CHARS.has(whole[start] ?? "") ||
+      MATH_GAP_WORDS.some((w) => whole.startsWith(w, start));
+    return endsWithGap || startsWithGap ? " " : "";
+  });
+}
+
 /** Any backslash token: a command (`\alpha`) or an escape (`\_`). */
 const RE_MATH_ESCAPE = /\\[A-Za-z]+|\\[^A-Za-z]/g;
 const RE_HAS_ESCAPE = /\\[A-Za-z]|\\[^A-Za-z]/;
@@ -1741,6 +1772,12 @@ function fracSide(side: string, numerator: boolean): string {
   return side;
 }
 const RE_MATH_TEXT = /\\text\{([^{}]*)\}/g;
+/** Groups whose whitespace is the AUTHOR's, not syntax: a `\text{}` body and
+ *  an escaped `\_` (a literal underscore in prose, not a subscript operator).
+ *  Masked while whitespace is stripped, restored before the rewrites. */
+const RE_MATH_PROTECT = /\\text\{[^{}]*\}|\s*\\_\s*/g;
+const MATH_MASK = "\u0001";
+const RE_MATH_MASK = /\u0001(\d+)\u0001/g;
 /** The accents: braces mandatory, mark appended to the operand. */
 const RE_MATH_VEC = /\\vec\{([^{}]*)\}/g;
 const RE_MATH_DOT = /\\dot\{([^{}]*)\}/g;
@@ -1767,7 +1804,15 @@ function mathSpanBody(body: string): string | null {
   // The terminated pass must still substitute as it goes: dropping the space
   // alone would re-form the command (`\Delta t` → `\Deltat`), which is how
   // this pass first shipped wrong.
-  const substituted = body
+  // Mask the groups whose whitespace is the author's, so the strip below
+  // cannot touch it: `$65\text{ m}^3$` must keep the value-unit space (ISO
+  // 80000-1), and `a \_ b` must keep the spaces around a literal underscore.
+  const protectedGroups: string[] = [];
+  const masked = body.replace(
+    RE_MATH_PROTECT,
+    (whole) => `${MATH_MASK}${protectedGroups.push(whole) - 1}${MATH_MASK}`,
+  );
+  const substituted = masked
     .replace(RE_MATH_SCRIPT, mathScript)
     .replace(RE_MATH_TERMINATED, (whole: string, cmd: string, space: string) =>
       // A rewrite-only command is consumed by its own braces, never by the
@@ -1780,9 +1825,11 @@ function mathSpanBody(body: string): string | null {
     .replace(RE_MATH_TOKEN, (t) =>
       MATH_REWRITE_ONLY.has(t) ? t : (MATH_LOOKUP.get(t) ?? t),
     );
-  const out = substituted
+  const out = stripMathSpace(substituted)
+    .replace(RE_MATH_MASK, (_m, i: string) => protectedGroups[Number(i)]!)
     .replace(RE_MATH_FRAC, (_m, num: string, den: string) => `${fracSide(num, true)}/${fracSide(den, false)}`)
     .replace(RE_MATH_TEXT, "$1")
+    .replace(/\\_/g, "_")
     .replace(RE_MATH_VEC, "$1\u20D7")
     .replace(RE_MATH_DOT, "$1\u0307");
   // A recognised-but-unconsumed rewrite survives here (`\vec v`, `\frac F A`,
