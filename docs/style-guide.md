@@ -17,6 +17,8 @@ The single pattern that most separates an okuda document from a wall of white. E
 
 The bold lead does the work a colon or a heading would, without the ceremony. Reach for it whenever a list's items each have a name and a payload.
 
+**A blank line is an assertion of a boundary, not a spacer.** In prose it separates thoughts and costs nothing. In a list it starts a **new item** — so splitting a bullet where a sentence turns gives you two items, and the second one has no bold lead for the eye to scan. Air inside a list is bought with a lead, or not at all: name the new item, or leave the sentence where it was.
+
 
 ## State glyphs: assess before you read
 
