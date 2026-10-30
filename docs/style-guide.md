@@ -2,7 +2,9 @@
 
 The inverse of the [grammar showcase](showcase.md). The showcase answers *"what does okuda do with my markdown?"* — the renderer's reference. This answers *"what markdown do I write to get the okuda look?"* — the author's guide. One read, the vocabulary internalised; the patterns reachable. Not a spec; a palette of moves.
 
-The okuda look is **structured colour the eye scans before reading**. A wall of white text is what an agent emits when it treats markdown as a plain-text dump. A cool sophisticate treats it as a *layout brief* — the renderer supplies the colour, the author supplies the structure that earns it. Ephemeral docs — a menu, an index, a status page — are the canonical test: they have no content depth to hide behind, so their look *is* their legibility. Render this with `just style-guide` and read it as the demo of itself.
+The okuda look is **structured colour the eye scans before reading**. A wall of white text is what an agent emits when it treats markdown as a plain-text dump. A cool sophisticate treats it as a *layout brief* — the renderer supplies the colour, the author supplies the structure that earns it.
+
+Ephemeral docs — a menu, an index, a status page — are the canonical test: they have no content depth to hide behind, so their look *is* their legibility. Render this document with `just style-guide` and read it as the demo of itself.
 
 
 ## The house move: the bold-lead list
@@ -39,7 +41,9 @@ A glyph only earns its place where there is real variance. A column where every 
 
 ## Tables: the structured glance
 
-Tables earn their place when the eye needs to compare across rows. The key column is bold amber (the bold lead, tabulated); the header is cyan; alignment is honoured per-column. Overflow splits by surface kind (ADR-022): jump-wired menus lay out right-anchored by role — number at the far edge, callsign its stable home, slug truncates with `…` then suppresses; prose tables wrap in-cell and the operator widens.
+Tables earn their place when the eye needs to compare across rows. The key column is bold amber (the bold lead, tabulated); the header is cyan; alignment is honoured per-column.
+
+Overflow splits by surface kind (ADR-022): jump-wired menus lay out right-anchored by role — number at the far edge, callsign its stable home, slug truncates with `…` then suppresses; prose tables wrap in-cell and the operator widens.
 
 | Pattern | Channel | When |
 | --- | :--- | :--- |
@@ -51,9 +55,19 @@ Tables earn their place when the eye needs to compare across rows. The key colum
 
 ## Near and far: the gloaming register
 
-The colour register has one principle: *is this near or far?* **Near** is the content you're reading — bold, bright, the core. **Far** is provenance and chrome — muted, receding, like the status bar's folder/file text. The gloaming is the gradient between, and the okuda palette *is* the gloaming: blues (heading), browns (strong), yellows (emphasis, state-todo) — near dark when still light. Every colour decision asks one question: is this near or far?
+The colour register has one principle: *is this near or far?* **Near** is the content you're reading — bold, bright, the core. **Far** is provenance and chrome — muted, receding, like the status bar's folder/file text.
 
-A bare `.md` path in prose — `decisions/010-bounded-anchor-proportional-fallback.md` — lifts to the doc-ref gold (amended 2026-09-12: it receded to muted for one day too many — 2026-08-28 wired the gold, 2026-08-28 dimmed it, both same afternoon). The recession was by location, and location is the wrong test. The path is an affordance before it is provenance: in a silo where the filesystem is the message bus, a filename is an act — type it in the search and it resolves. So the near/far question gains its third term, answered by *what the text does*, not where it sits: content is near, provenance is far, and affordances — actable paths, keybinding hints — lift out of the gloaming into a register of their own: visible, subordinate to the rose vector paint (the silcrow is the actuation point; the path is the address). Put it last on a line, where the eye lands after the title has done its work. **An address may carry its line** — `src/render.ts:274`, `a.rs:1123-1142` — and the suffix lifts with it, as one token, because half an address in the register and half in plain prose is neither actable nor visibly wrong. The line is dereferenced, never rendered: there are no gutters on code, in any mode (`ADR-ADDRESS-NOT-COORDINATE-074`). The renderer cannot resolve the line for you and does not pretend to; it makes the address one thing you can select, search, or hand to the host. If the gold shouts against the emphasis register, dim by lightness (OKLCH L down, hue and chroma held) — never by guessing a new hue.
+The gloaming is the gradient between, and the okuda palette *is* the gloaming: blues (heading), browns (strong), yellows (emphasis, state-todo) — near dark when still light. Every colour decision asks one question: is this near or far?
+
+A bare `.md` path in prose — `decisions/010-bounded-anchor-proportional-fallback.md` — lifts to the doc-ref gold (amended 2026-09-12: it receded to muted for one day too many — 2026-08-28 wired the gold, 2026-08-28 dimmed it, both same afternoon). The recession was by location, and location is the wrong test.
+
+The path is an affordance before it is provenance: in a silo where the filesystem is the message bus, a filename is an act — type it in the search and it resolves.
+
+So the near/far question gains its third term, answered by *what the text does*, not where it sits: content is near, provenance is far, and affordances — actable paths, keybinding hints — lift out of the gloaming into a register of their own: visible, subordinate to the rose vector paint (the silcrow is the actuation point; the path is the address).
+
+Put it last on a line, where the eye lands after the title has done its work. **An address may carry its line** — `src/render.ts:274`, `a.rs:1123-1142` — and the suffix lifts with it, as one token, because half an address in the register and half in plain prose is neither actable nor visibly wrong. The line is dereferenced, never rendered: there are no gutters on code, in any mode (`ADR-ADDRESS-NOT-COORDINATE-074`).
+
+The renderer cannot resolve the line for you and does not pretend to; it makes the address one thing you can select, search, or hand to the host. If the gold shouts against the emphasis register, dim by lightness (OKLCH L down, hue and chroma held) — never by guessing a new hue.
 
 ### Cheap precision is a licence to spend it — and prose still has to be worth reading
 
@@ -79,9 +93,11 @@ So the rules that were already here become load-bearing rather than decorative:
   URL is *where* the thing lives, never *what it says*, and an address on its own is
   an audit surface with nothing behind it: a bare link looks like evidence and
   carries no claim at all, which makes it the reference register's one form of
-  decorated Stuff. So the sentence does the work and the address follows it. Some
-  references have no address whatever — a book, a conversation, a thing on a shelf —
-  and the honest form is then the narrative plus the fact that there is no address.
+  decorated Stuff. So the sentence does the work and the address follows it.
+
+- **No address is not no reference.** Some references have no address whatever — a
+  book, a conversation, a thing on a shelf — and the honest form is then the
+  narrative plus the fact that there is no address.
   That is worth more to a reader than a link that will rot into a 404, and it is
   worth more than a citation that would only *look* dereferenceable. **Test: strike
   the address out.** If the sentence still carries the claim, the reference was the
@@ -143,7 +159,9 @@ is wrong. (`ADR-PANE-NOT-CANVAS-069`.)
 
 ## Diagrams: shape the eye can trace
 
-A diagram is not a one-off ornament — it earns column space wherever prose would otherwise be describing a shape. The fence is intercepted pre-render, piped to `mermaid-to-md`, and the ASCII is coloured by channel: borders recede, arrows lead, text sits in the foreground. The diagram never wraps — a wrapped state machine is a lie about the topology. It elides instead: past the glass the art is cut with `…`, and the receipt names the columns it would need. Widening the pane shows more of the *same* diagram; it never changes the diagram. That is the difference between resizing a window and rewriting a file.
+A diagram is not a one-off ornament — it earns column space wherever prose would otherwise be describing a shape. The fence is intercepted pre-render, piped to `mermaid-to-md`, and the ASCII is coloured by channel: borders recede, arrows lead, text sits in the foreground.
+
+The diagram never wraps — a wrapped state machine is a lie about the topology. It elides instead: past the glass the art is cut with `…`, and the receipt names the columns it would need. Widening the pane shows more of the *same* diagram; it never changes the diagram. That is the difference between resizing a window and rewriting a file.
 
 ```mermaid
 flowchart LR
@@ -236,17 +254,21 @@ or agent, gets wrong by default.
 - **BiDi is the second input the renderer cannot see.** okuda emits *logical*
   order and never reorders; the terminal's UAX #9 pass decides the visual result.
   That is not a gap — a renderer that reordered would be reversed a second time by
-  every bidi-capable emulator. The consequence for an author: a right-to-left
+  every bidi-capable emulator.
+
+- **The author's consequence.** A right-to-left
   paragraph mirrors its inset and ragged edge on its own, so write it plainly; but
   **a right-to-left label inside art is not safe**, because art is laid out by
   visual column and a bidi terminal reorders the run while the box stays put —
   which is the rule above, with the reason stated.
 - **Never tidy the right edge.** In a wide pane the ragged edge and the line
   count are the *scan channel*: one-line blocks read short, three-line blocks read
-  long, and the eye runs down the left rail instead of along the text. Anything
-  that equalises line lengths destroys the signal — justification, uniform
-  padding, a fixed measure, a reflowed table that pads every cell to the longest.
-  A ragged right edge is the document telling you how long each thing is.
+  long, and the eye runs down the left rail instead of along the text. A ragged
+  right edge is the document telling you how long each thing is.
+
+- **Equalising destroys the scan.** Anything that equalises line lengths —
+  justification, uniform padding, a fixed measure, a reflowed table that pads every
+  cell to the longest — destroys the signal the ragged edge was carrying.
 - **Never fake a fit.** No hand-wrapping, no hand-padding to simulate a width
   the renderer would have elided. Elision is marked with `…`; a faked fit is
   marked with nothing, which is the difference between a reader who widens and
@@ -255,4 +277,12 @@ or agent, gets wrong by default.
 
 ## The anti-pattern
 
-Everything above is a refusal of the wall of white — the undifferentiated paragraph dump that signals "I had thoughts and no layout." The okuda author asks, before each block: *what is this block's structure, and which pattern earns it?* A list with a name on each item is a bold-lead list. A list with state on each item is a status-led list. A comparison across rows is a table. A shape is a diagram. A menu is the menu pattern. Prose with no structure is prose — and prose is fine, where prose is what's earned. The wall of white is prose where structure was available and refused.
+Everything above is a refusal of the wall of white — the undifferentiated paragraph
+dump that signals "I had thoughts and no layout."
+
+The okuda author asks, before each block: *what is this block's structure, and which
+pattern earns it?* A list with a name on each item is a bold-lead list. A list with
+state on each item is a status-led list. A comparison across rows is a table. A shape
+is a diagram. A menu is the menu pattern. Prose with no structure is prose — and prose
+is fine, where prose is what's earned. The wall of white is prose where structure was
+available and refused.
