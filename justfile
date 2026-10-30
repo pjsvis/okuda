@@ -127,6 +127,11 @@ check:
 seams:
     @bun scripts/seams.ts
 
+# Citation drift finder
+[group('quality gate')]
+citation-drift:
+    @bun scripts/citation-drift.ts
+
 # Frame classes, measured
 [group('quality gate')]
 frame-classes:
