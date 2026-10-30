@@ -1676,6 +1676,39 @@ const RE_MATH_TERMINATED = /(\\[A-Za-z]+)( ?)(?=[A-Za-z0-9])/g;
  *  a `\\_`-only alternative until the 2026-10-30 tranche. */
 const RE_MATH_TOKEN = /\\[A-Za-z]+|\\[^A-Za-z]|\{,\}|--/g;
 const RE_MATH_FRAC = /\\frac\{([^{}]*)\}\{([^{}]*)\}/g;
+/** Why a fraction needs brackets at all: `\frac{3\mu}{2R^3}` flattened to
+ *  `3μ/2R^3` reads as `(3μ/2)·R^3` under left-associativity, so the equation
+ *  was only true for a reader who already knew the physics. LaTeX's grouping
+ *  is total; a linear form must restore it (ADR-MATH-GRAMMAR-076,
+ *  *meaning-preserving*). Bracketing is the cheap direction of error: extra
+ *  brackets are noise, missing ones are a wrong relation.
+ *
+ *  The two sides are not symmetric, which is the whole subtlety. A *term* is
+ *  anything with no loose operator (space, `+ - = < > · × * / ,`, a group, a
+ *  command): a numerator only needs one of those to be safe, since nothing
+ *  divides it from the left. A denominator also needs to be a single
+ *  *factor* — `2R^3` is two factors (2 and R^3) and `a/2R` continues
+ *  multiplying outside the fraction, so a product gets brackets even though
+ *  it contains no loose operator. Juxtaposition is the trap: it binds
+ *  tighter than nothing and looser than the slash. */
+const RE_MATH_TERM = /^[^\s+\-=<>·×*/\\,()]+$/;
+const RE_MATH_FACTOR = /^(?:\d+(?:\.\d+)?|[^\s+\-=<>·×*/\\,()\d^_]+)(?:[\^_](?:\{[^{}]*\}|[-\d]+))?$/;
+function balancedParens(s: string): boolean {
+  let depth = 0;
+  for (const c of s) {
+    if (c === "(") depth++;
+    else if (c === ")") depth--;
+    if (depth < 0) return false;
+  }
+  return depth === 0;
+}
+function fracSide(side: string, numerator: boolean): string {
+  // Already a group, and balanced: it brackets itself.
+  if (/^\(.*\)$/.test(side) && balancedParens(side)) return side;
+  if (!RE_MATH_TERM.test(side)) return `(${side})`;
+  if (!numerator && !RE_MATH_FACTOR.test(side)) return `(${side})`;
+  return side;
+}
 const RE_MATH_TEXT = /\\text\{([^{}]*)\}/g;
 /** The accents: braces mandatory, mark appended to the operand. */
 const RE_MATH_VEC = /\\vec\{([^{}]*)\}/g;
@@ -1716,7 +1749,7 @@ function mathSpanBody(body: string): string | null {
       MATH_REWRITE_ONLY.has(t) ? t : (MATH_LOOKUP.get(t) ?? t),
     );
   const out = substituted
-    .replace(RE_MATH_FRAC, "$1/$2")
+    .replace(RE_MATH_FRAC, (_m, num: string, den: string) => `${fracSide(num, true)}/${fracSide(den, false)}`)
     .replace(RE_MATH_TEXT, "$1")
     .replace(RE_MATH_VEC, "$1\u20D7")
     .replace(RE_MATH_DOT, "$1\u0307");

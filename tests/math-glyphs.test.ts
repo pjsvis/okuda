@@ -28,6 +28,18 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
     expect(mathGlyphs("$O(\\text{arithmetic})$")).toBe("O(arithmetic)");
   });
 
+  test("the fraction restores the grouping LaTeX had, and only where it must", () => {
+    // The asymmetry: a numerator needs no brackets unless it holds a loose
+    // operator; a denominator must also be a single FACTOR, because `a/2R`
+    // continues multiplying outside the fraction under left-associativity.
+    expect(mathGlyphs("$\\frac{F}{A}$")).toBe("F/A");
+    expect(mathGlyphs("$\\frac{3\\mu}{2R^3}$")).toBe("3μ/(2R^3)");
+    expect(mathGlyphs("$\\frac{a+b}{c}$")).toBe("(a+b)/c");
+    expect(mathGlyphs("$\\frac{x}{y z}$")).toBe("x/(y z)");
+    expect(mathGlyphs("$\\frac{x}{(a+b)}$")).toBe("x/(a+b)"); // already a group
+    expect(mathGlyphs("$\\frac{F \\times d}{A}$")).toBe("(F × d)/A");
+  });
+
   test("a malformed rewrite fails the second gate — no partial mangle", () => {
     // `\frac` is recognised, but there are no braces to rewrite: the
     // whole span stays literal rather than emitting `{F}{A}`.
@@ -98,7 +110,7 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
       // not an operand — the terminator rule only fires on `[A-Za-z0-9]`.
       expect(mathGlyphs("$\\sum \\vec{F}_{\\text{int}} = 0$")).toBe("∑ F⃗_{int} = 0");
       expect(mathGlyphs("$\\tau_{gg} = \\frac{3\\mu}{2R^3}(I_{\\text{max}} - I_{\\text{min}})\\sin(2\\theta)$"))
-        .toBe("τ_{gg} = 3μ/2R^3(I_{max} - I_{min})sin(2θ)");
+        .toBe("τ_{gg} = 3μ/(2R^3)(I_{max} - I_{min})sin(2θ)");
     });
   });
 
