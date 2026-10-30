@@ -11,7 +11,7 @@ briefs: [BRF-MATH-GLYPHS]
 # Debrief: The frame and the grammar — one design that needed nothing, one that needed 18 lines
 
 **Date:** 2026-10-30
-**Status:** Done — 12 commits, 937 tests, `just check` rc=0. One decision landed
+**Status:** Done — 14 commits, 939 tests, `just check` rc=0. One decision landed
 (`ADR-MATH-GRAMMAR-076`) with five follow-ons beneath it, the last of which unblocked
 itself on the review queue rather than beside it.
 
@@ -43,7 +43,7 @@ a corpus.
 | spans translated in the evidence document | 97 / 124 | **119 / 124** |
 | relation-bearing spans translated | 9 / 23 | **23 / 23** |
 | `MATH_GLYPHS` rows | 17 | **38** |
-| tests | 912 | **937** |
+| tests | 912 | **939** |
 | new dependencies | — | **0** |
 | packages installed to answer the question | 2 | **0** (both removed) |
 
@@ -194,10 +194,8 @@ provenance would spend the glance channel on history).
 
 ## What's left
 
-- **The cadence `Rate` column** — still written unpadded to markdown while the terminal
-  path pads it, which is the one compositor-side defect the instrument-frame reading
-  turned up.
-- **The instrument class list** — without it the squint gate cannot be pointed at a
-  frame, so the acceptance test the paper adopts cannot be run.
+Nothing from this sitting. Both of the compositor-side defects the instrument-frame
+reading turned up are closed — the cadence field widths, and the frame's own class
+list, which was the acceptance test the paper adopted and could not run.
 - The rest of the Greek alphabet and the other function names are one line each, on
   evidence, when a span wants them.
