@@ -75,6 +75,20 @@ So the rules that were already here become load-bearing rather than decorative:
   colour is the glance* — and the same failure it names: a signal that only exists
   in a channel a reader may not have.
 
+- **A reference carries its claim in text; the address is optional.** A path or a
+  URL is *where* the thing lives, never *what it says*, and an address on its own is
+  an audit surface with nothing behind it: a bare link looks like evidence and
+  carries no claim at all, which makes it the reference register's one form of
+  decorated Stuff. So the sentence does the work and the address follows it. Some
+  references have no address whatever — a book, a conversation, a thing on a shelf —
+  and the honest form is then the narrative plus the fact that there is no address.
+  That is worth more to a reader than a link that will rot into a 404, and it is
+  worth more than a citation that would only *look* dereferenceable. **Test: strike
+  the address out.** If the sentence still carries the claim, the reference was the
+  URL and you have written a pointer. (The derived reference list lifts only what
+  resolves, so an addressless reference stays a mention — by design, not by
+  omission.)
+
 A document dense with addresses should read as **prose with its evidence
 attached**, not as an index with prose in the gaps. The gold is not the point; it
 is what lets the point be checked.
