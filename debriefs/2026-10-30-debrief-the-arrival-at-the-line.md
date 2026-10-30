@@ -173,6 +173,13 @@ finder.
 
 ## What is left, and it is not a defect in this work
 
+- **The address shape is deferred, not decided.** The operator's judgement, 2026-10-30:
+  *going to a place in a code file is of value — otherwise code files are just
+  documents to read, which they are not.* So the line stays, and the token (an
+  address anchored to a symbol rather than a row) is the direction the drift points
+  without yet being the shape of the answer. No new grammar until the finder's
+  numbers argue for one; the style guide asks for the token beside the line, which
+  costs four words and keeps the future open.
 - **The compositor must write the address** for a *wired* row to name a
   coordinate (`extractJumps` now accepts one). Nothing in the renderer can
   manufacture wiring; if it turns out to exist nowhere, the finding is about the

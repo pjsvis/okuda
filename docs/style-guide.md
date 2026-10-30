@@ -87,12 +87,16 @@ Three authoring consequences, and they are the whole of the rule:
   stale the moment the file moves (it is checkable now, in two keystrokes, where a
   month ago it was invisible). So: real addresses cite real lines, and a *form*
   shown for its shape is written `path:NN`.
-- **Name the referent before the address where you can.** `wrapWholeFile`
-  (`src/render.ts:1164`) is checkable — a finder can see whether that line still
-  holds the symbol — while an address alone is a claim the reader must take on
-  trust. It is not a rule (a citation to a line rather than a definition has no
-  symbol to name), but it is the difference between a citation a machine can
-  defend and one only the author can.
+- **Name the referent before the address.** `wrapWholeFile` (`src/render.ts:1164`)
+  is checkable — a finder can see whether that line still holds the symbol —
+  where an address alone is a claim the reader must take on trust. This is not a
+  style preference; it is the direction the address problem points. **A line is a
+  copy of a fact that lives in the file, and the file moves; a token is the fact
+  itself, and survives the move.** The renderer cannot resolve a token yet — the
+  grammar takes `path:NN` — so write the token and the line both, and expect the
+  line to rot. When the address can name a token, the token is the address and the
+  line is a hint; that shape is **deferred**, not decided, until the drift is
+  measured against it.
 - **`.md` carries no line.** Prose wraps, so a rendered row is the renderer's
   invention; `docs/x.md:42` jumps to the top of the document, and the line is
   prose the reader will read as a promise the tool did not keep.
