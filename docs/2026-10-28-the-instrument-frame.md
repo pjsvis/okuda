@@ -56,9 +56,9 @@ style:
   Adopt the gate verbatim, and declare the boundary of the numbers: those classes are
   *heading, rule, diagram, prose* (ladder rungs, `docs/2026-10-12-the-squint-test.md:102-116`),
   and an instrument frame has prose deleted and no headings. The **ladder** transfers
-  as a method; the **figures** do not transfer as a prediction. The instrument's own
-  classes — value, glyph, label, receipt — have to be named before the gate means
-  anything, and that is the first measurement any build owes for itself.
+  as a method; the **figures** do not transfer as a prediction.
+
+  named before the gate means anything — and it has now been measured below.
 
 The one requirement that is new, and it is new because a document never had a second
 frame:
@@ -82,6 +82,35 @@ So the field width belongs to the pipe: emit fixed-width fields (`printf "%4d"`)
 The requirement is new to the **compositor**, never to the renderer, which makes the
 count below stronger rather than weaker: the one thing that looked like new renderer
 work turns out to be the frame's.
+
+## The frame's own classes, measured
+
+The squint gate was adopted as a method and its numbers were not, because a document's
+classes are not a frame's. Measured 2026-10-30 (`just frame-classes` — a fixture frame
+on the same 79/61/43/31 ladder, positive control first): the frame's classes are
+**value, glyph, slug, texture, history**, each with a predicate, because a class without
+one is a slogan.
+
+| class | predicate |
+|---|---|
+| value | a numeric measurement, with its unit |
+| glyph | a state glyph, one column |
+| slug | the row's name, left of its state |
+| texture | a Braille density run (U+2800–28FF) |
+| history | a block run — one cell, one time step |
+
+| rung | classes surviving | damage marked | note column visible |
+|---|---|---|---|
+| 79 | 5 / 5 | no | 3 / 3 |
+| 61 | 5 / 5 | no | 3 / 3 |
+| 43 | 5 / 5 | no | 3 / 3 |
+| 31 | **5 / 5** | **yes** | **0 / 3** |
+
+The frame passes its own gate at 31 columns, and what it loses is the **note column** —
+prose, which is what a frame deletes. Every cut line carries its `…`, so the damage is
+marked rather than inferred. That is the difference between this ladder and the document
+one: **a document loses classes at the narrowest rung; a frame loses its prose and keeps
+its data.**
 
 ## What this mode must refuse
 

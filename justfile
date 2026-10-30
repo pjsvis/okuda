@@ -127,6 +127,11 @@ check:
 seams:
     @bun scripts/seams.ts
 
+# Frame classes, measured
+[group('quality gate')]
+frame-classes:
+    @bun scripts/frame-classes.ts
+
 # Tests gate build
 [group('quality gate')]
 ship:
