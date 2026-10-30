@@ -11,9 +11,9 @@ briefs: [BRF-MATH-GLYPHS]
 # Debrief: The frame and the grammar — one design that needed nothing, one that needed 18 lines
 
 **Date:** 2026-10-30
-**Status:** Done — 4 commits, 920 tests, `just check` rc=0. One follow-on task
-open by choice (the declined-span mark), one decision landed
-(`ADR-MATH-GRAMMAR-076`).
+**Status:** Done — 8 commits, 926 tests, `just check` rc=0. One follow-on task open by
+choice (the declined-span mark), one decision landed (`ADR-MATH-GRAMMAR-076`), and the
+tranche's two children landed with it.
 
 ## What was asked, and what it turned into
 
@@ -42,8 +42,8 @@ a corpus.
 |---|---|---|
 | spans translated in the evidence document | 97 / 124 | **119 / 124** |
 | relation-bearing spans translated | 9 / 23 | **23 / 23** |
-| `MATH_GLYPHS` rows | 17 | **37** |
-| tests | 912 | **920** |
+| `MATH_GLYPHS` rows | 17 | **38** |
+| tests | 912 | **926** |
 | new dependencies | — | **0** |
 | packages installed to answer the question | 2 | **0** (both removed) |
 
@@ -114,6 +114,34 @@ now `\oint` — a command with no evidence and no prospect.
   table cell the refused span is usually the longest line and therefore the first thing
   the elision ladder cuts, so the reader loses the relation and the receipt in one
   gesture.
+
+## Added after this debrief was first written
+
+Two of the tranche's own follow-ons landed the same day, and both changed the sentence
+this file had already written.
+
+**The fraction was telling a lie, and it was ours.** `\frac{3\mu}{2R^3}` flattened to
+`3μ/2R^3`, which left-associativity reads as `(3μ/2)·R³` — a governing equation that
+was only true for a reader who already knew the physics. `fracSide` now brackets a side
+unless it is a single factor, and the two sides are asymmetric: a numerator needs
+brackets only for a loose operator, since nothing divides it from the left; a denominator
+must also be *one factor*, because `a/2R` keeps multiplying outside the fraction.
+`F/A` and `x/(a+b)` are untouched; `3μ/(2R³)` and `(a+b)/c` are now honest.
+
+**Script digits are the one prettiness that is total.** `^2` and `_2` map to `²` and `₂`
+for every numeral, all one column: `T⁴`, `O₂`, `H₂O`, `g/cm²`, `3μ/(2R³)`. Letters are
+refused on purpose — `ₘ ₐ ₓ` exist but `b c d f g h j q w y z` have no subscript form, so
+`^{n}` and `_{max}` stay as written. A partial alphabet works on the first equation and
+fails on the fourth.
+
+The asymmetry that survives both: `$T^4$` still shows its dollars. The span holds no
+command, and the currency guard fires on evidence, not on a guess about intent. The
+author writes `T⁴` when they mean it.
+
+Two corrections to what this file said before that work: the table is **38** rows, not
+37, and the `src/render.ts` line numbers in the ADR moved with the code — both fixed in
+the same commit as this section, because a citation that resolves is not yet a citation
+that means.
 
 ## What's left
 

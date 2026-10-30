@@ -17,10 +17,10 @@ the constraints.
 
 ## Context
 
-`BRF-MATH-GLYPHS` shipped a closed 17-row table (`src/render.ts:1571-1591`), a span
-regex that excludes newlines and `$$` (`src/render.ts:1626`), and an all-or-nothing
-gate: one unknown command and the whole span stays literal, as authored
-(`src/render.ts:1633-1652`). It declared three things out of scope — display math,
+`BRF-MATH-GLYPHS` shipped a closed 17-row table (`src/render.ts:1576`, now 38 rows),
+a span regex that excludes newlines and `$$` (`src/render.ts:1749`), and an
+all-or-nothing gate: one unknown command and the whole span stays literal, as authored
+(`src/render.ts:1756-1795`). It declared three things out of scope — display math,
 superscripts, any LaTeX engine — each *"none in the corpus"*, and it named the move
 if the vocabulary ever needed a parser: *"the mermaid-to-md precedent: an external
 CLI owns the parsing, okuda owns the paint"*
@@ -58,8 +58,10 @@ Two facts decided it, and neither was the throughput.
 **The external executable lost on the corpus it was proposed for.** texmath refuses
 `\frac` outright in its Unicode writer, and the two equation spans it dropped are the
 only fraction-bearing *governing* equations in the document (`τ_gg`, `Bo`). The
-in-house rewrite flattens `\frac{X}{Y}` → `X/Y` (`src/render.ts:1640`) and does not
-refuse. 124 beats 122, and the two it wins are the two that matter.
+in-house rewrite flattens `\frac{X}{Y}` → `X/Y` and does not refuse — and it now
+restores the grouping LaTeX had, bracketing a side that is not a single factor
+(`fracSide`, `src/render.ts:1736`), so `\frac{3\mu}{2R^3}` reads `3μ/(2R³)` rather
+than the product that left-associativity would give it. 124 beats 122, and the two it wins are the two that matter.
 
 **And the 2D route does not stand up.** A fraction needs two rows; a cell has one;
 `eqn` is the only tool with a lineage of typesetting equations onto a terminal, and on
@@ -147,7 +149,7 @@ filed in td on the same day rather than a wish.
 **Constraints this imposes:**
 
 - **No display-math fence.** `RE_MATH_SPAN` excludes `$$` and newlines
-  (`src/render.ts:1626`); a `$$…$$` block is a new fence type and therefore a renderer
+  (`src/render.ts:1749`); a `$$…$$` block is a new fence type and therefore a renderer
   feature, refused here.
 - **No superscript or subscript machinery.** `T^4` stays `T^4`; `_{max}` stays
   `_{max}`. Unicode `T⁴` is the sort of thing that looks like progress and costs the
@@ -156,6 +158,15 @@ filed in td on the same day rather than a wish.
   measurements against this table, not a blog post about a binding.
 - **The gate stays all-or-nothing.** Partial translation is the failure mode: a span
   half-translated is a wrong equation that looks rendered.
+- **A script may be prettified only when the mapping is total.** Digits have
+  superscript and subscript forms and all of them measure one column
+  (`src/render.ts:1700`); letters do not — `ₘ ₐ ₓ` exist but `b c d f g j q w y z` have
+  no subscript form — so `^{n}` and `_{max}` stay as written. A partial alphabet works
+  once and fails on the fourth equation, and a failure there reads as a rendering bug
+  rather than as a policy.
+- **A flattening that loses grouping is a wrong relation.** `\frac` was the case; the
+  rule it taught is that a future rewrite must be able to state the grouping it
+  preserves, or bracket the difference.
 - **The cheap gate, if this ever needs teeth:** a test asserting the renderer's known
   fence set, so a `tex` fence fails something. Until then this rule is advice, and
   saying so is the point of the *Enforced by* line.
