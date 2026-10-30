@@ -254,6 +254,39 @@ describe("math glyphs — in the render", () => {
     expect(plain).toContain("$\\oint$");
   });
 
+  test("a declined span is painted in the source register, and the text is unchanged", async () => {
+    const src = "Declined $\\oint$ and rendered $\\alpha$.";
+    const raw = await renderDocument(src, { width: W, color: "truecolor", palette: DRACULA_PALETTE });
+    const at = raw.indexOf("$\\oint$");
+    expect(at).toBeGreaterThan(0);
+    // An SGR open immediately before the span, and a reset immediately after:
+    // the mark is the codespan register, which is the source register.
+    expect(raw.slice(0, at)).toMatch(/\x1b\[[0-9;]*m$/);
+    expect(raw.slice(at + "$\\oint$".length, at + "$\\oint$".length + 4)).toBe("\x1b[0m");
+    // The rendered span is body text: no mark, because it has no state to report.
+    const alpha = raw.indexOf("α");
+    expect(raw.slice(Math.max(0, alpha - 8), alpha)).not.toMatch(/m$/);
+    // And the words are identical either way.
+    expect(stripANSI(raw)).toContain("Declined $\\oint$ and rendered α.");
+  });
+
+  test("the currency guard is not a decline — prose dollars stay bare", async () => {
+    const raw = await renderDocument("costs $5 and $10 here", {
+      width: W,
+      color: "truecolor",
+      palette: DRACULA_PALETTE,
+    });
+    expect(raw).not.toMatch(/\x1b\[[0-9;]*m\$5/);
+    expect(stripANSI(raw)).toContain("costs $5 and $10 here");
+  });
+
+  test("the mark nests inside strong, a list lead and a table cell", async () => {
+    for (const src of ["**bold $\\oint$ tail**", "- lead $\\oint$ tail", "| $\\oint$ | b |\n| --- | --- |"]) {
+      const raw = await renderDocument(src, { width: W, color: "truecolor", palette: DRACULA_PALETTE });
+      expect(raw).toMatch(/\x1b\[[0-9;]*m\$\\oint\$\x1b\[0m/);
+    }
+  });
+
   test("an unknown command degrades visibly, not silently", async () => {
     expect(await text("$\\oint$ renders as authored.")).toContain("$\\oint$ renders as authored.");
   });

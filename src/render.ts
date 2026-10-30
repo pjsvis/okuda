@@ -700,7 +700,14 @@ export async function renderDocument(
   // `code: …`), so a handler-level pass would translate inside code
   // however it was placed. Scanning fences and code spans here makes
   // the exemption structural instead of hopeful.
-  const source2a = applyMathGlyphs(source2);
+  // A span the pass DECLINES is marked in the source register, the way an
+  // inline codespan is drawn (ADR-MATH-GRAMMAR-076, *honest*): the `$`
+  // delimiters are a receipt only to a reader who knows LaTeX, and in a table
+  // cell the declined span is usually the longest line, so the elision ladder
+  // eats the tokens that were doing the reporting. `styler.codespan` is the
+  // existing register — no new colour role — and its RESET lands inside the
+  // enclosing run, which the styler's wrap re-opens (td-1dec86).
+  const source2a = applyMathGlyphs(source2, (span) => styler.codespan(span));
 
   // Pre-pass 3: intercept mermaid fences → pipe to binary → placeholder tokens.
   const source3 = await interceptMermaid(source2a, opts, ctx);
@@ -1873,11 +1880,14 @@ function mathSpanBody(body: string): string | null {
  *  literal. A span holding an unknown command (`$\oint$`) stays literal
  *  whole — visible degradation, never partial mangling. Fenced code and
  *  code spans route through their own handlers and never reach here. */
-export function mathGlyphs(s: string): string {
+export function mathGlyphs(s: string, mark?: (span: string) => string): string {
   if (!s.includes("$")) return s; // the common case costs a scan
   return s.replace(RE_MATH_SPAN, (whole, body: string) => {
+    // A span with no command is not a decline: it is not evidence of maths at
+    // all (the currency guard), so it is never marked. `costs $5 and $10` must
+    // not look like a rendering failure.
     if (!RE_HAS_ESCAPE.test(body)) return whole;
-    return mathSpanBody(body) ?? whole;
+    return mathSpanBody(body) ?? (mark ? mark(whole) : whole);
   });
 }
 
@@ -1895,15 +1905,15 @@ function closesFence(line: string, fence: string): boolean {
 }
 
 /** Apply the math pass to the segments of a line outside code spans. */
-function mathOutsideCodeSpans(line: string): string {
+function mathOutsideCodeSpans(line: string, mark?: (span: string) => string): string {
   let out = "";
   let last = 0;
   for (const m of line.matchAll(/`+[^`]*`+/g)) {
     const at = m.index ?? 0;
-    out += mathGlyphs(line.slice(last, at)) + m[0];
+    out += mathGlyphs(line.slice(last, at), mark) + m[0];
     last = at + m[0].length;
   }
-  return out + mathGlyphs(line.slice(last));
+  return out + mathGlyphs(line.slice(last), mark);
 }
 
 /** The math pass over a whole source. Fenced blocks and code spans are
@@ -1911,7 +1921,10 @@ function mathOutsideCodeSpans(line: string): string {
  *  exemptions are structural — a fence state machine and a backtick
  *  split — because the parser will not say which `text` events are code
  *  (see pre-pass 2.5 in `renderDocument`). */
-export function applyMathGlyphs(source: string): string {
+export function applyMathGlyphs(
+  source: string,
+  mark?: (span: string) => string,
+): string {
   if (!source.includes("$")) return source;
   const lines = source.split("\n");
   let fence: string | null = null;
@@ -1923,7 +1936,7 @@ export function applyMathGlyphs(source: string): string {
         fence = open[1]!;
         continue;
       }
-      lines[i] = mathOutsideCodeSpans(line);
+      lines[i] = mathOutsideCodeSpans(line, mark);
     } else if (closesFence(line, fence)) {
       fence = null;
     }
