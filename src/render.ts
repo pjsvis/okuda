@@ -1564,11 +1564,16 @@ function stripHtml(s: string): string {
 
 /** The closed vocabulary: LaTeX token → Unicode. Corpus-derived and
  *  append-only, like the conceptual lexicon — an entry arrives with grep
- *  evidence, never with anticipation. `\ge` is the one deliberate mirror
- *  (`\le` is evidenced; symmetry, not scope creep). `\text{X}` and
- *  `\frac{X}{Y}` are rewrites rather than glyphs: syntax dropped, not a
- *  character substituted. */
-const MATH_GLYPHS: ReadonlyArray<readonly [string, string]> = [
+ *  evidence, never with anticipation, and rows are **ranked on relations**
+ *  (`ADR-MATH-GRAMMAR-076`): a token that blocks a span carrying `=`, `≫`,
+ *  `∝`, `≈` or `∼` is taken before one that blocks a unit. `\ge` is the one
+ *  deliberate mirror (`\le` is evidenced; symmetry, not scope creep).
+ *  `\text{X}`, `\frac{X}{Y}`, `\vec{X}` and `\dot{X}` are rewrites rather
+ *  than glyphs: syntax dropped or moved, not a character substituted.
+ *
+ *  Exported for the width contract in `tests/math-glyphs.test.ts` — the
+ *  table is the assertion, not a copy of it. */
+export const MATH_GLYPHS: ReadonlyArray<readonly [string, string]> = [
   ["\\alpha", "α"],
   ["\\Delta", "Δ"],
   ["\\epsilon", "ε"],
@@ -1586,11 +1591,48 @@ const MATH_GLYPHS: ReadonlyArray<readonly [string, string]> = [
   ["{,}", ","],
   ["--", "–"],
   ["\\_", "_"],
+  // ── Greek (2026-10-30) ─────────────────────────────────────────────
+  // Evidence: `docs/2026-10-30-server-blades-in-space.md` for all but the
+  // last two; `\zeta` comes from five tracked spans and `\pi` is the ADR's
+  // regression case — `$e^{i\pi}+1=0$` rendered literally at 17 rows, which
+  // is the whole reason this tranche exists. The rest of the alphabet
+  // arrives with its own evidence: `\lambda`, `\phi`, `\omega` are one line
+  // each on the day a span needs them.
+  ["\\pi", "π"],
+  ["\\mu", "μ"],
+  ["\\sigma", "σ"],
+  ["\\rho", "ρ"],
+  ["\\tau", "τ"],
+  ["\\theta", "θ"],
+  ["\\Omega", "Ω"],
+  ["\\zeta", "ζ"],
+  // ── Operators and relations ─────────────────────────────────────────
+  // Ranked on relation spans blocked, per the ADR: `\vec` 5/5, `\sum` 5/4,
+  // `\approx` 4/4 in the tracked corpus at the time of the tranche.
+  ["\\sum", "∑"],
+  ["\\approx", "≈"],
+  ["\\gg", "≫"],
+  ["\\propto", "∝"],
+  ["\\sim", "∼"],
+  ["\\pm", "±"],
+  ["\\cdot", "·"],
+  ["\\circ", "°"],
+  ["\\longrightarrow", "⟶"],
+  ["\\%", "%"],
+  // A function name is a glyph of several columns: it measures what it
+  // spells, and the one-column rule below is about *characters*, not cells.
+  // `\cos`, `\tan`, `\log`, `\ln` arrive unprompted when a span wants them.
+  ["\\sin", "sin"],
+  // Accents. The command is consumed with its braces and the mark rides the
+  // operand, so `\vec{v}` is one column rather than two: the second gate
+  // rejects a surviving `\vec`, which is what makes the braces mandatory.
+  ["\\vec", "\u20D7"],
+  ["\\dot", "\u0307"],
 ];
 
 const MATH_LOOKUP = new Map(MATH_GLYPHS);
-/** The two entries whose command must not survive the rewrite pass. */
-const MATH_REWRITE_ONLY = new Set(["\\text", "\\frac"]);
+/** The entries whose command must not survive the rewrite pass. */
+export const MATH_REWRITE_ONLY = new Set(["\\text", "\\frac", "\\vec", "\\dot"]);
 /** Commands whose trailing space is a space the eye wants: a relation or
  *  an operator reads wrong welded to its operand (`\le 10` → `≤ 10`,
  *  `W \times H` → `W × H`). Every other command is a *glyph*, and the
@@ -1605,6 +1647,16 @@ const MATH_SPACED = new Set([
   "\\to",
   "\\rightarrow",
   "\\times",
+  "\\approx",
+  "\\gg",
+  "\\propto",
+  "\\sim",
+  "\\longrightarrow",
+  "\\pm",
+  "\\cdot",
+  // A function name is a word, so its trailing space is the word gap: `\sin x`
+  // is not `sinx`. Greek and operators stay out — their space is a terminator.
+  "\\sin",
 ]);
 /** Any backslash token: a command (`\alpha`) or an escape (`\_`). */
 const RE_MATH_ESCAPE = /\\[A-Za-z]+|\\[^A-Za-z]/g;
@@ -1617,10 +1669,17 @@ const RE_HAS_ESCAPE = /\\[A-Za-z]|\\[^A-Za-z]/;
 const RE_MATH_TERMINATED = /(\\[A-Za-z]+)( ?)(?=[A-Za-z0-9])/g;
 /** The remaining substitutable tokens — `[A-Za-z]+` is greedy, so
  *  `\times` cannot be pre-empted by a shorter sibling, and `\to` cannot
- *  be either. */
-const RE_MATH_TOKEN = /\\[A-Za-z]+|\\_|\{,\}|--/g;
+ *  be either. The non-letter escape is general (`\%`, `\_`, and whatever
+ *  joins the table next): gate 1 has already established that every escape
+ *  in the span is in the table, so matching the class is safe and a named
+ *  list here would be the copy that drifts — `\%` sat unsubstituted behind
+ *  a `\\_`-only alternative until the 2026-10-30 tranche. */
+const RE_MATH_TOKEN = /\\[A-Za-z]+|\\[^A-Za-z]|\{,\}|--/g;
 const RE_MATH_FRAC = /\\frac\{([^{}]*)\}\{([^{}]*)\}/g;
 const RE_MATH_TEXT = /\\text\{([^{}]*)\}/g;
+/** The accents: braces mandatory, mark appended to the operand. */
+const RE_MATH_VEC = /\\vec\{([^{}]*)\}/g;
+const RE_MATH_DOT = /\\dot\{([^{}]*)\}/g;
 /** An inline span: no `$` inside, no newline (display math is out of
  *  scope, and a multi-line pair is a table or a currency accident). */
 const RE_MATH_SPAN = /\$([^$\n]+)\$/g;
@@ -1634,21 +1693,47 @@ function mathSpanBody(body: string): string | null {
   for (const m of body.matchAll(RE_MATH_ESCAPE)) {
     if (!MATH_LOOKUP.has(m[0])) return null;
   }
-  const out = body.replace(RE_MATH_FRAC, "$1/$2").replace(RE_MATH_TEXT, "$1");
+  // ORDER MATTERS, and this is the order it shipped wrong in until 2026-10-30.
+  // Glyphs are substituted BEFORE the rewrites, because a rewrite that drops
+  // braces can weld a command name to the text it delivered: `\alpha\text{b}`
+  // became `\alphab`, a command nobody wrote, and the second gate then threw
+  // the whole span away. Substituting first leaves no command name for a
+  // rewrite to absorb — `\circ\text{C}` is `°C`, not `\circC`.
+  //
+  // The terminated pass must still substitute as it goes: dropping the space
+  // alone would re-form the command (`\Delta t` → `\Deltat`), which is how
+  // this pass first shipped wrong.
+  const substituted = body
+    .replace(RE_MATH_TERMINATED, (whole: string, cmd: string, space: string) =>
+      // A rewrite-only command is consumed by its own braces, never by the
+      // terminator rule: `\frac F A` must reach the second gate intact, not
+      // lose its command to a space and become `F A`.
+      MATH_REWRITE_ONLY.has(cmd)
+        ? whole
+        : (MATH_LOOKUP.get(cmd) ?? cmd) + (MATH_SPACED.has(cmd) ? space : ""),
+    )
+    .replace(RE_MATH_TOKEN, (t) =>
+      MATH_REWRITE_ONLY.has(t) ? t : (MATH_LOOKUP.get(t) ?? t),
+    );
+  const out = substituted
+    .replace(RE_MATH_FRAC, "$1/$2")
+    .replace(RE_MATH_TEXT, "$1")
+    .replace(RE_MATH_VEC, "$1\u20D7")
+    .replace(RE_MATH_DOT, "$1\u0307");
+  // A recognised-but-unconsumed rewrite survives here (`\vec v`, `\frac F A`,
+  // an unclosed `\text{oops`), and that is the only way a span can be
+  // half-translated. Reject it whole rather than emit half an equation.
   for (const m of out.matchAll(RE_MATH_ESCAPE)) {
     if (!MATH_LOOKUP.has(m[0]) || MATH_REWRITE_ONLY.has(m[0])) return null;
   }
-  const spaced = out.replace(RE_MATH_TERMINATED, (_m, cmd: string, space: string) =>
-    (MATH_LOOKUP.get(cmd) ?? cmd) + (MATH_SPACED.has(cmd) ? space : ""),
-  );
-  return spaced.replace(RE_MATH_TOKEN, (t) => MATH_LOOKUP.get(t) ?? t);
+  return out;
 }
 
 /** Replace inline math spans with the Unicode they denote
  *  (`$\Delta t$` → `Δt`). A span with no backslash command is left
  *  exactly as authored — which is the currency guard, not a gap: `costs
  *  $5 and $10` pairs into a span with nothing to translate and stays
- *  literal. A span holding an unknown command (`$\zeta$`) stays literal
+ *  literal. A span holding an unknown command (`$\oint$`) stays literal
  *  whole — visible degradation, never partial mangling. Fenced code and
  *  code spans route through their own handlers and never reach here. */
 export function mathGlyphs(s: string): string {

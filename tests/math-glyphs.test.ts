@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { mathGlyphs, renderDocument } from "../src/render";
+import { MATH_GLYPHS, MATH_REWRITE_ONLY, mathGlyphs, renderDocument } from "../src/render";
 import { DRACULA_PALETTE } from "../src/palette";
 import { displayWidth, stripANSI } from "../src/width";
 
@@ -37,8 +37,11 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
   });
 
   test("an unknown command keeps the whole span literal", () => {
-    expect(mathGlyphs("$\\zeta$")).toBe("$\\zeta$");
-    expect(mathGlyphs("$\\alpha \\zeta$")).toBe("$\\alpha \\zeta$");
+    // `\\zeta` was this exemplar until the 2026-10-30 tranche made it
+    // translatable — the exemplar has to be a command with no evidence and
+    // no prospect, or the test quietly turns into an assertion about ζ.
+    expect(mathGlyphs("$\\oint$")).toBe("$\\oint$");
+    expect(mathGlyphs("$\\alpha \\oint$")).toBe("$\\alpha \\oint$");
   });
 
   test("no command, no translation — the currency guard", () => {
@@ -57,15 +60,64 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
     expect(mathGlyphs("$a \\_ b \\to c$")).toBe("a _ b → c");
   });
 
-  test("every glyph in the table measures one column", () => {
-    for (const [, g] of [
-      ["\\alpha", "α"], ["\\Delta", "Δ"], ["\\epsilon", "ε"], ["\\in", "∈"],
-      ["\\le", "≤"], ["\\ge", "≥"], ["\\neq", "≠"], ["\\to", "→"],
-      ["\\times", "×"], ["\\S", "§"], ["\\dots", "…"], ["{,}", ","],
-      ["--", "–"], ["\\_", "_"],
-    ] as const) {
-      expect(displayWidth(g)).toBe(1);
+  describe("the 2026-10-30 tranche (ADR-MATH-GRAMMAR-076)", () => {
+    test("the regression case: at 17 rows this rendered literally", () => {
+      expect(mathGlyphs("$e^{i\\pi}+1=0$")).toBe("e^{iπ}+1=0");
+    });
+
+    test("Greek", () => {
+      expect(mathGlyphs("$\\mu \\sigma \\rho \\tau \\theta \\Omega \\zeta$"))
+        .toBe("μ σ ρ τ θ Ω ζ");
+    });
+
+    test("relations and operators", () => {
+      expect(mathGlyphs("$E \\approx 450\\text{ GPa}$")).toBe("E ≈ 450 GPa");
+      expect(mathGlyphs("$M \\gg m \\propto \\pm \\sim \\times$")).toBe("M ≫ m ∝ ± ∼ ×");
+      expect(mathGlyphs("$77^\\circ\\text{C}$")).toBe("77^°C");
+      expect(mathGlyphs("$34\\%\\text{ O}_2$")).toBe("34% O_2");
+      expect(mathGlyphs("$a \\longrightarrow b$")).toBe("a ⟶ b");
+    });
+
+    test("accents are rewrites, and the braces are mandatory", () => {
+      expect(mathGlyphs("$\\vec{v} \\cdot \\vec{B}$")).toBe("v⃗ · B⃗");
+      expect(mathGlyphs("$\\dot{m} = 0$")).toBe("ṁ = 0");
+      // No braces, no rewrite: the second gate keeps the span literal rather
+      // than emitting an arrow in front of its operand.
+      expect(mathGlyphs("$\\vec v$")).toBe("$\\vec v$");
+      expect(mathGlyphs("$\\dot m$")).toBe("$\\dot m$");
+    });
+
+    test("a function name keeps its word gap", () => {
+      expect(mathGlyphs("$\\sin x$")).toBe("sin x");
+      expect(mathGlyphs("$\\sin(2\\theta)$")).toBe("sin(2θ)");
+      expect(mathGlyphs("$\\sin \\theta$")).toBe("sin θ");
+    });
+
+    test("a governing equation now resolves whole", () => {
+      // The space after `∑` survives because the next character is a command,
+      // not an operand — the terminator rule only fires on `[A-Za-z0-9]`.
+      expect(mathGlyphs("$\\sum \\vec{F}_{\\text{int}} = 0$")).toBe("∑ F⃗_{int} = 0");
+      expect(mathGlyphs("$\\tau_{gg} = \\frac{3\\mu}{2R^3}(I_{\\text{max}} - I_{\\text{min}})\\sin(2\\theta)$"))
+        .toBe("τ_{gg} = 3μ/2R^3(I_{max} - I_{min})sin(2θ)");
+    });
+  });
+
+  test("every glyph in the table measures the columns it spells", () => {
+    // The table is the assertion, not a copy of it. The literal list that
+    // stood here was the copy, and it had already fallen behind by the time
+    // the 2026-10-30 tranche landed — a green test over a stale inventory.
+    // A glyph is one column per *character*; an accent is zero, so an
+    // accented operand still measures one.
+    for (const [cmd, glyph] of MATH_GLYPHS) {
+      if (MATH_REWRITE_ONLY.has(cmd)) continue; // syntax, no width of its own
+      const columns = [...glyph].filter((c) => displayWidth(c) > 0).length;
+      expect(displayWidth(glyph), `${cmd} → ${glyph}`).toBe(columns);
     }
+  });
+
+  test("the accent rewrites leave the operand one column wide", () => {
+    expect(displayWidth(mathGlyphs("$\\vec{v}$"))).toBe(1);
+    expect(displayWidth(mathGlyphs("$\\dot{m}$"))).toBe(1);
   });
 });
 
@@ -95,14 +147,19 @@ describe("math glyphs — in the render", () => {
   });
 
   test("NO_COLOR parity: the substitution is the only difference", async () => {
-    const src = "The interval is $\\Delta t$ wide, $\\zeta$ stays.";
+    const src = "The interval is $\\Delta t$ wide, $\\oint$ stays.";
     const [colour, plain] = [await text(src, "truecolor"), await text(src, "none")];
     expect(plain).toBe(colour);
     expect(plain).toContain("Δt");
-    expect(plain).toContain("$\\zeta$");
+    expect(plain).toContain("$\\oint$");
   });
 
   test("an unknown command degrades visibly, not silently", async () => {
-    expect(await text("$\\zeta$ renders as authored.")).toContain("$\\zeta$ renders as authored.");
+    expect(await text("$\\oint$ renders as authored.")).toContain("$\\oint$ renders as authored.");
+  });
+
+  test("the tranche, in the render: a table cell carries a governing equation", async () => {
+    const out = await text("| inv | eq |\n| --- | --- |\n| 3 | $P_{\\text{in}} + Q_{\\text{gen}} = \\epsilon \\sigma A_{\\text{rad}} T^4$ |");
+    expect(out).toContain("P_{in} + Q_{gen} = ε σA_{rad} T^4");
   });
 });
