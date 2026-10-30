@@ -11,9 +11,9 @@ briefs: [BRF-MATH-GLYPHS]
 # Debrief: The frame and the grammar — one design that needed nothing, one that needed 18 lines
 
 **Date:** 2026-10-30
-**Status:** Done — 11 commits, 934 tests, `just check` rc=0. One follow-on task open by
-choice (the declined-span mark), one decision landed (`ADR-MATH-GRAMMAR-076`), and the
-tranche's two children landed with it.
+**Status:** Done — 12 commits, 937 tests, `just check` rc=0. One decision landed
+(`ADR-MATH-GRAMMAR-076`) with five follow-ons beneath it, the last of which unblocked
+itself on the review queue rather than beside it.
 
 ## What was asked, and what it turned into
 
@@ -43,7 +43,7 @@ a corpus.
 | spans translated in the evidence document | 97 / 124 | **119 / 124** |
 | relation-bearing spans translated | 9 / 23 | **23 / 23** |
 | `MATH_GLYPHS` rows | 17 | **38** |
-| tests | 912 | **934** |
+| tests | 912 | **937** |
 | new dependencies | — | **0** |
 | packages installed to answer the question | 2 | **0** (both removed) |
 
@@ -172,10 +172,28 @@ in a table cell, whitespace treated as content, the command-free span that keeps
 dollars, and the literal fallback that is honest rather than broken. The code states
 what happens; only the guide can state what to do instead.
 
+## The mark, which waited for the bug in front of it
+
+The declined span is now labelled (`f11f976`). A span the pass refuses is drawn in the
+**source register** — the codespan paint, no new colour role — so *the renderer
+declined* is read at a glance instead of inferred from two `$` signs.
+
+The proposal had been sitting as "recorded and not adopted" in the ADR for a reason
+worth keeping: the math pass is a **source pre-pass**, so an SGR injected there lands
+inside a run whose enclosing style it cannot see. That is not a hypothesis — it is the
+class of defect the glyph-guest reset had already fixed by moving the re-open into the
+styler's wrap (`df7c5d3`), which closed on the same day and unblocked this. **The order
+was the engineering**: the mark was one line of styling and two of dependency, and
+sitting behind the review queue was cheaper than being the second instance of a known
+bug.
+
+Two boundaries came out of it, both now in the ADR and the guide: only a span that
+*attempted* translation and failed is marked (`costs $5 and $10` is prose, not a
+failure), and a rendered span is never marked (it has no state to report, and colouring
+provenance would spend the glance channel on history).
+
 ## What's left
 
-- **The declined-span mark** — decide it (source register, or leave it bare and say so).
-  Filed; the ADR records the argument and refuses to adopt it on the way past.
 - **The cadence `Rate` column** — still written unpadded to markdown while the terminal
   path pads it, which is the one compositor-side defect the instrument-frame reading
   turned up.

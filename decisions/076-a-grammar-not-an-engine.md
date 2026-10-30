@@ -8,9 +8,9 @@ date: 2026-10-30
 
 **Date:** 2026-10-30
 **Status:** Accepted — and landed. The vocabulary is `4ca324f`; the fraction's
-grouping `fbbec50`, the script digits `5dead49`, the whitespace rule `8e1fd1d` and
-the word-script braces `5c0ad6a` followed it, each as an application of the three
-rules below rather than a change to them. The vocabulary is still append-only, so
+grouping `fbbec50`, the script digits `5dead49`, the whitespace rule `8e1fd1d`, the
+word-script braces `5c0ad6a` and the declined-span mark `f11f976` followed it, each
+as an application of the rules below rather than a change to them. The vocabulary is still append-only, so
 this decision constrains every row that follows it.
 **Enforced by:** `tests/math-glyphs.test.ts` — the all-or-nothing gate (`:39`, an
 unknown command keeps the whole span literal) and the one-column assertion (`:60`).
@@ -97,17 +97,31 @@ Three rules follow, and they are the durable part:
   renderer will both fail to translate it *and* elide it at the glass edge, so the
   reader gets neither the relation nor the receipt.
 
-## What this decision does not decide
+## The mark, adopted after the fact
 
-**The mark.** A declined span is currently visible but not *labelled*: the `$`
-delimiters are the only receipt, so a reader cannot tell whether the renderer
-declined or the author wrote LaTeX on purpose. It is the case
-`ADR-UNIVERSAL-ELISION-050` (*damage marked*) forgot, and it bites hardest in a table
-cell, since the declined span is usually the longest line there and therefore the one
-the elision ladder cuts first. The proposal — paint a declined span in the **source**
-register, the way inline code is drawn, with no new colour role — is recorded here and
-**not adopted**: it changes rendering, it needs its own decision, and it has an owner
-filed in td on the same day rather than a wish.
+**The mark.** A declined span was visible but not *labelled*: the `$` delimiters
+are a receipt only to a reader who knows LaTeX, so a reader could not tell *the
+renderer declined* from *the author writes LaTeX on purpose*. It is the case
+`ADR-UNIVERSAL-ELISION-050` (*damage marked*) forgot, and it bites hardest in a
+table cell, where the declined span is usually the longest line and therefore the
+one the elision ladder cuts first — the reader loses the relation and the receipt
+in the same gesture.
+
+Recorded here as a proposal and **not** adopted by this decision, then adopted the
+same day (`f11f976`) once the blocker cleared. The blocker was mechanical: the
+math pass is a source pre-pass, so an SGR injected there lands inside a run whose
+enclosing style it cannot see — the class of defect the glyph-guest reset fixed by
+moving the re-open into the styler's wrap (`df7c5d3`). With that landed, the mark is a
+`styler.codespan` around the span: the existing source register, no new colour
+role, identity under `--no-color`, and the reset hands the enclosing style back.
+
+Two boundaries came with it, and both are load-bearing:
+
+- **Only a span that attempted translation and failed is marked.** A span with no
+  command is not a decline; it is a non-identification (the currency guard), so
+  `costs $5 and $10` stays bare prose and must never look like a failure.
+- **A rendered span is never marked.** It has no state to report, and colouring it
+  would report provenance — which is the far register, not a text colour.
 
 ## Alternatives Considered
 

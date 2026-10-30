@@ -179,11 +179,13 @@ fractions with their grouping restored (`\frac{3\mu}{2R^3}` → `3μ/(2R³)`), a
   currency guard fires on evidence (`\`) and not on a guess about intent — the
   same guard that keeps `costs $5 and $10` from becoming `costs ⁵ and ¹⁰`. In
   prose, write `T⁴` directly.
-- **The literal fallback is honest, not broken.** `$\oint$` rendering as
-  `$\oint$` is the renderer saying *I declined*. It is visible today and
-  unlabelled (painting it in the source register is an open proposal); do not
-  work around it by hand-transliterating inside the span, which produces
-  decorated Stuff that no gate can check.
+- **The literal fallback is honest, not broken.** `$\oint$` renders as
+  `$\oint$`, painted in the **source register** — the same draw an inline
+  codespan gets — so the decline is read at a glance instead of inferred from
+  the delimiters. It says *I declined*, not *this is broken*: do not work
+  around it by hand-transliterating inside the span, which produces decorated
+  Stuff that no gate can check. A span with **no** command is never marked —
+  `costs $5 and $10` is prose, not a failure.
 
 ## The closing bookends
 
