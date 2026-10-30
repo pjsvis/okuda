@@ -108,11 +108,14 @@ const RE_CALLSIGN = /\b[A-Z]{3}(?:-[A-Z0-9]+)+\b/g;
  *  non-md extension, optional `:NNN` line suffix, and optionally a range
  *  (`:NNN-MMM`) — one span either way. The suffix rides into the target
  *  as part of the address (ADR-CITED-JUMP-077); the gate is asked about
- *  the path. The slash is near-proof of intent — `UTF-8` and `OSC-8` carry
+ *  the path. The suffix shape is `\d+`, the same as the renderer's
+ *  `RE_CITED_PATH`: a four-digit bound here and none there made a
+ *  five-digit line gild as one address and mint as another (the path
+ *  alone), which is the half-actable case both lists exist to prevent. The slash is near-proof of intent — `UTF-8` and `OSC-8` carry
  *  none. `.md` is excluded here: named md paths are Ring B's own regex
  *  (RE_MD_PATH), same step's commit. */
 const RE_CODE_PATH =
-  /\b[\w@&.-]+(?:\/[\w@&.-]+)+\.(?!md\b)[A-Za-z0-9]{1,5}(?::\d{1,4}(?:-\d{1,4})?)?\b/g;
+  /\b[\w@&.-]+(?:\/[\w@&.-]+)+\.(?!md\b)[A-Za-z0-9]{1,5}(?::\d+(?:-\d+)?)?\b/g;
 /** Named md paths (BRF-SILCROW-PATHS Ring B): `dir/name.md`, optional
  *  `:NNN` — same shape as Ring A with the md exclusion lifted. The
  *  corpus's own convention: 1,192 free-standing mentions, 1 inside link
@@ -123,7 +126,7 @@ const RE_CODE_PATH =
  *  The `:NNN` is **swallowed and dropped** here, unlike Ring A: prose wraps,
  *  so a document's rendered rows are the renderer's invention and a line into
  *  one would be a false coordinate. A document is addressed by its name. */
-const RE_MD_PATH = /\b[\w@&.-]+(?:\/[\w@&.-]+)+\.md(?::\d{1,4}(?:-\d{1,4})?)?\b/g;
+const RE_MD_PATH = /\b[\w@&.-]+(?:\/[\w@&.-]+)+\.md(?::\d+(?:-\d+)?)?\b/g;
 
 /** The two halves of an address: the path a jump resolves, and the line it
  *  arrives at. The address is the whole thing — `src/vectors.ts:133` and

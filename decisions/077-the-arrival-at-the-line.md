@@ -15,6 +15,9 @@ two silcrows*; *the gate is asked about the path, never the coordinate*; *a hund
 addresses in one file is not one destination*. `tests/tui.test.ts` — `scrollForLine`
 against a real `renderDocument` frame, the arrival at a `.md` target, and the
 end-to-end jump (discovery → map → resolve → render → arrival) with no terminal.
+`tests/cited-jump-dogfood.test.ts` — the dogfood page's seven wired rows: numbers
+against the map, each address against the line it promises, each arrival against the
+top of the frame.
 
 ## Context
 
@@ -126,12 +129,14 @@ Three rules fall out, and they are the durable part:
 
 ## Related
 
-- Brief: `briefs/2026-10-28-brief-cited-jump.md` (`BRF-CITED-JUMP`)
+- Brief: `.archive/briefs/2026-10-28-brief-cited-jump.md` (`BRF-CITED-JUMP`)
 - ADR: `ADR-ADDRESS-NOT-COORDINATE-074` — the mark, untouched by this decision
 - ADR: `ADR-MAIN-DOCUMENT-031` — *one destination, one silcrow*, now keyed on the
   address
 - ADR: `ADR-GLASS-INK-073` — the boundary this stays on the right side of: the
   renderer asserts, the host actuates
+- Dogfood: `docs/2026-10-30-dogfood-cited-jump.md` (`just dogfood-jump`) — seven
+  real arrivals a test holds still
 - Code: `src/vectors.ts` (`parseAddress`, `scanReferences`, `buildJumpMap`),
   `src/tui.ts` (`scrollForLine`, `arrivalScroll`, `extractJumps`, `jumpTo`),
   `src/render.ts` (`RE_CITED_PATH`, `wrapWholeFile`)

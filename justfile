@@ -251,6 +251,11 @@ palette-audit:
 dogfood-pending:
     @expect scripts/dogfood-pending.exp
 
+# Cited-jump dogfood
+[group('dogfood')]
+dogfood-jump:
+    @./okuda docs/2026-10-30-dogfood-cited-jump.md --tui
+
 # ── Silcrow look gate ──────────────────────────────
 
 [group('dogfood')]
