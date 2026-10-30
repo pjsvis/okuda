@@ -53,3 +53,11 @@ UI design is the discipline of designing the layer that prevents the interface f
 - `docs/2026-09-05-i811-dual-layer-output.md` — the i811 pattern as the accessibility-layer instance of the same error.
 - `docs/2026-09-03-content-over-menu.md` — content over menu; the menu is the mediated interface the silo refuses.
 - `docs/2026-08-29-tfs-exclusion-principle.md` — TFS; the hampering abstractions are Themes, Fonts, and Shite, and excluding them is what leaves room for the interface to emerge.
+- *In the Beginning… Was the Command Line* — Neal Stephenson, 1999. **A physical
+  artefact: no path, no callsign, and it will never be in this silo.** Cited as the
+  argument's ancestor, not as a source that dereferences. Stephenson diagnoses the same
+  disease from the other end — the GUI as a metaphor that flatters, bought by hiding the
+  machine — and prescribes the opposite remedy: keep the command line and defend its
+  honesty. This document refuses the mediating layer instead of defending one. The shared
+  premise is the one that matters: an interface that has to explain itself is a grammar
+  that failed to communicate.
