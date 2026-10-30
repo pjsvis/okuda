@@ -7,7 +7,8 @@ date: 2026-10-30
 # Decision: A grammar, not an engine — the maths okuda declines
 
 **Date:** 2026-10-30
-**Status:** Accepted
+**Status:** Accepted — and landed. The tranche is `4ca324f`; the vocabulary is
+still append-only, so this decision constrains every row that follows it.
 **Enforced by:** `tests/math-glyphs.test.ts` — the all-or-nothing gate (`:39`, an
 unknown command keeps the whole span literal) and the one-column assertion (`:60`).
 The *no second door* rule below is **advice**: nothing in `just check` fails if a
@@ -114,7 +115,7 @@ filed in td on the same day rather than a wish.
 | `texmath -t eqn` → `groff` (the Bell Labs route) | Measured broken here: stacking collapses to overstrike on the tty device (`1\b2\b_`). Even working, it is a block, not a span — a new fence type and a layout engine in the pipeline. |
 | LaTeX → `dvipng`/`dvisvgm` → `chafa`/`img2txt`, or kitty/sixel previews | An image protocol in a character grid: poor fidelity, an emulator requirement, and an engine install (`tectonic` is 0.17 and bottled). Refused by the playbook's rules 4 and 6. |
 | Add 40 rows instead of 18 | Rows are cheap; *unearned* rows are not. The 18 are the commands the evidence actually uses. A row added in anticipation is the one the gate then honours wrongly. |
-| Leave the table at 17 rows and change nothing | `$e^{i\pi}+1=0$` renders literally today — `\pi` is not in the table. The promise *"we show simple equations"* is not currently true, and a promise that is not true is worse than a smaller one that is. |
+| Leave the table at 17 rows and change nothing | `$e^{i\pi}+1=0$` rendered literally — `\pi` was not in the table. The promise *"we show simple equations"* was not true at 17 rows, and a promise that is not true is worse than a smaller one that is. |
 
 ## Consequences
 
@@ -134,8 +135,12 @@ filed in td on the same day rather than a wish.
 - **The reader meets raw LaTeX when the table runs out,** and until the mark is
   decided they meet it unlabelled. That is a real cost, paid deliberately in exchange
   for a renderer with no engine in it.
-- **The grammar's promise now depends on the tranche landing.** *Simple equations*
-  means *every command in the table*, and the table does not yet contain `\pi`.
+- **The grammar's promise is now a measured one, and it is not universal.**
+  *Simple equations* means *every command in the table*: the evidence document went
+  from 97/124 spans to **119/124**, with all 23 relation spans resolving, and the
+  five that remain literal are the command-free ones (`$V$`, `$A$`, `$B_4C$`,
+  `$T^4$`, `$T$`) that the currency guard has always left alone. A document whose
+  maths is written in `\oint` or `\aleph` gets nothing, by design.
 - **Authors carry more of the load.** A linearised equation is the author's sentence,
   not the renderer's fallback.
 
