@@ -33,7 +33,9 @@ renderer and the same silcrow as anything else (`wrapWholeFile`,
 `src/render.ts:1217`). So a citation resolves to a **file**, and the reader browses
 it here. Writing and symbol lookup belong to the editor, reached with `88` from
 wherever you are standing — including a file you just dereferenced, because the verb
-acts on `currentFile` (`src/tui.ts:926`), not on the file you opened.
+acts on `currentFile` (`src/tui.ts:926`), not on the file you opened. **The file
+travels; the coordinate does not**: the spawn takes the path, and a line hint stays
+prose on the page rather than becoming an argument to the editor.
 
 The split is **orientation versus lookup**, not read versus write: okuda orients
 (what is this, what does its header claim, where am I, what is the shape at one
@@ -42,6 +44,9 @@ renderer never indexes code; the editor never renders it. Any feature that needs
 index — a line map, a symbol table, a call graph — is the editor's, and building it
 here buys a stale copy of a fact the other tool keeps exact
 (`ADR-LINE-IS-PROSE-078`, which is the coordinate this clause would have refused).
+If a coordinate is ever wanted again, the shape this clause permits is **pass-through,
+not map**: forward the author's mention to the tool that resolves it, and store
+nothing.
 
 ## Authoring
 
