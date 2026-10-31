@@ -26,6 +26,23 @@ okuda renders what this workflow generates: headers, loose lists, loose tables, 
 
 The test for any "should we build X": *does X touch the byte stream or the screen?* If it touches the byte stream's origin (compositing) or the pane layout (windowing), it belongs outside okuda. If it touches the screen before the byte stream, it's rendering and it's ours. One line, one gate, no exceptions — *we don't care where the text comes from.*
 
+**Reading, not editing** — the fourth clause, and the one a coordinate always breaks.
+A code file renders as a **document**: one fence, its comments as prose, the same
+renderer and the same silcrow as anything else (`wrapWholeFile`,
+`src/render.ts:1164`; discovery in a code file runs over its comment regions only,
+`src/render.ts:1217`). So a citation resolves to a **file**, and the reader browses
+it here. Writing and symbol lookup belong to the editor, reached with `88` from
+wherever you are standing — including a file you just dereferenced, because the verb
+acts on `currentFile` (`src/tui.ts:926`), not on the file you opened.
+
+The split is **orientation versus lookup**, not read versus write: okuda orients
+(what is this, what does its header claim, where am I, what is the shape at one
+screen); the editor looks up (where is it defined, who calls it, rename it). The
+renderer never indexes code; the editor never renders it. Any feature that needs an
+index — a line map, a symbol table, a call graph — is the editor's, and building it
+here buys a stale copy of a fact the other tool keeps exact
+(`ADR-LINE-IS-PROSE-078`, which is the coordinate this clause would have refused).
+
 ## Authoring
 
 The silo has one written guide to producing a document: `docs/style-guide.md`.

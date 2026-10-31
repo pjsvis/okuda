@@ -153,6 +153,9 @@ person to propose a coordinate deserves to know it was tried, measured and refus
 - ADR: `ADR-MAIN-DOCUMENT-031` — *one destination, one silcrow*, back to the path
 - ADR: `ADR-SILCROW-PATHS-045` — the W2 rule (suffix swallowed, target stripped),
   restored
+- `AGENTS.md`, *Scope Discipline* — the clause that generalises this reversal:
+  **reading, not editing; orientation versus lookup**; any feature that needs an
+  index belongs to the editor
 - Brief: `.archive/briefs/2026-10-28-brief-cited-jump.md` — the attempt, archived
 - Code: `src/render.ts` (`RE_CITED_PATH`), `src/vectors.ts` (`pathOf`,
   `scanReferences`), `src/tui.ts` (`extractJumps`, `jumpTo`),
