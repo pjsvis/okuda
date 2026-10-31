@@ -1,19 +1,31 @@
 /**
- * citation-drift.ts — the finder for a citation whose line has moved.
+ * citation-drift.ts — the finder for a line hint that has moved.
  *
- * **The problem.** `src/render.ts:1164` is a copy of a fact that lives in the
- * file: where the referent is. The file moves, the copy does not, and the copy
- * is now a confident lie in the register the reader trusts. Measured 2026-10-30
- * over the corpus this script walks: of the citations that name a symbol beside
- * their address, **12% still land on it** — and that is the optimistic half,
- * because the other 80% name nothing a machine can check.
+ * **The problem, and it is now a smaller one by design.** A citation's line —
+ * `src/render.ts:1164` — is a copy of a fact that lives in the file, and the
+ * file moves. Measured 2026-10-30 over the corpus this script walks: of the
+ * citations that name a symbol beside their line, **11% still land on it** (5 of
+ * 46 at the last run). That measurement is why `ADR-LINE-IS-PROSE-078` took the line *out* of the address:
+ * the renderer now gilds the path and leaves the `:NNN` as prose, so the tool no
+ * longer promises a row and a stale hint is the author's problem rather than a
+ * lie in the affordance register.
  *
- * **Why a finder and not a fixer.** Re-anchoring a citation is a claim about
- * intent — the symbol moved and the sentence still means it, or the code changed
- * and the sentence is now false — and a script that rewrites lines converts
- * *wrong* into *plausible*, which is the failure `ADR-TEMPERAMENT-DISCIPLINE-027`
- * calls worse than silence. So this prints; a human takes the diff. The
- * house precedent is `reg-sync`, which writes derived tables and never prose.
+ * What remains is a hygiene reading: how many prose hints are stale, where they
+ * are, and which ones name their referent well enough to be checkable at all. It
+ * keeps the argument that got it built — a line rots because it is a copy — and
+ * it keeps the shape of the evidence that would reopen the decision.
+ *
+ * **Nothing here is gated.** With no promise there is no defect: a hint past EOF
+ * is a hint about a file that shrank, not an address that lies. `past-eof` is
+ * reported because it is the clearest rot, and the day someone proposes a gate,
+ * the numbers below are the argument to have with them.
+ *
+ * **Why a finder and not a fixer.** Re-anchoring is a claim about intent — the
+ * symbol moved and the sentence still means it, or the code changed and the
+ * sentence is now false — and a script that rewrites lines converts *wrong* into
+ * *plausible*, which is the failure `ADR-TEMPERAMENT-DISCIPLINE-027` calls worse
+ * than silence. So this prints; a human takes the diff. The house precedent is
+ * `reg-sync`, which writes derived tables and never prose.
  *
  * **The expectation, which is the whole difficulty.** A linter needs to know what
  * the line was supposed to say, and a citation does not carry that. Three
@@ -37,17 +49,16 @@
  * `just check` yet: the rung has defects, and one of them is deliberate
  * (`docs/2026-10-30-dogfood-cited-jump.md` demonstrates the clamp).
  *
- * Prints numbers, not conclusions. Run: bun scripts/citation-drift.ts [--json] [--gate] [--all]
+ * Prints numbers, not conclusions. Run: bun scripts/citation-drift.ts [--json] [--all]
  */
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { RE_CITED_PATH } from "../src/render";
-import { parseAddress } from "../src/vectors";
 import { scannedFiles } from "./td-id-lint";
 
 const ROOT = resolve(dirname(import.meta.dir), ".");
 
-/** One citation that carries a line, and the idents the sentence offers as its
+/** One path carrying a line hint, and the idents the sentence offers as its
  *  referent (same line, backticked, at least four characters — a one- or
  *  two-letter ident is a variable in prose, not a reference). */
 export interface Cite {
@@ -93,21 +104,24 @@ export function citationsIn(text: string, source: string): Cite[] {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]!;
     const matches = [...line.matchAll(RE_CITED_PATH)];
-    // Two addresses on one line are two claims; attributing the whole line's idents
-    // to both made each citation the other's evidence. With one address the whole
-    // line is fair game — the house form often follows the address
-    // (`src/render.ts:594`, then the symbol named after it).
+    // Two hints on one line are two claims; attributing the whole line's idents
+    // to both made each citation the other's evidence. With one hint the whole
+    // line is fair game — the house form often names the referent after it.
     const multi = matches.length > 1;
     let cursor = 0;
     for (const m of matches) {
-      const address = m[0]!;
+      const path = m[0]!;
       const at = m.index!;
-      const { path, line: n } = parseAddress(address);
       const segment = multi ? line.slice(cursor, at) : line;
-      cursor = at + address.length;
-      if (n === undefined) continue;
+      cursor = at + path.length;
+      // The hint is the `:NN` immediately after the gilded path — the renderer's
+      // own grammar for what lifts, then the author's prose for the row. Reading
+      // it this way keeps one extension list (ADR-LINE-IS-PROSE-078).
+      const hint = /^:(\d+)(?:-(\d+))?\b/.exec(line.slice(cursor));
+      if (!hint) continue;
+      const address = `${path}:${hint[1]}${hint[2] ? `-${hint[2]}` : ""}`;
       const named = [...segment.matchAll(IDENT)].map((x) => x[1]!).filter((s) => s.length >= 4);
-      out.push({ source, at: i + 1, address, path, line: n, named: [...new Set(named)] });
+      out.push({ source, at: i + 1, address, path, line: Number(hint[1]), named: [...new Set(named)] });
     }
   }
   return out;
@@ -183,18 +197,14 @@ export function walk(root = ROOT): Drift[] {
 
 const ORDER: Verdict[] = ["past-eof", "blank", "missing", "gone", "moved", "unnamed", "ok"];
 const LABEL: Record<Verdict, string> = {
-  "past-eof": "past EOF — the address cannot be right",
-  blank: "blank line (a reading: the blank may be the point)",
-  missing: "no such file here (a reading: it may be another silo)",
+  "past-eof": "past EOF — the hint points beyond the file",
+  blank: "blank line (the blank may be the point)",
+  missing: "no such file here (it may be another silo)",
   gone: "GONE — the sentence names an ident this file does not hold",
   moved: "MOVED — the named ident is elsewhere; a line is proposed",
   unnamed: "unnamed — nothing to check (the expectation problem)",
   ok: "lands on the named ident",
 };
-
-/** The findings a gate may act on. One entry, and it must stay one: everything
- *  else here is a judgement about intent. */
-export const GATED: Verdict[] = ["past-eof"];
 
 export function counts(rows: Drift[]): Map<Verdict, number> {
   const m = new Map<Verdict, number>(ORDER.map((v) => [v, 0]));
@@ -207,12 +217,11 @@ function main(): void {
   const rows = walk();
   if (argv.has("--json")) {
     console.log(JSON.stringify(rows, null, 2));
-    if (argv.has("--gate") && rows.some((r) => GATED.includes(r.verdict))) process.exit(1);
     return;
   }
   const n = counts(rows);
   const named = (n.get("ok") ?? 0) + (n.get("moved") ?? 0) + (n.get("gone") ?? 0);
-  console.log(`citation-drift — ${rows.length} citation(s) carrying a line, ${named} naming a referent\n`);
+  console.log(`citation-drift — ${rows.length} path(s) carrying a line hint, ${named} naming a referent\n`);
   for (const v of ORDER) {
     console.log(`  ${String(n.get(v)).padStart(4)}  ${LABEL[v]}`);
   }
@@ -239,18 +248,9 @@ function main(): void {
     if (rowsOf.length > limit) console.log(`  … ${rowsOf.length - limit} more (--all)`);
   }
   console.log(`\n* definition-shaped occurrence. Proposals are proposals: re-anchoring is a claim about intent, so a diff is printed and a human takes it.`);
-  const gated = rows.filter((r) => GATED.includes(r.verdict));
-  if (argv.has("--gate")) {
-    if (gated.length > 0) {
-      console.error(`citation-drift: FAIL — ${gated.length} address(es) past EOF`);
-      process.exit(1);
-    }
-    console.log(`citation-drift: OK — no address past EOF (readings above are not gated)`);
-    return;
-  }
   console.log(
-    `citation-drift: ${gated.length} gateable finding(s); the rest are readings. ` +
-      "Neither `just check` nor this run fails on them.",
+    `citation-drift: a reading — nothing is gated, because the renderer no longer ` +
+      "promises a row (`ADR-LINE-IS-PROSE-078`).",
   );
 }
 

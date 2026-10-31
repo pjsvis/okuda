@@ -60,7 +60,10 @@ reference invisible to the resolver, hiding for weeks).
    falsified by `ADR-ARRIVAL-AT-LINE-077`: the line is claimed, and two
    lines of one file are two addresses, two silcrows. The span rule is
    unchanged; the target rule is reversed, and the reason is in that
-   decision.*
+   decision.* **And un-struck the same day**: `ADR-LINE-IS-PROSE-078`
+   returned the target to the file, so point 3's original text is the rule
+   again — the span swallows the hint, the target is the path, line-jump is
+   not a verb. Read the struck sentence as the round trip.
 
 4. **The badge paints inside the codespan** — 98% of code mentions are
    backtick-wrapped, and the glass probe (2026-09-29) confirmed the

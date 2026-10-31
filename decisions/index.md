@@ -10,7 +10,8 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-10-30 | ADR-MATH-GRAMMAR-076 | Accepted | A grammar, not an engine — the maths okuda declines | 076-a-grammar-not-an-engine.md |
-| 2026-10-30 | ADR-ARRIVAL-AT-LINE-077 | Accepted | The arrival at the line — an address includes its coordinate, and the jump is a render | 077-the-arrival-at-the-line.md |
+| 2026-10-30 | ADR-ARRIVAL-AT-LINE-077 | Superseded | The arrival at the line — an address includes its coordinate, and the jump is a render | 077-the-arrival-at-the-line.md |
+| 2026-10-30 | ADR-LINE-IS-PROSE-078 | Accepted | The line is prose — the address is the path | 078-the-line-is-prose.md |
 | 2026-10-28 | ADR-BODY-INK-072 | Accepted | Prose gets a role — and it ships empty | 072-body-ink.md |
 | 2026-10-28 | ADR-GLASS-INK-073 | Accepted | The glass owns its ink — okuda owns only the relations between its roles | 073-the-glass-owns-its-ink.md |
 | 2026-10-28 | ADR-ADDRESS-NOT-COORDINATE-074 | Accepted | The address, not the coordinate — citations dereference, they do not print | 074-the-address-not-the-coordinate.md |

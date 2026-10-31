@@ -16,7 +16,7 @@
  */
 
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
-import { annotateSource, appendReferences, deriveReferences, parseAddress, CLONE_TOKEN } from "./vectors";
+import { annotateSource, appendReferences, deriveReferences, CLONE_TOKEN } from "./vectors";
 
 import { cloneArgs, editArgs, resolveEditor } from "./clone";
 import { frameBounds, headingLines, pageStep, paragraphStarts, snapFrame } from "./frames";
@@ -610,43 +610,8 @@ export function tapOf(buf: Uint8Array): string | null {
   return null;
 }
 
-/** The rows above a whole-file code render's first file line.
- *
- *  **Measured, not derived** (BRF-CITED-JUMP, 2026-10-28): the TUI renders a
- *  code file through `wrapWholeFile`, and the fence block opens with one blank
- *  row before the body, so file line 1 sits at row 1 — at every width tried
- *  (40, 80, 100), and for a file whose own first line is blank. The TUI has no
- *  identity header, which is why the streaming render's offset (header at 0,
- *  body from 2) is a different number and is not this one.
- *
- *  The constant is the claim; `tests/tui.test.ts` renders a real fixture and
- *  asserts this is where line 1 lands. If the fence block's margin ever changes
- *  the test fails here rather than the jump landing a row out.
- *
- *  Vertical elision stays none in a code path (lines are cut horizontally), so
- *  the count is exact: file line N is one row below file line N-1. A vertical
- *  budget would break that, and the same test is what would catch it. */
-const CODE_FRAME_LEAD = 1;
-
-/** The row a code file's line `fileLine` occupies in a whole-file render, as a
- *  scroll offset. A line past EOF clamps to the last screenful — a jump that
- *  blanked the pane would be an address resolving to nothing. Pure. */
-export function scrollForLine(lines: string[], fileLine: number, height: number): number {
-  const maxScroll = viewport(lines, 0, height).maxScroll;
-  return Math.min(Math.max(0, CODE_FRAME_LEAD + fileLine - 1), maxScroll);
-}
-
-/** Where a jump lands, from the address alone: a code address arrives at its
- *  line, everything else at the top. A `.md` address carries no line — discovery
- *  drops the suffix, because prose wraps and its rendered rows are the
- *  renderer's invention — so a document is entered where it starts. Pure. */
-export function arrivalScroll(lines: string[], address: string, height: number): number {
-  const { line } = parseAddress(address);
-  return line === undefined ? 0 : scrollForLine(lines, line, height);
-}
-
 /** Scan markdown source for jump wiring — a `%%okuda-rhs:NN%%` token
- *  paired with a cited address on the same line — returning a token→address
+ *  paired with a cited path on the same line — returning a token→path
  *  map. Line-scoped (the compositor's contract: the wiring shares the
  *  line with its item, hidden in a table row's HTML comment or trailing
  *  a one-line paragraph — the renderer strips the comment, this reads
@@ -654,17 +619,16 @@ export function arrivalScroll(lines: string[], address: string, height: number):
  *
  *  **The address list is the renderer's** (`RE_CITED_PATH`), not a second one:
  *  an extension the paint does not gild must not be jumpable, and one it does
- *  must not be inert. A line rides along with its path, so a wired row may
- *  point at a coordinate (`src/tui.ts:634`) rather than a document; the
- *  actuator reads the line at `arrivalScroll`. A bare `.md` path is unchanged. */
+ *  must not be inert. The address is the file — a `:NNN` written after it is the
+ *  author's prose and is not read here (ADR-LINE-IS-PROSE-078). */
 export function extractJumps(source: string): Map<number, string> {
   const out = new Map<number, string>();
   for (const line of source.split("\n")) {
     const tok = line.match(/%%okuda-rhs:(\d{1,2})%%/);
     if (!tok) continue;
-    const addresses = [...line.matchAll(RE_CITED_PATH)].map((m) => m[0]!);
-    const address = addresses[addresses.length - 1];
-    if (address) out.set(Number(tok[1]!), address);
+    const paths = [...line.matchAll(RE_CITED_PATH)].map((m) => m[0]!);
+    const path = paths[paths.length - 1];
+    if (path) out.set(Number(tok[1]!), path);
   }
   return out;
 }
@@ -1201,11 +1165,8 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  wording belongs to the vector: "§14 — no document to render". */
   const jumpTo = async (token: number): Promise<void> => {
     if (backstack.length > 0) return; // dereferenced render is clean — nothing to actuate
-    const address = mainJumps.get(token);
-    if (!address) return; // no such vector — silent, per the old contract
-    // The address names a path and, for a code file, the line to arrive at.
-    // Existence is asked of the path only: a coordinate is not a filename.
-    const { path: target } = parseAddress(address);
+    const target = mainJumps.get(token);
+    if (!target) return; // no such vector — silent, per the old contract
     const path = resolveJumpTarget(mainFile, target, opts.resolveTarget, opts.root);
     if (!path) {
       flash(`§${token} — no document to render`);
@@ -1219,10 +1180,10 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     backstack.push({ file: currentFile, scroll });
     currentFile = path;
     const next = await renderLines(fetch.text, dims().cols);
-    // okuda renders code, so dereferencing a coordinate is a render that starts
-    // at the line — not an editor spawn. The offset is the frame's (measured in
-    // `scrollForLine`), the clamp is the viewport's.
-    present(fetch, next, arrivalScroll(next, address, contentHeight(dims().rows)));
+    // The arrival is the top of the file: a path is the address, and the line a
+    // citation may name is prose (ADR-LINE-IS-PROSE-078). Reading the code from
+    // there is `88` — the editor's job, and it has one.
+    present(fetch, next, 0);
   };
 
   /** Unwind (`u`): pop the dereference and re-render the MAIN document —

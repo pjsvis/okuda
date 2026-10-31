@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { GATED, citationsIn, counts, judge, type Cite } from "../scripts/citation-drift";
+import { citationsIn, counts, judge, type Cite } from "../scripts/citation-drift";
 
 /** The finder's two pure halves: what a citation carries, and what its target
  *  says about it. The corpus walk is the reading; these pin the classification,
@@ -104,11 +104,13 @@ describe("citation-drift — the verdict (pure)", () => {
   });
 });
 
-describe("citation-drift — what may be gated", () => {
-  test("one verdict only: a coordinate past EOF", () => {
-    // Everything else is a judgement about intent — a blank line can be the
-    // point, a missing path can be another silo, a proposal is a proposal.
-    expect(GATED).toEqual(["past-eof"]);
+describe("citation-drift — a reading, with no gate", () => {
+  test("the script exports no gateable verdict", async () => {
+    // The renderer stopped promising a row (ADR-LINE-IS-PROSE-078), so a stale
+    // hint is the author's problem, not an address that lies. An exported
+    // GATED would be the first step back to gating a judgement.
+    const mod = await import("../scripts/citation-drift");
+    expect("GATED" in mod).toBe(false);
   });
 
   test("counts cover every verdict, including the quiet ones", () => {

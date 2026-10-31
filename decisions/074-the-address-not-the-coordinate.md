@@ -7,7 +7,15 @@ date: 2026-10-28
 # Decision: The address, not the coordinate — citations dereference, they do not print
 
 **Date:** 2026-10-28
-**Status:** Accepted — refuses a gutter, and widens `doc-ref` to carry the line
+**Status:** Accepted in its core; **its one widening is reversed** (2026-10-30, the
+same day it was made). The **core stands**: no gutter in any mode; the citation is
+dereferenced rather than rendered; the extension list is closed and evidenced; no
+OSC 8 and no editor URL scheme. What goes is the `doc-ref` widening — the line is
+prose again, and the address is the path (`ADR-LINE-IS-PROSE-078`). The reversal is
+this ADR's own title read literally: **the address, not the coordinate.** The
+amendment made the coordinate part of the address, which is the thing the title
+refuses; the finding that forced it is in 078, and the widened form is kept there as
+the record of what it cost.
 **Enforced by:** `tests/render.test.ts` — *a citation is one affordance*: the
 suffix paints inside the role, a range is one token, the five cited extensions
 gild, and the sweep's own false positives (`v1.2:3`, `example.com:8080`) stay prose.

@@ -67,42 +67,44 @@ The path is an affordance before it is provenance: in a silo where the filesyste
 
 So the near/far question gains its third term, answered by *what the text does*, not where it sits: content is near, provenance is far, and affordances — actable paths, keybinding hints — lift out of the gloaming into a register of their own: visible, subordinate to the rose vector paint (the silcrow is the actuation point; the path is the address).
 
-Put it last on a line, where the eye lands after the title has done its work. **An address may carry its line** — `src/render.ts:1396`, `a.rs:1123-1142` — and the suffix lifts with it, as one token, because half an address in the register and half in plain prose is neither actable nor visibly wrong. The line is dereferenced, never rendered: there are no gutters on code, in any mode (`ADR-ADDRESS-NOT-COORDINATE-074`).
+Put it last on a line, where the eye lands after the title has done its work.
 
-**A wired address jumps; a bare one is a mark.** Two digits and a number is
-the actuator — `12` — and a code address arrives with the cited line at the top of
-the render, because okuda renders code files rather than handing them to an editor
-(`ADR-ARRIVAL-AT-LINE-077`). The renderer resolves nothing from prose: an address
-with no silcrow is a well-formed marker and one keystroke short of a jump, and that
-is the compositor's half of the work, not the author's to fake.
+**The address is the path; the line is prose.** `src/render.ts` lifts to the
+`doc-ref` gold and `:1396` after it does not — the gold stops at the extension
+because the file is what can be reached. A line number is a copy of a fact that
+lives in the file, and code is edited far more often than prose, so the copy rots
+first: measured 2026-10-30, three citations written in one session were stale within
+the hour, and of the corpus's line hints that name a symbol, 11% still land on it.
+So the coordinate is dereferenced, never rendered, and never *promised*
+(`ADR-LINE-IS-PROSE-078`; no gutters on code, in any mode, `ADR-074`).
+
+**A wired path jumps; a bare one is a mark.** Two digits is the actuator — `12` —
+and the jump takes you to the **file**, at its top. Reading the code from there is
+`88` (the editor has a symbol index and a language server; this renderer never
+will) or plain reading. The renderer resolves nothing from prose: a path with no
+silcrow is a well-formed marker and one keystroke short of a jump, and that is the
+compositor's half of the work, not the author's to fake.
 
 Three authoring consequences, and they are the whole of the rule:
 
-- **Write the range whole, token last:** `path:NN-MM §12`. The interleaved
-  `path:1123 §14-1142` gilds the first half and leaves `-1142` as prose, because
-  the paint matches the address, not the intent.
-- **A coordinate on a real file is a checkable claim.** `a.rs:1123-1142` above
-  is inert — no such file, so no silcrow, nothing to jump to. Change it to a file
-  that exists and every reader can be sent to the row, which is a claim that goes
-  stale the moment the file moves (it is checkable now, in two keystrokes, where a
-  month ago it was invisible). So: real addresses cite real lines, and a *form*
-  shown for its shape is written `path:NN`.
+- **Write a line hint if it helps, and expect it to rot.** `src/render.ts:1396` is
+  a fine thing to write — it is the author pointing at a row, and it saves a reader
+  scrolling a 2,000-line file. What it is *not* is an address: the gold ignores it,
+  the silcrow lands after it, and the jump goes to the top of the file. Write the
+  hint as a courtesy, never as a coordinate the tool will honour.
 - **Name the referent before the address.** `wrapWholeFile` (`src/render.ts:1164`)
-  is checkable — a finder can see whether that line still holds the symbol —
-  where an address alone is a claim the reader must take on trust. This is not a
-  style preference; it is the direction the address problem points. **A line is a
-  copy of a fact that lives in the file, and the file moves; a token is the fact
-  itself, and survives the move.** The renderer cannot resolve a token yet — the
-  grammar takes `path:NN` — so write the token and the line both, and expect the
-  line to rot. When the address can name a token, the token is the address and the
-  line is a hint; that shape is **deferred**, not decided, until the drift is
-  measured against it.
-- **`.md` carries no line.** Prose wraps, so a rendered row is the renderer's
-  invention; `docs/x.md:42` jumps to the top of the document, and the line is
-  prose the reader will read as a promise the tool did not keep.
+  is checkable — a finder can see whether that line still holds the symbol — where
+  an address alone is a claim the reader must take on trust. This is the direction
+  the address problem points: **a line is a copy, a token is the fact.** The
+  renderer cannot resolve a token yet, so name the token and let the line be the
+  hint. A token-addressed citation is **deferred**, not decided — it arrives when
+  the drift is measured against it, not when it looks tidier.
+- **`.md` carries no line like any other file**, and for one reason more: prose
+  wraps, so a rendered row is the renderer's invention. `docs/x.md:42` is a hint
+  about a place in a document; the jump goes to the document.
 
 The renderer cannot show the line for you and does not pretend to; it makes the
-address one thing you can select, search, jump, or hand to the host. If the gold
+path one thing you can select, search, jump, or hand to the host. If the gold
 shouts against the emphasis register, dim by lightness (OKLCH L down, hue and
 chroma held) — never by guessing a new hue.
 

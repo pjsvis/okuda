@@ -731,25 +731,29 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
     expect(out).toContain("\x1b[38;2;232;196;74mdocs/essay.md\x1b[0m");
   });
 
-  describe("a citation is one affordance — the line is dereferenced, not rendered (ADR-074)", () => {
+  describe("the address is the path — the line is prose (ADR-LINE-IS-PROSE-078)", () => {
     const GOLD = "\x1b[38;2;232;196;74m";
 
-    test("path:line paints as ONE token, suffix included", async () => {
-      // Half an address in the register and half in plain prose is neither
-      // actable nor visibly wrong: the reason the suffix is inside the role.
+    test("a citation gilds its path and leaves the line plain", async () => {
+      // Reversed 2026-10-30: the line was inside the role for an hour of
+      // history. It is a copy of a fact that lives in the file, and code is
+      // edited more than prose, so the copy rots first — the gold stops at the
+      // extension, and `:274` is plainly the author's hint.
       const out = await render("see src/render.ts:274 for the read.");
-      expect(out).toContain(`${GOLD}src/render.ts:274\x1b[0m`);
-      expect(out).not.toContain(`${GOLD}src/render.ts\x1b[0m:274`);
+      expect(out).toContain(`${GOLD}src/render.ts\x1b[0m:274`);
+      expect(out).not.toContain(`${GOLD}src/render.ts:274`);
     });
 
-    test("a range is one token too — a citation states its extent", async () => {
+    test("a range is prose too — the path is the whole address", async () => {
       const out = await render("the sweep is src/render.ts:1123-1142 today.");
-      expect(out).toContain(`${GOLD}src/render.ts:1123-1142\x1b[0m`);
+      expect(out).toContain(`${GOLD}src/render.ts\x1b[0m:1123-1142`);
+      expect(out).not.toContain(`${GOLD}src/render.ts:1123`);
     });
 
     test("every extension in the corpus is cited: ts, md, rs, sh, py", async () => {
       for (const p of ["a.ts:1", "a.md:2", "a.rs:3", "a.sh:4", "a.py:5"]) {
-        expect(await render(`see ${p} here`)).toContain(`${GOLD}${p}\x1b[0m`);
+        const [path, line] = p.split(":") as [string, string];
+        expect(await render(`see ${p} here`)).toContain(`${GOLD}${path}\x1b[0m:${line}`);
       }
     });
 
@@ -761,8 +765,8 @@ describe("render — near/far + RHS number, the one-line list pattern", () => {
     });
 
     test("an uncited extension stays prose until something cites it", async () => {
-      // Corpus-derived and append-only: `json` has no `file:line` evidence in
-      // this repo, so it is not in the list. It arrives when it is needed.
+      // Corpus-derived and append-only: `json` has no evidence in this repo, so
+      // it is not in the list. It arrives when it is needed.
       expect(await render("see a.json:1 here")).not.toContain(GOLD);
     });
 

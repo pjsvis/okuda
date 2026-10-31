@@ -171,6 +171,44 @@ three citations that resolve on disk cannot gild or jump. Recorded, not fixed: t
 grammar is the address decision's, and the operator's instruction was to stop at the
 finder.
 
+## Reversed the same day, on the finder's numbers
+
+The operator's verdict, an hour after the finder was built: *"we do not need line
+numbers and we do not need line number references so we do not need navigation to
+line numbers."* The argument behind it is the one the measurement makes — a line
+number is a copy of a fact that lives in the file, code is edited more than prose,
+so the copy rots first, and a corpus of copies has two steady states, **drift or
+thrash**. Neither is a product.
+
+So `ADR-LINE-IS-PROSE-078` reverses the 2026-10-28 widening of `ADR-074` and
+supersedes `ADR-077`. **What went:** the line and range groups in the paint, the
+path/line split, the address-keyed dedupe, the arrival engine (`scrollForLine`,
+`arrivalScroll`, the measured `CODE_FRAME_LEAD`), the dogfood page and its test,
+`just dogfood-jump`, and the finder's gate. **What stayed:** the extension list,
+the paint's one affordance per path, `extractJumps`, `resolveJumpTarget`, root
+containment, the jump verb — a citation still dereferences, to a **file** — and
+`ADR-074`'s core, which was never about the line: no gutter, the coordinate
+dereferenced, the list closed, no OSC 8.
+
+Three boundaries survived the reversal and are now the whole of the rule: the
+**gold** ends at the extension (the address is the path), the **span** covers the
+mention (so the silcrow lands after `path:NN` instead of splitting it), and the
+**target** is the path (so two mentions of one file are one destination, drawing
+the week's line back to `ADR-031` and `ADR-045`'s W2).
+
+What the round trip bought, honestly: a measured answer to *does the coordinate pay*
+— no, at one keystroke over `88` in an editor that does this properly — and a
+finder that outlives the feature because it reads prose hints, not addresses. What
+it cost: two annotated ADRs, one superseded ADR, a deleted page and test, and a
+decision log that shows two same-day reversals. That is the price of testing a
+premise the cheapest available way, and it is cheaper than the alternative, which
+was carrying the coordinate for a year and calling the drift "maintenance".
+
+The operator's line, kept because it is the reason the verb stays in some form:
+*going to a place in a code file is of value — otherwise code files are just
+documents to read, which they are not.* The path is the address until a token can
+be; that shape is deferred, not refused.
+
 ## What is left, and it is not a defect in this work
 
 - **The address shape is deferred, not decided.** The operator's judgement, 2026-10-30:

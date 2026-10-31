@@ -23,13 +23,12 @@
  *   - code-file mentions — `dir/name.ext`, non-md (BRF-SILCROW-PATHS
  *     Ring A) — gated like callsigns; for paths the gate's substrate is
  *     the filesystem (ADR-045): a phantom, a typo, or a URL never paints.
- *     A `:NNN` line suffix (`src/tui.ts:634`) is part of the **address**:
- *     swallowed into the occurrence span (the badge paints after the whole
- *     mention) and kept in the target, because a line is where a code render
- *     starts and therefore what the silcrow actuates (ADR-CITED-JUMP-077).
- *     Two lines of one file are two addresses; the gate still sees the path
+ *     **The silcrow is file-level**: a `:NNN` line suffix is prose, not an
+ *     address — it does not enter the span, the target, or the map, because
+ *     a coordinate copied into a document rots faster than the document does
+ *     (ADR-LINE-IS-PROSE-078). Two mentions of one file are one destination.
  *   - named md paths — `dir/name.md` (BRF-SILCROW-PATHS Ring B) — gated
- *     like Ring A, same substrate, same suffix rule; a target inside
+ *     like Ring A, same substrate, same no-suffix rule; a target inside
  *     explicit link syntax is excluded (the link already minted its
  *     occurrence — one claim, one badge)
  * Never vectors: zero-padded or single-digit bracketed numbers (`[07]`
@@ -104,42 +103,31 @@ export const CALLSIGN_SHAPE = /^[A-Z]{3}(-[A-Z0-9]+)+$/;
 
 const RE_MD_LINK = /\[[^\]\n]*\]\((\S+?\.md)\)/g;
 const RE_CALLSIGN = /\b[A-Z]{3}(?:-[A-Z0-9]+)+\b/g;
-/** Code-file mentions (BRF-SILCROW-PATHS Ring A): at least one `/`, a
- *  non-md extension, optional `:NNN` line suffix, and optionally a range
- *  (`:NNN-MMM`) — one span either way. The suffix rides into the target
- *  as part of the address (ADR-CITED-JUMP-077); the gate is asked about
- *  the path. The suffix shape is `\d+`, the same as the renderer's
- *  `RE_CITED_PATH`: a four-digit bound here and none there made a
- *  five-digit line gild as one address and mint as another (the path
- *  alone), which is the half-actable case both lists exist to prevent. The slash is near-proof of intent — `UTF-8` and `OSC-8` carry
- *  none. `.md` is excluded here: named md paths are Ring B's own regex
- *  (RE_MD_PATH), same step's commit. */
+/** Code-file mentions (BRF-SILCROW-PATHS Ring A): at least one `/`, a non-md
+ *  extension, and an **optional line hint that is swallowed into the span but
+ *  stripped from the target** (ADR-LINE-IS-PROSE-078; the W2 rule ADR-045
+ *  stated and this briefly reversed). Three boundaries, and each earns its own:
+ *  the **gold** ends at the extension (the address is the path), the **span**
+ *  covers `path:NN` so the badge lands after the whole mention rather than
+ *  splitting it, and the **target** is the path. The slash is near-proof of
+ *  intent — `UTF-8` and `OSC-8` carry none. `.md` is excluded here: named md
+ *  paths are Ring B's own regex (RE_MD_PATH), same step's commit. */
 const RE_CODE_PATH =
   /\b[\w@&.-]+(?:\/[\w@&.-]+)+\.(?!md\b)[A-Za-z0-9]{1,5}(?::\d+(?:-\d+)?)?\b/g;
-/** Named md paths (BRF-SILCROW-PATHS Ring B): `dir/name.md`, optional
- *  `:NNN` — same shape as Ring A with the md exclusion lifted. The
- *  corpus's own convention: 1,192 free-standing mentions, 1 inside link
- *  syntax (the P-1 probe). Gated on the same `resolves` predicate as
- *  every inferred reference; explicit links mint their own occurrence,
- *  so a hit inside a link span is skipped (one claim, one badge).
- *
- *  The `:NNN` is **swallowed and dropped** here, unlike Ring A: prose wraps,
- *  so a document's rendered rows are the renderer's invention and a line into
- *  one would be a false coordinate. A document is addressed by its name. */
+/** Named md paths (BRF-SILCROW-PATHS Ring B): `dir/name.md`, same shape as Ring A
+ *  with the md exclusion lifted. The corpus's own convention: 1,192 free-standing
+ *  mentions, 1 inside link syntax (the P-1 probe). Gated on the same `resolves`
+ *  predicate as every inferred reference; explicit links mint their own
+ *  occurrence, so a hit inside a link span is skipped (one claim, one badge). A
+ *  document is addressed by its name; a `:NN` after it is prose for the same
+ *  reason it is prose after a code path (ADR-LINE-IS-PROSE-078), and for one
+ *  more: prose wraps, so a rendered row is the renderer's invention. The hint is
+ *  swallowed into the span and dropped from the target, as in Ring A. */
 const RE_MD_PATH = /\b[\w@&.-]+(?:\/[\w@&.-]+)+\.md(?::\d+(?:-\d+)?)?\b/g;
 
-/** The two halves of an address: the path a jump resolves, and the line it
- *  arrives at. The address is the whole thing — `src/vectors.ts:133` and
- *  `src/vectors.ts` name different arrivals, so they are different destinations
- *  (ADR-CITED-JUMP-077) — and this is the one place the split is decided, so
- *  the gate, the actuator and the dedupe cannot disagree about what an address
- *  is. A range arrives at its opening line: the span is the citation's, the
- *  arrival is the reader's. Pure. */
-export function parseAddress(address: string): { path: string; line?: number } {
-  const m = /^(.*?):(\d+)(?:-(\d+))?$/.exec(address);
-  if (!m) return { path: address };
-  return { path: m[1]!, line: Number(m[2]) };
-}
+/** The path at the head of a mention: everything before the line hint. The hint
+ *  is the author's prose, so it is the only thing stripped — never the file. */
+const pathOf = (mention: string): string => mention.replace(/:\d+(?:-\d+)?$/, "");
 
 /** The legibility denylist (ADR-049): extensions whose deref is a
  *  render the silcrow cannot keep honest. `.jsonl` is horizontal data —
@@ -246,17 +234,14 @@ export function scanReferences(
   // filesystem (ADR-045's second substrate) and exiled by extension
   // (ADR-049's legibility criterion — the exile applies ungated: an
   // exiled target can never enter the map, so it can never paint).
-  // The gate sees the path — the line is where the render starts, not what
-  // the filesystem is asked about. Two lines of one file are two addresses
-  // (ADR-CITED-JUMP-077), so the suffix rides into the target.
+  // The target is the file; the span is the whole mention (ADR-LINE-IS-PROSE-078).
   for (const m of source.matchAll(RE_CODE_PATH)) {
     const i = m.index!;
-    const address = m[0]!;
-    const { path } = parseAddress(address); // the gate's substrate is the file
-    const ext = /\.([A-Za-z0-9]{1,5})$/.exec(path)?.[1]?.toLowerCase();
+    const target = pathOf(m[0]!);
+    const ext = /\.([A-Za-z0-9]{1,5})$/.exec(target)?.[1]?.toLowerCase();
     if (ext && EXILED_EXTS.has(ext)) continue; // ADR-049: never a vector
-    if (ok(i) && (!resolves || resolves(path))) {
-      hits.push({ pos: i, end: i + address.length, target: address });
+    if (ok(i) && (!resolves || resolves(target))) {
+      hits.push({ pos: i, end: i + m[0]!.length, target });
     }
   }
   // Ring B (BRF-SILCROW-PATHS step 3): the named md path — the corpus's
@@ -271,7 +256,7 @@ export function scanReferences(
   const inLink = (pos: number) => linkSpans.some(([a, b]) => pos >= a && pos < b);
   for (const m of source.matchAll(RE_MD_PATH)) {
     const i = m.index!;
-    const target = parseAddress(m[0]!).path; // a document is addressed by name
+    const target = pathOf(m[0]!); // a document is addressed by name
     if (ok(i) && !inLink(i) && (!resolves || resolves(target))) {
       hits.push({ pos: i, end: i + m[0]!.length, target });
     }
@@ -289,13 +274,11 @@ export function scanReferences(
  *  space, never discovery. Rebuilt on every render —
  *  re-derivation replaces invalidation.
  *
- *  **The dedupe key is the address, and the address includes its line.**
- *  `src/vectors.ts:133` and `src/vectors.ts:299` arrive in different places, so
- *  they are two destinations with two silcrows; a bare path and a lined one differ
- *  too, for the same reason. Keying on the path alone made a document that
- *  cites a hundred lines of one file read as one destination — and the
- *  References receipt would state a fullness that is not there
- *  (ADR-CITED-JUMP-077, amending ADR-031's path-level rule). */
+ *  **The dedupe key is the path**, because the path is the address
+ *  (ADR-LINE-IS-PROSE-078). The two ADRs in between briefly keyed it on path
+ *  *and* line; that made a hundred citations of one file read as a hundred
+ *  destinations, which was true of the map and false of the tool — none of the
+ *  hundred could be reached, because the coordinate they named rotted first. */
 export function buildJumpMap(refs: RefOccurrence[]): Map<number, string> {
   const map = new Map<number, string>();
   let n = VECTOR_MIN;
@@ -334,7 +317,7 @@ export function deriveReferences(
 ): DerivedMap {
   const refs = scanReferences(source, resolves, regions);
   const map = buildJumpMap(refs);
-  const distinct = new Set(refs.map((r) => r.target)).size; // addresses, not paths
+  const distinct = new Set(refs.map((r) => r.target)).size;
   return { map, truncated: distinct > map.size };
 }
 

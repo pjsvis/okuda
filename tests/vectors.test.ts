@@ -10,7 +10,6 @@ import {
   jumpMapFor,
   deriveReferences,
   annotateSource,
-  parseAddress,
   referencesSection,
   referencesCovered,
   appendReferences,
@@ -163,16 +162,6 @@ describe("vectors — discovery (occurrences, reading order, one-to-many)", () =
     expect(deriveReferences(of(81)).map.size).toBe(MAX_ADDRESSES);
     // Repetition is not truncation: one destination cited eighty times.
     expect(deriveReferences(Array.from({ length: 80 }, () => "ADR-030").join(" ")).truncated).toBe(false);
-  });
-
-  test("a hundred addresses in one file is not one destination", () => {
-    // The receipt's fullness is a fact about ADDRESSES (ADR-CITED-JUMP-077):
-    // keyed on the path this reads as one destination, and the mark is silent
-    // about eighty destinations the reader has.
-    const src = Array.from({ length: MAX_ADDRESSES + 1 }, (_, i) => `src/tui.ts:${i + 1}`).join(", ");
-    const { map, truncated } = deriveReferences(src);
-    expect(map.size).toBe(MAX_ADDRESSES);
-    expect(truncated).toBe(true);
   });
 
   test("the pocket Set's invariant: exactly the doubled pairs in range", () => {
@@ -522,32 +511,34 @@ describe("vectors — Ring A: code-file mentions (BRF-SILCROW-PATHS)", () => {
     ]);
   });
 
-  test("W2: the :NNN suffix is swallowed into the span and KEPT in the target", () => {
+  test("the silcrow is file-level: the hint is swallowed into the span, dropped from the target", () => {
+    // Three boundaries (ADR-LINE-IS-PROSE-078): the GOLD ends at the extension,
+    // the SPAN covers the whole mention so the badge never splits it, and the
+    // TARGET is the file. The line is prose; the file is the address.
     const src = "the edit brief is wired at src/tui.ts:756 today.";
     const refs = scanReferences(src);
     expect(refs.length).toBe(1);
-    expect(refs[0]!.target).toBe("src/tui.ts:756"); // the address includes its line
-    expect(src.slice(refs[0]!.pos, refs[0]!.end)).toBe("src/tui.ts:756"); // paint covers the mention
+    expect(refs[0]!.target).toBe("src/tui.ts");
+    expect(src.slice(refs[0]!.pos, refs[0]!.end)).toBe("src/tui.ts:756");
   });
 
-  test("W2: two lines of one file are two addresses, two silcrows", () => {
-    // ADR-CITED-JUMP-077 amends the path-level rule: they arrive in different
-    // places, so they are different destinations.
+  test("two mentions of one file are one destination, however they are lined", () => {
     const resolves = (t: string) => t === "src/tui.ts";
-    const map = jumpMapFor("see src/tui.ts:756, then src/tui.ts:1161.", resolves);
-    expect([...map.values()]).toEqual(["src/tui.ts:756", "src/tui.ts:1161"]);
-    expect(map.size).toBe(2);
+    const map = jumpMapFor("see src/tui.ts:756, then src/tui.ts:1161, then src/tui.ts.", resolves);
+    expect([...map.values()]).toEqual(["src/tui.ts"]);
+    expect(map.size).toBe(1);
+    expect(scanReferences("see src/tui.ts:756, then src/tui.ts.", resolves).length).toBe(2); // occurrences
   });
 
-  test("W2: a range is one span and one address — the arrival is its opening line", () => {
+  test("a range is one mention and one target — the hint is prose either way", () => {
     const src = "the sweep is src/render.ts:1123-1142 today.";
     const refs = scanReferences(src);
     expect(refs.length).toBe(1);
+    expect(refs[0]!.target).toBe("src/render.ts");
     expect(src.slice(refs[0]!.pos, refs[0]!.end)).toBe("src/render.ts:1123-1142");
-    expect(parseAddress(refs[0]!.target)).toEqual({ path: "src/render.ts", line: 1123 });
   });
 
-  test("the gate is asked about the path, never the coordinate", () => {
+  test("the gate is asked about the path, never a coordinate", () => {
     const asked: string[] = [];
     const resolves = (t: string) => (asked.push(t), true);
     scanReferences("see src/tui.ts:756 and docs/help.md:42.", resolves);
@@ -602,12 +593,12 @@ describe("vectors — Ring B: named md paths (BRF-SILCROW-PATHS step 3)", () => 
     expect((out.match(/%okuda-vector:12%/g) ?? []).length).toBe(2); // both painted, once each
   });
 
-  test("W2 re-worn: an md :NNN suffix swallows into the span, strips from the target", () => {
+  test("an md :NNN suffix is prose — a document is addressed by its name", () => {
     const src = "the line is docs/help.md:42, file-level only.";
     const refs = scanReferences(src);
     expect(refs.length).toBe(1);
-    expect(refs[0]!.target).toBe("docs/help.md"); // the silcrow is file-level
-    expect(src.slice(refs[0]!.pos, refs[0]!.end)).toBe("docs/help.md:42"); // paint covers the mention
+    expect(refs[0]!.target).toBe("docs/help.md");
+    expect(src.slice(refs[0]!.pos, refs[0]!.end)).toBe("docs/help.md:42"); // one mention, one badge
   });
 
   test("suffixed and plain md mentions share the vector", () => {

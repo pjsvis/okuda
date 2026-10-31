@@ -7,9 +7,13 @@ date: 2026-10-30
 # Decision: The arrival at the line — an address includes its coordinate, and the jump is a render
 
 **Date:** 2026-10-30
-**Status:** Accepted — amends one clause of `ADR-ADDRESS-NOT-COORDINATE-074`'s
-successor work, and ADR-031's *one destination, one silcrow* from the path to the
-address
+**Status:** Superseded 2026-10-30, the day it landed, by
+`ADR-LINE-IS-PROSE-078` — the address is the path and the line is prose, so there
+is no arrival to make exact. Kept whole, not deleted: it is the record of what the
+coordinate bought (a measured frame offset, a path/line split, an address-keyed
+map, a dogfood page and its test) and what it cost (11% of checkable hints still
+landing, and a corpus that would either drift or thrash). The next proposal of a
+coordinate should read this one first.
 **Enforced by:** `tests/vectors.test.ts` — *two lines of one file are two addresses,
 two silcrows*; *the gate is asked about the path, never the coordinate*; *a hundred
 addresses in one file is not one destination*. `tests/tui.test.ts` — `scrollForLine`

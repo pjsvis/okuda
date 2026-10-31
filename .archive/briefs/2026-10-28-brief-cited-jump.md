@@ -8,7 +8,15 @@ callsign: BRF-CITED-JUMP
 **Date:** 2026-10-28 · **amended the same day**, twice: the operator's spec
 deleted the first draft's editor hand-off and its cursor. What remains is smaller
 and is the tool's own mechanism.
-**Status:** Landed 2026-10-30 — the verb is built (`ADR-ARRIVAL-AT-LINE-077`):
+**Status:** Rejected 2026-10-30 — it landed first, and the approach was reversed
+within the hour (`ADR-LINE-IS-PROSE-078`). The verb was built
+(`ADR-ARRIVAL-AT-LINE-077`) and the address grammar went back to the path once the
+finder measured the cost: 11% of checkable line hints still land. Read the brief as
+the record of an attempt — the spec, the construction, and the measurement that
+ended it — and note that *rejected* here means the coordinate, not the navigation:
+a citation still dereferences, to a file. The original status follows, unedited.
+
+**Landed 2026-10-30** — the verb is built (`ADR-ARRIVAL-AT-LINE-077`):
 an address keeps its line, and a jump *renders* the code file at it. Two claims
 below were falsified by the landing and are annotated in place; two addresses were
 pointed at nothing measurable and are corrected. Measured the day it shipped, this

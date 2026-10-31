@@ -976,7 +976,7 @@ async function interceptMermaid(
 
 // ── Chroma pipe (BRF-FENCE-COLOUR) ───────────────────────────────────
 
-/** The extensions a cited address may carry, and its optional line.
+/** The extensions a cited address may carry.
  *
  *  Corpus-derived and closed — the MATH_GLYPHS rule, applied to paths: an entry
  *  arrives with grep evidence, never with anticipation. Measured 2026-10-28 over
@@ -985,15 +985,22 @@ async function interceptMermaid(
  *  the list is closed rather than `[a-z]+`, and an unfamiliar extension shows up
  *  as prose until someone has cited it. Append-only on evidence.
  *
- *  The line is optional and may be a range: `path:274`, `path:1123-1142`. A bare
- *  path keeps the exact behaviour it had before lines were allowed.
+ *  **The address is the path; the line is prose** (`ADR-LINE-IS-PROSE-078`,
+ *  reversing the 2026-10-28 widening). A line number is a copy of a fact that
+ *  lives in the file, and code is edited far more often than documents are — so
+ *  the copy's half-life is one edit above it. Measured 2026-10-30: three citations
+ *  written in a single session were stale within the hour, and of the corpus
+ *  citations that name a symbol beside their address, 11% still land on it (5 of 46).
+ *  The gold therefore stops at the extension: `src/render.ts` is the affordance, and
+ *  `:274` is plain prose — a hint from the author, visibly not a promise from the
+ *  tool.
  *
- *  Exported because the jump wiring reads the **same** list rather than a second
- *  one: the paint and the actuator must agree about which strings are addresses,
- *  or a citation gilds and does not jump (ADR-CITED-JUMP-077). Read it through
+ *  Exported because the jump wiring reads the same list rather than a second one
+ *  (the one-list rule outlives the coordinate it was written for): the paint and
+ *  the actuator must agree about which strings are addresses. Read it through
  *  `matchAll`, which clones the regex — the shared `lastIndex` of a `/g` literal
  *  is why this is not to be used with `.test`/`.exec` across modules. */
-export const RE_CITED_PATH = /\b([\w][\w/.-]*\.(?:ts|md|rs|sh|py))(?::(\d+)(?:-(\d+))?)?\b/g;
+export const RE_CITED_PATH = /\b[\w][\w/.-]*\.(?:ts|md|rs|sh|py)\b/g;
 
 /** A fence tag we will forward: one conservative word (ts, c++, c#,
  * objective-c). Anything else is not a language claim. */
