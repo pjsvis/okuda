@@ -395,6 +395,11 @@ view-glow file:
 post:
     @./okuda docs/2026-08-25-the-common-control-surface.md --tui
 
+# Surface pair
+[group('build')]
+surface *args:
+    @bun scripts/contrast.ts --surface {{args}}
+
 # Palette ranking
 [group('build')]
 ranking *args:

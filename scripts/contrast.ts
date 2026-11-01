@@ -215,6 +215,133 @@ export function configFile(pairs: Pair[] = PAIRS): string {
   return out.join("\n");
 }
 
+// ── The surface pair, checked (BRF-SURFACE-PAIR) ──────────────────────
+//  Two readings, because a page can fail in two disjoint ways and the first
+//  instrument only saw one of them:
+//
+//    READABLE   every role clears a floor against the GROUND it is painted on.
+//               Fails on a light ground: measured 2026-11-01, on #ffffff,
+//               sixteen of twenty-three roles sit under 3:1 — `state-todo` at
+//               1.30:1, `heading` at 1.69:1 — and the page is a ghost.
+//    NAVIGABLE  no role that annotates prose out-ranks the INK. Fails on a
+//               dimmer ink: atom-one-dark's #abb2bf crosses twelve roles.
+//
+//  They are disjoint on purpose-adjacent grounds: a white ground reports
+//  `ordered` (nothing crosses a black ink) while being unreadable, which is the
+//  false negative that made this brief necessary. One verdict, both questions,
+//  because a person at a terminal needs one answer and not a diagram.
+
+/** The floor a role must clear against the ground. **3:1**, and it is a chosen
+ *  constant rather than a derived one: it is the accessible minimum for
+ *  non-text marks, and below it a structural mark stops being distinguishable
+ *  from the ground at a glance — which is the whole job of `muted` (rules,
+ *  table pipes) and of the state glyphs. Named so a future reader can argue with
+ *  the number instead of hunting a literal. */
+export const FLOOR = 3;
+
+/** Roles that are **not painted on the ground**, and so cannot be measured
+ *  against it. Both were found by the control, not by argument: the reference
+ *  pair failed the floor on exactly these two, and the answer was not to lower
+ *  the floor.
+ *
+ *  - `badge-fg` is black ink on `badge-bg` (amber). Its partner is in the
+ *    palette; the ground is irrelevant to it.
+ *  - `muted` is the structural ink — rules, table pipes — and its job is to be
+ *    quiet. The ground page treats 2.0–2.3 on a good ground as the accepted
+ *    band and names it the *binding constraint* that chooses grounds
+ *    (`docs/2026-10-28-the-ground-you-read-on.md`), so a 3:1 floor here would
+ *    refuse every ground the palette was designed for. */
+export const NOT_ON_GROUND: Readonly<Record<string, string>> = {
+  "badge-fg": "painted on badge-bg, never on the ground",
+  muted: "structural — deliberately quiet; the ground page's binding constraint",
+};
+
+export interface FloorRow {
+  role: string;
+  hex: string;
+  ratio: number;
+  /** Measured against the ground, or exempt with a reason. */
+  onGround: boolean;
+}
+
+/** Every palette role's contrast against the ground, with the two exemptions
+ *  marked rather than hidden. Pure. */
+export function floor(ground: string, palette: Palette = okudaPalette()): FloorRow[] {
+  return Object.entries(palette)
+    .filter(([, v]) => typeof v === "string" && /^#[0-9a-f]{6}$/i.test(v as string))
+    .map(([role, v]) => ({
+      role,
+      hex: v as string,
+      ratio: ratio(v as string, ground),
+      onGround: !(role in NOT_ON_GROUND),
+    }))
+    .sort((a, b) => a.ratio - b.ratio);
+}
+
+export interface SurfaceVerdict {
+  pair: { bg: string; fg: string };
+  ink: number;
+  belowFloor: FloorRow[];
+  crossed: RankShift[];
+  readable: boolean;
+  navigable: boolean;
+}
+
+/** The whole answer: both readings over one pair, against the reference. Pure.
+ *  `ordered` is the ranking's verdict; `readable` is the floor's. */
+export function surfaceVerdict(
+  pair: { bg: string; fg: string },
+  refPair: { bg: string; fg: string } = referencePair(),
+): SurfaceVerdict {
+  const ranked = compareRanking(refPair, pair);
+  const measured = floor(pair.bg);
+  const belowFloor = measured.filter((r) => r.onGround && r.ratio < FLOOR);
+  return {
+    pair,
+    ink: ratio(pair.fg, pair.bg),
+    belowFloor,
+    crossed: ranked.filter((r) => r.crossed),
+    readable: belowFloor.length === 0,
+    navigable: ranked.every((r) => !r.crossed),
+  };
+}
+
+/** The verdict as text: the two readings named, the failures listed, one answer
+ *  at the end — because the answer is the thing a person came for. */
+export function surfaceText(v: SurfaceVerdict, refPair: { bg: string; fg: string; name?: string }, label?: string): string {
+  const out: string[] = [];
+  out.push(
+    `${label ? label + "\n" : ""}pair ${v.pair.bg} / ${v.pair.fg}   ink ${v.ink.toFixed(1)}:1` +
+      (refPair.name ? `   reference ${refPair.bg} / ${refPair.fg} (${refPair.name})` : ""),
+  );
+  out.push("");
+  const all = floor(v.pair.bg);
+  const exempt = all.length - all.filter((r) => r.onGround).length;
+  out.push(
+    v.readable
+      ? `readable   YES — all ${all.length - exempt} on-ground roles clear ${FLOOR}:1` +
+        (exempt > 0 ? ` (${exempt} exempt: ${all.filter((r) => !r.onGround).map((r) => r.role).join(", ")})` : "")
+      : `readable   NO  — ${v.belowFloor.length} role(s) under the floor of ${FLOOR}:1: ` +
+        v.belowFloor.map((r) => `${r.role} ${r.ratio.toFixed(2)}`).join(", "),
+  );
+  out.push(
+    v.navigable
+      ? "navigable  YES — no role crossed the ink; the order is intact"
+      : `navigable  NO  — ${v.crossed.length} role(s) out-rank the prose: ` +
+        v.crossed.map((r) => `${r.role} ${r.before.toFixed(2)}→${r.over.toFixed(2)}`).join(", "),
+  );
+  out.push("");
+  const verdict =
+    v.readable && v.navigable
+      ? "OK — readable and navigable on this pair."
+      : [
+          v.readable ? "" : "NOT readable",
+          v.navigable ? "" : "NOT navigable",
+        ].filter(Boolean).join(" and ") + " on this pair.";
+  out.push(verdict);
+  return out.join("\n");
+}
+
 // ── The ranking ───────────────────────────────────────────────────────
 //  `share` above is one role ÷ ink — the rule that a rule must not out-shout
 //  the prose it divides. The ranking is that rule lifted to the whole palette,
@@ -345,7 +472,7 @@ function main(): void {
   const themePath = argAfter("--theme");
   const refRung = Number.parseInt(argAfter("--ref-rung") ?? String(REFERENCE_RUNG), 10) || REFERENCE_RUNG;
   const refPair = referencePair(refRung);
-  if (argv.includes("--ranking") || themePath !== undefined) {
+  if (argv.includes("--ranking") || argv.includes("--surface") || themePath !== undefined) {
     let cand: { bg: string; fg: string } | null = null;
     if (themePath !== undefined) {
       cand = themePair(themePath);
@@ -365,6 +492,15 @@ function main(): void {
         return;
       }
       cand = { bg, fg };
+    }
+    if (argv.includes("--surface")) {
+      const v = surfaceVerdict(cand, refPair);
+      if (json) {
+        console.log(JSON.stringify(v, null, 2));
+        return;
+      }
+      console.log(surfaceText(v, refPair, themePath));
+      return;
     }
     const shifts = compareRanking(refPair, cand);
     if (json) {
