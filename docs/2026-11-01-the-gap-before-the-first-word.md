@@ -221,6 +221,40 @@ Six commitments. Each is a claim with a test, not a preference with an adjective
 - **Not that the terminal will obey.** The pair is recommended to a host and
   asserted by nothing. Where the host disagrees, we diagnose and do not argue.
 
+### The banal version, and why this is not it
+
+Stated plainly, the principle is near-tautological: **apps that own their content and
+their surface are already coherent, because one hand tunes both ends.** Every product
+we would name as well designed does exactly that. Said to such a product, this
+document says nothing it does not already do by instinct — and Solarized published the
+designer's version of the argument in 2011.
+
+The claim here is narrower, and it is the only version that survives a hostile reader:
+
+> **Where a document carries its own palette onto a surface it does not own, the
+> figure–ground requirement has no owner — and it is violated silently.**
+
+Two conditions, together, and neither is sufficient alone:
+
+| case | the document's palette | the surface | result |
+|---|---|---|---|
+| a browser page | the page's own CSS | the page's own | **fine** — nothing is inherited |
+| HTML email in a dark client | the sender's colours | the client's | light-on-light |
+| pasted cells in a spreadsheet | the run's colours | the sheet's theme | white-on-white |
+| a document in an app-hosted terminal | the renderer's roles | the app's theme ink | figure–ground reversal |
+
+The first row is the tell, and it is the exception that proves the rule: the web looks
+fine not because browsers are wise but because a page arrives with its surface
+attached, so the requirement is always satisfiable by the party that has it. Every
+other row inherits one end, and every other row fails the same way — silently, because
+the bytes are correct and nothing throws.
+
+So the honest scope: **the principle is banal for products that own both ends, and
+necessary only for the class that cannot.** That class is growing, not because
+designers are becoming careless but because terminals are moving inside apps and
+documents are moving into viewers. A product that owns its surface does not follow a
+principle; it enjoys a condition. The condition is what is changing.
+
 ## What would falsify this
 
 A position that cannot be wrong is a mood. Three observations would sink it:
