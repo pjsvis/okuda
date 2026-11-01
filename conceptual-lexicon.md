@@ -308,6 +308,34 @@ something was deleted.
 
 ---
 
+* **TFS** (*Themes, Fonts, Shite*): the exclusion principle — three categories of
+  overhead a renderer declines to accommodate. **Themes**: pick high-contrast,
+  respect the palette the terminal is already running, close the settings tab.
+  **Fonts**: the emulator has one; okuda writes characters to stdout. **Shite**:
+  un-factored prose and diagrams with no semantic title get `CSN: too wide`, not
+  graceful degradation. The payoff claimed is not an empty room but velocity: a tiny
+  parser, a fast engine, low entropy, prose forced to mean something.
+  * **The tax, and where it stops.** A theme is a cognitive tax when it changes
+  the **mapping from role to meaning** — the reader relearns what the colours
+  assert, and the paint stops being a contract. It is free when it changes only the
+  **ground** the roles paint on: the roles are the contract, the ground is the
+  variable. The distinction is okuda's whole palette design (`src/palette.ts`: roles
+  carry meaning, `scripts/contrast.ts`: grounds are measured pairs), and it is what
+  makes "it looks a bit bright" a question about the glass rather than the ink.
+  **Test:** does the change move a role's meaning, or the ground under it? The first
+  pays the tax; the second does not. **Failure it names:** a theme that redefines
+  what a colour asserts — the reader's learned vocabulary is silently rewritten, and
+  every document's paint becomes a claim they must re-verify.
+  **Prior art:** `docs/2026-08-29-tfs-exclusion-principle.md` (the doctrine,
+  2026-08-29, the source of the term and its three exclusions);
+  `src/palette.ts:17-20` (the prose role ships empty — *"the one role whose right
+  value is relative to a surface okuda cannot see"*);
+  `docs/2026-10-28-the-ground-you-read-on.md` (grounds measured as pairs, and why
+  the honest direction for "too bright" is downward);
+  `debriefs/2026-11-01-debrief-the-mark-that-was-already-decided.md` (the measured
+  instance — the same rose `§` at 5.2:1 reading bright on a default ground and calm
+  on a matched host pair — and the derivation of the test).
+
 ## Register open — the gathering
 
 This file is deliberately thin on the day it was created. The lexicon it was
