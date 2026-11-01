@@ -155,3 +155,18 @@ The outcome is `open`, `promoted: <callsign>`, or `refused: <why>`.
   the first report of a page that passes `just surface` and is still unreadable. The
   two readings already exist; what would be missing is the effective ground, and
   measuring it needs a screenshot or an honest declaration from the host.
+
+- **`zoom-ownership`** · 2026-11-01 · `render` · **open**
+  Zoom has two implementations wearing one word. **Layout zoom** changes the unit size,
+  so the grid changes and the program is told: the terminal's font size, a browser's
+  page zoom, an app that recomputes its embedded terminals at the new cell size.
+  **Visual zoom** magnifies pixels, so nothing is told and content clips: pinch zoom,
+  Windows Magnifier, and any app that scales a frame instead of a layout. The
+  requirement is not "zoom works" but **the program is told the grid** — a renderer's
+  layout is a claim about a width, and a zoom that does not re-lay-out is a claim about a
+  width that no longer exists. The same defect class as figure–ground, one parameter
+  over; it also moves the floor, since fine structure degrades before the ratio does.
+  **Trigger:** the first app or web-hosted terminal where `stty size` at 100% and at
+  200% page zoom differ not at all — i.e. the terminal was magnified rather than
+  resized — or the first report of clipped content at an increased zoom. The detector
+  costs one command and needs no instrument from us, which is why the idea waits.

@@ -221,11 +221,43 @@ written down — which is the whole of what this document asks of anyone.
 | translucent ground | opacity, blur, background image | the ground stops being a value and becomes a range, so the pair becomes a bound |
 | cell size, zoom | font size, zoom, cell width | fine structure (rules, joins, stems) degrades before the ratio does, so the effective floor rises |
 | stroke weight | font weight, `font-thicken` | apparent contrast at the same measured ratio changes with stem width |
+| **zoom, reflow** | zoom implemented as scale rather than as resize | the program is never told the new grid, so a width contract is satisfied on a width that no longer exists |
 | theme's own ink | `minimum-contrast` and similar | the reading is computed on colours the program no longer displays |
 
 Each of these is filed with a trigger rather than fixed, because each is measurable and
 none is yet measured. Naming them is what stops the next session rediscovering one by
 accident and calling it a new finding.
+
+### The geometry sibling
+
+Zoom is the pair's sibling, and the test is the same one:
+
+> **A zoom the program is told about is a resize, and the host owns the mechanism while
+> the renderer keeps its contract. A zoom the program is not told about is a
+> magnification of someone else's output — a claim about a width that no longer
+> exists.**
+
+Figure–ground is a claim about a palette the host was never told about; zoom without
+reflow is a claim about a width that no longer exists. One defect class, two
+parameters.
+
+Three consequences worth keeping:
+
+- **Delegating to a terminal resolves it.** okuda's own answer to "who owns zoom" is to
+  clone out to a terminal, where the cell size drives the grid and the program is
+  therefore told. We do not own zoom and do not need to: we own the width contract, and
+  a terminal honours it. That is the same move as the pair — declare the requirement,
+  let the host hold the mechanism.
+- **The app world missed a trick with global zoom.** A global scale could have been a
+  *resize broadcast* — recompute every embedded terminal's grid at the new cell size and
+  tell each program — instead of a magnification applied to a frame. The mechanism is
+  the same cost either way; only one of them keeps the content honest.
+- **The web is another ownership loss.** When a terminal is hosted in a browser, the
+  page owns zoom, and whether reflow survives becomes a property of that terminal's
+  implementation — a fit-on-resize grid reflows, a fixed grid magnifies. That is
+  testable in one command on any terminal: **`stty size` at 100% and at 200% page
+  zoom.** Same width means magnified; halved width means reflowed. Nobody needs an
+  instrument to settle it, which is exactly why there is no excuse for not checking.
 
 ## Coherence, stated precisely
 
