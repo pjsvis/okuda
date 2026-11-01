@@ -296,6 +296,51 @@ describe("tui — footerLine (identity left, affordance right)", () => {
     expect(without).not.toContain("[9]");
     expect(without).toBe(footerLine(72, "Gloam", FILE, muted, badge, "okuda", "DOC-X", undefined));
   });
+  // ADR-DEREFERENCE-MARK-075: a bare `§`, rose, immediately left of the
+  // filename, present exactly while the render is dereferenced. The three tests
+  // below are the tooth that decision said it lacked.
+  test("the dereference mark: rose § prefixing the filename, after the identity run", () => {
+    const rose = (s: string) => styler.role("vector", s);
+    const f = footerLine(96, "Gloam", FILE, muted, badge, "okuda", "ADR-BOUND-010", undefined, rose);
+    expect(f.startsWith(
+      badge("Gloam") + " " + muted("okuda") + " \u00b7 " + muted("ADR-BOUND-010") + " \u00b7 " + rose("\u00a7") + " " + muted("docs/audit.md"),
+    )).toBe(true);
+    expect(displayWidth(stripANSI(f))).toBe(96); // the two cells are in the arithmetic
+  });
+  test("the main document: no mark, and no empty slot where one would be", () => {
+    const rose = (s: string) => styler.role("vector", s);
+    const withMark = footerLine(72, "Gloam", FILE, muted, badge, "okuda", undefined, undefined, rose);
+    const main = footerLine(72, "Gloam", FILE, muted, badge, "okuda");
+    expect(stripANSI(withMark)).toContain("\u00a7 docs/audit.md");
+    expect(main).not.toContain("\u00a7");
+    // Absence is absence, not a blanked cell: the identity run ends and the
+    // filename begins. A reserved slot would read `okuda \u00b7  docs/audit.md`
+    // (two spaces) or `okuda \u00b7 \u00a7 docs/audit.md` — this is the assertion
+    // that fails if the mark ever becomes a permanent condition.
+    expect(stripANSI(main)).toContain("okuda \u00b7 docs/audit.md");
+    // The comparison with `withMark` is deliberately NOT equality-minus-the-mark:
+    // the two cells come out of the gap, so the difference is trailing spaces.
+    // The mark costs the flex, never the name.
+    expect(displayWidth(stripANSI(withMark))).toBe(displayWidth(stripANSI(main)));
+  });
+  test("the mark is state, not control: no bold, and the glyph survives NO_COLOR", () => {
+    const rose = (s: string) => styler.role("vector", s);
+    const coloured = footerLine(72, "Gloam", FILE, muted, badge, "okuda", undefined, undefined, rose);
+    expect(coloured).toContain(rose("\u00a7")); // the rose is the glance…
+    expect(coloured).not.toContain("\x1b[1m"); // …and it is never bold
+
+    const none = makeStyler(DRACULA_PALETTE, "none");
+    const plain = footerLine(72, "Gloam", FILE,
+      (s) => none.role("muted", s), (s) => none.badge(s), "okuda", undefined, undefined, (s) => none.role("vector", s));
+    expect(plain).not.toContain("\x1b"); // the glyph carries the state…
+    expect(plain.startsWith(" Gloam  okuda \u00b7 \u00a7 docs/audit.md")).toBe(true); // …and it is still there
+  });
+  test("the dereference mark at a narrow width: the gap collapses, the mark does not vanish", () => {
+    const rose = (s: string) => styler.role("vector", s);
+    const f = footerLine(24, "Gloam", FILE, muted, badge, "okuda", undefined, undefined, rose);
+    expect(f).toContain(rose("\u00a7"));
+    expect(f.endsWith(" ")).toBe(true); // the corner pad still owns the last column
+  });
   test("pendingMark: a keycap for a digit, the gesture's own spelling for a bracket", () => {
     expect(pendingMark("9")).toBe("[9]");
     expect(pendingMark("0")).toBe("[0]");

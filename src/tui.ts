@@ -698,6 +698,17 @@ export function footerLine(
    *  structure*): the mark is on screen exactly while a tap waits. Absent →
    *  nothing, never an empty slot. */
   pending?: string,
+  /** The dereference mark (ADR-DEREFERENCE-MARK-075): a bare `§`, painted by
+   *  the caller, prefixed to the filename. `undefined` on the main document —
+   *  the absent painter *is* the absent mark, so there is no slot to reserve
+   *  and nothing to ghost (*Attributable structure*). A painter rather than a
+   *  colour for the same reason `muted`/`badge` are: `footerLine` stays
+   *  registry-free, and a colourless styler still paints the glyph. The glyph
+   *  carries the state, the colour only the glance. Never bold — rose + bold is
+   *  the control channel (BRF-READING-FRACTION ruling 2), and this is state,
+   *  which ADR-075's narrow amendment licenses for the address channel and
+   *  nothing else. */
+  derefMark?: (s: string) => string,
 ): string {
   const name = displayPath(file);
   // The pending mark sits LEFT of the affordance, so `? help` keeps the edge
@@ -710,12 +721,17 @@ export function footerLine(
   const identity = [silo, callsign].filter((s): s is string => s !== undefined);
   const run = identity.length > 0 ? identity.map(muted).join(" \u00b7 ") + " \u00b7 " : "";
   const runWidth = identity.reduce((w, s) => w + s.length, 0) + identity.length * 3;
-  // Left: badge (label + 2 padding) + space + identity run + folder/file.
-  const leftWidth = label.length + 2 + 1 + runWidth + name.length;
+  // The mark is `§` plus its space — two cells, counted as a constant: the
+  // painter's output carries ANSI, which is zero-width (the same reason the
+  // width math above uses plain lengths).
+  const markWidth = derefMark === undefined ? 0 : 2;
+  const mark = derefMark === undefined ? "" : derefMark("\u00a7") + " ";
+  // Left: badge (label + 2 padding) + space + identity run + mark + folder/file.
+  const leftWidth = label.length + 2 + 1 + runWidth + markWidth + name.length;
   // Reserve the last column: Apple's rounded window corner clips the
   // bottom-right cell — the footer never writes it.
   const gap = Math.max(1, width - leftWidth - rightText.length - 1);
-  return badge(label) + " " + run + muted(name) + " ".repeat(gap) + muted(rightText) + " ";
+  return badge(label) + " " + run + mark + muted(name) + " ".repeat(gap) + muted(rightText) + " ";
 }
 
 // ── I/O loop ──────────────────────────────────────────────────────────
@@ -994,7 +1010,12 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     let frame = "\x1b[2J\x1b[H"; // clear + home
     frame += shown.join("\n");
     const held = runBuffer !== null && !runBuffer.spent ? runBuffer.keys : undefined;
-    const footer = footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined, held === undefined ? undefined : pendingMark(held));
+    // The dereference mark (ADR-DEREFERENCE-MARK-075). `jumpTo` caps depth at
+    // one, so the state is a boolean: a non-empty backstack is the whole
+    // condition, and the mark reports it rather than the reader counting
+    // silcrows in a document that has none.
+    const dereferenced = backstack.length > 0;
+    const footer = footerLine(cols, "Gloam", currentFile, muted, badge, opts.silo, opts.callsignFor?.(currentFile) ?? undefined, held === undefined ? undefined : pendingMark(held), dereferenced ? (t) => styler.role("vector", t) : undefined);
     // Chrome geometry (BRF-FOOTER-SEPARATOR): the badge owns the BOTTOM
     // edge — the last row, permanent identity under the transient; the
     // separator row above it is blank by default and carries hints and
