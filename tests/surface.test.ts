@@ -137,3 +137,34 @@ describe("the theme directory — two syntaxes, one reading", () => {
     expect(text).toContain("1/2 cannot read anything");
   });
 });
+
+describe("the probe — what a machine's config actually states", () => {
+  const { clue } = require("../scripts/probe-surface") as typeof import("../scripts/probe-surface");
+
+  test("three shorthands, one reader: ghostty, alacritty toml, kitty conf", () => {
+    expect(clue("g", "background = #1d2021\nforeground = #d5c4a1\n").pair).toEqual({ bg: "#1d2021", fg: "#d5c4a1" });
+    expect(clue("a", '[colors.primary]\nbackground = "#1d2021"\nforeground = "#d5c4a1"\n').pair).toEqual({
+      bg: "#1d2021",
+      fg: "#d5c4a1",
+    });
+    expect(clue("k", "background #1d2021\nforeground #d5c4a1\n").pair).toEqual({ bg: "#1d2021", fg: "#d5c4a1" });
+  });
+
+  test("a commented default states nothing — the kitty-template case", () => {
+    expect(clue("k", "# background #000000\n# foreground #ffffff\n").pair).toBeNull();
+  });
+
+  test("a JSON theme reads like the others", () => {
+    expect(clue("h", JSON.stringify({ background: "#21252b", foreground: "#abb2bf" })).pair).toEqual({
+      bg: "#21252b",
+      fg: "#abb2bf",
+    });
+  });
+
+  test("flatness is reported, because a non-flat ground makes the pair a bound", () => {
+    const flat = clue("g", "background = #1d2021\nforeground = #d5c4a1\n");
+    expect(flat.nonFlat).toEqual([]);
+    const lucent = clue("g", "background = #1d2021\nforeground = #d5c4a1\nbackground-opacity = 0.9\n");
+    expect(lucent.nonFlat.length).toBeGreaterThan(0);
+  });
+});

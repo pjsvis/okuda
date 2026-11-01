@@ -400,6 +400,11 @@ post:
 themes *args:
     @bun scripts/contrast.ts --theme-dir {{args}}
 
+# Surface probe
+[group('build')]
+surface-probe *args:
+    @bun scripts/probe-surface.ts {{args}}
+
 # Surface pair
 [group('build')]
 surface *args:
