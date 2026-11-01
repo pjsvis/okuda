@@ -395,6 +395,11 @@ view-glow file:
 post:
     @./okuda docs/2026-08-25-the-common-control-surface.md --tui
 
+# Theme audit
+[group('build')]
+themes *args:
+    @bun scripts/contrast.ts --theme-dir {{args}}
+
 # Surface pair
 [group('build')]
 surface *args:

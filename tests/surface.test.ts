@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { configFile, FLOOR, floor, NOT_ON_GROUND, PAIR, referencePair, surfaceFails, surfaceVerdict } from "../scripts/contrast";
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { configFile, FLOOR, floor, NOT_ON_GROUND, PAIR, referencePair, surfaceDir, surfaceDirText, surfaceFails, surfaceVerdict, themePair } from "../scripts/contrast";
 import { pinSurface } from "../scripts/herdr-theme";
 
 /** BRF-SURFACE-PAIR: two readings, one answer. The control runs first — the
@@ -95,5 +97,39 @@ describe("the surface — the pair is named, and the gate asks one question", ()
     expect(surfaceFails(surfaceVerdict(PAIR))).toBe(false);
     expect(surfaceFails(surfaceVerdict(ATOM_ONE_DARK))).toBe(true);
     expect(surfaceFails(surfaceVerdict(WHITE))).toBe(true);
+  });
+});
+
+describe("the theme directory — two syntaxes, one reading", () => {
+  const tmp = mkdtempSync(join(process.env.TMPDIR ?? "/tmp", "okuda-themes-"));
+
+  test("a config-syntax theme (Ghostty) and a JSON theme (Herdr) read the same way", () => {
+    const conf = join(tmp, "ghostty-style");
+    const json = join(tmp, "herdr-style.json");
+    writeFileSync(conf, [
+      "# a comment",
+      "palette = 0=#262427",
+      "background = #1b1e24   # trailing comment",
+      "foreground = #a9aeb8",
+    ].join("\n"));
+    writeFileSync(json, JSON.stringify({ background: "#1b1e24", foreground: "#a9aeb8", ansi: [] }));
+    expect(themePair(conf)).toEqual({ bg: "#1b1e24", fg: "#a9aeb8" });
+    expect(themePair(conf)).toEqual(themePair(json));
+  });
+
+  test("the directory census: worst ink first, unreadable reported not dropped", () => {
+    const dir = mkdtempSync(join(tmp, "set-"));
+    writeFileSync(join(dir, "good"), "background = #221f1c\nforeground = #d6cfc4\n");
+    writeFileSync(join(dir, "broken"), "background = #ffffff\nforeground = #c0c0c0\n");
+    writeFileSync(join(dir, "no-pair"), "accent = #ff0000\n");
+    writeFileSync(join(dir, ".hidden"), "background = #000000\nforeground = #000000\n");
+    const res = surfaceDir(dir);
+    expect(res.rows.map((r) => r.name)).toEqual(["broken", "good"]); // worst ink first
+    expect(res.noPair).toEqual(["no-pair"]);
+    expect(res.rows[0]!.readable).toBe(false);
+    expect(res.rows[1]!.readable).toBe(true);
+    const text = surfaceDirText(res, referencePair());
+    expect(text).toContain("1/2 cannot be read");
+    expect(text).toContain("1/2 invert");
   });
 });

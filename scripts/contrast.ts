@@ -23,7 +23,7 @@
 //  The doc's numbers are pinned against this file by tests/contrast.test.ts.
 
 import { DRACULA_PALETTE, type Palette } from "../src/palette";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 export interface Pair {
@@ -466,14 +466,105 @@ export function compareText(
  *  ink okuda inherits and cannot see. Returns null when the file does not carry
  *  a usable pair — a theme for the app's chrome alone has nothing to report. */
 export function themePair(path: string): { bg: string; fg: string } | null {
+  let text: string;
   try {
-    const raw = JSON.parse(readFileSync(path, "utf8")) as { background?: unknown; foreground?: unknown };
-    const bg = typeof raw.background === "string" ? raw.background : null;
-    const fg = typeof raw.foreground === "string" ? raw.foreground : null;
-    return bg && fg && /^#[0-9a-f]{6}$/i.test(bg) && /^#[0-9a-f]{6}$/i.test(fg) ? { bg, fg } : null;
+    text = readFileSync(path, "utf8");
   } catch {
     return null;
   }
+  // Two syntaxes, because the two hosts we have met disagree about what a theme
+  // is: Herdr writes JSON, Ghostty writes its own config (a theme there is
+  // "simply another configuration file"). Both name the pair in the same two
+  // words, so one reader serves both — and a host that invents a third spelling
+  // gets its own branch here rather than a new instrument.
+  let bg: string | null = null;
+  let fg: string | null = null;
+  const flat = text.trimStart().startsWith("{");
+  if (flat) {
+    try {
+      const raw = JSON.parse(text) as { background?: unknown; foreground?: unknown };
+      bg = typeof raw.background === "string" ? raw.background : null;
+      fg = typeof raw.foreground === "string" ? raw.foreground : null;
+    } catch {
+      return null;
+    }
+  } else {
+    // `key = value`, `#` comments, whitespace tolerated. The first assignment of
+    // each wins: a config file may repeat a key, and the terminal is the authority
+    // on which one it honours — we take the earliest rather than invent a rule.
+    for (const line of text.split("\n")) {
+      const m = line.match(/^\s*(background|foreground)\s*=\s*(#[0-9a-fA-F]{6})\s*(?:#.*)?$/);
+      if (!m) continue;
+      if (m[1] === "background" && bg === null) bg = m[2]!;
+      if (m[1] === "foreground" && fg === null) fg = m[2]!;
+    }
+  }
+  return bg && fg && /^#[0-9a-f]{6}$/i.test(bg) && /^#[0-9a-f]{6}$/i.test(fg) ? { bg, fg } : null;
+}
+
+export interface ThemeRow extends SurfaceVerdict {
+  name: string;
+  path: string;
+}
+
+/** Every theme file in a directory, read and judged. The probe this exists for:
+ *  a host's own shipped collection, measured by the pair it supplies. Sorted
+ *  worst ink first — the weakest pairs are the ones a reader meets by default.
+ *  Files that carry no usable pair are reported, not dropped: a theme that cannot
+ *  state its own surface is a finding too. Pure apart from the reads. */
+export function surfaceDir(dir: string, refPair: { bg: string; fg: string } = referencePair()): {
+  rows: ThemeRow[];
+  noPair: string[];
+} {
+  const rows: ThemeRow[] = [];
+  const noPair: string[] = [];
+  for (const name of readdirSync(dir).sort()) {
+    // Ghostty's themes are extensionless, Herdr's are `.json`, and a third host
+    // will invent a third spelling. So: read everything that is not a dotfile and
+    // let the reader decide, reporting what it cannot read rather than guessing
+    // from a suffix.
+    if (name.startsWith(".")) continue;
+    const path = join(dir, name);
+    const pair = themePair(path);
+    if (!pair) {
+      noPair.push(name);
+      continue;
+    }
+    rows.push({ name, path, ...surfaceVerdict(pair, refPair) });
+  }
+  rows.sort((a, b) => a.ink - b.ink);
+  return { rows, noPair };
+}
+
+/** The directory reading as text: one line per theme, then the census. The
+ *  census is the letter: how many of a host's own themes cannot be read, and how
+ *  many invert a foreign palette. */
+export function surfaceDirText(res: { rows: ThemeRow[]; noPair: string[] }, refPair: { bg: string; fg: string }): string {
+  const out: string[] = [];
+  const pad = (s: string, n: number): string => s.padEnd(n);
+  out.push(`theme directory — ${res.rows.length} theme(s) with a pair, ${res.noPair.length} without`);
+  out.push(`reference ${refPair.bg} / ${refPair.fg}`);
+  out.push("");
+  out.push(pad("theme", 34) + pad("bg/fg", 18) + pad("ink", 7) + pad("readable", 10) + "navigable");
+  for (const r of res.rows) {
+    out.push(
+      pad(r.name.slice(0, 33), 34) +
+        pad(`${r.pair.bg}/${r.pair.fg}`, 18) +
+        pad(`${r.ink.toFixed(1)}:1`, 7) +
+        pad(r.readable ? "yes" : `NO (${r.belowFloor.length})`, 10) +
+        (r.navigable ? "yes" : `NO (${r.crossed.length})`),
+    );
+  }
+  const unreadable = res.rows.filter((r) => !r.readable).length;
+  const inverted = res.rows.filter((r) => !r.navigable).length;
+  const both = res.rows.filter((r) => !r.readable && !r.navigable).length;
+  out.push("");
+  out.push(
+    `census: ${unreadable}/${res.rows.length} cannot be read at ${FLOOR}:1 · ` +
+      `${inverted}/${res.rows.length} invert a foreign palette · ${both} do both`,
+  );
+  if (res.noPair.length > 0) out.push(`no pair stated (${res.noPair.length}): ${res.noPair.slice(0, 8).join(", ")}`);
+  return out.join("\n");
 }
 
 function main(): void {
@@ -487,6 +578,16 @@ function main(): void {
     const i = argv.indexOf(flag);
     return i >= 0 ? argv[i + 1] : undefined;
   };
+  const themeDir = argAfter("--theme-dir");
+  if (themeDir !== undefined) {
+    const refForDir = referencePair(
+      Number.parseInt(argAfter("--ref-rung") ?? String(REFERENCE_RUNG), 10) || REFERENCE_RUNG,
+    );
+    const res = surfaceDir(themeDir, refForDir);
+    if (json) console.log(JSON.stringify({ reference: refForDir, ...res }, null, 2));
+    else console.log(surfaceDirText(res, refForDir));
+    return;
+  }
   const themePath = argAfter("--theme");
   const refRung = Number.parseInt(argAfter("--ref-rung") ?? String(REFERENCE_RUNG), 10) || REFERENCE_RUNG;
   const refPair = referencePair(refRung);
