@@ -138,3 +138,20 @@ The outcome is `open`, `promoted: <callsign>`, or `refused: <why>`.
   emits, and say which are missing), and it is not worth building until something
   is actually broken, because unlike the pair the reader can *see* this failure and
   will tell us.
+
+- **`translucent-ground`** · 2026-11-01 · `colour` · **open**
+  The pair is a requirement on a **flat** ground, and the hosts we are writing to
+  increasingly are not flat. `background-opacity`, `background-blur`, gradients and
+  background images (Ghostty offers all four; Herdr has terminal opacity and gradient
+  backgrounds) make the effective ground a *range*, not a hex — whatever the theme's
+  background blends with through the window. So "is this pair readable?" becomes "is
+  it readable in the worst case?", which is answerable by blending the background over
+  the backdrop and taking the least favourable result, but only by a party holding the
+  backdrop — the host, not the renderer. The pair stops being a fact and becomes a
+  **bound**, and the honest position is that a host which makes the ground non-flat owes
+  a stronger requirement than the one we can state.
+  **Trigger:** the first host where we cannot state the worst case — a theme with
+  background opacity below 1, a gradient, or an image behind the character grid — or
+  the first report of a page that passes `just surface` and is still unreadable. The
+  two readings already exist; what would be missing is the effective ground, and
+  measuring it needs a screenshot or an honest declaration from the host.
