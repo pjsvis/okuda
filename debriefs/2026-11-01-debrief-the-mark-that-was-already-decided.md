@@ -70,6 +70,46 @@ deref   Gloam  okuda · SYS-ARCH-OTH-001 · § docs/2026-10-30-server-blades-in-
 At 72, 44 and 24 columns the composition holds; below the render width the footer
 runs long, which is pre-existing and not this mark's doing.
 
+## Ground sensitivity, measured
+
+The report after the mark landed, in the operator's words: informative, and *"the
+rubrication looks a bit bright at the moment but … in our Herdr TUI, with the correct
+fg/bg colour pair, it looks fine."* That is a percept, so it gets a measurement
+rather than agreement — `scripts/contrast.ts` (`just contrast`), the `vector` role
+against the grounds the palette already names:
+
+| ground | `vector` § | ink | muted |
+|---|---|---|---|
+| `#282c34` — Ghostty default | 5.2:1 | 10.5:1 | 1.8:1 |
+| `#23272e` — ground deeper | 5.6:1 | 9.3:1 | 2.0:1 |
+| `#1b1e24` — deep and dim | 6.2:1 | 7.5:1 | 2.2:1 |
+| `#221f1c` — deeper still | 6.1:1 | 10.6:1 | 2.1:1 |
+| `#1c1a17` — the floor test | 6.5:1 | 11.2:1 | 2.3:1 |
+
+The rose sits at **half the ink's contrast** (OKLCH L 0.719 against ink's 0.903 on
+the default ground), which is the same rung as `strong` and below `heading`. So it is
+not bright in luminance; it is **saturated on a loud ground**. The compass here is
+already written down: the prose role ships empty because *"the one role whose right
+value is relative to a surface okuda cannot see"* (`src/palette.ts:17-20`), and the
+ground page's own instruction is that the honest direction for "too bright" is
+*downward* because the binding constraint is `muted`, not the ink
+(`docs/2026-10-28-the-ground-you-read-on.md`).
+
+**So: no change, and the reason is measured rather than preferred.** The ADR's
+alternative table had already refused the quiet version (§ in `muted` is *"a
+smudge"*), and darkening the hue would buy calm on `#282c34` while costing the cue on
+the three darker grounds. The mark is in band on every ground the palette names; the
+difference the operator saw is the glass, which is the host's.
+
+What the observation left behind is a line worth keeping, and it is now in
+`conceptual-lexicon.md` under **TFS**: *a theme is a tax when it changes the mapping
+from role to meaning, and free when it only changes the ground the roles paint on.*
+
+If the reading ever needs to be re-derivable rather than remembered, `vector` gains a
+row in `scripts/contrast.ts`'s role table and `just contrast` prints it per ground —
+deferred, because that page is pinned against the script by
+`tests/contrast.test.ts` and prose costs nothing.
+
 ## The next temptation, named now
 
 The ADR refused a status segment, and it was right: *"a status bar is where a
