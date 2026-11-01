@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-01 | DBF-DEREFERENCE-MARK | done | Debrief: The mark that was already decided | 2026-11-01-debrief-the-mark-that-was-already-decided.md |
 | 2026-11-01 | DBF-SILO-STATUS | done | Debrief: The three states a repository can pay | 2026-11-01-debrief-the-three-states-a-repository-can-pay.md |
 | 2026-10-30 | DBF-ARRIVAL-AT-LINE | done | Debrief: The arrival at the line — the brief named the wrong function, and that was the work | 2026-10-30-debrief-the-arrival-at-the-line.md |
 | 2026-10-30 | DBF-FRAME-AND-GRAMMAR | done | Debrief: The frame and the grammar — one design that needed nothing, one that needed 18 lines | 2026-10-30-debrief-the-frame-and-the-grammar.md |
