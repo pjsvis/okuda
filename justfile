@@ -110,6 +110,11 @@ amp-regen:
 orient:
     @bash scripts/orient.sh
 
+# Status line
+[group('navigation')]
+silo-status:
+    @bun scripts/silo-status.ts --text
+
 # The idea ledger
 [group('navigation')]
 ideas:
