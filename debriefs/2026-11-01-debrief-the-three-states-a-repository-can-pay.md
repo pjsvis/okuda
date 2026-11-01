@@ -72,9 +72,14 @@ Two smaller refusals fell out of the same discipline:
 | Gate | What it refused | The rule it was enforcing |
 |---|---|---|
 | `ref-census --gate` | `feat/silo-status` with no commit on it | a branch whose tip is in `main` carries nothing |
-| `td-id-lint` | `**TD:** td-ab59c0` in the brief | *cite the callsign or SHA, never a td ID* — the one-way valve |
+| `td-id-lint` | a `**TD:**` header naming a td id | *cite the callsign or SHA, never a td ID* — the one-way valve |
 | `amp-check` | the new brief with no `&briefs` row | the table reconciles or it is not the table |
 | `brief-queue --gate` | `Done` while still in the live tier | a settled status must move; the status is the claim and the folder disagrees |
+
+The second row is worth a note on its own: this debrief's first draft *quoted* the
+refused header, and the gate caught the quotation. That is the correct behaviour —
+the lint reads bytes, not intent, and a document that quotes a forbidden form is
+carrying it. The table paraphrases for that reason.
 
 Each one demanded a derived surface catch up, which is the loop working as
 designed — and the last one is worth naming, because `Done`-in-live is exactly the
