@@ -343,6 +343,10 @@ gloam *args:
 test:
     @bun test
 
+# Consumer-path mermaid probe
+probe:
+    @scripts/probe-mermaid.sh
+
 # Grammar tour
 [group('build')]
 showcase:
