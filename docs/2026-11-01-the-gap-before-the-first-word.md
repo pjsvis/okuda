@@ -7,9 +7,27 @@ status: position taken — falsifiers named in the last section, not disclaimers
 
 # The gap before the first word
 
-> The interface is judged before the reader reads a word, and the thing that
-> judges it is the one thing no discipline owns. That is not an oversight in a
-> specification; it is a hole in the division of labour, and it is old.
+> A hosted terminal can be told its font, its cursor, its padding, its opacity, its
+> palette, its theme — and not its ink and its ground. Those two values decide
+> whether a document is readable at all. That is not a missing feature; it is a
+> hole in the division of labour, and it is old.
+
+## The gap
+
+Stated as an inventory, so it can be checked instead of believed.
+
+| settable in a hosted terminal | not settable |
+|---|---|
+| font, font size, fallbacks, features | **the ink** |
+| cursor style, colour, blink | **the ground** |
+| padding, opacity, blur, background image | |
+| the sixteen ANSI slots, the palette | |
+| the theme itself, and the picker | |
+
+Every value in the surface can be set except the two that decide whether any of the
+rest can be read. The renderer cannot set them — it does not see the glass. The host
+can, and in an app the host has put them inside an object with a picker, so changing
+the paper under someone else's document is a side effect of choosing a look.
 
 ## The claim
 
@@ -42,6 +60,20 @@ annotates prose out-ranks the ink.
 The third is the one to sit with: its terminal pair is **1.8:1**. That is not a
 pair chosen for a bad palette; it is a pair no program could read comfortably. It
 shipped. The document that shipped it renders perfectly.
+
+Nor is it a sample of two. The same reading over a terminal's own bundled catalogue
+(`Ghostty.app/Contents/Resources/ghostty/themes`, 819 themes in this build):
+
+| reading | count |
+|---|---|
+| cannot be read at 3:1 | 227 / 819 |
+| invert a foreign palette | 366 / 819 |
+| both | 165 / 819 |
+| cannot read anything — own ink under 3:1 against own ground | 10 / 819 |
+
+Two in five of a terminal's own themes cannot carry a foreign document palette
+correctly, and ten cannot read plain text. No one was careless; nobody had been told
+the property existed.
 
 ## Why this is a gap, and not a defect
 
