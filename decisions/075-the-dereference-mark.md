@@ -7,12 +7,19 @@ date: 2026-10-28
 # Decision: The dereference mark — a bare silcrow in the chrome
 
 **Date:** 2026-10-28
-**Status:** Accepted — the decision; the mark is not yet built
-**Enforced by:** `nothing — advice`, said plainly, because the code does not exist
-yet. The gate this decision owes is in `tests/tui.test.ts` (*footerLine — identity
-left, affordance right*): the mark present on a dereferenced render, absent on the
-main document, and identical under a colourless styler. Until that test exists this
-is a decision with no teeth, and a reader should treat it as such.
+**Status:** Accepted (**annotated 2026-11-01** — the mark is built; see *Enforced by*)
+**Enforced by:** `tests/tui.test.ts` — the four tests under *the dereference mark*
+(annotated 2026-11-01): the rose `§` prefixing the filename after the identity
+run, no mark and no reserved slot on the main document, the glyph surviving a
+colourless styler and never bold, and the mark present at a narrow width with
+the corner pad intact. The seam is `footerLine`'s `derefMark` painter — the
+absent painter *is* the absent mark — fed from `backstack.length > 0`, the
+boolean this decision argued the code already guarantees.
+
+The paragraph this replaces said `nothing — advice`, because the code did not
+exist. It does now, and the debt it named is paid rather than restated: the
+pre-annotation reading is kept here as the record of how long a decided mark
+went unbuilt with an open task behind it (2026-10-28 to 2026-11-01).
 
 ## Context
 
