@@ -185,6 +185,48 @@ Here it is an unbilled debt: continuous, invisible, and — after enough years �
 invisible *to the person paying it*, which is how a defect becomes a matter of
 taste.
 
+## Options, parameters, and the range they are allowed
+
+The rule at the stack is that an option may not **set** the requirement. There is a
+second rule, and it is the one that stops the first being read as permission:
+
+> **An option may not set the requirement, but an option can move the measurement.**
+> And if a value makes the page unreadable or unranked, it is not an eccentric choice —
+> it is outside the range in which the layer above survives. As the operator put it:
+> *"if it makes things look like shite then it's not a good option, is it."*
+
+That distinction sorts every setting into three kinds, and only the first is a matter
+of taste:
+
+| kind | example | any value admissible? | what it owes |
+|---|---|---|---|
+| **free option** | the hue of a palette; the serif of a face | yes | nothing |
+| **bounded parameter** | background opacity; cell size; stroke weight; **the pair itself** | **no** — there is a failing band | its range, stated |
+| **requirement** | that figures be distinguishable from ground | not applicable | an owner |
+
+The middle row is where the industry's trouble lives. A bounded parameter presented as
+a free option is a trap wearing a preference's clothes: the person believes they are
+choosing a look and is in fact choosing whether the app can be read at all. And the
+cost is not private — a bad value in one settings file damages every document that
+person will ever read in that app.
+
+The answer is not prohibition, which nobody accepts and nobody needs. It is **bounding**:
+freedom inside the range, and the range stated where the value is set. A terminal can
+let you pick any ink that keeps its own text legible; a theme picker can let you pick
+any theme that does not invert someone else's page. Freedom with a floor, and the floor
+written down — which is the whole of what this document asks of anyone.
+
+| known coupling | the option | what it moves |
+|---|---|---|
+| translucent ground | opacity, blur, background image | the ground stops being a value and becomes a range, so the pair becomes a bound |
+| cell size, zoom | font size, zoom, cell width | fine structure (rules, joins, stems) degrades before the ratio does, so the effective floor rises |
+| stroke weight | font weight, `font-thicken` | apparent contrast at the same measured ratio changes with stem width |
+| theme's own ink | `minimum-contrast` and similar | the reading is computed on colours the program no longer displays |
+
+Each of these is filed with a trigger rather than fixed, because each is measurable and
+none is yet measured. Naming them is what stops the next session rediscovering one by
+accident and calling it a new finding.
+
 ## Coherence, stated precisely
 
 A page coheres when every mark on it is **comparable with every other on one scale**.
