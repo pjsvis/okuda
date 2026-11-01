@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**8 live · 151 archived · 10 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 2 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**7 live · 152 archived · 10 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 2 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
