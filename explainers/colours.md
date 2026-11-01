@@ -112,12 +112,46 @@ see the glass, the theme owner knows nothing of the roles, and the standard
 measures a single pair. Each is right in isolation. The gap is in the between,
 which is where this page lives.
 
+## The correction — there is no "web" case, only terminals we cannot configure
+
+This page originally imagined a *web* mode that could assert its own surface. That
+was a category error worth recording: **the modern web is a terminal.** A
+browser-hosted okuda runs in an xterm.js-class emulator, and Herdr's app renders
+into a terminal like any other. So there is no second renderer to parameterise —
+there is one renderer, and a class of host whose pair we cannot set. The missing
+capability is not surface assertion; it is *the ability to fix the pair*, and it is
+missing in exactly one place: an instance with no settings file the person knows
+about.
+
+## The base requirement, as three tests
+
+Everything above is instrument. The requirement is narrower than the reasoning, and
+worth stating in the form it would be judged in:
+
+| Property | What it means | Measured |
+|---|---|---|
+| **Readable** | every role painted on the ground clears a floor | `just surface` — the floor reading |
+| **Navigable** | the marks that carry navigation out-rank the prose | `just surface` — the ranking reading |
+| **Recognisable** | the page reads as okuda from across the room | follows from fixed roles plus an intact order; not separately measured, deliberately |
+
+Navigability is why this is not a matter of taste. Navigation in okuda is **painted**
+— addresses, states and structure are colour — so if the prose rises above them the
+page stops being navigable in the same way a removed underline stops a link being a
+link.
+
+Two roles are **exempt from the floor** and are printed as exempt rather than hidden,
+because the control found them: `badge-fg` is painted on `badge-bg` and never on the
+ground, and `muted` is the structural ink whose quietness the ground page treats as
+the binding constraint (2.0–2.3 on a good ground). Lowering the floor for everything
+to accommodate those two would have been the wrong repair.
+
 ## The reading — `just ranking`
 
 ```
-bun scripts/contrast.ts --theme <a host theme.json>     # judge a theme's pair
-bun scripts/contrast.ts --ranking --rung 4              # judge a dogfooded pair
-bun scripts/contrast.ts --ranking --bg '#21252b' --fg '#abb2bf'
+just surface --theme <a host theme.json>     # both readings, one verdict
+just surface --rung 8                        # a dogfooded pair
+just surface --bg '#21252b' --fg '#abb2bf'
+just ranking --theme <theme.json>            # the order alone, role by role
 ```
 
 Output is the palette in rank order, each role's `÷ ink`, and the crossings named.
@@ -175,7 +209,13 @@ not select it, because selecting it is the person's act.
    rungs on purpose (`muted` at 2.0:1 draws every rule in the page). Same mistake
    in a different shape: a number rewriting the ink instead of respecting the
    ranking.
-5. **Measure the glass, not the impression.** `herdr-app shot /tmp/ui.png`
+5. **Refuse light mode.** A light palette is a second set of role meanings — the
+   tax, paid in full — and the order would have to be re-authored rather than
+   re-tuned. `color-scheme: dark` is the whole of our position: one pair, asserted
+   nowhere, recommended everywhere. If a light class ever arrives in the wild, the
+   instrument generates the palette to hit symmetric deltas; until then, a second
+   palette is a second design wearing our names.
+6. **Measure the glass, not the impression.** `herdr-app shot /tmp/ui.png`
    captures the app at physical pixels, no screen-recording permission needed
    (`~/.config/herdr-app/AGENTS.md:65-68`). Sample the pixel behind a document,
    compare with the theme's declared pair, apply, re-measure. The loop that fixed

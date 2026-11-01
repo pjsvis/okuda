@@ -126,6 +126,13 @@ invisible. That false negative is the defect this brief exists to close.
    roles below the floor; `just surface --theme <herdr atom-one-dark>` reports
    **NOT ordered** and names the roles that crossed.
 2. `just surface --rung 8` reports readable **and** ordered.
+   *Amended during execution (2026-11-01):* the reference pair failed a flat
+   3:1 floor on exactly two roles — `badge-fg` (painted on `badge-bg`, never on
+   the ground) and `muted` (the structural ink, deliberately quiet, and the
+   ground page's own binding constraint at 2.0–2.3). "Readable" therefore means
+   **every role painted on the ground**; the two exemptions are declared in
+   `NOT_ON_GROUND` with their reasons and printed in the reading, not hidden.
+   The control found them, which is what a control is for.
 3. `surfaceVerdict` is pure and table-tested; the control is asserted before the
    defects, in that order, in the test file.
 4. The floor is a named constant, not a literal, and its reason is stated where it is
