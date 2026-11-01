@@ -101,3 +101,22 @@ The outcome is `open`, `promoted: <callsign>`, or `refused: <why>`.
   curate it, do not generate it. Cost is bounded by the retirement rule this
   silo just adopted — the corpus holds ~1400 occurrences but only **220 are on
   the living surface**, and the protocol's 12 come with a deploy.
+
+- **`ranking-on-a-themed-desktop`** · 2026-11-01 · `colour` · **open**
+  A theming-first desktop is the stress case this palette has never met. Omarchy
+  ships **twenty-two** themes and switches them on one keystroke, and a theme
+  styles "the desktop, terminal, neovim, … and the entire Omarchy shell"
+  (`omacom/omarchy`, `manual/06-themes.md`) — so the terminal's ground and ink are
+  a *live, one-gesture variable* that the person cycles for pleasure. okuda's roles
+  are dark-mode hexes and its ink is inherited, so every theme switch is a
+  re-ranking. Two distinct failures, only one of which we can currently see:
+  measured today against a white ground, **no role crosses the ink** (the crossing
+  test is blind by construction) while **16 of 23 roles fall under 3:1** — heading
+  1.69:1, `state-todo` 1.30:1. Omarchy ships light themes (flexoki-light,
+  catppuccin-latte, white), so the light class is not hypothetical.
+  **Trigger:** the next time okuda is run on someone else's themed desktop, or the
+  moment a second ground class (light) enters scope — whichever comes first. The
+  first half of the reading already exists (`just ranking --theme <file>`); the
+  second half is missing, and its absence is the finding: *a floor reading for
+  every role, not just `muted`*, since the instrument currently answers "is the
+  order intact?" and not "is anything legible?".
