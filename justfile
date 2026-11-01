@@ -395,6 +395,16 @@ view-glow file:
 post:
     @./okuda docs/2026-08-25-the-common-control-surface.md --tui
 
+# Palette ranking
+[group('build')]
+ranking *args:
+    @bun scripts/contrast.ts --ranking {{args}}
+
+# Host theme
+[group('build')]
+herdr-theme *args:
+    @bun scripts/herdr-theme.ts {{args}}
+
 # Colour audit
 [group('build')]
 audit:
