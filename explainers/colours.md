@@ -152,6 +152,7 @@ just surface --theme <a host theme.json>     # both readings, one verdict
 just surface --rung 8                        # a dogfooded pair
 just surface --bg '#21252b' --fg '#abb2bf'
 just ranking --theme <theme.json>            # the order alone, role by role
+just surface --gate                          # exit 1 unless the recommended pair passes
 ```
 
 Output is the palette in rank order, each role's `÷ ink`, and the crossings named.
@@ -159,7 +160,9 @@ The reference is the dogfooded pair (rung 8, `--ref-rung` to change it), because
 *"louder than prose"* is a design choice nobody has to defend — a **change in
 order** is the defect, and it needs no argument about taste.
 
-The control runs first, in `tests/ranking.test.ts`: the reference against itself
+`just check` runs `--gate` on the recommended pair, so a role hex that breaks the
+page fails the build rather than a habit. The control runs first, in
+`tests/ranking.test.ts`: the reference against itself
 reports zero crossings and zero movement. Only then is the detector believed about
 the defect — atom-one-dark's default pair crossing twelve roles, `heading` first
 among them. A detector whose control fails is measuring itself.
