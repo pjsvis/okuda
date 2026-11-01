@@ -336,6 +336,73 @@ something was deleted.
   instance — the same rose `§` at 5.2:1 reading bright on a default ground and calm
   on a matched host pair — and the derivation of the test).
 
+* **The pair**: the ink and the ground a page is read on — the two values a
+  renderer needs and, in a terminal, does not own. It is the **only unowned
+  parameter of the render**: the roles are fixed by the renderer, the bytes'
+  destination belongs to the environment, and the pair is the one input chosen by
+  nobody in particular and observed by nobody who could object. A theme is a
+  family and is chosen; **the pair is two values and is required** — which is why
+  it is a precondition and not a preference, and why it survives the exclusion of
+  themes (`TFS`).
+  * **Why it went unaddressed**: two parties must agree on it and neither owns it.
+  The renderer cannot see the glass; the host does not know what the roles mean.
+  It is not an error — nothing throws, the document renders — it is an **absence
+  of agreement**, and absences do not raise exceptions. So the failure is repaired
+  by whatever is at hand, which is why a decade of readers have reached for the
+  brightness keys: a uniform scale cannot fix a relational defect, but it does
+  produce *relief*, and relief uncorrelated with the cause teaches the wrong one.
+  * **Two halves of legibility, and only one is ours.** The **device side** — the
+  pair, and the contrast between its two values — is measurable and therefore
+  declarable. The **room side** — the surround luminance that pulls an eye toward
+  the ceiling — is not observable by any software and belongs to the person's
+  lighting. A claim to have made a device "optimally legible" is only ever a claim
+  about the first half, and saying which half is the honest form of the claim.
+  * **The rule**: **declare it, never compensate.** An unowned parameter must be
+  stated where the other party can read it — a pasteable config, a generated
+  theme, a printed verdict. A renderer that infers a bad pair and adjusts to it
+  makes the bad pair invisible, which is worse than the bad pair. Silence is not
+  neutral: an unstated requirement is not a boundary but an omission with a good
+  reputation.
+  * **Test:** two readings, neither of which is taste — **readable** (every role
+    painted on the ground clears a floor) and **navigable** (no role that
+    annotates prose out-ranks the ink). `just surface` answers both for any
+    candidate pair; `just check` gates the recommended one. **Failure it names:** a
+    page that renders perfectly and cannot be read — inverted by a dimmer ink, or
+    ghosted by a light ground — with no error anywhere to say so.
+  * **Prior art:** `docs/2026-10-28-the-ground-you-read-on.md` (the grounds,
+    measured as pairs; `muted` as the binding constraint); Solarized, *Precision,
+    symmetry* (`ethanschoonover.com/solarized`, 2011 — palettes defined as
+    lightness relationships, body text deliberately not the nearest monotone);
+    `decisions/073-the-glass-owns-its-ink.md` (`ADR-GLASS-INK-073` — the renderer
+    paints its roles and leaves the default ink *and* the absolute luminance to
+    the glass, which is exactly what created the unowned parameter); `debriefs/2026-11-01-debrief-two-readings-one-verdict.md` (the
+    control that found two roles not painted on the ground, and the dogfood on two
+    live host themes); `explainers/colours.md` (the finding and the base
+    requirement, *readable, navigable, recognisable*).
+
+* **The exclusion's precondition**: what an exclusion of choice leaves behind. A
+  doctrine that refuses a cosmetic choice — a theme, a font — is refusing the
+  *choice*, not the *environment the choice would have controlled*, and that
+  environment arrives anyway, supplied by a party who was never told what it must
+  supply. So every exclusion carries a **delegation**, and every delegation carries
+  an **unstated precondition** until someone writes it down.
+  * **Named 2026-11-01**, when the residual under `TFS`'s Themes clause was found:
+  *"pick high-contrast, respect whatever palette the terminal is already running"*
+  welds an exclusion to a delegation, and the delegation presumes the palette is
+  well set. Measured on the app in front of the operator, a shipped theme's
+  terminal pair was **1.8:1** — the presumption was false, and had been for as long
+  as it was unstated. The residual is `the pair`.
+  * **Test:** name the precondition the exclusion delegates. If it cannot be named,
+    the exclusion is incomplete, and the omission will be discovered as a defect in
+    someone else's theme rather than as a gap in the doctrine. **Failure it names:**
+  a doctrine that is right about what to exclude and silent about what it handed
+  over — the surrender is invisible precisely because the choice was refused
+  loudly.
+  * **Prior art:** `docs/2026-08-29-tfs-exclusion-principle.md` (the doctrine and
+    its three exclusions); `AGENTS.md` (*three concerns* — the same shape one level
+    up: refusing compositing is also a delegation, and it names the delegate);
+    `conceptual-lexicon.md` **TFS** and **the pair**.
+
 ## Register open — the gathering
 
 This file is deliberately thin on the day it was created. The lexicon it was
