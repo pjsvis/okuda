@@ -185,6 +185,38 @@ Here it is an unbilled debt: continuous, invisible, and — after enough years �
 invisible *to the person paying it*, which is how a defect becomes a matter of
 taste.
 
+## Coherence, stated precisely
+
+A page coheres when every mark on it is **comparable with every other on one scale**.
+That scale is the ink: a role's meaning is its ratio to the ink it is painted beside.
+Fix the ink and hierarchy is *ranked* — a heading quieter than the prose, a rule
+quieter than both, a state glyph louder on purpose and by how much. Remove the fixed
+ink and there is no common denominator left, so the only axis remaining is raw
+salience: chroma, brightness, size.
+
+That is what "the loudest colour wins" describes, and it is worth being exact about
+because the phrase invites the wrong diagnosis. **The problem is not decoration. The
+problem is competition without a denominator.** A nursery with a palette is fine; a
+nursery in which every object fights for the eye is a market, and markets rank by
+loudness because loudness is the only measure they share. A document is the opposite
+instrument: an advertisement must win attention against an unknown surround and so
+maximises chroma; a document must be **calm** against a known surround, because its
+whole job is to let structure be noticed. Hand a document an advert's conditions and it
+adopts an advert's grammar.
+
+Two consequences worth keeping, both of which bound the claim:
+
+- **The three readings are three faces of one requirement.** *Readable* asks whether a
+  mark can be seen at all; *navigable* asks whether it keeps its rank; *coherent* is
+  what the reader experiences when both hold — every mark commensurable with every
+  other, so attention can be spent on meaning instead of on finding things.
+- **Coherence is local to a surface, not global to a product.** This document does not
+  argue that everything should look alike. It argues that everything on **one page** is
+  measured against **one ink**. Two documents in two palettes are each coherent; a
+  design system that makes them identical has bought coherence by deleting the
+  difference. The instrument checks one pair at a time, which is pluralism by
+  construction: commensurability, not uniformity.
+
 ## The position
 
 Six commitments. Each is a claim with a test, not a preference with an adjective.
