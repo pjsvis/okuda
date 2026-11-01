@@ -61,6 +61,57 @@ a tax when it changes the mapping from role to meaning. A theme that supplies th
 ink does exactly that, and it does it silently, to every document the person
 owns.
 
+## Prior art — three layers, three owners
+
+The finding is not a discovery, and saying so first is the honest form. It was
+solved at three layers, decades apart, and each solution is correct *at its own
+layer* — which is why the defect survives between them.
+
+**Solarized (Ethan Schoonover, 2011) — the ranking, bought by owning both ends.**
+From the design page (`ethanschoonover.com/solarized`), the construction is
+lightness *deltas*, not colours:
+
+> The monotones have symmetric CIELAB lightness differences, so switching from
+> dark to light mode retains the same perceived contrast in brightness between
+> each value.
+
+and the role rule that exists to protect the order:
+
+> the normal relationship for background and body text is `base03:base0` (please
+> note body text is **not** `base00`) … The L\*a\*b lightness difference between
+> `base03:base0` and `base02:base1` is identical by design, resulting in identical
+> readability against both normal and highlighted backgrounds.
+
+That is a palette defined as an **order with prescribed deltas**, plus a role
+assignment chosen so the order survives a change of ground. It is also why the
+solution is not available to us as written: Solarized owns the ink as well as the
+roles, and it can flip modes because the *deltas* are symmetric. okuda's hexes are
+single-mode, so its light-mode equivalent does not exist — a second palette would
+be a second set of role meanings, which is the tax this page is about.
+
+**base16 / tinted-theming (Chris Kempson, 2012→) — the slots, and silence on the
+rank.** The spec (v0.4.2, `tinted-theming/home/styling.md`) assigns a construct to
+each of sixteen slots and asks only that the monotones span the right direction:
+
+> In order to create a dark scheme, colors `base00` to `base07` should span from
+> dark to light. For a light scheme, these color should span from light to dark.
+
+That is a contract about *within-scheme* ordering. It says nothing about a foreign
+palette arriving with fixed accents and inheriting `base05` — and One Dark's
+`base05` is `#abb2bf`, the exact hex that inverted this page. A perfectly
+conformant scheme, and the defect walks straight through the contract.
+
+**The accessibility line — text against its own background** (recollection,
+unverified here): WCAG 2's contrast ratio, and APCA as drafted for WCAG 3, measure
+legibility of text on the surface immediately behind it. Correct for reading.
+Blind to the ordering *between roles*, which is what "everything shouts at once"
+actually is.
+
+Three layers, three owners, no invariant spanning them: the palette owner cannot
+see the glass, the theme owner knows nothing of the roles, and the standard
+measures a single pair. Each is right in isolation. The gap is in the between,
+which is where this page lives.
+
 ## The reading — `just ranking`
 
 ```
@@ -143,5 +194,7 @@ command, that the order just changed.
 - `explainers/the-render-as-context.md` — why the renderer owns ink and not ground.
 - `docs/2026-10-28-the-ground-you-read-on.md` — the grounds, measured as pairs.
 - `conceptual-lexicon.md` — **TFS**, the tax this page is an instance of.
+- Solarized — `ethanschoonover.com/solarized`; base16 — `tinted-theming/home` (the
+  prior art above, cited as ancestry rather than as ancestry's equal).
 - `debriefs/2026-11-01-debrief-the-mark-that-was-already-decided.md` — the mark,
   and the first reading of the same evening, which blamed the ground.
