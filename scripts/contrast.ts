@@ -505,6 +505,10 @@ export function themePair(path: string): { bg: string; fg: string } | null {
 export interface ThemeRow extends SurfaceVerdict {
   name: string;
   path: string;
+  /** The theme's own ink fails the floor against its own ground: a pair that
+   *  cannot read *anything*, before any foreign palette is involved. Reported
+   *  separately from `readable`, which asks about our roles on their ground. */
+  selfBroken: boolean;
 }
 
 /** Every theme file in a directory, read and judged. The probe this exists for:
@@ -530,7 +534,7 @@ export function surfaceDir(dir: string, refPair: { bg: string; fg: string } = re
       noPair.push(name);
       continue;
     }
-    rows.push({ name, path, ...surfaceVerdict(pair, refPair) });
+    rows.push({ name, path, selfBroken: ratio(pair.fg, pair.bg) < FLOOR, ...surfaceVerdict(pair, refPair) });
   }
   rows.sort((a, b) => a.ink - b.ink);
   return { rows, noPair };
@@ -545,23 +549,26 @@ export function surfaceDirText(res: { rows: ThemeRow[]; noPair: string[] }, refP
   out.push(`theme directory — ${res.rows.length} theme(s) with a pair, ${res.noPair.length} without`);
   out.push(`reference ${refPair.bg} / ${refPair.fg}`);
   out.push("");
-  out.push(pad("theme", 34) + pad("bg/fg", 18) + pad("ink", 7) + pad("readable", 10) + "navigable");
+  out.push(pad("theme", 34) + pad("bg/fg", 18) + pad("ink", 7) + pad("readable", 10) + pad("navigable", 12) + "self");
   for (const r of res.rows) {
     out.push(
       pad(r.name.slice(0, 33), 34) +
         pad(`${r.pair.bg}/${r.pair.fg}`, 18) +
         pad(`${r.ink.toFixed(1)}:1`, 7) +
         pad(r.readable ? "yes" : `NO (${r.belowFloor.length})`, 10) +
-        (r.navigable ? "yes" : `NO (${r.crossed.length})`),
+        pad(r.navigable ? "yes" : `NO (${r.crossed.length})`, 12) +
+        (r.selfBroken ? "BROKEN" : "ok"),
     );
   }
   const unreadable = res.rows.filter((r) => !r.readable).length;
   const inverted = res.rows.filter((r) => !r.navigable).length;
   const both = res.rows.filter((r) => !r.readable && !r.navigable).length;
   out.push("");
+  const broken = res.rows.filter((r) => r.selfBroken).length;
   out.push(
     `census: ${unreadable}/${res.rows.length} cannot be read at ${FLOOR}:1 · ` +
-      `${inverted}/${res.rows.length} invert a foreign palette · ${both} do both`,
+      `${inverted}/${res.rows.length} invert a foreign palette · ${both} do both · ` +
+      `${broken}/${res.rows.length} cannot read anything (own ink under ${FLOOR}:1)`,
   );
   if (res.noPair.length > 0) out.push(`no pair stated (${res.noPair.length}): ${res.noPair.slice(0, 8).join(", ")}`);
   return out.join("\n");

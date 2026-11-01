@@ -131,5 +131,9 @@ describe("the theme directory — two syntaxes, one reading", () => {
     const text = surfaceDirText(res, referencePair());
     expect(text).toContain("1/2 cannot be read");
     expect(text).toContain("1/2 invert");
+    // The 1.8:1 pair is broken before any foreign palette is in play.
+    expect(res.rows[0]!.selfBroken).toBe(true);
+    expect(res.rows[1]!.selfBroken).toBe(false);
+    expect(text).toContain("1/2 cannot read anything");
   });
 });
