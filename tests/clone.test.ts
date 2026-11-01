@@ -76,38 +76,50 @@ describe("clone — the restricted grammar (ADR-031)", () => {
   });
 
   test("ghostty: spawns via interactive shell with gloam", () => {
-    // The shell is INJECTED, like the platform: the grammar is "the user's
-    // interactive login shell", and a spec that read process.env.SHELL
-    // asserted zsh on a box running bash and read as a product failure
-    // (DBF-OMARCHY-TOOLCHAIN). The machine is the caller's problem.
-    const spec = cloneArgs("ghostty", "docs/x.md", "darwin", "/silo", undefined, "/bin/zsh");
-    const args = spec as { cmd: string; args: string[] };
-    expect(args.cmd).toContain("Ghostty.app/Contents/MacOS/ghostty");
-    expect(args.args[0]).toBe("-e");
-    expect(args.args[1]).toBe("/bin/zsh");
-    expect(args.args[2]).toBe("-i");
-    expect(args.args[3]).toBe("-c");
-    expect(args.args[4]).toContain("gloam");
-    expect(args.args[4]).toContain("docs/x.md");
+    // The terminal is the test's argument too: the ambient $TERMINAL wins
+    // before the darwin bundle, and this box sets it (DBF-OMARCHY-TOOLCHAIN).
+    withoutTerminalEnv(() => withEnv({ TERMINAL: "/Applications/Ghostty.app/Contents/MacOS/ghostty" }, () => {
+      // The shell is INJECTED, like the platform: the grammar is "the user's
+      // interactive login shell", and a spec that read process.env.SHELL
+      // asserted zsh on a box running bash and read as a product failure
+      // (DBF-OMARCHY-TOOLCHAIN). The machine is the caller's problem.
+      const spec = cloneArgs("ghostty", "docs/x.md", "darwin", "/silo", undefined, "/bin/zsh");
+      const args = spec as { cmd: string; args: string[] };
+      expect(args.cmd).toContain("Ghostty.app/Contents/MacOS/ghostty");
+      expect(args.args[0]).toBe("-e");
+      expect(args.args[1]).toBe("/bin/zsh");
+      expect(args.args[2]).toBe("-i");
+      expect(args.args[3]).toBe("-c");
+      expect(args.args[4]).toContain("gloam");
+      expect(args.args[4]).toContain("docs/x.md");
+    }));
   });
 
   test("ghostty: whatever shell the user has, not the one we shipped on", () => {
-    const spec = cloneArgs("ghostty", "docs/x.md", "darwin", "/silo", undefined, "/usr/bin/bash");
-    const args = spec as { cmd: string; args: string[] };
-    expect(args.args[1]).toBe("/usr/bin/bash");
-    expect(args.args[2]).toBe("-i"); // still interactive, still a login shell
+    // The terminal is the test's argument too: the ambient $TERMINAL wins
+    // before the darwin bundle, and this box sets it (DBF-OMARCHY-TOOLCHAIN).
+    withoutTerminalEnv(() => withEnv({ TERMINAL: "/Applications/Ghostty.app/Contents/MacOS/ghostty" }, () => {
+      const spec = cloneArgs("ghostty", "docs/x.md", "darwin", "/silo", undefined, "/usr/bin/bash");
+      const args = spec as { cmd: string; args: string[] };
+      expect(args.args[1]).toBe("/usr/bin/bash");
+      expect(args.args[2]).toBe("-i"); // still interactive, still a login shell
+    }));
   });
 
   test("ghostty-edit: spawns via interactive shell with editor", () => {
-    const spec = cloneArgs("ghostty-edit", "docs/note.md", "darwin", "/silo", "vi", "/bin/zsh");
-    const args = spec as { cmd: string; args: string[] };
-    expect(args.cmd).toContain("Ghostty.app/Contents/MacOS/ghostty");
-    expect(args.args[0]).toBe("-e");
-    expect(args.args[1]).toBe("/bin/zsh");
-    expect(args.args[2]).toBe("-i");
-    expect(args.args[3]).toBe("-c");
-    expect(args.args[4]).toContain("vi");
-    expect(args.args[4]).toContain("docs/note.md");
+    // The terminal is the test's argument too: the ambient $TERMINAL wins
+    // before the darwin bundle, and this box sets it (DBF-OMARCHY-TOOLCHAIN).
+    withoutTerminalEnv(() => withEnv({ TERMINAL: "/Applications/Ghostty.app/Contents/MacOS/ghostty" }, () => {
+      const spec = cloneArgs("ghostty-edit", "docs/note.md", "darwin", "/silo", "vi", "/bin/zsh");
+      const args = spec as { cmd: string; args: string[] };
+      expect(args.cmd).toContain("Ghostty.app/Contents/MacOS/ghostty");
+      expect(args.args[0]).toBe("-e");
+      expect(args.args[1]).toBe("/bin/zsh");
+      expect(args.args[2]).toBe("-i");
+      expect(args.args[3]).toBe("-c");
+      expect(args.args[4]).toContain("vi");
+      expect(args.args[4]).toContain("docs/note.md");
+    }));
   });
 
   test("doc paths with spaces survive the appleScript quoting", () => {
@@ -190,36 +202,44 @@ describe("the editor — the declaration chain (88)", () => {
   });
 
   test("a terminal editor rides the integration, inside a login shell", () => {
-    const spec = editArgs(
-      "docs/x.md",
-      "ghostty-edit",
-      { name: "vi", args: [], path: "/usr/bin/vi", gui: false },
-      "darwin",
-      "/silo",
-      "/bin/zsh",
-    );
-    const args = spec as { cmd: string; args: string[] };
-    expect(args.cmd).toContain("Ghostty.app/Contents/MacOS/ghostty");
-    expect(args.args[1]).toBe("/bin/zsh");
-    expect(args.args[4]).toContain("vi");
-    expect(args.args[4]).toContain("docs/x.md");
+    // The terminal is the test's argument too: the ambient $TERMINAL wins
+    // before the darwin bundle, and this box sets it (DBF-OMARCHY-TOOLCHAIN).
+    withoutTerminalEnv(() => withEnv({ TERMINAL: "/Applications/Ghostty.app/Contents/MacOS/ghostty" }, () => {
+      const spec = editArgs(
+        "docs/x.md",
+        "ghostty-edit",
+        { name: "vi", args: [], path: "/usr/bin/vi", gui: false },
+        "darwin",
+        "/silo",
+        "/bin/zsh",
+      );
+      const args = spec as { cmd: string; args: string[] };
+      expect(args.cmd).toContain("Ghostty.app/Contents/MacOS/ghostty");
+      expect(args.args[1]).toBe("/bin/zsh");
+      expect(args.args[4]).toContain("vi");
+      expect(args.args[4]).toContain("docs/x.md");
+    }));
   });
 
   test("a declared editor that is NOT on PATH still goes through the shell", () => {
-    // gui: true but path: null — an alias, a shell function, or a
-    // PATH the login shell knows and this process does not. The
-    // terminal path is the one that can find it; spawning `zed` by a
-    // path we do not have would just fail.
-    const spec = editArgs(
-      "docs/x.md",
-      "ghostty-edit",
-      { name: "zed", args: [], path: null, gui: true },
-      "darwin",
-      "/silo",
-    );
-    const args = spec as { cmd: string; args: string[] };
-    expect(args.cmd).toContain("Ghostty.app");
-    expect(args.args[4]).toContain("zed");
+    // The terminal is the test's argument too: the ambient $TERMINAL wins
+    // before the darwin bundle, and this box sets it (DBF-OMARCHY-TOOLCHAIN).
+    withoutTerminalEnv(() => withEnv({ TERMINAL: "/Applications/Ghostty.app/Contents/MacOS/ghostty" }, () => {
+      // gui: true but path: null — an alias, a shell function, or a
+      // PATH the login shell knows and this process does not. The
+      // terminal path is the one that can find it; spawning `zed` by a
+      // path we do not have would just fail.
+      const spec = editArgs(
+        "docs/x.md",
+        "ghostty-edit",
+        { name: "zed", args: [], path: null, gui: true },
+        "darwin",
+        "/silo",
+      );
+      const args = spec as { cmd: string; args: string[] };
+      expect(args.cmd).toContain("Ghostty.app");
+      expect(args.args[4]).toContain("zed");
+    }));
   });
 });
 
