@@ -8,13 +8,21 @@ status: draft — not sent; the operator sends, and may cut anything
 
 Hello —
 
-I run a markdown renderer (`okuda`) inside Herdr, and I have spent two days
-measuring something that the app version of a terminal quietly cannot express. I am
-sending it because the fix looks like an afternoon, and because Herdr is the first of
-a generation of apps that host terminals — so whatever Herdr does here will be the
-pattern.
+I run a markdown renderer (`okuda`) inside Herdr. This letter is about one gap in the
+app's config surface, and the gap is small enough to state in a sentence.
 
-## What I measured
+## The gap
+
+**A terminal in Herdr can be told its font, its cursor, its padding, its opacity, its
+palette, its theme — and not its ink and its ground.** Those two values are the ones
+that decide whether a document is readable at all, and in the app they belong to the
+theme: the only way to change them is to change the theme, and the theme picker
+changes them as a side effect.
+
+Every other value in the surface is settable. Two are not. That is the whole claim,
+and it needs nobody to agree with my taste to be true.
+
+## What it costs, measured
 
 My renderer emits fixed colour roles and leaves its body text to inherit the
 terminal's default foreground. That means the terminal's ink is *half of my palette's

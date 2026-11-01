@@ -8,16 +8,26 @@ status: draft — not sent; the operator sends, and may cut anything
 
 Hello —
 
-First, the compliment, because it is earned and it is the reason this letter is
-narrow: `minimum-contrast` exists, and its documentation says the honest thing about
-itself — *"the higher the value, the more likely that text will become black or
-white."* Almost nothing in this space admits its own cost in the same sentence that
-offers the feature. That sentence is why I am writing to you rather than about you.
+I write a markdown renderer that runs in Ghostty, and this letter is about one gap —
+not in the engine, which is fine, and not in the feature set, which already has the
+lever. It is a gap in what the catalogue knows about itself.
 
-I write a markdown renderer that runs in Ghostty. Its colour roles are fixed hexes and
-its body text inherits your default foreground — so Ghostty supplies half of my
-palette's design, and I cannot see it. That is my choice, and it is the choice that
-made the thing below measurable.
+## The gap, stated as arithmetic
+
+Two values decide whether a document on this terminal can be read: the ink and the
+ground. Ghostty lets both be set, which is why this is not a feature request. What no
+part of the toolchain reports is the **arithmetic those two values imply** — for the
+theme's own text, and for a palette that arrives with its own hierarchy and inherits
+your ink. Eight hundred and nineteen themes ship; nothing prints what their pairs
+mean.
+
+That absence is the gap, and it is one a terminal is the right party to close, because
+the terminal is the only party that holds both values.
+
+A second observation, offered because it is earned: `minimum-contrast` exists, and its
+documentation says the honest thing about itself — *"the higher the value, the more
+likely that text will become black or white."* Almost nothing in this space admits its
+own cost in the same sentence that offers the feature.
 
 ## What the measurement found
 
