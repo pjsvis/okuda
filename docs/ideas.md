@@ -120,3 +120,21 @@ The outcome is `open`, `promoted: <callsign>`, or `refused: <why>`.
   second half is missing, and its absence is the finding: *a floor reading for
   every role, not just `muted`*, since the instrument currently answers "is the
   order intact?" and not "is anything legible?".
+
+- **`font-coverage-precondition`** · 2026-11-01 · `render` · **open**
+  The same residual as `the pair`, one exclusion over. `TFS` refuses the font
+  *choice*; what it delegates is **glyph coverage and cell width**, and nobody has
+  said so. okuda emits box-drawing, eighth-blocks (U+2580–U+259F) and Braille
+  (U+2800–U+28FF) as structural glyphs (`tests/width.test.ts` pins each to one
+  column), plus mermaid's ASCII. A host whose font lacks them renders a table as a
+  row of replacement characters or a bar chart as boxes — and nothing raises,
+  because the bytes are correct and the glyph is the font's business. The width
+  half is worse than the coverage half: a proportional or ligature-happy face
+  breaks the one-column contract the whole renderer rests on, quietly.
+  **Trigger:** the first screenshot or report of a table, diagram or state glyph
+  rendered as replacement characters, tofu, or a ragged column — or the first host
+  whose font we cannot inspect but whose output we can see. The check is cheap when
+  it is wanted (probe the font for the handful of ranges the renderer actually
+  emits, and say which are missing), and it is not worth building until something
+  is actually broken, because unlike the pair the reader can *see* this failure and
+  will tell us.
