@@ -29,6 +29,34 @@ rest can be read. The renderer cannot set them — it does not see the glass. Th
 can, and in an app the host has put them inside an object with a picker, so changing
 the paper under someone else's document is a side effect of choosing a look.
 
+## The stack
+
+Three layers. The rule is that each may use the layer below it and may not redefine
+it.
+
+| layer | kind | what it decides | owner |
+|---|---|---|---|
+| **the pair** — ink and ground | **required** | whether anything can be read at all | everyone, which is to say nobody |
+| **the roles** — the document's colours | **fixed** | what a mark on the page means | the renderer |
+| **the theme** — chrome, ANSI slots, everything the first two do not need | **optional** | what it looks like | the host, then the person |
+
+Read upwards: an option may decorate a requirement, and may not set it. Both defects
+found this week are one inversion of that order — in one app the *theme* owns the
+pair, so a cosmetic choice sets a requirement as a side effect of picking a look; in
+one terminal the pair sits correctly at the bottom and nothing reports whether any of
+its 819 shipped pairs satisfies the layer above.
+
+The rule that follows is checkable, which is the only reason to state it:
+
+> **An option must not consume a requirement.** Adding a choice may not subtract a
+> capability that existed without it.
+
+Test it by enumerating the preconditions — the pair is settable, the roles are not
+remapped, the text is the text — then enabling each option and checking the list
+survives. Every regression of this class fails the same test: an app's terminal losing
+the pair it had as a program; a minimum contrast replacing the program's colours with
+black and white; a picker changing the paper under someone else's document.
+
 ## The claim
 
 **Legibility is not a feature of the interface. It is the precondition for there
@@ -44,6 +72,12 @@ The two values are the **ink** and the **ground**. What a renderer controls is t
 *contrast between them*, never either alone. The figures on a page are its roles;
 the page is the ground; and when that relation inverts, the accents become the
 figures, the prose recedes, and nothing anywhere reports an error.
+
+**If it cannot be read, it does not matter what colour it is.** That is the whole
+doctrine in one line, and it is a slogan unless it carries a test — so it carries
+this one: a page that clears the floor and keeps its order is a page whose colours
+matter; a page that does not is a page whose colours someone is paying for with their
+own attention. The falsifiers at the end of this document are the line's falsifiers.
 
 ## What we measured
 
