@@ -215,8 +215,166 @@ export function configFile(pairs: Pair[] = PAIRS): string {
   return out.join("\n");
 }
 
+// ── The ranking ───────────────────────────────────────────────────────
+//  `share` above is one role ÷ ink — the rule that a rule must not out-shout
+//  the prose it divides. The ranking is that rule lifted to the whole palette,
+//  because the instrument was only ever measuring one member of a set: **a
+//  palette is not a set of colours, it is a ranking**, and the ranking is
+//  expressed as ratios against the ink.
+//
+//  Why it matters, measured 2026-11-01: okuda's coloured roles are fixed hexes,
+//  and prose ships EMPTY so it inherits whatever the terminal calls the
+//  foreground (`src/palette.ts:17-20`). A host that supplies a dimmer ink
+//  therefore changes no colour at all — it moves the prose down the ladder, and
+//  every accent ends up above it. On the tuned pair (`#23272e`/`#c8ccd4`)
+//  heading ÷ ink is 0.95; on atom-one-dark's defaults (`#21252b`/`#abb2bf`) it is
+//  1.26. Nothing got brighter. The ORDER inverted, and that is what reads as
+//  "blown out".
+//
+//  So the reading is a comparison, not an absolute: a pair is judged against the
+//  **reference pair** — the one dogfooded on the glass — and what it reports is
+//  which roles CROSSED the ink. Absolute loudness is a design choice nobody here
+//  has to defend; a change in order is the defect, and it is measurable without
+//  arguing about taste.
+//
+//  The control starts the file: reference against itself reports zero movement.
+//  A detector whose control does not pass first is measuring the detector.
+
+/** The dogfooded pair — rung 8 of `PAIRS`, *"best so far"* on the ground page.
+ *  A parameter, not a truth: `--ref-rung` judges a candidate against another. */
+export const REFERENCE_RUNG = 8;
+
+export function referencePair(n: number = REFERENCE_RUNG): { bg: string; fg: string; name: string } {
+  const p = PAIRS.find((x) => x.n === n) ?? PAIRS[4]!;
+  return { bg: p.bg, fg: p.fg, name: p.name };
+}
+
+export interface RankRow {
+  role: string;
+  hex: string;
+  ratio: number;
+  /** role ÷ ink. Above 1.00 the role is louder than the prose. */
+  over: number;
+}
+
+/** Every palette role's contrast against a ground, as a share of the ink's.
+ *  Pure: a pair in, a ranking out. */
+export function ranking(fg: string, bg: string, palette: Palette = okudaPalette()): RankRow[] {
+  const ink = ratio(fg, bg);
+  return Object.entries(palette)
+    .filter(([, v]) => typeof v === "string" && /^#[0-9a-f]{6}$/i.test(v as string))
+    .map(([role, v]) => {
+      const r = ratio(v as string, bg);
+      return { role, hex: v as string, ratio: r, over: r / ink };
+    });
+}
+
+export interface RankShift extends RankRow {
+  before: number;
+  /** Ranking movement: candidate ÷ reference. 1.00 = unmoved. */
+  moved: number;
+  /** It sat under the ink and now sits over it — the inversion. */
+  crossed: boolean;
+}
+
+/** Two rankings, compared role by role. Pure. */
+export function compareRanking(refPair: { bg: string; fg: string }, candPair: { bg: string; fg: string }): RankShift[] {
+  const before = new Map(ranking(refPair.fg, refPair.bg).map((r) => [r.role, r.over]));
+  return ranking(candPair.fg, candPair.bg)
+    .map((r) => {
+      const b = before.get(r.role) ?? r.over;
+      return { ...r, before: b, moved: r.over / b, crossed: b <= 1 && r.over > 1 };
+    })
+    .sort((a, b) => b.moved - a.moved);
+}
+
+/** The comparison as text: the crossings first (they are the finding), then the
+ *  movement, then the verdict. */
+export function compareText(
+  shifts: RankShift[],
+  refPair: { bg: string; fg: string; name?: string },
+  candPair: { bg: string; fg: string },
+  label?: string,
+): string {
+  const pad = (s: string, n: number): string => s.padEnd(n);
+  const crossed = shifts.filter((r) => r.crossed);
+  const out: string[] = [];
+  out.push(`${label ? label + "\n" : ""}candidate ${candPair.bg} / ${candPair.fg}` +
+    `   reference ${refPair.bg} / ${refPair.fg}${refPair.name ? ` (${refPair.name})` : ""}`);
+  out.push("");
+  out.push(pad("role", 16) + pad("hex", 9) + pad("÷ ink now", 11) + pad("was", 7) + "moved");
+  for (const r of shifts) {
+    const flag = r.crossed ? "  ← crossed the ink" : "";
+    out.push(pad(r.role, 16) + pad(r.hex, 9) + pad(r.over.toFixed(2), 11) + pad(r.before.toFixed(2), 7) + r.moved.toFixed(2) + flag);
+  }
+  out.push("");
+  out.push(
+    crossed.length === 0
+      ? "ranking: HELD — no role crossed the ink."
+      : `ranking: INVERTED — ${crossed.map((r) => `${r.role} ${r.before.toFixed(2)} → ${r.over.toFixed(2)}`).join(", ")}`,
+  );
+  return out.join("\n");
+}
+
+/** A host theme file, read for the pair it supplies. Herdr's `themes/<name>.json`
+ *  carries `background` and `foreground`, which is exactly the surface and the
+ *  ink okuda inherits and cannot see. Returns null when the file does not carry
+ *  a usable pair — a theme for the app's chrome alone has nothing to report. */
+export function themePair(path: string): { bg: string; fg: string } | null {
+  try {
+    const raw = JSON.parse(readFileSync(path, "utf8")) as { background?: unknown; foreground?: unknown };
+    const bg = typeof raw.background === "string" ? raw.background : null;
+    const fg = typeof raw.foreground === "string" ? raw.foreground : null;
+    return bg && fg && /^#[0-9a-f]{6}$/i.test(bg) && /^#[0-9a-f]{6}$/i.test(fg) ? { bg, fg } : null;
+  } catch {
+    return null;
+  }
+}
+
 function main(): void {
-  const json = process.argv.includes("--json");
+  const argv = process.argv.slice(2);
+  const json = argv.includes("--json");
+
+  // ── The ranking reading: a pair in, the palette ranked against its ink out.
+  //    `--theme <file>` is the case this exists for — a host theme supplies the
+  //    ground and the ink, and the document renderer sees neither.
+  const argAfter = (flag: string): string | undefined => {
+    const i = argv.indexOf(flag);
+    return i >= 0 ? argv[i + 1] : undefined;
+  };
+  const themePath = argAfter("--theme");
+  const refRung = Number.parseInt(argAfter("--ref-rung") ?? String(REFERENCE_RUNG), 10) || REFERENCE_RUNG;
+  const refPair = referencePair(refRung);
+  if (argv.includes("--ranking") || themePath !== undefined) {
+    let cand: { bg: string; fg: string } | null = null;
+    if (themePath !== undefined) {
+      cand = themePair(themePath);
+      if (!cand) {
+        console.error(`${themePath}: no usable background/foreground pair — a chrome-only theme has nothing to report.`);
+        process.exitCode = 1;
+        return;
+      }
+    } else {
+      const rung = argAfter("--rung");
+      const named = rung === undefined ? undefined : PAIRS.find((p) => String(p.n) === rung);
+      const bg = argAfter("--bg") ?? named?.bg;
+      const fg = argAfter("--fg") ?? named?.fg;
+      if (!bg || !fg) {
+        console.error("--ranking needs a pair: --bg <hex> --fg <hex>, --rung <n>, or --theme <file>.");
+        process.exitCode = 1;
+        return;
+      }
+      cand = { bg, fg };
+    }
+    const shifts = compareRanking(refPair, cand);
+    if (json) {
+      console.log(JSON.stringify({ reference: refPair, candidate: cand, rows: shifts }, null, 2));
+      return;
+    }
+    console.log(compareText(shifts, refPair, cand, themePath));
+    return;
+  }
+
   const rs = rows();
   if (json) {
     console.log(JSON.stringify(rs, null, 2));
