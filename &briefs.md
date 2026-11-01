@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**8 live · 152 archived · 11 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 3 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**7 live · 153 archived · 11 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 2 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -14,7 +14,6 @@ Nothing waits on these and no Thing records them. The question per row is **what
 |---|---|---|
 | BRF-SEARCH-ROW | 10d | The search row — the contract, frozen by the probe |
 | BRF-PROBES-TIER | 5d | Establish Registered `probes/` Tier for Exploratory Python |
-| BRF-SURFACE-PAIR | -6d | The surface pair — readable, navigable, recognisable |
 
 ### Ticketed, live — the load-bearing set
 

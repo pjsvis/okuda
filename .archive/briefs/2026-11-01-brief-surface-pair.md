@@ -7,7 +7,7 @@ date: 2026-11-01
 # Brief: The surface pair — readable, navigable, recognisable
 
 **Date:** 2026-11-01
-**Status:** Open
+**Status:** Done
 
 ---
 
