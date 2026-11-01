@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-01 | BRF-SURFACE-PAIR | open | The surface pair — readable, navigable, recognisable | 2026-11-01-brief-surface-pair.md |
 | 2026-10-21 | BRF-AUTHORING-CONVENTION | open | Authoring Convention — Route Agents to the Style Guide | 2026-10-21-brief-authoring-convention.md |
 | 2026-10-21 | BRF-PROBES-TIER | open | Establish Registered `probes/` Tier for Exploratory Python Scripts | 2026-10-21-brief-registered-probes-tier.md |
 | 2026-10-16 | BRF-SEARCH-ROW | open | The search row — the contract, frozen by the probe | 2026-10-16-brief-search-row.md |

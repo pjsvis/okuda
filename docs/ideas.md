@@ -102,7 +102,7 @@ The outcome is `open`, `promoted: <callsign>`, or `refused: <why>`.
   silo just adopted — the corpus holds ~1400 occurrences but only **220 are on
   the living surface**, and the protocol's 12 come with a deploy.
 
-- **`ranking-on-a-themed-desktop`** · 2026-11-01 · `colour` · **open**
+- **`ranking-on-a-themed-desktop`** · 2026-11-01 · `colour` · **promoted: BRF-SURFACE-PAIR**
   A theming-first desktop is the stress case this palette has never met. Omarchy
   ships **twenty-two** themes and switches them on one keystroke, and a theme
   styles "the desktop, terminal, neovim, … and the entire Omarchy shell"
