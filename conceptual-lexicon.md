@@ -369,6 +369,8 @@ something was deleted.
     candidate pair; `just check` gates the recommended one. **Failure it names:** a
     page that renders perfectly and cannot be read — inverted by a dimmer ink, or
     ghosted by a light ground — with no error anywhere to say so.
+  * *Renamed 2026-11-01 → **figure and ground**, which is the relation; "the
+    pair" was the count of values and said nothing about what they do.*
   * **Prior art:** `docs/2026-10-28-the-ground-you-read-on.md` (the grounds,
     measured as pairs; `muted` as the binding constraint); Solarized, *Precision,
     symmetry* (`ethanschoonover.com/solarized`, 2011 — palettes defined as
@@ -402,6 +404,46 @@ something was deleted.
     its three exclusions); `AGENTS.md` (*three concerns* — the same shape one level
     up: refusing compositing is also a delegation, and it names the delegate);
     `conceptual-lexicon.md` **TFS** and **the pair**.
+
+* **Figure and ground**: the relation a page is read through. The roles are
+  **figures**; the page is a **ground**; and what a renderer controls is the
+  *contrast between the two*, never either value alone. This is the term **the
+  pair** was reaching for and did not name: a count of two values says nothing
+  about what they do, and what they do is the thing that breaks.
+  * **The failure has a name already: figure–ground reversal.** When the ink dims,
+    the accents become the figures and the prose recedes into ground — measured
+    2026-11-01, `heading` moving from 0.92 to 1.26 of the ink as the ink itself
+    dropped one OKLCH rung. Nothing errors, the document renders, and the page is
+    read as "blown out" by an eye that can feel the inversion and cannot name it.
+    Naming the defect after its known phenomenon means the argument needs no
+    invention — only a measurement.
+  * **The beholder's share, and what it costs.** A reader handed an inverted page
+    does not fail to read; they *supply* the missing order — by leaning in, by
+    narrowing attention, by reaching for the brightness keys. Gombrich's point that
+    the viewer contributes to what is seen becomes, here, an uncompensated debt:
+    the correction is continuous, invisible, and unbilled, which is why the defect
+    can survive decades as a matter of taste. **The design rule that follows: never
+    ask the beholder to supply the invariant.** Declare the pair; do not compensate
+    for it.
+  * **Test:** the two readings (`the pair`'s test) — **readable** (every role
+    painted on the ground clears a floor) and **navigable** (no role that annotates
+    prose out-ranks the ink). Reversal is what the navigable reading detects;
+    extinction is what the readable reading detects. `just surface` answers both.
+  * **Ancestry, and why this entry exists at all.** The lesson arrived without its
+    address: read half a century ago, retained as a habit rather than as a
+    citation — which is *retention working* and *citation failing*, the normal case
+    for anything worth keeping. A lexicon's job is to hand the lesson its address
+    back, so the next reader can go to the source rather than to us.
+  * **Prior art:** **Edgar Rubin (1915)** — the phenomenon: the vase and the two
+    faces, one contour, two readings; the **Gestalt school** (Wertheimer, Koffka,
+    Köhler) — the doctrine that perception organises into figure against ground;
+    **E. H. Gombrich, *Art and Illusion* (1960)** — *schema and correction*, and
+    the **beholder's share**: the viewer's contribution to what is seen, which is
+    the half a bad surface spends. In-repo: `conceptual-lexicon.md` **the pair**
+    (the arithmetic gloss), **the exclusion's precondition** (why the delegation
+    went unwritten); `docs/2026-10-28-the-ground-you-read-on.md`;
+    `debriefs/2026-11-01-debrief-two-readings-one-verdict.md`;
+    `explainers/colours.md`.
 
 ## Register open — the gathering
 
