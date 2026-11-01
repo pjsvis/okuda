@@ -306,6 +306,12 @@ export function surfaceVerdict(
   };
 }
 
+/** Does this pair fail the requirement? The one predicate `--gate` asks, kept
+ *  pure so the check can be tested without a process. */
+export function surfaceFails(v: SurfaceVerdict): boolean {
+  return !(v.readable && v.navigable);
+}
+
 /** The verdict as text: the two readings named, the failures listed, one answer
  *  at the end — because the answer is the thing a person came for. */
 export function surfaceText(v: SurfaceVerdict, refPair: { bg: string; fg: string; name?: string }, label?: string): string {
@@ -371,9 +377,21 @@ export function surfaceText(v: SurfaceVerdict, refPair: { bg: string; fg: string
  *  A parameter, not a truth: `--ref-rung` judges a candidate against another. */
 export const REFERENCE_RUNG = 8;
 
-export function referencePair(n: number = REFERENCE_RUNG): { bg: string; fg: string; name: string } {
-  const p = PAIRS.find((x) => x.n === n) ?? PAIRS[4]!;
+/** The rung, as a pair. */
+function rungPair(p: Pair): { bg: string; fg: string; name: string } {
   return { bg: p.bg, fg: p.fg, name: p.name };
+}
+
+/** **THE PAIR** — the one this silo recommends, named once so a reader does not
+ *  have to know that "rung 8" is the answer. It is the dogfooded ground; every
+ *  host artefact is generated from it (`docs/2026-10-28-ghostty-ground.conf`,
+ *  `just herdr-theme`), and `just check` gates it (BRF-SURFACE-PAIR).
+ *  `referencePair(n)` is the parameterised view, for judging a candidate against
+ *  a *different* rung; the default is this pair and only this pair. */
+export const PAIR = rungPair(PAIRS.find((x) => x.n === REFERENCE_RUNG) ?? PAIRS[4]!);
+
+export function referencePair(n: number = REFERENCE_RUNG): { bg: string; fg: string; name: string } {
+  return n === REFERENCE_RUNG ? PAIR : rungPair(PAIRS.find((x) => x.n === n) ?? PAIRS[4]!);
 }
 
 export interface RankRow {
@@ -486,20 +504,29 @@ function main(): void {
       const named = rung === undefined ? undefined : PAIRS.find((p) => String(p.n) === rung);
       const bg = argAfter("--bg") ?? named?.bg;
       const fg = argAfter("--fg") ?? named?.fg;
+      // `--gate` with no pair is the check `just check` runs: gate the recommended
+      // pair itself, so a role hex that breaks it fails the build rather than a habit.
+      const gateOnly = argv.includes("--gate");
       if (!bg || !fg) {
-        console.error("--ranking needs a pair: --bg <hex> --fg <hex>, --rung <n>, or --theme <file>.");
-        process.exitCode = 1;
-        return;
+        if (!gateOnly) {
+          console.error("--ranking needs a pair: --bg <hex> --fg <hex>, --rung <n>, or --theme <file>.");
+          process.exitCode = 1;
+          return;
+        }
+        cand = { bg: PAIR.bg, fg: PAIR.fg };
+      } else {
+        cand = { bg, fg };
       }
-      cand = { bg, fg };
     }
     if (argv.includes("--surface")) {
       const v = surfaceVerdict(cand, refPair);
       if (json) {
         console.log(JSON.stringify(v, null, 2));
+        if (argv.includes("--gate") && surfaceFails(v)) process.exitCode = 1;
         return;
       }
       console.log(surfaceText(v, refPair, themePath));
+      if (argv.includes("--gate") && surfaceFails(v)) process.exitCode = 1;
       return;
     }
     const shifts = compareRanking(refPair, cand);

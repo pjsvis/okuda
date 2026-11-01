@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { configFile, FLOOR, floor, NOT_ON_GROUND, referencePair, surfaceVerdict } from "../scripts/contrast";
+import { configFile, FLOOR, floor, NOT_ON_GROUND, PAIR, referencePair, surfaceFails, surfaceVerdict } from "../scripts/contrast";
 import { pinSurface } from "../scripts/herdr-theme";
 
 /** BRF-SURFACE-PAIR: two readings, one answer. The control runs first — the
@@ -80,5 +80,20 @@ describe("the surface — the artefacts agree about the pair", () => {
     expect(themed.foreground).toBe(REF.fg);
     // And the pinned pair is the one the reading calls OK.
     expect(surfaceVerdict({ bg: themed.background, fg: themed.foreground! }).readable).toBe(true);
+  });
+});
+
+describe("the surface — the pair is named, and the gate asks one question", () => {
+  test("THE PAIR is the reference, so a reader does not need the rung table", () => {
+    expect(PAIR).toEqual(referencePair());
+    expect(referencePair(8)).toEqual(PAIR);
+    // Another rung is a different judgement, not a different recommendation.
+    expect(referencePair(4)).not.toEqual(PAIR);
+  });
+
+  test("surfaceFails is the gate: the recommended pair passes, the two defects do not", () => {
+    expect(surfaceFails(surfaceVerdict(PAIR))).toBe(false);
+    expect(surfaceFails(surfaceVerdict(ATOM_ONE_DARK))).toBe(true);
+    expect(surfaceFails(surfaceVerdict(WHITE))).toBe(true);
   });
 });

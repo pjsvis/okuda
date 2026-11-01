@@ -30,7 +30,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { compareRanking, compareText, referencePair, REFERENCE_RUNG } from "./contrast";
+import { compareRanking, compareText, PAIR, referencePair } from "./contrast";
 
 export interface HostTheme {
   background: string;
@@ -76,7 +76,7 @@ function main(argv: string[]): number {
   const source = JSON.parse(readFileSync(sourcePath, "utf8")) as HostTheme;
 
   const rung = argAfter("--rung");
-  const ref = referencePair(rung === undefined ? REFERENCE_RUNG : Number.parseInt(rung, 10));
+  const ref = rung === undefined ? PAIR : referencePair(Number.parseInt(rung, 10));
   const pair = { bg: argAfter("--bg") ?? ref.bg, fg: argAfter("--fg") ?? ref.fg };
   const themed = pinSurface(source, pair);
 
