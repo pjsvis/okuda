@@ -151,7 +151,15 @@ describe("the probe — what a machine's config actually states", () => {
   });
 
   test("a commented default states nothing — the kitty-template case", () => {
-    expect(clue("k", "# background #000000\n# foreground #ffffff\n").pair).toBeNull();
+    const c = clue("k", "# background #000000\n# foreground #ffffff\n");
+    expect(c.pair).toBeNull();
+    expect(c.commented).toBe(2); // the menu is there; nothing is selected
+  });
+
+  test("an indented, uncommented pair is the real thing — the pasted-config case", () => {
+    const c = clue("g", "   # background = #282c34\n   background = #221f1c\n   foreground = #d6cfc4\n");
+    expect(c.pair).toEqual({ bg: "#221f1c", fg: "#d6cfc4" });
+    expect(c.commented).toBe(1);
   });
 
   test("a JSON theme reads like the others", () => {

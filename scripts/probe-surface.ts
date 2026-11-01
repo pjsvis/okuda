@@ -36,8 +36,10 @@ export const CANDIDATES = [
   ".config/alacritty/alacritty.yml",
   ".config/kitty/kitty.conf",
   ".config/wezterm/wezterm.lua",
-  // macOS puts Ghostty's config under Application Support, not XDG.
+  // macOS puts Ghostty's config under Application Support, not XDG — and names
+  // the file `config.ghostty`, which is the one a Mac install actually has.
   "Library/Application Support/com.mitchellh.ghostty/config",
+  "Library/Application Support/com.mitchellh.ghostty/config.ghostty",
   // Herdr's themes are a directory; `just themes` audits those.
 ];
 
@@ -49,6 +51,10 @@ export interface Clue {
   pair: { bg: string; fg: string } | null;
   /** Keys that make the effective ground a range. Empty means flat. */
   nonFlat: string[];
+  /** `background`/`foreground` lines present but commented: the menu with nothing
+   *  selected. The most common state of a machine somebody has "done something"
+   *  to and cannot remember what. */
+  commented: number;
 }
 
 /** One config file, read for the pair and the flatness. Pure. Handles the three
@@ -76,7 +82,10 @@ export function clue(path: string, text: string): Clue {
       if (key === "foreground" && fg === null) fg = `#${m[2]!.toLowerCase()}`;
     }
   }
-  return { path, pair: bg && fg ? { bg, fg } : null, nonFlat: [...new Set(nonFlat)] };
+  const commented = text
+    .split("\n")
+    .filter((l) => /^\s*#\s*(background|foreground)\s*[=: ]/.test(l)).length;
+  return { path, pair: bg && fg ? { bg, fg } : null, nonFlat: [...new Set(nonFlat)], commented };
 }
 
 /** Read one candidate locally, or over ssh. Absent files are absent, not errors. */
@@ -128,7 +137,10 @@ function main(argv: string[]): number {
   }
   for (const r of rows) {
     if (!r.pair || !r.verdict) {
-      console.log(`${r.path}\n  present, no pair stated — this machine inherits its terminal's defaults`);
+      console.log(
+        `${r.path}\n  present, no pair stated — this machine inherits its terminal's defaults` +
+          (r.commented > 0 ? `\n  ${r.commented} commented pair line(s): the menu is there, nothing is selected` : ""),
+      );
       continue;
     }
     const v = r.verdict;
