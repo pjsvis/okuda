@@ -1,0 +1,143 @@
+name: release
+
+# What this workflow gates, and what it deliberately does not.
+#
+# `just check` is a SILO gate: it reads the operator's `td` database, the
+# machine's own terminal configs (`contrast.ts --surface`), and a locally built
+# binary (`signature-check.sh`). None of those three exist on a runner, and
+# manufacturing them here would be a second derivation of the gate — the two
+# would drift, which is the failure `scripts/probe-surface.ts:12` already names.
+#
+# CI therefore gates the ARTEFACT: the suite runs, the binary compiles, the card
+# passes its own control, and both tarballs pack. The silo gate stays where the
+# three inputs are.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish to npm (otherwise build and pack only)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    name: gate — the artefact is publishable
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          # DEPENDENCIES.md, Linux row. Pinned so a runner image bump cannot
+          # change the renderer under the test suite quietly.
+          bun-version: "1.4.3"
+
+      - name: the tag names the version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          v="$(bun -e 'console.log(require("./package.json").version)')"
+          if [ "${GITHUB_REF_NAME}" != "v${v}" ]; then
+            echo "tag ${GITHUB_REF_NAME} does not name package.json version ${v}" >&2
+            exit 1
+          fi
+          echo "tag ${GITHUB_REF_NAME} == package.json ${v}"
+
+      # The suite pipes real mermaid fences through the engine, and its
+      # precondition test refuses to pass without one (tests/table-diagram.test.ts
+      # — "stat is not smoke"). Until mermaid-to-md publishes release assets this
+      # is a source build; it is also the strongest available proof that the
+      # build works from a clean machine.
+      - name: mermaid-to-md, built from source
+        run: |
+          git clone --depth 1 https://github.com/pjsvis/mermaid-to-md.git "$RUNNER_TEMP/mermaid-to-md"
+          cargo build --release --manifest-path "$RUNNER_TEMP/mermaid-to-md/Cargo.toml"
+          mkdir -p "$HOME/.local/bin"
+          # Copy, do not link: the wrapper resolves ../target/release relative to
+          # its own path, misses, and falls back to `command -v mermaid-tui`.
+          install -m 755 "$RUNNER_TEMP/mermaid-to-md/target/release/mermaid-tui" "$HOME/.local/bin/mermaid-tui"
+          install -m 755 "$RUNNER_TEMP/mermaid-to-md/scripts/mermaid-to-md.sh" "$HOME/.local/bin/mermaid-to-md"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - run: bun install --frozen-lockfile
+
+      - name: the suite
+        run: bun test
+
+      - name: the binary path still compiles
+        run: |
+          bun build --compile src/cli.ts --outfile okuda
+          ./okuda --version
+
+      - name: the card passes its own control
+        run: sh scripts/tty-card.sh --assert
+
+      - name: both tarballs pack
+        run: |
+          npm pack --dry-run
+          ( cd packages/testcard && npm pack )
+
+      - name: the testcard tarball is runnable out of the box
+        run: |
+          mkdir -p "$RUNNER_TEMP/tc"
+          tar xzf packages/testcard/polyvis-testcard-*.tgz -C "$RUNNER_TEMP/tc"
+          "$RUNNER_TEMP/tc/package/bin/testcard" --assert
+          rm -f packages/testcard/polyvis-testcard-*.tgz
+
+  publish:
+    name: publish — npm, dist-tag from the version
+    needs: gate
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # provenance: the registry signs a statement about which commit and which
+      # workflow produced the bytes. Costs one line and cannot be added later.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.3"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - run: bun install --frozen-lockfile
+
+      # A prerelease published without --tag lands on `latest`, which would make
+      # `npx okuda` resolve to an alpha. The tag is therefore derived from each
+      # package's OWN version rather than remembered, or shared: the card is a
+      # stable 0.1.0 while okuda is an alpha, and a single shared tag would put
+      # the card on `alpha` and leave `latest` unset for it.
+      - name: testcard (only if this version is unpublished)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd packages/testcard
+          v="$(bun -e 'console.log(require("./package.json").version)')"
+          case "$v" in *-*) tag=alpha ;; *) tag=latest ;; esac
+          if npm view "@polyvis/testcard@${v}" version >/dev/null 2>&1; then
+            echo "@polyvis/testcard@${v} is already published — skipping"
+          else
+            echo "publishing @polyvis/testcard@${v} → --tag ${tag}"
+            npm publish --access public --provenance --tag "$tag"
+          fi
+
+      - name: okuda
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          v="$(bun -e 'console.log(require("./package.json").version)')"
+          case "$v" in *-*) tag=alpha ;; *) tag=latest ;; esac
+          echo "publishing okuda@${v} → --tag ${tag}"
+          npm publish --access public --provenance --tag "$tag"
