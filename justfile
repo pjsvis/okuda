@@ -170,6 +170,15 @@ dogfood-colour: colour-smoke
 tty-card *args:
     @sh scripts/tty-card.sh {{args}}
 
+# Published card pack
+[group('quality gate')]
+testcard-pack:
+    @cd packages/testcard && npm pack --silent >/dev/null
+    @rm -rf /tmp/testcard-pack && mkdir -p /tmp/testcard-pack
+    @tar xzf packages/testcard/polyvis-testcard-*.tgz -C /tmp/testcard-pack
+    @/tmp/testcard-pack/package/bin/testcard --assert
+    @rm -rf /tmp/testcard-pack packages/testcard/polyvis-testcard-*.tgz
+
 # Picker instance replay
 [group('quality gate')]
 search-replay *args:

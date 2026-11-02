@@ -146,6 +146,17 @@ Each subject row is a *ramp*, not a solid field, and that is deliberate: a const
 run cannot show sub-cell drift, because every cell is identical and every error
 looks identical too. Put a diagonal in it and one bad cell is a kink.
 
+It is published as `@polyvis/testcard`, so it has an address and a version and a
+bug report can name which card it used — the thing a test card has to have if
+two people are to agree they are looking at the same one:
+
+```sh
+npx @polyvis/testcard
+```
+
+The source never moves: the package copies `scripts/tty-card.sh` at pack time, so
+git keeps the only copy anyone edits.
+
 Below the geometry the card emits two truecolor traps — `#242424` and `#EBEBEB` —
 each invisible on the ground it matches. If your host clamps minimum contrast, both
 become legible. If it does not, exactly one disappears, and you have found the

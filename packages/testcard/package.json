@@ -1,0 +1,33 @@
+{
+  "name": "@polyvis/testcard",
+  "version": "0.1.0",
+  "description": "A card you read, not a suite you run: the surface invariants a byte stream cannot test.",
+  "license": "MIT",
+  "author": "Peter John Smith <729613+pjsvis@users.noreply.github.com>",
+  "homepage": "https://github.com/pjsvis/okuda/blob/main/docs/2026-11-02-the-instrument-card.md",
+  "bugs": {
+    "url": "https://github.com/pjsvis/okuda/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pjsvis/okuda.git",
+    "directory": "packages/testcard"
+  },
+  "bin": {
+    "testcard": "./bin/testcard"
+  },
+  "files": [
+    "bin"
+  ],
+  "keywords": [
+    "terminal",
+    "conformance",
+    "test-card",
+    "glyph-atlas",
+    "contrast",
+    "posix"
+  ],
+  "scripts": {
+    "prepack": "mkdir -p bin && cp ../../scripts/tty-card.sh bin/testcard && chmod +x bin/testcard"
+  }
+}

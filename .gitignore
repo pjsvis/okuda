@@ -42,3 +42,6 @@ todo.txt
 
 # Bun compile temp (left behind by an interrupted or re-run build)
 *.bun-build
+
+# Generated at pack time from scripts/tty-card.sh (packages/testcard)
+packages/*/bin/

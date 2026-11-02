@@ -55,6 +55,13 @@ is the message bus, and a crossing is a copy the receiver commits, declared
 
 This repo is a **silo** — external tool dependencies are inventoried in [`DEPENDENCIES.md`](DEPENDENCIES.md).
 
+One directory here is not okuda's: `packages/testcard/` publishes
+[`@polyvis/testcard`](https://www.npmjs.com/package/@polyvis/testcard), the surface
+conformance card. Its source is `scripts/tty-card.sh`, copied into the package at
+pack time so that git keeps the only copy anyone edits. The account of what it
+measures, and what it replaced, is
+[`docs/2026-11-02-the-instrument-card.md`](docs/2026-11-02-the-instrument-card.md).
+
 ```bash
 just help     # workflow guide
 just orient   # current state
