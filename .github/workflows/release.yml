@@ -153,5 +153,12 @@ jobs:
         run: |
           v="$(bun -e 'console.log(require("./package.json").version)')"
           case "$v" in *-*) tag=alpha ;; *) tag=latest ;; esac
-          echo "publishing okuda@${v} → --tag ${tag}"
-          npm publish --access public --provenance --tag "$tag"
+          if npm view "okuda@${v}" version >/dev/null 2>&1; then
+            # Idempotent on purpose: a bootstrap publish done by hand, or a
+            # re-run of this workflow, must not turn a successful release red
+            # with "cannot publish over the previously published version".
+            echo "okuda@${v} is already published — skipping"
+          else
+            echo "publishing okuda@${v} → --tag ${tag}"
+            npm publish --access public --provenance --tag "$tag"
+          fi
