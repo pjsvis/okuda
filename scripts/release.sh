@@ -96,10 +96,32 @@ cmd_preflight() {
   fi
 }
 
+# A 2FA account prompts once per `npm publish`, and this publishes two packages —
+# two prompts, two thirty-second windows, and the second can expire while the
+# first is still pushing. Ask once, then hand the code to both invocations
+# through npm's own config channel (npm maps `npm_config_otp` to `--otp`), so the
+# script never puts it in argv where `ps` can read it.
+#
+# An OTP is short-lived by design: if the second publish reports EOTP, the code
+# aged out mid-run. Rerun — the first package is skipped as already published.
+ask_otp() {
+  local otp="${npm_config_otp:-${NPM_OTP:-}}"
+  if [ -z "$otp" ] && [ -t 0 ]; then
+    printf 'npm one-time password (6 digits, blank to let npm prompt): ' >&2
+    read -rs otp || otp=""
+    printf '\n' >&2
+  fi
+  if [ -n "$otp" ]; then
+    export npm_config_otp="$otp"
+    say "  using a one-time password for this run (not echoed, not logged)"
+  fi
+}
+
 cmd_publish() {
   say "publish (bootstrap — a human holds the credential here, and only here)"
   npm whoami >/dev/null 2>&1 || die "not logged in to npm; run 'npm login' first (2FA)"
   say "  publishing as $(npm whoami)"
+  ask_otp
 
   for root in "${PACKAGES[@]}"; do
     local name v tag
