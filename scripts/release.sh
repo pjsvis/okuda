@@ -65,7 +65,8 @@ cmd_preflight() {
 
   local branch
   branch=$(git rev-parse --abbrev-ref HEAD)
-  check "[ '$branch' = main ]" "on main (currently $branch)"
+  [ "$branch" = HEAD ] && branch="a detached HEAD"
+  check "[ \"$branch\" = main ]" "on main (currently $branch)"
   check "[ -z \"\$(git status --porcelain)\" ]" "working tree clean"
 
   git fetch --quiet origin 2>/dev/null || true
