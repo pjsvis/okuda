@@ -109,8 +109,22 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          # 24, not 22: Node 22 still bundles npm 10.9.x, and OIDC trusted
+          # publishing needs npm >= 11.5.1. The assertion below names the floor
+          # rather than letting the publish fail as ENEEDAUTH, which reads like
+          # a permissions problem and is not one.
+          node-version: "24"
           registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+
+      - name: the npm floor for OIDC
+        run: |
+          v="$(npm --version)"
+          echo "npm ${v}"
+          if [ "$(printf '%s\n' 11.5.1 "$v" | sort -V | head -1)" != "11.5.1" ]; then
+            echo "npm ${v} is below 11.5.1: OIDC trusted publishing is unavailable." >&2
+            exit 1
+          fi
 
       - run: bun install --frozen-lockfile
 

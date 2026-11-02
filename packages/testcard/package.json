@@ -27,6 +27,9 @@
     "contrast",
     "posix"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "prepack": "mkdir -p bin && cp ../../scripts/tty-card.sh bin/testcard && chmod +x bin/testcard"
   }
