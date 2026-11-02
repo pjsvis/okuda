@@ -165,6 +165,11 @@ dogfood-colour: colour-smoke
     @./okuda src/cli.ts --tui
     @./okuda tmp/colour-smoke.py --tui
 
+# Surface invariant card
+[group('quality gate')]
+tty-card *args:
+    @sh scripts/tty-card.sh {{args}}
+
 # Picker instance replay
 [group('quality gate')]
 search-replay *args:

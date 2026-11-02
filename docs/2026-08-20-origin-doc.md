@@ -4,6 +4,13 @@
 **TD:** td-md-term-viewer
 **Status:** pending[cite: 1]
 
+> **The dependency name below is stale (annotated 2026-11-02).** This brief names
+> `spacex-mermaid`, which is what the renderer was called when it was written. The
+> live dependency is `mermaid-to-md` (`DEPENDENCIES.md`). The name is kept here as
+> written, because a dated record keeps its words; nothing forward-looking should
+> adopt it. This note exists because a reader without the silo's context copied the
+> stale name faithfully into new work.
+
 ## What
 A high-performance terminal markdown viewer built on `Bun.markdown` and compiled to a single binary. It replaces Glow by enforcing clean intra-list line spacing (loose lists), ~~honoring soft returns~~ maintaining terminal-width word wrapping, and piping Mermaid code fences into the existing SpaceX Rust ASCII Mermaid renderer.
 
