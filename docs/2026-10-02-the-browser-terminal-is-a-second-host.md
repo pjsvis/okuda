@@ -56,12 +56,12 @@ host, and every one of them is already discharged by a native terminal:
 
 | Mode | What it buys | Where |
 |------|--------------|-------|
-| `2026h` / `2026l` | atomic frames | `tui.ts:310` |
-| `1049h` / `1049l` | alternate screen | `tui.ts:482` |
-| `25l` / `25h` | cursor hidden | `tui.ts:484` |
-| `1007h` / `1007l` | wheel sends arrows | `tui.ts:530` |
-| `2J` then `H` | clear, then home | `tui.ts:662` |
-| `row;1H` | absolute row address | `tui.ts:665` |
+| `2026h` / `2026l` | atomic frames | `src/tui.ts:411` |
+| `1049h` / `1049l` | alternate screen | `src/tui.ts:739` |
+| `25l` / `25h` | cursor hidden | `src/tui.ts:741` |
+| `1007h` / `1007l` | wheel sends arrows | `src/tui.ts:834` |
+| `2J` then `H` | clear, then home | `src/tui.ts:1010` |
+| `row;1H` | absolute row address | `src/tui.ts:1024` |
 | 24-bit SGR | the palettes | `ansi.ts` |
 | winsize not zero | the true column count | `DEPENDENCIES.md:109` |
 

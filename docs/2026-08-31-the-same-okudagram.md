@@ -16,9 +16,9 @@ started from?
 ## The answer: yes — where "same" means *same composition state*
 
 The backstack records `{ file, scroll }` — the **position, not the
-pixels** (`src/tui.ts:463`). On `u`, `back()` re-reads the source,
+pixels** (`src/tui.ts:855`). On `u`, `back()` re-reads the source,
 re-renders it, and calls `present(fetch, next, prev.scroll)` — which
-runs the returned view through `reanchoredScroll` (tui.ts:512, 200):
+runs the returned view through `reanchoredScroll` (`src/tui.ts:299`, called at `:348`):
 the **eye-proxy anchor** — the non-blank line nearest the viewport
 middle — is re-matched in the fresh layout (bounded text-match first,
 proportional fallback), and the viewport re-anchors to it.
@@ -56,7 +56,7 @@ vocabulary is comfortable.
    *reading state*, redrawn.
 3. **The target vanished** (file deleted while away): `back()` stays
    put and drops the entry — silent, honest degradation
-   (tui.ts:548). The same rule as a dead jump token: the map is
+   (`src/tui.ts:1215`). The same rule as a dead jump token: the map is
    source-derived, and sources can die.
 
 ## The boundary condition that keeps it honest

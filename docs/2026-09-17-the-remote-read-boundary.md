@@ -8,7 +8,7 @@ status: open — nothing is built; the boundary is measured and the recommendati
 # The pipe renders; only a file reads
 
 > ◆ okuda already renders a GitHub file with no change at all — `curl -sL
-> <raw-url> | okuda` works today, through the stdin path at `cli.ts:110`. What a
+> <raw-url> | okuda` works today, through the stdin path at `src/cli.ts:153`. What a
 > pipe cannot do is *read*: no jump, no reload, no resize anchor, no callsign,
 > because every one of those re-reads the document and a stream is consumed once.
 > And the network must not move onto that read path: a warmed remote fetch is
@@ -48,7 +48,7 @@ than a formatter needs to re-read the document, and a stream cannot be re-read:
 | reload (`r`), watch, resize anchor | no | yes |
 | callsign resolution | no | yes, with a root |
 
-`--tui` requires a file outright (`cli.ts:227`), and the reason is structural
+`--tui` requires a file outright (`src/cli.ts:351`), and the reason is structural
 rather than incidental: `rerenderAnchored` re-fetches on every watch, resize and
 reload, and `resolveTarget` maps a vector to a path. **A pipe gets the render; a
 file gets the reader.** Since references are the whole reason to want a remote
