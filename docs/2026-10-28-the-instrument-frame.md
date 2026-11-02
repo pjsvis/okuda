@@ -21,8 +21,8 @@ there is no history to pop.
 
 | what it needs | where it already is |
 |---|---|
-| reading a stream with no file | `src/cli.ts:144` — stdin is rendered when it is not a TTY |
-| naming nothing, honestly | `src/cli.ts:305` — *stdin is anonymous: no name, no header*; absent segments collapse, no placeholder |
+| reading a stream with no file | `src/cli.ts:153` — stdin is rendered when it is not a TTY |
+| naming nothing, honestly | `src/cli.ts:314` — *stdin is anonymous: no name, no header*; absent segments collapse, no placeholder |
 | no filesystem in the render path | `src/render.ts` reads no file: no `existsSync`, no `readFileSync`, no `Bun.file` |
 | coloured code and diagrams without a temp file | chroma and mermaid-to-md take their input on `stdin: "pipe"` and answer on stdout |
 

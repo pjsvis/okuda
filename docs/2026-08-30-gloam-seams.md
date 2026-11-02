@@ -14,9 +14,9 @@ process or a pure function:
 1. **select** — fd/rg → fzf → a path. The launcher loop
    (`src/launcher.ts`) is this seam wrapped in a TUI.
 2. **resolve** — a callsign → a path, via the tier registers
-   (`src/root.ts`, `resolveByCallsign`; dispatch at `src/cli.ts:95`).
+   (`src/root.ts`, `resolveByCallsign`; dispatch at `src/cli.ts:242`).
 3. **render** — markdown → ANSI bytes (`okuda <file>`, and pipe mode:
-   `src/cli.ts:77` — non-TTY stdin is read as the document).
+   `src/cli.ts:153` — non-TTY stdin is read as the document).
 
 Headless gloam is not a feature to build; it is these seams *without the
 loop that binds them*. Most of it exists.
@@ -56,8 +56,8 @@ stateDiagram-v2
 | Seam | Today | Where | Headless? |
 |---|---|---|---|
 | render, file | `okuda <file>` | `src/cli.ts` | yes — bytes to stdout |
-| render, pipe | `cat doc.md \| okuda` | `src/cli.ts:77` | yes — the headless renderer already exists |
-| resolve | `gloam <callsign>` | `src/cli.ts:95` | **no — gated on `stdin.isTTY`** |
+| render, pipe | `cat doc.md \| okuda` | `src/cli.ts:153` | yes — the headless renderer already exists |
+| resolve | `gloam <callsign>` | `src/cli.ts:242` | **no — gated on `stdin.isTTY`** |
 | select | the picker loop | `src/launcher.ts` | **no — loop-bound; `--print-query` machinery exists but is internal** |
 | compose | `reg-menu`, `reg-sync` | `scripts/` | yes — emit markdown / maintain registers |
 | structured API | the registers themselves | `*/INDEX.jsonl` | yes — field-anchored queries, no code needed |

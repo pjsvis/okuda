@@ -63,7 +63,7 @@ message names an act the reader can take. It reads 16 of 24, and the aggregate i
 it splits:
 
 - **9 name only the refusal.** `okuda: unexpected argument: --frobnicate` — the reader does not learn
-  the accepted set, though the `usage:` line at `src/cli.ts:142` already exists. `§14 — no document
+  the accepted set, though the `usage:` line at `src/cli.ts:154` already exists. `§14 — no document
   to render` — the reference failed, or the file is missing, and the string does not say which.
 - **7 name the variable, constraint or object**, so the act is inferable. `--width wants a column
   count of 20 or more, got '9'` gives both the floor and the value it got; `edit: no $EDITOR is set`

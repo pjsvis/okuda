@@ -23,7 +23,7 @@ between a repository and okuda's read path.
 
 ## The question is already answered, and the answer is a pipe
 
-`readSource` (`src/cli.ts:100`) takes a file or, when stdin is not a TTY, the
+`readSource` (`src/cli.ts:143`) takes a file or, when stdin is not a TTY, the
 stream:
 
 ```
@@ -221,7 +221,7 @@ Three probes, all in `tmp/` (scratch, gitignored):
 
 - `docs/2026-09-16-GLoam-github-ssh.md` — the transport-wire doctrine this
   prices (Local Primacy; Git as an asynchronous wire)
-- `src/cli.ts:100` — `readSource`, the file-or-stdin fork; `:110` the stdin path
+- `src/cli.ts:143` — `readSource`, the file-or-stdin fork; `:153` the stdin path
 - `src/tui.ts:461` — the reader's own `readSource`; `:45` `resolveTarget`'s type
 - `src/root.ts:84` — `detectRoot`, what makes a directory a silo
 - `decisions/031-vector-actuator.md` — the resolver closure this would sit behind
