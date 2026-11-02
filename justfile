@@ -170,6 +170,26 @@ dogfood-colour: colour-smoke
 tty-card *args:
     @sh scripts/tty-card.sh {{args}}
 
+# Release preflight
+[group('release')]
+release-preflight:
+    @bash scripts/release.sh preflight
+
+# Release bootstrap publish
+[group('release')]
+release-publish:
+    @bash scripts/release.sh publish
+
+# Release tag push
+[group('release')]
+release-tag:
+    @bash scripts/release.sh tag
+
+# Release registry status
+[group('release')]
+release-status:
+    @bash scripts/release.sh status
+
 # Published card pack
 [group('quality gate')]
 testcard-pack:
