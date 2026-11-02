@@ -1,9 +1,42 @@
 {
   "name": "okuda",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.1.0-alpha.1",
+  "description": "A terminal markdown viewer: loose lists, honoured soft returns, and mermaid fences rendered to ASCII art.",
+  "license": "MIT",
+  "author": "Peter John Smith <729613+pjsvis@users.noreply.github.com>",
+  "homepage": "https://github.com/pjsvis/okuda#readme",
+  "bugs": {
+    "url": "https://github.com/pjsvis/okuda/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pjsvis/okuda.git"
+  },
   "module": "src/cli.ts",
   "type": "module",
+  "bin": {
+    "okuda": "./bin/okuda.ts",
+    "gloam": "./bin/gloam.ts"
+  },
+  "files": [
+    "bin",
+    "src",
+    "LICENSE",
+    "README.md",
+    "DEPENDENCIES.md"
+  ],
+  "engines": {
+    "bun": ">=1.4.0"
+  },
+  "keywords": [
+    "markdown",
+    "terminal",
+    "tui",
+    "renderer",
+    "mermaid",
+    "ascii",
+    "cli"
+  ],
   "scripts": {
     "dev": "bun run src/cli.ts",
     "build": "bun build --compile src/cli.ts --outfile okuda",

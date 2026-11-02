@@ -146,7 +146,22 @@ async function readSource(file: string | null): Promise<string> {
   process.exit(1);
 }
 
-async function main(): Promise<void> {
+/** The mode the entry point declares for itself.
+ *
+ *  A shebang install cannot carry it in the filename: npm's bin symlink is
+ *  resolved by the kernel before the interpreter sees it, so `./gloam` and
+ *  `./okuda` both arrive reporting the real script path (measured 2026-11-02,
+ *  `process.argv0` = `bun`, `argv[1]` = the resolved `.ts`). The compiled
+ *  binary still infers, because `exec -a gloam` and the `just install`
+ *  symlinks do hand it the name — so the declaration is an override, not a
+ *  replacement, and it is a declared choice rather than an inference. */
+export interface MainOptions {
+  /** Announce the gloam mode regardless of argv[0]. */
+  asGloam?: boolean;
+}
+
+export async function main(opts: MainOptions = {}): Promise<void> {
+  const asGloam = opts.asGloam ?? invokedAsGloam();
   const args = parseArgs(process.argv.slice(2));
   // Headless entry-stream printer (ADR-030): the live picker's reload
   // target and the debugging surface. Works under both binary names, no
@@ -156,11 +171,11 @@ async function main(): Promise<void> {
     process.stdout.write(rankedShortlistEntries(args.entries, siloRoot()).join("\n") + "\n");
     return;
   }
-  if (args.grep !== null && (!invokedAsGloam() || !process.stdin.isTTY)) {
+  if (args.grep !== null && (!asGloam || !process.stdin.isTTY)) {
     process.stderr.write("gloam: -g is a gloam mode flag and needs a TTY (invoke as gloam -g <query>)\n");
     process.exit(1);
   }
-  if (!invokedAsGloam() && args.extra.length > 0) {
+  if (!asGloam && args.extra.length > 0) {
     process.stderr.write(`okuda: unexpected argument: ${args.extra[0]}\n`);
     process.exit(1);
   }
@@ -189,7 +204,7 @@ async function main(): Promise<void> {
   // runTui's opts.resolves; the launcher builds the same gate per round
   // — no second composition to drift (the launcher drift, 2026-10-02).
   const silcrowResolves = makeSilcrowGate(args.file ?? undefined, cwd);
-  if (invokedAsGloam() && process.stdin.isTTY) {
+  if (asGloam && process.stdin.isTTY) {
     // `-g <query>`: seed alias (ADR-030 §4) — same as a bare-arg query.
     if (args.grep !== null) {
       await runLauncher({ query: args.grep });
@@ -215,7 +230,7 @@ async function main(): Promise<void> {
   // names no file resolves through the rooted registry — the human code
   // for low-bandwidth channels. Unknown code or unrooted cwd → honest
   // error; anything else falls through to the reader's own diagnostics.
-  if (invokedAsGloam() && args.file && !existsSync(args.file) && CALLSIGN_SHAPE.test(args.file) && process.stdin.isTTY) {
+  if (asGloam && args.file && !existsSync(args.file) && CALLSIGN_SHAPE.test(args.file) && process.stdin.isTTY) {
     const path = root ? resolveByCallsign(args.file, cwd) : null;
     if (!path) {
       process.stderr.write(`gloam: unknown callsign: ${args.file}${root ? "" : " (the silo is not rooted)"}\n`);
