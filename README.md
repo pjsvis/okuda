@@ -4,7 +4,25 @@ L§AB
 
 LEITH §CRIPTORIUM & BOND
 
-A terminal markdown viewer built on `Bun.markdown` and compiled to a single binary. Named for Michael Okuda — high-contrast, functional, uncluttered.
+A terminal markdown viewer built on `Bun.markdown`. Named for Michael Okuda — high-contrast, functional, uncluttered.
+
+## Install
+
+The alpha runs from source under Bun (`>=1.4.0`):
+
+```sh
+bunx okuda README.md
+```
+
+Or compile a single binary, which needs no runtime at all:
+
+```sh
+bun install && bun run build     # → ./okuda
+```
+
+Mermaid fences are piped to the `mermaid-to-md` engine, which is the one external
+dependency and is optional: absent, a fence degrades to a one-line reason instead
+of art, and nothing else changes.
 
 ## Why
 
@@ -22,7 +40,8 @@ In an agentic paired-terminal workflow (agent on the left, live preview on the r
   foreground/background pairs to try is in
   [docs/2026-10-28-the-ground-you-read-on.md](docs/2026-10-28-the-ground-you-read-on.md)
 * **Terminal-width wrapping** — bypassed on raw ASCII diagrams
-* **Zero runtime deps** — a single `bun build --compile` executable
+* **No dependencies of its own** — `bun build --compile` produces one executable;
+  the mermaid engine is the only external, and it is optional
 
 ## Operating principle
 
@@ -36,7 +55,19 @@ The filesystem is the message bus; any tool that writes markdown to a file is al
 
 ## Status
 
-L§AB — the Leith Scriptorium & Bond. Pre-implementation instrument. Design source: [docs/2026-08-20-origin-doc.md](docs/2026-08-20-origin-doc.md) — the *what*. Design rationale: [docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md](docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md) — the *why* (the Derrida gate, the Foxtrot Oscar, and the ventilator).
+**`0.1.0-alpha.1`.** Not pre-implementation: the renderer, the TUI, the launcher and
+the reference graph are here and gated by the test suite. What *alpha* means,
+concretely:
+
+* **Distribution is source.** The npm package ships TypeScript entry points run by
+  Bun (148 kB), not platform binaries. Prebuilt binaries arrive when they earn
+  their keep; the `bin` key is where they will arrive.
+* **Mermaid is a separate engine.** `mermaid-to-md` has no release assets yet, so
+  diagrams are the first thing to fail on a bare machine — loudly, naming the
+  reason, never silently.
+* **Windows is untested.** Nothing in the design excludes it; nobody has run it.
+
+Design source: [docs/2026-08-20-origin-doc.md](docs/2026-08-20-origin-doc.md) — the *what*. Design rationale: [docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md](docs/2026-08-23-why-okuda-derrida-gate-foxtrot-oscar.md) — the *why* (the Derrida gate, the Foxtrot Oscar, and the ventilator).
 
 ## Related silos
 

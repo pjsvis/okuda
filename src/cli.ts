@@ -71,7 +71,17 @@ function readingWidth(declared: number | null): number {
   return declared ?? terminalCols(80);
 }
 
-function parseArgs(argv: string[]): Args {
+/** The one-line usage a first-time reader needs. Each bin states its own
+ *  mode's surface and nothing else: an `okuda -h` that explains `gloam -g
+ *  <query>` is the front door answering a question the visitor did not ask.
+ *  Pure. */
+export function usageLine(asGloam: boolean): string {
+  return asGloam
+    ? "usage: gloam [<query words>] [-g <query>] [--entries <query>]\n       gloam <file>            (the launcher: search → read → loop)\n"
+    : "usage: okuda <file> [--watch] [--tui] [--no-color] [--palette <name>] [--width <cols>] [--no-references]\n       cat doc.md | okuda     (stdin, when it is not a TTY)\n";
+}
+
+function parseArgs(argv: string[], asGloam: boolean): Args {
   const args: Args = { file: null, watch: false, noColor: false, tui: false, palette: null, grep: null, entries: null, width: null, noReferences: false, extra: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
@@ -108,8 +118,7 @@ function parseArgs(argv: string[]): Args {
       args.entries = argv.slice(i + 1).join(" ");
       break;
     } else if (a === "--help" || a === "-h") {
-      process.stdout.write("usage: okuda <file> [--watch] [--tui] [--no-color] [--palette <name>] [--width <cols>] [--no-references]\n");
-      process.stdout.write("       gloam [<query words>] [-g <query>] [--entries <query>]  (live search → read → loop)\n");
+      process.stdout.write(usageLine(asGloam));
       process.exit(0);
     } else if (a === "--version") {
       const sha = typeof BUILD_SHA !== "undefined" ? BUILD_SHA : undefined;
@@ -162,7 +171,7 @@ export interface MainOptions {
 
 export async function main(opts: MainOptions = {}): Promise<void> {
   const asGloam = opts.asGloam ?? invokedAsGloam();
-  const args = parseArgs(process.argv.slice(2));
+  const args = parseArgs(process.argv.slice(2), asGloam);
   // Headless entry-stream printer (ADR-030): the live picker's reload
   // target and the debugging surface. Works under both binary names, no
   // TTY required — fzf spawns it per keystroke. The corpus is the SILO
