@@ -106,13 +106,13 @@ each `present, no pair stated`.
 
 ## Work Plan
 
-1. [ ] `--omarchy` emitter: built-in template in, pinned template out. Pure, with
+1. [x] `--omarchy` emitter: built-in template in, pinned template out. Pure, with
        the placeholder substitution table-tested.
-2. [ ] The install path, carrying the seam sentence — what, where, whose it is.
+2. [x] The install path, carrying the seam sentence — what, where, whose it is.
 3. [ ] Verify by switching a theme: the ground must not move. That is the
        acceptance test, and it is the one the paste-me `.conf` fails.
-4. [ ] Wire the `just surface-probe` verdict so a drifted machine is reported.
-5. [ ] `explainers/colours.md` gains the per-host delivery table.
+4. [x] Wire the `just surface-probe` verdict so a drifted machine is reported.
+5. [x] `explainers/colours.md` gains the per-host delivery table.
 6. [ ] File the Herdr issue.
 7. [ ] `just check` green; `bun test` green.
 
@@ -121,8 +121,18 @@ each `present, no pair stated`.
 - After `just ground --omarchy` and **a theme switch**, `just surface-probe`
   reports the recommended pair and `just surface` returns **readable and
   navigable**.
-- The generated template differs from the built-in in exactly two values, and a
-  test asserts that.
+- The generated template differs from the built-in in exactly **three tokens
+  across six lines**, and a test asserts that.
+  *Amended during execution (2026-11-03):* the criterion said *two values*, and
+  the real template says otherwise. `{{ bright_foreground }}` is spent twice —
+  `cursor-color` **and** `palette = 15` — and a light theme's bright foreground is
+  a *dark* ink: flexoki-light `#100F0F` (1.17:1 on the reference ground),
+  catppuccin-latte `#4c4f69` (2.05:1). Pinning two values would have delivered a
+  dark ground with an invisible cursor and invisible bright-white text in a fence.
+  The third token is measured, not tasted. `{{ muted }}` is the control for the
+  line: a light theme's muted stays legible on a dark ground (`#B7B5AC` 7.98:1,
+  `#acb0be` 7.58:1), so it is **left alone** and a test says why — if that ratio
+  ever falls below the floor, `muted` joins the pin.
 - The built-in template is the emitter's source, never a hand-copied file — a
   test fails if the two drift.
 - No role hex changes, no renderer colour change, no OSC on any path.

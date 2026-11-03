@@ -432,7 +432,11 @@ post:
 # Theme audit
 [group('build')]
 themes *args:
-    @bun scripts/contrast.ts --theme-dir {{args}}
+    #!/usr/bin/env bash
+    # `{{args}}` is re-joined into a shell line, and a word starting with `#` is a
+    # comment there — so `just themes '#ffffff'` lost its argument. `"$@"` keeps
+    # the caller's words whole.
+    exec bun scripts/contrast.ts --theme-dir "$@"
 
 # Surface probe
 [group('build')]
@@ -442,12 +446,14 @@ surface-probe *args:
 # Surface pair
 [group('build')]
 surface *args:
-    @bun scripts/contrast.ts --surface {{args}}
+    #!/usr/bin/env bash
+    exec bun scripts/contrast.ts --surface "$@"
 
 # Palette ranking
 [group('build')]
 ranking *args:
-    @bun scripts/contrast.ts --ranking {{args}}
+    #!/usr/bin/env bash
+    exec bun scripts/contrast.ts --ranking "$@"
 
 # Host theme
 [group('build')]
@@ -501,8 +507,13 @@ contrast:
 
 # Ground pairs, pasteable
 [group('build')]
-ground:
-    @cat docs/2026-10-28-ghostty-ground.conf
+ground *args:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # `--omarchy` is the same pair delivered into the re-themer's own override
+    # instead of a file a human pastes (`scripts/omarchy-theme.ts`).
+    if [[ "${1:-}" == "--omarchy" ]]; then shift; exec bun scripts/omarchy-theme.ts "$@"; fi
+    cat docs/2026-10-28-ghostty-ground.conf
 
 # Ground page
 [group('build')]

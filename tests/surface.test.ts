@@ -139,7 +139,7 @@ describe("the theme directory — two syntaxes, one reading", () => {
 });
 
 describe("the probe — what a machine's config actually states", () => {
-  const { clue } = require("../scripts/probe-surface") as typeof import("../scripts/probe-surface");
+  const { clue, includes } = require("../scripts/probe-surface") as typeof import("../scripts/probe-surface");
 
   test("three shorthands, one reader: ghostty, alacritty toml, kitty conf", () => {
     expect(clue("g", "background = #1d2021\nforeground = #d5c4a1\n").pair).toEqual({ bg: "#1d2021", fg: "#d5c4a1" });
@@ -174,5 +174,25 @@ describe("the probe — what a machine's config actually states", () => {
     expect(flat.nonFlat).toEqual([]);
     const lucent = clue("g", "background = #1d2021\nforeground = #d5c4a1\nbackground-opacity = 0.9\n");
     expect(lucent.nonFlat.length).toBeGreaterThan(0);
+  });
+
+  test("a config that names another file is followed, because that is where the pair lives", () => {
+    // Omarchy's `~/.config/ghostty/config` states no pair at all and includes a
+    // file it regenerates on every theme switch. Reading only the config said
+    // "inherits its terminal's defaults", which was wrong twice over: it does
+    // inherit a pair, and that pair moves. Measured 2026-11-03.
+    const ghostty = [
+      '# Dynamic theme colors',
+      'config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"',
+      "font-size = 12",
+      '# config-file = "~/not-this-one"',
+    ].join("\n");
+    expect(includes(ghostty)).toEqual(["~/.local/state/omarchy/current/theme/ghostty.conf"]);
+    // The `?"` is ghostty's "not an error if absent", not part of the path.
+    expect(includes(ghostty)[0]!.startsWith("?")).toBe(false);
+    // A bare quoted include reads the same way.
+    expect(includes('config-file = "/etc/ghostty/theme"\n')).toEqual(["/etc/ghostty/theme"]);
+    // And a config with no include has nothing to follow.
+    expect(includes("background = #1d2021\n")).toEqual([]);
   });
 });

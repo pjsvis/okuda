@@ -190,6 +190,44 @@ crossing, so it declares itself: what it wrote, where it landed, that the file i
 the receiver's now, and the one line of `settings.json` that selects it. It does
 not select it, because selecting it is the person's act.
 
+## Delivery — where the pair lands, per host
+
+A pinned pair only helps if the thing that moves the surface *re-applies* it.
+That is the difference between a paste and a delivery:
+
+| host | where the pair lands | survives a theme switch? |
+|---|---|---|
+| Ghostty, hand-edited | `~/.config/ghostty/config` → `background` / `foreground` | yes — nothing rewrites it |
+| Ghostty, re-themed desktop | `~/.config/omarchy/themed/ghostty.conf.tpl`, `just ground --omarchy --install` | **yes — re-applied by the very thing that changes the surface** |
+| Herdr UI | `~/.config/herdr-app/themes/gloam.json`, `just herdr-theme --install`, selected by hand | only while the picker is not carrying the pair |
+| anything else | nothing | `just surface-probe` says so, which is the point |
+
+The re-themed case is the one the paste fails. Omarchy regenerates
+`~/.local/state/omarchy/current/theme/ghostty.conf` on every switch from a
+template, so a pair pasted into the terminal's own config wins until the next
+keystroke and then loses **silently** — the ground page's own warning, *two pairs
+do not compare: the later key wins*. The override template is the host's own
+extension point, and it is re-applied by the theme switch, so there is nothing to
+out-run.
+
+**What moves is three tokens, not two.** `{{ background }}`, `{{ foreground }}`,
+and `{{ bright_foreground }}` — the last one because the template spends it twice,
+`cursor-color` **and** `palette = 15`, and a light theme's bright foreground is a
+*dark* ink (flexoki-light `#100F0F` 1.17:1 on the reference ground; catppuccin-latte
+`#4c4f69` 2.05:1). Two tokens would pin a dark ground and leave an invisible cursor
+on it. Substitution is at token level, so the template's own invariant survives —
+`palette = 0` is the ground and `palette = 7` is the ink, in a fence as on the page.
+`{{ muted }}` is deliberately left to the theme, and a test says why: a light
+theme's muted stays legible on a dark ground (`#B7B5AC` 7.98:1), so pinning it would
+be taste. Every hue stays the theme's. **A surface, not a palette.**
+
+**Measured on Omarchy, 2026-11-03.** The active dark theme (ristretto
+`#2c2525` / `#e6d9db`) is already *readable and navigable* — the page is fine on a
+dark desktop, which is why the complaint only arrives with a light one. Against
+flexoki-light, **16 of 21** on-ground roles fall under 3:1; against
+catppuccin-latte, **19**. That is the class a pin removes, and it is why the pin is
+offered rather than argued.
+
 ## The proposals
 
 1. **Pin the pair once, above the themes.** `settings.json` accepts a theme name

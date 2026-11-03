@@ -108,6 +108,47 @@ function readOne(target: string | null, rel: string): string | null {
   }
 }
 
+/** A ghostty `config-file` line names another file, and on a theming-first
+ *  desktop that is where the pair actually lives: Omarchy's `~/.config/ghostty/config`
+ *  states none, and a regenerated theme file behind an include supplies one.
+ *  Reads the directive only — expansion and existence are the caller's business,
+ *  because a missing optional include is a fact about the host, not an error.
+ *  `?"path"` is ghostty's "not an error if absent", so the `?` is dropped and the
+ *  quotes with it. */
+export function includes(text: string): string[] {
+  const out: string[] = [];
+  for (const line of text.split("\n")) {
+    if (/^\s*#/.test(line)) continue;
+    const m = line.match(/^\s*config-file\s*=\s*\??\s*"?([^"]+?)"?\s*$/);
+    if (m?.[1]) out.push(m[1]);
+  }
+  return out;
+}
+
+/** Read an absolute or `~/` path locally, or over ssh. Absent is absent. */
+function readPath(target: string | null, path: string): string | null {
+  if (path.startsWith("~/") && target !== null) {
+    try {
+      return execFileSync("ssh", [target, `cat "$HOME/${path.slice(2)}" 2>/dev/null`], { encoding: "utf8" }) || null;
+    } catch {
+      return null;
+    }
+  }
+  const local = path.startsWith("~/") ? join(homedir(), path.slice(2)) : path;
+  if (target === null) {
+    try {
+      return existsSync(local) ? readFileSync(local, "utf8") : null;
+    } catch {
+      return null;
+    }
+  }
+  try {
+    return execFileSync("ssh", [target, `cat "${path}" 2>/dev/null`], { encoding: "utf8" }) || null;
+  } catch {
+    return null;
+  }
+}
+
 function main(argv: string[]): number {
   const asJson = argv.includes("--json");
   const target = argv.find((a) => !a.startsWith("--")) ?? null;
@@ -116,7 +157,16 @@ function main(argv: string[]): number {
     const text = readOne(target, rel);
     // A file that exists and states no pair is a reading too: that machine inherits
     // its terminal's defaults, which is the most common state in the world.
-    if (text !== null && text !== "") clues.push(clue(rel, text));
+    if (text === null || text === "") continue;
+    clues.push(clue(rel, text));
+    // ...and a file that names another file is not stating a pair either. The
+    // include is followed, because that is where a re-theming desktop puts it;
+    // "inherits its terminal's defaults" was wrong on Omarchy for exactly this
+    // reason (measured 2026-11-03).
+    for (const inc of includes(text)) {
+      const child = readPath(target, inc);
+      if (child !== null && child !== "") clues.push(clue(`${rel} → ${inc}`, child));
+    }
   }
 
   const rows = clues.map((c) => ({
