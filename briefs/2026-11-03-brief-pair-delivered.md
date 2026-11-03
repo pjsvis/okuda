@@ -121,18 +121,33 @@ each `present, no pair stated`.
 - After `just ground --omarchy` and **a theme switch**, `just surface-probe`
   reports the recommended pair and `just surface` returns **readable and
   navigable**.
-- The generated template differs from the built-in in exactly **three tokens
-  across six lines**, and a test asserts that.
+- The generated template differs from the built-in in exactly **four neutral
+  tokens across seven lines**, and a test asserts that.
   *Amended during execution (2026-11-03):* the criterion said *two values*, and
-  the real template says otherwise. `{{ bright_foreground }}` is spent twice —
-  `cursor-color` **and** `palette = 15` — and a light theme's bright foreground is
-  a *dark* ink: flexoki-light `#100F0F` (1.17:1 on the reference ground),
-  catppuccin-latte `#4c4f69` (2.05:1). Pinning two values would have delivered a
-  dark ground with an invisible cursor and invisible bright-white text in a fence.
-  The third token is measured, not tasted. `{{ muted }}` is the control for the
-  line: a light theme's muted stays legible on a dark ground (`#B7B5AC` 7.98:1,
-  `#acb0be` 7.58:1), so it is **left alone** and a test says why — if that ratio
-  ever falls below the floor, `muted` joins the pin.
+  the real template says otherwise. The tokens divide on one line — **the neutral
+  rank is ours, the hues and the selection pair are the theme's** — and two of
+  the four fail in opposite directions:
+
+  - `{{ bright_foreground }}` fails by going **dark**. It is spent twice,
+    `cursor-color` and `palette = 15`, and a light theme's bright foreground is a
+    dark ink: flexoki-light `#100F0F` (1.17:1 on the reference ground),
+    catppuccin-latte `#4c4f69` (2.05:1). Two tokens would pin a dark ground with
+    an invisible cursor on it.
+  - `{{ muted }}` fails by staying **loud**, which this brief's first cut missed:
+    the test it wrote asserted *legibility* for a channel whose requirement is
+    *quietness* (review, 2026-11-03). The channel's measure is `muted ÷ ink`, and
+    every shipped theme holds it at 0.11–0.26 on its own ground; on the pinned
+    dark ground flexoki-light goes to 0.75, catppuccin-latte 0.71, **rose-pine
+    0.95** — dim text at the prose's own loudness. Nothing errors, and the quiet
+    register is gone precisely because the ground was pinned and the rank left
+    behind. Pinning three of four neutrals is the hybrid with no name: own the
+    rank, or recommend a theme instead of delivering a pair.
+
+  The hues (`{{ red }}` … `{{ bright_cyan }}`) and the selection pair stay the
+  theme's. The selection is a self-consistent ground+ink pair whose amplified
+  contrast is the mark's job; okuda has no hex to offer it, so it is left — and
+  that is a decision, not an omission.
+
 - The built-in template is the emitter's source, never a hand-copied file — a
   test fails if the two drift.
 - No role hex changes, no renderer colour change, no OSC on any path.

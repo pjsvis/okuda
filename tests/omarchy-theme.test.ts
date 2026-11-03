@@ -1,16 +1,17 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { changedLines, DEFAULT_SOURCE, PINNED, pinTemplate, pinValues } from "../scripts/omarchy-theme";
-import { FLOOR, PAIR, ratio } from "../scripts/contrast";
+import { FLOOR, okudaPalette, PAIR, ratio } from "../scripts/contrast";
 
 /** BRF-PAIR-DELIVERED: the pair, delivered where it lands.
  *
  *  The control runs first — the reference pair on a template of the real shape
- *  pins three tokens and touches nothing else — because a detector whose control
- *  fails is measuring itself. Then the defect that made the third token necessary
- *  (a light theme's bright foreground is a *dark* ink, and it is both the cursor
- *  and ANSI slot 15), and the near-miss that did *not* earn a pin (`{{ muted }}`),
- *  asserted so the omission is evidence rather than an oversight.
+ *  pins the four neutral tokens and touches nothing else — because a detector
+ *  whose control fails is measuring itself. Then the two defects the neutrals
+ *  exist for, which fail on different axes: `{{ bright_foreground }}` by going
+ *  **dark** (unreadable), and `{{ muted }}` by staying **loud** (unquiet). The
+ *  second was found by review, 2026-11-03: the first cut tested muted's contrast
+ *  and passed it, which is the wrong instrument for a rank channel.
  *
  *  The template below is **the shape, transcribed from the built-in on
  *  2026-11-03, not the source**. The source is the source: `--from` reads it, and
@@ -46,15 +47,34 @@ palette = 15={{ bright_foreground }}
 const LIGHT = [
   { theme: "flexoki-light", background: "#FFFCF0", foreground: "#100F0F", bright_foreground: "#100F0F", muted: "#B7B5AC" },
   { theme: "catppuccin-latte", background: "#eff1f5", foreground: "#4c4f69", bright_foreground: "#4c4f69", muted: "#acb0be" },
+  { theme: "rose-pine", background: "#faf4ed", foreground: "#575279", bright_foreground: "#575279", muted: "#cecacd" },
 ];
 
+/** The dark themes used in actual use, for the same measurement. Their own
+ *  `muted` is already in band, which is why the pin is a *uniformisation* there
+ *  and a repair only on the light class — the correction to the review. */
+const DARK = [
+  { theme: "ristretto", background: "#2c2525", foreground: "#e6d9db", bright_foreground: "#e6d9db", muted: "#72696a" },
+  { theme: "tokyo-night", background: "#1a1b26", foreground: "#a9b1d6", bright_foreground: "#c0caf5", muted: "#414868" },
+  { theme: "nord", background: "#2e3440", foreground: "#d8dee9", bright_foreground: "#d8dee9", muted: "#4c566a" },
+];
+
+/** `muted ÷ ink` — the quiet channel's rank, and the number every shipped theme
+ *  holds at 0.11–0.26 on its own ground (read from the six themes' `colors.toml`
+ *  on the box, 2026-11-03). The band is the reference grounds' own range
+ *  (`docs/2026-10-28-the-ground-you-read-on.md`, the `share` column). */
+const share = (muted: string, bg: string, ink: string): number => ratio(muted, bg) / ratio(ink, bg);
+const QUIET: [number, number] = [0.13, 0.29];
+const inBand = (s: number): boolean => s >= QUIET[0] && s <= QUIET[1];
+
 describe("the pin — the control passes first", () => {
-  test("the reference pair pins three tokens, six occurrences, and nothing else", () => {
+  test("the reference pair pins four neutral tokens, seven occurrences, and nothing else", () => {
     const res = pinTemplate(SHAPE, PAIR);
     expect(res.missing).toEqual([]);
     expect(res.pins.map((p) => [p.token, p.count])).toEqual([
       ["background", 2],
       ["foreground", 2],
+      ["muted", 1],
       ["bright_foreground", 2],
     ]);
     // The hues and the selection pair are the theme's: untouched, byte-identical.
@@ -68,7 +88,6 @@ describe("the pin — the control passes first", () => {
       "blue",
       "magenta",
       "cyan",
-      "muted",
       "bright_red",
       "bright_green",
       "bright_yellow",
@@ -89,9 +108,9 @@ describe("the pin — the control passes first", () => {
     expect(res.text).toContain(`palette = 7=${PAIR.fg}`);
   });
 
-  test("six lines differ between the built-in and the pinned template", () => {
+  test("seven lines differ between the built-in and the pinned template", () => {
     const res = pinTemplate(SHAPE, PAIR);
-    expect(changedLines(SHAPE, res.text).map((l) => l.n)).toEqual([1, 2, 3, 7, 14, 22]);
+    expect(changedLines(SHAPE, res.text).map((l) => l.n)).toEqual([1, 2, 3, 7, 14, 15, 22]);
   });
 });
 
@@ -115,14 +134,44 @@ describe("the third token — the defect it exists for", () => {
   });
 });
 
-describe("the omission — why {{ muted }} is not pinned", () => {
-  test("a light theme's muted stays legible on a dark ground, so pinning it would be taste", () => {
-    // The control for the decision to leave it alone. If this ever fails, `muted`
-    // earns a place in PINNED and the header's rule is wrong, not this test.
+describe("the fourth neutral — the defect that is loudness, not illegibility", () => {
+  test("the control has a defect to catch: on a pinned ground, a light theme's muted leaves the band", () => {
+    // Before the pin. Every one of these themes holds the rank on its *own*
+    // ground; it is the pinned ground that breaks it. If this ever stops failing,
+    // the third neutral stops earning its place and the header's rule is wrong.
     for (const t of LIGHT) {
-      expect(ratio(t.muted, PAIR.bg)).toBeGreaterThanOrEqual(FLOOR);
+      const before = share(t.muted, PAIR.bg, PAIR.fg);
+      expect(inBand(before)).toBe(false);
+      expect(before).toBeGreaterThan(0.7);
     }
-    expect(PINNED).not.toContain("muted" as never);
+    // rose-pine is the near-miss that names the failure: at 0.95 the dim text is
+    // the prose's own loudness, and the page's rule is that above 1.00 a rule
+    // out-shouts what it divides.
+    const rosePine = LIGHT.find((t) => t.theme === "rose-pine")!;
+    expect(share(rosePine.muted, PAIR.bg, PAIR.fg)).toBeGreaterThan(0.9);
+  });
+
+  test("after the pin the quiet register is the palette's own, and inside the band", () => {
+    const pinnedMuted = okudaPalette().muted;
+    expect(pinTemplate(SHAPE, PAIR).pins.find((p) => p.token === "muted")?.value).toBe(pinnedMuted);
+    const after = share(pinnedMuted, PAIR.bg, PAIR.fg);
+    expect(inBand(after)).toBe(true);
+    // 0.20 on the reference ground: `docs/2026-10-28-the-ground-you-read-on.md`.
+    expect(after).toBeGreaterThan(0.18);
+    expect(after).toBeLessThan(0.22);
+    // And it is not a legibility minimum: it is *darker* than a shipped theme's
+    // own dim ink (tokyo-night 1.84:1), which is why contrast was the wrong test.
+    expect(ratio(pinnedMuted, PAIR.bg)).toBeLessThan(3);
+  });
+
+  test("on a dark theme the pin is a uniformisation, not a repair — stated so it is not oversold", () => {
+    // Measured on the pinned ground: ristretto 0.29 (the band's own top edge),
+    // tokyo-night 0.17, nord 0.21. All already quiet, so this is not a repair;
+    // the pin moves each of them to the palette's 0.20, which is the point — one
+    // page, whichever theme is cycling.
+    const seen = DARK.map((t) => share(t.muted, PAIR.bg, PAIR.fg));
+    for (const s of seen) expect(s).toBeLessThanOrEqual(0.30);
+    expect(Math.max(...seen)).toBeGreaterThanOrEqual(0.28); // the edge is real
   });
 });
 
@@ -136,12 +185,16 @@ describe("a template that changed shape is refused, not patched", () => {
     expect(res.text).toContain("{{ bright_fg }}");
   });
 
-  test("the values are the pair, and the bright token takes the ink rather than inventing one", () => {
+  test("the values are the pair plus the palette's quiet ink, and nothing is invented", () => {
     expect(pinValues({ bg: "#221f1c", fg: "#d6cfc4" })).toEqual({
       background: "#221f1c",
       foreground: "#d6cfc4",
+      muted: okudaPalette().muted,
       bright_foreground: "#d6cfc4",
     });
+    // The bright neutral takes the ink rather than a brighter hex: on a ground
+    // this dark the ink already is the brightest text.
+    expect(pinValues({ bg: "#221f1c", fg: "#d6cfc4" }).bright_foreground).toBe("#d6cfc4");
   });
 });
 

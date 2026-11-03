@@ -14,29 +14,44 @@
 //  into a flag: anything okuda asserts competes with the re-themer, and the
 //  competitor loses on the next keystroke.
 //
-//  ## What is pinned, and why it is three tokens and not two
+//  ## What is pinned, and the one rule it settles
 //
-//  `BRF-PAIR-DELIVERED` said "replace `{{ background }}` and `{{ foreground }}`,
-//  leave every `{{ colorN }}` alone". Read against the real template
-//  (`/usr/share/omarchy/default/themed/ghostty.conf.tpl`, 2026-11-03), two is not
-//  enough. The template spends each token in two places:
+//  **The neutral rank is ours; the hues and the selection pair are the theme's.**
+//  The template's eighteen variables divide cleanly on that line: slots 0, 7, 8
+//  and 15 are the figure/ground rank (ground, ink, quiet ink, bright ink), slots
+//  1–6 and 9–14 are the theme's identity, and the selection pair is an attention
+//  mark that is loud on purpose.
 //
-//      background        = {{ background }}        palette = 0={{ background }}
-//      foreground        = {{ foreground }}        palette = 7={{ foreground }}
-//      cursor-color      = {{ bright_foreground }} palette = 15={{ bright_foreground }}
+//  The first cut of this file pinned three of the four neutrals and left
+//  `{{ muted }}` alone on a *legibility* test: a light theme's muted is a light
+//  grey, 7.98:1 on the reference ground, so it reads. That test measured the wrong
+//  axis (review, 2026-11-03). Slot 8's requirement is not legibility, it is
+//  **quietness** — the channel's meaning is `muted ÷ ink`, and every shipped theme
+//  holds it at 0.11–0.26 on its own ground:
 //
-//  so `{{ bright_foreground }}` is both the **cursor** and ANSI slot 15. A light
-//  theme's bright foreground is a *dark* ink — flexoki-light `#100F0F` (1.17:1 on
-//  the reference ground), catppuccin-latte `#4c4f69` (2.05:1) — which on a pinned
-//  dark ground gives an invisible cursor and invisible bright-white text in a
-//  fence. Measured, not supposed: those two are the whole of this third token.
+//      ristretto 0.26 · tokyo-night 0.24 · nord 0.18   (dark)
+//      rose-pine 0.22 · flexoki-light 0.11 · catppuccin-latte 0.27   (light)
 //
-//  `{{ muted }}` is the neighbourhood and is deliberately **left alone**: a light
-//  theme's muted is a light grey (`#B7B5AC` 7.98:1, `#acb0be` 7.58:1 on the same
-//  ground), so it reads fine and pinning it would be taste. The rule this leaves
-//  is checkable: **pin the tokens that can go dark on a dark ground; leave the
-//  ones that stay light.** The hues (`{{ red }}` … `{{ bright_cyan }}`) are the
-//  theme's throughout — this pins a surface, not a palette.
+//  On the pinned dark ground those light themes' muted goes to **0.95 / 0.75 /
+//  0.71** — rose-pine's dim text arrives at the prose's own loudness, and the
+//  page's rule is that above 1.00 a rule out-shouts what it divides
+//  (`docs/2026-10-28-the-ground-you-read-on.md`). Nothing errors; the quiet
+//  register is simply gone, *because* the ground was pinned and the rank left
+//  behind. Pinning three of four neutrals is the hybrid with no name: own the
+//  rank, or recommend a theme instead of delivering a pair.
+//
+//  `{{ muted }}` therefore takes okuda's own quiet ink (`#445566`, 2.14:1 on the
+//  reference ground, share 0.20 — inside every shipped theme's range, and darker
+//  than tokyo-night's 1.84:1). On a dark theme this is close to a no-op; on a
+//  light one it is the repair.
+//
+//  `{{ bright_foreground }}` is the fourth neutral and it is spent twice —
+//  `cursor-color` **and** `palette = 15`. A light theme's bright foreground is a
+//  *dark* ink (flexoki-light `#100F0F` 1.17:1, catppuccin-latte `#4c4f69`
+//  2.05:1), so on a pinned dark ground it is an invisible cursor. Legibility does
+//  bind here, which is why the two directions of the rule are stated separately:
+//  **a neutral may fail by going dark (unreadable) or by staying loud (unquiet);
+//  the hues fail only if the theme's identity fails, and that is the theme's.**
 //
 //  Token-level substitution is also what preserves the template's own invariant
 //  (`palette 0` is the ground, `palette 7` is the ink). Rewriting lines instead
@@ -46,6 +61,7 @@
 //    bun scripts/omarchy-theme.ts                    # the pinned template, on stdout
 //    bun scripts/omarchy-theme.ts --rung 6           # another dogfooded pair
 //    bun scripts/omarchy-theme.ts --bg '#23272e' --fg '#c8ccd4'
+//    bun scripts/omarchy-theme.ts --muted '#5a4f45'   # a different quiet ink
 //    bun scripts/omarchy-theme.ts --from <tpl>       # a copy, e.g. on a Mac
 //    bun scripts/omarchy-theme.ts --diff             # only the lines that moved
 //    bun scripts/omarchy-theme.ts --install          # write the override, say where
@@ -55,7 +71,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
-import { PAIR, referencePair, surfaceText, surfaceVerdict } from "./contrast";
+import { okudaPalette, PAIR, referencePair, surfaceText, surfaceVerdict } from "./contrast";
 
 /** The built-in template Omarchy ships for Ghostty. One per output file, which
  *  is what the override name keys on — not the theme name. */
@@ -64,10 +80,11 @@ export const DEFAULT_SOURCE = "/usr/share/omarchy/default/themed/ghostty.conf.tp
 /** The override that wins over the built-in and is re-applied on every switch. */
 export const DEFAULT_TARGET = join(homedir(), ".config", "omarchy", "themed", "ghostty.conf.tpl");
 
-/** The tokens this pins, in the order the reading names them. The value for each
- *  is a *pair* decision, made below; membership is a measurement decision, made
- *  in the header and re-tested in `tests/omarchy-theme.test.ts`. */
-export const PINNED = ["background", "foreground", "bright_foreground"] as const;
+/** The tokens this pins, in the order the reading names them: **the four neutrals
+ *  that carry the rank** (ANSI 0, 7, 8, 15 — ground, ink, quiet ink, bright ink).
+ *  Membership is the header's rule; the values are below. The hues and the
+ *  selection pair are the theme's and are not here on purpose. */
+export const PINNED = ["background", "foreground", "muted", "bright_foreground"] as const;
 
 export type PinnedToken = (typeof PINNED)[number];
 
@@ -90,15 +107,25 @@ export interface PinnedTemplate {
 
 /** What each token becomes. `bright_foreground` takes the ink, not a brighter
  *  one: on a ground this dark the ink *is* the brightest text, and the theme's
- *  own bright foreground is the value that can be dark (the header's finding). */
-export function pinValues(pair: { bg: string; fg: string }): Record<PinnedToken, string> {
-  return { background: pair.bg, foreground: pair.fg, bright_foreground: pair.fg };
+ *  own bright foreground is the value that can go dark (the header's finding).
+ *  `muted` takes okuda's own quiet ink by default — a *rank* value, share 0.20 on
+ *  the reference ground, which is why it comes from the palette and not from the
+ *  pair. A principal who wants a different quiet register passes `--muted`. */
+export function pinValues(
+  pair: { bg: string; fg: string },
+  muted: string = okudaPalette().muted,
+): Record<PinnedToken, string> {
+  return { background: pair.bg, foreground: pair.fg, muted, bright_foreground: pair.fg };
 }
 
 /** Substitute the pinned tokens and leave every other `{{ … }}` byte-identical.
- *  Pure: template text and a pair in, text and a receipt out. */
-export function pinTemplate(template: string, pair: { bg: string; fg: string }): PinnedTemplate {
-  const values = pinValues(pair);
+ *  Pure: template text, a pair and the quiet ink in; text and a receipt out. */
+export function pinTemplate(
+  template: string,
+  pair: { bg: string; fg: string },
+  muted: string = okudaPalette().muted,
+): PinnedTemplate {
+  const values = pinValues(pair, muted);
   const counts = new Map<PinnedToken, number>();
   const text = template.replace(/\{\{\s*([a-z_]+)\s*\}\}/g, (whole, name: string) => {
     if (!(PINNED as readonly string[]).includes(name)) return whole;
@@ -149,8 +176,9 @@ function main(argv: string[]): number {
   const rung = argAfter("--rung");
   const ref = rung === undefined ? PAIR : referencePair(Number.parseInt(rung, 10));
   const pair = { bg: argAfter("--bg") ?? ref.bg, fg: argAfter("--fg") ?? ref.fg };
+  const muted = argAfter("--muted") ?? okudaPalette().muted;
 
-  const pinned = pinTemplate(source, pair);
+  const pinned = pinTemplate(source, pair, muted);
   if (pinned.missing.length > 0) {
     console.error(
       `${sourcePath}: ${pinned.missing.map((t) => `{{ ${t} }}`).join(", ")} not found in the template.\n` +
@@ -169,7 +197,7 @@ function main(argv: string[]): number {
   }
 
   if (argv.includes("--json")) {
-    console.log(JSON.stringify({ source: sourcePath, pair, pins: pinned.pins, text: pinned.text }, null, 2));
+    console.log(JSON.stringify({ source: sourcePath, pair, muted, pins: pinned.pins, text: pinned.text }, null, 2));
     return 0;
   }
 
@@ -184,7 +212,7 @@ function main(argv: string[]): number {
       `  from ${sourcePath} — neutral ramp pinned to ${pair.bg} / ${pair.fg}` +
         (ref.name ? ` (${ref.name})` : ""),
     );
-    console.log(`  ${pinned.pins.map((p) => `${p.token} ×${p.count}`).join(", ")}; palette 0/7/15 follow`);
+    console.log(`  ${pinned.pins.map((p) => `${p.token} ×${p.count}`).join(", ")}; palette 0/7/8/15 follow`);
     console.log(`  the file is yours now: Omarchy re-applies it on every theme switch;`);
     console.log(`  delete it to let the theme own the surface again`);
     console.log(`  next: switch a theme, then \`just surface-probe\` — it reads the pair back`);

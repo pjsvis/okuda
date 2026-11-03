@@ -210,16 +210,31 @@ do not compare: the later key wins*. The override template is the host's own
 extension point, and it is re-applied by the theme switch, so there is nothing to
 out-run.
 
-**What moves is three tokens, not two.** `{{ background }}`, `{{ foreground }}`,
-and `{{ bright_foreground }}` — the last one because the template spends it twice,
-`cursor-color` **and** `palette = 15`, and a light theme's bright foreground is a
-*dark* ink (flexoki-light `#100F0F` 1.17:1 on the reference ground; catppuccin-latte
-`#4c4f69` 2.05:1). Two tokens would pin a dark ground and leave an invisible cursor
-on it. Substitution is at token level, so the template's own invariant survives —
-`palette = 0` is the ground and `palette = 7` is the ink, in a fence as on the page.
-`{{ muted }}` is deliberately left to the theme, and a test says why: a light
-theme's muted stays legible on a dark ground (`#B7B5AC` 7.98:1), so pinning it would
-be taste. Every hue stays the theme's. **A surface, not a palette.**
+**What moves is the neutral rank — four tokens, seven lines.** ANSI slots 0, 7, 8
+and 15: the ground, the ink, the quiet ink and the bright ink. Slots 1–6 and 9–14
+are the theme's identity and stay; the selection pair stays too, because it is a
+self-consistent ground+ink pair whose extra loudness is the mark's job. **A
+surface, not a palette** — and the line is drawn by role, not by taste.
+
+Two of the four fail in *opposite* directions, which is why the first cut of this
+delivery was wrong:
+
+- `{{ bright_foreground }}` fails by going **dark**. The template spends it twice
+  — `cursor-color` and `palette = 15` — and a light theme's bright foreground *is*
+  a dark ink (flexoki-light `#100F0F` 1.17:1 on the reference ground;
+  catppuccin-latte `#4c4f69` 2.05:1). Pinning only the pair leaves an invisible
+  cursor on a pinned dark ground.
+- `{{ muted }}` fails by staying **loud**. Its requirement is not legibility but
+  rank — `muted ÷ ink`, which every shipped theme holds at **0.11–0.26** on its
+  own ground. Pinned to a dark ground, flexoki-light's muted goes to 0.75,
+  catppuccin-latte's to 0.71, rose-pine's to **0.95**: dim text at the prose's own
+  loudness, the quiet register erased *by* the pin. A contrast test passes all
+  three, which is exactly the wrong instrument — the ground page's own warning,
+  that a ratio ranks nothing and this palette is a ranking.
+
+So `muted` takes okuda's own quiet ink (`#445566`, share 0.20 on the reference
+ground, 2.14:1 — inside every shipped theme's range and darker than tokyo-night's
+1.84:1), and on a dark theme the change is a uniformisation rather than a repair.
 
 **Measured on Omarchy, 2026-11-03.** The active dark theme (ristretto
 `#2c2525` / `#e6d9db`) is already *readable and navigable* — the page is fine on a

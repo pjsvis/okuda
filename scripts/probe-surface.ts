@@ -160,6 +160,9 @@ function main(argv: string[]): number {
     if (text === null || text === "") continue;
     clues.push(clue(rel, text));
     // ...and a file that names another file is not stating a pair either. The
+    // include is followed **one level only**, which is what bounds a cycle: the
+    // included file is never scanned for includes of its own, so a config that
+    // names itself is read twice (a duplicate line) and cannot loop.
     // include is followed, because that is where a re-theming desktop puts it;
     // "inherits its terminal's defaults" was wrong on Omarchy for exactly this
     // reason (measured 2026-11-03).
