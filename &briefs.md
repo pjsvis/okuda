@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**7 live · 154 archived · 11 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 2 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**8 live · 154 archived · 12 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 3 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -14,6 +14,7 @@ Nothing waits on these and no Thing records them. The question per row is **what
 |---|---|---|
 | BRF-SEARCH-ROW | 10d | The search row — the contract, frozen by the probe |
 | BRF-PROBES-TIER | 5d | Establish Registered `probes/` Tier for Exploratory Python |
+| BRF-PAIR-DELIVERED | -8d | The pair, delivered where it lands — the re-themer's own o |
 
 ### Ticketed, live — the load-bearing set
 
@@ -42,6 +43,7 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 | BRF-CITED-JUMP | ✓ landed 2026-10-30 | Cited jump — go to the line, never show it | — |
 | BRF-SILO-STATUS | · open | Silo status — the vitals get a machine face, and a suite gets a status line | — |
 | BRF-SURFACE-PAIR | · open | The surface pair — readable, navigable, recognisable | — |
+| BRF-PAIR-DELIVERED | · open | The pair, delivered where it lands — the re-themer's own override point | — |
 
 ## Ready — specced, next up
 
