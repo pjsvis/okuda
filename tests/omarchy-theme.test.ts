@@ -47,7 +47,11 @@ palette = 15={{ bright_foreground }}
 const LIGHT = [
   { theme: "flexoki-light", background: "#FFFCF0", foreground: "#100F0F", bright_foreground: "#100F0F", muted: "#B7B5AC" },
   { theme: "catppuccin-latte", background: "#eff1f5", foreground: "#4c4f69", bright_foreground: "#4c4f69", muted: "#acb0be" },
-  { theme: "rose-pine", background: "#faf4ed", foreground: "#575279", bright_foreground: "#575279", muted: "#cecacd" },
+  // Named `(dawn)`, because there is a dark rose-pine too and the two are 4× apart
+  // under the same theme name: 0.95 here, 0.30 there (review, 2026-11-03). A reader
+  // meeting both will otherwise assume a bug. The difference is the ground's, not
+  // the theme's — which is the whole finding.
+  { theme: "rose-pine (dawn)", background: "#faf4ed", foreground: "#575279", bright_foreground: "#575279", muted: "#cecacd" },
 ];
 
 /** The dark themes used in actual use, for the same measurement. Their own
@@ -147,7 +151,7 @@ describe("the fourth neutral — the defect that is loudness, not illegibility",
     // rose-pine is the near-miss that names the failure: at 0.95 the dim text is
     // the prose's own loudness, and the page's rule is that above 1.00 a rule
     // out-shouts what it divides.
-    const rosePine = LIGHT.find((t) => t.theme === "rose-pine")!;
+    const rosePine = LIGHT.find((t) => t.theme === "rose-pine (dawn)")!;
     expect(share(rosePine.muted, PAIR.bg, PAIR.fg)).toBeGreaterThan(0.9);
   });
 
@@ -168,7 +172,9 @@ describe("the fourth neutral — the defect that is loudness, not illegibility",
     // Measured on the pinned ground: ristretto 0.29 (the band's own top edge),
     // tokyo-night 0.17, nord 0.21. All already quiet, so this is not a repair;
     // the pin moves each of them to the palette's 0.20, which is the point — one
-    // page, whichever theme is cycling.
+    // page, whichever theme is cycling. The dark rose-pine cross-checks it at
+    // 0.30, a hair over the edge, against its dawn twin's 0.95 — the same theme,
+    // the same muted, a different ground.
     const seen = DARK.map((t) => share(t.muted, PAIR.bg, PAIR.fg));
     for (const s of seen) expect(s).toBeLessThanOrEqual(0.30);
     expect(Math.max(...seen)).toBeGreaterThanOrEqual(0.28); // the edge is real
