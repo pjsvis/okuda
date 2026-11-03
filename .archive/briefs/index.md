@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-03 | BRF-STATED-GROUND | rejected | The stated ground — okuda supplies the surface its palette was drawn for | 2026-11-03-brief-stated-ground.md |
 | 2026-11-01 | BRF-SILO-STATUS | done | Silo status — the vitals get a machine face, and a suite gets a status line | 2026-11-01-brief-silo-status.md |
 | 2026-11-01 | BRF-SURFACE-PAIR | done | The surface pair — readable, navigable, recognisable | 2026-11-01-brief-surface-pair.md |
 | 2026-10-28 | BRF-CITED-JUMP | rejected | Cited jump — the render starts at the line, and never shows it | 2026-10-28-brief-cited-jump.md |

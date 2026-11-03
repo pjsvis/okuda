@@ -151,3 +151,4 @@
 {"file":"2026-10-28-brief-cited-jump.md","date":"2026-10-28","status":"rejected","summary":"Cited jump — the render starts at the line, and never shows it","meta":{},"callsign":"BRF-CITED-JUMP"}
 {"file":"2026-11-01-brief-silo-status.md","date":"2026-11-01","status":"done","summary":"Silo status — the vitals get a machine face, and a suite gets a status line","meta":{},"callsign":"BRF-SILO-STATUS"}
 {"file":"2026-11-01-brief-surface-pair.md","date":"2026-11-01","status":"done","summary":"The surface pair — readable, navigable, recognisable","meta":{},"callsign":"BRF-SURFACE-PAIR"}
+{"file":"2026-11-03-brief-stated-ground.md","date":"2026-11-03","status":"rejected","summary":"The stated ground — okuda supplies the surface its palette was drawn for","meta":{},"callsign":"BRF-STATED-GROUND"}
