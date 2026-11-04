@@ -371,12 +371,23 @@ export function gateFails(rows: GateRow[], referenceRung: number = REFERENCE_RUN
  *  headline, so it prints first when there is one. */
 export function gateText(rows: GateRow[], refPair: { bg: string; fg: string; name?: string }): string {
   const pad = (s: string, n: number): string => s.padEnd(n);
-  const failed = rows.filter((r) => !r.refused && r.fails);
+  // Only the failures the gate *acts* on get a FAILS block: a broken floor
+  // anywhere, and an inverted order on the reference rung. The other inversions
+  // are printed in the table and named in the reading — a "FAILS" heading over a
+  // rung the gate deliberately passes is the report contradicting its own verdict,
+  // and it was misread exactly that way by a sibling session (2026-11-04).
+  const floorFailed = rows.filter((r) => !r.refused && !r.verdict.readable);
+  const reference = rows.find((r) => r.n === REFERENCE_RUNG);
+  const referenceOrderFailed = reference !== undefined && !reference.refused && !reference.verdict.navigable;
   const out: string[] = [];
   out.push(`surface gate — ${rows.filter((r) => !r.refused).length} admissible rung(s) vs ${FLOOR}:1 and the ink`);
-  if (failed.length > 0) {
+  if (floorFailed.length > 0) {
     out.push("");
-    for (const r of failed) out.push(surfaceText(r.verdict, refPair, `${r.n} · ${r.name} — FAILS`));
+    for (const r of floorFailed) out.push(surfaceText(r.verdict, refPair, `${r.n} · ${r.name} — FAILS THE FLOOR`));
+  }
+  if (referenceOrderFailed) {
+    out.push("");
+    out.push(surfaceText(reference.verdict, refPair, `${reference.n} · ${reference.name} — FAILS THE ORDER (the recommended rung)`));
   }
   out.push("");
   out.push(pad("rung", 6) + pad("pair", 20) + pad("readable", 11) + "navigable");
@@ -400,8 +411,8 @@ export function gateText(rows: GateRow[], refPair: { bg: string; fg: string; nam
   }
   out.push(
     gateFailure
-      ? `FAILED — ${failed.filter((r) => !r.verdict.readable).length} rung(s) break the ${FLOOR}:1 floor` +
-          (rows.find((r) => r.n === REFERENCE_RUNG && !r.verdict.navigable) ? `, and the reference rung's order is inverted` : "") +
+      ? `FAILED — ${floorFailed.length} rung(s) break the ${FLOOR}:1 floor` +
+          (referenceOrderFailed ? `, and the recommended rung's order is inverted` : "") +
           "."
       : `OK — the ${FLOOR}:1 floor holds on all ${rows.filter((r) => !r.refused).length} admissible rung(s),` +
           ` and the order holds on the reference rung.`,

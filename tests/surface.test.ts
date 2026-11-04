@@ -223,6 +223,21 @@ describe("the surface gate — every admissible rung, not the recommended one", 
     expect(rows.find((r) => r.n === REFERENCE_RUNG)!.verdict.navigable).toBe(true);
   });
 
+  test("the report never contradicts its own verdict: no FAILS over a rung it passes", () => {
+    // A sibling session read "3 · ink grey, evening only — FAILS" above an "OK"
+    // line and nearly called the tree broken (2026-11-04). The heading now belongs
+    // only to the failures the gate acts on.
+    const text = gateText(rows, referencePair());
+    expect(text).not.toContain("FAILS");
+    expect(text).toContain("the order is inverted on rung(s) 3 (3), 4 (1), 5 (12)");
+    // The floor failure names itself...
+    const broken = gateRows([...PAIRS, { n: 99, name: "invented", bg: "#ffffff", fg: "#000000" }], referencePair());
+    expect(gateText(broken, referencePair())).toContain("99 · invented — FAILS THE FLOOR");
+    // ...and so does an inversion on the rung the gate does assert.
+    const forged = rows.map((r) => (r.n === REFERENCE_RUNG ? { ...r, verdict: { ...r.verdict, navigable: false } } : r));
+    expect(gateText(forged, referencePair())).toContain("FAILS THE ORDER (the recommended rung)");
+  });
+
   test("the defect: a ground where the roles cannot be read fails the gate", () => {
     // The control had to pass before this. A light ground is the measured failure
     // (`just surface --bg '#ffffff'`: 16 of 21 roles under the floor), and it is a
