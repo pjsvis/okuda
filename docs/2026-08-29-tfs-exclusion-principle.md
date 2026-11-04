@@ -12,11 +12,34 @@ The modern developer spends forty-five minutes choosing between *Catppuccin Macc
 
 **The Rule:** The character matrix has near and far, foreground and background. Pick high-contrast, respect whatever palette the terminal emulator is already running, and close the settings tab. We are writing software, not painting a nursery.
 
+> **Amended 2026-11-04 — one theme, and it is ours to define.** *Respect whatever
+> palette the terminal is already running* was the rule before a desktop could
+> re-theme the terminal on a keystroke; measured against a light Omarchy theme it
+> put 16 of 21 on-ground roles under 3:1 (`BRF-PAIR-DELIVERED`). We still refuse
+> *theme-se*, and we accept that legibility needs **a** theme: the pair okuda
+> defines, delivered through the host's own override and re-applied by the thing
+> that changes the surface — so nothing is asserted in the bytes and nothing is
+> left to the theme either (`ADR-GLASS-INK-073`).
+
 ## Fonts: FO
 
 Entire engineering teams now burn sprints debating custom ligatures, geometric sans-serifs, and dynamic font-smoothing engines that chew through 300MB of RAM just to render a bulleted list.
 
 **The Rule:** Your terminal emulator has a font. We render characters to standard out. If you want italics, tilt your head. The renderer does not bundle 40 megabytes of variable OpenType assets to show you a checklist.
+
+> **Amended 2026-11-04 — we reject *font-se*, not a *definition*.** This section's
+> rule was measured and found false in the field: `\vec{g}` emitted U+20D7
+> COMBINING RIGHT ARROW ABOVE, absent from seven of eight monospaced faces, and a
+> fallback cannot position a combining mark over another font's base — so the
+> arrow was drawn *beside* the `g`, in a cell okuda had counted as zero
+> (`BRF-FONT-COVERAGE`, `docs/2026-11-04-font-coverage.md`). "Your terminal
+> emulator has a font" is true; *that it has these glyphs* is not. The exclusion
+> stands where it was aimed — at the tuning, the picker and the ligature debate —
+> and does not extend to a **precondition**. okuda defines a font set (a named
+> recommendation and one named alternative) exactly as it defines one theme, states
+> both as preconditions, and checks both with an instrument the principal runs;
+> the host applies them and the renderer asserts neither. Nothing is bundled, and
+> `just fonts` is what makes the recommendation a reading rather than a taste.
 
 ## Shite: FO
 

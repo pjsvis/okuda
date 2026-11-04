@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-04 | PLY-OMARCHY | canonical | Omarchy playbook — the host that re-themes itself | omarchy-playbook.md |
 | 2026-11-02 | PLY-PUBLISHING | canonical | Two packages, two orders, no remembered dist-tags — what ships, what CI gates, and the four things that were nearly wrong | publishing-playbook.md |
 | 2026-10-12 | PLY-AUTHORING | canonical | The house markdown style, and the comprehension surface that says which affordance carries which content | authoring-playbook.md |
 | 2026-10-12 | PLY-CRAFT | canonical | The craft pass — the comment probe, the surfaces to wander, and the failure modes | craft-playbook.md |
