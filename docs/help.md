@@ -14,6 +14,14 @@ Work cycle: **brief → branch → implement → check → review → debrief**
 - `okuda <file.md> --watch` — re-render on change + resize (streaming canvas)
 - `okuda <file.md> --tui` — control plane: alternate screen, viewport scroll, Gloam footer. Falls back to streaming under `NO_COLOR` / `TERM=dumb` / non-TTY.
 - `cat doc.md | okuda` — stdin piping
+- `okuda <file> --symbols=plain` — the **ASCII repertoire**, for a glass whose face
+  lacks the symbol set: `✓ → [x]`, `≫ → >>`, `⋮ → :`, `∑ → sum`, `π → pi`, `H₂O →
+  H_2O`, and the rest of what `PLAIN_SYMBOLS` maps. Box drawing, block elements,
+  Braille, Latin-1 and General Punctuation are **kept** in both modes — the grid and
+  the address grammar are not the variable. `OKUDA_SYMBOLS=plain` is the set-once
+  form. The mode is always *declared*, never inferred from the font: two machines
+  running the same command produce the same bytes (`BRF-SYMBOL-PLAIN`,
+  `just fonts` tells you whether your face needs it).
 - `okuda <file> --no-color --width <cols>` — the **sink payload**: every hue dropped,
   the glass width declared. For anything that is not a terminal — an e-ink panel, a
   pager writing a fixed page, a pipe with no tty. (Bold and italic survive

@@ -101,16 +101,16 @@ render okuda in any mode, so the flag must not pretend to cover it.
 
 ## Work Plan
 
-1. [ ] The table as a pure map, its keys a **subset of the measured emitted set** —
+1. [x] The table as a pure map, its keys a **subset of the measured emitted set** —
        derived from `just fonts`, not from taste.
-2. [ ] `symbols` threaded beside `color` through `renderDocument`, applied in the
+2. [x] `symbols` threaded beside `color` through `renderDocument`, applied in the
        same pre-pass as the maths, never in a handler.
-3. [ ] Two tests that make the table self-checking: **no dead key**, and **no
+3. [x] Two tests that make the table self-checking: **no dead key**, and **no
        repertoire codepoint left unmapped**. A table that drifts from the corpus
        fails here rather than in a render.
-4. [ ] The 2×2 matrix: colour × symbols, all four legible, no line-break drift
+4. [x] The 2×2 matrix: colour × symbols, all four legible, no line-break drift
        (`--no-color` must not change breaks in either mode).
-5. [ ] Facade, docs, `just fonts` line, `just check`.
+5. [x] Facade, docs, `just fonts` line, `just check`.
 
 ## Acceptance Criteria
 

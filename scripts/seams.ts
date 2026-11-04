@@ -76,6 +76,7 @@ const POLICY: Policy[] = [
   { key: "tui.ts env:OKUDA_FRAME_LOG", rung: "control", why: "the frame trace IS the second instrument — the reading that settled the widening jolt (ADR-WIDENING-LAG-054)" },
   { key: "tui.ts env:TMUX", rung: "declare", why: "presence selects the multiplexer path for a dereference" },
   { key: "width.ts env:FZF_PREVIEW_COLUMNS", rung: "declare", why: "the preview pane hands us its width; its presence means 'you are in a preview'" },
+  { key: "cli.ts env:OKUDA_SYMBOLS", rung: "declare", why: "the symbol repertoire is chosen by the principal and never inferred from the face (BRF-SYMBOL-PLAIN); an ambient default would make the page machine-dependent" },
   // ── tty — the glass. It can lie (Bun's columns=0), so it is never trusted
   //    to a single reading.
   { key: "tui.ts tty:columns", rung: "control", why: "read through terminalSize, whose tput fallback is the independent instrument (src/width.ts:287-306)" },

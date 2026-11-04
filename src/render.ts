@@ -711,7 +711,7 @@ export async function renderDocument(
   // the *only* marker a vector has — so this borrows `roleBold`'s stance (the
   // weight channel survives) rather than `bold`'s (attributes are colour-only).
   const weight = (t: string): string => (styler.mode === "none" ? `\x1b[1m${t}\x1b[0m` : styler.bold(t));
-  const source2a = applyMathGlyphs(source2, (span) => styler.codespan(span), weight);
+  const source2a = applyMathGlyphs(source2, (span) => styler.codespan(span), weight, opts.symbols === "plain");
 
   // Pre-pass 3: intercept mermaid fences → pipe to binary → placeholder tokens.
   const source3 = await interceptMermaid(source2a, opts, ctx);
@@ -1929,6 +1929,88 @@ export function mathGlyphs(
   });
 }
 
+// ── The plain repertoire (BRF-SYMBOL-PLAIN) ──────────────────────────
+
+/** Blocks a terminal face has carried since before terminals were a product:
+ *  Latin-1 (the silcrow, the degree sign, `×`, `±`, `²`) and General Punctuation
+ *  (the em dash, the curly quotes, the bullet). Everything **outside** those two
+ *  is the measured variable, and that boundary is the table's derivation, not its
+ *  taste: `just fonts` reports 64 emitted codepoints, and the faces it has met
+ *  differ only above Latin-1 (`docs/2026-11-04-font-coverage.md`).
+ *
+ *  So plain mode leaves typography and the address grammar alone — a silcrow
+ *  rewritten to `S` would break the thing the page is for — and translates the
+ *  repertoire a poor face lacks: the state vocabulary, the maths, the Greek, the
+ *  super- and subscripts beyond Latin-1, and the accent forms.
+ *
+ *  The table is self-checking against the corpus (`tests/symbols-plain.test.ts`):
+ *  no dead key, and no repertoire codepoint left unmapped. That is what makes a
+ *  hand table admissible here — the specification is the emission, and the table
+ *  is the ASCII it chose. */
+export const PLAIN_SYMBOLS: ReadonlyArray<readonly [string, string]> = [
+  // The state vocabulary — the marks a plan is read by.
+  ["\u2713", "[x]"], // ✓ confirmed
+  ["\u2717", "[ ]"], // ✗ refused
+  ["\u2610", "[ ]"], // ☐ open
+  ["\u25C6", "*"], // ◆ the parked/comment mark
+  ["\u22EE", ":"], // ⋮ the reserved fold
+  ["\u2E2E", "?"], // ⸮ the irony mark
+  // Diagram arrows and triangle heads.
+  ["\u2192", "->"],
+  ["\u27F6", "-->"],
+  ["\u25B6", ">"],
+  ["\u25B8", ">"],
+  ["\u25B2", "^"],
+  ["\u25BC", "v"],
+  // Maths.
+  ["\u2211", "sum"],
+  ["\u221D", "prop."],
+  ["\u2248", "~="],
+  ["\u226B", ">>"],
+  ["\u2264", "<="],
+  ["\u2265", ">="],
+  ["\u2260", "!="],
+  ["\u2208", "in"],
+  ["\u223C", "~"],
+  ["\u221A", "sqrt"],
+  // Greek, transliterated — plain mode is a smaller repertoire, not a quieter one.
+  ["\u03B1", "a"],
+  ["\u03B5", "e"],
+  ["\u03BC", "u"],
+  ["\u03C1", "r"],
+  ["\u03C3", "s"],
+  ["\u03C4", "t"],
+  ["\u03B8", "th"],
+  ["\u03C0", "pi"],
+  ["\u03B6", "z"],
+  ["\u0394", "D"],
+  ["\u03A9", "O"],
+  // Scripts beyond Latin-1 (¹ ² ³ ⁰-in-Latin-1 stay: every face has them).
+  ["\u2070", "^0"],
+  ["\u2074", "^4"],
+  ["\u2075", "^5"],
+  ["\u2077", "^7"],
+  ["\u2082", "_2"],
+  ["\u2083", "_3"],
+  ["\u2090", "_a"],
+  ["\u2093", "_x"],
+  ["\u2098", "_m"],
+  // The accent forms, flattened (the brief's deferred item, taken because plain
+  // mode's promise is a repertoire, not a footnote).
+  ["\u1E41", "m'"],
+  ["\u0307", "'"],
+];
+
+const PLAIN_MAP = new Map(PLAIN_SYMBOLS);
+const RE_PLAIN = new RegExp(`[${PLAIN_SYMBOLS.map(([k]) => k).join("")}]`, "gu");
+
+/** The repertoire in ASCII. Pure. Applied to the segments of a line *outside*
+ *  code spans — a fenced block or a codespan is literal, and a mode that rewrote
+ *  it would be editing the author. */
+export function plainSymbols(text: string): string {
+  return text.replace(RE_PLAIN, (c) => PLAIN_MAP.get(c) ?? c);
+}
+
 // ── The source pass: math outside code ───────────────────────────────
 
 /** A fence marker at the left margin (``` or ~~~, up to three spaces of
@@ -1947,15 +2029,18 @@ function mathOutsideCodeSpans(
   line: string,
   mark?: (span: string) => string,
   weight?: (t: string) => string,
+  plain?: boolean,
 ): string {
   let out = "";
   let last = 0;
   for (const m of line.matchAll(/`+[^`]*`+/g)) {
     const at = m.index ?? 0;
-    out += mathGlyphs(line.slice(last, at), mark, weight) + m[0];
+    const seg = mathGlyphs(line.slice(last, at), mark, weight);
+    out += (plain ? plainSymbols(seg) : seg) + m[0];
     last = at + m[0].length;
   }
-  return out + mathGlyphs(line.slice(last), mark, weight);
+  const tail = mathGlyphs(line.slice(last), mark, weight);
+  return out + (plain ? plainSymbols(tail) : tail);
 }
 
 /** The math pass over a whole source. Fenced blocks and code spans are
@@ -1967,8 +2052,11 @@ export function applyMathGlyphs(
   source: string,
   mark?: (span: string) => string,
   weight?: (t: string) => string,
+  plain?: boolean,
 ): string {
-  if (!source.includes("$")) return source;
+  // A page with no `$` still needs the plain pass: the state vocabulary lives in
+  // tables and plans, not in maths.
+  if (!source.includes("$") && !plain) return source;
   const lines = source.split("\n");
   let fence: string | null = null;
   for (let i = 0; i < lines.length; i++) {
@@ -1979,7 +2067,7 @@ export function applyMathGlyphs(
         fence = open[1]!;
         continue;
       }
-      lines[i] = mathOutsideCodeSpans(line, mark, weight);
+      lines[i] = mathOutsideCodeSpans(line, mark, weight, plain);
     } else if (closesFence(line, fence)) {
       fence = null;
     }

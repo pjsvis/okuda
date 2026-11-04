@@ -8,6 +8,8 @@
  *  - --watch: fs.watch + SIGWINCH re-render, debounced, screen cleared.
  *  - --no-color: same as NO_COLOR (plain text, identical line breaks).
  *  - --palette <name>: named preset (e.g. 'dracula' for glow parity).
+ *  - --symbols=plain: the ASCII repertoire, for a glass whose font lacks the
+ *    symbol set (BRF-SYMBOL-PLAIN). `OKUDA_SYMBOLS=plain` is the set-once form.
  *    Default: okuda (LCARS identity).
  */
 
@@ -34,6 +36,8 @@ interface Args {
   noColor: boolean;
   tui: boolean;
   palette: string | null;
+  /** `rich` (default) or `plain` — a declared repertoire, never inferred. */
+  symbols: "rich" | "plain";
   grep: string | null;
   entries: string | null;
   /** Declared glass width (`--width`), null = ask the terminal. */
@@ -82,7 +86,11 @@ export function usageLine(asGloam: boolean): string {
 }
 
 function parseArgs(argv: string[], asGloam: boolean): Args {
-  const args: Args = { file: null, watch: false, noColor: false, tui: false, palette: null, grep: null, entries: null, width: null, noReferences: false, extra: [] };
+  const args: Args = {
+    file: null, watch: false, noColor: false, tui: false, palette: null,
+    symbols: process.env.OKUDA_SYMBOLS === "plain" ? "plain" : "rich",
+    grep: null, entries: null, width: null, noReferences: false, extra: [],
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
     if (a === "--watch" || a === "-w") args.watch = true;
@@ -100,6 +108,13 @@ function parseArgs(argv: string[], asGloam: boolean): Args {
         process.exit(1);
       }
       args.width = n;
+    } else if (a.startsWith("--symbols=")) {
+      const v = a.slice("--symbols=".length);
+      if (v !== "rich" && v !== "plain") {
+        process.stderr.write(`okuda: --symbols wants rich or plain, got '${v}'\n`);
+        process.exit(1);
+      }
+      args.symbols = v;
     } else if (a === "--palette") {
       args.palette = argv[++i] ?? null;
       if (!args.palette) {
@@ -250,6 +265,7 @@ export async function main(opts: MainOptions = {}): Promise<void> {
       width: terminalCols(80),
       rows: terminalRows(24),
       silo: root?.badge,
+      symbols: args.symbols,
       callsignFor: makeCallsignResolver(cwd),
       // The TUI's fence: the silo root, handed down (BRF-ROOT-CONTAINMENT).
       root: cwd,
@@ -310,6 +326,7 @@ export async function main(opts: MainOptions = {}): Promise<void> {
     const out = await renderDocument(body, {
       width,
       palette,
+      symbols: args.symbols,
       color,
       // stdin (no file argument) is anonymous: no name, no header.
       ...(args.file
@@ -341,6 +358,7 @@ export async function main(opts: MainOptions = {}): Promise<void> {
       width: terminalCols(80),
       rows: terminalRows(24),
       palette,
+      symbols: args.symbols,
       // The TUI's fence: the silo root, handed down (BRF-ROOT-CONTAINMENT).
       root: cwd,
       resolveTarget,

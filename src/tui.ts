@@ -58,6 +58,9 @@ export interface TuiOptions {
   width: number;
   rows: number;
   palette?: Palette;
+  /** The symbol repertoire (`BRF-SYMBOL-PLAIN`): chosen at the door, carried
+   *  down. The TUI never infers it from the face — a mode is declared. */
+  symbols?: "rich" | "plain";
   /** Silo badge (brief: silo-mnemonics). Undefined when unrooted → today's
    *  footer, no silo badge. The renderer paints the string; it learns
    *  nothing about trees or registries. */
@@ -778,7 +781,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  content it describes. 0 until something is rendered. */
   let renderCols = 0;
   const renderLines = async (source: string, width: number): Promise<string[]> => {
-    const out = await renderDocument(source, { width, palette, color });
+    const out = await renderDocument(source, { width, palette, color, symbols: opts.symbols });
     const lines = out.split("\n");
     renderCols = width;
     if (process.env.OKUDA_FRAME_LOG) {
