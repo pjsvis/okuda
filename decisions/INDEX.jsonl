@@ -76,3 +76,4 @@
 {"file":"077-the-arrival-at-the-line.md","date":"2026-10-30","status":"Superseded","summary":"The arrival at the line — an address includes its coordinate, and the jump is a render","meta":{},"callsign":"ADR-ARRIVAL-AT-LINE-077"}
 {"file":"078-the-line-is-prose.md","date":"2026-10-30","status":"Accepted","summary":"The line is prose — the address is the path","meta":{},"callsign":"ADR-LINE-IS-PROSE-078"}
 {"file":"079-authoring-contract.md","date":"2026-11-03","status":"Accepted","summary":"Authoring is a contract, not a style — four things an author is given","meta":{},"callsign":"ADR-AUTHORING-CONTRACT-079"}
+{"file":"080-the-gate-judges-head.md","date":"2026-11-04","status":"Accepted","summary":"A gate judges the record, not the desk — two modes, and the shared index","meta":{},"callsign":"ADR-GATE-JUDGES-HEAD-080"}
