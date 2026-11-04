@@ -87,8 +87,11 @@ made the delivery checkable. Without it, the install would have been a claim.
   escapes, and a remote scan that built *local* paths and spawned one ssh
   connection per font — the run aborted. Both found by running it, not by reading
   it.
-- `just surface --gate` gates the reference rung only. A ladder of rungs would be
-  a check covering a tenth of the claim — recorded before the ladder exists.
+- `just surface --gate` gated the reference rung only — a check covering a tenth of
+  the claim. **Closed 2026-11-04:** it reads every admissible rung now, and the
+  reading it produced on first contact is a finding of its own — the order is
+  inverted on rungs 3, 4 and 5 (3, 1 and 12 roles), so the gate asserts the floor
+  everywhere and the *order* on the reference rung, and prints the rest.
 - **Windows is unmeasured.** There is no Windows box in this silo, so Consolas and
   Cascadia are knowledge, not measurement.
 - **A pinned ground has an aesthetic cost that is now live:** a light desktop gets

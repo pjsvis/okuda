@@ -312,6 +312,103 @@ export function surfaceFails(v: SurfaceVerdict): boolean {
   return !(v.readable && v.navigable);
 }
 
+export interface GateRow {
+  n: number;
+  name: string;
+  pair: { bg: string; fg: string };
+  /** The rung the ground page refuses, with its reason — reported, never gated:
+   *  a pair refused for glare cannot fail a legibility gate meaningfully. */
+  refused?: string;
+  verdict: SurfaceVerdict;
+  fails: boolean;
+}
+
+/** **Every admissible rung, not the reference one.** A gate that checks the rung
+ *  okuda recommends today is a check covering a tenth of the claim: the palette is
+ *  one set of relations and every rung in `PAIRS` is a ground a principal may
+ *  actually sit at. A role hex that breaks rung 3 fails the build here, which is
+ *  the point — the recommended pair is a *sample*, not the surface.
+ *
+ *  Rungs the ground page refuses are carried with their reason and excluded from
+ *  `gateFails`: rung 7 is refused for reading as emitted light, and a legibility
+ *  verdict on it would answer a question nobody asked. Pure. */
+export function gateRows(pairs: Pair[] = PAIRS, refPair: { bg: string; fg: string } = referencePair()): GateRow[] {
+  return pairs.map((p) => {
+    const verdict = surfaceVerdict({ bg: p.bg, fg: p.fg }, refPair);
+    return {
+      n: p.n,
+      name: p.name,
+      pair: { bg: p.bg, fg: p.fg },
+      refused: p.refused,
+      verdict,
+      fails: surfaceFails(verdict),
+    };
+  });
+}
+
+/** The gate's two requirements, and they are deliberately different tests.
+ *
+ *  1. **The floor holds on every admissible rung.** Readability is a floor: a
+ *     palette hex that cannot be read on *any* ground a principal may sit at is
+ *     drift, and it fails the build. This is what "gate every rung" buys.
+ *  2. **The order holds on the recommended rung.** Navigability is not a floor —
+ *     it is a property of the pair you sit at, and the ladder deliberately
+ *     contains dimmer inks whose cost is recorded in its own verdicts. Measured
+ *     2026-11-04: rungs 3, 4 and 5 have accents out-ranking the ink (3, 1 and 12
+ *     roles), so a gate that demanded order everywhere would fail on a document
+ *     nobody has revised yet, and a red build is not a finding. The reference rung
+ *     is the one okuda recommends, so the "blown-out page" failure is caught there.
+ *
+ *  The inverted rungs are *reported*, never hidden — see `gateText`. Pure. */
+export function gateFails(rows: GateRow[], referenceRung: number = REFERENCE_RUNG): boolean {
+  const floorBroken = rows.some((r) => !r.refused && !r.verdict.readable);
+  const ref = rows.find((r) => r.n === referenceRung);
+  const orderBroken = ref !== undefined && !ref.verdict.navigable;
+  return floorBroken || orderBroken;
+}
+
+/** The gate's report: one line per rung, then the count. The failing rung is the
+ *  headline, so it prints first when there is one. */
+export function gateText(rows: GateRow[], refPair: { bg: string; fg: string; name?: string }): string {
+  const pad = (s: string, n: number): string => s.padEnd(n);
+  const failed = rows.filter((r) => !r.refused && r.fails);
+  const out: string[] = [];
+  out.push(`surface gate — ${rows.filter((r) => !r.refused).length} admissible rung(s) vs ${FLOOR}:1 and the ink`);
+  if (failed.length > 0) {
+    out.push("");
+    for (const r of failed) out.push(surfaceText(r.verdict, refPair, `${r.n} · ${r.name} — FAILS`));
+  }
+  out.push("");
+  out.push(pad("rung", 6) + pad("pair", 20) + pad("readable", 11) + "navigable");
+  for (const r of rows) {
+    out.push(
+      pad(String(r.n), 6) +
+        pad(`${r.pair.bg}/${r.pair.fg}`, 20) +
+        pad(r.refused ? "refused" : r.verdict.readable ? "yes" : `NO (${r.verdict.belowFloor.length})`, 11) +
+        (r.refused ? "refused — not gated" : r.verdict.navigable ? "yes" : `NO (${r.verdict.crossed.length})`),
+    );
+  }
+  out.push("");
+  const gateFailure = gateFails(rows);
+  const inverted = rows.filter((r) => !r.refused && !r.verdict.navigable);
+  if (inverted.length > 0) {
+    out.push(
+      `reading: the order is inverted on rung(s) ${inverted.map((r) => `${r.n} (${r.verdict.crossed.length})`).join(", ")}` +
+        ` — not a build failure, because those inks are chosen and their cost is in the page;`,
+    );
+    out.push(`         the reference rung's order is gated (it is the one okuda recommends).`);
+  }
+  out.push(
+    gateFailure
+      ? `FAILED — ${failed.filter((r) => !r.verdict.readable).length} rung(s) break the ${FLOOR}:1 floor` +
+          (rows.find((r) => r.n === REFERENCE_RUNG && !r.verdict.navigable) ? `, and the reference rung's order is inverted` : "") +
+          "."
+      : `OK — the ${FLOOR}:1 floor holds on all ${rows.filter((r) => !r.refused).length} admissible rung(s),` +
+          ` and the order holds on the reference rung.`,
+  );
+  return out.join("\n");
+}
+
 /** The verdict as text: the two readings named, the failures listed, one answer
  *  at the end — because the answer is the thing a person came for. */
 export function surfaceText(v: SurfaceVerdict, refPair: { bg: string; fg: string; name?: string }, label?: string): string {
@@ -612,13 +709,24 @@ function main(): void {
       const named = rung === undefined ? undefined : PAIRS.find((p) => String(p.n) === rung);
       const bg = argAfter("--bg") ?? named?.bg;
       const fg = argAfter("--fg") ?? named?.fg;
-      // `--gate` with no pair is the check `just check` runs: gate the recommended
-      // pair itself, so a role hex that breaks it fails the build rather than a habit.
+      // `--gate` with no pair is the check `just check` runs: gate **every**
+      // admissible rung, so a role hex that breaks any ground a principal may sit
+      // at fails the build rather than a habit. The recommended pair is a sample.
       const gateOnly = argv.includes("--gate");
       if (!bg || !fg) {
         if (!gateOnly) {
           console.error("--ranking needs a pair: --bg <hex> --fg <hex>, --rung <n>, or --theme <file>.");
           process.exitCode = 1;
+          return;
+        }
+        // The whole ladder, not the reference rung. Handled here and returned,
+        // because the loop below is written for one pair.
+        if (argv.includes("--surface")) {
+          const rows = gateRows(PAIRS, refPair);
+          const fails = gateFails(rows);
+          if (json) console.log(JSON.stringify({ reference: refPair, rows }, null, 2));
+          else console.log(gateText(rows, refPair));
+          if (fails) process.exitCode = 1;
           return;
         }
         cand = { bg: PAIR.bg, fg: PAIR.fg };

@@ -110,6 +110,23 @@ method, not a finding: the record is written for an experiment that has not
 finished, and that is the one thing an ADR cannot do (`ADR-PANE-NOT-CANVAS-069`:
 a record written first is a proposal wearing a decision's clothes).
 
+## The ladder, read for order — added 2026-11-04
+
+`just surface --gate` now reads **every** admissible rung, not the recommended one,
+and it reports what the comfort axis could not: on **rung 3 the order is inverted
+on 3 roles, rung 4 on 1, rung 5 on 12** — the accents out-rank the prose, which is
+the failure the eye called *blown out* on Herdr's default pair. The floor (3:1 on
+every on-ground role) holds on all nine admissible rungs, which is why the gate
+still passes: those inks are **chosen**, and this page records their cost in the
+verdicts above.
+
+The gate's two requirements are deliberately different tests. **The floor holds
+everywhere** — a palette hex that cannot be read on any ground is drift and fails
+the build. **The order holds on the reference rung** — that is the ground okuda
+recommends, so the blown-out page is caught where it would be shipped. Inversion
+on the other rungs is printed, never hidden, and never a red build on a decision
+this page already made.
+
 ## The paste block
 
 Two ways, one source. Paste the block below into

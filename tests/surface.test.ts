@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { configFile, FLOOR, floor, NOT_ON_GROUND, PAIR, referencePair, surfaceDir, surfaceDirText, surfaceFails, surfaceVerdict, themePair } from "../scripts/contrast";
+import { configFile, FLOOR, floor, gateFails, gateRows, gateText, NOT_ON_GROUND, PAIR, PAIRS, REFERENCE_RUNG, referencePair, surfaceDir, surfaceDirText, surfaceFails, surfaceVerdict, themePair } from "../scripts/contrast";
 import { pinSurface } from "../scripts/herdr-theme";
 
 /** BRF-SURFACE-PAIR: two readings, one answer. The control runs first — the
@@ -194,5 +194,54 @@ describe("the probe — what a machine's config actually states", () => {
     expect(includes('config-file = "/etc/ghostty/theme"\n')).toEqual(["/etc/ghostty/theme"]);
     // And a config with no include has nothing to follow.
     expect(includes("background = #1d2021\n")).toEqual([]);
+  });
+});
+
+describe("the surface gate — every admissible rung, not the recommended one", () => {
+  const rows = gateRows(PAIRS, referencePair());
+
+  test("the control passes first: the floor holds on every admissible rung", () => {
+    // Nine admissible rungs, one refused (rung 7, glare — refused by its own
+    // ground and corroborated by its rules). The gate fails on a rung whose floor
+    // breaks, which is the drift this exists to catch.
+    expect(rows.filter((r) => r.refused)).toHaveLength(1);
+    expect(rows.filter((r) => !r.refused)).toHaveLength(9);
+    expect(rows.every((r) => r.refused || r.verdict.readable)).toBe(true);
+    expect(gateFails(rows)).toBe(false);
+  });
+
+  test("the inverted rungs are reported, not hidden and not gated", () => {
+    // Measured 2026-11-04: the dimmer inks put accents above the prose. Those
+    // inks are chosen and their cost is written into the ground page, so a red
+    // build would be noise — but silence would be the confident wrong answer.
+    const inverted = rows.filter((r) => !r.refused && !r.verdict.navigable).map((r) => r.n);
+    expect(inverted).toEqual([3, 4, 5]);
+    const text = gateText(rows, referencePair());
+    expect(text).toContain("the order is inverted on rung(s) 3 (3), 4 (1), 5 (12)");
+    expect(text).toContain("OK — the 3:1 floor holds on all 9 admissible rung(s)");
+    // ...and the reference rung's order is still asserted.
+    expect(rows.find((r) => r.n === REFERENCE_RUNG)!.verdict.navigable).toBe(true);
+  });
+
+  test("the defect: a ground where the roles cannot be read fails the gate", () => {
+    // The control had to pass before this. A light ground is the measured failure
+    // (`just surface --bg '#ffffff'`: 16 of 21 roles under the floor), and it is a
+    // rung that is NOT the reference one — which is the whole point of covering all
+    // of them. Dimming the *ink* does not fail the floor: the floor is roles
+    // against the ground, and the ink's cost is the order, tested separately.
+    const broken = gateRows([...PAIRS, { n: 99, name: "invented", bg: "#ffffff", fg: "#000000" }], referencePair());
+    expect(broken.find((r) => r.n === 99)!.verdict.readable).toBe(false);
+    expect(gateFails(broken)).toBe(true);
+  });
+
+  test("the defect: an inverted order on the reference rung fails the gate", () => {
+    // The other half of the requirement — the blown-out page on the ground okuda
+    // actually recommends. Forged so the test does not depend on the palette.
+    const forged = rows.map((r) =>
+      r.n === REFERENCE_RUNG
+        ? { ...r, verdict: { ...r.verdict, navigable: false } }
+        : r,
+    );
+    expect(gateFails(forged)).toBe(true);
   });
 });
