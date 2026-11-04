@@ -445,6 +445,32 @@ something was deleted.
     `debriefs/2026-11-01-debrief-two-readings-one-verdict.md`;
     `explainers/colours.md`.
 
+## Variables to invariants
+
+- **Variables to invariants**: an **external variable** whose owner has no stake
+  in our legibility will be set against us — repeatedly, and each time
+  asymmetrically, because they change it once and we discover it in a render. You
+  do not negotiate with it. You take it at the **host's own extension point**, and
+  it stops being a variable and becomes a substrate we can build on. **Test:** can
+  the host's own mechanism still change it? Yes → an invariant we own. No → we
+  replaced the host, and we have built a **ventilator**. **Acceptance rule —
+  the gain must be a proof, not a dial:** any move that arrives with a flag, an
+  environment variable or a new config file has re-acquired a variable, and it
+  will feel like progress while doing so. **Two instances earned it:** the ground
+  and ink (`ADR-GLASS-INK-073` + `BRF-PAIR-DELIVERED` — delivered into Omarchy's
+  own override template, verified with a live switch to a light theme, ground
+  unmoved) and the character repertoire (`BRF-FONT-COVERAGE`, `BRF-SYMBOL-PLAIN`
+  — measured, bounded, and lowered by a mode rather than inherited from a font).
+  *Prior art:* `docs/2026-10-28-the-ground-you-read-on.md`; the **seam rule**
+  (a crossing declares itself — which is why "at the host's own extension point"
+  and not "in place of it"); **the default shape** (whose boundary conditions the
+  modal solution encodes); `debriefs/2026-11-04-debrief-variables-to-invariants.md`.
+  *Register:* by the inclusion test this term reads **general** — another silo
+  could use it verbatim — and it is recorded here first because this silo paid for
+  it in two fights. Promotion to `system.md`'s lexicon is a separate act.
+
+---
+
 ## Register open — the gathering
 
 This file is deliberately thin on the day it was created. The lexicon it was

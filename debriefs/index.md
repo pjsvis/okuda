@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-04 | DBF-VARIABLES-TO-INVARIANTS | done | Debrief: Two variables taken, and the instrument that caught its author three times | 2026-11-04-debrief-variables-to-invariants.md |
 | 2026-11-01 | DBF-DEREFERENCE-MARK | done | Debrief: The mark that was already decided | 2026-11-01-debrief-the-mark-that-was-already-decided.md |
 | 2026-11-01 | DBF-SILO-STATUS | done | Debrief: The three states a repository can pay | 2026-11-01-debrief-the-three-states-a-repository-can-pay.md |
 | 2026-11-01 | DBF-SURFACE-PAIR | done | Debrief: Two readings, one verdict, and the control that corrected the brief | 2026-11-01-debrief-two-readings-one-verdict.md |
