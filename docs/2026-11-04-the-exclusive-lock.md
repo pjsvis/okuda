@@ -113,15 +113,31 @@ process** — *"One immutable load of models.json"* (`dist/core/model-config.js:
 which is why the change could be made mid-session and takes effect at the next start:
 the same boundary at which the launcher takes effect, so the two halves land together.
 
-**A finding the templates exposed, not fixed:** `omlx` and `openrouter` carried an
-**identical** resolution command before the change — two providers reading one store
-entry. Whether that is a shared proxy credential or a copy-paste is the operator's to
-say; the templates make it visible, and this record does not guess.
+**A duplicate the templates exposed, and what it turned out to be.** `omlx` and
+`openrouter` carried an **identical** resolution command — two providers reading one
+store entry. The templates made it visible; the provider's own configuration explained
+it: `omlx` is a **local** endpoint (`127.0.0.1:8000`) with one local model, and it was
+borrowing the *cloud* credential entry. Not a pass-through for cloud models, but the
+reverse — a local server holding a cloud key's provenance. It now carries `local`, the
+same placeholder its three siblings (`apfel`, `llama`, `ollama`) already carry, so the
+duplicate is gone and no capability was deleted. **No provider resolves a key by
+spawning the store at all** now.
 
 **Retired: the bounded retry loop.** It measured 13/16 failures down to 0/16 and it
 works — but it is one instrument *per caller*. The launcher is one instrument *for the
 session*. That is the same choice this silo makes elsewhere in the week: remove the
 demand rather than satisfy it.
+
+**An interactive alias, and what it is not.** `~/.zshrc` now carries
+`alias pi="$HOME/.pi/agent/bin/pi-env"`, and the wrapper is idempotent — it does
+nothing when the environment already carries credentials — so nesting and repeated
+calls are free. Measured: **0.67 s cold** (29 sequential opens), **0.01 s warm**.
+
+The alias is a convenience and must not be mistaken for the launcher. An alias exists
+only in an interactive shell that sourced the profile; a pane spawned by a desktop or
+a multiplexer inherits no alias, and would reach the bare binary with no credentials.
+The alias saves the human's own terminal from a stale shell — it does not solve the
+pane.
 
 **Still owed: the pane launcher must use it.** Until a pane starts through `pi-env`, a
 provider reading `${…}` fails with an honest message (*environment variable not
