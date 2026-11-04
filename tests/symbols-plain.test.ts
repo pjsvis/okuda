@@ -62,6 +62,19 @@ describe("the plain repertoire — the control first", () => {
   });
 });
 
+describe("the colour modes compose with the repertoire mode", () => {
+  test("`plain` has identical line breaks with and without colour", async () => {
+    // The 2x2 matrix the brief asks for: a mode that moved a line break would put
+    // the sink payload (`--no-color`, fixed width) out of step with the glass.
+    const [colour, none] = await Promise.all([
+      renderDocument(REPERTOIRE, { width: W, color: "truecolor", palette: DRACULA_PALETTE, symbols: "plain" }),
+      renderDocument(REPERTOIRE, { width: W, color: "none", palette: DRACULA_PALETTE, symbols: "plain" }),
+    ]);
+    const breaks = (s: string): string => s.split("\n").map((l) => stripANSI(l)).join("\n");
+    expect(breaks(colour)).toBe(breaks(none));
+  });
+});
+
 describe("the table is self-checking against the vocabulary", () => {
   const keys = new Map(PLAIN_SYMBOLS);
   const values = MATH_GLYPHS.map(([, v]) => v).filter((v) => v.length > 0);

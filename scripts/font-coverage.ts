@@ -60,6 +60,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { stripANSI } from "../src/width.ts";
+import { PLAIN_SYMBOLS } from "../src/render.ts";
 
 /** The pages whose render is the corpus — the repository's own demos, plus the
  *  current index (tables, addresses, rules) and the maths page (maths, tables).
@@ -532,6 +533,14 @@ function textOf(r: Report): string {
     }
     if (r.common.notCommon.length > 20) out.push(`  … and ${r.common.notCommon.length - 20} more (--json)`);
   }
+  out.push("");
+  // The escape hatch, stated where the deficit is: how much of what this machine
+  // cannot draw would plain mode translate (`BRF-SYMBOL-PLAIN`).
+  const translated = r.emitted.filter((e) => PLAIN_SYMBOLS.some(([k]) => k === String.fromCodePoint(e.cp)));
+  out.push(
+    `plain     ${translated.length}/${r.emitted.length} codepoint(s) translate to ASCII (--symbols=plain);` +
+      ` the rest — box drawing, blocks, Braille, Latin-1, punctuation — are kept`,
+  );
   out.push("");
   out.push("boundary: an intersection is a floor for these faces, not a claim about the next one.");
   return out.join("\n");

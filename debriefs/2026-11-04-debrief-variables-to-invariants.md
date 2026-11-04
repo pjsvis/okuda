@@ -101,6 +101,26 @@ made the delivery checkable. Without it, the install would have been a claim.
   the perceptual-emphasis page) landed in the same commit because the derived
   registries hold both halves' rows and cannot be split. Carried, not claimed.
 
+## Built afterwards: the plain repertoire
+
+`BRF-SYMBOL-PLAIN`, landed the same day. `--symbols=plain` / `OKUDA_SYMBOLS=plain`
+translates the repertoire above Latin-1 into ASCII and keeps everything a face has
+carried since before terminals were a product — box drawing, blocks, Braille,
+Latin-1, General Punctuation. **The silcrow stays**: a mark rewritten to `S` would
+break the grammar the page is navigated by, which is the line between a mode and a
+vandal.
+
+Two properties are *tested*, because both would be plausible claims otherwise: rich
+is byte-identical by default (the control runs first), and the substitution
+demonstrably runs before layout — no table row out-runs the rule its own `>>`
+widened. And the table checks itself against the vocabulary both ways: on first run
+it found `≥ ≠ π ζ ⟶` unmapped, codepoints in the glyph table but not yet in the
+corpus. That is the two-way check earning its keep inside a minute.
+
+`just fonts` now ends with the escape hatch: how many of the machine's undrawable
+codepoints plain mode would translate. The instrument names the deficit and the
+remedy in the same breath.
+
 ## What this leaves behind
 
 `scripts/font-coverage.ts` (`just fonts`, two readings, local and over ssh),
