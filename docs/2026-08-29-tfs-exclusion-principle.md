@@ -35,9 +35,10 @@ Entire engineering teams now burn sprints debating custom ligatures, geometric s
 > (`BRF-FONT-COVERAGE`, `docs/2026-11-04-font-coverage.md`). "Your terminal
 > emulator has a font" is true; *that it has these glyphs* is not. The exclusion
 > stands where it was aimed — at the tuning, the picker and the ligature debate —
-> and does not extend to a **precondition**. okuda defines a font set (a named
-> recommendation and one named alternative) exactly as it defines one theme, states
-> both as preconditions, and checks both with an instrument the principal runs;
+> and does not extend to a **precondition**. okuda defines a font set — one
+> recommendation, one alternative, one plain repertoire tier — exactly as it
+> defines one theme, states both as preconditions, and checks both with an
+> instrument the principal runs;
 > the host applies them and the renderer asserts neither. Nothing is bundled, and
 > `just fonts` is what makes the recommendation a reading rather than a taste.
 

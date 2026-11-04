@@ -465,6 +465,14 @@ something was deleted.
   (a crossing declares itself — which is why "at the host's own extension point"
   and not "in place of it"); **the default shape** (whose boundary conditions the
   modal solution encodes); `debriefs/2026-11-04-debrief-variables-to-invariants.md`.
+  **And the class it refuses:** **theme-se** and **font-se** — the tuning,
+  the picker, the ligature debate, *shite*'s siblings under `TFS`
+  (`docs/2026-08-29-tfs-exclusion-principle.md`). TFS excludes the *choice*, never
+  the *definition*: okuda defines one theme and a closed font set of three (one
+  recommendation, one alternative, one plain repertoire tier), states them as
+  preconditions, and checks them; the host applies them. **Test:** if the doctrine
+  ever says *one font*, it will be unmet on the second machine and rot — the set
+  must be closed and finite, or it is a preference wearing a precondition's coat.
   *Register:* by the inclusion test this term reads **general** — another silo
   could use it verbatim — and it is recorded here first because this silo paid for
   it in two fights. Promotion to `system.md`'s lexicon is a separate act.

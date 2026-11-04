@@ -370,7 +370,20 @@ export interface Report {
   families: Family[];
   viaFcList: number;
   viaDirs: number;
-  primary: { family: string; from: string; missing: number[]; covered: number; files: string[] } | null;
+  primary: {
+    family: string;
+    from: string;
+    /** Every style the family ships, intersected — the worst case. */
+    missing: number[];
+    covered: number;
+    /** The most complete single face in the family, and how it differs. A family
+     *  is not one charset: measured 2026-11-04, Menlo Regular draws the grid and
+     *  Menlo Bold does not, so the intersection reports 47/64 where the face a
+     *  reader actually reads prose in reports 61/64. One number would hide that,
+     *  and hiding it is the failure class this instrument exists to catch. */
+    best: { file: string; covered: number; missing: number[] } | null;
+    files: string[];
+  } | null;
   /** The authoring-safe set: common to every terminal-candidate family measured. */
   common: { families: number; ok: number; notCommon: Array<{ cp: number; missingIn: number }> };
 }
@@ -404,11 +417,19 @@ export function report(target: string | null, opts: { family?: string; allFaces?
       // the worst case: a mark absent from the slab you are reading is absent.
       const charset = matched.map((f) => f.charset).reduce(intersectRanges);
       const missing = missingFrom(charset, cps);
+      const scored = measured
+        .filter((f) => names.includes(f.family.split(",")[0]!.trim()))
+        .map((f) => ({ file: f.file.split("/").pop() ?? f.file, miss: missingFrom(f.charset, cps) }))
+        .sort((a, b) => a.miss.length - b.miss.length);
+      const best = scored[0]
+        ? { file: scored[0].file, covered: cps.length - scored[0].miss.length, missing: scored[0].miss }
+        : null;
       primary = {
         family: configured.family,
         from: configured.from,
         missing,
         covered: cps.length - missing.length,
+        best,
         files: matched.flatMap((f) => f.files).map((f) => f.split("/").pop() ?? f),
       };
     }
@@ -480,7 +501,15 @@ function textOf(r: Report): string {
     out.push("          so the glass is using a default this instrument cannot name. Pass --family.");
   } else {
     out.push(`primary   ${r.primary.family}   (from ${r.primary.from})`);
-    out.push(`  covers ${r.primary.covered}/${r.emitted.length}`);
+    const b = r.primary.best;
+    if (b && b.covered > r.primary.covered) {
+      out.push(
+        `  covers ${b.covered}/${r.emitted.length} in ${b.file}; ${r.primary.covered}/${r.emitted.length}` +
+          ` with every style it ships (a style lacks ${r.primary.missing.length - b.missing.length} more)`,
+      );
+    } else {
+      out.push(`  covers ${r.primary.covered}/${r.emitted.length}`);
+    }
     if (r.primary.missing.length === 0) {
       out.push("  nothing missing — the face draws everything we emit.");
     } else {
