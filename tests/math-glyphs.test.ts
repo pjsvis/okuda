@@ -5,6 +5,9 @@ import { displayWidth, stripANSI } from "../src/width";
 
 const W = 100;
 
+/** The weight channel a vector rides on, as the renderer supplies it. */
+const BOLD = (t: string): string => `\x1b[1m${t}\x1b[0m`;
+
 /** Render with colour, then drop the SGR — the text as the eye reads it. */
 async function text(src: string, color: "truecolor" | "none" = "truecolor") {
   const out = await renderDocument(src, { width: W, color, palette: DRACULA_PALETTE });
@@ -181,12 +184,23 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
     });
 
     test("accents are rewrites, and the braces are mandatory", () => {
-      expect(mathGlyphs("$\\vec{v} \\cdot \\vec{B}$")).toBe("v⃗ · B⃗");
+      // A vector is WEIGHT, not a character (ISO 80000-2). U+20D7 COMBINING
+      // RIGHT ARROW ABOVE was the old output and it exists in one of eight
+      // monospaced faces measured; a fallback cannot position a combining mark,
+      // so it was drawn beside the `g` in a cell okuda counted as zero.
+      expect(mathGlyphs("$\\vec{v} \\cdot \\vec{B}$", undefined, BOLD)).toBe(`${BOLD("v")} · ${BOLD("B")}`);
       expect(mathGlyphs("$\\dot{m} = 0$")).toBe("ṁ = 0");
       // No braces, no rewrite: the second gate keeps the span literal rather
-      // than emitting an arrow in front of its operand.
-      expect(mathGlyphs("$\\vec v$")).toBe("$\\vec v$");
+      // than bolding something the author did not mark.
+      expect(mathGlyphs("$\\vec v$", undefined, BOLD)).toBe("$\\vec v$");
       expect(mathGlyphs("$\\dot m$")).toBe("$\\dot m$");
+    });
+
+    test("a vector with no weight channel is plain, never a broken glyph", () => {
+      // The renderer always supplies one; a pure caller may not. The degrade is
+      // to read the symbol, not to emit a mark with no host.
+      expect(mathGlyphs("$\\vec{g}$")).toBe("g");
+      expect(mathGlyphs("$\\vec{g}$")).not.toContain("\u20d7");
     });
 
     test("a function name keeps its word gap", () => {
@@ -196,7 +210,7 @@ describe("math glyphs — the pure pass (BRF-MATH-GLYPHS)", () => {
     });
 
     test("a governing equation now resolves whole", () => {
-      expect(mathGlyphs("$\\sum \\vec{F}_{\\text{int}} = 0$")).toBe("∑F⃗_int = 0");
+      expect(mathGlyphs("$\\sum \\vec{F}_{\\text{int}} = 0$", undefined, BOLD)).toBe(`∑${BOLD("F")}_int = 0`);
       expect(mathGlyphs("$\\tau_{gg} = \\frac{3\\mu}{2R^3}(I_{\\text{max}} - I_{\\text{min}})\\sin(2\\theta)$"))
         .toBe("τ_gg = 3μ/(2R³)(I_max - I_min)sin(2θ)");
     });
@@ -252,6 +266,28 @@ describe("math glyphs — in the render", () => {
     expect(plain).toBe(colour);
     expect(plain).toContain("Δt");
     expect(plain).toContain("$\\oint$");
+  });
+
+  test("a vector is bold in the render, one column wide, and carries no combining mark", async () => {
+    const out = await renderDocument("The pull is $(\\vec{g})$ from here.", {
+      width: W,
+      color: "truecolor",
+      palette: DRACULA_PALETTE,
+    });
+    // The weight is the whole notation: no U+20D7, no extra cell.
+    expect(out).not.toContain("\u20d7");
+    expect(out).toContain("\x1b[1mg\x1b[0m");
+    // One column for the operand, so the closing paren sits where arithmetic says.
+    expect(stripANSI(out)).toContain("(g)");
+  });
+
+  test("the vector weight survives NO_COLOR — it is the only marker it has", async () => {
+    // `styler.bold` is identity under none mode; the call site borrows
+    // roleBold's stance instead, because a vector with no weight is a scalar.
+    const src = "The pull is $(\\vec{g})$ from here.";
+    const plain = await renderDocument(src, { width: W, color: "none", palette: DRACULA_PALETTE });
+    expect(plain).toContain("\x1b[1mg\x1b[0m");
+    expect(stripANSI(plain)).toContain("(g)");
   });
 
   test("a declined span is painted in the source register, and the text is unchanged", async () => {

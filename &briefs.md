@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**8 live · 154 archived · 12 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 3 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**11 live · 154 archived · 15 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 6 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -14,7 +14,10 @@ Nothing waits on these and no Thing records them. The question per row is **what
 |---|---|---|
 | BRF-SEARCH-ROW | 10d | The search row — the contract, frozen by the probe |
 | BRF-PROBES-TIER | 5d | Establish Registered `probes/` Tier for Exploratory Python |
+| BRF-CHOICE-LIST | -8d | The choice list — a document that is a setting, and the ac |
 | BRF-PAIR-DELIVERED | -8d | The pair, delivered where it lands — the re-themer's own o |
+| BRF-FONT-COVERAGE | -9d | The codepoints we emit, against the fonts that must draw t |
+| BRF-SYMBOL-PLAIN | -9d | The repertoire, and the plain mode for a host that cannot  |
 
 ### Ticketed, live — the load-bearing set
 
@@ -44,6 +47,9 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 | BRF-SILO-STATUS | · open | Silo status — the vitals get a machine face, and a suite gets a status line | — |
 | BRF-SURFACE-PAIR | · open | The surface pair — readable, navigable, recognisable | — |
 | BRF-PAIR-DELIVERED | · open | The pair, delivered where it lands — the re-themer's own override point | — |
+| BRF-CHOICE-LIST | · open | The choice list — a document that is a setting, and the actuator it would need | — |
+| BRF-FONT-COVERAGE | · open | The codepoints we emit, against the fonts that must draw them | — |
+| BRF-SYMBOL-PLAIN | · open | The repertoire, and the plain mode for a host that cannot draw it | — |
 
 ## Ready — specced, next up
 

@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-03 | ADR-AUTHORING-CONTRACT-079 | Accepted | Authoring is a contract, not a style — four things an author is given | 079-authoring-contract.md |
 | 2026-10-30 | ADR-MATH-GRAMMAR-076 | Accepted | A grammar, not an engine — the maths okuda declines | 076-a-grammar-not-an-engine.md |
 | 2026-10-30 | ADR-ARRIVAL-AT-LINE-077 | Superseded | The arrival at the line — an address includes its coordinate, and the jump is a render | 077-the-arrival-at-the-line.md |
 | 2026-10-30 | ADR-LINE-IS-PROSE-078 | Accepted | The line is prose — the address is the path | 078-the-line-is-prose.md |

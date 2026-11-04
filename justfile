@@ -438,6 +438,12 @@ themes *args:
     # the caller's words whole.
     exec bun scripts/contrast.ts --theme-dir "$@"
 
+# Font coverage
+[group('build')]
+fonts *args:
+    #!/usr/bin/env bash
+    exec bun scripts/font-coverage.ts "$@"
+
 # Surface probe
 [group('build')]
 surface-probe *args:

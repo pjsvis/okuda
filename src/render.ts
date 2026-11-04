@@ -707,7 +707,11 @@ export async function renderDocument(
   // eats the tokens that were doing the reporting. `styler.codespan` is the
   // existing register — no new colour role — and its RESET lands inside the
   // enclosing run, which the styler's wrap re-opens (td-1dec86).
-  const source2a = applyMathGlyphs(source2, (span) => styler.codespan(span));
+  // The vector weight. `styler.bold` is identity under NO_COLOR, and weight is
+  // the *only* marker a vector has — so this borrows `roleBold`'s stance (the
+  // weight channel survives) rather than `bold`'s (attributes are colour-only).
+  const weight = (t: string): string => (styler.mode === "none" ? `\x1b[1m${t}\x1b[0m` : styler.bold(t));
+  const source2a = applyMathGlyphs(source2, (span) => styler.codespan(span), weight);
 
   // Pre-pass 3: intercept mermaid fences → pipe to binary → placeholder tokens.
   const source3 = await interceptMermaid(source2a, opts, ctx);
@@ -1589,7 +1593,8 @@ function stripHtml(s: string): string {
  *  `∝`, `≈` or `∼` is taken before one that blocks a unit. `\ge` is the one
  *  deliberate mirror (`\le` is evidenced; symmetry, not scope creep).
  *  `\text{X}`, `\frac{X}{Y}`, `\vec{X}` and `\dot{X}` are rewrites rather
- *  than glyphs: syntax dropped or moved, not a character substituted.
+ *  than glyphs: syntax dropped or moved, not a character substituted. `\vec`
+ *  moved further — its output is *weight*, not a character (see its row).
  *
  *  Exported for the width contract in `tests/math-glyphs.test.ts` — the
  *  table is the assertion, not a copy of it. */
@@ -1644,10 +1649,22 @@ export const MATH_GLYPHS: ReadonlyArray<readonly [string, string]> = [
   // `\cos`, `\tan`, `\log`, `\ln` arrive unprompted when a span wants them.
   ["\\sin", "sin"],
   // Accents. The command is consumed with its braces and the mark rides the
-  // operand, so `\vec{v}` is one column rather than two: the second gate
-  // rejects a surviving `\vec`, which is what makes the braces mandatory.
-  ["\\vec", "\u20D7"],
+  // operand, so `\dot{m}` is one column rather than two: the second gate
+  // rejects a surviving `\dot`, which is what makes the braces mandatory.
+  //
   ["\\dot", "\u0307"],
+  // `\vec` is recognised with an EMPTY substitution, like `\text` and `\frac`:
+  // it is a rewrite, and its output is *weight* rather than a character. The
+  // arrow it used to emit is gone, and that is a measurement (2026-11-04):
+  // U+20D7 COMBINING RIGHT ARROW ABOVE exists in exactly one of eight monospaced
+  // faces measured (JuliaMono; not DejaVu, not Menlo, not Noto, not
+  // JetBrainsMono, not Fira Code). A combining mark cannot be borrowed from a
+  // fallback — it positions only over a base in the *same* font — so on every
+  // other face the arrow rode beside the `g` as a spacing glyph, occupying a cell
+  // okuda had counted as zero. **ISO 80000-2 sets vectors in bold**: no codepoint,
+  // one column by construction, and it survives NO_COLOR because the weight
+  // channel already does.
+  ["\\vec", ""],
 ];
 
 const MATH_LOOKUP = new Map(MATH_GLYPHS);
@@ -1831,7 +1848,7 @@ const RE_MATH_SPAN = /\$([^$\n]+)\$/g;
  *  again after the rewrites — so a malformed `\frac{F}` (braces absent,
  *  command recognised) fails the second gate instead of half-
  *  translating into `{F}`. */
-function mathSpanBody(body: string): string | null {
+function mathSpanBody(body: string, weight?: (t: string) => string): string | null {
   for (const m of body.matchAll(RE_MATH_ESCAPE)) {
     if (!MATH_LOOKUP.has(m[0])) return null;
   }
@@ -1874,7 +1891,11 @@ function mathSpanBody(body: string): string | null {
     .replace(RE_MATH_TEXT, "$1")
     .replace(RE_MATH_FRAC, (_m, num: string, den: string) => `${fracSide(num, true)}/${fracSide(den, false)}`)
     .replace(/\\_/g, "_")
-    .replace(RE_MATH_VEC, "$1\u20D7")
+    // `\vec` is the one rewrite whose output is *weight* rather than a
+    // character: ISO 80000-2's bold, which every face can draw because it is not
+    // a codepoint at all. With no weight function supplied the operand is
+    // emitted plain — degrade to reading the symbol, never to a broken glyph.
+    .replace(RE_MATH_VEC, (_m, operand: string) => (weight ? weight(operand) : operand))
     .replace(RE_MATH_DOT, "$1\u0307")
     .replace(RE_MATH_WORD_SCRIPT, "$1$2");
   // A recognised-but-unconsumed rewrite survives here (`\vec v`, `\frac F A`,
@@ -1893,14 +1914,18 @@ function mathSpanBody(body: string): string | null {
  *  literal. A span holding an unknown command (`$\oint$`) stays literal
  *  whole — visible degradation, never partial mangling. Fenced code and
  *  code spans route through their own handlers and never reach here. */
-export function mathGlyphs(s: string, mark?: (span: string) => string): string {
+export function mathGlyphs(
+  s: string,
+  mark?: (span: string) => string,
+  weight?: (t: string) => string,
+): string {
   if (!s.includes("$")) return s; // the common case costs a scan
   return s.replace(RE_MATH_SPAN, (whole, body: string) => {
     // A span with no command is not a decline: it is not evidence of maths at
     // all (the currency guard), so it is never marked. `costs $5 and $10` must
     // not look like a rendering failure.
     if (!RE_HAS_ESCAPE.test(body)) return whole;
-    return mathSpanBody(body) ?? (mark ? mark(whole) : whole);
+    return mathSpanBody(body, weight) ?? (mark ? mark(whole) : whole);
   });
 }
 
@@ -1918,15 +1943,19 @@ function closesFence(line: string, fence: string): boolean {
 }
 
 /** Apply the math pass to the segments of a line outside code spans. */
-function mathOutsideCodeSpans(line: string, mark?: (span: string) => string): string {
+function mathOutsideCodeSpans(
+  line: string,
+  mark?: (span: string) => string,
+  weight?: (t: string) => string,
+): string {
   let out = "";
   let last = 0;
   for (const m of line.matchAll(/`+[^`]*`+/g)) {
     const at = m.index ?? 0;
-    out += mathGlyphs(line.slice(last, at), mark) + m[0];
+    out += mathGlyphs(line.slice(last, at), mark, weight) + m[0];
     last = at + m[0].length;
   }
-  return out + mathGlyphs(line.slice(last), mark);
+  return out + mathGlyphs(line.slice(last), mark, weight);
 }
 
 /** The math pass over a whole source. Fenced blocks and code spans are
@@ -1937,6 +1966,7 @@ function mathOutsideCodeSpans(line: string, mark?: (span: string) => string): st
 export function applyMathGlyphs(
   source: string,
   mark?: (span: string) => string,
+  weight?: (t: string) => string,
 ): string {
   if (!source.includes("$")) return source;
   const lines = source.split("\n");
@@ -1949,7 +1979,7 @@ export function applyMathGlyphs(
         fence = open[1]!;
         continue;
       }
-      lines[i] = mathOutsideCodeSpans(line, mark);
+      lines[i] = mathOutsideCodeSpans(line, mark, weight);
     } else if (closesFence(line, fence)) {
       fence = null;
     }

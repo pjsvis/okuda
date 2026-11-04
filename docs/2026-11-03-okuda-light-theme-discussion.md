@@ -52,12 +52,23 @@ did not move are now the visually loud ones.
 Is the light-theme render acceptable as the declared boundary, or should okuda
 ship a **named** light preset (`--palette light`)?
 
-`ADR-GLASS-INK-073` permits a named preset the principal selects explicitly; it
-forbids an automatic default and any renderer-side brightness knob. A light
-preset is therefore not a brightness control — it is a second set of relative
-relations tuned for a light ground.
+`ADR-GLASS-INK-073` closes the lightness family and forbids a renderer-side
+absolute-luminance knob; it keeps `body` empty by default and makes it a
+*declared relation*. **It does not discuss presets** — the word does not appear in
+it, so the sentence that stood here ("permits a named preset the principal
+selects explicitly") was an unpaid claim, and is corrected rather than dropped.
+The corpus rule that does speak to it is `BRF-PAIR-DELIVERED`'s out-of-scope:
+*no light palette, and no second set of role meanings*.
 
 ## Options
+
+> **Received and answered, 2026-11-03.** The operator's ruling: **the light preset
+> is out.** Option 2 is refused on the tax — a light palette is a second set of
+> role meanings, re-authored rather than re-tuned (`conceptual-lexicon.md`, TFS).
+> What actually answered the light case was pinning the ground dark into the
+> host's own override: 16 of 21 on-ground roles sat under 3:1 on flexoki-light.
+> Option 3 (a probe) is not refused by this; it is simply not this question. The
+> page carrying the position for humans is `explainers/colours.md`.
 
 1. **Do nothing in the renderer.** Document a `body` hex and any accent
    overrides in `~/.config/okuda/palette.json`. Cheapest, but pushes a
@@ -94,3 +105,6 @@ This is an okuda palette question, which is why it is being delivered here.
 - `decisions/073-the-glass-owns-its-ink.md`
 - `~/.config/okuda/palette.json` — absent on this box
 - Omarchy theme switch observed 2026-11-03; `COLORTERM=truecolor`, `TERM=xterm-256color`
+- `briefs/2026-11-03-brief-pair-delivered.md` — the pin, and the out-of-scope this
+  ruling rests on
+- `explainers/colours.md` — the human-facing position, updated 2026-11-03

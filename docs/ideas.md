@@ -121,7 +121,7 @@ The outcome is `open`, `promoted: <callsign>`, or `refused: <why>`.
   every role, not just `muted`*, since the instrument currently answers "is the
   order intact?" and not "is anything legible?".
 
-- **`font-coverage-precondition`** · 2026-11-01 · `render` · **open**
+- **`font-coverage-precondition`** · 2026-11-01 · `render` · **promoted: BRF-FONT-COVERAGE**
   The same residual as `the pair`, one exclusion over. `TFS` refuses the font
   *choice*; what it delegates is **glyph coverage and cell width**, and nobody has
   said so. okuda emits box-drawing, eighth-blocks (U+2580–U+259F) and Braille

@@ -142,16 +142,7 @@ takes it back.**
   case shortest. No timed sequences, no hold-and-wait, no
   press-before-the-bar-runs-out.
 
-The honest exception: the two-digit jump buffer has timing — the
-spaced double-tap protocol (ADR-021). One timed affordance in the whole
-system, designed to be forgiving (visible buffer, cancelled by any
-non-digit, no penalty), because two digits must resolve. It is the
-exception that proves the law: the timing exists *for* the reader's
-fingers, not against their patience.
-
-Contrast with the pattern this law refuses: the session timeout, the
-expiring link, the auto-advancing carousel — each one a system spending
-the user's time without permission. WCAG's timing guidelines (2.2.1,
+WCAG's timing guidelines (2.2.1,
 2.2.6) ask systems to make timers adjustable; this silo satisfies them
 by architecture: **there are no timers to adjust.** Time is the one
 dimension the silo does not gate — and the first law says it never

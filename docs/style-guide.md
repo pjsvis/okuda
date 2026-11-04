@@ -221,7 +221,9 @@ the literal fallback is the renderer declining rather than a rendering fault.
 **What renders.** Greek (`\pi \mu \sigma \rho \tau \theta \Omega \zeta`),
 the common relations and operators (`\le \ge \neq \in \approx \gg \propto
 \pm \cdot \sum \circ \%`), the arrows, `\sin`, the accents (`\vec{v}` →
-`v⃗`, `\dot{m}` → `ṁ`), digits as scripts (`T^4` → `T⁴`, `H_2O` → `H₂O`),
+**v** in bold — ISO 80000-2, not an arrow: the combining arrow is absent from
+almost every monospaced face and cannot be borrowed from a fallback — and
+`\dot{m}` → `ṁ`), digits as scripts (`T^4` → `T⁴`, `H_2O` → `H₂O`),
 fractions with their grouping restored (`\frac{3\mu}{2R^3}` → `3μ/(2R³)`), and
 `^{\circ}` as the degree sign rather than a superscript.
 

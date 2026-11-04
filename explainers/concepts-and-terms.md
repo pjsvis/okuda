@@ -34,6 +34,30 @@ moment) and *tied to the mast* (a screen that stays put while you study it)
 and colour, is Michael Okuda's screens, cited as an influence
 (`ADR-RETIRE-OKUDAGRAM-066`).
 
+## Colour
+
+A palette is not a bag of colours, and four words carry the argument. The page
+that makes it is [Colour](colours.md).
+
+**The ground** is the background your terminal paints — the paper. **The ink** is
+the foreground it paints — your prose. okuda sets **neither**: it inherits both,
+because a renderer cannot see the glass it is drawn on (`ADR-GLASS-INK-073`).
+That is why the same document can feel different in a different terminal theme,
+and it is not a bug in either one.
+
+A **role** is one named job in the palette — *heading*, *link*, *muted*, *badge*,
+*vector* — each with a fixed colour of its own. A role's meaning is not its
+colour but its **rank**: how loud it sits beside your prose. A rank is a ratio,
+*the role against the ink*: below 1.00 the mark is quieter than your prose and
+recedes (rules, dimmed state), above 1.00 it is louder and announces (headings,
+the rose `§`).
+
+The consequence worth knowing before you read that page: because okuda cannot see
+your ground, a terminal theme can **re-order the whole palette at once** without
+anything erroring. The marks that were meant to be quieter than your prose become
+louder than it, and the page reads as blown out. That is a change of order, not of
+brightness — and it is why the ranking is measured rather than eyeballed.
+
 ## Callsigns
 
 A **callsign** is a short, stable, human-friendly name for one document
@@ -85,12 +109,12 @@ session. Internally: **the ledger is the moat.**
 
 Exercise the vocabulary — these are the real compartments, open one:
 
-| Open |
-| [Briefs](briefs/index.md) — what will we build? |
-| [Decisions](decisions/index.md) — why did we choose this? |
-| [Debriefs](debriefs/index.md) — what happened when we built it? |
-| [&alpha](&alpha.md) — the orientation document, the silo's home screen |
-| [The decision table](&next.md) — what is next, ranked |
+- | Open |
+- | [Briefs](briefs/index.md) — what will we build? |
+- | [Decisions](decisions/index.md) — why did we choose this? |
+- | [Debriefs](debriefs/index.md) — what happened when we built it? |
+- | [&alpha](&alpha.md) — the orientation document, the silo's home screen |
+- | [The decision table](&next.md) — what is next, ranked |
 
 ## The roll
 

@@ -1,12 +1,16 @@
 # Colour — a ranking, not a set of swatches
 
-> Status: **findings and proposals**, 2026-11-01. Human-facing. The claim of
+> Status: **findings and proposals**, 2026-11-03. Human-facing. The claim of
 > this page: almost every colour argument goes wrong because it treats a palette
 > as a set of colours when it is a **ranking**, and the ranking is expressed as
 > ratios against the *ink* — which a document renderer inherits and cannot see.
-> Two tools come out of it: `scripts/contrast.ts --theme` (the reading) and
-> `scripts/herdr-theme.ts` (the fix). Measurements are printed by those scripts,
-> not typed here.
+> Four words carry the argument — **ground**, **ink**, **role**, **rank** — and
+> they are defined in [concepts and terms](concepts-and-terms.md), under *Colour*.
+> Four tools come out of it: `scripts/contrast.ts` (the reading, `just surface` /
+> `just ranking`), `scripts/herdr-theme.ts` (the fix for the app),
+> `scripts/omarchy-theme.ts` (the same pair delivered into a re-theming desktop's
+> own override, `just ground --omarchy`), and `just surface-probe` (the receipt).
+> Measurements are printed by those scripts, not typed here.
 
 ## The finding, in one table
 
@@ -265,12 +269,20 @@ offered rather than argued.
    rungs on purpose (`muted` at 2.0:1 draws every rule in the page). Same mistake
    in a different shape: a number rewriting the ink instead of respecting the
    ranking.
-5. **Refuse light mode.** A light palette is a second set of role meanings — the
-   tax, paid in full — and the order would have to be re-authored rather than
-   re-tuned. `color-scheme: dark` is the whole of our position: one pair, asserted
-   nowhere, recommended everywhere. If a light class ever arrives in the wild, the
-   instrument generates the palette to hit symmetric deltas; until then, a second
-   palette is a second design wearing our names.
+5. **A light palette is out, and the question has been asked and answered.**
+   This page said *"if a light class ever arrives in the wild, the instrument
+   generates the palette to hit symmetric deltas."* It arrived on 2026-11-03, on
+   a light Omarchy theme: **16 of 21** on-ground roles under 3:1 against
+   flexoki-light, 19 against catppuccin-latte (`:239`). The answer was **not** a
+   second palette — it was to pin the ground dark, into the host's own override
+   point. The principal's ruling the same day: *the light preset is out.*
+
+   The reasoning is the tax, paid in full: a light palette is a second set of
+   role meanings, and the order would have to be re-authored rather than
+   re-tuned (`conceptual-lexicon.md`, **TFS**). `ADR-GLASS-INK-073` closes the
+   lightness family and keeps `body` empty by default; `BRF-PAIR-DELIVERED`
+   puts *no light palette, and no second set of role meanings* out of scope. If
+   the class returns, the answer stays the same: pin the ground, not the palette.
 6. **Measure the glass, not the impression.** `herdr-app shot /tmp/ui.png`
    captures the app at physical pixels, no screen-recording permission needed
    (`~/.config/herdr-app/AGENTS.md:65-68`). Sample the pixel behind a document,

@@ -7,7 +7,7 @@
 >
 > Unregistered by design — no callsigns (ADR-025's boundary). A register
 > fires when this folder grows a named consumer or crosses ~8 documents.
-> **It has fired:** nine explainers as of 2026-10-26. The register is owed
+> **It has fired:** eleven explainers as of 2026-11-03. The register is owed
 > a decision — an index without mnemonics, or a full tier — and it is
 > tracked in td rather than decided here.
 >
@@ -26,6 +26,7 @@
 | [&next](&next.md) — the decision table (you are ready for this one) | **15** |
 | [Accessibility](explainers/accessibility.md) — the hit list, and what the design already gives | **16** |
 | [Causation, indoors](explainers/causation.md) — the ladder, and why our walls are checkable | **17** |
+| [Colour](explainers/colours.md) — a palette is a ranking, and your terminal supplies half of it | **18** |
 
 New explainers join the path. The rule is the house rule: explain the
 concept before using the word, and lead with why the reader should
