@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**11 live · 154 archived · 15 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 3 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**12 live · 154 archived · 16 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 4 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -15,6 +15,7 @@ Nothing waits on these and no Thing records them. The question per row is **what
 | BRF-SEARCH-ROW | 10d | The search row — the contract, frozen by the probe |
 | BRF-PROBES-TIER | 5d | Establish Registered `probes/` Tier for Exploratory Python |
 | BRF-CHOICE-LIST | -8d | The choice list — a document that is a setting, and the ac |
+| BRF-TEMPORAL-WINDOW | -8d | The temporal window — the date the reader already types, a |
 
 ### Ticketed, live — the load-bearing set
 
@@ -55,6 +56,7 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 | BRF-PERIMETER-GATE | · ready | the report that becomes a gate; lands first | — |
 | BRF-PERIMETER-RUNNER | · ready | the tuning recipes and artifacts leave | — |
 | BRF-PERIMETER-SILO | · ready | the doctrine and the records leave | — |
+| BRF-TEMPORAL-WINDOW | ▸ ready | The temporal window — the date the reader already types, and the three words beside it | — |
 
 ## In flight — partially landed, has commits
 
