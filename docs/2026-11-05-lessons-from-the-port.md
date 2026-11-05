@@ -84,6 +84,17 @@ half the rules in each.** The rule is not "share the code" (the two consumers ar
 genuinely different); it is **enumerate the rules the substrate owes, and check
 each one on both sides.**
 
+**The positive case, and it is the same rule read forwards.** Code colour: the
+terminal pipes every tagged fence through chroma with `--formatter terminal16`;
+the page pipes the same fences through the same binary with `--formatter html`.
+One classifier, two output formats. A JavaScript highlighter was the obvious
+alternative and was refused twice over — it is a *second classifier* (two
+highlighters disagree about what a keyword is, and nobody notices for months),
+and it is a *runtime* (Shiki's grammars are megabytes, so the artefact would
+either fetch them, breaking the one property it has, or carry them, which is a
+different artefact). **The tool classifies, the sheet themes** — the same
+division the terminal already made.
+
 ## Lesson 5 — A budget must name what it costs, and say when it bites
 
 The panel budget was **a count of 24**. A count is a proxy that does not track
@@ -129,6 +140,47 @@ Every mechanism question that was *reasoned* was answered wrong at least once:
 
 Each cost minutes to measure and hours to reason about wrongly.
 
+## Lesson 8 — A pass must reach every surface
+
+The code colour ran on the main body and not on the panel bodies, so every
+code-file panel rendered in a single colour while the main document's fences
+were painted. The operator saw it; the gate did not.
+
+This is the third instance of one class:
+
+| Instance | The surface that was missed |
+|---|---|
+| self-exclusion | the package's resolver (the terminal had it) |
+| archive anchor | the terminal's resolver (the package had it) |
+| code colour | the panel bodies (the main body had it) |
+
+**When a pass is added, enumerate every surface it must reach — the main body,
+the panel bodies, the listing — and assert on each.** A pass that runs on one
+surface is a pass that has not been written.
+
+## Lesson 9 — The budget measures the artefact, after every pass
+
+The panel budget was computed from the uncoloured body. Colouring is what makes
+a code panel expensive — chroma's spans took the showcase's panels from 176 KiB
+to 518 KiB, because one of them is the whole 2,836-line renderer. A budget
+measured before the last pass is measuring a document that does not exist.
+
+This is Lesson 5 one layer down: **a budget must measure the thing that costs,
+at the moment it costs.** Count instead of bytes was the first version; bytes
+before colouring was the second.
+
+## Lesson 10 — A check that fails when the artefact changes is working
+
+The code pass consumes the `language-` class and replaces it with chroma's
+spans, so the check *"a code file dereferences into a fence"* — which looked for
+that class — failed the moment the colouring landed. That is not a broken check.
+**The artefact changed and the assertion noticed**, which is the whole job.
+
+The temptation is to loosen the assertion until it passes. The correct move is
+to re-point it at what the artefact now is (`pre.code`) and add a second check
+for the new property (the colouring), so the gate covers both the old guarantee
+and the new one.
+
 ## The checklist, for the next port
 
 - [ ] Enumerate what the source renderer **owes** — resolution rules, self-exclusion, archive, budgets. Check each on both sides.
@@ -138,6 +190,9 @@ Each cost minutes to measure and hours to reason about wrongly.
 - [ ] Give each token **one** register, and make the rule the text's own colour.
 - [ ] Budget the **cost**, and print when the budget bites.
 - [ ] Measure the platform. Every reasoned answer was wrong once.
+- [ ] Enumerate the **surfaces** a pass must reach, and assert on each.
+- [ ] Measure the budget **after** every pass, on the artefact that ships.
+- [ ] When a check fails because the artefact changed, **re-point it** — do not loosen it.
 - [ ] Read the artefact. The gates cover behaviour; nothing covers look until you build an instrument for it.
 
 ## Naming — a proposal, not a decision
@@ -161,7 +216,7 @@ references — bound as one file that carries everything it needs.*
 **Decided 2026-11-05: the artefact is a `cahier`** — the same word, in the
 language it had before it was English, and the form that wears its foreignness
 rather than inviting false confidence. The reasoning, the three collisions and
-the archive checks are in `docs/2026-11-05-cahier.md`. `just html <file>`
+the archive checks are in `docs/2026-11-05-naming-the-cahier.md`. `just html <file>`
 produces one; **a cahier of documents** is the set. The machine code does not
 change.
 
