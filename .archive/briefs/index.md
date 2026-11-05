@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-05 | BRF-HTML-PACKAGE | done | The package — a document and its one-hop closure, in one file | 2026-11-05-brief-html-package.md |
 | 2026-11-03 | BRF-STATED-GROUND | rejected | The stated ground — okuda supplies the surface its palette was drawn for | 2026-11-03-brief-stated-ground.md |
 | 2026-11-01 | BRF-SILO-STATUS | done | Silo status — the vitals get a machine face, and a suite gets a status line | 2026-11-01-brief-silo-status.md |
 | 2026-11-01 | BRF-SURFACE-PAIR | done | The surface pair — readable, navigable, recognisable | 2026-11-01-brief-surface-pair.md |

@@ -7,7 +7,10 @@ date: 2026-11-05
 # Brief: The package — a document and its one-hop closure, in one file
 
 **Date:** 2026-11-05
-**Status:** Open
+**Status:** Done — 2026-11-05. `just html-verify` measures twelve checks in
+Chrome; `just check` rc=0. The mechanism decision is `ADR-PANEL-NOT-DOOR-081`.
+One defect deferred with an owner in the task ledger: the close control scrolls
+away inside an open panel.
 
 ---
 

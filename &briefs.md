@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**13 live · 154 archived · 17 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 5 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**12 live · 155 archived · 17 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 4 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -16,7 +16,6 @@ Nothing waits on these and no Thing records them. The question per row is **what
 | BRF-PROBES-TIER | 5d | Establish Registered `probes/` Tier for Exploratory Python |
 | BRF-CHOICE-LIST | -8d | The choice list — a document that is a setting, and the ac |
 | BRF-TEMPORAL-WINDOW | -8d | The temporal window — the date the reader already types, a |
-| BRF-HTML-PACKAGE | -10d | The package — a document and its one-hop closure, in one f |
 
 ### Ticketed, live — the load-bearing set
 
