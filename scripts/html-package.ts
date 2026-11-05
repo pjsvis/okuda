@@ -328,11 +328,13 @@ function template(
   body: string,
   byline: string,
   provenance: Provenance | null,
+  source: string,
 ): string {
   const prov = provenance
     ? `<p class="provenance">Published from <a href="${escapeHtml(provenance.url)}">${escapeHtml(provenance.title)}</a></p>\n`
     : "";
   return `<!doctype html>
+<!-- source: ${escapeHtml(source)} -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -439,8 +441,17 @@ const { meta, body: source } = splitFrontMatter(raw);
 // mtime. A name that already carries an ISO date keeps it — the corpus is
 // date-first, and prefixing again would say the date twice.
 const stem = basename(input, ".md");
+// `index.md` exists in every tier, and the artefact name is date + stem — so
+// decisions/index.md and debriefs/index.md both became 2026-08-29-index.html
+// and one silently overwrote the other. Measured 2026-11-05: the debriefs
+// index (515 KiB) replaced the decisions index (664 KiB) with no message.
+// A bare `index` is qualified with its tier; nothing else is.
+const qualified =
+  stem === "index" ? `${basename(dirname(resolve(input)))}-index` : stem;
 const datePrefix = meta.date ?? firstCommitDate(input) ?? mtimeDate(input);
-const named = /^\d{4}-\d{2}-\d{2}-/.test(stem) ? stem : `${datePrefix}-${stem}`;
+const named = /^\d{4}-\d{2}-\d{2}-/.test(qualified)
+  ? qualified
+  : `${datePrefix}-${qualified}`;
 const finalPath = outPath ?? resolve("html", `${named}.html`);
 const css = styleBlock();
 
@@ -619,9 +630,22 @@ const provenance =
     : null;
 
 mkdirSync(dirname(finalPath), { recursive: true });
+if (existsSync(finalPath)) {
+  const prior = readFileSync(finalPath, "utf8")
+    .slice(0, 400)
+    .match(/<!-- source: ([\s\S]*?) -->/)?.[1];
+  if (prior && prior !== input) {
+    console.warn(
+      `  ! ${finalPath} was built from ${prior} and is about to be overwritten by ${input}.`,
+    );
+    console.warn(
+      `    Two documents, one artefact name. Rename one, or pass -o.`,
+    );
+  }
+}
 writeFileSync(
   finalPath,
-  template(title, css, `${html}\n${panels}`, byline, provenance),
+  template(title, css, `${html}\n${panels}`, byline, provenance, input),
 );
 
 const kib = (readFileSync(finalPath).length / 1024).toFixed(1);
