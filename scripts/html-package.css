@@ -33,10 +33,22 @@
   --okuda-ground: #221f1c;
   --okuda-ink: #d6cfc4;
 
+  /* The desk. A terminal's page is the pane: the text fills a bounded
+   * rectangle, so the ground is *inside* the page and the figure-ground
+   * ratio is near 1. A browser has no pane, so a narrow measure floats in
+   * a void — measured 2026-11-05 at 1440x900: 24% of the viewport was ink.
+   * The fix is not more ink, it is a page: the ground becomes the page's
+   * surface and the desk behind it is darker, so the reader sees a
+   * document on a desk rather than a ribbon in the dark. */
+  --okuda-desk: #17150f;
+
   /* The measure. 79 columns is the authoring contract's top rung
-   * (docs/style-guide.md, "Authoring contract"). A ceiling, not a fixed
-   * measure: the ragged right edge is the scan channel and must survive. */
-  --okuda-measure: 79ch;
+   * (docs/style-guide.md, "Authoring contract") — a constraint on the
+   * SOURCE, so the terminal does not wrap it. The display measure is the
+   * glass's, and the browser wraps for free, so the page may be wider
+   * than the author wrote. A ceiling, not a fixed measure: the ragged
+   * right edge is the scan channel and must survive. */
+  --okuda-measure: 88ch;
 
   /* The fermata — one beat at a mode boundary, measured at 240ms in the
    * spike. Consistent and short, or it reads as latency rather than rest. */
@@ -52,7 +64,7 @@
 }
 
 html {
-  background: var(--okuda-ground);
+  background: var(--okuda-desk);
   color: var(--okuda-ink);
   /* JuliaMono covers 64/64 of the emitted repertoire, DejaVu Sans Mono 62,
    * Menlo 61 (docs/2026-11-04-font-coverage.md). The stack prefers
@@ -60,19 +72,30 @@ html {
    * per-glyph, which is the reader's machine doing what it does. */
   font-family: "JuliaMono", "DejaVu Sans Mono", Menlo, ui-monospace,
     "SF Mono", monospace;
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 17px;
+  line-height: 1.55;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  padding: 2rem 1.5rem 6rem;
 }
 
+/* The page. A bounded surface with a shoulder, not a box: the ground is
+ * the page's own, and the desk shows at the edges. */
 main {
-  max-width: var(--okuda-measure);
+  background: var(--okuda-ground);
+  max-width: calc(var(--okuda-measure) + 5rem);
+  min-height: 100vh;
   margin: 0 auto;
+  padding: 3rem 2.5rem 5rem;
+  box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+  main {
+    padding: 1.5rem 1rem 3rem;
+  }
 }
 
 /* ── The byline and the provenance ─────────────────────────────────── */

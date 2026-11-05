@@ -28,7 +28,7 @@
  *                                        [--max-panels <n>]
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import {
   applyMathGlyphs,
@@ -40,6 +40,36 @@ import {
 } from "../src/render.ts";
 import { loadCallsigns, resolveAmongCallsigns, siloRoot } from "../src/root.ts";
 import { styleBlock } from "./html-palette.ts";
+
+// ── The document's own date ───────────────────────────────────────────
+//
+// A record's date is the date it was made, not the date it was copied.
+// The front matter says so when it says anything; the source's first
+// commit says so otherwise; the mtime is the last resort and is honest
+// about being one.
+
+function firstCommitDate(file: string): string | null {
+  try {
+    const p = Bun.spawnSync({
+      cmd: ["git", "log", "--diff-filter=A", "--format=%ad", "--date=short", "--", file],
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    if (p.exitCode !== 0) return null;
+    const lines = new TextDecoder().decode(p.stdout).trim().split("\n").filter(Boolean);
+    return lines.at(-1) ?? null; // the oldest, i.e. the first commit
+  } catch {
+    return null;
+  }
+}
+
+function mtimeDate(file: string): string {
+  try {
+    return statSync(file).mtime.toISOString().slice(0, 10);
+  } catch {
+    return new Date().toISOString().slice(0, 10);
+  }
+}
 
 // ── Front matter: use it, do not render it ────────────────────────────
 //
@@ -325,14 +355,7 @@ const flag = (name: string): string | undefined => {
 
 // The artefact directory. A separate folder is the test of file
 // independence: if the package needs anything beside it, it fails here.
-//
-// Every artefact is ISO-date prefixed, because the date is the sort key a
-// listing needs and a filename is the one index that cannot drift from the
-// file. The date is the document's own when it declares one (front matter),
-// and the publication date otherwise — so re-publishing a dated document
-// overwrites it, and re-publishing an undated one mints a new artefact.
-const today = new Date().toISOString().slice(0, 10);
-const outPath = flag("-o") ?? resolve("html", `${today}-${basename(input, ".md")}.html`);
+const outPath = flag("-o");
 const rootOverride = flag("--root");
 const provenanceUrl = flag("--source-url");
 const provenanceTitle = flag("--source-title");
@@ -343,13 +366,20 @@ const WIDTH = 79; // the authoring contract's top rung
 const raw = readFileSync(input, "utf8");
 const { meta, body: source } = splitFrontMatter(raw);
 
-// The date prefix: the document's own, or the publication date. A name
-// that already carries an ISO date keeps it — the corpus's own convention
-// is date-first, and prefixing it again would say the date twice.
-const datePrefix = meta.date ?? today;
+// The date prefix. A document of record is static: re-publishing it means
+// publishing the same document under the same name, and a different name
+// means a different document. So the date is the document's OWN, never the
+// publication date — a name that moved every day would make one document
+// look like a series.
+//
+// Derived, in order: the front matter's `date`; the source's first commit
+// (the document's birth, which is what a record's date is); the file's
+// mtime. A name that already carries an ISO date keeps it — the corpus is
+// date-first, and prefixing again would say the date twice.
 const stem = basename(input, ".md");
+const datePrefix = meta.date ?? firstCommitDate(input) ?? mtimeDate(input);
 const named = /^\d{4}-\d{2}-\d{2}-/.test(stem) ? stem : `${datePrefix}-${stem}`;
-const finalPath = flag("-o") ?? resolve("html", `${named}.html`);
+const finalPath = outPath ?? resolve("html", `${named}.html`);
 const css = styleBlock();
 
 // The path substrate, anchored the way actuation resolves a target: the
