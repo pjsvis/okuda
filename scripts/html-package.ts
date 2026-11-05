@@ -520,6 +520,9 @@ let panelBytes = 0;
 let droppedByCap = 0;
 const droppedPaths = new Set<string>();
 
+// The document's own path, resolved once, for the self-exclusion below.
+const SELF = resolve(input);
+
 function resolveTarget(ref: string): string | null {
   // A path — markdown or code. The filesystem is the substrate for both
   // (ADR-045), and a code file is a document the terminal renders too
@@ -528,6 +531,13 @@ function resolveTarget(ref: string): string | null {
     const hit =
       anchors.map((a) => resolve(a, ref)).find((p) => existsSync(p)) ??
       archiveAnchors.map((a) => resolve(a, ref)).find((p) => existsSync(p));
+    // A document citing itself mints nothing: the reader is already there,
+    // and a panel holding the page you are standing on is a recursive
+    // mystery tour with no rainbow at the end. The terminal retired this
+    // with makeSelfExclusion (src/root.ts:305); the package had no such
+    // rule, and docs/showcase.md — which names its own path in its first
+    // paragraph — grew a panel containing a copy of itself.
+    if (hit && resolve(hit) === SELF) return null;
     if (hit) return hit;
   }
   // A callsign, gated by the registry (ADR-044) — the same gate the

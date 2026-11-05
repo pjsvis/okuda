@@ -44,7 +44,8 @@ writeFileSync(
 
 - **Loose.** A loose list item, which is the house form.
 
-A bare silcrow §27 in prose stays prose, and an inline reference to
+This fixture cites itself: fixture.md, and must not grow a panel — the reader is
+already there. A bare silcrow §27 in prose stays prose, and an inline reference to
 decisions/027-temperament-is-downstream-of-discipline.md becomes a link. A code
 file is a document too: src/render.ts should dereference into a fence. A callsign
 such as ADR-GLASS-INK-073 is a registered name, not a path, so it stays in prose
@@ -218,6 +219,11 @@ const probe = () =>
       // A rule before a heading is redundant: 603 of the corpus's 656
       // thematic breaks are followed by one. A rule that is NOT followed by
       // a heading is the only structure there, and stays.
+      // A document citing itself mints nothing. The terminal retired this
+      // with makeSelfExclusion; the package had no such rule until the
+      // showcase grew a panel containing a copy of itself.
+      selfPanel: !!document.querySelector('.deref#ref-fixture'),
+      selfLink: !!document.querySelector('a[href="#ref-fixture"]'),
       hrTotal: document.querySelectorAll('hr').length,
       // The three link registers, and the rule that must not borrow a second
       // colour: the colour is the register, the rule is only the affordance.
@@ -321,6 +327,7 @@ const checks: Array<[string, boolean, string]> = [
   ["the panel chrome stays in view when scrolled", chromeOnScroll?.inView === true, `in view ${chromeOnScroll?.inView}`],
   ["the panel chrome names the document", (chromeOnScroll?.id ?? "").length > 0, `id "${chromeOnScroll?.id}"`],
   ["the build says when the panel budget bites", budgetSaid === true, `warned ${budgetSaid}`],
+  ["a self-citation mints no panel", closed.selfPanel === false && closed.selfLink === false, `panel ${closed.selfPanel}, link ${closed.selfLink}`],
   ["a rule before a heading is dropped", closed.hrBeforeHeading === false, `hr before heading ${closed.hrBeforeHeading}`],
   ["a rule that is the only structure stays", closed.hrTotal === 1, `${closed.hrTotal} hr`],
   ["a heading keeps a full line of air below", closed.headingGap !== null && parseFloat(closed.headingGap) >= 20, `gap ${closed.headingGap}`],
