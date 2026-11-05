@@ -622,7 +622,6 @@ function addRef(path: string, num: string | null): string | null {
     body: docRefPass(stateGlyphPass(redundantHrPass(body))),
   });
   byPath.set(path, id);
-  panelBytes += refs.get(id)!.body.length;
   return id;
 }
 
@@ -681,6 +680,21 @@ html = transformText(html, (text) => {
 
 // 4. Whatever is left is an address with no target: gold, not a link.
 html = docRefPass(html);
+
+// A panel is a document and gets the same passes as one — including the
+// code colour. It did not, and the operator saw it: every code-file panel
+// rendered in a single colour while the main document's fences were
+// painted. The pass is last because it only touches `<pre><code
+// class="language-…">`, which the glyph and address passes skip.
+for (const r of refs.values()) {
+  r.body = await codeFencePass(r.body);
+}
+// The budget is measured AFTER the code pass, because colouring is what
+// makes a code panel expensive: chroma's spans tripled the showcase's
+// panels (176 KiB to 519 KiB). A budget that measured the uncoloured body
+// would be measuring the wrong artefact — the same mistake as counting
+// panels instead of bytes.
+panelBytes = [...refs.values()].reduce((n, r) => n + r.body.length, 0);
 
 const panels = [...refs.values()].map(panel).join("\n");
 

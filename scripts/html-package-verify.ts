@@ -235,6 +235,10 @@ const probe = () =>
       selfLink: !!document.querySelector('a[href="#ref-fixture"]'),
       // Code colour: chroma's classes, the palette's hues. One classifier,
       // two formatters — the terminal uses terminal16, the page uses html.
+      // A panel is a document and gets the same passes as one. It did not,
+      // and every code-file panel rendered in a single colour while the
+      // main document's fences were painted.
+      codePanelColoured: document.querySelectorAll('.deref pre.code [class^="ok-"]').length,
       codeColoured: (() => {
         const spans = document.querySelectorAll('pre.code [class^="ok-"]');
         if (spans.length === 0) return null;
@@ -351,6 +355,7 @@ const checks: Array<[string, boolean, string]> = [
   ["the build says when the panel budget bites", budgetSaid === true, `warned ${budgetSaid}`],
   ["a self-citation mints no panel", closed.selfPanel === false && closed.selfLink === false, `panel ${closed.selfPanel}, link ${closed.selfLink}`],
   ["a code fence is coloured by chroma", (closed.codeColoured?.spans ?? 0) > 0, `${closed.codeColoured?.spans} token span(s)`],
+  ["a code-file panel is coloured too", closed.codePanelColoured > 0, `${closed.codePanelColoured} token span(s) in panels`],
   ["a keyword takes the heading hue", closed.codeColoured?.keyword === "rgb(153, 204, 255)", `${closed.codeColoured?.keyword}`],
   ["a comment is readable, not the dimmest slot", closed.codeColoured?.comment === "rgb(94, 139, 191)", `${closed.codeColoured?.comment}`],
   ["a rule before a heading is dropped", closed.hrBeforeHeading === false, `hr before heading ${closed.hrBeforeHeading}`],
