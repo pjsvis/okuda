@@ -79,3 +79,4 @@
 {"file":"080-the-gate-judges-head.md","date":"2026-11-04","status":"Accepted","summary":"A gate judges the record, not the desk — two modes, and the shared index","meta":{},"callsign":"ADR-GATE-JUDGES-HEAD-080"}
 {"file":"081-the-panel-not-the-door.md","date":"2026-11-05","status":"Accepted","summary":"The panel, not the door — `:target` over `<details>` and `<dialog>`, and the accessibility gap declared","meta":{},"callsign":"ADR-PANEL-NOT-DOOR-081"}
 {"file":"082-the-export-surface.md","date":"2026-11-05","status":"Accepted","summary":"The export surface is the contract — observed, not declared","meta":{},"callsign":"ADR-EXPORT-SURFACE-082"}
+{"file":"083-family-distribution.md","date":"2026-11-05","status":"Accepted","summary":"The family distributes as N binaries — one generated installer, and the npm location","meta":{},"callsign":"ADR-FAMILY-DISTRIBUTION-083"}
