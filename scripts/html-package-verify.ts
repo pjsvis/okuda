@@ -60,6 +60,18 @@ if (build.exitCode !== 0) {
   process.exit(1);
 }
 
+// ── The budget is honest ──────────────────────────────────────────────
+//
+// A dropped reference looks exactly like an unresolvable one — gold text,
+// no link. So the build must SAY when the budget bites. Checked here at the
+// build, not in the browser, because it is a message to the publisher.
+
+const capped = Bun.spawnSync(
+  ["bun", "scripts/html-package.ts", src, "-o", join(dir, "capped.html"), "--root", repo, "--max-panels", "1"],
+  { cwd: repo, stdout: "pipe", stderr: "pipe" },
+);
+const budgetSaid = capped.stderr.toString().includes("dropped by the budget");
+
 // ── Chrome ────────────────────────────────────────────────────────────
 
 const profile = mkdtempSync(join(tmpdir(), "okuda-chrome-"));
@@ -263,6 +275,7 @@ const checks: Array<[string, boolean, string]> = [
   ["opening a panel adds no history entry", opened.historyLen === before.historyLen, `${before.historyLen} → ${opened.historyLen}`],
   ["closing adds no history entry", closed.historyLen === before.historyLen, `${before.historyLen} → ${closed.historyLen}`],
   ["the close control stays visible when the panel scrolls", closeVisibleOnScroll === true, `in view ${closeVisibleOnScroll}`],
+  ["the build says when the panel budget bites", budgetSaid === true, `warned ${budgetSaid}`],
 ];
 
 let failed = 0;

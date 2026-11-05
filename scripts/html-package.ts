@@ -408,7 +408,20 @@ const outPath = flag("-o");
 const rootOverride = flag("--root");
 const provenanceUrl = flag("--source-url");
 const provenanceTitle = flag("--source-title");
-const maxPanels = Number(flag("--max-panels") ?? 24);
+// The panel budget. Two limits, because they measure different things:
+//
+//   - BYTES is the cost. A panel is a document, and documents differ in
+//     size by an order of magnitude: measured 2026-11-05, decisions/index.md
+//     costs 9.4 KiB per panel and docs/2026-10-12-the-squint-test.md costs
+//     18.5 KiB, so a count of 24 is 226 KiB in one case and 388 KiB in the
+//     other. A count is a proxy that does not track what it proxies.
+//   - COUNT is the backstop, for a document that cites a hundred stubs.
+//
+// Both are reported when they bite. A dropped reference looks exactly like
+// an unresolvable one, so silence here is the defect the package keeps
+// finding elsewhere.
+const maxPanels = Number(flag("--max-panels") ?? 200);
+const maxBytes = Number(flag("--max-bytes") ?? 2 * 1024 * 1024);
 
 const WIDTH = 79; // the authoring contract's top rung
 
@@ -458,6 +471,13 @@ html = stateGlyphPass(html);
 
 const refs = new Map<string, Ref>(); // id → ref
 const byPath = new Map<string, string>(); // resolved path → id
+// The budget's survivors and casualties. A cap that drops a reference must
+// SAY so: a dropped reference looks exactly like an unresolvable one —
+// gold text, no link — and silence is the failure mode this package keeps
+// finding (the quiet citation, the stale glyph, the too-wide heading).
+let panelBytes = 0;
+let droppedByCap = 0;
+const droppedPaths = new Set<string>();
 
 function resolveTarget(ref: string): string | null {
   // A path — markdown or code. The filesystem is the substrate for both
@@ -477,7 +497,14 @@ function resolveTarget(ref: string): string | null {
 function addRef(path: string, num: string | null): string | null {
   const existing = byPath.get(path);
   if (existing) return existing;
-  if (refs.size >= maxPanels) return null;
+  if (refs.size >= maxPanels || panelBytes >= maxBytes) {
+    if (!byPath.has(path)) {
+      droppedByCap++;
+      droppedPaths.add(path);
+    }
+    byPath.set(path, ""); // remember the casualty, don't recount
+    return null;
+  }
   let body: string;
   try {
     const text = readFileSync(path, "utf8");
@@ -512,6 +539,7 @@ function addRef(path: string, num: string | null): string | null {
     body: docRefPass(stateGlyphPass(body)),
   });
   byPath.set(path, id);
+  panelBytes += refs.get(id)!.body.length;
   return id;
 }
 
@@ -597,6 +625,15 @@ writeFileSync(
 );
 
 const kib = (readFileSync(finalPath).length / 1024).toFixed(1);
+const panelsKib = (panelBytes / 1024).toFixed(0);
 console.log(
-  `${finalPath} — ${refs.size} panel(s)${refs.size >= maxPanels ? ` (cap ${maxPanels})` : ""}, ${kib} KiB`,
+  `${finalPath} — ${refs.size} panel(s) (${panelsKib} KiB of panel), ${kib} KiB total`,
 );
+if (droppedByCap > 0) {
+  console.warn(
+    `  ! ${droppedByCap} reference(s) dropped by the budget — left as prose, indistinguishable from an unresolvable one.`,
+  );
+  console.warn(
+    `    budget: ${maxPanels} panels / ${(maxBytes / 1024).toFixed(0)} KiB; used ${refs.size} panels / ${(panelBytes / 1024).toFixed(0)} KiB.`,
+  );
+}
