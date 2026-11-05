@@ -7,7 +7,8 @@ date: 2026-11-05
 # Brief: Per-token baselines — the count-parity swap hole, closed
 
 **Created:** 2026-11-05
-**Status:** Open
+**Status:** Done — shipped 2026-11-05: both gates judge per token, `ADR-ALLOWANCE-NAMES-REFERENT-084` accepted, 1035 tests green, `just check` rc=0.
+**Debrief:** `DBF-ALLOWANCE-REFERENT`
 
 ## Lineage
 

@@ -152,4 +152,5 @@
 {"file":"2026-11-01-brief-silo-status.md","date":"2026-11-01","status":"done","summary":"Silo status — the vitals get a machine face, and a suite gets a status line","meta":{},"callsign":"BRF-SILO-STATUS"}
 {"file":"2026-11-01-brief-surface-pair.md","date":"2026-11-01","status":"done","summary":"The surface pair — readable, navigable, recognisable","meta":{},"callsign":"BRF-SURFACE-PAIR"}
 {"file":"2026-11-03-brief-stated-ground.md","date":"2026-11-03","status":"rejected","summary":"The stated ground — okuda supplies the surface its palette was drawn for","meta":{},"callsign":"BRF-STATED-GROUND"}
+{"file":"2026-11-05-brief-count-baseline-tokens.md","date":"2026-11-05","status":"done","summary":"Per-token baselines — the count-parity swap hole, closed","meta":{},"callsign":"BRF-COUNT-BASELINE-TOKENS"}
 {"file":"2026-11-05-brief-html-package.md","date":"2026-11-05","status":"done","summary":"The package — a document and its one-hop closure, in one file","meta":{},"callsign":"BRF-HTML-PACKAGE"}

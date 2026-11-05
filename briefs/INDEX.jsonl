@@ -11,5 +11,4 @@
 {"file":"2026-11-04-brief-font-coverage.md","date":"2026-11-04","status":"open","summary":"The codepoints we emit, against the fonts that must draw them","meta":{},"callsign":"BRF-FONT-COVERAGE"}
 {"file":"2026-11-04-brief-symbol-plain.md","date":"2026-11-04","status":"open","summary":"The repertoire, and the plain mode for a host that cannot draw it","meta":{},"callsign":"BRF-SYMBOL-PLAIN"}
 {"file":"2026-11-05-brief-cahier-binary.md","date":"2026-11-05","status":"open","summary":"The cahier binary — the compositor, compiled and shipped","meta":{},"callsign":"BRF-CAHIER-BINARY"}
-{"file":"2026-11-05-brief-count-baseline-tokens.md","date":"2026-11-05","status":"open","summary":"Per-token baselines — the count-parity swap hole, closed","meta":{},"callsign":"BRF-COUNT-BASELINE-TOKENS"}
 {"file":"2026-11-05-brief-platform-packages.md","date":"2026-11-05","status":"open","summary":"The platform packages — the binaries ride npm under `@okuda`","meta":{},"callsign":"BRF-PLATFORM-PACKAGES"}
