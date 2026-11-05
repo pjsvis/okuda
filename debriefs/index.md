@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-05 | DBF-ALLOWANCE-REFERENT | done | Debrief: The allowance named its referent, and the reliever counted lines | 2026-11-05-debrief-the-allowance-named-its-referent.md |
 | 2026-11-05 | DBF-PANEL-NOT-DOOR | done | Debrief: The package — a document and its one-hop closure, in one file | 2026-11-05-debrief-the-panel-not-the-door.md |
 | 2026-11-04 | DBF-VARIABLES-TO-INVARIANTS | done | Debrief: Two variables taken, and the instrument that caught its author three times | 2026-11-04-debrief-variables-to-invariants.md |
 | 2026-11-01 | DBF-DEREFERENCE-MARK | done | Debrief: The mark that was already decided | 2026-11-01-debrief-the-mark-that-was-already-decided.md |
