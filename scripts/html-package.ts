@@ -496,6 +496,17 @@ const maxBytes = Number(flag("--max-bytes") ?? 2 * 1024 * 1024);
 
 const WIDTH = 79; // the authoring contract's top rung
 
+// A missing input is a typo, not a stack trace. `readFileSync` throws ENOENT
+// with the parser's own noise; say what is wrong and stop.
+if (!existsSync(input)) {
+  console.error(`no such file: ${input}`);
+  process.exit(1);
+}
+if (!statSync(input).isFile()) {
+  console.error(`not a file: ${input}`);
+  process.exit(1);
+}
+
 const raw = readFileSync(input, "utf8");
 const { meta, body: source } = splitFrontMatter(raw);
 
