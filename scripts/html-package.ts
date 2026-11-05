@@ -437,7 +437,14 @@ const css = styleBlock();
 // package and the terminal cannot disagree about where an address lands.
 const docDir = dirname(resolve(input));
 const root = rootOverride ? resolve(rootOverride) : siloRoot(docDir);
+// Three anchors, in the order actuation uses, plus one the terminal does not
+// have: the archive. A brief that lands is `git mv`d to `.archive/briefs/`,
+// and every document that cites it keeps the citation — so a resolver that
+// does not look in the archive breaks every citation the moment a brief is
+// filed. Found 2026-11-05: ADR-PANEL-NOT-DOOR-081's own Related section
+// pointed at a brief that had just been archived, and the link went quiet.
 const anchors = [docDir, root];
+const archiveAnchors = [docDir, root].map((a) => resolve(a, ".archive"));
 const callsigns = loadCallsigns(root);
 
 // PRE-pass: maths glyphs, before the parser sees them.
@@ -457,7 +464,9 @@ function resolveTarget(ref: string): string | null {
   // (ADR-045), and a code file is a document the terminal renders too
   // (wrapWholeFile, src/render.ts:1175).
   if (ref.includes("/") || /\.(md|ts|rs|sh|py)$/.test(ref)) {
-    const hit = anchors.map((a) => resolve(a, ref)).find((p) => existsSync(p));
+    const hit =
+      anchors.map((a) => resolve(a, ref)).find((p) => existsSync(p)) ??
+      archiveAnchors.map((a) => resolve(a, ref)).find((p) => existsSync(p));
     if (hit) return hit;
   }
   // A callsign, gated by the registry (ADR-044) — the same gate the

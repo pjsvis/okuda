@@ -351,12 +351,15 @@ td:first-child strong {
 
 a {
   color: var(--okuda-link-text);
-  /* The terminal shows link text in rose with no underline. In HTML an
-   * unmarked link is an accessibility failure, so the underline is kept
-   * and made quiet: the colour carries the register, the rule carries
-   * the affordance. */
+  /* The terminal shows link text with no underline. In HTML an unmarked
+   * link is an accessibility failure, so the underline is kept and made
+   * QUIET — but not this quiet: at 45% against `emphasis` (#e0b45c) and
+   * `strong` (#dfa21a), both warm neighbours of the link's #ff9966, the
+   * hue carries no distinction and the rule was doing no work. The rule
+   * is now the channel that separates a link from an emphasis. */
   text-decoration: underline;
-  text-decoration-color: color-mix(in oklab, var(--okuda-link-text) 45%, transparent);
+  text-decoration-color: var(--okuda-link-text);
+  text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
 }
 

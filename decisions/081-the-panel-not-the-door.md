@@ -69,6 +69,12 @@ become a history entry. The accessibility gap is declared rather than solved.**
   position. The reader gets the affordance they already have.
 - **Deep links work.** `package.html#ref-27` opens the panel on load — measured —
   so a blog post can link to a specific dereference.
+- **Each reference keeps its own place.** Every panel is in the DOM and is only
+  translated, so its `scrollTop` survives being closed and reopened, and two
+  references hold two different positions at once. Found by the operator scrolling
+  one panel, closing it, scrolling another, and returning: *"they both keep their
+  place — awesome."* That is a capability the terminal's swap-and-return does not
+  have, and it is a consequence of the panel never being destroyed.
 
 **What became harder:**
 
