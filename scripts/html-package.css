@@ -58,9 +58,11 @@
    * One rule, no perimeter, no radius. */
   --okuda-shoulder: 2px;
 
-  /* The rhythm. One number for the gap between blocks, so the page has a
-   * beat rather than a set of ad-hoc margins. */
-  --okuda-gap: 1.4em;
+  /* The rhythm. The terminal's beat is exactly one blank row between
+   * every block — paragraphs, headings, and list items alike — and the
+   * row is a full line-height. `1lh` is that row, so the page keeps the
+   * terminal's frequency rather than approximating it in ems. */
+  --okuda-gap: 1lh;
 }
 
 html {
@@ -242,9 +244,11 @@ li::marker {
 }
 
 /* One rhythm for both shapes: the gap lives between items, never inside
- * them, so a loose list and a tight one render identically. */
+ * them, so a loose list and a tight one render identically. The gap is a
+ * full line — the terminal's blank row between items, which is what makes
+ * the bold-lead column scan as a column rather than as a run of text. */
 li + li {
-  margin-top: 0.7em;
+  margin-top: var(--okuda-gap);
 }
 
 li > p {
@@ -477,6 +481,32 @@ a:hover {
 .receipt-meta {
   color: var(--okuda-muted);
   font-size: 0.9em;
+}
+
+/* ── The terminator: the closing bookends ──────────────────────────── */
+
+/* The header opens the render; the closer mirrors it. A muted chip at the
+ * badge's column, a rule between, a muted chip at the heading chip's
+ * column. Openings announce; closings release. A document that does not
+ * know it is done reads as a broken frame. */
+.terminator {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin: 3em 0 0;
+  color: var(--okuda-muted);
+  font-size: 0.9em;
+}
+
+.terminator::before,
+.terminator::after {
+  content: "█";
+  flex: none;
+}
+
+.terminator .rule {
+  flex: 1;
+  border-top: 1px solid var(--okuda-muted);
 }
 
 /* ── Print: the inverse of the panel ───────────────────────────────── */

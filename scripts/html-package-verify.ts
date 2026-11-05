@@ -44,7 +44,8 @@ writeFileSync(
 
 - **Loose.** A loose list item, which is the house form.
 
-An inline reference to decisions/027-temperament-is-downstream-of-discipline.md in prose.\n\ndecisions/027-temperament-is-downstream-of-discipline.md §27\n\nA closing paragraph.\n`,
+A bare silcrow §27 in prose stays prose, and an inline reference to
+decisions/027-temperament-is-downstream-of-discipline.md becomes a link.\n\ndecisions/027-temperament-is-downstream-of-discipline.md §27\n\nA closing paragraph.\n`,
 );
 
 // The package is built from the repo root, so the relative address resolves.
@@ -144,8 +145,20 @@ const probe = () =>
       scrollY: Math.round(window.scrollY),
       panelOpen: p ? p.matches(':target') : null,
       closeHref: document.querySelector('.deref-close')?.getAttribute('href') ?? null,
+      // A bare §NN is a section number or a painted badge, never a
+      // reference: the renderer's scan keys on paths and callsigns
+      // (src/vectors.ts), and §NN is what it PAINTS after one.
       inlineSilcrowIsLink: [...document.querySelectorAll('a')]
         .some(a => a.textContent?.trim() === '§27'),
+      silcrowInProse: document.body.textContent?.includes('bare silcrow §27') ?? false,
+      terminator: (() => {
+        const t = document.querySelector('.terminator');
+        if (!t) return null;
+        return {
+          chips: getComputedStyle(t, '::before').content + getComputedStyle(t, '::after').content,
+          rule: !!t.querySelector('.rule'),
+        };
+      })(),
       inlineRefIsLink: [...document.querySelectorAll('a.doc-ref')]
         .some(a => a.textContent?.includes('decisions/027')),
       byline: document.querySelector('.byline')?.textContent ?? null,
@@ -219,7 +232,12 @@ const checks: Array<[string, boolean, string]> = [
   ["a loose list's bold lead takes the key colour", closed.looseBoldLead === "rgb(224, 180, 92)", `${closed.looseBoldLead} vs ${closed.tableKey}`],
   ["a heading carries its LHS badge", closed.headingBadge?.content === '"#"', `content ${closed.headingBadge?.content}`],
   ["a heading carries its RHS chip", closed.headingChip?.content === '"█"' && closed.headingChip?.position === "absolute", `${closed.headingChip?.content} ${closed.headingChip?.position}`],
-  ["every list item is loose", closed.listRhythm === "11.9px", `margin-top ${closed.listRhythm}`],
+  // A full line of air, not a fraction: the terminal's blank row between
+  // items. Asserted as a range, because an exact pixel value is a
+  // measurement of the font, not of the rhythm.
+  ["every list item is loose", parseFloat(closed.listRhythm) > 20, `margin-top ${closed.listRhythm}`],
+  ["a bare silcrow stays prose", closed.silcrowInProse === true && closed.inlineSilcrowIsLink === false, `prose ${closed.silcrowInProse}, link ${closed.inlineSilcrowIsLink}`],
+  ["the document closes with its terminator", closed.terminator?.chips === '"█""█"' && closed.terminator?.rule === true, `${closed.terminator?.chips} rule ${closed.terminator?.rule}`],
 ];
 
 let failed = 0;

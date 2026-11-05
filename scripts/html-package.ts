@@ -334,6 +334,7 @@ ${css}
 <main>
 ${prov}${byline}
 ${body}
+<footer class="terminator"><span class="rule"></span></footer>
 </main>
 </body>
 </html>
@@ -472,7 +473,19 @@ html = html.replace(
   },
 );
 
-// 2. Inline references: a `.md` path or a callsign in prose becomes a link
+// 2. Explicit markdown links to a local document. `[showcase](showcase.md)`
+//    is the author's deliberate claim, and in a single-file package a
+//    relative href would 404 — the file is not beside it. So the link
+//    becomes a panel link, which is the same claim kept.
+const RE_MD_LINK_HTML = /<a href="([^"#:][^"]*\.md)">/g;
+html = html.replace(RE_MD_LINK_HTML, (whole, href: string) => {
+  const target = resolveTarget(decodeURIComponent(href));
+  if (!target) return whole;
+  const id = addRef(target, null);
+  return id ? `<a class="doc-ref" href="#${id}">` : whole;
+});
+
+// 3. Inline references: a `.md` path or a callsign in prose becomes a link
 //    to the same panel. This is what makes a blog post work — its
 //    references are inline, not address lines.
 html = transformText(html, (text) => {
@@ -491,7 +504,7 @@ html = transformText(html, (text) => {
   return out;
 });
 
-// 3. Whatever is left is an address with no target: gold, not a link.
+// 4. Whatever is left is an address with no target: gold, not a link.
 html = docRefPass(html);
 
 const panels = [...refs.values()].map(panel).join("\n");
