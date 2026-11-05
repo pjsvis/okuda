@@ -1,9 +1,19 @@
 # The cahier — what it is, how to make one, and what it will not do
 
-> Logged 2026-11-05. **Status: the explainer.** For a reader who wants to know
-> what this thing is and whether they want one. The name's reasoning is
-> `docs/2026-11-05-naming-the-cahier.md`; the mechanism is
-> `ADR-PANEL-NOT-DOOR-081`; the transfer lessons are
+> Logged 2026-11-05. **Status: the reference record.** The *reading* version is
+> `explainers/the-cahier.md` — narrative, why-first, for someone who has never
+> heard of the silo. This one is the detail: the guarantee table, the cost
+> table, the pipeline, the exclusions.
+>
+> **Two registers, one subject, and the division is deliberate** — the explainer
+> is the living document a reader is sent to; this is the dated record of what
+> was true on 2026-11-05. If the cahier changes, the explainer changes and this
+> one does not, because a record that is edited is no longer a record. The
+> guarantee table below is the exception: it is asserted by `just html-verify`,
+> so it is a live claim and must be kept true.
+>
+> The name's reasoning is `docs/2026-11-05-naming-the-cahier.md`; the mechanism
+> is `ADR-PANEL-NOT-DOOR-081`; the transfer lessons are
 > `docs/2026-11-05-lessons-from-the-port.md`.
 
 ## What it is
