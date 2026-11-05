@@ -30,8 +30,10 @@ the platform-package form it has not taken yet.
 **N binaries, not one multicall binary.** `okuda` and `cahier` are separate binaries
 with separate contracts; `gloam` is a symlink alias. Two channels carry them:
 
-1. **The npm location** — the primary channel for npm users. The binaries ride as
-   scoped platform packages (`@<scope>/okuda-<os>-<cpu>`, `@<scope>/cahier-<os>-<cpu>`),
+1. **The npm location** — the primary channel for npm users. **The scope is
+   `@okuda`** (decided 2026-11-05: the core's name, so the family grows under it and
+   a new product never races the world for an unscoped name). The binaries ride as
+   scoped platform packages (`@okuda/okuda-<os>-<cpu>`, `@okuda/cahier-<os>-<cpu>`),
    and the main `okuda` package's `bin` shims over them (the esbuild/swc/loctree
    pattern). npm carries integrity, so no checksum script is owed. This is what the
    commissioning of a new scope is *for*; see `PLY-NPM-COMMISSIONING`.

@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**13 live · 155 archived · 18 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 4 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**14 live · 155 archived · 19 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 5 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -16,6 +16,7 @@ Nothing waits on these and no Thing records them. The question per row is **what
 | BRF-PROBES-TIER | 5d | Establish Registered `probes/` Tier for Exploratory Python |
 | BRF-CHOICE-LIST | -8d | The choice list — a document that is a setting, and the ac |
 | BRF-TEMPORAL-WINDOW | -8d | The temporal window — the date the reader already types, a |
+| BRF-PLATFORM-PACKAGES | -10d | The platform packages — the binaries ride npm under `@okud |
 
 ### Ticketed, live — the load-bearing set
 
@@ -50,6 +51,7 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 | BRF-SYMBOL-PLAIN | · open | The repertoire, and the plain mode for a host that cannot draw it | — |
 | BRF-HTML-PACKAGE | · open | The package — a document and its one-hop closure, in one file | — |
 | BRF-CAHIER-BINARY | · open | The cahier binary — the compositor, compiled and shipped | — |
+| BRF-PLATFORM-PACKAGES | · open | The platform packages — the binaries ride npm under `@okuda` | — |
 
 ## Ready — specced, next up
 
