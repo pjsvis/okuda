@@ -10,6 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-11-05 | ADR-PANEL-NOT-DOOR-081 | Accepted | The panel, not the door — `:target` over `<details>` and `<dialog>`, and the accessibility gap declared | 081-the-panel-not-the-door.md |
+| 2026-11-05 | ADR-EXPORT-SURFACE-082 | Accepted | The export surface is the contract — observed, not declared | 082-the-export-surface.md |
 | 2026-11-04 | ADR-GATE-JUDGES-HEAD-080 | Accepted | A gate judges the record, not the desk — two modes, and the shared index | 080-the-gate-judges-head.md |
 | 2026-11-03 | ADR-AUTHORING-CONTRACT-079 | Accepted | Authoring is a contract, not a style — four things an author is given | 079-authoring-contract.md |
 | 2026-10-30 | ADR-MATH-GRAMMAR-076 | Accepted | A grammar, not an engine — the maths okuda declines | 076-a-grammar-not-an-engine.md |
