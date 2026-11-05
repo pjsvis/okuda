@@ -37,8 +37,8 @@ it grows, or it is deleted. There is no third state, and "it is only advice" is
 the third state wearing a hat.
 
 **3. The ready list serves deferred work as startable.** `td usage
---new-session` printed `td-97013a` P1 under READY TO START; its `td context`
-says deferred until 2026-12-01. The machine view is already honest — `td list
+--new-session` printed a deferred P1 under READY TO START, and only its `td
+context` said so (deferred until 2026-12-01). The machine view is already honest — `td list
 --json` omits deferred rows (td 0.69.0) — so the defect is the *prose* view, and
 the silo's remedy is the house one: a derived view over the honest source, never
 a second store.

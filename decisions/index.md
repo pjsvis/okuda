@@ -14,6 +14,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-11-05 | ADR-FAMILY-DISTRIBUTION-083 | Accepted | The family distributes as N binaries — one generated installer, and the npm location | 083-family-distribution.md |
 | 2026-11-05 | ADR-ALLOWANCE-NAMES-REFERENT-084 | Accepted | The allowance names its referent — baselines are per token, not per count | 084-the-allowance-names-its-referent.md |
 | 2026-11-05 | ADR-GATE-TWO-RENDERS-085 | Accepted | A gate prints its verdict; the reading is a deliberate invocation | 085-a-gate-prints-two-renders.md |
+| 2026-11-05 | ADR-GLOBAL-TERM-086 | Accepted | An entry in the loaded protocol file is a term, its test, and an attribution | 086-the-global-term-and-the-local-history.md |
 | 2026-11-04 | ADR-GATE-JUDGES-HEAD-080 | Accepted | A gate judges the record, not the desk — two modes, and the shared index | 080-the-gate-judges-head.md |
 | 2026-11-03 | ADR-AUTHORING-CONTRACT-079 | Accepted | Authoring is a contract, not a style — four things an author is given | 079-authoring-contract.md |
 | 2026-10-30 | ADR-MATH-GRAMMAR-076 | Accepted | A grammar, not an engine — the maths okuda declines | 076-a-grammar-not-an-engine.md |
