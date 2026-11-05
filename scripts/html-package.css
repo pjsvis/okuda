@@ -13,6 +13,14 @@
  * this stylesheet. Same role, different file. The renderer still
  * asserts nothing; the glass still owns its ink.
  *
+ * We are not in the terminal any more. The terminal's discipline is a
+ * fixed column count, elision and no reflow; the browser has a layout
+ * engine, so the discipline here is different: the *structure* is
+ * preserved (a diagram never wraps, a table is a table) and the
+ * *measure* is the glass's. What does not change is the palette and the
+ * hierarchy — colour does the work, and the author supplies the
+ * structure that earns it.
+ *
  * Contract: briefs/2026-11-05-brief-html-package.md
  * Authoring spec: docs/style-guide.md
  */
@@ -37,6 +45,10 @@
   /* The shoulder. A frame that wraps is a gesture; a box is furniture.
    * One rule, no perimeter, no radius. */
   --okuda-shoulder: 2px;
+
+  /* The rhythm. One number for the gap between blocks, so the page has a
+   * beat rather than a set of ad-hoc margins. */
+  --okuda-gap: 1.4em;
 }
 
 html {
@@ -50,7 +62,6 @@ html {
     "SF Mono", monospace;
   font-size: 16px;
   line-height: 1.6;
-  /* The glass owns the measure; the reader may override it. */
   -webkit-text-size-adjust: 100%;
 }
 
@@ -96,6 +107,10 @@ th {
   color: var(--okuda-body, var(--okuda-ink));
 }
 
+p {
+  margin: 0 0 var(--okuda-gap);
+}
+
 h1,
 h2,
 h3,
@@ -113,6 +128,14 @@ h2 { font-size: 1.3em; }
 h3 { font-size: 1.15em; }
 h4, h5, h6 { font-size: 1em; }
 
+/* A heading that opens a section gets air above it; the first one does
+ * not, because the page already has a top. */
+h1:first-child,
+h2:first-child,
+h3:first-child {
+  margin-top: 0;
+}
+
 strong {
   color: var(--okuda-strong);
   font-weight: 600;
@@ -123,26 +146,57 @@ em {
   font-style: italic;
 }
 
-/* The bold lead: the house move. A list item that opens with a bold key
- * renders as an amber column the eye scans without reading — the table's
- * first column, rotated vertical. No extra markup: the pattern is the
- * author's, and the colour is the renderer's. */
-li > strong:first-child {
-  color: var(--okuda-table-key);
+hr {
+  border: 0;
+  border-top: 1px solid var(--okuda-muted);
+  margin: 2.5em 0;
 }
 
+/* ── Lists: loose is the house form ────────────────────────────────── */
+
+/* okuda's signature is the LOOSE list, and the parser preserves the
+ * author's choice: a loose list emits `<li><p>…</p></li>`, a tight one
+ * emits `<li>…</li>`. So the sheet honours the source rather than
+ * imposing a rhythm — the author's blank line is the assertion, and the
+ * CSS is not entitled to overrule it. */
 ul, ol {
   padding-left: 1.4em;
+  margin: 0 0 var(--okuda-gap);
 }
 
 li::marker {
   color: var(--okuda-muted);
 }
 
-hr {
-  border: 0;
-  border-top: 1px solid var(--okuda-muted);
-  margin: 2.5em 0;
+/* A tight list still breathes a little; a loose one gets its paragraph
+ * gap from the <p> inside it. */
+li + li {
+  margin-top: 0.25em;
+}
+
+li > p {
+  margin: 0 0 0.6em;
+}
+
+li > p:last-child {
+  margin-bottom: 0;
+}
+
+/* Nested lists hang off their parent item, not off the page. */
+li > ul,
+li > ol {
+  margin: 0.4em 0 0;
+}
+
+/* The bold lead: the house move. A list item that opens with a bold key
+ * renders as an amber column the eye scans without reading — the table's
+ * first column, rotated vertical. Two selectors because the parser emits
+ * two shapes: tight (`li > strong`) and loose (`li > p > strong`). The
+ * loose form is the house form, so missing it would have been the
+ * signature pattern failing in the style it is named for. */
+li > strong:first-child,
+li > p:first-child > strong:first-child {
+  color: var(--okuda-table-key);
 }
 
 /* ── Code ──────────────────────────────────────────────────────────── */
@@ -156,11 +210,12 @@ pre {
   /* A shoulder, not a box: the frame wraps and leaves the far end open. */
   border-left: var(--okuda-shoulder) solid var(--okuda-muted);
   padding: 0.6em 0 0.6em 1em;
-  margin: 1.4em 0;
+  margin: var(--okuda-gap) 0;
   overflow-x: auto;
   /* Structure never wraps. A wrapped code line reads as two lines. */
   white-space: pre;
   tab-size: 2;
+  line-height: 1.45;
 }
 
 pre code {
@@ -171,7 +226,7 @@ pre code {
 
 blockquote {
   border-left: var(--okuda-shoulder) solid var(--okuda-blockquote);
-  margin: 1.4em 0;
+  margin: var(--okuda-gap) 0;
   padding: 0.2em 0 0.2em 1em;
   color: var(--okuda-blockquote);
 }
@@ -180,12 +235,18 @@ blockquote p {
   color: inherit;
 }
 
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
 /* ── Tables: the structured glance ─────────────────────────────────── */
 
 table {
   border-collapse: collapse;
-  margin: 1.4em 0;
-  /* A table is structure, not prose: it may outrun the measure. */
+  margin: var(--okuda-gap) 0;
+  /* A table is structure, not prose: it may outrun the measure, and the
+   * page scrolls rather than the cells reflowing into a shape the author
+   * never wrote. */
   max-width: 100%;
 }
 
@@ -251,7 +312,7 @@ a:hover {
 .diagram {
   border-left: var(--okuda-shoulder) solid var(--okuda-diagram-border);
   padding: 0.6em 0 0.6em 1em;
-  margin: 1.4em 0;
+  margin: var(--okuda-gap) 0;
   overflow-x: auto;
   /* A diagram never wraps. A wrapped state machine is a lie about the
    * topology — this is the one place the terminal's discipline is
@@ -296,6 +357,13 @@ a:hover {
   margin-right: auto;
 }
 
+/* A panel is a document, but it is not the document: its title sits one
+ * rung below the main one, so the reader can tell which page they are on
+ * without reading the chrome. */
+.deref h1 {
+  font-size: 1.3em;
+}
+
 /* The close control. Its href MUST be an unmatched fragment: `#` scrolls
  * to the top, so the panel closes correctly and the reader is silently
  * somewhere else. Measured — the one trap. */
@@ -317,11 +385,19 @@ a:hover {
 }
 
 /* The receipt: the map you hold. What the reference is, without visiting
- * it — the lexicon's test for a reference rather than a door. */
+ * it — the lexicon's test for a reference rather than a door. It is a
+ * link, so it must not wear the link's underline: the gold is the
+ * register, and the whole block is the target. */
 .receipt {
+  display: block;
   border-left: var(--okuda-shoulder) solid var(--okuda-doc-ref);
   padding: 0.2em 0 0.2em 1em;
-  margin: 1.2em 0;
+  margin: 0;
+  text-decoration: none;
+}
+
+.receipt:hover .receipt-title {
+  text-decoration: underline;
 }
 
 .receipt-title {
@@ -348,6 +424,9 @@ a:hover {
   .deref-close {
     display: none !important;
   }
+  /* Paper has no scrollbar, so the two blocks that never wrap on screen
+   * are the two that must wrap here. A cut diagram is worse than a
+   * wrapped one when there is no way to widen the page. */
   pre,
   .diagram {
     overflow: visible;

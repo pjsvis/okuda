@@ -40,7 +40,11 @@ const filler = Array.from(
 
 writeFileSync(
   src,
-  `---\ntype: Brief\ncallsign: BRF-FIXTURE\ndate: 2026-11-05\n---\n\n# Fixture\n\n${filler}\n\nAn inline reference to decisions/027-temperament-is-downstream-of-discipline.md in prose.\n\ndecisions/027-temperament-is-downstream-of-discipline.md §27\n\nA closing paragraph.\n`,
+  `---\ntype: Brief\ncallsign: BRF-FIXTURE\ndate: 2026-11-05\n---\n\n# Fixture\n\n${filler}\n\n- **Tight.** A tight list item.
+
+- **Loose.** A loose list item, which is the house form.
+
+An inline reference to decisions/027-temperament-is-downstream-of-discipline.md in prose.\n\ndecisions/027-temperament-is-downstream-of-discipline.md §27\n\nA closing paragraph.\n`,
 );
 
 // The package is built from the repo root, so the relative address resolves.
@@ -145,6 +149,15 @@ const probe = () =>
       inlineRefIsLink: [...document.querySelectorAll('a.doc-ref')]
         .some(a => a.textContent?.includes('decisions/027')),
       byline: document.querySelector('.byline')?.textContent ?? null,
+      // The house move, in the house's own list style. A loose list emits
+      // <li><p><strong>, so a selector that only knows <li><strong> misses
+      // the signature pattern in the style it is named for.
+      looseBoldLead: (() => {
+        const e = document.querySelector('li > p > strong:first-child');
+        return e ? getComputedStyle(e).color : null;
+      })(),
+      tableKey: getComputedStyle(document.documentElement)
+        .getPropertyValue('--okuda-table-key').trim(),
       frontMatterLeaked: document.body.textContent?.includes('callsign: BRF-FIXTURE') ?? false,
       // ASSETS, not references. A link to another document is a reference
       // the reader may follow; an asset is something this file must fetch,
@@ -182,6 +195,7 @@ const checks: Array<[string, boolean, string]> = [
   ["front matter becomes a byline", closed.byline === "BRF-FIXTURE · Brief · 2026-11-05", `byline ${closed.byline}`],
   ["front matter does not leak into the body", closed.frontMatterLeaked === false, `leaked ${closed.frontMatterLeaked}`],
   ["the file fetches no external asset", closed.externalAssets.length === 0, `${closed.externalAssets.length} found`],
+  ["a loose list's bold lead takes the key colour", closed.looseBoldLead === "rgb(224, 180, 92)", `${closed.looseBoldLead} vs ${closed.tableKey}`],
 ];
 
 let failed = 0;
