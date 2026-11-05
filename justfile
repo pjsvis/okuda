@@ -378,10 +378,17 @@ dev file:
 
 # Compile, re-sign, verify
 [group('build')]
-build:
+build: cahier-build
     @bun build --compile --define "BUILD_SHA=\"$(git rev-parse --short=7 HEAD)\"" src/cli.ts --outfile okuda
     @bash scripts/sign-binary.sh okuda
     @bash scripts/signature-check.sh okuda
+
+# Compile the compositor
+[group('build')]
+cahier-build:
+    @bun build --compile --define "BUILD_SHA=\"$(git rev-parse --short=7 HEAD)\"" scripts/html-package.ts --outfile cahier
+    @bash scripts/sign-binary.sh cahier
+    @bash scripts/signature-check.sh cahier
 
 # Install
 [group('build')]
@@ -389,6 +396,7 @@ install:
     @mkdir -p ~/.local/bin
     @ln -sf $(pwd)/okuda ~/.local/bin/okuda
     @ln -sf $(pwd)/okuda ~/.local/bin/gloam
+    @ln -sf $(pwd)/cahier ~/.local/bin/cahier
 
 # Gloam launcher
 [group('build')]

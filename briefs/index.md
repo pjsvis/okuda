@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-05 | BRF-CAHIER-BINARY | open | The cahier binary — the compositor, compiled and shipped | 2026-11-05-brief-cahier-binary.md |
 | 2026-11-04 | BRF-FONT-COVERAGE | open | The codepoints we emit, against the fonts that must draw them | 2026-11-04-brief-font-coverage.md |
 | 2026-11-04 | BRF-SYMBOL-PLAIN | open | The repertoire, and the plain mode for a host that cannot draw it | 2026-11-04-brief-symbol-plain.md |
 | 2026-11-03 | BRF-CHOICE-LIST | open | The choice list — a document that is a setting, and the actuator it would need | 2026-11-03-brief-choice-list.md |

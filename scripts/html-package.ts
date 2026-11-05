@@ -42,6 +42,11 @@ import { loadCallsigns, resolveAmongCallsigns, siloRoot } from "../src/root.ts";
 import { styleBlock } from "./html-palette.ts";
 import { artefactName, splitFrontMatter } from "./html-naming.ts";
 
+/** Build stamp: --define BUILD_SHA="<sha>" at compile time (justfile
+ *  `cahier-build`). Undefined when run as a script via bun — the same
+ *  shape src/cli.ts:55 uses, so one `fresh` gate reads both binaries. */
+declare const BUILD_SHA: string | undefined;
+
 // ── The mermaid pipe ──────────────────────────────────────────────────
 //
 // The binary is the environment's, not ours: okuda never parses mermaid.
@@ -463,9 +468,26 @@ ${body}
 // ── Main ──────────────────────────────────────────────────────────────
 
 const args = process.argv.slice(2);
+
+const USAGE = `usage: cahier <file.md> [-o out.html] [--root <dir>]
+              [--source-url <url>] [--source-title <title>]
+              [--max-panels <n>] [--max-bytes <n>]`;
+
+// The actuator's two discovery verbs. An actuator, not a wrapper: `--help` is
+// the whole interface, and the build stamp is what `just fresh` reads.
+if (args.includes("--version")) {
+  const sha = typeof BUILD_SHA !== "undefined" ? BUILD_SHA : undefined;
+  process.stdout.write(`cahier ${sha ? `(${sha})` : "(dev)"}\n`);
+  process.exit(0);
+}
+if (args.includes("--help") || args.includes("-h")) {
+  process.stdout.write(USAGE + "\n");
+  process.exit(0);
+}
+
 const input = args.find((a) => !a.startsWith("-"));
 if (!input) {
-  console.error("usage: bun scripts/html-package.ts <file.md> [-o out.html]");
+  console.error(USAGE);
   process.exit(2);
 }
 const flag = (name: string): string | undefined => {

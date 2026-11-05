@@ -10,8 +10,8 @@
  * `var(--okuda-body, …)` fallback does the inheriting.
  */
 
-import { readFileSync } from "node:fs";
 import palette from "../src/palettes/okuda.json" with { type: "json" };
+import css from "./html-package.css" with { type: "text" };
 
 export function paletteVars(): string {
   const lines: string[] = [];
@@ -22,9 +22,12 @@ export function paletteVars(): string {
   return `:root {\n${lines.join("\n")}\n}`;
 }
 
-/** The structural sheet, read once. */
+/** The structural sheet. Bundled at build time, not read at runtime: a
+ *  compiled binary (`cahier`, BRF-CAHIER-BINARY) has no filesystem beside
+ *  it — `import.meta.url` resolves into the virtual `/$bunfs` root, where
+ *  the .css does not exist. The text import carries it into the artifact. */
 export function readCss(): string {
-  return readFileSync(new URL("./html-package.css", import.meta.url), "utf8");
+  return css;
 }
 
 /** The whole `<style>` payload: derived roles first, then the relations. */

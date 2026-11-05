@@ -10,3 +10,4 @@
 {"file":"2026-11-03-brief-temporal-window.md","date":"2026-11-03","status":"ready","summary":"The temporal window — the date the reader already types, and the three words beside it","meta":{},"callsign":"BRF-TEMPORAL-WINDOW"}
 {"file":"2026-11-04-brief-font-coverage.md","date":"2026-11-04","status":"open","summary":"The codepoints we emit, against the fonts that must draw them","meta":{},"callsign":"BRF-FONT-COVERAGE"}
 {"file":"2026-11-04-brief-symbol-plain.md","date":"2026-11-04","status":"open","summary":"The repertoire, and the plain mode for a host that cannot draw it","meta":{},"callsign":"BRF-SYMBOL-PLAIN"}
+{"file":"2026-11-05-brief-cahier-binary.md","date":"2026-11-05","status":"open","summary":"The cahier binary — the compositor, compiled and shipped","meta":{},"callsign":"BRF-CAHIER-BINARY"}
