@@ -10,8 +10,8 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 ## This sweep found the table pointing at a closed queue — read this first
 
 Every task ID this table carried pointed at nothing live. Checked 2026-11-05:
-eleven were **closed**, and one (`td-fa0454`) was not on the board at all — the
-ephemeral store had pruned the row the table still cited. The recommendations
+eleven were **closed**, and one was not on the board at all — the ephemeral
+store had pruned a row this table still cited. The recommendations
 were three weeks old and the queue underneath them had emptied.
 
 **And "closed" carried four different verdicts, plus one that was simply
