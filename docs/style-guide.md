@@ -26,7 +26,9 @@ The closed lexicon carries document-state the bullet cannot. **One glyph, one jo
 
 - ☐ **Open.** Pending, draft, ready to start — not yet landed.
 - ✓ **Done.** Accepted, shipped, verified — closed.
-- ⋮ **Parked.** Gated, deferred, elided into a further question.
+- ⸮ **Parked.** Gated, deferred, elided into a further question. The irony
+  mark, not the vertical ellipsis: `⋮` means *continues below*, which is
+  elision's meaning, and it is reserved for the fold.
 - ✗ **Rejected.** Out of scope, declined, failed — closed negative.
 
 A glyph only earns its place where there is real variance. A column where every row is ✓ is decoration, not signal — leave it off. Declare the legend once, trust it after. The glyphs colour in prose, lists, and tables alike — the lexicon is consistent everywhere.

@@ -158,6 +158,27 @@ const probe = () =>
       })(),
       tableKey: getComputedStyle(document.documentElement)
         .getPropertyValue('--okuda-table-key').trim(),
+      // The heading anchors: a badge on the left, a chip on the right.
+      // They are the strongest horizontal signal on the page, and losing
+      // them is most of why a web page scans worse than a terminal.
+      headingBadge: (() => {
+        const h = document.querySelector('h1');
+        if (!h) return null;
+        const cs = getComputedStyle(h, '::before');
+        return { content: cs.content, bg: cs.backgroundColor };
+      })(),
+      headingChip: (() => {
+        const h = document.querySelector('h1');
+        if (!h) return null;
+        const cs = getComputedStyle(h, '::after');
+        return { content: cs.content, position: cs.position };
+      })(),
+      // The terminal normalises list looseness away; so must the sheet.
+      listRhythm: (() => {
+        const items = [...document.querySelectorAll('li')];
+        if (items.length < 2) return null;
+        return getComputedStyle(items[1]).marginTop;
+      })(),
       frontMatterLeaked: document.body.textContent?.includes('callsign: BRF-FIXTURE') ?? false,
       // ASSETS, not references. A link to another document is a reference
       // the reader may follow; an asset is something this file must fetch,
@@ -196,6 +217,9 @@ const checks: Array<[string, boolean, string]> = [
   ["front matter does not leak into the body", closed.frontMatterLeaked === false, `leaked ${closed.frontMatterLeaked}`],
   ["the file fetches no external asset", closed.externalAssets.length === 0, `${closed.externalAssets.length} found`],
   ["a loose list's bold lead takes the key colour", closed.looseBoldLead === "rgb(224, 180, 92)", `${closed.looseBoldLead} vs ${closed.tableKey}`],
+  ["a heading carries its LHS badge", closed.headingBadge?.content === '"#"', `content ${closed.headingBadge?.content}`],
+  ["a heading carries its RHS chip", closed.headingChip?.content === '"█"' && closed.headingChip?.position === "absolute", `${closed.headingChip?.content} ${closed.headingChip?.position}`],
+  ["every list item is loose", closed.listRhythm === "11.9px", `margin-top ${closed.listRhythm}`],
 ];
 
 let failed = 0;

@@ -48,7 +48,7 @@
    * glass's, and the browser wraps for free, so the page may be wider
    * than the author wrote. A ceiling, not a fixed measure: the ragged
    * right edge is the scan channel and must survive. */
-  --okuda-measure: 88ch;
+  --okuda-measure: 80ch;
 
   /* The fermata — one beat at a mode boundary, measured at 240ms in the
    * spike. Consistent and short, or it reads as latency rather than rest. */
@@ -73,7 +73,9 @@ html {
   font-family: "JuliaMono", "DejaVu Sans Mono", Menlo, ui-monospace,
     "SF Mono", monospace;
   font-size: 17px;
-  line-height: 1.55;
+  /* Tighter than a reading page, because this is a scanning page: the
+   * terminal's density is the thing the browser loses first. */
+  line-height: 1.45;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -144,6 +146,53 @@ h6 {
   font-weight: 600;
   line-height: 1.25;
   margin: 2.2em 0 0.6em;
+  /* The heading is an anchor, and the terminal anchors it with two solid
+   * blocks: a badge on the left whose width is the level, and a chip on
+   * the right at the measure's edge. They are the strongest horizontal
+   * signal on the page, and losing them is most of why a web page scans
+   * worse than a terminal. */
+  position: relative;
+  padding-right: 1.6em;
+}
+
+/* The LHS badge: the marker glyphs in the heading's own colour on the
+ * heading's own ground, so they read as a solid block the width of the
+ * level (the LCARS tab). The glyph stays in the stream, so a reader with
+ * no colour still sees `##`. */
+h1::before,
+h2::before,
+h3::before,
+h4::before,
+h5::before,
+h6::before {
+  background: var(--okuda-heading);
+  color: var(--okuda-heading);
+  margin-right: 0.5em;
+  font-weight: 400;
+}
+
+h1::before { content: "#"; }
+h2::before { content: "##"; }
+h3::before { content: "###"; }
+h4::before { content: "####"; }
+h5::before { content: "#####"; }
+h6::before { content: "######"; }
+
+/* The RHS chip: one muted cell at the measure's edge, the fixed reference
+ * the badge is measured against. Absolute, so a wrapped heading keeps it
+ * on the first line and inline content is not disturbed. */
+h1::after,
+h2::after,
+h3::after,
+h4::after,
+h5::after,
+h6::after {
+  content: "█";
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: var(--okuda-muted);
+  font-weight: 400;
 }
 
 h1 { font-size: 1.5em; }
@@ -177,11 +226,12 @@ hr {
 
 /* ── Lists: loose is the house form ────────────────────────────────── */
 
-/* okuda's signature is the LOOSE list, and the parser preserves the
- * author's choice: a loose list emits `<li><p>…</p></li>`, a tight one
- * emits `<li>…</li>`. So the sheet honours the source rather than
- * imposing a rhythm — the author's blank line is the assertion, and the
- * CSS is not entitled to overrule it. */
+/* okuda's signature is the LOOSE list, and the terminal NORMALISES the
+ * source's looseness away: `renderList` joins every item with a blank line
+ * regardless of how the author spaced them (src/render.ts, `itemBlocks
+ * .join("\n\n")`). So the sheet does the same. Honouring the source was
+ * wrong — it made a tight list render tight, which is a rhythm the
+ * terminal never shows and the bold-lead column cannot scan without. */
 ul, ol {
   padding-left: 1.4em;
   margin: 0 0 var(--okuda-gap);
@@ -191,18 +241,14 @@ li::marker {
   color: var(--okuda-muted);
 }
 
-/* A tight list still breathes a little; a loose one gets its paragraph
- * gap from the <p> inside it. */
+/* One rhythm for both shapes: the gap lives between items, never inside
+ * them, so a loose list and a tight one render identically. */
 li + li {
-  margin-top: 0.25em;
+  margin-top: 0.7em;
 }
 
 li > p {
-  margin: 0 0 0.6em;
-}
-
-li > p:last-child {
-  margin-bottom: 0;
+  margin: 0;
 }
 
 /* Nested lists hang off their parent item, not off the page. */
