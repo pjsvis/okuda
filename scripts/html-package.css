@@ -419,7 +419,7 @@ a:hover {
   transform: translateX(100%);
   transition: transform var(--okuda-beat) ease;
   overflow: auto;
-  padding: 2rem 1.5rem 6rem;
+  padding: 0;
   box-sizing: border-box;
   /* A closed panel is a document nobody is reading. Skip its layout and
    * paint; the intrinsic size keeps the scrollbar honest. */
@@ -432,10 +432,59 @@ a:hover {
   transform: none;
 }
 
-.deref > * {
+.deref-body {
+  padding: 2rem 1.5rem 6rem;
+}
+
+.deref-body > * {
   max-width: var(--okuda-measure);
   margin-left: auto;
   margin-right: auto;
+}
+
+/* The panel's chrome: the identity run the terminal carries in its footer,
+ * made sticky. A scrolled panel otherwise has no identity — the browser tab
+ * still names the MAIN document, so the reader is inside a document that
+ * nothing on screen names. */
+.deref-chrome {
+  position: sticky;
+  top: 0;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  padding: 0.7rem 1.5rem;
+  background: var(--okuda-ground);
+  border-bottom: 1px solid color-mix(in oklab, var(--okuda-muted) 40%, transparent);
+}
+
+.deref-id {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  min-width: 0;
+  font-size: 0.9em;
+  color: var(--okuda-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The mark is the actuation point, so it wears the vector rose — the same
+ * role the terminal paints it in. */
+.deref-mark {
+  color: var(--okuda-vector);
+  font-weight: 600;
+}
+
+.deref-callsign {
+  color: var(--okuda-doc-ref);
+}
+
+.deref-path {
+  color: var(--okuda-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 
@@ -450,12 +499,8 @@ a:hover {
  * the content. Sticky is relative to the scroll container, which is exactly
  * the thing it must stay inside. */
 .deref-close {
-  position: sticky;
-  top: 1rem;
-  z-index: 11;
-  display: block;
-  width: max-content;
-  margin: 0 0 1rem auto;
+  flex: none;
+  margin-left: auto;
   padding: 0.3em 0.8em;
   border: 1px solid var(--okuda-muted);
   color: var(--okuda-muted);

@@ -29,7 +29,7 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { basename, dirname, resolve } from "node:path";
+import { basename, dirname, relative, resolve } from "node:path";
 import {
   applyMathGlyphs,
   classifyChar,
@@ -301,6 +301,7 @@ const RE_CALLSIGN = /\b[A-Z]{3}(?:-[A-Z0-9]+)+\b/g;
 interface Ref {
   id: string;
   path: string;
+  displayPath: string;
   num: string | null;
   title: string;
   callsign: string | null;
@@ -311,8 +312,20 @@ function slug(path: string): string {
   return basename(path, ".md").replace(/[^a-z0-9]+/gi, "-").toLowerCase();
 }
 
+/** The panel's chrome: the identity run the terminal carries in its footer —
+ *  the mark, the callsign, the filename — made sticky, because a scrolled
+ *  panel otherwise has no identity at all. The browser tab still names the
+ *  MAIN document, so without this the reader is inside a document that
+ *  nothing on screen names. */
 function panel(r: Ref): string {
-  return `<section class="deref" id="${r.id}"><a class="deref-close" href="#_">close</a>${r.body}</section>`;
+  const mark = r.num ? `<span class="deref-mark">§${r.num}</span>` : "";
+  const callsign = r.callsign
+    ? `<span class="deref-callsign">${escapeHtml(r.callsign)}</span>`
+    : "";
+  // The spaces between the spans are for textContent — a copy-paste of the
+  // identity run should read as words, not as a run-together token. The
+  // visual gap is the flex `gap`, so the spaces cost nothing on screen.
+  return `<section class="deref" id="${r.id}"><header class="deref-chrome"><span class="deref-id">${mark} ${callsign} <span class="deref-path">${escapeHtml(r.displayPath)}</span></span><a class="deref-close" href="#_">close</a></header><div class="deref-body">${r.body}</div></section>`;
 }
 
 // ── The template ──────────────────────────────────────────────────────
@@ -544,6 +557,7 @@ function addRef(path: string, num: string | null): string | null {
   refs.set(id, {
     id,
     path,
+    displayPath: relative(root, path) || path,
     num,
     title,
     callsign: callsigns.find((c) => c.path === path)?.callsign ?? null,

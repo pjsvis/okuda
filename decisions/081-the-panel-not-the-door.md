@@ -69,6 +69,12 @@ become a history entry. The accessibility gap is declared rather than solved.**
   position. The reader gets the affordance they already have.
 - **Deep links work.** `package.html#ref-27` opens the panel on load — measured —
   so a blog post can link to a specific dereference.
+- **The panel carries its own identity.** The terminal's footer names the
+  document — `silo · callsign · § filename` — and a scrolled panel had nothing:
+  the browser tab still names the MAIN document, so the reader was inside a
+  document that nothing on screen named. The panel now has a sticky chrome
+  carrying the mark, the callsign and the path. Found by the operator returning
+  to a scrolled reference and finding the H1 gone.
 - **Each reference keeps its own place.** Every panel is in the DOM and is only
   translated, so its `scrollTop` survives being closed and reopened, and two
   references hold two different positions at once. Found by the operator scrolling

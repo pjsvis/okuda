@@ -246,6 +246,17 @@ const closeVisibleOnScroll = await ev(`(() => {
   return r.top >= 0 && r.top < window.innerHeight && r.height > 0;
 })()`);
 
+// The panel's chrome must carry the identity AND stay in view. A scrolled
+// panel otherwise has none: the browser tab still names the MAIN document,
+// so the reader is inside a document that nothing on screen names.
+const chromeOnScroll = await ev(`(() => {
+  const c = document.querySelector('.deref-chrome');
+  if (!c) return null;
+  const r = c.getBoundingClientRect();
+  const id = c.querySelector('.deref-id')?.textContent ?? '';
+  return { inView: r.top >= 0 && r.top < window.innerHeight, id: id.trim() };
+})()`);
+
 ws.close();
 
 // ── The checks ────────────────────────────────────────────────────────
@@ -275,6 +286,8 @@ const checks: Array<[string, boolean, string]> = [
   ["opening a panel adds no history entry", opened.historyLen === before.historyLen, `${before.historyLen} → ${opened.historyLen}`],
   ["closing adds no history entry", closed.historyLen === before.historyLen, `${before.historyLen} → ${closed.historyLen}`],
   ["the close control stays visible when the panel scrolls", closeVisibleOnScroll === true, `in view ${closeVisibleOnScroll}`],
+  ["the panel chrome stays in view when scrolled", chromeOnScroll?.inView === true, `in view ${chromeOnScroll?.inView}`],
+  ["the panel chrome names the document", (chromeOnScroll?.id ?? "").length > 0, `id "${chromeOnScroll?.id}"`],
   ["the build says when the panel budget bites", budgetSaid === true, `warned ${budgetSaid}`],
 ];
 
