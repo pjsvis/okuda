@@ -3,11 +3,6 @@
   "measured": "2026-11-03",
   "rung": 160,
   "accepted": {
-    "scripts/invariants-testcard/2026-11-02-figure-ground-benchmark.md": {
-      "cuts": 3,
-      "needs": 250,
-      "reason": "An instrument, not a document: the figure-ground conformance plate, whose alignment markers (`<Col 51`) only read if the plate is not reflowed. It is supposed to lose content at 160. Added 2026-11-03 — the fifth member of the irreducible set, and the only one under `scripts/`."
-    },
     "docs/2026-10-25-test-diagrams.md": {
       "cuts": 6,
       "needs": 250,

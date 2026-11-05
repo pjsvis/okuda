@@ -279,9 +279,12 @@ const closed = CLOSED.filter((c) =>
 
 const RUNG_ORDER: Rung[] = ["cut", "control", "lag", "declare"];
 const rows = [...crossings.keys()].sort();
+// The verdict render prints none of the census (ADR-GATE-TWO-RENDERS-085):
+// the ladder IS the reading, and `just seams` is where it is looked at.
+const GATE = process.argv.includes("--gate");
 
-console.log(`seams — ${crossings.size} inbound crossing(s) in src/, ${files.length} file(s)\n`);
-for (const rung of RUNG_ORDER) {
+if (!GATE) console.log(`seams — ${crossings.size} inbound crossing(s) in src/, ${files.length} file(s)\n`);
+for (const rung of GATE ? ([] as Rung[]) : RUNG_ORDER) {
   const mine = rows.filter((k) => byKey.get(k)?.rung === rung);
   if (mine.length === 0) {
     // CUT is the top rung and it is always empty, by construction: a cut
@@ -299,10 +302,12 @@ for (const rung of RUNG_ORDER) {
   }
   console.log("");
 }
-console.log(`CLOSED — refused arrows, with their verifier (${CLOSED.length})`);
-for (const c of CLOSED) {
-  const holds = !closed.includes(c);
-  console.log(`  ${holds ? "✓" : "✗"} ${c.claim}`);
+if (!GATE) {
+  console.log(`CLOSED — refused arrows, with their verifier (${CLOSED.length})`);
+  for (const c of CLOSED) {
+    const holds = !closed.includes(c);
+    console.log(`  ${holds ? "✓" : "✗"} ${c.claim}`);
+  }
 }
 
 const defects: string[] = [];
@@ -311,11 +316,12 @@ if (stale.length) defects.push(`STALE — ${stale.length} policy row(s) naming a
 if (closed.length) defects.push(`CLOSED — ${closed.length} refused arrow(s) no longer refusing:\n` + closed.map((c) => `    ${c.claim} (${c.absent})`).join("\n"));
 
 if (defects.length === 0) {
-  console.log("\nseams: OK — every crossing names its rung, and every refusal holds.");
+  // one line, no leading blank: the verdict render is read beside 23 others
+  console.log(`${GATE ? "" : "\n"}seams: OK — every crossing names its rung, and every refusal holds.`);
   process.exit(0);
 }
 console.error("\n" + defects.join("\n\n"));
-if (process.argv.includes("--gate")) process.exit(1);
+if (GATE) process.exit(1);
 console.error("\n(reading mode — pass --gate to fail on this)");
 }
 

@@ -122,10 +122,30 @@ ideas:
 
 # ── Quality gate ─────────────────────────────────────────────
 
-# Sync gate
+# The whole gate
 [group('quality gate')]
 check:
-    @bash scripts/signature-check.sh && bash scripts/tree-lint.sh && bun scripts/ref-census.ts --gate && bun scripts/reg-sync.ts --all && bun scripts/family.ts --gate && bun scripts/platform-packages.ts --check && bash scripts/facade-lint.sh && bun scripts/amp-check.ts && bun scripts/amp-briefs.ts --check && bun scripts/td-id-lint.ts && bun scripts/callsign-lint.ts && bun scripts/date-lint.ts && bun scripts/archive-lint.ts && bun scripts/idea-lint.ts --gate && bun scripts/debrief-link-lint.ts --gate && bun scripts/retired-terms-lint.ts --gate && bun scripts/citation-census.ts --strict && bun scripts/lexicon-lint.ts && bun scripts/prose-check.ts --strict-leaks && bun scripts/elision-monotone.ts --gate --strict && bun scripts/seams.ts --gate && bun scripts/brief-queue.ts --gate && bun scripts/html-batch.ts && bun scripts/contrast.ts --surface --gate
+    @bash scripts/gates.sh
+
+# One gate
+[group('quality gate')]
+gate *name:
+    @bash scripts/gates.sh {{name}}
+
+# Branch census
+[group('quality gate')]
+ref-census:
+    @bun scripts/ref-census.ts
+
+# Date readings
+[group('quality gate')]
+dates:
+    @bun scripts/date-lint.ts
+
+# Citation readings
+[group('quality gate')]
+census:
+    @bun scripts/citation-census.ts
 
 # The seam census
 [group('quality gate')]

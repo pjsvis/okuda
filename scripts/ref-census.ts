@@ -194,26 +194,31 @@ function main(): void {
 
   const { findings, merged } = refFindings(rows, DECLARED, today);
 
-  console.log(`ref-census — ${rows.length} branch(es) beside ${BASE}, ${inProgress.length} task(s) in progress`);
-  console.log("");
-  for (const r of [...rows].sort((a, b) => b.behind - a.behind)) {
-    const d = DECLARED[r.name];
-    const state =
-      r.ahead === 0 ? "MERGED  " : r.behind === 0 ? "current " : d ? "declared" : "SIDING  ";
-    const note = d ? `  → declared: ${d.why} (review ${d.review})` : "";
-    console.log(`  ${state} ${r.name.padEnd(24)} ${String(r.ahead).padStart(3)} ahead, ${String(r.behind).padStart(4)} behind, ${String(r.age).padStart(4)}d${note}`);
-    for (const s of r.subjects) console.log(`             ${s.slice(0, 88)}`);
-  }
-  console.log("");
-
-  if (inProgress.length > 0) {
-    console.log("in progress, per the board:");
-    for (const t of inProgress) {
-      const r = rows.find((x) => x.branch === t.id || t.branch === x.name);
-      const stale = r !== undefined && r.ahead > 0 && r.behind > 0;
-      console.log(`  ${t.id}  ${t.title.slice(0, 60)}${stale ? "  ← branch is behind main" : ""}`);
+  // The board is the READING (ADR-GATE-TWO-RENDERS-085): it is looked at
+  // with `just ref-census`, and a passing gate spends one line on it.
+  if (!GATE) {
+    console.log(`ref-census — ${rows.length} branch(es) beside ${BASE}, ${inProgress.length} task(s) in progress`);
+    console.log("");
+    for (const r of [...rows].sort((a, b) => b.behind - a.behind)) {
+      const d = DECLARED[r.name];
+      const state =
+        r.ahead === 0 ? "MERGED  " : r.behind === 0 ? "current " : d ? "declared" : "SIDING  ";
+      const note = d ? `  → declared: ${d.why} (review ${d.review})` : "";
+      console.log(`  ${state} ${r.name.padEnd(24)} ${String(r.ahead).padStart(3)} ahead, ${String(r.behind).padStart(4)} behind, ${String(r.age).padStart(4)}d${note}`);
+      for (const s of r.subjects) console.log(`             ${s.slice(0, 88)}`);
     }
     console.log("");
+
+    if (inProgress.length > 0) {
+      console.log("in progress, per the board:");
+      for (const t of inProgress) {
+        const r = rows.find((x) => x.branch === t.id || t.branch === x.name);
+        const stale = r !== undefined && r.ahead > 0 && r.behind > 0;
+        console.log(`  ${t.id}  ${t.title.slice(0, 60)}${stale ? "  ← branch is behind main" : ""}`);
+      }
+      console.log("");
+    }
+
   }
 
   const fail = findings.map(findingLine);

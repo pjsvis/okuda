@@ -66,6 +66,11 @@ function readBaseline(): Record<string, number> {
 
 function main() {
   const writeBaseline = process.argv.includes("--write-baseline");
+  // The verdict render (ADR-GATE-TWO-RENDERS-085): a passing gate says one
+  // line. The uncorroborated-name ceiling and the shrink notes are the
+  // reading — `just dates` — because a note printed on every run is a note
+  // nobody actions (the 32 stale entries pruned on 2026-11-05).
+  const GATE = process.argv.includes("--gate");
   const baseline = readBaseline();
   const registered = registeredFiles();
   const files = scannedFiles().filter((f) => f.endsWith(".md"));
@@ -99,8 +104,8 @@ function main() {
     return;
   }
 
-  for (const s of shrinks) console.log(`  baseline can shrink: ${s}`);
-  if (uncorroborated > 0) {
+  if (!GATE) for (const s of shrinks) console.log(`  baseline can shrink: ${s}`);
+  if (!GATE && uncorroborated > 0) {
     const eg = uncorroboratedSamples.slice(0, 3).join(", ");
     console.log(
       `  ${uncorroborated} prefixed name(s) uncorroborated (no declared date, no registry row) — ${eg}` +

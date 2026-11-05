@@ -1,7 +1,20 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { configFile, oklchL, ratio, rows, rungLine } from "../scripts/contrast";
+import {
+  FLOOR,
+  PAIRS,
+  configFile,
+  gateFails,
+  gateRows,
+  gateText,
+  gateVerdict,
+  oklchL,
+  ratio,
+  referencePair,
+  rows,
+  rungLine,
+} from "../scripts/contrast";
 
 // The page is a claim set — every ratio on it is arithmetic, so every ratio on it
 // can be checked. This file is what makes `docs/2026-10-28-the-ground-you-read-on.md`
@@ -159,5 +172,30 @@ describe("the contrast primitives", () => {
     // ~0.6 in L — the reason the table carries both numbers.
     expect(oklchL("#808080")).toBeGreaterThan(0.55);
     expect(oklchL("#808080")).toBeLessThan(0.65);
+  });
+});
+
+describe("the surface gate — verdict and reading are one answer (ADR-GATE-TWO-RENDERS-085)", () => {
+  // The gate prints one line when it passes; the reading prints the ladder and
+  // ends with the same line. If those ever disagree, `just check` and
+  // `just surface --ranking` are reporting two different things about one census.
+  const ref = referencePair();
+  const real = gateRows(PAIRS, ref);
+
+  test("a passing ladder: the verdict is the last line of the reading", () => {
+    expect(gateFails(real)).toBe(false);
+    const verdict = gateVerdict(real);
+    expect(verdict.startsWith(`OK — the ${FLOOR}:1 floor holds`)).toBe(true);
+    expect(gateText(real, ref).trimEnd().endsWith(verdict)).toBe(true);
+  });
+
+  test("a failing rung: the reading carries the failure and the verdict says so", () => {
+    const broken = real.map((r, i) =>
+      i === 0 && !r.refused ? { ...r, verdict: { ...r.verdict, readable: false } } : r,
+    );
+    expect(gateFails(broken)).toBe(true);
+    const verdict = gateVerdict(broken);
+    expect(verdict.startsWith(`FAILED — 1 rung(s) break the ${FLOOR}:1 floor`)).toBe(true);
+    expect(gateText(broken, ref).trimEnd().endsWith(verdict)).toBe(true);
   });
 });

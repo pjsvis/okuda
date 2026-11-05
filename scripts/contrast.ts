@@ -400,7 +400,6 @@ export function gateText(rows: GateRow[], refPair: { bg: string; fg: string; nam
     );
   }
   out.push("");
-  const gateFailure = gateFails(rows);
   const inverted = rows.filter((r) => !r.refused && !r.verdict.navigable);
   if (inverted.length > 0) {
     out.push(
@@ -409,15 +408,23 @@ export function gateText(rows: GateRow[], refPair: { bg: string; fg: string; nam
     );
     out.push(`         the reference rung's order is gated (it is the one okuda recommends).`);
   }
-  out.push(
-    gateFailure
-      ? `FAILED — ${floorFailed.length} rung(s) break the ${FLOOR}:1 floor` +
-          (referenceOrderFailed ? `, and the recommended rung's order is inverted` : "") +
-          "."
-      : `OK — the ${FLOOR}:1 floor holds on all ${rows.filter((r) => !r.refused).length} admissible rung(s),` +
-          ` and the order holds on the reference rung.`,
-  );
+  out.push(gateVerdict(rows));
   return out.join("\n");
+}
+
+/** The gate's answer, alone. `gateText` is the reading and ends with this line;
+ *  the verdict render (ADR-GATE-TWO-RENDERS-085) prints it without the ladder,
+ *  because a passing gate spends one line and 24 of them are read in a row. */
+export function gateVerdict(rows: GateRow[]): string {
+  const floorFailed = rows.filter((r) => !r.refused && !r.verdict.readable);
+  const reference = rows.find((r) => r.n === REFERENCE_RUNG);
+  const referenceOrderFailed = reference !== undefined && !reference.refused && !reference.verdict.navigable;
+  return gateFails(rows)
+    ? `FAILED — ${floorFailed.length} rung(s) break the ${FLOOR}:1 floor` +
+        (referenceOrderFailed ? `, and the recommended rung's order is inverted` : "") +
+        "."
+    : `OK — the ${FLOOR}:1 floor holds on all ${rows.filter((r) => !r.refused).length} admissible rung(s),` +
+        ` and the order holds on the reference rung.`;
 }
 
 /** The verdict as text: the two readings named, the failures listed, one answer
@@ -725,19 +732,23 @@ function main(): void {
       // at fails the build rather than a habit. The recommended pair is a sample.
       const gateOnly = argv.includes("--gate");
       if (!bg || !fg) {
-        if (!gateOnly) {
-          console.error("--ranking needs a pair: --bg <hex> --fg <hex>, --rung <n>, or --theme <file>.");
-          process.exitCode = 1;
-          return;
-        }
         // The whole ladder, not the reference rung. Handled here and returned,
-        // because the loop below is written for one pair.
+        // because the loop below is written for one pair. Two renders of one
+        // census: `--surface --gate` is the verdict (one line when it passes),
+        // `--surface` alone is the reading — its door, and the reason the gate
+        // can afford to be quiet (ADR-GATE-TWO-RENDERS-085).
         if (argv.includes("--surface")) {
           const rows = gateRows(PAIRS, refPair);
           const fails = gateFails(rows);
           if (json) console.log(JSON.stringify({ reference: refPair, rows }, null, 2));
-          else console.log(gateText(rows, refPair));
+          else if (fails || !gateOnly) console.log(gateText(rows, refPair));
+          else console.log(`contrast: ${gateVerdict(rows)}`);
           if (fails) process.exitCode = 1;
+          return;
+        }
+        if (!gateOnly) {
+          console.error("--ranking needs a pair: --bg <hex> --fg <hex>, --rung <n>, or --theme <file>.");
+          process.exitCode = 1;
           return;
         }
         cand = { bg: PAIR.bg, fg: PAIR.fg };

@@ -182,17 +182,19 @@ function main(): void {
     return;
   }
 
-  console.log(`idea ledger: ${c.total} entr${c.total === 1 ? "y" : "ies"} in ${Object.keys(c.byCluster).length} cluster(s)`);
-  for (const [cluster, n] of Object.entries(c.byCluster).sort((a, b) => b[1] - a[1])) {
+  // The verdict render (ADR-GATE-TWO-RENDERS-085): the clusters and the
+  // promotion ratio are the reading — `just ideas`.
+  if (!gate) console.log(`idea ledger: ${c.total} entr${c.total === 1 ? "y" : "ies"} in ${Object.keys(c.byCluster).length} cluster(s)`);
+  for (const [cluster, n] of gate ? [] : Object.entries(c.byCluster).sort((a, b) => b[1] - a[1])) {
     const un = ideas.filter((i) => i.cluster === cluster && i.outcome === "open").length;
     console.log(`  ${cluster}: ${n} (${un} open)`);
   }
   const ratio = c.promotionRatio;
-  console.log(
+  if (!gate) console.log(
     `  outcomes: ${c.byOutcome.open} open · ${c.byOutcome.promoted} promoted · ${c.byOutcome.refused} refused` +
       (ratio === null ? "" : ` — promotion ${(ratio * 100).toFixed(0)}%`),
   );
-  if (c.total >= 20 && c.byOutcome.promoted === 0) {
+  if (!gate && c.total >= 20 && c.byOutcome.promoted === 0) {
     console.log(
       "  FALSIFIER: the ledger is growing and promoting nothing — ADR-IDEA-LEDGER-064 says delete it, not curate it",
     );

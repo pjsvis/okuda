@@ -53,6 +53,7 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 | BRF-CAHIER-BINARY | · open | The cahier binary — the compositor, compiled and shipped | — |
 | BRF-PLATFORM-PACKAGES | · open | The platform packages — the binaries ride npm under `@okuda` | — |
 | BRF-COUNT-BASELINE-TOKENS | · open | Per-token baselines — the count-parity swap hole, closed | — |
+| BRF-FIRST-CONTACT | · open | First contact — the check log names its gate, and the board stops lying | — |
 
 ## Ready — specced, next up
 

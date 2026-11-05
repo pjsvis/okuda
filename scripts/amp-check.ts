@@ -23,6 +23,9 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+/** The verdict render (ADR-GATE-TWO-RENDERS-085): the per-document wire
+ *  counts and the staleness calendar are the reading — `just amp` shows them. */
+const GATE = process.argv.includes("--gate");
 const AMPERS = ["&alpha.md", "&briefs.md", "&next.md", "&stack.md"];
 
 let hardDrift = 0;
@@ -59,7 +62,7 @@ for (const doc of AMPERS) {
       }
     }
   }
-  console.log(`  ${doc} — ${wires} wire(s), ${seen.size} distinct jump number(s)`);
+  if (!GATE) console.log(`  ${doc} — ${wires} wire(s), ${seen.size} distinct jump number(s)`);
 }
 
 // ── Staleness: advisory only. The judgment pass is human; the calendar
@@ -67,11 +70,11 @@ for (const doc of AMPERS) {
 for (const doc of AMPERS) {
   const mtime = statSync(join(ROOT, doc)).mtime;
   const days = Math.floor((Date.now() - mtime.getTime()) / 86_400_000);
-  if (days >= 3) console.log(`  ~ ${doc} — last touched ${days}d ago (drift likely)`);
+  if (!GATE && days >= 3) console.log(`  ~ ${doc} — last touched ${days}d ago (drift likely)`);
 }
 
 if (hardDrift > 0) {
   console.error(`\namp-check: FAIL — ${hardDrift} hard drift item(s)`);
   process.exit(1);
 }
-console.log("\namp-check: OK — AMPER documents ride the current state");
+console.log(`${GATE ? "" : "\n"}amp-check: OK — AMPER documents ride the current state`);

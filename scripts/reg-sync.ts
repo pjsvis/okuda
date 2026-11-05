@@ -20,6 +20,11 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
+/** The verdict render (ADR-GATE-TWO-RENDERS-085): `just check` asks whether
+ *  the registries agree, one line. The per-registry readings and the NO DATE
+ *  advisory are what `just reg-list` / `just reg-sync` are for. */
+const GATE = process.argv.includes("--gate");
+
 interface RegistryDef {
   dir: string;
   index: string;
@@ -557,7 +562,7 @@ function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { miss
     console.log(`  ${name}: DRIFT ${e.file} — ${diffs.join(", ")}${fix ? " → corrected" : ""}`);
   }
   if (noDate > 0) {
-    console.log(`  ${name}: ${noDate} doc(s) declare NO DATE — the row keeps its stored value; add a \`**Date:**\` or a date-first filename`);
+    if (!GATE) console.log(`  ${name}: ${noDate} doc(s) declare NO DATE — the row keeps its stored value; add a \`**Date:**\` or a date-first filename`);
   }
 
   const kept = entries.filter((e) => !staleFiles.has(e.file));
@@ -566,13 +571,13 @@ function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { miss
       kept.sort((a, b) => a.file.localeCompare(b.file));
       writeFileSync(indexPath, kept.map((e) => JSON.stringify(e)).join("\n") + "\n");
       console.log(`  ${name}: index rewritten (${kept.length} entries)`);
-    } else {
+    } else if (!GATE) {
       console.log(`  ${name}: OK (0 missing, 0 stale)`);
     }
   } else if (missing.length || stale.length || fieldDrift > 0) {
     console.log(`  ${name}: ${missing.length} MISSING, ${stale.length} STALE, ${fieldDrift} DRIFTED`);
   } else {
-    console.log(`  ${name}: OK (0 missing, 0 stale)`);
+    if (!GATE) console.log(`  ${name}: OK (0 missing, 0 stale)`);
   }
 
   const indexDoc = syncIndexDoc(name, def, kept, fix);
@@ -635,7 +640,7 @@ if (import.meta.main) {
   const all = args.includes("--all");
   const names = all || args.length === 0 ? Object.keys(REGISTRIES) : args.filter((a) => !a.startsWith("--"));
 
-  console.log(`reg-sync ${fix ? "(fix mode)" : "(check mode)"} — ${names.join(", ")}`);
+  if (!GATE) console.log(`reg-sync ${fix ? "(fix mode)" : "(check mode)"} — ${names.join(", ")}`);
   const { perRegistry, fmDrift } = migrateCorpus(fix);
   let drift = fmDrift;
   let collisions = 0;
@@ -663,6 +668,6 @@ if (import.meta.main) {
     process.exitCode = 1; // unfiixable in both modes — the loud gate
   }
   if (drift === 0 && collisions === 0) {
-    console.log("All registries in sync");
+    console.log(GATE ? `reg-sync: OK (${names.length} registr${names.length === 1 ? "y" : "ies"} in sync)` : "All registries in sync");
   }
 }
