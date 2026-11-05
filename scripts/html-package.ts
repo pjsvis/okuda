@@ -40,58 +40,7 @@ import {
 } from "../src/render.ts";
 import { loadCallsigns, resolveAmongCallsigns, siloRoot } from "../src/root.ts";
 import { styleBlock } from "./html-palette.ts";
-
-// ── The document's own date ───────────────────────────────────────────
-//
-// A record's date is the date it was made, not the date it was copied.
-// The front matter says so when it says anything; the source's first
-// commit says so otherwise; the mtime is the last resort and is honest
-// about being one.
-
-function firstCommitDate(file: string): string | null {
-  try {
-    const p = Bun.spawnSync({
-      cmd: ["git", "log", "--diff-filter=A", "--format=%ad", "--date=short", "--", file],
-      stdout: "pipe",
-      stderr: "pipe",
-    });
-    if (p.exitCode !== 0) return null;
-    const lines = new TextDecoder().decode(p.stdout).trim().split("\n").filter(Boolean);
-    return lines.at(-1) ?? null; // the oldest, i.e. the first commit
-  } catch {
-    return null;
-  }
-}
-
-function mtimeDate(file: string): string {
-  try {
-    return statSync(file).mtime.toISOString().slice(0, 10);
-  } catch {
-    return new Date().toISOString().slice(0, 10);
-  }
-}
-
-// ── Front matter: use it, do not render it ────────────────────────────
-//
-// Every silo document carries YAML front matter, and `Bun.markdown.html()`
-// renders it as a rule and a heading — a document publishing its own
-// metadata. The fix is not to strip it but to spend it: the title becomes
-// the `<title>` and the `<h1>`, the rest becomes the byline.
-
-interface Meta {
-  [key: string]: string;
-}
-
-function splitFrontMatter(source: string): { meta: Meta; body: string } {
-  const m = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
-  if (!m) return { meta: {}, body: source };
-  const meta: Meta = {};
-  for (const line of m[1]!.split(/\r?\n/)) {
-    const kv = line.match(/^([A-Za-z_][\w-]*):\s*(.*)$/);
-    if (kv) meta[kv[1]!] = kv[2]!.trim().replace(/^["']|["']$/g, "");
-  }
-  return { meta, body: source.slice(m[0].length) };
-}
+import { artefactName, splitFrontMatter } from "./html-naming.ts";
 
 // ── The mermaid pipe ──────────────────────────────────────────────────
 //
@@ -469,19 +418,9 @@ const { meta, body: source } = splitFrontMatter(raw);
 // (the document's birth, which is what a record's date is); the file's
 // mtime. A name that already carries an ISO date keeps it — the corpus is
 // date-first, and prefixing again would say the date twice.
-const stem = basename(input, ".md");
-// `index.md` exists in every tier, and the artefact name is date + stem — so
-// decisions/index.md and debriefs/index.md both became 2026-08-29-index.html
-// and one silently overwrote the other. Measured 2026-11-05: the debriefs
-// index (515 KiB) replaced the decisions index (664 KiB) with no message.
-// A bare `index` is qualified with its tier; nothing else is.
-const qualified =
-  stem === "index" ? `${basename(dirname(resolve(input)))}-index` : stem;
-const datePrefix = meta.date ?? firstCommitDate(input) ?? mtimeDate(input);
-const named = /^\d{4}-\d{2}-\d{2}-/.test(qualified)
-  ? qualified
-  : `${datePrefix}-${qualified}`;
-const finalPath = outPath ?? resolve("html", `${named}.html`);
+// The name, from the one function that owns the rule — the batch gate
+// predicts this exact answer, so a second copy here would make the gate lie.
+const finalPath = outPath ?? resolve("html", artefactName(input, meta));
 const css = styleBlock();
 
 // The path substrate, anchored the way actuation resolves a target: the
