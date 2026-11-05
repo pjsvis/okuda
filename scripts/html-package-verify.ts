@@ -144,11 +144,14 @@ const probe = () =>
     const p = document.querySelector('.deref');
     return {
       scrollY: Math.round(window.scrollY),
-      panelOpen: p ? p.matches(':target') : null,
+      // A panel is open by :target (no JS) or by the class the script
+      // toggles (JS, no history entry). Both are the same state.
+      panelOpen: p ? (p.matches(':target') || p.classList.contains('is-open')) : null,
       closeHref: document.querySelector('.deref-close')?.getAttribute('href') ?? null,
       // A bare §NN is a section number or a painted badge, never a
       // reference: the renderer's scan keys on paths and callsigns
       // (src/vectors.ts), and §NN is what it PAINTS after one.
+      historyLen: history.length,
       inlineSilcrowIsLink: [...document.querySelectorAll('a')]
         .some(a => a.textContent?.trim() === '§27'),
       silcrowInProse: document.body.textContent?.includes('bare silcrow §27') ?? false,
@@ -218,6 +221,19 @@ const before = await step(() => ev("window.scrollTo(0, document.body.scrollHeigh
 const opened = await step(() => ev("document.querySelector('a.receipt').click()"));
 const closed = await step(() => ev("document.querySelector('.deref-close').click()"));
 
+// The close control must stay in view when the panel scrolls. Measured
+// before the socket closes, because a probe after it would hang.
+await ev("document.querySelector('a.receipt').click()");
+await Bun.sleep(300);
+await ev("document.querySelector('.deref.is-open, .deref:target').scrollTop = 600");
+await Bun.sleep(250);
+const closeVisibleOnScroll = await ev(`(() => {
+  const c = document.querySelector('.deref-close');
+  if (!c) return false;
+  const r = c.getBoundingClientRect();
+  return r.top >= 0 && r.top < window.innerHeight && r.height > 0;
+})()`);
+
 ws.close();
 
 // ── The checks ────────────────────────────────────────────────────────
@@ -244,6 +260,9 @@ const checks: Array<[string, boolean, string]> = [
   ["a bare silcrow stays prose", closed.silcrowInProse === true && closed.inlineSilcrowIsLink === false, `prose ${closed.silcrowInProse}, link ${closed.inlineSilcrowIsLink}`],
   ["the document closes with its terminator", closed.terminator?.chips === '"█""█"' && closed.terminator?.rule === true, `${closed.terminator?.chips} rule ${closed.terminator?.rule}`],
   ["a code file dereferences into a fence", closed.codePanelIsFenced === true, `fenced ${closed.codePanelIsFenced}`],
+  ["opening a panel adds no history entry", opened.historyLen === before.historyLen, `${before.historyLen} → ${opened.historyLen}`],
+  ["closing adds no history entry", closed.historyLen === before.historyLen, `${before.historyLen} → ${closed.historyLen}`],
+  ["the close control stays visible when the panel scrolls", closeVisibleOnScroll === true, `in view ${closeVisibleOnScroll}`],
 ];
 
 let failed = 0;

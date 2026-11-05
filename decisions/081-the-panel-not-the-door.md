@@ -8,10 +8,13 @@ date: 2026-11-05
 
 **Date:** 2026-11-05
 **Status:** Accepted — measured before it was chosen (Chrome 156, CDP, 2026-11-05),
-and built the same day.
-**Enforced by:** `just html-verify` (`scripts/html-package-verify.ts`) — twelve
+and built the same day. **Amended 2026-11-05, same day:** *no JavaScript* was too
+strong. The base document still needs none; a small progressive-enhancement script
+is added for the history model alone, and the reasoning is below.
+**Enforced by:** `just html-verify` (`scripts/html-package-verify.ts`) — twenty-one
 checks in a real browser, including the one that matters: *closing returns to the
-same `scrollY`*. A regression in the mechanism fails the gate.
+same `scrollY`*, and the amended one: *opening a panel adds no history entry*. A
+regression in the mechanism fails the gate.
 
 ## Context
 
@@ -36,8 +39,10 @@ map — the lexicon's *references, not hypertext*.
 ## Decision
 
 **A `:target` panel: always in the DOM, parked off-screen by `transform`, revealed
-by the fragment, closed by an unmatched fragment. No JavaScript. The accessibility
-gap is declared rather than solved.**
+by the fragment, closed by an unmatched fragment. No JavaScript in the base
+document — the hrefs work with scripts off. A single progressive-enhancement
+script moves the address with `history.replaceState` so a dereference does not
+become a history entry. The accessibility gap is declared rather than solved.**
 
 ## Alternatives Considered
 
@@ -46,7 +51,7 @@ gap is declared rather than solved.**
 | `<details>` inline | Destroys the address: the open state lives nowhere the reader can copy, bookmark, or return to. A silcrow *is* an address, so this loses the thing being modelled. It also cannot sit inside a `<p>`, so an inline reference could not use it at all. |
 | `<dialog>` + `showModal()` | Has the semantics and loses the address, and needs JavaScript to put it back. A document that requires a runtime to be a document is a different artefact. |
 | A plain `<a href>` to a separate file | A door. The reader leaves the document, and the map is no longer held. |
-| JavaScript + `pushState` | The fallback if the accessibility gap is judged unacceptable. ~15 lines, and the trade flips cleanly. Not taken, because the gap is declarable and the runtime is not. |
+| JavaScript + `pushState` | **Adopted as an enhancement on 2026-11-05, not as a requirement.** The operator's report: *"the back button is a bit weird, as it goes back to the dereferenced document — we should keep the referenced documents out of history as they are not valid as history."* A package's state is *the main document, or one of its references*; a panel open is a view of the same document, not a new page. Native fragment navigation cannot express that — every open and close mints an entry — and `replaceState` does not re-fire `:target`, so a class carries the state alongside it. What is refused is a *runtime dependency*: with the script absent, every href still works and `:target` still opens the panel. |
 
 ## Consequences
 
@@ -79,9 +84,15 @@ gap is declared rather than solved.**
   the `<details>` wart, and worth writing once.
 - **`content-visibility: auto` on the panel creates a containing block**, which
   makes a `position: fixed` descendant position against the panel rather than the
-  viewport. Found by the operator reading the artefact: the close control scrolls
-  away. The fix is booked in the task ledger; the lesson is that a CSS smoke test would
-  have caught it and a screenshot did.
+  viewport — so the close control scrolled away. Found by the operator reading the
+  artefact twice, the second time after it had been diagnosed and deferred. The fix
+  is `position: sticky`, which is relative to the scroll container and therefore
+  survives the containment. The lesson is that a CSS smoke test would have caught it
+  and a screenshot did.
+- **The heading was too wide, and the cause was the scale.** The terminal renders
+  every heading level at one size, encoding the level in the badge's width; a
+  heading scaled to 1.5em at the same `ch` measure is a line 50% wider than the
+  body. Headings are now 1em, and the badge carries the hierarchy.
 
 ## Related
 

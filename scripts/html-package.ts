@@ -145,6 +145,18 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+/** The inverse, for text read back out of generated HTML. A title
+ *  containing `&lt;details&gt;` was escaped twice and rendered as
+ *  `&amp;lt;details&amp;gt;` — the double-escape, 2026-11-05. */
+function unescapeHtml(s: string): string {
+  return s
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&");
+}
+
 /** Colour the art by channel, run-length: borders recede, arrows lead, text
  *  sits in the foreground. `classifyChar` is okuda's own classifier, so the
  *  HTML and the terminal cannot disagree about what a border is. */
@@ -336,6 +348,42 @@ ${prov}${byline}
 ${body}
 <footer class="terminator"><span class="rule"></span></footer>
 </main>
+<script>
+/* The state of a package is: the main document, or one of its references.
+ * A panel open is a VIEW of the same document, not a new page, so it must
+ * not become a history entry — a back button that walks through
+ * dereferences is a history of views, not of documents.
+ *
+ * Progressive enhancement, and only that: with this script absent the
+ * hrefs still work and :target still opens the panel. What the script adds
+ * is the address moving without the history growing — replaceState
+ * changes the URL, and a class carries the state because replaceState
+ * does not re-fire :target. */
+(() => {
+  const panels = [...document.querySelectorAll('.deref')];
+  const show = (id) => {
+    for (const p of panels) p.classList.toggle('is-open', p.id === id);
+    const base = location.href.split('#')[0];
+    try {
+      history.replaceState(null, '', id ? base + '#' + id : base);
+    } catch {
+      /* file:// or a sandboxed origin refuses replaceState — the panel
+         still opens and closes; only the address does not follow. */
+    }
+  };
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    const id = a.getAttribute('href').slice(1);
+    if (id === '_') { e.preventDefault(); show(null); return; }
+    if (!document.getElementById(id)) return; /* not a panel: leave it */
+    e.preventDefault();
+    show(id);
+  });
+  const h = location.hash.slice(1);
+  if (h && document.getElementById(h)) show(h);
+})();
+</script>
 </body>
 </html>
 `;
@@ -438,9 +486,10 @@ function addRef(path: string, num: string | null): string | null {
     return null;
   }
   const id = num ? `ref-${num}` : `ref-${slug(path)}`;
-  const title =
+  const title = unescapeHtml(
     body.match(/<h1>([\s\S]*?)<\/h1>/)?.[1]?.replace(/<[^>]*>/g, "") ??
-    basename(path, ".md");
+      basename(path, ".md"),
+  );
   // The panel is a document and must look like one: the same glyph and
   // address passes, so a ✓ in a panel is green and a path is gold. What it
   // does NOT get is the reference pass — its own references stay prose,
@@ -510,11 +559,19 @@ html = docRefPass(html);
 const panels = [...refs.values()].map(panel).join("\n");
 
 // The title: front matter, then the H1, then the filename.
-const h1 = html.match(/<h1>([\s\S]*?)<\/h1>/)?.[1]?.replace(/<[^>]*>/g, "");
-const title = meta.title ?? h1 ?? basename(input, ".md");
+const h1 = unescapeHtml(
+  html.match(/<h1>([\s\S]*?)<\/h1>/)?.[1]?.replace(/<[^>]*>/g, "") ?? "",
+);
+const title = meta.title ?? (h1 || basename(input, ".md"));
 
-// The byline: what the front matter knows, and nothing it does not.
-const bylineBits = [meta.callsign, meta.type, meta.date].filter(Boolean);
+// The byline. The callsign is the document's registered name — from the
+// front matter, or from the registry when the front matter omits it. A
+// publication has to say what it is, and the callsign is the address
+// every other document in the corpus uses for it.
+const registered = callsigns.find(
+  (c) => resolve(root, c.path) === resolve(input),
+)?.callsign;
+const bylineBits = [meta.callsign ?? registered, meta.type, meta.date].filter(Boolean);
 const byline = bylineBits.length
   ? `<p class="byline">${bylineBits.map(escapeHtml).join(" · ")}</p>\n`
   : "";

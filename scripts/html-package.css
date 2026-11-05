@@ -197,10 +197,14 @@ h6::after {
   font-weight: 400;
 }
 
-h1 { font-size: 1.5em; }
-h2 { font-size: 1.3em; }
-h3 { font-size: 1.15em; }
-h4, h5, h6 { font-size: 1em; }
+/* No size scaling. The terminal renders every level at one size and
+ * encodes the level in the badge's width and the colour — and a heading
+ * scaled to 1.5em at the same `ch` measure is a line 50% wider than the
+ * body, which reads as a too-wide heading and drags every other heading
+ * with it. The badge is the hierarchy. */
+h1, h2, h3, h4, h5, h6 {
+  font-size: 1em;
+}
 
 /* A heading that opens a section gets air above it; the first one does
  * not, because the page already has a top. */
@@ -420,7 +424,8 @@ a:hover {
   contain-intrinsic-size: auto 100vh;
 }
 
-.deref:target {
+.deref:target,
+.deref.is-open {
   transform: none;
 }
 
@@ -430,21 +435,24 @@ a:hover {
   margin-right: auto;
 }
 
-/* A panel is a document, but it is not the document: its title sits one
- * rung below the main one, so the reader can tell which page they are on
- * without reading the chrome. */
-.deref h1 {
-  font-size: 1.3em;
-}
+
 
 /* The close control. Its href MUST be an unmatched fragment: `#` scrolls
  * to the top, so the panel closes correctly and the reader is silently
- * somewhere else. Measured — the one trap. */
+ * somewhere else. Measured — the one trap.
+ *
+ * STICKY, not fixed. `content-visibility: auto` implies `contain: layout`,
+ * which makes the panel a containing block for fixed-position descendants —
+ * so a `fixed` control positions against the panel and scrolls away with
+ * the content. Sticky is relative to the scroll container, which is exactly
+ * the thing it must stay inside. */
 .deref-close {
-  position: fixed;
+  position: sticky;
   top: 1rem;
-  right: 1rem;
   z-index: 11;
+  display: block;
+  width: max-content;
+  margin: 0 0 1rem auto;
   padding: 0.3em 0.8em;
   border: 1px solid var(--okuda-muted);
   color: var(--okuda-muted);
