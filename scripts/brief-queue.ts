@@ -138,7 +138,7 @@ export function report(): Report {
 
   const graph = textOf("decisions") + "\n" + textOf("debriefs");
   const cited = new Set(live.filter((b) => graph.includes(b.callsign)).map((b) => b.callsign));
-  const board = Bun.spawnSync(["td", "list", "--all"], { stdout: "pipe" }).stdout.toString();
+  const board = Bun.spawnSync(["td", "list", "--all", "--limit", "0"], { stdout: "pipe" }).stdout.toString();
   const ticketed = new Set(live.filter((b) => board.includes(b.callsign)).map((b) => b.callsign));
 
   const disagree: Report["disagree"] = [];

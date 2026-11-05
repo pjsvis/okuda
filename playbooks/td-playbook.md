@@ -26,6 +26,10 @@ td session --new         # force a new session at context start (not mid-work �
 
 `td usage` shows focused work, pending reviews, and open issues. Use `--new-session` only at conversation start or after `/clear` — forcing a new session mid-work bypasses the review-separation that gives the audit trail meaning.
 
+**`td usage`'s READY TO START section includes deferred work.** A task deferred to a later date is held back by `td list` and served as startable by `td usage` — measured on td 0.69.0, 2026-11-05, when a P1 deferred to 2026-12-01 arrived at the top of a fresh session's ready list and only `td context` said so. So the prose view is not the board: `just next` derives the queue from `td list --json` (honest about deferrals) and says how many rows the mechanism is hiding. Read `td next`/`just next` for *what to start*, and `td usage` for *where the session stands*.
+
+**A `td list` is capped at 50 rows and says so on stdout.** `--limit 0` is not optional in any script that reads `list --json`: the cap notice mixes into the JSON, and an uncapped read is an instrument reporting a ceiling as a fact.
+
 ## Claiming Work
 
 Before editing a file, claim its task:

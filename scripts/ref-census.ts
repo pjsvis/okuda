@@ -184,7 +184,7 @@ function main(): void {
   // live session holds.
   let inProgress: { id: string; title: string; branch?: string }[] = [];
   try {
-    const raw = execFileSync("td", ["list", "--json"], { encoding: "utf8" });
+    const raw = execFileSync("td", ["list", "--limit", "0", "--json"], { encoding: "utf8" });
     inProgress = (JSON.parse(raw) as { id: string; title: string; status: string; branch?: string }[])
       .filter((t) => t.status === "in_progress")
       .map((t) => ({ id: t.id, title: t.title, branch: t.branch }));

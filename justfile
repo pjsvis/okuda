@@ -110,6 +110,11 @@ amp-regen:
 orient:
     @bash scripts/orient.sh
 
+# Ready queue
+[group('navigation')]
+next:
+    @bun scripts/next.ts
+
 # Status line
 [group('navigation')]
 silo-status:

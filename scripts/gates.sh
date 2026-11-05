@@ -47,7 +47,7 @@ GATES=(
   "prose|bun scripts/prose-check.ts --strict-leaks"
   "elision|bun scripts/elision-monotone.ts --gate --strict"
   "seams|bun scripts/seams.ts --gate"
-  "briefs|bun scripts/brief-queue.ts --gate"
+  "decide|bun scripts/brief-queue.ts --gate"
   "html|bun scripts/html-batch.ts"
   "contrast|bun scripts/contrast.ts --surface --gate"
 )
