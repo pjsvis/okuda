@@ -7,9 +7,10 @@ briefs: [BRF-HTML-PACKAGE]
 
 # Debrief: The package — a document and its one-hop closure, in one file
 
-**Status:** Done — `main` is `6b0f1d4` plus this record, `just check` rc=0,
-`just html-verify` twelve checks green. One defect deferred with an owner in the
-task ledger, and the mechanism decision recorded as `ADR-PANEL-NOT-DOOR-081`.
+**Status:** Done — `main` is `62fe828` plus this record, `just check` rc=0,
+`just html-verify` thirty-one checks green, and the collision gate wired into
+`just check` over 439 documents. The mechanism decision is
+`ADR-PANEL-NOT-DOOR-081`, amended once on the day it was written.
 
 ## What was asked
 
@@ -91,10 +92,17 @@ compositor and compositing belongs to the environment.
   cover look. The loose-list bug and the close-control bug were both found by a
   human reading a screenshot. That is a structural weakness, and the mitigation is
   computed-style assertions, not screenshot diffs.
-- **Scale is untested.** One 35 KB document rendered fine (23,057px, no page-level
-  horizontal overflow, four code blocks scrolling internally). The corpus has
-  115 KB files. The panel cap (24) and the file size (307 KiB for nine panels) are
-  guesses about where the ceiling is, and neither has been hit.
+- **Scale is now measured, not guessed.** The budget is bytes (2 MiB) with a
+  count backstop (200), because a count does not track its cost: measured 9.4 KiB
+  per panel on decisions/index.md against 18.5 KiB on the squint test, so a count
+  of 24 was 226 KiB in one case and 388 KiB in the other. After: decisions/index.md
+  carries all 80 panels in 684 KiB, debriefs/index.md all 64 in 531 KiB, neither
+  dropping anything, both loading in ~20 ms. **The whole decision record in one
+  file**, which is what the package was for.
+- **The quick failures are the class.** A broken citation, a stale glyph, a
+  heading 50% too wide, a panel holding a copy of its own document — none threw,
+  all looked fine, all were found by a human reading. That is the argument for the
+  CSS smoke tests, and the argument for reading the artefacts.
 - **The accessibility gap is declared, not solved.** A `:target` panel is not a
   dialog to the tree. `<dialog>` has the semantics and loses the address. Nothing
   native gives both.
@@ -117,11 +125,15 @@ and it is a better object than the post that links to it.
 
 ## What is next
 
-1. The close control scrolls away (`content-visibility` creates a containing
-   block) — booked in the task ledger, and the first item for the CSS smoke-test
-   work.
-2. The CSS smoke tests: computed-style assertions for the patterns a screenshot
-   currently guards.
-3. Scale: a monster document through the pipeline, and the panel cap measured
-   rather than guessed.
-4. Dogfood: publish a real post and see what the pattern actually wants.
+1. **The CSS smoke tests.** Thirty-one checks now cover behaviour and the computed
+   styles the sheet must hold — the badge, the chip, the list rhythm, the link
+   registers, the table's absence of rules. What they cannot cover is *look*, and
+   five of the nine dogfooding finds were look. The next instrument is a small
+   set of visual assertions, not a screenshot diff.
+2. **The terminal's archive anchor** — filed, and the one asymmetry left: the
+   package resolves a citation into `.archive/` and the terminal does not, which
+   is the wrong way round.
+3. **The pipe in a code span** — measured as a source defect in both renderers.
+   The count decides whether the remedy is the document or the grammar.
+4. **Dogfood for real.** Publish a post, link it, and see what the pattern
+   actually wants from a reader who has never heard of the silo.
