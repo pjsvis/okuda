@@ -56,14 +56,12 @@ list is a deployment fact, not a reading.
 - npm installs the matching platform package by `os`/`cpu`; the others are
   skipped, not downloaded.
 
-## The first decision this brief needs
+## The decision, resolved
 
-**Does the main package move to `@okuda/okuda`, or stay unscoped `okuda` with only
-the platform packages scoped?** The operator said the scope is the core's name.
-Moving it is a migration — the unscoped `okuda` name stays on the registry forever
-and a version is immutable — so it is a one-time act, not a rename. **Recommended:**
-`@okuda/okuda` for one family name, with the unscoped package left as a pointer and
-deprecated note.
+**The main package moves to `@okuda/okuda`** (operator, 2026-11-05), with the
+unscoped `okuda` left as a deprecated pointer. One family name, one scope — the
+core's name, so the family grows under it. The unscoped name stays on the registry
+forever; the move is a one-time act, not a rename.
 
 ## Acceptance Criteria
 
