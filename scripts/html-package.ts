@@ -623,11 +623,17 @@ html = transformText(html, (text) => {
     const id = addRef(target, null);
     return id ? `<a class="doc-ref" href="#${id}">${p}</a>` : p;
   });
+  // A callsign is not a path. In the terminal a callsign stays in prose ink
+  // and the ACTUATION is a rose `§NN` badge painted after it; painting the
+  // callsign gold borrowed the path's register and painted an uppercase
+  // identifier in the address colour, which is the one thing the style guide
+  // says the gold is for. So: prose ink, quiet rule, no badge (the rule is
+  // the affordance in a medium that has no cursor).
   out = out.replace(RE_CALLSIGN, (c) => {
     const target = resolveTarget(c);
     if (!target) return c;
     const id = addRef(target, null);
-    return id ? `<a class="doc-ref" href="#${id}">${c}</a>` : c;
+    return id ? `<a class="ref-callsign" href="#${id}">${c}</a>` : c;
   });
   return out;
 });

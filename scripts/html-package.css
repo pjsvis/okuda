@@ -331,6 +331,10 @@ table {
   max-width: 100%;
 }
 
+/* A rule under the header, and nothing else. The terminal separates table
+ * rows with a BLANK LINE, not a line — a line pulls the eye along it, and
+ * the table's structure is the columns, which are already there. Structure
+ * by space, not by rules. */
 th {
   color: var(--okuda-table-header);
   font-weight: 600;
@@ -343,7 +347,11 @@ th {
 td {
   padding: 0.3em 1.2em 0.3em 0;
   vertical-align: top;
-  border-bottom: 1px solid color-mix(in oklab, var(--okuda-muted) 40%, transparent);
+}
+
+/* The blank line between rows, as a full one. */
+tbody tr + tr > td {
+  padding-top: var(--okuda-gap);
 }
 
 /* The key column is the bold lead, tabulated. */
@@ -356,15 +364,27 @@ td:first-child strong {
 a {
   color: var(--okuda-link-text);
   /* The terminal shows link text with no underline. In HTML an unmarked
-   * link is an accessibility failure, so the underline is kept and made
-   * QUIET — but not this quiet: at 45% against `emphasis` (#e0b45c) and
-   * `strong` (#dfa21a), both warm neighbours of the link's #ff9966, the
-   * hue carries no distinction and the rule was doing no work. The rule
-   * is now the channel that separates a link from an emphasis. */
+   * link is an accessibility failure, so the underline is kept — and it is
+   * the SAME COLOUR as the text. A rule in a second colour was the weird
+   * red line under a gold path: two registers on one token, neither
+   * meaning anything. The colour is the register; the rule is only the
+   * affordance. */
   text-decoration: underline;
-  text-decoration-color: var(--okuda-link-text);
+  text-decoration-color: currentColor;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
+}
+
+/* A callsign is a registered name, not a path: it stays in prose ink. The
+ * terminal paints a rose `§NN` badge after it; a page has no cursor, so the
+ * rule is the actuation and it is kept quiet — half the ink, same hue. */
+a.ref-callsign {
+  color: inherit;
+  text-decoration-color: color-mix(in oklab, currentColor 45%, transparent);
+}
+
+a.ref-callsign:hover {
+  text-decoration-color: currentColor;
 }
 
 a:hover {

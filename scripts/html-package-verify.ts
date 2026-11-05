@@ -46,7 +46,9 @@ writeFileSync(
 
 A bare silcrow §27 in prose stays prose, and an inline reference to
 decisions/027-temperament-is-downstream-of-discipline.md becomes a link. A code
-file is a document too: src/render.ts should dereference into a fence.\n\ndecisions/027-temperament-is-downstream-of-discipline.md §27\n\nA closing paragraph.\n`,
+file is a document too: src/render.ts should dereference into a fence. A callsign
+such as ADR-GLASS-INK-073 is a registered name, not a path, so it stays in prose
+ink.\n\ndecisions/027-temperament-is-downstream-of-discipline.md §27\n\nA closing paragraph.\n`,
 );
 
 // The package is built from the repo root, so the relative address resolves.
@@ -217,6 +219,26 @@ const probe = () =>
       // thematic breaks are followed by one. A rule that is NOT followed by
       // a heading is the only structure there, and stays.
       hrTotal: document.querySelectorAll('hr').length,
+      // The three link registers, and the rule that must not borrow a second
+      // colour: the colour is the register, the rule is only the affordance.
+      linkRuleMatchesInk: (() => {
+        const a = document.querySelector('a.ref-callsign, a');
+        if (!a) return null;
+        const cs = getComputedStyle(a);
+        return { rule: cs.textDecorationColor, ink: cs.color };
+      })(),
+      callsignIsInk: (() => {
+        const a = document.querySelector('a.ref-callsign');
+        if (!a) return null;
+        // The link inherits its colour, so it must match the prose around it.
+        return getComputedStyle(a).color === getComputedStyle(a.parentElement).color;
+      })(),
+      // A table's structure is its columns, not its rules.
+      tableRowRule: (() => {
+        const tds = document.querySelectorAll('tbody td');
+        if (tds.length < 2) return null;
+        return [...tds].map(td => getComputedStyle(td).borderBottomWidth).join(',');
+      })(),
       headingGap: (() => {
         const h = document.querySelector('h2');
         return h ? getComputedStyle(h).marginBottom : null;
@@ -302,6 +324,9 @@ const checks: Array<[string, boolean, string]> = [
   ["a rule before a heading is dropped", closed.hrBeforeHeading === false, `hr before heading ${closed.hrBeforeHeading}`],
   ["a rule that is the only structure stays", closed.hrTotal === 1, `${closed.hrTotal} hr`],
   ["a heading keeps a full line of air below", closed.headingGap !== null && parseFloat(closed.headingGap) >= 20, `gap ${closed.headingGap}`],
+  ["a link's rule is the same colour as its ink", closed.linkRuleMatchesInk !== null && closed.linkRuleMatchesInk.rule === closed.linkRuleMatchesInk.ink, `${closed.linkRuleMatchesInk?.rule} vs ${closed.linkRuleMatchesInk?.ink}`],
+  ["a callsign link stays in prose ink", closed.callsignIsInk === true, `ink ${closed.callsignIsInk}`],
+  ["table rows are separated by space, not rules", closed.tableRowRule !== null && !closed.tableRowRule.split(',').some(w => parseFloat(w) > 0), `borders ${closed.tableRowRule}`],
 ];
 
 let failed = 0;
