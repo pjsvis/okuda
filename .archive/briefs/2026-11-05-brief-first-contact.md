@@ -7,7 +7,8 @@ date: 2026-11-05
 # Brief: First contact — the check log names its gate, and the board stops lying
 
 **Created:** 2026-11-05
-**Status:** Open
+**Status:** Done — shipped 2026-11-05: `scripts/gates.sh` (24 named gates, 24 lines, 15s), the `--gate` verdict render across seven gates, `just next`, and the protocol trimmed to 385 lines.
+**Debrief:** `DBF-FIRST-CONTACT`
 
 ## Lineage
 
