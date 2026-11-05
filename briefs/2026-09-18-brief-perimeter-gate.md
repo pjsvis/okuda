@@ -6,6 +6,12 @@ date: 2026-09-18
 
 # Brief: The perimeter gate — the moira group holds only recipes that invoke okuda
 
+> **Overtaken 2026-11-05.** The eviction ran by relocation (`cc722e4`, 2026-10-10).
+> The counts below (25 offenders, 28 recipes) are stale; the `[moira]` group is 6
+> recipes, 2 invoking `./okuda`. The gate was retired, not built, because its
+> classifier would flag the post-flit kept set. Current state:
+> `ADR-PERIMETER-039` (*Amended*).
+
 **Created:** 2026-09-18
 **Status:** Open
 **TD:** td-1bb4c4 (epic) — td-9997dc the check and the report

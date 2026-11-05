@@ -6,7 +6,28 @@ callsign: ADR-PERIMETER-039
 # Decision: The perimeter — the voice reads okuda and does not live in it
 
 **Date:** 2026-09-18
-**Status:** Accepted (the perimeter is recorded; the eviction is not run)
+**Status:** Accepted (the perimeter is recorded; the eviction ran 2026-10-10 — see *Amended*)
+
+## Amended
+
+**2026-11-05 — the eviction ran, by relocation, and the destination moved.**
+
+`cc722e4` (*Moira's flit*, 2026-10-10) moved the rehearsal recipes out and deleted the
+casting doctrine. The perimeter was enforced by relocation, not by the gate this ADR
+proposed — and the gate is retired rather than built: the `[moira]` group is now **6
+recipes, 2 invoking `./okuda`**, and the four a binary-classifier would flag (`recite`,
+`moira`, `moira-showcase`, `moira-commendation`) are the post-flit kept set. The
+measurement's *22 of 28* is superseded; the gate brief's *25* is false.
+
+The destination moved too: `../speak-md` no longer exists; the recipes landed in
+`../Blandings`. The **records** the flit did not touch — the three tracked `.txt`
+artifacts, `playbooks/ear-playbook.md`, `&ear.md`, the Moira documents in `docs/`, and
+`decisions/033` — remain, and are tracked as the residue task. A relocation across the
+seam is a declared handover to Blandings, not a `git mv` from here.
+
+The *Decision* and *Consequences* below stand; the **three briefs** do not.
+`BRF-PERIMETER-GATE` and `BRF-PERIMETER-RUNNER` are overtaken; `BRF-PERIMETER-SILO`'s
+remainder is the residue task.
 
 ## Context
 

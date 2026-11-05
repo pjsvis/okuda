@@ -2,7 +2,7 @@
 date: 2026-09-18
 kind: survey — a proposed split, measured against okuda's own tree
 lineage: the reader's proposal — *"we should split the prosody training into a separate project so that we can concentrate on GLoam and Okuda, opinion"* — tested with `tmp/speech-census.py` against the tracked tree rather than argued from the file listing
-status: open — nothing is moved. A perimeter is proposed, a gate is proposed, and the one coupling that must survive is named.
+status: superseded 2026-11-05 — the eviction ran by relocation (`cc722e4`, 2026-10-10); this is the 2026-09-18 measurement, kept as the reading that sized it. Current state: `ADR-PERIMETER-039`'s *Amended* section.
 ---
 
 # A perimeter, not a project
@@ -10,6 +10,12 @@ status: open — nothing is moved. A perimeter is proposed, a gate is proposed, 
 > ◆ The split is already decided — in ADR-036, in `speak-md`'s own rules, and in a
 > design note the silo does not track. What does not exist is a perimeter: **22 of the
 > 28 recipes in okuda's task runner have no relationship to okuda at all.**
+
+> **Superseded 2026-11-05.** The eviction ran by relocation: `cc722e4` (*Moira's flit*,
+> 2026-10-10) moved the rehearsal recipes out and deleted the casting doctrine. The
+> `[moira]` group is now **6 recipes, 2 invoking `./okuda`** — not 28 and 22. The
+> destination moved from `../speak-md` (gone) to `../Blandings`. The records residue is a
+> separate task; `ADR-PERIMETER-039` carries the current state.
 
 ## What we are deciding
 

@@ -6,6 +6,12 @@ date: 2026-09-18
 
 # Brief: The perimeter silo — the speech doctrine and its records leave okuda
 
+> **Partly overtaken 2026-11-05.** `cc722e4` (*Moira's flit*, 2026-10-10) removed the
+> casting doctrine; the records it did not touch are tracked as the residue task
+> (3 tracked `.txt`, `playbooks/ear-playbook.md`, `&ear.md`, the Moira docs,
+> `decisions/033`). The destination is `../Blandings`, not `../speak-md` (gone).
+> Current state: `ADR-PERIMETER-039` (*Amended*).
+
 **Created:** 2026-09-18
 **Status:** Open
 **TD:** td-1bb4c4 (epic) — td-0a5aa5 the split and the records

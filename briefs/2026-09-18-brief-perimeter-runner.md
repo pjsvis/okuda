@@ -6,6 +6,11 @@ date: 2026-09-18
 
 # Brief: The perimeter runner — the tuning recipes and their artifacts leave the task runner
 
+> **Overtaken 2026-11-05.** The move landed as `cc722e4` (*Moira's flit*,
+> 2026-10-10) — to `../Blandings`, not `../speak-md` (which no longer exists).
+> The counts below (25 recipes) are stale. Current state: `ADR-PERIMETER-039`
+> (*Amended*).
+
 **Created:** 2026-09-18
 **Status:** Open
 **TD:** td-1bb4c4 (epic) — td-db45e2 the move

@@ -128,15 +128,13 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
   the paid-claim inventory: what okuda can do right now, every entry
   citing its landing record. The reader asked for a changelog; this is
   the snapshot that doesn't rot · **S**
-- **The perimeter** (ADR-PERIMETER-039, 2026-09-18) — the speech work
-  leaves okuda, and a check keeps it out. Three briefs, independently
-  closable: the tuning recipes and their artifacts go
-  (BRF-PERIMETER-RUNNER), the doctrine and the records go
-  (BRF-PERIMETER-SILO), and the report that becomes a gate lands first
-  (BRF-PERIMETER-GATE). The measurement is
-  `docs/2026-09-18-a-perimeter-not-a-project.md`: **22 of the 28
-  `[moira]` recipes touch nothing of okuda's**, and every `.txt` the
-  silo tracks is a rendered TTS artifact · **M**
+- **The perimeter** (ADR-PERIMETER-039, 2026-09-18) — **the eviction ran
+  2026-10-10** (`cc722e4`, Moira's flit): the rehearsal recipes left for
+  Blandings and the casting doctrine went. The `[moira]` group is 6
+  recipes, 2 invoking `./okuda`; the gate is retired, because its
+  classifier would flag the post-flit kept set. Remainder: the **records
+  residue** — 3 tracked `.txt`, `playbooks/ear-playbook.md`, `&ear.md`,
+  the Moira docs, `decisions/033` · **S**
 - **The frame thing, two objectives** (2026-09-07) — (1) figure out how
   to best do the frame thing (the semantic pager, chunk = heading-subtree
   vs sub-heading/paragraph for the ear); (2) determine if the frame
