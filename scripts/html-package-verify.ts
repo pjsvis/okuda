@@ -180,9 +180,10 @@ const probe = () =>
         .some(a => a.textContent?.trim() === '§27'),
       silcrowInProse: document.body.textContent?.includes('bare silcrow §27') ?? false,
       // A code file is not markdown. The panel must be a fence, wrapped by
-      // wrapWholeFile, not TypeScript parsed as prose.
-      codePanelIsFenced: [...document.querySelectorAll('.deref pre code')]
-        .some(c => /language-(ts|rs|sh|py)/.test(c.className)),
+      // wrapWholeFile, not TypeScript parsed as prose. Since the code pass
+      // the fence carries pre.code and chroma's spans rather than a
+      // language- class — the class is consumed by the colouring.
+      codePanelIsFenced: document.querySelectorAll('.deref pre.code').length > 0,
       terminator: (() => {
         const t = document.querySelector('.terminator');
         if (!t) return null;
