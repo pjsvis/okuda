@@ -378,6 +378,22 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   `playbooks/registry-playbook.md` (*no parallel stores* — the same rule inside
   one boundary); `docs/2026-10-08-the-participants.md` (participants are actors).
 
+* **The declaration is not the record**: a crossing declares itself — what was
+  written, where it landed, who owns the commit (the seam rule's own text) — but
+  **the declaration is evidence that a crossing happened, not the artefact.** A
+  receiver who treats the declaration as the record endorses a thing they have not
+  read, and the failure is silent in the direction that matters: from inside the
+  receiver's context, a message and a missing file look identical.
+  * **Test:** for any sentence you are about to treat as filed, name the path or
+  the sha where it lives. If the only referent is the message in front of you, it
+  is in transit, not in the record.
+  * **Prior art:** the seam rule above (*undeclared scope is the defect class*);
+  **derived, not specified** (*the vitals are derived, never judged*) — the same
+  law one layer in. **Coined 2026-11-05** at an okuda/cool-pi seam, when an
+  endorsed sentence existed only in a handover message and was filed afterwards.
+  * **Anti-pattern:** *"keep it in X exactly as you wrote it"* said about a summary
+  that never reached X.
+
 * **References, not hypertext**: the primitive is the **document plus its
   references**, not the link. A hyperlink is a **door** you walk through — and the
   literature named the cost (*disorientation*, "lost in hyperspace", whose remedy
