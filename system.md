@@ -384,9 +384,16 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   receiver who treats the declaration as the record endorses a thing they have not
   read, and the failure is silent in the direction that matters: from inside the
   receiver's context, a message and a missing file look identical.
+  * **Ownership is not agency.** *Who must commit* is the receiver; *who executed*
+  is the actor, and **a crossing owes both.** The seam rule's list has no slot for
+  agency, so a receipt can be correct about every field it has and still leave the
+  next reader wrong about the act: a `source_commit` names the content's origin, a
+  `to` names the receiver, and neither says who ran it. **Amended 2026-11-05**, one
+  turn after this term was first published — someone ran a silo's own actuator from
+  the far side of the seam, and the receipt could not say so.
   * **Test:** for any sentence you are about to treat as filed, name the path or
-  the sha where it lives. If the only referent is the message in front of you, it
-  is in transit, not in the record.
+  the sha where it lives **and who put it there**. If the only referent is the
+  message in front of you, it is in transit, not in the record.
   * **Prior art:** the seam rule above (*undeclared scope is the defect class*);
   **derived, not specified** (*the vitals are derived, never judged*) — the same
   law one layer in. **Coined 2026-11-05** at an okuda/cool-pi seam, when an
