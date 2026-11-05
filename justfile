@@ -350,6 +350,16 @@ silcrow-control *flags:
 write file:
     @gloam-edit {{file}}
 
+# Publish as HTML
+[group('writing')]
+html file:
+    @bun scripts/html-package.ts {{file}}
+
+# Measure the package
+[group('writing')]
+html-verify:
+    @bun scripts/html-package-verify.ts
+
 # ── Build ───────────────────────────────────────────────────
 
 [group('build')]

@@ -1,0 +1,343 @@
+/* html-package.css — the glass's half of the HTML package.
+ *
+ * The 25 palette roles are NOT in this file. They are generated from
+ * src/palettes/okuda.json at build time and emitted as `--okuda-<role>`
+ * custom properties ahead of this sheet (derived, not specified: a
+ * hand-copied hex table is a second list to drift, and the palette is
+ * the one list).
+ *
+ * What lives here is the *relations* between the roles — which is the
+ * half ADR-GLASS-INK-073 leaves to okuda. The absolute ground and ink
+ * are declared below, and that is not a contradiction of that ruling:
+ * in a terminal the glass is Ghostty's config, and in HTML the glass is
+ * this stylesheet. Same role, different file. The renderer still
+ * asserts nothing; the glass still owns its ink.
+ *
+ * Contract: briefs/2026-11-05-brief-html-package.md
+ * Authoring spec: docs/style-guide.md
+ */
+
+:root {
+  /* The ground. The palette is a dark-ground palette — #dfa21a strong
+   * and #5fd35f state-ok are unreadable on white — so the glass declares
+   * a dark ground rather than inheriting the browser's white. A light
+   * variant is a palette question, not a stylesheet question. */
+  --okuda-ground: #221f1c;
+  --okuda-ink: #d6cfc4;
+
+  /* The measure. 79 columns is the authoring contract's top rung
+   * (docs/style-guide.md, "Authoring contract"). A ceiling, not a fixed
+   * measure: the ragged right edge is the scan channel and must survive. */
+  --okuda-measure: 79ch;
+
+  /* The fermata — one beat at a mode boundary, measured at 240ms in the
+   * spike. Consistent and short, or it reads as latency rather than rest. */
+  --okuda-beat: 240ms;
+
+  /* The shoulder. A frame that wraps is a gesture; a box is furniture.
+   * One rule, no perimeter, no radius. */
+  --okuda-shoulder: 2px;
+}
+
+html {
+  background: var(--okuda-ground);
+  color: var(--okuda-ink);
+  /* JuliaMono covers 64/64 of the emitted repertoire, DejaVu Sans Mono 62,
+   * Menlo 61 (docs/2026-11-04-font-coverage.md). The stack prefers
+   * coverage and degrades honestly: a face that lacks a glyph falls back
+   * per-glyph, which is the reader's machine doing what it does. */
+  font-family: "JuliaMono", "DejaVu Sans Mono", Menlo, ui-monospace,
+    "SF Mono", monospace;
+  font-size: 16px;
+  line-height: 1.6;
+  /* The glass owns the measure; the reader may override it. */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 2rem 1.5rem 6rem;
+}
+
+main {
+  max-width: var(--okuda-measure);
+  margin: 0 auto;
+}
+
+/* ── Prose ─────────────────────────────────────────────────────────── */
+
+p,
+li,
+td,
+th {
+  /* `body` ships empty in the palette: no ink, inherit the glass's own.
+   * A principal who wants dimmer prose declares a hex; the sheet ships
+   * no opinion about their eyes (ADR-PROSE-MEASURE-071). */
+  color: var(--okuda-body, var(--okuda-ink));
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--okuda-heading);
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 2.2em 0 0.6em;
+}
+
+h1 { font-size: 1.5em; }
+h2 { font-size: 1.3em; }
+h3 { font-size: 1.15em; }
+h4, h5, h6 { font-size: 1em; }
+
+strong {
+  color: var(--okuda-strong);
+  font-weight: 600;
+}
+
+em {
+  color: var(--okuda-emphasis);
+  font-style: italic;
+}
+
+/* The bold lead: the house move. A list item that opens with a bold key
+ * renders as an amber column the eye scans without reading — the table's
+ * first column, rotated vertical. No extra markup: the pattern is the
+ * author's, and the colour is the renderer's. */
+li > strong:first-child {
+  color: var(--okuda-table-key);
+}
+
+ul, ol {
+  padding-left: 1.4em;
+}
+
+li::marker {
+  color: var(--okuda-muted);
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--okuda-muted);
+  margin: 2.5em 0;
+}
+
+/* ── Code ──────────────────────────────────────────────────────────── */
+
+code {
+  color: var(--okuda-code-text);
+  font-family: inherit;
+}
+
+pre {
+  /* A shoulder, not a box: the frame wraps and leaves the far end open. */
+  border-left: var(--okuda-shoulder) solid var(--okuda-muted);
+  padding: 0.6em 0 0.6em 1em;
+  margin: 1.4em 0;
+  overflow-x: auto;
+  /* Structure never wraps. A wrapped code line reads as two lines. */
+  white-space: pre;
+  tab-size: 2;
+}
+
+pre code {
+  color: var(--okuda-code-text);
+}
+
+/* ── Quotes ────────────────────────────────────────────────────────── */
+
+blockquote {
+  border-left: var(--okuda-shoulder) solid var(--okuda-blockquote);
+  margin: 1.4em 0;
+  padding: 0.2em 0 0.2em 1em;
+  color: var(--okuda-blockquote);
+}
+
+blockquote p {
+  color: inherit;
+}
+
+/* ── Tables: the structured glance ─────────────────────────────────── */
+
+table {
+  border-collapse: collapse;
+  margin: 1.4em 0;
+  /* A table is structure, not prose: it may outrun the measure. */
+  max-width: 100%;
+}
+
+th {
+  color: var(--okuda-table-header);
+  font-weight: 600;
+  text-align: left;
+  border-bottom: 1px solid var(--okuda-muted);
+  padding: 0.35em 1.2em 0.35em 0;
+  white-space: nowrap;
+}
+
+td {
+  padding: 0.3em 1.2em 0.3em 0;
+  vertical-align: top;
+  border-bottom: 1px solid color-mix(in oklab, var(--okuda-muted) 40%, transparent);
+}
+
+/* The key column is the bold lead, tabulated. */
+td:first-child strong {
+  color: var(--okuda-table-key);
+}
+
+/* ── Links and addresses ───────────────────────────────────────────── */
+
+a {
+  color: var(--okuda-link-text);
+  /* The terminal shows link text in rose with no underline. In HTML an
+   * unmarked link is an accessibility failure, so the underline is kept
+   * and made quiet: the colour carries the register, the rule carries
+   * the affordance. */
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--okuda-link-text) 45%, transparent);
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  text-decoration-color: var(--okuda-link-text);
+}
+
+/* A bare .md path in prose — the address, not the coordinate. The gold
+ * stops at the extension; a line hint after it stays prose. */
+.doc-ref {
+  color: var(--okuda-doc-ref);
+}
+
+/* The silcrow: the actuation point. Rose, bold, never a link inside a
+ * panel (the bound is the design). */
+.vector {
+  color: var(--okuda-vector);
+  font-weight: 600;
+}
+
+/* ── State glyphs: assess before you read ──────────────────────────── */
+
+.state-ok     { color: var(--okuda-state-ok); }
+.state-todo   { color: var(--okuda-state-todo); }
+.state-parked { color: var(--okuda-state-parked); }
+.state-failed { color: var(--okuda-state-failed); }
+
+/* ── Diagrams: shape the eye can trace ─────────────────────────────── */
+
+.diagram {
+  border-left: var(--okuda-shoulder) solid var(--okuda-diagram-border);
+  padding: 0.6em 0 0.6em 1em;
+  margin: 1.4em 0;
+  overflow-x: auto;
+  /* A diagram never wraps. A wrapped state machine is a lie about the
+   * topology — this is the one place the terminal's discipline is
+   * reimposed, because the browser would otherwise reflow it. */
+  white-space: pre;
+  line-height: 1.15;
+}
+
+.diagram-border { color: var(--okuda-diagram-border); }
+.diagram-arrow  { color: var(--okuda-diagram-arrow); }
+.diagram-text   { color: var(--okuda-diagram-text); }
+
+/* ── The dereference panel ─────────────────────────────────────────── */
+
+/* Always in the DOM, parked off-screen, revealed by :target. The panel
+ * is position:fixed, and a fixed element has no scroll position — which
+ * is why the fragment resolves without moving the page, and why the
+ * reader returns to the same place. Measured 2026-11-05, Chrome 156. */
+.deref {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: var(--okuda-ground);
+  transform: translateX(100%);
+  transition: transform var(--okuda-beat) ease;
+  overflow: auto;
+  padding: 2rem 1.5rem 6rem;
+  box-sizing: border-box;
+}
+
+.deref:target {
+  transform: none;
+}
+
+.deref > * {
+  max-width: var(--okuda-measure);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* The close control. Its href MUST be an unmatched fragment: `#` scrolls
+ * to the top, so the panel closes correctly and the reader is silently
+ * somewhere else. Measured — the one trap. */
+.deref-close {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 11;
+  padding: 0.3em 0.8em;
+  border: 1px solid var(--okuda-muted);
+  color: var(--okuda-muted);
+  text-decoration: none;
+  background: var(--okuda-ground);
+}
+
+.deref-close:hover {
+  color: var(--okuda-ink);
+  border-color: var(--okuda-ink);
+}
+
+/* The receipt: the map you hold. What the reference is, without visiting
+ * it — the lexicon's test for a reference rather than a door. */
+.receipt {
+  border-left: var(--okuda-shoulder) solid var(--okuda-doc-ref);
+  padding: 0.2em 0 0.2em 1em;
+  margin: 1.2em 0;
+}
+
+.receipt-title {
+  color: var(--okuda-doc-ref);
+  font-weight: 600;
+}
+
+.receipt-meta {
+  color: var(--okuda-muted);
+  font-size: 0.9em;
+}
+
+/* ── Print: the inverse of the panel ───────────────────────────────── */
+
+/* A :target panel prints only the panel. Print wants the main document
+ * and no panels — the opposite of the <details> wart, and worth writing
+ * once. */
+@media print {
+  html {
+    background: #fff;
+    color: #000;
+  }
+  .deref,
+  .deref-close {
+    display: none !important;
+  }
+  pre,
+  .diagram {
+    overflow: visible;
+    white-space: pre-wrap;
+  }
+  a {
+    text-decoration: none;
+  }
+}
+
+/* ── Motion ────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .deref {
+    transition: none;
+  }
+}
