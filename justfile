@@ -360,6 +360,11 @@ html file:
 html-verify:
     @bun scripts/html-package-verify.ts
 
+# Serve the packages
+[group('writing')]
+serve-html:
+    @bun scripts/serve-html.ts
+
 # ── Build ───────────────────────────────────────────────────
 
 [group('build')]

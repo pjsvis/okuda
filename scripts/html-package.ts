@@ -39,24 +39,7 @@ import {
   wrapWholeFile,
 } from "../src/render.ts";
 import { loadCallsigns, resolveAmongCallsigns, siloRoot } from "../src/root.ts";
-import palette from "../src/palettes/okuda.json" with { type: "json" };
-
-// ── The palette, derived not specified ────────────────────────────────
-//
-// The 25 roles come from src/palettes/okuda.json, never from a hand-copied
-// table: a second list is a second thing to drift. An empty value means
-// "emit nothing, inherit the glass's own" — so it becomes no custom
-// property at all, and the stylesheet's `var(--okuda-body, …)` fallback
-// does the inheriting.
-
-function paletteVars(): string {
-  const lines: string[] = [];
-  for (const [role, hex] of Object.entries(palette as Record<string, string>)) {
-    if (!hex) continue; // empty = no ink; the glass supplies it
-    lines.push(`  --okuda-${role}: ${hex};`);
-  }
-  return `:root {\n${lines.join("\n")}\n}`;
-}
+import { styleBlock } from "./html-palette.ts";
 
 // ── Front matter: use it, do not render it ────────────────────────────
 //
@@ -342,7 +325,14 @@ const flag = (name: string): string | undefined => {
 
 // The artefact directory. A separate folder is the test of file
 // independence: if the package needs anything beside it, it fails here.
-const outPath = flag("-o") ?? resolve("html", `${basename(input, ".md")}.html`);
+//
+// Every artefact is ISO-date prefixed, because the date is the sort key a
+// listing needs and a filename is the one index that cannot drift from the
+// file. The date is the document's own when it declares one (front matter),
+// and the publication date otherwise — so re-publishing a dated document
+// overwrites it, and re-publishing an undated one mints a new artefact.
+const today = new Date().toISOString().slice(0, 10);
+const outPath = flag("-o") ?? resolve("html", `${today}-${basename(input, ".md")}.html`);
 const rootOverride = flag("--root");
 const provenanceUrl = flag("--source-url");
 const provenanceTitle = flag("--source-title");
@@ -352,7 +342,15 @@ const WIDTH = 79; // the authoring contract's top rung
 
 const raw = readFileSync(input, "utf8");
 const { meta, body: source } = splitFrontMatter(raw);
-const css = readFileSync(new URL("./html-package.css", import.meta.url), "utf8");
+
+// The date prefix: the document's own, or the publication date. A name
+// that already carries an ISO date keeps it — the corpus's own convention
+// is date-first, and prefixing it again would say the date twice.
+const datePrefix = meta.date ?? today;
+const stem = basename(input, ".md");
+const named = /^\d{4}-\d{2}-\d{2}-/.test(stem) ? stem : `${datePrefix}-${stem}`;
+const finalPath = flag("-o") ?? resolve("html", `${named}.html`);
+const css = styleBlock();
 
 // The path substrate, anchored the way actuation resolves a target: the
 // document's own directory first, the silo root second (makePathValidator,
@@ -483,13 +481,13 @@ const provenance =
     ? { url: provenanceUrl, title: provenanceTitle }
     : null;
 
-mkdirSync(dirname(outPath), { recursive: true });
+mkdirSync(dirname(finalPath), { recursive: true });
 writeFileSync(
-  outPath,
-  template(title, `${paletteVars()}\n\n${css}`, `${html}\n${panels}`, byline, provenance),
+  finalPath,
+  template(title, css, `${html}\n${panels}`, byline, provenance),
 );
 
-const kib = (readFileSync(outPath).length / 1024).toFixed(1);
+const kib = (readFileSync(finalPath).length / 1024).toFixed(1);
 console.log(
-  `${outPath} — ${refs.size} panel(s)${refs.size >= maxPanels ? ` (cap ${maxPanels})` : ""}, ${kib} KiB`,
+  `${finalPath} — ${refs.size} panel(s)${refs.size >= maxPanels ? ` (cap ${maxPanels})` : ""}, ${kib} KiB`,
 );
