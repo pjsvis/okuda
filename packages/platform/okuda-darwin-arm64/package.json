@@ -1,0 +1,19 @@
+{
+  "name": "@okuda/okuda-darwin-arm64",
+  "version": "0.1.0-alpha.1",
+  "description": "okuda — the compiled binary for darwin arm64",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pjsvis/okuda.git"
+  },
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "files": [
+    "okuda"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@okuda/okuda-linux-arm64",
+  "version": "0.1.0-alpha.1",
+  "description": "okuda — the compiled binary for linux arm64",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pjsvis/okuda.git"
+  },
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "files": [
+    "okuda"
+  ]
+}

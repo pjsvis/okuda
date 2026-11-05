@@ -1,0 +1,19 @@
+{
+  "name": "@okuda/cahier-linux-x64",
+  "version": "0.1.0-alpha.1",
+  "description": "cahier — the compiled binary for linux x64",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pjsvis/okuda.git"
+  },
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "files": [
+    "cahier"
+  ]
+}
