@@ -15,6 +15,9 @@ node_modules
 dist/
 okuda
 
+# Published HTML packages (just html) — build output, uploaded not committed
+html/
+
 # td task database (runtime state)
 .todos/
 

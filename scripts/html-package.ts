@@ -20,10 +20,15 @@
  * `renderDocument` does it. State glyphs are a POST-pass — they need elements,
  * and they must not touch `<pre>` or `<code>`.
  *
- * Usage:  bun scripts/html-package.ts <file.md> [-o out.html]
+ * Usage:
+ *   bun scripts/html-package.ts <file.md> [-o out.html]
+ *                                        [--root <dir>]
+ *                                        [--source-url <url>]
+ *                                        [--source-title <title>]
+ *                                        [--max-panels <n>]
  */
 
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import {
   applyMathGlyphs,
@@ -31,6 +36,7 @@ import {
   extractDiagramArt,
   RE_CITED_PATH,
   STATE_GLYPH_ROLE,
+  wrapWholeFile,
 } from "../src/render.ts";
 import { loadCallsigns, resolveAmongCallsigns, siloRoot } from "../src/root.ts";
 import palette from "../src/palettes/okuda.json" with { type: "json" };
@@ -50,6 +56,28 @@ function paletteVars(): string {
     lines.push(`  --okuda-${role}: ${hex};`);
   }
   return `:root {\n${lines.join("\n")}\n}`;
+}
+
+// ── Front matter: use it, do not render it ────────────────────────────
+//
+// Every silo document carries YAML front matter, and `Bun.markdown.html()`
+// renders it as a rule and a heading — a document publishing its own
+// metadata. The fix is not to strip it but to spend it: the title becomes
+// the `<title>` and the `<h1>`, the rest becomes the byline.
+
+interface Meta {
+  [key: string]: string;
+}
+
+function splitFrontMatter(source: string): { meta: Meta; body: string } {
+  const m = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+  if (!m) return { meta: {}, body: source };
+  const meta: Meta = {};
+  for (const line of m[1]!.split(/\r?\n/)) {
+    const kv = line.match(/^([A-Za-z_][\w-]*):\s*(.*)$/);
+    if (kv) meta[kv[1]!] = kv[2]!.trim().replace(/^["']|["']$/g, "");
+  }
+  return { meta, body: source.slice(m[0].length) };
 }
 
 // ── The mermaid pipe ──────────────────────────────────────────────────
@@ -87,10 +115,6 @@ async function mermaidArt(source: string, width: number): Promise<string | null>
 }
 
 // ── Post-pass 1: mermaid fences → ASCII art ───────────────────────────
-//
-// `html()` emits `<pre><code class="language-mermaid">…</code></pre>` with
-// the body HTML-escaped, so the fence is unescaped before it reaches the
-// engine and the art is escaped again on the way out.
 
 const RE_MERMAID_FENCE =
   /<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/g;
@@ -105,10 +129,7 @@ function unescapeHtml(s: string): string {
 }
 
 function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 /** Colour the art by channel, run-length: borders recede, arrows lead, text
@@ -172,7 +193,10 @@ const RE_PROTECTED = /(<pre[\s\S]*?<\/pre>|<code[\s\S]*?<\/code>)/g;
 function stateGlyphPass(html: string): string {
   const glyphs = Object.keys(STATE_GLYPH_ROLE);
   if (glyphs.length === 0) return html;
-  const re = new RegExp(`(${glyphs.map((g) => g.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "g");
+  const re = new RegExp(
+    `(${glyphs.map((g) => g.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`,
+    "g",
+  );
   return html
     .split(RE_PROTECTED)
     .map((part, i) => {
@@ -180,8 +204,38 @@ function stateGlyphPass(html: string): string {
       if (i % 2 === 1) return part;
       return part.replace(re, (g) => {
         const role = STATE_GLYPH_ROLE[g];
-        return role ? `<span class="state-${role.replace(/^state-/, "")}">${g}</span>` : g;
+        return role
+          ? `<span class="state-${role.replace(/^state-/, "")}">${g}</span>`
+          : g;
       });
+    })
+    .join("");
+}
+
+// ── Text-node traversal ───────────────────────────────────────────────
+//
+// A reference is only a reference in prose. Inside a tag it is an attribute;
+// inside `<a>` it is already a link; inside `<pre>` or `<code>` it is art or
+// source. One traversal, so every pass agrees about what counts as text.
+
+function transformText(html: string, fn: (text: string) => string): string {
+  const parts = html.split(/(<[^>]*>)/);
+  let inA = 0;
+  let inPre = 0;
+  return parts
+    .map((p, i) => {
+      if (i % 2 === 1) {
+        if (/^<a\b/i.test(p)) inA++;
+        else if (/^<\/a>/i.test(p)) inA = Math.max(0, inA - 1);
+        // Fences, not spans: the renderer's scan skips fenced blocks and
+        // treats a code span as prose (src/vectors.ts:220), so a callsign
+        // in backticks is a reference in the terminal and is one here.
+        else if (/^<pre\b/i.test(p)) inPre++;
+        else if (/^<\/pre>/i.test(p)) inPre = Math.max(0, inPre - 1);
+        return p;
+      }
+      if (inA > 0 || inPre > 0) return p;
+      return fn(p);
     })
     .join("");
 }
@@ -190,45 +244,46 @@ function stateGlyphPass(html: string): string {
 //
 // The address is the path; the line is prose. The gold stops at the
 // extension, so a `:1396` after it stays plain (ADR-LINE-IS-PROSE-078).
-// Skip tags and protected regions: a path inside an href is already an
-// address and must not be gilded twice.
+// This runs LAST, on whatever the reference pass could not resolve: a path
+// with no target is still an address, and it is still gold.
 
 function docRefPass(html: string): string {
-  return html
-    .split(RE_PROTECTED)
-    .map((part, i) => {
-      if (i % 2 === 1) return part;
-      // Split on tags so a path inside an attribute is never touched.
-      return part
-        .split(/(<[^>]*>)/)
-        .map((seg, j) => (j % 2 === 1 ? seg : seg.replace(RE_CITED_PATH, (p) => `<span class="doc-ref">${p}</span>`)))
-        .join("");
-    })
-    .join("");
+  return transformText(html, (text) =>
+    text.replace(RE_CITED_PATH, (p) => `<span class="doc-ref">${p}</span>`),
+  );
 }
 
 // ── The dereference layer ─────────────────────────────────────────────
 //
-// An address line is a paragraph that is nothing but `path §NN` — the
-// renderer's own distinction (RE_ADDRESS_LINE, src/render.ts:78). It is a
-// block, so it can carry a panel. A silcrow mid-sentence cannot: `<details>`
-// and `<section>` are flow content and cannot sit inside a `<p>`, so an
-// inline silcrow stays a link. The content model reached that verdict.
+// Two authored forms, and the renderer's own distinction between them
+// (RE_ADDRESS_LINE, src/render.ts:78):
+//
+//   - an ADDRESS LINE is a paragraph that is nothing but `path §NN` — a
+//     block, so it carries a receipt and a panel;
+//   - an INLINE reference is a `.md` path or a callsign in prose — it
+//     becomes a link to the same panel, because the panel is a sibling at
+//     the end of the document and a `<section>` cannot sit inside a `<p>`.
+//
+// `§NN` on its own is NOT a reference: in the terminal it is a badge the
+// renderer paints after a reference (src/vectors.ts), and in prose it is a
+// section number. It stays text.
 
-// Both authored orders, as the renderer's own RE_ADDRESS_LINE accepts them
-// (src/render.ts:78): `§NN path` and `path §NN`. Anchored at both ends, so a
-// silcrow mid-sentence stays prose — and stays a link, because a `<section>`
-// cannot sit inside a `<p>`.
 const RE_ADDRESS_LINE_HTML =
   /<p>(?:§(\d{1,2})\s+([\w][\w/.-]*\.md)|([\w][\w/.-]*\.md)\s+§(\d{1,2}))<\/p>/g;
 
+const RE_CALLSIGN = /\b[A-Z]{3}(?:-[A-Z0-9]+)+\b/g;
+
 interface Ref {
-  num: string;
-  path: string;
   id: string;
+  path: string;
+  num: string | null;
   title: string;
   callsign: string | null;
   body: string;
+}
+
+function slug(path: string): string {
+  return basename(path, ".md").replace(/[^a-z0-9]+/gi, "-").toLowerCase();
 }
 
 function panel(r: Ref): string {
@@ -237,7 +292,21 @@ function panel(r: Ref): string {
 
 // ── The template ──────────────────────────────────────────────────────
 
-function template(title: string, css: string, body: string): string {
+interface Provenance {
+  url: string;
+  title: string;
+}
+
+function template(
+  title: string,
+  css: string,
+  body: string,
+  byline: string,
+  provenance: Provenance | null,
+): string {
+  const prov = provenance
+    ? `<p class="provenance">Published from <a href="${escapeHtml(provenance.url)}">${escapeHtml(provenance.title)}</a></p>\n`
+    : "";
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -250,6 +319,7 @@ ${css}
 </head>
 <body>
 <main>
+${prov}${byline}
 ${body}
 </main>
 </body>
@@ -265,33 +335,25 @@ if (!input) {
   console.error("usage: bun scripts/html-package.ts <file.md> [-o out.html]");
   process.exit(2);
 }
-const outIdx = args.indexOf("-o");
-const outPath = outIdx >= 0 ? args[outIdx + 1]! : input.replace(/\.md$/, ".html");
-// The silo root, when the document does not sit inside one (a fixture in a
-// temp directory, a document published from elsewhere). Defaults to the
-// document's own silo.
-const rootIdx = args.indexOf("--root");
-const rootOverride = rootIdx >= 0 ? args[rootIdx + 1] : undefined;
+const flag = (name: string): string | undefined => {
+  const i = args.indexOf(name);
+  return i >= 0 ? args[i + 1] : undefined;
+};
+
+// The artefact directory. A separate folder is the test of file
+// independence: if the package needs anything beside it, it fails here.
+const outPath = flag("-o") ?? resolve("html", `${basename(input, ".md")}.html`);
+const rootOverride = flag("--root");
+const provenanceUrl = flag("--source-url");
+const provenanceTitle = flag("--source-title");
+const maxPanels = Number(flag("--max-panels") ?? 24);
 
 const WIDTH = 79; // the authoring contract's top rung
 
-const source = readFileSync(input, "utf8");
+const raw = readFileSync(input, "utf8");
+const { meta, body: source } = splitFrontMatter(raw);
 const css = readFileSync(new URL("./html-package.css", import.meta.url), "utf8");
 
-// PRE-pass: maths glyphs, before the parser sees them.
-const withMath = applyMathGlyphs(source);
-
-// The emitter.
-let html = Bun.markdown.html(withMath);
-
-// POST-passes, in order: fences first (they introduce protected regions),
-// then glyphs, then address lines — and the doc-ref gold LAST, because it
-// would otherwise gild the path inside an address line and break the match.
-html = await mermaidPass(html, WIDTH);
-html = stateGlyphPass(html);
-
-// The dereference layer: resolve each address line, render the target once,
-// emit a receipt in the flow and a panel holding the full render.
 // The path substrate, anchored the way actuation resolves a target: the
 // document's own directory first, the silo root second (makePathValidator,
 // src/root.ts:280 — "resolveJumpTarget's HTML semantics"). One rule, so the
@@ -300,53 +362,134 @@ const docDir = dirname(resolve(input));
 const root = rootOverride ? resolve(rootOverride) : siloRoot(docDir);
 const anchors = [docDir, root];
 const callsigns = loadCallsigns(root);
-const refs = new Map<string, Ref>();
-for (const m of html.matchAll(RE_ADDRESS_LINE_HTML)) {
-  const num = m[1] ?? m[4];
-  const path = m[2] ?? m[3];
-  const target = anchors.map((a) => resolve(a, path!)).find((p) => existsSync(p));
-  if (!target) continue; // unresolvable — leave the address as prose, honestly
-  let body: string;
-  try {
-    body = Bun.markdown.html(applyMathGlyphs(readFileSync(target, "utf8")));
-  } catch {
-    continue;
+
+// PRE-pass: maths glyphs, before the parser sees them.
+let html = Bun.markdown.html(applyMathGlyphs(source));
+
+// POST-passes, in order: fences first (they introduce protected regions),
+// then glyphs, then references — and the doc-ref gold LAST, because it
+// would otherwise gild the path inside a reference and break the match.
+html = await mermaidPass(html, WIDTH);
+html = stateGlyphPass(html);
+
+const refs = new Map<string, Ref>(); // id → ref
+const byPath = new Map<string, string>(); // resolved path → id
+
+function resolveTarget(ref: string): string | null {
+  // A path — markdown or code. The filesystem is the substrate for both
+  // (ADR-045), and a code file is a document the terminal renders too
+  // (wrapWholeFile, src/render.ts:1175).
+  if (ref.includes("/") || /\.(md|ts|rs|sh|py)$/.test(ref)) {
+    const hit = anchors.map((a) => resolve(a, ref)).find((p) => existsSync(p));
+    if (hit) return hit;
   }
-  const id = `ref-${num}`;
-  if (refs.has(id)) continue;
-  const title =
-    body.match(/<h1>([\s\S]*?)<\/h1>/)?.[1]?.replace(/<[^>]*>/g, "") ??
-    basename(path!);
-  // The panel is a document and must look like one: the same glyph and
-  // address passes, so a ✓ in a panel is green and a path is gold. What it
-  // does NOT get is the address-line pass — its own silcrows stay prose,
-  // because the bound is the design and `:target` is singular.
-  refs.set(id, {
-    num: num!,
-    path: path!,
-    id,
-    title,
-    callsign: resolveAmongCallsigns(callsigns, `ADR-${num}`) ? `ADR-${num}` : null,
-    body: docRefPass(stateGlyphPass(body)),
-  });
+  // A callsign, gated by the registry (ADR-044) — the same gate the
+  // terminal's scan applies, so the paint and the link cannot disagree.
+  return resolveAmongCallsigns(callsigns, ref);
 }
 
-// Replace each address line with a receipt that opens its panel. The panel
-// itself is appended at the end of the document, off-screen until :target.
-html = html.replace(RE_ADDRESS_LINE_HTML, (whole, a: string, b: string, c: string, d: string) => {
-  const num = a ?? d;
-  const r = refs.get(`ref-${num}`);
-  if (!r) return whole;
-  return `<p><a class="receipt" href="#${r.id}"><span class="receipt-title">§${r.num} ${escapeHtml(r.title)}</span> <span class="receipt-meta">${escapeHtml(r.callsign ?? r.path)}</span></a></p>`;
+function addRef(path: string, num: string | null): string | null {
+  const existing = byPath.get(path);
+  if (existing) return existing;
+  if (refs.size >= maxPanels) return null;
+  let body: string;
+  try {
+    const text = readFileSync(path, "utf8");
+    // A code file is not markdown. The terminal renders it as a document —
+    // one fence, its comments as prose (wrapWholeFile, src/render.ts:1175) —
+    // so the panel does the same rather than parsing TypeScript as markdown.
+    body = Bun.markdown.html(
+      applyMathGlyphs(
+        path.endsWith(".md")
+          ? splitFrontMatter(text).body
+          : wrapWholeFile(path, text),
+      ),
+    );
+  } catch {
+    return null;
+  }
+  const id = num ? `ref-${num}` : `ref-${slug(path)}`;
+  const title =
+    body.match(/<h1>([\s\S]*?)<\/h1>/)?.[1]?.replace(/<[^>]*>/g, "") ??
+    basename(path, ".md");
+  // The panel is a document and must look like one: the same glyph and
+  // address passes, so a ✓ in a panel is green and a path is gold. What it
+  // does NOT get is the reference pass — its own references stay prose,
+  // because the bound is the design and `:target` is singular.
+  refs.set(id, {
+    id,
+    path,
+    num,
+    title,
+    callsign: callsigns.find((c) => c.path === path)?.callsign ?? null,
+    body: docRefPass(stateGlyphPass(body)),
+  });
+  byPath.set(path, id);
+  return id;
+}
+
+// 1. Address lines: the declared references. They carry the number, so they
+//    mint the readable ids (`#ref-27`) that a blog post can deep-link to.
+html = html.replace(
+  RE_ADDRESS_LINE_HTML,
+  (whole, a: string, b: string, c: string, d: string) => {
+    const num = a ?? d;
+    const path = b ?? c;
+    const target = resolveTarget(path!);
+    if (!target) return whole;
+    const id = addRef(target, num!);
+    if (!id) return whole;
+    const r = refs.get(id)!;
+    return `<p><a class="receipt" href="#${id}"><span class="receipt-title">§${r.num} ${escapeHtml(r.title)}</span> <span class="receipt-meta">${escapeHtml(r.callsign ?? r.path)}</span></a></p>`;
+  },
+);
+
+// 2. Inline references: a `.md` path or a callsign in prose becomes a link
+//    to the same panel. This is what makes a blog post work — its
+//    references are inline, not address lines.
+html = transformText(html, (text) => {
+  let out = text.replace(RE_CITED_PATH, (p) => {
+    const target = resolveTarget(p);
+    if (!target) return p;
+    const id = addRef(target, null);
+    return id ? `<a class="doc-ref" href="#${id}">${p}</a>` : p;
+  });
+  out = out.replace(RE_CALLSIGN, (c) => {
+    const target = resolveTarget(c);
+    if (!target) return c;
+    const id = addRef(target, null);
+    return id ? `<a class="doc-ref" href="#${id}">${c}</a>` : c;
+  });
+  return out;
 });
 
+// 3. Whatever is left is an address with no target: gold, not a link.
 html = docRefPass(html);
 
 const panels = [...refs.values()].map(panel).join("\n");
-const title = source.match(/^#\s+(.+)$/m)?.[1] ?? basename(input, ".md");
 
+// The title: front matter, then the H1, then the filename.
+const h1 = html.match(/<h1>([\s\S]*?)<\/h1>/)?.[1]?.replace(/<[^>]*>/g, "");
+const title = meta.title ?? h1 ?? basename(input, ".md");
+
+// The byline: what the front matter knows, and nothing it does not.
+const bylineBits = [meta.callsign, meta.type, meta.date].filter(Boolean);
+const byline = bylineBits.length
+  ? `<p class="byline">${bylineBits.map(escapeHtml).join(" · ")}</p>\n`
+  : "";
+
+const provenance =
+  provenanceUrl && provenanceTitle
+    ? { url: provenanceUrl, title: provenanceTitle }
+    : null;
+
+mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(
   outPath,
-  template(title, `${paletteVars()}\n\n${css}`, `${html}\n${panels}`),
+  template(title, `${paletteVars()}\n\n${css}`, `${html}\n${panels}`, byline, provenance),
 );
-console.log(`${outPath} — ${refs.size} reference(s), ${(readFileSync(outPath).length / 1024).toFixed(1)} KiB`);
+
+const kib = (readFileSync(outPath).length / 1024).toFixed(1);
+console.log(
+  `${outPath} — ${refs.size} panel(s)${refs.size >= maxPanels ? ` (cap ${maxPanels})` : ""}, ${kib} KiB`,
+);

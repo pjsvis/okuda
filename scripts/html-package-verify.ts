@@ -40,7 +40,7 @@ const filler = Array.from(
 
 writeFileSync(
   src,
-  `# Fixture\n\n${filler}\n\ndecisions/027-temperament-is-downstream-of-discipline.md §27\n\nA closing paragraph.\n`,
+  `---\ntype: Brief\ncallsign: BRF-FIXTURE\ndate: 2026-11-05\n---\n\n# Fixture\n\n${filler}\n\nAn inline reference to decisions/027-temperament-is-downstream-of-discipline.md in prose.\n\ndecisions/027-temperament-is-downstream-of-discipline.md §27\n\nA closing paragraph.\n`,
 );
 
 // The package is built from the repo root, so the relative address resolves.
@@ -142,9 +142,17 @@ const probe = () =>
       closeHref: document.querySelector('.deref-close')?.getAttribute('href') ?? null,
       inlineSilcrowIsLink: [...document.querySelectorAll('a')]
         .some(a => a.textContent?.trim() === '§27'),
-      externalRefs: [...document.querySelectorAll('[src],[href]')]
-        .map(e => e.getAttribute('src') ?? e.getAttribute('href'))
-        .filter(h => h && !h.startsWith('#')),
+      inlineRefIsLink: [...document.querySelectorAll('a.doc-ref')]
+        .some(a => a.textContent?.includes('decisions/027')),
+      byline: document.querySelector('.byline')?.textContent ?? null,
+      frontMatterLeaked: document.body.textContent?.includes('callsign: BRF-FIXTURE') ?? false,
+      // ASSETS, not references. A link to another document is a reference
+      // the reader may follow; an asset is something this file must fetch,
+      // and that is what breaks the single-file invariant.
+      externalAssets: [
+        ...[...document.querySelectorAll('[src]')].map(e => e.getAttribute('src')),
+        ...[...document.querySelectorAll('link[rel=stylesheet]')].map(e => e.getAttribute('href')),
+      ].filter(Boolean),
     };
   })()`);
 
@@ -170,7 +178,10 @@ const checks: Array<[string, boolean, string]> = [
   ["the panel closes", closed.panelOpen === false, `panelOpen ${closed.panelOpen}`],
   ["the close control uses an unmatched fragment", closed.closeHref === "#_", `href ${closed.closeHref}`],
   ["an inline silcrow is not a link", closed.inlineSilcrowIsLink === false, `isLink ${closed.inlineSilcrowIsLink}`],
-  ["the file has no external reference", closed.externalRefs.length === 0, `${closed.externalRefs.length} found`],
+  ["an inline path is a link to its panel", closed.inlineRefIsLink === true, `isLink ${closed.inlineRefIsLink}`],
+  ["front matter becomes a byline", closed.byline === "BRF-FIXTURE · Brief · 2026-11-05", `byline ${closed.byline}`],
+  ["front matter does not leak into the body", closed.frontMatterLeaked === false, `leaked ${closed.frontMatterLeaked}`],
+  ["the file fetches no external asset", closed.externalAssets.length === 0, `${closed.externalAssets.length} found`],
 ];
 
 let failed = 0;

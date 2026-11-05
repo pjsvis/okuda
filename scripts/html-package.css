@@ -64,6 +64,26 @@ main {
   margin: 0 auto;
 }
 
+/* ── The byline and the provenance ─────────────────────────────────── */
+
+/* Front matter is spent, not rendered: the title becomes the <h1>, and
+ * what is left becomes this line. A document that publishes its own YAML
+ * is a document leaking its metadata. */
+.byline {
+  color: var(--okuda-muted);
+  font-size: 0.9em;
+  margin: 0 0 2em;
+}
+
+/* The package arrives in a tab with no context — a link from a blog post,
+ * a shared URL, a bookmark. This line says where it came from, as text
+ * with a link: a reference, not an asset, so the file stays single. */
+.provenance {
+  color: var(--okuda-muted);
+  font-size: 0.9em;
+  margin: 0 0 0.4em;
+}
+
 /* ── Prose ─────────────────────────────────────────────────────────── */
 
 p,
@@ -260,6 +280,10 @@ a:hover {
   overflow: auto;
   padding: 2rem 1.5rem 6rem;
   box-sizing: border-box;
+  /* A closed panel is a document nobody is reading. Skip its layout and
+   * paint; the intrinsic size keeps the scrollbar honest. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100vh;
 }
 
 .deref:target {
