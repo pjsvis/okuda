@@ -120,6 +120,27 @@ honest trade: a code file costs what its tokens cost.**
 For scale: a typical blog hero image is 150–300 KiB and carries nothing. A
 687 KiB cahier carries eighty documents, offline, every one reachable.
 
+**Weight against the source it carries.** Measured 2026-11-05 on a main document
+(794 B) citing two code files, `src/root.ts` (15.7 KiB) and
+`scripts/html-package.ts` (30.6 KiB):
+
+| Form | Files | Bytes | × source |
+|---|---|---|---|
+| the sources | 3 | 47,107 | 1.00× |
+| the terminal's rendered stream | — | 122,313 | 2.60× |
+| the cahier | 1 | 207,201 | 4.40× |
+
+The page is 1.69× the terminal's own output, and 1.88× it gzipped. The extra
+over the terminal is HTML's token markup and entity-escaping against ANSI's
+escapes — not the shared stylesheet, which is 10.7% of the file. The panels are
+87.9%; the main document costs about 1 KiB.
+
+**The terminal inflates its source 2.6× before the page exists.** That is the
+finding. The ordering is *source < terminal stream < page*: the page is the
+heaviest object, and the terminal is heavier than the text it reads. The
+terminal's own overhead is invisible until measured, because it shows you the
+inflated stream and never the ratio.
+
 ## How it is built, in one paragraph
 
 `Bun.markdown.html()` emits the block roster; three post-passes fill the gaps
