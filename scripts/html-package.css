@@ -147,7 +147,11 @@ h6 {
   color: var(--okuda-heading);
   font-weight: 600;
   line-height: 1.25;
-  margin: 2.2em 0 0.6em;
+  /* One blank line above and below, the terminal's own beat. The gap under
+   * a heading used to be 0.6em — a fraction of a line — which butted the
+   * heading against its first paragraph. The badge and the chip carry the
+   * emphasis; the space is the break, and it must be a whole one. */
+  margin: var(--okuda-gap) 0;
   /* The heading is an anchor, and the terminal anchors it with two solid
    * blocks: a badge on the left whose width is the level, and a chip on
    * the right at the measure's edge. They are the strongest horizontal

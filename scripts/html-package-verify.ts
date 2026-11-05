@@ -40,7 +40,7 @@ const filler = Array.from(
 
 writeFileSync(
   src,
-  `---\ntype: Brief\ncallsign: BRF-FIXTURE\ndate: 2026-11-05\n---\n\n# Fixture\n\n${filler}\n\n- **Tight.** A tight list item.
+  `---\ntype: Brief\ncallsign: BRF-FIXTURE\ndate: 2026-11-05\n---\n\n# Fixture\n\n---\n\n## A section after a rule\n\nThe rule above is redundant — the heading is the break — so the build drops it.\n\n${filler}\n\n---\n\nText after a bare rule, which stays: no heading follows, so the rule is the\nonly structure there is.\n\n${filler}\n\n- **Tight.** A tight list item.
 
 - **Loose.** A loose list item, which is the house form.
 
@@ -213,6 +213,16 @@ const probe = () =>
         return getComputedStyle(items[1]).marginTop;
       })(),
       frontMatterLeaked: document.body.textContent?.includes('callsign: BRF-FIXTURE') ?? false,
+      // A rule before a heading is redundant: 603 of the corpus's 656
+      // thematic breaks are followed by one. A rule that is NOT followed by
+      // a heading is the only structure there, and stays.
+      hrTotal: document.querySelectorAll('hr').length,
+      headingGap: (() => {
+        const h = document.querySelector('h2');
+        return h ? getComputedStyle(h).marginBottom : null;
+      })(),
+      hrBeforeHeading: [...document.querySelectorAll('hr')]
+        .some(h => /^H[1-6]$/.test(h.nextElementSibling?.tagName ?? '')),
       // ASSETS, not references. A link to another document is a reference
       // the reader may follow; an asset is something this file must fetch,
       // and that is what breaks the single-file invariant.
@@ -289,6 +299,9 @@ const checks: Array<[string, boolean, string]> = [
   ["the panel chrome stays in view when scrolled", chromeOnScroll?.inView === true, `in view ${chromeOnScroll?.inView}`],
   ["the panel chrome names the document", (chromeOnScroll?.id ?? "").length > 0, `id "${chromeOnScroll?.id}"`],
   ["the build says when the panel budget bites", budgetSaid === true, `warned ${budgetSaid}`],
+  ["a rule before a heading is dropped", closed.hrBeforeHeading === false, `hr before heading ${closed.hrBeforeHeading}`],
+  ["a rule that is the only structure stays", closed.hrTotal === 1, `${closed.hrTotal} hr`],
+  ["a heading keeps a full line of air below", closed.headingGap !== null && parseFloat(closed.headingGap) >= 20, `gap ${closed.headingGap}`],
 ];
 
 let failed = 0;

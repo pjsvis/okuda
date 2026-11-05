@@ -278,6 +278,22 @@ function docRefPass(html: string): string {
   );
 }
 
+// ── Post-pass 4: a rule before a heading is redundant ─────────────────
+//
+// Measured across the corpus 2026-11-05: 656 thematic breaks outside front
+// matter, and **603 of them (92%) are immediately followed by a heading**.
+// The heading is the structure; the rule in front of it is a second
+// statement of the same break, drawn at a weight the terminal never gives
+// it (there it is box-drawing glyphs at text weight, here a 1px line across
+// the full measure). The 53 that are not followed by a heading are real
+// breaks and stay.
+
+const RE_HR_BEFORE_HEADING = /<hr\s*\/?>\s*(?=<h[1-6][\s>])/gi;
+
+function redundantHrPass(html: string): string {
+  return html.replace(RE_HR_BEFORE_HEADING, "");
+}
+
 // ── The dereference layer ─────────────────────────────────────────────
 //
 // Two authored forms, and the renderer's own distinction between them
@@ -492,6 +508,7 @@ let html = Bun.markdown.html(applyMathGlyphs(source));
 // would otherwise gild the path inside a reference and break the match.
 html = await mermaidPass(html, WIDTH);
 html = stateGlyphPass(html);
+html = redundantHrPass(html);
 
 const refs = new Map<string, Ref>(); // id → ref
 const byPath = new Map<string, string>(); // resolved path → id
@@ -561,7 +578,7 @@ function addRef(path: string, num: string | null): string | null {
     num,
     title,
     callsign: callsigns.find((c) => c.path === path)?.callsign ?? null,
-    body: docRefPass(stateGlyphPass(body)),
+    body: docRefPass(stateGlyphPass(redundantHrPass(body))),
   });
   byPath.set(path, id);
   panelBytes += refs.get(id)!.body.length;
