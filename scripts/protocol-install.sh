@@ -29,6 +29,10 @@ cd "$(dirname "$0")/.."
 
 SRC="system.md"
 RECEIVER="${COOL_PI_DIR:-$HOME/Dev/GitHub/cool-pi-extensions}"
+# The destination is DERIVED from the receiver, never typed: a publish names where
+# it is going. Hardcoding it made this actuator single-address — the three behind
+# copies in the roster could not be published to without editing the script.
+TO="$(basename "$RECEIVER")"
 
 [ -f "$SRC" ] || { echo "protocol-install: $SRC not found" >&2; exit 1; }
 [ -d "$RECEIVER/msgs" ] || {
@@ -57,7 +61,7 @@ COMMIT="$(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
 
 jq -n \
   --arg from "okuda-session ($FROM)" \
-  --arg to "cool-pi-extensions" \
+  --arg to "$TO" \
   --arg cut "$CUT" \
   --arg commit "$COMMIT" \
   --arg timestamp "$ISO" \
@@ -80,6 +84,6 @@ jq -n \
 
 echo "protocol-install: message sent -> $OUT"
 echo "  cut:      $CUT  (source $COMMIT)"
-echo "  receiver: cool-pi-extensions owns SYSTEM.md and the commit (not this script)"
+echo "  receiver: $TO owns SYSTEM.md and the commit (not this script)"
 echo "  next:     commit it there, then run just protocol-check to name who is still behind"
 echo "  chain:    $HOME/.pi/agent/AGENTS.md untouched — no write through the symlink"
