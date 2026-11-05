@@ -394,6 +394,11 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   * **Test:** for any sentence you are about to treat as filed, name the path or
   the sha where it lives **and who put it there**. If the only referent is the
   message in front of you, it is in transit, not in the record.
+  * **Corollary:** **a term that has never caught its author is either brand new
+  or not being used.** A term that only ever finds other people's errors is a
+  term nobody is applying. **2026-11-05**: this one caught both of us on the
+  evening it was coined — four firings on a summary, a receipt, an id, and a
+  process statement, and a fifth on the sentence that declined to file this.
   * **Prior art:** the seam rule above (*undeclared scope is the defect class*);
   **derived, not specified** (*the vitals are derived, never judged*) — the same
   law one layer in. **Coined 2026-11-05** at an okuda/cool-pi seam, when an
