@@ -495,7 +495,11 @@ a:hover {
   gap: 0.5em;
   margin: 3em 0 0;
   color: var(--okuda-muted);
-  font-size: 0.9em;
+  /* The same cell as the h1 chip, because in the terminal they ARE the
+   * same cell: a chip is one column at every level and at the close. The
+   * closer mirrors the header, so it must be the header's size. */
+  font-size: 1.5em;
+  line-height: 1;
 }
 
 .terminator::before,

@@ -54,13 +54,27 @@ interface Entry {
 
 const cache = new Map<string, { mtime: number; title: string }>();
 
+/** The title is read from the file's own `<title>`, which is already
+ *  HTML-escaped. Unescape it here and escape it again on the way out, or a
+ *  title containing `&lt;details&gt;` renders as `&amp;lt;details&amp;gt;` —
+ *  the double-escape the listing showed on 2026-11-05. */
+function unescapeHtml(s: string): string {
+  return s
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&");
+}
+
 function titleOf(path: string, mtime: number): string {
   const hit = cache.get(path);
   if (hit && hit.mtime === mtime) return hit.title;
   let title = basename(path, ".html");
   try {
     const head = readFileSync(path, "utf8").slice(0, 4096);
-    title = head.match(/<title>([\s\S]*?)<\/title>/)?.[1]?.trim() ?? title;
+    const raw = head.match(/<title>([\s\S]*?)<\/title>/)?.[1]?.trim();
+    if (raw) title = unescapeHtml(raw);
   } catch {
     /* unreadable — the filename stands */
   }

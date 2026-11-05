@@ -45,7 +45,8 @@ writeFileSync(
 - **Loose.** A loose list item, which is the house form.
 
 A bare silcrow §27 in prose stays prose, and an inline reference to
-decisions/027-temperament-is-downstream-of-discipline.md becomes a link.\n\ndecisions/027-temperament-is-downstream-of-discipline.md §27\n\nA closing paragraph.\n`,
+decisions/027-temperament-is-downstream-of-discipline.md becomes a link. A code
+file is a document too: src/render.ts should dereference into a fence.\n\ndecisions/027-temperament-is-downstream-of-discipline.md §27\n\nA closing paragraph.\n`,
 );
 
 // The package is built from the repo root, so the relative address resolves.
@@ -151,6 +152,10 @@ const probe = () =>
       inlineSilcrowIsLink: [...document.querySelectorAll('a')]
         .some(a => a.textContent?.trim() === '§27'),
       silcrowInProse: document.body.textContent?.includes('bare silcrow §27') ?? false,
+      // A code file is not markdown. The panel must be a fence, wrapped by
+      // wrapWholeFile, not TypeScript parsed as prose.
+      codePanelIsFenced: [...document.querySelectorAll('.deref pre code')]
+        .some(c => /language-(ts|rs|sh|py)/.test(c.className)),
       terminator: (() => {
         const t = document.querySelector('.terminator');
         if (!t) return null;
@@ -238,6 +243,7 @@ const checks: Array<[string, boolean, string]> = [
   ["every list item is loose", parseFloat(closed.listRhythm) > 20, `margin-top ${closed.listRhythm}`],
   ["a bare silcrow stays prose", closed.silcrowInProse === true && closed.inlineSilcrowIsLink === false, `prose ${closed.silcrowInProse}, link ${closed.inlineSilcrowIsLink}`],
   ["the document closes with its terminator", closed.terminator?.chips === '"█""█"' && closed.terminator?.rule === true, `${closed.terminator?.chips} rule ${closed.terminator?.rule}`],
+  ["a code file dereferences into a fence", closed.codePanelIsFenced === true, `fenced ${closed.codePanelIsFenced}`],
 ];
 
 let failed = 0;
