@@ -7,225 +7,190 @@ Actuate the rose vectors §11-§98 to render the referenced documents:
 - `u` unwinds and returns to main document; 
 - `99` promotes the referenced document to its own terminal. 
 
-## Landed today — the debt this table was tracking
+## This sweep found the table pointing at a closed queue — read this first
 
-- **BRF-TABLE-SLOT-INSTRUMENT** (2026-10-13) — the header/body drift filed by eye was a
-  **measurement artifact**, and the two traps that made it are named: the renderer receives
-  `glass − 4` (the document margin, `src/render.ts:348`), so slots computed from the glass
-  disagree with the bytes; and a cell's parsed text is not its markdown source (a link's URL
-  is visible content). `tableSlots` is exported and `renderTable` calls it, so the renderer
-  and the instrument are one function; the output-only alignment check finds **0 of 1676**
-  table×glass combinations disagreeing, and the monster table at glass 160 draws
-  `2/17/32/44/54/65/73/85/97` for header and body alike. A body cell wider than its slot
-  wraps to it before padding, so the drift **cannot** be drawn. · see
-  `briefs/2026-10-13-brief-table-slot-instrument.md`, `tests/table-slot.test.ts`
-- **The brief's status vocabulary is settled** (2026-10-13,
-  ADR-BRIEF-LIFECYCLE-061) — the Hygiene entry it pays had stood since 2026-10-05:
-  ten unrecognised words, reported loudly and never guessed at. They were **five**.
-  `ready` is a **state** — six briefs wrote it and `&briefs` had been maintaining
-  the section by hand, so only the vocabulary lagged — while `aborted`, `accepted`
-  and `pending` fold onto `rejected`, `done` and `open`. One of the ten was a
-  Status line that was a *sentence* rather than a state, and it had held the
-  the frame-mode row at `open` for **six weeks against a rule that landed**.
-  `just check` now reports zero unrecognised words.
-- **Two gates, three closed edges** (2026-10-13) — `elision-monotone` (the
-  recoverability invariant: 518 documents, no rise anywhere, residue baselined)
-  and `ref-census` (a branch is deleted, current, or declared) both run on
-  `just check`. `BRF-ADDRESS-CAP` moved the cap onto destinations, and
-  `BRF-BOUNDARY-MARK` gave the receipt its end — a bare `…` when the document
-  holds more destinations than the space holds (ADR-047 amended). `BRF-TABLE-GUTTER`
-  was **rejected**: the gutter is the body's column boundary, not chrome.
-- **The amp reconciliation** (2026-10-10) — the `&briefs` state table is back in
-  agreement with the registry: 46 briefs added, the coverage check reads live
-  *and* archive (a landed brief is not a phantom), and the `&alpha` fixture wire
-  is gone. `just amp` is green.
-- **&stack — the map** (2026-10-10) — the silo, the seam and the reader as one
-  walkable document: a root AMPER page with four expansions, each carrying its
-  diagram and its named failure. The render found four defects, now briefed and
-  issued; the reference list is self-tabling, so the receipt is suppressed.
-- **BRF-KINDLE-PORCH** (2026-10-06) — the silo on an e-ink glass. Device
-  known: **Paperwhite 11th gen (PW5)**. The next move is five minutes and
-  cannot wait: **Airplane Mode on, then read the firmware version** — the
-  community jailbreak for this generation (Nosebleed) covers 5.16.4–5.18.6,
-  and 5.18.1.1.1 / 5.19.x are closed, with the patch arriving as an ordinary
-  update. Then it is host-driven: `okuda <file> --no-color` paginated on the
-  host, painted by FBInk over ssh, nothing of ours on the device. Assessment:
-  `docs/2026-10-06-the-eink-frame-is-a-second-host.md` — the reading path
-  emits **zero bytes of cursor control across 427 documents**.
-- **BRF-DIAGRAM-DESCRIBE** (2026-10-03) — the `diagram-describe` binary reads
-  mermaid source on stdin and writes prose markdown on stdout via the local
-  LLM (ollama + gemma4). okuda's ` ```mermaid describe ` fence tag routes to
-  it; the prose renders as a muted panel with a left border.
-- **Ghostty clone/edit integration** — the `99` (clone) and `88` (edit)
-  verbs spawn fresh Ghostty windows with the full interactive
-  environment (zsh -i -c). Seven iterations to get the spawn boundary
-  right. Lesson persisted in `src/clone.ts`.
-- **The edit verb is 88, and the editor is Zed** — `09` (a blank note)
-  and the never-wired `10` retired; `88` binds the *current document* to
-  the editor, the doubled pair beside `99` clone (ADR-032 amended,
-  keymap page moved with the table). The editor is a declaration:
-  `OKUDA_EDITOR`, then `EDITOR`, then the first of `zed`, `code`,
-  `cursor`, `subl` on PATH, then `vi`. A GUI editor is spawned
-  directly — no terminal spun up to host it; a terminal editor rides
-  `ghostty-edit`, where a login shell can find it. Cue seam speaks
-  "edit" automatically (it speaks as it binds).
-- **BRF-MATH-GLYPHS** — `$\Delta t$` renders as `Δt`. A closed
-  vocabulary of 17 entries, an all-or-nothing gate, and a source-level
-  pass with structural fence and code-span exemption (the brief's
-  handler-level placement failed a probe — fences *do* reach the `text`
-  handler on bun 1.4.0). Brief carries the landing record and both
-  deviations.
-- **BRF-HEADING-ANSI-STRIP** (2026-10-03) — heading colour leak fixed: inline
-  `**strong**` inside a heading no longer bleeds gold into blue. **Done**.
-- **BRF-DOC-SEARCH-FERMATA** (2026-10-03) — brief written for the doc→search
-  held-frame pause. Open. · **S**
-- **Dogfood crashes fixed** — Bun.spawn stdio compat, appleScript arg
-  count, path doubling in resolve(cwd,doc).
-- **reg-sync reconciles derived fields** — a brief flipped to Done used
-  to keep its stale row forever: membership was checked, the derived
-  fields were not, and the map was only consulted when an entry was
-  rebuilt. Check mode now compares status, an *authored* date and the
-  callsign (never the summary — the playbooks carry hand-written ones),
-  reports a status word outside the tier vocabulary loudly instead of
-  mapping it to `open`, and refuses the lossy traps the first run
-  exposed: `parked`/`rejected`/`draft`/`proposed` are now declared
-  words, the archive's statuses are fixed by *location* (ADR-052), and
-  an mtime is not a date claim. It found and repaired ADR-023's row
-  (`Accepted` → `Aborted`) on its first real run.
-- **The dogfood ritual is complete** — the scripted six-case probe
-  (`tmp/dogfood-probe.py`) ran green twice, and the operator's by-hand
-  pass covered the physical holds, the one-shot slot, the abort, and
-  the exit fermata; by-hand findings #1 and #2 (the FOUT, and the beat's
-  positive verdict) shipped inside it. It fed `td-51d5f4` (pending digit
-  indicator) and `td-e81b92` (grammar ADR), both still open.
-- **TD hygiene** — closed stale td-fa0454 (quiet period, design went
-  clock-free), reviewed td-3da242 (archive sweep).
+Every task ID this table carried pointed at nothing live. Checked 2026-11-05:
+eleven were **closed**, and one (`td-fa0454`) was not on the board at all — the
+ephemeral store had pruned the row the table still cited. The recommendations
+were three weeks old and the queue underneath them had emptied.
+
+**And "closed" carried four different verdicts, plus one that was simply
+wrong** — which is the part that matters:
+
+- **decided**: the remote speech seam closed because `ADR-036` gave it a
+  verdict the day it was written.
+- **refused**: `BRF-RENDER-DEFECTS` and `BRF-CAPABILITIES-DOC` closed rejected
+  2026-10-27, the operator's call — too old, the corpus moved on. Both archived
+  rather than deleted, so they can be replundered.
+- **parked**: the capabilities task closed 2026-10-02 having never started.
+- **swept**: the rest closed 2026-10-27 by a sweep that recorded its own reason
+  as *"closed as cleanup, not as work judged."*
+- **and one recorded a reason that is false**: the cut cell was swept with *"its
+  brief was refused"* — but `BRF-TABLE-WIDTH` is **Done**, shipped 2026-10-02
+  on `866f1fc` under `ADR-UNIVERSAL-ELISION-050`, three weeks before the sweep.
+
+An ID survives all five. Only the callsign carries the verdict, and only the
+registry can still tell you which one it was.
+
+So the rule for this document, from now: **an action block cites a callsign or
+a path, never a task ID.** A task is a pointer into an ephemeral store whose
+closure is unreadable from the pointer — the One-Way Valve, applied to the one
+document that had been ignoring it. Where an action has no brief yet, this table
+says so and *writing that brief is the first hour of the work.*
+
+This table is hand-edited by design (ADR-DERIVED-AMP-TABLE-058: the grouping
+and the verdicts are the editor's, and only `&briefs` is derived). That is why
+it rotted: nothing derivable can notice a hand-written judgement going out of
+date. The mechanism is now filed — see **Hygiene**.
+
+## Landed since the last sweep — 2026-11-05
+
+- **Per-token baselines, both citation gates** (`ADR-ALLOWANCE-NAMES-REFERENT-084`,
+  `BRF-COUNT-BASELINE-TOKENS`, `DBF-ALLOWANCE-REFERENT`) — a count cannot say
+  *which* citation it permits, so a file could drop one grandfathered citation
+  and gain a different one at equal count and read `ok`. Both gates now judge
+  `{file: {token: count}}`; the swap fails and names the intruder. The migration
+  found two things: the td-ID gate had been counting **citation-bearing lines**
+  (31 citations invisible), and 32 stale baseline entries had been printing
+  `can shrink` unread for weeks.
+- **The gate names itself** (`ADR-GATE-TWO-RENDERS-085`, `BRF-FIRST-CONTACT`,
+  `DBF-FIRST-CONTACT`) — `justfile`'s 860-character `&&` line is now a named
+  table (`scripts/gates.sh`), fail-fast, with the failure printed *below* the
+  evidence and a one-command re-run. `--gate` is the verdict render: a passing
+  check is **24 lines, each a gate's own answer** (was 127, ~100 carrying no
+  verdict), and every reading moved behind its own address (`just seams`,
+  `ideas`, `census`, `amp`, `dates`, `ref-census`).
+- **The ready queue is derived** — `just next` reads `td list --json`, separates
+  claimed from startable work, and prints its own depth. Two instrument defects
+  fell out: `td list` caps at 50 rows and announces the cap **on stdout** (three
+  readers were exposed; all now pass `--limit 0`), and the contrast ladder had
+  no reading door at all — the gate was the only way to see the evidence it
+  judged.
+- **The loaded protocol states the term, not the history**
+  (`ADR-GLOBAL-TERM-086`) — 490 lines / 33 KB → 385 / 25.9 KB, 13 callsigns that
+  resolved inside exactly one silo → 0. Every term and every **Test** kept; the
+  narration dropped, because it already lives here.
 
 ## Recommended — start these next
 
-- **BRF-READ-ACTUATOR** (td-166367, 2026-10-10) — the speech actuator: **77
-  calls a function that does the speech thing**, and what it does is the epic's
-  to find. Three issues — bind the token, find the function, dogfood by ear. The
-  definition is deliberately empty so the speech work is *pressable* before it is
-  decided. · **S**
-- **BRF-RENDER-DEFECTS** (td-51ea5e, 2026-10-10) — the stack map's four render
-  findings: parallel-edge collapse, back-edge label collision, the LR width
-  fallback, and the headless map's optimism. The okuda correction is the hazard
-  rules plus a lint (report first); the two renderer defects are a **message
-  across the seam** to `mermaid-to-md`. · **S**
-- **BRF-AST-PROSODY** (2026-10-05) — intermediate representation for speech
-  rendering. Open, awaiting the perimeter verdict and the seam decision.
+- **BRF-PLATFORM-PACKAGES, step two** — the shim, the name migration, the
+  publish. The matrix is green in the gate (`platform-packages: OK — 8
+  manifest(s) match the matrix`), so this is the step where the silo starts
+  shipping a binary rather than a source tree. · **M**
+- **The map cap fails silently** — `briefs/index.md` mints 77 of 80. This is the
+  third instance of one class found in a single day (the td list cap, the count
+  baseline, this): *an instrument reporting a ceiling as a fact*. Cheapest class
+  in the silo to close and the one it keeps re-finding. No brief yet. · **S**
+- **BRF-SEARCH-ROW** — the search row as a pure renderer over `Row[]`, with
+  tests. The brief is written and the contract is frozen by the probe, so the
+  work is defined rather than to be discovered. · **M**
+- **A pipe inside a code span breaks a table cell — in both renderers,
+  silently** — silent corruption of a document's own content, in the one place
+  the restricted grammar cannot escape. Two renderers, one test. No brief yet.
   · **S**
-- **BRF-STICKY-HEADING-STEPPER** (2026-10-04) — step through a document
-  section by section, heading as anchor, never truncate. Open. · **S**
-- **The cut cell** (BRF-TABLE-WIDTH, td-b78642) — 104 tables in the
-  corpus, 106 cuts, 97 with room already on the glass; the allocator
-  spends the columns wrong. Highest dogfood leverage per hour · **M**
-- **BRF-PALETTE-AUDIT** (td-bb44ca, 2026-09-19) — per-role verdict at
-  α = 0.2 and 1.2, the precondition; then **BRF-OKLCH-TUNING** wires the
-  brightness keys to a palette that has already passed review · **M**
-- **BRF-CAPABILITIES-DOC** (td-8f49bd, 2026-09-19) — `docs/capabilities.md`,
-  the paid-claim inventory: what okuda can do right now, every entry
-  citing its landing record. The reader asked for a changelog; this is
-  the snapshot that doesn't rot · **S**
-- **The perimeter** (ADR-PERIMETER-039, 2026-09-18) — **the eviction ran
-  2026-10-10** (`cc722e4`, Moira's flit): the rehearsal recipes left for
-  Blandings and the casting doctrine went. The `[moira]` group is 6
-  recipes, 2 invoking `./okuda`; the gate is retired, because its
-  classifier would flag the post-flit kept set. Remainder: the **records
-  residue** — 3 tracked `.txt`, `playbooks/ear-playbook.md`, `&ear.md`,
-  the Moira docs, `decisions/033` · **S**
-- **The frame thing, two objectives** (2026-09-07) — (1) figure out how
-  to best do the frame thing (the semantic pager, chunk = heading-subtree
-  vs sub-heading/paragraph for the ear); (2) determine if the frame
-  thing serves the two modes (visual scroll, audio TTS). The coupled-
-  frame dogfood is the test rig. External test: Nate B Jones + wife,
-  read-and-listen to the same document, discuss with references. Maybe
-  add writing new docs and passing callsigns around. · **M**
-- **Duplicate-callsign lint** (td-040450) — ADR-025's exactly-one
-  contract is prose until this ships; the resolver is still
-  silent-first-wins. Freshest debt, smallest fix · **S**
-- **The conceptual lexicon extraction** (BRF-CONCEPTUAL-LEXICON) —
-  brief drafted, awaiting TD decomposition; a fresh oriented agent
-  reviews and builds the workflow. The `briefs/evals` barnacle
-  resolves or removes with it · **M**
+- **The ladder's verdicts vs the ranking reading** — rungs 3, 4 and 5 are
+  order-inverted. Observed today in the ladder's own reading while the verdict
+  render was being cut: the inversion is a *reading*, not a failure, and the
+  task exists because nobody has decided what a rung may cost. This one needs a
+  decision before code, so the brief comes first. · **S-M**
 
 ## Ready — when the pain flares
 
-- **`--no-color` escape leak** — Run 1 of the TTS dogfood found
-  `--no-color` leaves 28 bold ANSI escapes; `say` reads them as noise.
-  Either strip bold too (a future `--plain` render dial), or accept the
-  audio path skips okuda. The clean audio input today is `cat doc.md`.
-  Routed 2026-09-19: the `--plain` dial is the one okuda-side artifact
-  of **BRF-REMOTE-SPEECH-SEAM** — build it when the verdict confirms.
-  **Second consumer named 2026-10-05 (BRF-KINDLE-PORCH):** an e-ink sink
-  painting with FBInk renders `\x1b[1m` as literal characters, so the panel
-  wants the same "no escapes at all" dial the voice wants. Two consumers,
-  one artefact — read that gate again with both in hand.
+- **The citation web's blind spots** — three filed, all the same shape (a lint
+  that cannot see what it is looking at): `citation-drift` cannot see a hint
+  that names no identity, **221 of 330 are that shape**; the citation census is
+  blind to a dangling `Enforced by:` — the one line `decisions/TEMPLATE.md`
+  calls load-bearing; a path citation to an **archived** brief goes quiet in the
+  terminal, though the callsign resolves (today's archived `BRF-COUNT-BASELINE-TOKENS`
+  is the live instance: the callsign still lands, the path would not). Each is
+  a day's work once the shape is chosen. · **S** each
+- **`--no-color` escape leak** — 28 bold escapes survive into a sink that cannot
+  read them. Two consumers now named (the voice, and the e-ink panel that draws
+  `\x1b[1m` literally), one artefact: a `--plain` dial. Build it when the second
+  consumer is real, which it now is. · **S**
+- **The perimeter's stale measurement** — `BRF-PERIMETER-GATE`'s 22-of-28 was
+  taken before the eviction. Retake it before writing any report on it, because
+  a stale measurement is a claim with a live referent that no longer agrees.
   · **S**
-
-- **BRF-REFRESH-OFF-DISK** — real bugs in the repaint path: the resize
-  race, the R placebo, and the **height-only resize** (fixed 2026-09-30 on
-  `fix/resize-height`, ADR-RESIZE-GEOMETRY-046). **Corrected 2026-09-30:**
-  this read *"bites on mobile SSH only"* — it bites on the desktop,
-  deterministically, for a height change. Faults 1 and 2 remain · **M**
-- **BRF-DOCUMENT-LINKS** — gopher links, keyspace unified and specced;
-  the vector render supersedes part of it, the served-content half
-  waits on a reason · **M**
+- **Tidy-first: the palimpsest sweep** — two sittings of gate surgery have left
+  the corpus with new documents and old residue. The four invariants drive it;
+  it wants the backlog's quiet spot, not its head. No brief yet. · **M**
 
 ## Exploration — read-and-think, no code
 
 - **CALL Scotland — the outreach option, reserved** (2026-10-05). The
-  University of Edinburgh's assistive-technology service (Books for All,
-  Adapted Digital Exams, Communication Passports, Symbols for All, WordTalk,
-  The Scottish Voice) — the one outside body whose remit overlaps this
-  project's *purpose* rather than its mechanism. Their published stance is
-  ours one layer upstream: *making the original accessible reduces the need
-  to produce accessible formats*. The drafted piece is
-  `docs/2026-10-06-the-shared-artifact.md` — shared cognition, the artifact
-  discipline, the method stated as it is, limits first. **Reserved, not
-  sent:** their public guidance is reference material now; contact is the
-  operator's call, and the trigger is a re-read in a week. The two questions
-  worth their time: does the unreachable-address idea help a tremor or switch
-  user, and what does a shared artifact owe a partner who arrives cold? · **S**
-- **BRF-REMOTE-SPEECH-SEAM** (td-9dac3b, proposal) — the verdict before
-  any build: confirm okuda's duty ends at a `--plain` dial (the
-  perimeter already carries the transport), or veto with the property
-  that touches the byte stream · **S**
-- **BRF-PAGED-OKUDAGRAM — the EC walk** — frame mode v1 shipped; the
-  brief's EC1–EC9 edge cases need a validation walk against real
-  documents (tall frames, blank frames, nested headers) · **S**
+  University of Edinburgh's assistive-technology service — the one outside body
+  whose remit overlaps this project's *purpose* rather than its mechanism.
+  Their published stance is ours one layer upstream: *making the original
+  accessible reduces the need to produce accessible formats*. The drafted piece
+  is `docs/2026-10-06-the-shared-artifact.md`. **Reserved, not sent:** contact
+  is the operator's call, and the trigger is a re-read in a week. The two
+  questions worth their time: does the unreachable-address idea help a tremor or
+  switch user, and what does a shared artifact owe a partner who arrives cold?
+  · **S**
+- **The frame thing, two objectives** (2026-09-07) — (1) how best to do the
+  frame thing (the semantic pager: chunk = heading-subtree vs
+  sub-heading/paragraph for the ear); (2) whether the frame thing serves the two
+  modes (visual scroll, audio TTS). The coupled-frame dogfood is the test rig.
+  External test: two readers, one document, references passed between them.
+  · **M**
+- **BRF-PRINCIPAL-CLERK / BRF-CHOICE-LIST / BRF-PAIR-DELIVERED /
+  BRF-TEMPORAL-WINDOW** — four briefs at the design edge of the rendering
+  contract: the three-way triage, a document that is a setting, the re-themer's
+  own override point, and the date the reader already types. All open, none
+  scheduled; read them together before promoting one, because they share the
+  question of what the document is allowed to *be*. · **M**
 
 ## Hygiene — small, owed
 
-- **BRF-SILO-MNEMONICS — close or scope** — resolution shipped, badge
-  shipped, bootstrap deferred: what remains is likely a debrief and a
-  close · **S**
-- **The porch matrix** (BRF-PORCH-MATRIX) — not built yet: the scheme
-  handlers and the per-glass verdicts. The table's newest resident · **M**
+- **Mechanism for this table's rot** — an `&` document that cites a task ID
+  should fail the gate when that task is no longer open, so a hand-written
+  action block cannot go out of date silently. `amp-check` already reads these
+  documents and already fails on a wire that resolves to nothing; this is the
+  same rule pointed at the ephemeral store. Ticket filed 2026-11-05. · **S**
+- **A stale-open task on the board** — `briefs` status vocabulary is filed as
+  open work, but `ADR-BRIEF-LIFECYCLE-061` landed it on 2026-10-13 and
+  `reg-sync` reports zero unrecognised words today. Either the task's acceptance
+  is wider than its title, or it is done and the board is carrying a finished
+  thing. **The operator's call, and the first one in the morning** — closing
+  another session's task without walking its acceptance would be a claim, not a
+  decision.
+- **The porch matrix** (BRF-PORCH-MATRIX) — not built yet: the scheme handlers
+  and the per-glass verdicts. · **M**
+- **Two dating debts** — 19 playbooks declare no date (the tier's dating rule is
+  undecided: first commit as a derived date, or no date at all), and 113
+  date-prefixed documents have no declared date and no registry row. Both
+  ticketed 2026-11-05 rather than guessed at, because a date nobody verified is
+  a claim. · **S-M**
 
 ## Not next — deliberately
 
-- **The single binary** (2026-10-05) — a vendor proposal to compile the
-  helpers to Wasm and ship one artifact, answered and shelved:
-  `docs/2026-10-05-the-single-binary-is-a-provisioning-question.md`.
-  The measured maximum win is 60 ms on the heaviest document in the
-  corpus (four mermaid fences) and 15.0 ms per fence end to end, of
-  which the Rust engine is 0.5 ms — the rest is a bash wrapper. Three
-  named revival triggers: a host with no provisioning path, a consumer
-  wanting the engine as a library, or the per-fence number going
-  material (re-run the probe in §5 if a forty-diagram document arrives).
+- **The single binary** (2026-10-05) — a vendor proposal to compile the helpers
+  to Wasm and ship one artifact, answered and shelved:
+  `docs/2026-10-05-the-single-binary-is-a-provisioning-question.md`. The
+  measured maximum win is 60 ms on the heaviest document in the corpus (four
+  mermaid fences) and 15.0 ms per fence end to end, of which the Rust engine is
+  0.5 ms — the rest is a bash wrapper. Three named revival triggers: a host with
+  no provisioning path, a consumer wanting the engine as a library, or the
+  per-fence number going material.
+- **BRF-FLOW-WRAP** (fresh) · **BRF-MERMAID-HARD** (waits on a paged-view
+  world) · **the speech set** (leaves this table — `ADR-PERIMETER-039`: the
+  tuning loop is Blandings', and the ear owes its own corpus the auditions.
+  **BRF-SPOKEN-BLOCK-GRAMMAR stays**, because `ADR-037` cites it and moving it
+  breaks the record) · **the docs candidates** (speech-driven design, the
+  intention loop — landed, unregistered, awaiting the Derrida and Foxtrot-Oscar
+  gates) · **everything parked** (still parked).
 
-- **BRF-FLOW-WRAP** (fresh) · **BRF-MERMAID-HARD** (waits on a
-  paged-view world) · **the search-area redesign session** (td-3ac46b,
-  2026-09-19 — deferred behind the rest of the action list by
-  dependency: the wire fix, math glyphs, the cut cell, the palette
-  audit, the capabilities doc, the seam verdict; it clears when they
-  do, not by a date. GLOAM-OWNS-THE-LOOP scoping is the first agenda
-  item) · **the speech set** (leaves this table —
-  ADR-PERIMETER-039: the tuning loop is Blandings', and the ear
-  owes its own corpus the auditions. **BRF-SPOKEN-BLOCK-GRAMMAR stays**,
-  because ADR-037 cites it and moving it breaks the record) · **the docs
-  candidates** (speech-driven design, the intention loop — landed,
-  unregistered, awaiting the Derrida and Foxtrot-Oscar gates) ·
-  **everything parked** (still parked).
+## Closed, and what closed it
+
+Kept for one sweep so the morning review can see what this table used to say;
+then this section goes — git has it.
+
+| Was recommended | How it closed | The record that carries the verdict |
+|---|---|---|
+| The cut cell (the allocator spends columns wrong) | swept as *"brief refused"* — **the reason is false** | `BRF-TABLE-WIDTH`: Done, shipped 2026-10-02 (`866f1fc`, `ADR-UNIVERSAL-ELISION-050`) |
+| Render defects — the stack map's four findings | rejected 2026-10-27, operator's call | `BRF-RENDER-DEFECTS` (archived, replunderable) |
+| Capabilities doc — the paid-claim inventory | parked 2026-10-02, later rejected | `BRF-CAPABILITIES-DOC` (archived) |
+| Remote speech seam verdict | **decided** | `ADR-036` — no speech code; duty ends at the plain-text channel |
+| The search-area redesign session | epic closed; the scoping it deferred is unrecorded here | — |
+| Duplicate-callsign lint | closed, and the lint is in place: `reg-sync` names every collision and fails on it | `scripts/reg-sync.ts` (collision path) |
