@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { extractCallsigns, messageViolations } from "../scripts/callsign-lint";
+import { extractCallsigns, messageViolations, unresolvableCitations } from "../scripts/callsign-lint";
+import { judge, tally } from "../scripts/td-id-lint";
 
 describe("callsign lint — the token families (BRF-CALLSIGN-CHECKSUM)", () => {
   test("every registry family matches; ordinal prose forms included", () => {
@@ -60,5 +61,35 @@ describe("callsign lint — message violations (both valves, resolver injected)"
       "td ID in message: td-123456",
       "unresolvable callsign: BRF-PHANTOM",
     ]);
+  });
+});
+
+describe("callsign lint — the corpus core and the swap hole", () => {
+  // The resolver is the oracle, injected — so the corpus gate's own reading
+  // is testable without the filesystem (the export convention the tests cite,
+  // tests/ref-census.test.ts:9).
+  const resolve = (t: string) => (t === "BRF-KNOWN" ? "briefs/x.md" : null);
+
+  test("only unresolvable citations are the gate's tokens", () => {
+    expect(unresolvableCitations("BRF-KNOWN and BRF-PHANTOM", resolve)).toEqual(["BRF-PHANTOM"]);
+    expect(unresolvableCitations("nothing to see", resolve)).toEqual([]);
+  });
+
+  test("a swap at count parity fails the checksum — the hole this closes", () => {
+    // Before: one grandfathered dead name. After: it is gone and a DIFFERENT
+    // dead name took its place, same count. `BRF-COUNT-BASELINE-TOKENS`.
+    const before = tally(unresolvableCitations("see BRF-OLD-DEAD", resolve));
+    const after = tally(unresolvableCitations("see BRF-NEW-DEAD", resolve));
+    expect(Object.values(before)[0]).toBe(Object.values(after)[0]); // count parity
+    const j = judge(after, before);
+    expect(j.verdict).toBe("violation");
+    expect(j.newTokens).toEqual(["BRF-NEW-DEAD"]);
+    expect(j.shrunk).toEqual([["BRF-OLD-DEAD", 0, 1]]);
+  });
+
+  test("the same citation twice over its grandfathered count fails", () => {
+    const j = judge(tally(["BRF-OLD-DEAD", "BRF-OLD-DEAD"]), tally(["BRF-OLD-DEAD"]));
+    expect(j.verdict).toBe("violation");
+    expect(j.grown).toEqual([["BRF-OLD-DEAD", 2, 1]]);
   });
 });

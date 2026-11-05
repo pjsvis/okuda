@@ -9,13 +9,14 @@
 //  The baseline (scripts/callsign-baseline.json) grandfathers the
 //  census residue: placeholders, documented forward references
 //  (ADR-043 self-heals when it lands — the shrink note fires), dead
-//  names, and frozen-doc sediment. At-count passes, over-count fails,
-//  under-count says so and names the prune remedy — the ratchet stays
-//  a ratchet, never an allowance.
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+//  names, and frozen-doc sediment. It is PER TOKEN ({file: {token:
+//  count}}, BRF-COUNT-BASELINE-TOKENS): a token the baseline never saw
+//  fails at any count, over-count fails, under-count says so and names
+//  the prune remedy — the ratchet stays a ratchet, never an allowance.
+import { readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { resolveByCallsign } from "../src/root";
-import { scannedFiles, verdict, TD_ID, type Verdict } from "./td-id-lint";
+import { scannedFiles, judge, readBaseline, tally, TD_ID, type Baseline, type Verdict } from "./td-id-lint";
 
 /** The citation families the registries mint (ADR-024's vocabulary plus
  *  the OKF bundle prefix and the reserved CSN space — both verified in
@@ -34,6 +35,12 @@ export function extractCallsigns(text: string): string[] {
   return [...text.matchAll(CALLSIGN_TOKEN)].map((m) => m[0]!);
 }
 
+/** The unresolvable citations in a document, resolver injected. Pure —
+ *  the corpus gate's core, testable without the filesystem. */
+export function unresolvableCitations(text: string, resolve: (t: string) => string | null): string[] {
+  return extractCallsigns(text).filter((t) => resolve(t) === null);
+}
+
 /** Message-range violations of both valves, resolver injected (pure for
  *  the tests, the product's resolver in the gate). */
 export function messageViolations(
@@ -48,39 +55,39 @@ export function messageViolations(
   return out;
 }
 
-function readBaseline(): Record<string, number> {
-  const p = "scripts/callsign-baseline.json";
-  return existsSync(p) ? JSON.parse(readFileSync(p, "utf8")) : {};
-}
+const CALLSIGN_BASELINE = "scripts/callsign-baseline.json";
 
 /** The corpus scan: every persisted doc's citations resolve, or sit at
- *  baseline. One file with no entry and any hit is a violation — the
- *  gate governs forward, from the census. */
-function checkCorpus(baseline: Record<string, number>): Verdict[] {
+ *  their own baseline. A token with no entry is a violation at any count —
+ *  the gate governs forward, from the census. */
+function checkCorpus(baseline: Baseline, report = true): Verdict[] {
   const verdicts: Verdict[] = [];
-  const next: Record<string, number> = {};
+  const next: Baseline = {};
   for (const f of scannedFiles()) {
-    const text = readFileSync(f, "utf8");
-    const hits = extractCallsigns(text).filter(
-      (t) => resolveByCallsign(t, REPO_ROOT) === null,
-    );
-    // verdict for EVERY file — a zero-hit file with a baseline entry is
-    // a stale entry, reported as shrink, never silently skipped (a
-    // skipped stale count is an allowance: a new citation rides it).
-    if (hits.length > 0) next[f] = hits.length;
-    const v = verdict(hits.length, baseline[f]);
-    if (v === "violation") {
-      const shown = [...new Set(hits)].slice(0, 4).join(", ");
-      const extra = new Set(hits).size > 4 ? ` (+${new Set(hits).size - 4} more)` : "";
-      console.error(`  ${f}: ${hits.length} unresolvable — ${shown}${extra} (baseline ${baseline[f] ?? 0})`);
-    } else if (v === "shrink") {
-      console.log(`  baseline can shrink: ${f}: ${hits.length} < baseline ${baseline[f]} — prune with --write-baseline`);
+    const hits = tally(unresolvableCitations(readFileSync(f, "utf8"), (t) => resolveByCallsign(t, REPO_ROOT)));
+    // judged for EVERY file — a zero-hit file with baseline entries is a
+    // stale entry, reported token by token as shrink, never silently
+    // skipped (a skipped stale entry is an allowance: a new citation rides it).
+    if (Object.keys(hits).length > 0) next[f] = hits;
+    const j = judge(hits, baseline[f]);
+    if (report && j.verdict === "violation") {
+      const parts = [
+        ...j.newTokens.slice(0, 4).map((t) => `new: ${t}`),
+        ...j.grown.map(([t, n, b]) => `${t} x${n} > baseline ${b}`),
+      ];
+      const extra = j.newTokens.length > 4 ? ` (+${j.newTokens.length - 4} more)` : "";
+      console.error(`  ${f}: ${parts.join(", ")}${extra}`);
+    } else if (report && j.verdict === "shrink") {
+      const gone = j.shrunk.map(([t, n, b]) => (n === 0 ? `${t} gone` : `${t} x${n} < ${b}`)).join(", ");
+      console.log(`  baseline can shrink: ${f}: ${gone} — prune with --write-baseline`);
     }
-    verdicts.push(v);
+    verdicts.push(j.verdict);
   }
   if (process.argv.includes("--write-baseline")) {
-    writeFileSync("scripts/callsign-baseline.json", JSON.stringify(next, null, 2) + "\n");
-    console.log(`callsign baseline written: ${Object.keys(next).length} files, ${Object.values(next).reduce((a, b) => a + b, 0)} citations grandfathered`);
+    writeFileSync(CALLSIGN_BASELINE, JSON.stringify(next, null, 2) + "\n");
+    const tokens = Object.values(next).reduce((a, m) => a + Object.keys(m).length, 0);
+    const cites = Object.values(next).reduce((a, m) => a + Object.values(m).reduce((x, y) => x + y, 0), 0);
+    console.log(`callsign baseline written: ${Object.keys(next).length} files, ${tokens} token(s), ${cites} citations grandfathered`);
   }
   return verdicts;
 }
@@ -110,7 +117,13 @@ function checkUnpushed(): string[] {
 }
 
 function main() {
-  const vs = checkCorpus(readBaseline());
+  // In write mode the baseline is not consulted: the writer records the corpus
+  // and judges nothing, so it neither reads the shape it is replacing nor
+  // reports verdicts against a baseline it did not read (see
+  // scripts/td-id-lint.ts for where the migration's proof lives).
+  const writeBaseline = process.argv.includes("--write-baseline");
+  const vs = checkCorpus(writeBaseline ? {} : readBaseline(CALLSIGN_BASELINE), !writeBaseline);
+  if (writeBaseline) return;
   const range = checkUnpushed();
   const corpusFail = vs.includes("violation");
   if (corpusFail) console.error("callsign lint: unresolvable citations beyond baseline — cite the registered form, or register the thing.");

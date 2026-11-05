@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**14 live · 155 archived · 19 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 5 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**15 live · 155 archived · 20 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 5 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -52,6 +52,7 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 | BRF-HTML-PACKAGE | · open | The package — a document and its one-hop closure, in one file | — |
 | BRF-CAHIER-BINARY | · open | The cahier binary — the compositor, compiled and shipped | — |
 | BRF-PLATFORM-PACKAGES | · open | The platform packages — the binaries ride npm under `@okuda` | — |
+| BRF-COUNT-BASELINE-TOKENS | · open | Per-token baselines — the count-parity swap hole, closed | — |
 
 ## Ready — specced, next up
 
