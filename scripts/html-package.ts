@@ -155,6 +155,97 @@ async function mermaidPass(html: string, width: number): Promise<string> {
   });
 }
 
+// ── Post-pass 1b: code fences → chroma, as HTML ───────────────────────
+//
+// The terminal pipes every tagged fence through chroma with
+// `--formatter terminal16 --style monokai`: the tool classifies, the
+// terminal themes (BRF-FENCE-COLOUR). The page does the same with a
+// different formatter — `--formatter html --html-only` — so there is ONE
+// classifier and two output formats, not two highlighters that disagree
+// about what a keyword is.
+//
+// A JavaScript highlighter was the obvious alternative and is refused on
+// two counts. It is a second classifier, which is the defect this week
+// wrote down twice (the substrate implemented twice has half the rules in
+// each). And it is a runtime: Shiki's grammars are megabytes, so the
+// artefact would either fetch them — breaking the one property it has —
+// or carry them, which is a different artefact. Chroma runs at build time
+// and the page stays static.
+
+const CHROMA_BIN = "chroma";
+
+/** chroma's alias table, parsed once. chroma never rejects an unknown
+ *  --lexer: it falls back to plaintext, colours it white, and exits 0. So
+ *  "an unknown tag renders as today" is reachable only by knowing the
+ *  table (src/render.ts:1013, the same rule). */
+let chromaAliases: Set<string> | undefined;
+
+async function getChromaAliases(): Promise<Set<string> | null> {
+  if (chromaAliases !== undefined) return chromaAliases;
+  try {
+    const proc = Bun.spawn([CHROMA_BIN, "--list"], {
+      stdin: "ignore",
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    const out = await new Response(proc.stdout).text();
+    await proc.exited;
+    const set = new Set<string>();
+    for (const m of out.matchAll(/^ {4}aliases:[ \t]*([^\n]*)$/gm)) {
+      for (const a of m[1]!.split(/\s+/)) if (a) set.add(a);
+    }
+    if (set.size > 0) chromaAliases = set;
+    return set.size > 0 ? set : null;
+  } catch {
+    return null;
+  }
+}
+
+async function chromaHtml(tag: string, code: string): Promise<string | null> {
+  try {
+    const proc = Bun.spawn(
+      [
+        CHROMA_BIN,
+        "--formatter", "html",
+        "--html-only",
+        "--html-prevent-surrounding-pre",
+        "--html-prefix", "ok-",
+        "--lexer", tag,
+      ],
+      { stdin: "pipe", stdout: "pipe", stderr: "pipe" },
+    );
+    proc.stdin.write(code);
+    proc.stdin.end();
+    const out = await new Response(proc.stdout).text();
+    const code2 = await proc.exited;
+    return code2 === 0 && out.trim() !== "" ? out : null;
+  } catch {
+    return null;
+  }
+}
+
+const RE_CODE_FENCE = /<pre><code class="language-([\w+#.-]+)">([\s\S]*?)<\/code><\/pre>/g;
+
+async function codeFencePass(html: string): Promise<string> {
+  const fences = [...html.matchAll(RE_CODE_FENCE)];
+  if (fences.length === 0) return html;
+  const aliases = await getChromaAliases();
+  const painted = await Promise.all(
+    fences.map((m) => {
+      const tag = m[1]!.toLowerCase();
+      // No table, or a tag the table does not know: the plain fence stands.
+      if (aliases === null || !aliases.has(tag)) return Promise.resolve(null);
+      return chromaHtml(tag, unescapeHtml(m[2]!));
+    }),
+  );
+  let i = 0;
+  return html.replace(RE_CODE_FENCE, (whole) => {
+    const out = painted[i++];
+    // chroma's output is already escaped; it must not be escaped again.
+    return out === null ? whole : `<pre class="code"><code>${out}</code></pre>`;
+  });
+}
+
 // ── Post-pass 2: state glyphs → spans ─────────────────────────────────
 //
 // CSS cannot colour a character. The renderer colours ✓ green because ✓ is
@@ -446,6 +537,7 @@ let html = Bun.markdown.html(applyMathGlyphs(source));
 // then glyphs, then references — and the doc-ref gold LAST, because it
 // would otherwise gild the path inside a reference and break the match.
 html = await mermaidPass(html, WIDTH);
+html = await codeFencePass(html);
 html = stateGlyphPass(html);
 html = redundantHrPass(html);
 

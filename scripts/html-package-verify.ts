@@ -44,6 +44,15 @@ writeFileSync(
 
 - **Loose.** A loose list item, which is the house form.
 
+A tagged fence is coloured by chroma, the same classifier the terminal uses:
+
+\`\`\`ts
+function elide(line: string, width: number): string {
+  // a comment
+  return line.slice(0, width - 1) + "…";
+}
+\`\`\`
+
 This fixture cites itself: fixture.md, and must not grow a panel — the reader is
 already there. A bare silcrow §27 in prose stays prose, and an inline reference to
 decisions/027-temperament-is-downstream-of-discipline.md becomes a link. A code
@@ -224,6 +233,19 @@ const probe = () =>
       // showcase grew a panel containing a copy of itself.
       selfPanel: !!document.querySelector('.deref#ref-fixture'),
       selfLink: !!document.querySelector('a[href="#ref-fixture"]'),
+      // Code colour: chroma's classes, the palette's hues. One classifier,
+      // two formatters — the terminal uses terminal16, the page uses html.
+      codeColoured: (() => {
+        const spans = document.querySelectorAll('pre.code [class^="ok-"]');
+        if (spans.length === 0) return null;
+        const kw = document.querySelector('pre.code .ok-kd, pre.code .ok-k');
+        const cm = document.querySelector('pre.code .ok-c1, pre.code .ok-c');
+        return {
+          spans: spans.length,
+          keyword: kw ? getComputedStyle(kw).color : null,
+          comment: cm ? getComputedStyle(cm).color : null,
+        };
+      })(),
       hrTotal: document.querySelectorAll('hr').length,
       // The three link registers, and the rule that must not borrow a second
       // colour: the colour is the register, the rule is only the affordance.
@@ -328,6 +350,9 @@ const checks: Array<[string, boolean, string]> = [
   ["the panel chrome names the document", (chromeOnScroll?.id ?? "").length > 0, `id "${chromeOnScroll?.id}"`],
   ["the build says when the panel budget bites", budgetSaid === true, `warned ${budgetSaid}`],
   ["a self-citation mints no panel", closed.selfPanel === false && closed.selfLink === false, `panel ${closed.selfPanel}, link ${closed.selfLink}`],
+  ["a code fence is coloured by chroma", (closed.codeColoured?.spans ?? 0) > 0, `${closed.codeColoured?.spans} token span(s)`],
+  ["a keyword takes the heading hue", closed.codeColoured?.keyword === "rgb(153, 204, 255)", `${closed.codeColoured?.keyword}`],
+  ["a comment is readable, not the dimmest slot", closed.codeColoured?.comment === "rgb(94, 139, 191)", `${closed.codeColoured?.comment}`],
   ["a rule before a heading is dropped", closed.hrBeforeHeading === false, `hr before heading ${closed.hrBeforeHeading}`],
   ["a rule that is the only structure stays", closed.hrTotal === 1, `${closed.hrTotal} hr`],
   ["a heading keeps a full line of air below", closed.headingGap !== null && parseFloat(closed.headingGap) >= 20, `gap ${closed.headingGap}`],

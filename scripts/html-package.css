@@ -303,6 +303,68 @@ pre code {
   color: var(--okuda-code-text);
 }
 
+/* ── Code colour: chroma's classes, the palette's hues ──────────────── */
+
+/* The terminal pipes every tagged fence through chroma with
+ * `--formatter terminal16 --style monokai`: the tool classifies, the
+ * terminal themes (BRF-FENCE-COLOUR). The page uses the SAME classifier
+ * with `--formatter html`, so there is one tokeniser and two output
+ * formats — not two highlighters that disagree about what a keyword is.
+ *
+ * The emphasis map is ours, as it is in the terminal. The terminal's
+ * monokai map had to be hand-patched because comments landed on the
+ * dimmest slot (90) and were unreadable; the same trap is here, so
+ * comments take `diagram-border` — a mid blue at 4.7:1 on the ground —
+ * rather than `muted`, which is 2.2:1 and would repeat the defect. */
+
+/* Keywords: the heading blue, as the terminal's keywords are cyan. */
+.ok-k, .ok-kc, .ok-kd, .ok-kn, .ok-kp, .ok-kr, .ok-kt, .ok-ow {
+  color: var(--okuda-heading);
+}
+
+/* Function names: the strong amber, as the terminal's are yellow. */
+.ok-nf, .ok-fm {
+  color: var(--okuda-strong);
+}
+
+/* Types and classes: the table header's tan — a register of its own. */
+.ok-nc, .ok-nn, .ok-nt, .ok-nb, .ok-bp {
+  color: var(--okuda-table-header);
+}
+
+/* Strings: the sea green the palette already uses for an address. */
+.ok-s, .ok-sa, .ok-sb, .ok-sc, .ok-dl, .ok-sd, .ok-s2, .ok-se,
+.ok-sh, .ok-si, .ok-sx, .ok-sr, .ok-s1, .ok-ss {
+  color: var(--okuda-link-url);
+}
+
+/* Numbers: the todo yellow. */
+.ok-m, .ok-mb, .ok-mf, .ok-mh, .ok-mi, .ok-il, .ok-mo {
+  color: var(--okuda-state-todo);
+}
+
+/* Comments: readable, and receding. Not `muted` — see the note above. */
+.ok-c, .ok-ch, .ok-cm, .ok-c1, .ok-cs, .ok-cp, .ok-cpf {
+  color: var(--okuda-diagram-border);
+  font-style: italic;
+}
+
+/* Errors and diffs. */
+.ok-err, .ok-gd {
+  color: var(--okuda-alert);
+}
+
+.ok-gi {
+  color: var(--okuda-state-ok);
+}
+
+/* Everything else — identifiers, operators, punctuation — is the fence's
+ * own ink, so the coloured tokens are the ones that carry meaning. */
+.ok-n, .ok-nx, .ok-nv, .ok-na, .ok-no, .ok-nd, .ok-ni, .ok-ne,
+.ok-nl, .ok-py, .ok-p, .ok-pi, .ok-o, .ok-l, .ok-ld, .ok-g, .ok-gt {
+  color: var(--okuda-code-text);
+}
+
 /* ── Quotes ────────────────────────────────────────────────────────── */
 
 blockquote {
