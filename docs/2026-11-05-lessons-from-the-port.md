@@ -158,8 +158,12 @@ references — bound as one file that carries everything it needs.*
 | bundle / package | things carried together | no referent beyond transport; collides with software distribution |
 | vade mecum | a handbook carried for ready reference | accurate but two words, and a name you would have to spell |
 
-**Proposal:** the artefact is a **quire**. `just html <file>` produces one; a
-quire of documents is the set. The machine code does not change.
+**Decided 2026-11-05: the artefact is a `cahier`** — the same word, in the
+language it had before it was English, and the form that wears its foreignness
+rather than inviting false confidence. The reasoning, the three collisions and
+the archive checks are in `docs/2026-11-05-cahier.md`. `just html <file>`
+produces one; **a cahier of documents** is the set. The machine code does not
+change.
 
 ## Related
 
