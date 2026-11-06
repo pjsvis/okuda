@@ -83,3 +83,4 @@
 {"file":"084-the-allowance-names-its-referent.md","date":"2026-11-05","status":"Accepted","summary":"The allowance names its referent — baselines are per token, not per count","meta":{},"callsign":"ADR-ALLOWANCE-NAMES-REFERENT-084"}
 {"file":"085-a-gate-prints-two-renders.md","date":"2026-11-05","status":"Accepted","summary":"A gate prints its verdict; the reading is a deliberate invocation","meta":{},"callsign":"ADR-GATE-TWO-RENDERS-085"}
 {"file":"086-the-global-term-and-the-local-history.md","date":"2026-11-05","status":"Accepted","summary":"An entry in the loaded protocol file is a term, its test, and an attribution","meta":{},"callsign":"ADR-GLOBAL-TERM-086"}
+{"file":"087-the-scope-is-the-familys-name.md","date":"2026-11-05","status":"Accepted","summary":"The npm scope is the family's name — `@polyvis`, declared once and checked","meta":{},"callsign":"ADR-SCOPE-FAMILY-087"}

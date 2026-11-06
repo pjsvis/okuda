@@ -4,7 +4,7 @@ callsign: BRF-PLATFORM-PACKAGES
 date: 2026-11-05
 ---
 
-# Brief: The platform packages — the binaries ride npm under `@okuda`
+# Brief: The platform packages — the binaries ride npm under `@polyvis`
 
 **Created:** 2026-11-05
 **Status:** Open
@@ -13,11 +13,13 @@ date: 2026-11-05
 
 `ADR-FAMILY-DISTRIBUTION-083`'s first channel; `ADR-EXPORT-SURFACE-082` made the
 core shared; `PLY-NPM-COMMISSIONING` stands up the scope. The operator's call,
-2026-11-05: *"npm scope name should be okuda, as that is the core."*
+2026-11-05, was `@okuda` — *"the core's name"* — and `ADR-SCOPE-FAMILY-087`
+reversed it the same day: the scope is the **family's** name, `@polyvis`, because
+the repo already carried that name in six documents and nothing was published.
 
 ## Objective
 
-Ship `okuda` and `cahier` as per-platform npm packages under the `@okuda` scope,
+Ship `okuda` and `cahier` as per-platform npm packages under the `@polyvis` scope,
 with the main package's `bin` shimming over the installed platform package, so
 `npm i -g` works on every supported host without a 61 MB payload in the main
 tarball.
@@ -39,7 +41,7 @@ channel); thin release repos; a Homebrew tap; the export-surface contract (done)
 | `okuda` | ✓ | ✓ | ✓ | ✓ |
 | `cahier` | ✓ | ✓ | ✓ | ✓ |
 
-Eight packages: `@okuda/okuda-darwin-arm64` … `@okuda/cahier-linux-arm64`. The
+Eight packages: `@polyvis/okuda-darwin-arm64` … `@polyvis/cahier-linux-arm64`. The
 matrix is explicit even though `FAMILY.md` derives the *products* — the platform
 list is a deployment fact, not a reading.
 
@@ -50,7 +52,7 @@ list is a deployment fact, not a reading.
   entrance.
 - **The main package**: `optionalDependencies` on its four platform packages, and a
   `bin` that shims to whichever one installed for this host.
-- **The shim**: resolve the matching `@okuda/<product>-<os>-<cpu>` and `exec` its
+- **The shim**: resolve the matching `@polyvis/<product>-<os>-<cpu>` and `exec` its
   binary. If none installed, a **named error** naming the host and the packages
   tried — never a silent no-op.
 - npm installs the matching platform package by `os`/`cpu`; the others are
@@ -58,16 +60,18 @@ list is a deployment fact, not a reading.
 
 ## The decision, resolved
 
-**The main package moves to `@okuda/okuda`** (operator, 2026-11-05), with the
-unscoped `okuda` left as a deprecated pointer. One family name, one scope — the
-core's name, so the family grows under it. The unscoped name stays on the registry
-forever; the move is a one-time act, not a rename.
+**The main package moves to `@polyvis/okuda`**, with the unscoped `okuda` left as
+a deprecated pointer (`ADR-SCOPE-FAMILY-087`). One family name, one scope: the
+scope is the family, the package is the product. The unscoped name stays on the
+registry forever; the move is a one-time act, not a rename. The scope is declared
+once, in the root manifest's `family.scope`, and `platform-packages.ts --check`
+fails a committed manifest that sits under any other.
 
 ## Acceptance Criteria
 
-- `npm i -g @okuda/okuda` works on darwin-arm64 and linux-x64; the `bin` resolves
+- `npm i -g @polyvis/okuda` works on darwin-arm64 and linux-x64; the `bin` resolves
   the platform binary and runs it.
-- `@okuda/okuda --version` prints the `BUILD_SHA` stamp.
+- `@polyvis/okuda --version` prints the `BUILD_SHA` stamp.
 - The main package's tarball is small — no binary; the platform package carries it.
 - A host with no matching platform package gets a named error naming the host.
 - `just check` green; `FAMILY.md` lists the platform products; the registries agree.

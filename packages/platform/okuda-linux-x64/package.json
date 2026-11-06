@@ -1,5 +1,5 @@
 {
-  "name": "@okuda/okuda-linux-x64",
+  "name": "@polyvis/okuda-linux-x64",
   "version": "0.1.0-alpha.1",
   "description": "okuda — the compiled binary for linux x64",
   "license": "MIT",

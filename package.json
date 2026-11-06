@@ -14,6 +14,9 @@
   },
   "module": "src/cli.ts",
   "type": "module",
+  "family": {
+    "scope": "polyvis"
+  },
   "bin": {
     "okuda": "./bin/okuda.ts",
     "gloam": "./bin/gloam.ts"

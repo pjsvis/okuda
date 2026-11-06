@@ -1,5 +1,5 @@
 {
-  "name": "@okuda/cahier-darwin-x64",
+  "name": "@polyvis/cahier-darwin-x64",
   "version": "0.1.0-alpha.1",
   "description": "cahier — the compiled binary for darwin x64",
   "license": "MIT",

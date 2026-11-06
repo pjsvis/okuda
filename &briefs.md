@@ -62,7 +62,7 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 | BRF-SYMBOL-PLAIN | · open | The repertoire, and the plain mode for a host that cannot draw it | — |
 | BRF-HTML-PACKAGE | · open | The package — a document and its one-hop closure, in one file | — |
 | BRF-CAHIER-BINARY | · open | The cahier binary — the compositor, compiled and shipped | — |
-| BRF-PLATFORM-PACKAGES | · open | The platform packages — the binaries ride npm under `@okuda` | — |
+| BRF-PLATFORM-PACKAGES | · open | The platform packages — the binaries ride npm under `@polyvis` | — |
 | BRF-COUNT-BASELINE-TOKENS | · open | Per-token baselines — the count-parity swap hole, closed | — |
 | BRF-FIRST-CONTACT | · open | First contact — the check log names its gate, and the board stops lying | — |
 

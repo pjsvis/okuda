@@ -1,5 +1,5 @@
 {
-  "name": "@okuda/cahier-linux-x64",
+  "name": "@polyvis/cahier-linux-x64",
   "version": "0.1.0-alpha.1",
   "description": "cahier — the compiled binary for linux x64",
   "license": "MIT",

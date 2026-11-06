@@ -6,7 +6,10 @@ callsign: ADR-FAMILY-DISTRIBUTION-083
 # Decision: The family distributes as N binaries — one generated installer, and the npm location
 
 **Date:** 2026-11-05
-**Status:** Accepted
+**Status:** Accepted — the npm scope clause is **superseded in part** by
+`ADR-SCOPE-FAMILY-087` (2026-11-05). The rest of this decision stands and was
+not re-argued; the reversed text is kept below rather than rewritten, because a
+reversal that erases its own argument is how a repository loses it.
 
 ## Context
 
@@ -37,6 +40,16 @@ with separate contracts; `gloam` is a symlink alias. Two channels carry them:
    and the main `okuda` package's `bin` shims over them (the esbuild/swc/loctree
    pattern). npm carries integrity, so no checksum script is owed. This is what the
    commissioning of a new scope is *for*; see `PLY-NPM-COMMISSIONING`.
+
+   > **Reversed in part, 2026-11-05 — `ADR-SCOPE-FAMILY-087`.** The scope is
+   > **`@polyvis`**, the family's name, not the core's: a family of four
+   > designated by one member is the designation lying about its referent
+   > (clause 4), six documents in this repository already said `@polyvis`, and
+   > nothing was published, which is the last moment the choice is a decision
+   > rather than a deprecation pointer. The reasoning above *about racing the
+   > world* stands, and is why the remedy is a scope rather than an unscoped
+   > name. The text it reverses is kept in place, above.
+
 2. **A generated installer** — the fallback for a machine with neither npm nor bun.
    A `curl | sh` that detects OS/arch, fetches the per-target tarballs, verifies
    checksums, and drops the binaries plus the `gloam` symlink.
@@ -107,3 +120,4 @@ a byte-stream cannot drift.
 - `briefs/2026-11-05-brief-cahier-binary.md` — the second product that made the family real
 - `playbooks/publishing-playbook.md` — the release *sequence*
 - `playbooks/npm-commissioning-playbook.md` — standing up the npm location
+- `ADR-SCOPE-FAMILY-087` — supersedes in part (the scope is the family's name)
