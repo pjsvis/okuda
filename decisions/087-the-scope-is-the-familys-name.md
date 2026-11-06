@@ -80,10 +80,15 @@ an empty prefix, because an empty prefix mints `@/okuda-…` and npm says yes.
 `just check`. Adding a product under a different scope is not a preference, it is
 a leftover, and it will be named with its path.
 
-**Deliberately not done here:** the scope has not been *claimed* on npmjs.com.
-That is the operator's act (`PLY-NPM-COMMISSIONING`), it is free and permanent,
-and it is now the only thing standing between this decision and a stranger
-taking the name this repository tells the world it publishes under.
+**The scope was already owned, and this ADR first said it was not.** Corrected
+in place the same day, from the registry: the account **`polyvis`** maintains
+exactly one package, `amalfa@1.5.1`, so `@polyvis` is that *user's* scope — npm
+gives every account a scope named after it, and there was never a claim to make.
+What remains is not a claim but a login (`npm whoami` answers 401 on this machine,
+which is a fact about the machine, not about the scope), and one decision that is
+permanent: **a user's scope cannot be handed to a second human.** If more than one
+person will ever publish, that is an org, and it is chosen before the first
+publish rather than after.
 
 ## Related
 

@@ -20,9 +20,16 @@ Read it when you are about to create a scope. Add to it every time one is made.
 | unscoped | `okuda` | the world — first come, globally unique |
 | scoped | `@polyvis/testcard` | the scope's owner; package names under it are yours |
 
-The repo already ships one of each (`okuda`, `@polyvis/testcard`), which is why a
-new scope — not a new unscoped name — is the way the family grows: **a scope owns
-a namespace, so a new product never races the world for a name.**
+**What the registry actually held, measured 2026-11-05:** the account `polyvis`
+maintains exactly one package, `amalfa@1.5.1`, and nothing from this tree —
+`okuda`, `@polyvis/testcard` and `@polyvis/okuda` were all 404. The account is
+real; the tree's packages are planned. **A playbook states the registry's state
+as measured — with the date and the lookup — because a plan described in a
+registry's voice is the one claim this file exists to stop.**
+
+That is still why a new scope — not a new unscoped name — is the way the family
+grows: **a scope owns a namespace, so a new product never races the world for a
+name.**
 
 ## The principle — commission the scope, then the first package, then the pipeline
 
@@ -50,6 +57,30 @@ already observed.
    surface stays open, and the reason to use OIDC is exactly to not have one.
 4. **Note the owner string and the repo name** — the trusted publisher matches
    them *character for character*.
+
+### A user's scope is already claimed
+
+npm gives every account a scope named after it: `@polyvis` exists the moment the
+user does, and there is nothing left to "claim". What remains is to **log in on
+the machine that publishes** — `npm whoami` answers 401 on a machine with no
+token, which is a fact about the machine and must not be read as a fact about the
+scope — and to set the account's 2FA and publishing-access posture, because that
+posture is the entire guarantee once a token route exists.
+
+Verify the owner with no login at all, straight from the registry:
+
+```bash
+curl -s 'https://registry.npmjs.org/-/v1/search?text=maintainer:polyvis&size=20' | jq -r '.objects[].package.name'
+```
+
+The packages it returns are the ones the account can already publish; an empty
+list means the account is new, not absent.
+
+**An organisation is the other kind of location**, and the difference is
+permanent: a user's scope cannot be handed to a second human, while an org's
+membership can. If more than one person will ever publish, that call is taken
+*before* the first publish — afterwards it is a re-publish under a new name,
+which npm will not let you undo.
 
 ## The package's side — the repo's acts
 
