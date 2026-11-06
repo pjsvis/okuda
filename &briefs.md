@@ -31,7 +31,7 @@ this table is waiting on it.
 | BRF-PAIR-DELIVERED | -8d | The pair, delivered where it lands — the re-themer's own o |
 | BRF-FONT-COVERAGE | -9d | The codepoints we emit, against the fonts that must draw t |
 | BRF-CAHIER-BINARY | -10d | The cahier binary — the compositor, compiled and shipped |
-| BRF-PLATFORM-PACKAGES | -10d | The platform packages — the binaries ride npm under `@okud |
+| BRF-PLATFORM-PACKAGES | -10d | The platform packages — the binaries ride npm under `@poly |
 
 
 <!-- decide:end -->
