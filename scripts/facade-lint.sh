@@ -39,9 +39,18 @@ fi
 # ── 1. Comment column ──────────────────────────────────────────────────
 # `just --list` prints recipes indented 4 spaces; the comment column is the
 # 1-based index of the first '#' on a commented recipe line.
-col=$(just --justfile "$JUSTFILE" --list 2>/dev/null \
-  | grep '#' | head -1 \
-  | awk '{for(i=1;i<=length($0);i++){if(substr($0,i,1)=="#"){print i; exit}}}')
+#
+# One `awk`, reading to EOF (ADR-GATE-NO-RACE-089). This was
+# `grep '#' | head -1 | awk '{for…}'`: `head -1` exits after one line and closes
+# the pipe, `grep` then dies of SIGPIPE, `pipefail` propagates 141 and `set -e`
+# aborts at the assignment — zero bytes, before any diagnostic, which is the
+# exact signature the precondition note above exists to prevent. Whether it
+# fired depended on scheduling: 12/12 failing untraced on 2026-11-08, passing
+# under `bash -x` because the tracing let `grep` finish writing first. A verdict
+# that races its own plumbing is not a fact about the facade.
+col=$(just --justfile "$JUSTFILE" --list 2>/dev/null | awk '
+  !found && index($0, "#") { print index($0, "#"); found = 1 }
+')
 if [[ -z "$col" ]]; then
   # No commented recipes — vacuously in band.
   col_ok=1

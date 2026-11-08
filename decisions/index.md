@@ -10,6 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-11-08 | ADR-GATE-RUNS-FILE-088 | Accepted | A gate runs the file it checked | 088-a-gate-runs-the-file-it-checked.md |
+| 2026-11-08 | ADR-GATE-NO-RACE-089 | Accepted | A gate does not race its own plumbing | 089-a-gate-does-not-race-its-own-pipe.md |
 | 2026-11-05 | ADR-PANEL-NOT-DOOR-081 | Accepted | The panel, not the door — `:target` over `<details>` and `<dialog>`, and the accessibility gap declared | 081-the-panel-not-the-door.md |
 | 2026-11-05 | ADR-EXPORT-SURFACE-082 | Accepted | The export surface is the contract — observed, not declared | 082-the-export-surface.md |
 | 2026-11-05 | ADR-FAMILY-DISTRIBUTION-083 | Accepted | The family distributes as N binaries — one generated installer, and the npm location | 083-family-distribution.md |

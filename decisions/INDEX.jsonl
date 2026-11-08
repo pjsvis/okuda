@@ -85,3 +85,4 @@
 {"file":"086-the-global-term-and-the-local-history.md","date":"2026-11-05","status":"Accepted","summary":"An entry in the loaded protocol file is a term, its test, and an attribution","meta":{},"callsign":"ADR-GLOBAL-TERM-086"}
 {"file":"087-the-scope-is-the-familys-name.md","date":"2026-11-05","status":"Accepted","summary":"The npm scope is the family's name — `@polyvis`, declared once and checked","meta":{},"callsign":"ADR-SCOPE-FAMILY-087"}
 {"file":"088-a-gate-runs-the-file-it-checked.md","date":"2026-11-08","status":"Accepted","summary":"A gate runs the file it checked","meta":{},"callsign":"ADR-GATE-RUNS-FILE-088"}
+{"file":"089-a-gate-does-not-race-its-own-pipe.md","date":"2026-11-08","status":"Accepted","summary":"A gate does not race its own plumbing","meta":{},"callsign":"ADR-GATE-NO-RACE-089"}
