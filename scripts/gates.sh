@@ -53,7 +53,7 @@ GATES=(
   "decide|bun scripts/brief-queue.ts --gate"
   "html|bun scripts/html-batch.ts"
   "contrast|bun scripts/contrast.ts --surface --gate"
-  "ground|bun scripts/omarchy-theme.ts --verify"
+  "ground|bun scripts/omarchy-theme.ts --verify --gate"
   "lightcard|bun scripts/lightcard.ts --gate"
 )
 

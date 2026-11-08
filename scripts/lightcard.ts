@@ -55,6 +55,10 @@ import { FLOOR, NOT_ON_GROUND, floor, luminance, okudaPalette, ratio, referenceP
 import { paperInk } from "./paper";
 import type { Palette } from "../src/palette";
 
+/** The dark card's ground, named once so the gate's one line can say which pair
+ *  it moved from. */
+const REFERENCE_GROUND = referencePair().bg;
+
 /** A light ground to derive onto. `#fffcf0` is flexoki-light's — the theme the
  *  measurement that started this was taken on — and the default because a card
  *  derived for the ground that broke the palette is the honest one to ship first. */
@@ -340,12 +344,19 @@ function main(argv: string[]): number {
     console.log(JSON.stringify({ card, rows: cardRows(card), fails }, null, 2));
     return 0;
   }
-  console.log(cardText(card, "derived · rank preserved", source));
   if (argv.includes("--gate")) {
+    // The verdict alone on pass; the reading is a deliberate invocation
+    // (ADR-GATE-TWO-RENDERS-085). A gate that prints 25 rows on every green run
+    // is the wall the next failure has to be found in.
     const bad = fails.belowFloor.length > 0 || fails.extra.length > 0;
-    console.log(`lightcard: ${bad ? "FAILS" : "OK"} — derivation holds the floor and the order.`);
+    if (bad) console.log(cardText(card, "derived · rank preserved", source));
+    console.log(
+      `lightcard: ${bad ? "FAILS" : "OK"} — the derivation holds the floor and the order` +
+        ` (${REFERENCE_GROUND} → ${card.ground}, ${cardRows(card).filter((r) => r.onGround).length} roles on ground).`,
+    );
     return bad ? 1 : 0;
   }
+  console.log(cardText(card, "derived · rank preserved", source));
   return 0;
 }
 
