@@ -26,7 +26,10 @@ cd "$REPO" || exit 2
 
 # name | command. Order is the order they run; a gate that fails stops the run.
 GATES=(
-  "signature|bash scripts/signature-check.sh"
+  # Both shipped binaries: the default was `okuda`, so `just check` never looked
+  # at `cahier` and the defect ADR-GATE-RUNS-FILE-088 records lived behind a
+  # default. A gate's default is not coverage; the row names what it means.
+  "signature|bash scripts/signature-check.sh okuda && bash scripts/signature-check.sh cahier"
   "tree|bash scripts/tree-lint.sh"
   "ref-census|bun scripts/ref-census.ts --gate"
   "reg-sync|bun scripts/reg-sync.ts --all --gate"

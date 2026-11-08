@@ -46,6 +46,23 @@ if [ ! -f "$BIN" ]; then
   exit 0
 fi
 
+# The subject is the FILE, so it is a PATH and not a name (ADR-GATE-RUNS-FILE-088).
+# `[ -f "$BIN" ]` above is a filesystem question about a path; `"$BIN" --version`
+# below is a COMMAND position, which bash resolves through $PATH. Given a bare
+# name the two disagree: on 2026-11-08 this gate verified ./cahier, executed
+# `cahier`, found nothing on $PATH (`just install` was never run for it), and
+# reported bash's `command not found` as the artifact refusing to execute — exit
+# 127 against a binary whose own --version answered `cahier (2398aa0)` at HEAD.
+# `okuda` had passed since ADR-BUILD-SIGNS-040 only because ~/.local/bin/okuda
+# symlinks back to $(pwd)/okuda, so $PATH landed on the verified bytes by
+# accident; were it a copy, the gate would have verified the fresh file and run
+# the stale one, printing a green verdict with the contradicting SHA inside it.
+# Normalised once, here, so every later use names the one file that was tested.
+case "$BIN" in
+  /* | */*) ;;
+  *) BIN="./$BIN" ;;
+esac
+
 # The bytes are the contract; `file`'s wording is not. Hex, not `read -N 4`: in
 # a UTF-8 locale `read -N` counts CHARACTERS, and 0xcf is not a valid lead byte,
 # so the Mach-O magics never matched. Measured, then fixed.
