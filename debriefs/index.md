@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-08 | DBF-GATE-SUBJECT | done | Debrief: A verdict is a fact about its subject — two gates that were not | 2026-11-08-debrief-a-verdict-about-its-subject.md |
 | 2026-11-05 | DBF-FIRST-CONTACT | done | Debrief: First contact — the log got shorter, the board got honest, the protocol got general | 2026-11-05-debrief-first-contact.md |
 | 2026-11-05 | DBF-ALLOWANCE-REFERENT | done | Debrief: The allowance named its referent, and the reliever counted lines | 2026-11-05-debrief-the-allowance-named-its-referent.md |
 | 2026-11-05 | DBF-PANEL-NOT-DOOR | done | Debrief: The package — a document and its one-hop closure, in one file | 2026-11-05-debrief-the-panel-not-the-door.md |
