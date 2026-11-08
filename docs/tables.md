@@ -1,6 +1,8 @@
 # okuda — Table Audit (sparse → crowded)
 
-Each section states **what you should see**, then renders a table live. The configurations walk from sparse to crowded — the territory loose tables are meant to fix. Read the rendered output against the stated expectation. Where loose rows help, note it; where they make a crowded table into a *tall* crowded table, note that too.
+Each section states **what you should see**, then renders a table live. The configurations walk from sparse to crowded: the territory loose tables are meant to fix. 
+
+Read the rendered output against the stated expectation. Where loose rows help, note it; where they make a crowded table into a *tall* crowded table, note that too.
 
 Run `okuda docs/tables.md --tui` (or `just tables`). The real test is at **two terminal widths**: narrow (~80) and wide (~140). A 5-column table is crowded at 80 and sparse at 140 — the loose-rows judgement shifts with width. Resize and re-read.
 
@@ -17,7 +19,7 @@ Run `okuda docs/tables.md --tui` (or `just tables`). The real test is at **two t
 
 ## 2. Dictionary — 2 cols, many rows, short key / medium value
 
-**Should see:** the first-column amber bold reads as a key column. Loose rows let the eye walk key→value. The grid header brackets it.
+**Should see:** the first-column amber bold reads as a key column. Loose rows let the eye walk key → value. The grid header brackets it.
 
 | Flag | Effect |
 | --- | --- |
@@ -49,7 +51,11 @@ Run `okuda docs/tables.md --tui` (or `just tables`). The real test is at **two t
 
 ## 5. Wide — 5 cols, long cell content (forces width-shrink)
 
-**Should see:** the table fits the terminal width (never overflows). The widest columns shrink to a proportional budget; long cells wrap in-cell. This is where loose rows meet overcrowding — does the whitespace help you scan, or does the wrapped table just get taller? (Generic tables only — a jump-wired menu table role-fits instead: number far right, callsign stable, slug truncates then suppresses. ADR-022; `just jump-demo` shows that path.)
+**Should see:** the table fits the terminal width (never overflows). The widest columns shrink to a proportional budget; long cells wrap in-cell. 
+
+This is where loose rows meet overcrowding — does the whitespace help you scan, or does the wrapped table just get taller? 
+
+Generic tables only: a jump-wired menu table role-fits instead: number far right, callsign stable, slug truncates then suppresses. ADR-022; `just jump-demo` shows that path.
 
 | Name | Kind | Width | Colour | Notes |
 | --- | --- | --- | --- | --- |

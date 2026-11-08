@@ -1,7 +1,7 @@
 # Monster Tables — the elision proof
 
-**Kind:** monster document. The far end of `docs/tables.md`'s sparse→crowded
-walk — the tables that genuinely don't fit a reasonable terminal and
+**Kind:** monster document. The far end of `docs/tables.md`'s sparse → crowded
+walk: the tables that genuinely don't fit a reasonable terminal and
 force the renderer to *decide*. `tables.md` audits the shape; this doc
 audits the *limit*.
 
