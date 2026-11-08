@@ -249,8 +249,11 @@ function main(argv: string[]): number {
     const expected = pinValues(referencePair());
     const rows = verifyPin(readFileSync(sourcePath, "utf8"), readFileSync(target, "utf8"), expected);
     const held = rows.every((r) => r.held);
+    // `--gate` is the quiet reading: the verdict in one line on pass, the table
+    // when it is the evidence for a failure (ADR-GATE-TWO-RENDERS-085).
+    const quiet = argv.includes("--gate");
     const text = verifyText(rows, `${target} ← ${sourcePath}`);
-    if (held) console.log(text);
+    if (held) console.log(quiet ? text.split("\n").pop()!.trim() : text);
     else console.error(text);
     return held ? 0 : 1;
   }
