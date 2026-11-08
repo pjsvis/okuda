@@ -12,6 +12,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-11-08 | BRF-EDITOR-HINT | ready | The editor hint — open where I'm reading, and forward the author's coordinate | 2026-11-08-brief-editor-hint.md |
 | 2026-11-08 | BRF-GATE-RUNS-FILE | open | The gate runs the file it checked | 2026-11-08-brief-gate-runs-file.md |
 | 2026-11-05 | BRF-CAHIER-BINARY | open | The cahier binary — the compositor, compiled and shipped | 2026-11-05-brief-cahier-binary.md |
+| 2026-11-05 | BRF-OWN-SURFACE | ready | Own the glass for the session — the pair taken at entry and given back at exit | 2026-11-05-brief-own-surface.md |
 | 2026-11-05 | BRF-PLATFORM-PACKAGES | open | The platform packages — the binaries ride npm under `@polyvis` | 2026-11-05-brief-platform-packages.md |
 | 2026-11-04 | BRF-FONT-COVERAGE | open | The codepoints we emit, against the fonts that must draw them | 2026-11-04-brief-font-coverage.md |
 | 2026-11-04 | BRF-SYMBOL-PLAIN | open | The repertoire, and the plain mode for a host that cannot draw it | 2026-11-04-brief-symbol-plain.md |

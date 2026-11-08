@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**16 live · 157 archived · 23 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 3 silent · 9 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**17 live · 157 archived · 24 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 3 silent · 10 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -31,6 +31,7 @@ this table is waiting on it.
 | BRF-PAIR-DELIVERED | -8d | The pair, delivered where it lands — the re-themer's own o |
 | BRF-FONT-COVERAGE | -9d | The codepoints we emit, against the fonts that must draw t |
 | BRF-CAHIER-BINARY | -10d | The cahier binary — the compositor, compiled and shipped |
+| BRF-OWN-SURFACE | -10d | Own the glass for the session — the pair taken at entry an |
 | BRF-PLATFORM-PACKAGES | -10d | The platform packages — the binaries ride npm under `@poly |
 
 
@@ -76,6 +77,7 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 | BRF-PERIMETER-SILO | · ready | the doctrine and the records leave | — |
 | BRF-TEMPORAL-WINDOW | ▸ ready | The temporal window — the date the reader already types, and the three words beside it | — |
 | BRF-EDITOR-HINT | ▸ ready | The editor hint — open where I'm reading, and forward the author's coordinate | — |
+| BRF-OWN-SURFACE | ▸ ready | Own the glass for the session — the pair taken at entry and given back at exit | — |
 
 ## In flight — partially landed, has commits
 

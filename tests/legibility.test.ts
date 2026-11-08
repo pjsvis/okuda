@@ -219,3 +219,36 @@ describe("the light card — derived, with the rank it inherited", () => {
     expect(fails.extra).toEqual([]);
   });
 });
+
+describe("the OSC probe — the parse, which is the half a gate can hold", () => {
+  // The IO half needs a terminal and cannot be gated; the parse is the half that
+  // turns bytes into a claim, so it is the half that gets tests. Imported last so
+  // the file reads in the order the instruments were built.
+  const { parseOscReply, multiplexer } = require("../scripts/probe-osc") as typeof import("../scripts/probe-osc");
+
+  test("both spellings in the wild: xterm's rgb: and the newer hex form", () => {
+    expect(parseOscReply("\x1b]11;rgb:1e1e/1e1e/2e2e\x1b\\", 11)).toEqual({
+      hex: "#1e1e2e",
+      raw: "rgb:1e1e/1e1e/2e2e",
+    });
+    expect(parseOscReply("\x1b]10;#cdd6f4\x07", 10)).toEqual({ hex: "#cdd6f4", raw: "#cdd6f4" });
+  });
+
+  test("a short channel is a fraction of its width, not a left-aligned pattern", () => {
+    // X11's rule: `f` is 15/15 = 1.0, so `rgb:f/0/8` is #ff0088. Padding the
+    // digits (`f` → `f000`) reads #ef007c — a quiet lie in a reply nobody eyeballs.
+    expect(parseOscReply("\x1b]11;rgb:f/0/8\x1b\\", 11)!.hex).toBe("#ff0088");
+    expect(parseOscReply("\x1b]11;rgb:1e1e/1e1e/2e2e\x1b\\", 11)!.hex).toBe("#1e1e2e");
+  });
+
+  test("the wrong code is not a reply: a background answer cannot satisfy a foreground query", () => {
+    expect(parseOscReply("\x1b]11;#1e1e2e\x1b\\", 10)).toBeNull();
+    expect(parseOscReply("#1e1e2e", 11)).toBeNull();
+  });
+
+  test("the multiplexer test reads markers and nothing else", () => {
+    expect(multiplexer({ HERDR_ENV: "1", HERDR_PANE_ID: "wE:pW" })).toBe("herdr");
+    expect(multiplexer({ TMUX: "/tmp/tmux-501/default,123,0" })).toBe("tmux");
+    expect(multiplexer({ TERM: "xterm-256color", COLORTERM: "truecolor" })).toBeNull();
+  });
+});

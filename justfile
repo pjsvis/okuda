@@ -727,3 +727,9 @@ ssh-stop:
 lightcard *args:
     #!/usr/bin/env bash
     exec bun scripts/lightcard.ts "$@"
+
+# OSC probe
+[group('build')]
+probe-osc *args:
+    #!/usr/bin/env bash
+    exec bun scripts/probe-osc.ts "$@"

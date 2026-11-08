@@ -11,6 +11,7 @@
 {"file":"2026-11-04-brief-font-coverage.md","date":"2026-11-04","status":"open","summary":"The codepoints we emit, against the fonts that must draw them","meta":{},"callsign":"BRF-FONT-COVERAGE"}
 {"file":"2026-11-04-brief-symbol-plain.md","date":"2026-11-04","status":"open","summary":"The repertoire, and the plain mode for a host that cannot draw it","meta":{},"callsign":"BRF-SYMBOL-PLAIN"}
 {"file":"2026-11-05-brief-cahier-binary.md","date":"2026-11-05","status":"open","summary":"The cahier binary — the compositor, compiled and shipped","meta":{},"callsign":"BRF-CAHIER-BINARY"}
+{"file":"2026-11-05-brief-own-surface.md","date":"2026-11-05","status":"ready","summary":"Own the glass for the session — the pair taken at entry and given back at exit","meta":{},"callsign":"BRF-OWN-SURFACE"}
 {"file":"2026-11-05-brief-platform-packages.md","date":"2026-11-05","status":"open","summary":"The platform packages — the binaries ride npm under `@polyvis`","meta":{},"callsign":"BRF-PLATFORM-PACKAGES"}
 {"file":"2026-11-08-brief-editor-hint.md","date":"2026-11-08","status":"ready","summary":"The editor hint — open where I'm reading, and forward the author's coordinate","meta":{},"callsign":"BRF-EDITOR-HINT"}
 {"file":"2026-11-08-brief-gate-runs-file.md","date":"2026-11-08","status":"open","summary":"The gate runs the file it checked","meta":{},"callsign":"BRF-GATE-RUNS-FILE"}
