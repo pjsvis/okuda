@@ -60,6 +60,11 @@ skill or MCP wrapper — an actuator needs none, and `cahier --help` is the disc
 ## Acceptance Criteria
 
 - `just cahier-build` produces a signed `cahier`; `signature-check.sh cahier` OK.
+  *(Corrected 2026-11-08: recorded here as met while it was unsatisfiable. The
+  gate tested the path `./cahier` and executed the bare name `cahier`, so it read
+  `OK` only where `just install` had already linked it — and work-plan item 4, the
+  link, was never done. `just build` therefore failed at this step on 2026-11-08
+  with exit 127 against a binary that ran. See `ADR-GATE-RUNS-FILE-088`.)*
 - `cahier --version` prints a build stamp; `cahier --help` prints usage.
 - `just build` produces both binaries; `just install` links both; `just ship` green.
 - `just fresh` verifies both binaries' link and stamp.

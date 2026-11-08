@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-08 | BRF-GATE-RUNS-FILE | open | The gate runs the file it checked | 2026-11-08-brief-gate-runs-file.md |
 | 2026-11-05 | BRF-CAHIER-BINARY | open | The cahier binary — the compositor, compiled and shipped | 2026-11-05-brief-cahier-binary.md |
 | 2026-11-05 | BRF-PLATFORM-PACKAGES | open | The platform packages — the binaries ride npm under `@polyvis` | 2026-11-05-brief-platform-packages.md |
 | 2026-11-04 | BRF-FONT-COVERAGE | open | The codepoints we emit, against the fonts that must draw them | 2026-11-04-brief-font-coverage.md |
