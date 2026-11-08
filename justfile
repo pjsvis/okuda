@@ -524,6 +524,12 @@ ranking *args:
     #!/usr/bin/env bash
     exec bun scripts/contrast.ts --ranking "$@"
 
+# Torch reading
+[group('build')]
+headroom *args:
+    #!/usr/bin/env bash
+    exec bun scripts/contrast.ts --headroom "$@"
+
 # Host theme
 [group('build')]
 herdr-theme *args:
@@ -581,6 +587,8 @@ ground *args:
     set -euo pipefail
     # `--omarchy` is the same pair delivered into the re-themer's own override
     # instead of a file a human pastes (`scripts/omarchy-theme.ts`).
+    # `just ground --omarchy --verify` reads the installed pin back: a pin that is
+    # never read is advice, and a light theme then erases the annotation layer.
     if [[ "${1:-}" == "--omarchy" ]]; then shift; exec bun scripts/omarchy-theme.ts "$@"; fi
     cat docs/2026-10-28-ghostty-ground.conf
 
@@ -713,3 +721,9 @@ ssh-view doc:
 [group('ssh')]
 ssh-stop:
     @bash scripts/sshd-test.sh stop
+
+# Light card
+[group('build')]
+lightcard *args:
+    #!/usr/bin/env bash
+    exec bun scripts/lightcard.ts "$@"

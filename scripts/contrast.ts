@@ -239,6 +239,41 @@ export function configFile(pairs: Pair[] = PAIRS): string {
  *  the number instead of hunting a literal. */
 export const FLOOR = 3;
 
+/** **The torch.** WCAG's ratio is `(Yhi + 0.05) / (Ylo + 0.05)`, and the `0.05`
+ *  is an allowance for ambient light landing on the glass. A torch — or a sunlit
+ *  kitchen, or a bright room in the morning — multiplies *both* luminances and so
+ *  changes the arithmetic: the ratio climbs toward the reflectance ratio
+ *  `Yhi / Ylo`, which is the ceiling the flare term can never pass. Measured on
+ *  the reference rung: 10.6:1 as shipped, 16.8:1 at twice the light, 26.6:1 at
+ *  five times.
+ *
+ *  Two consequences, and they are the reason this function exists rather than a
+ *  paragraph:
+ *
+ *  1. **A ratio is only true of one room.** Every number in this file describes
+ *     a pair at the illuminance it was measured in, and the same page that reads
+ *     well at night is illegible in daylight with sun on the glass.
+ *  2. **The order of failure is computable.** A role at 4.16:1 is not a role at
+ *     7.81:1 that happens to be dimmer — it is the one that fails first when the
+ *     light drops — the cooking-packet number, not the prose around it.
+ *
+ *  `k` is the illuminance multiple, defaulting to the case the principal
+ *  described: half light, the page read from the far side of the room. */
+export function atLight(hex: string, ground: string, k = 0.5): number {
+  const hi = Math.max(luminance(hex), luminance(ground)) * k + 0.05;
+  const lo = Math.min(luminance(hex), luminance(ground)) * k + 0.05;
+  return hi / lo;
+}
+
+/** **Headroom**: how far a role stands above the floor, as a multiple of it.
+ *  `1.00` is a role sitting exactly on the floor — the canary, and the one whose
+ *  next rendering is the complaint. Reported, never gated: the floor is the
+ *  verdict (`floor()`), headroom is the reading, so a hex may sit near the floor
+ *  on purpose. */
+export function headroom(hex: string, ground: string): number {
+  return ratio(hex, ground) / FLOOR;
+}
+
 /** Roles that are **not painted on the ground**, and so cannot be measured
  *  against it. Both were found by the control, not by argument: the reference
  *  pair failed the floor on exactly these two, and the answer was not to lower
@@ -515,6 +550,8 @@ export interface RankRow {
   ratio: number;
   /** role ÷ ink. Above 1.00 the role is louder than the prose. */
   over: number;
+  /** ratio ÷ FLOOR — the torch reading's first axis. See `headroom()`. */
+  headroom: number;
 }
 
 /** Every palette role's contrast against a ground, as a share of the ink's.
@@ -525,7 +562,7 @@ export function ranking(fg: string, bg: string, palette: Palette = okudaPalette(
     .filter(([, v]) => typeof v === "string" && /^#[0-9a-f]{6}$/i.test(v as string))
     .map(([role, v]) => {
       const r = ratio(v as string, bg);
-      return { role, hex: v as string, ratio: r, over: r / ink };
+      return { role, hex: v as string, ratio: r, over: r / ink, headroom: r / FLOOR };
     });
 }
 
@@ -573,6 +610,59 @@ export function compareText(
       ? "ranking: HELD — no role crossed the ink."
       : `ranking: INVERTED — ${crossed.map((r) => `${r.role} ${r.before.toFixed(2)} → ${r.over.toFixed(2)}`).join(", ")}`,
   );
+  return out.join("\n");
+}
+
+/** **The torch reading** — the palette ordered by headroom, with the ratio each
+ *  role would carry at a fraction of the measured light. One pair in, the order
+ *  of failure out; the canary is named rather than inferred from the column.
+ *
+ *  A reading, not a verdict (ADR-GATE-TWO-RENDERS-085): nothing here fails a
+ *  build, because a role near the floor may be there on purpose. What it buys is
+ *  that "too dim" stops being a feeling and becomes a position in a list. Pure. */
+export function headroomText(
+  pair: { bg: string; fg: string; name?: string },
+  palette: Palette = okudaPalette(),
+  k = 0.5,
+): string {
+  const pad = (s: string | number, n: number): string => String(s).padEnd(n);
+  const ink = ratio(pair.fg, pair.bg);
+  const measured = floor(pair.bg, palette)
+    .filter((r) => r.onGround)
+    .map((r) => ({ ...r, headroom: r.ratio / FLOOR, low: atLight(r.hex, pair.bg, k) }))
+    .sort((a, b) => a.headroom - b.headroom);
+  const out: string[] = [];
+  out.push(
+    `torch reading — ${pair.bg} / ${pair.fg}${pair.name ? ` (${pair.name})` : ""}` +
+      `   ink ${ink.toFixed(1)}:1   at ${(k * 100).toFixed(0)}% light`,
+  );
+  out.push("");
+  out.push(pad("role", 16) + pad("hex", 9) + pad("ratio", 8) + pad("headroom", 10) + "at low light");
+  for (const r of measured) {
+    out.push(
+      pad(r.role, 16) +
+        pad(r.hex, 9) +
+        pad(`${r.ratio.toFixed(2)}:1`, 8) +
+        pad(r.headroom.toFixed(2), 10) +
+        `${r.low.toFixed(2)}:1` +
+        (r.low < FLOOR ? "  ← fails first" : ""),
+    );
+  }
+  const failing = measured.filter((r) => r.low < FLOOR);
+  out.push("");
+  out.push(
+    failing.length === 0
+      ? `torch: every on-ground role holds ${FLOOR}:1 at ${(k * 100).toFixed(0)}% light.`
+      : `torch: ${failing.length} role(s) fall under ${FLOOR}:1 at ${(k * 100).toFixed(0)}% light — ` +
+        `${failing.map((r) => `${r.role} ${r.low.toFixed(2)}:1`).join(", ")}`,
+  );
+  const canary = measured[0];
+  if (canary) {
+    out.push(
+      `canary: ${canary.role} (${canary.hex}) — thinnest headroom at ${canary.headroom.toFixed(2)}×, ` +
+        `and the first thing to go when the light does.`,
+    );
+  }
   return out.join("\n");
 }
 
@@ -624,6 +714,12 @@ export interface ThemeRow extends SurfaceVerdict {
    *  cannot read *anything*, before any foreign palette is involved. Reported
    *  separately from `readable`, which asks about our roles on their ground. */
   selfBroken: boolean;
+  /** The three on-ground roles nearest the floor on this theme's ground, worst
+   *  first. `floor()` already sorts ascending, so this is a slice of its answer.
+   *  On a light ground these are the whole annotation layer (headings, silcrows,
+   *  state lamps, doc-refs) arriving as texture while the prose still reads —
+   *  which is the failure a count cannot show and one line can. */
+  weakest: { role: string; hex: string; ratio: number }[];
 }
 
 /** Every theme file in a directory, read and judged. The probe this exists for:
@@ -649,7 +745,18 @@ export function surfaceDir(dir: string, refPair: { bg: string; fg: string } = re
       noPair.push(name);
       continue;
     }
-    rows.push({ name, path, selfBroken: ratio(pair.fg, pair.bg) < FLOOR, ...surfaceVerdict(pair, refPair) });
+    const verdict = surfaceVerdict(pair, refPair);
+    // The role nearest the floor, because "16 of 21 roles under 3:1" is a count
+    // and the *finding* is that the thing which vanishes is the annotation layer:
+    // the alarm lamp at 1.15:1 is texture, and nothing warns you that it went.
+    const measured = floor(pair.bg).filter((r) => r.onGround);
+    rows.push({
+      name,
+      path,
+      selfBroken: ratio(pair.fg, pair.bg) < FLOOR,
+      weakest: measured.map((r) => ({ role: r.role, hex: r.hex, ratio: r.ratio })).slice(0, 3),
+      ...verdict,
+    });
   }
   rows.sort((a, b) => a.ink - b.ink);
   return { rows, noPair };
@@ -686,6 +793,22 @@ export function surfaceDirText(res: { rows: ThemeRow[]; noPair: string[] }, refP
       `${broken}/${res.rows.length} cannot read anything (own ink under ${FLOOR}:1)`,
   );
   if (res.noPair.length > 0) out.push(`no pair stated (${res.noPair.length}): ${res.noPair.slice(0, 8).join(", ")}`);
+  // The count says the annotation layer is gone; this says *which part of it*,
+  // and whether it went silently. An unreadable theme whose prose still reads is
+  // the dangerous shape — the page looks fine and every mark okuda added is
+  // texture, because what fails first is the alarm.
+  const weakest = res.rows.filter((r) => r.weakest.length > 0 && !r.readable);
+  if (weakest.length > 0) {
+    out.push("");
+    out.push("weakest on-ground role, per unreadable theme (what vanishes first):");
+    for (const r of weakest) {
+      out.push(
+        "  " +
+          pad(r.name.slice(0, 24), 25) +
+          r.weakest.map((w) => `${w.role} ${w.ratio.toFixed(2)}:1`).join(" · "),
+      );
+    }
+  }
   return out.join("\n");
 }
 
@@ -713,7 +836,8 @@ function main(): void {
   const themePath = argAfter("--theme");
   const refRung = Number.parseInt(argAfter("--ref-rung") ?? String(REFERENCE_RUNG), 10) || REFERENCE_RUNG;
   const refPair = referencePair(refRung);
-  if (argv.includes("--ranking") || argv.includes("--surface") || themePath !== undefined) {
+  const headroomMode = argv.includes("--headroom");
+  if (argv.includes("--ranking") || argv.includes("--surface") || headroomMode || themePath !== undefined) {
     let cand: { bg: string; fg: string } | null = null;
     if (themePath !== undefined) {
       cand = themePair(themePath);
@@ -747,7 +871,9 @@ function main(): void {
           return;
         }
         if (!gateOnly) {
-          console.error("--ranking needs a pair: --bg <hex> --fg <hex>, --rung <n>, or --theme <file>.");
+          console.error(
+            "--ranking/--headroom needs a pair: --bg <hex> --fg <hex>, --rung <n>, or --theme <file>.",
+          );
           process.exitCode = 1;
           return;
         }
@@ -755,6 +881,15 @@ function main(): void {
       } else {
         cand = { bg, fg };
       }
+    }
+    if (headroomMode) {
+      const k = Number.parseFloat(argAfter("--light") ?? "0.5") || 0.5;
+      if (json) {
+        console.log(JSON.stringify({ pair: cand, light: k, rows: ranking(cand.fg, cand.bg) }, null, 2));
+        return;
+      }
+      console.log(headroomText({ ...cand, name: themePath }, okudaPalette(), k));
+      return;
     }
     if (argv.includes("--surface")) {
       const v = surfaceVerdict(cand, refPair);

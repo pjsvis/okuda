@@ -154,6 +154,70 @@ export function changedLines(source: string, pinned: string): { n: number; from:
   return out;
 }
 
+/** What the installed template currently says for each pinned neutral — read by
+ *  **alignment, not by name**: the installed file is the built-in with values
+ *  substituted, so the line that carries `{{ token }}` in the source is the line
+ *  that carries the value on disk. Written this way because a substituted
+ *  template no longer mentions the token, and a reader that cannot find a token it
+ *  wrote cannot say whether its write survived.
+ *
+ *  Pure: two texts and the expected values in, a receipt out. `found: null` is a
+ *  token whose line moved shape — the case where the answer is "cannot vouch"
+ *  rather than "absent", and the two are reported differently. */
+export function verifyPin(
+  source: string,
+  installed: string,
+  expected: Record<PinnedToken, string>,
+): { token: PinnedToken; found: string[]; expected: string; held: boolean }[] {
+  const src = source.split("\n");
+  const inst = installed.split("\n");
+  return PINNED.map((token) => {
+    const want = expected[token].toLowerCase();
+    const needle = new RegExp(`\\{\\{\\s*${token}\\s*\\}\\}`);
+    // **Every** occurrence, not the first: the template spends each token twice
+    // (`background`, `foreground`, `palette = 0/7/8/15`, `cursor-color`), and a
+    // reader that checks the first one calls a half-substituted template held.
+    // Found by the stale control: editing `palette = 7` alone read as HELD.
+    const found = src.flatMap((l, i) =>
+      needle.test(l) ? [inst[i]?.match(/#[0-9a-fA-F]{6}/)?.[0].toLowerCase() ?? null] : [],
+    );
+    return { token, found, expected: want, held: found.length > 0 && found.every((f) => f === want) };
+  });
+}
+
+/** The verify reading, and the one rule it enforces: **a pin that is not read
+ *  back is an advice**. Three verdicts, and they are different facts:
+ *
+ *  - `absent` — no override file. The theme owns the surface again, which on a
+ *    light theme means 16 of 21 on-ground roles under 3:1 (measured; `just
+ *    surface-probe` on the box). This is a FAILURE on a host that has the
+ *    template, because the pin is what makes okuda's own palette legible there.
+ *  - `stale` — a file is installed and at least one neutral is not the pair it
+ *    was pinned to. Someone edited it, or a pair moved in the palette.
+ *  - `held` — all four neutrals are the pinned values. The page is the one the
+ *    measurements describe. */
+export function verifyText(
+  rows: { token: PinnedToken; found: string[]; expected: string; held: boolean }[],
+  where: string,
+): string {
+  const pad = (s: string | number, n: number): string => String(s).padEnd(n);
+  const out: string[] = [`ground: ${where}`];
+  for (const r of rows) {
+    const seen = r.found.length === 0 ? "(not found)" : [...new Set(r.found.map((f) => f ?? "?"))].join(", ");
+    out.push(
+      `  ${pad(r.token, 18)}${pad(seen, 22)}${pad(`×${r.found.length}`, 4)}${r.held ? "held" : `expected ${r.expected}`}`,
+    );
+  }
+  const held = rows.every((r) => r.held);
+  out.push(
+    held
+      ? `  verdict: HELD — the four neutrals are okuda's pair; the theme supplies the hues.`
+      : `  verdict: ${rows.some((r) => r.found.length === 0) ? "UNREADABLE" : "STALE"} — ` +
+        `${rows.filter((r) => !r.held).map((r) => r.token).join(", ")} do not match the pin.`,
+  );
+  return out.join("\n");
+}
+
 function main(argv: string[]): number {
   const argAfter = (flag: string): string | undefined => {
     const i = argv.indexOf(flag);
@@ -161,7 +225,35 @@ function main(argv: string[]): number {
   };
   const sourcePath = argAfter("--from") ?? DEFAULT_SOURCE;
   const install = argv.includes("--install");
+  const verify = argv.includes("--verify");
   const target = argAfter("--out") ?? DEFAULT_TARGET;
+
+  // ── Verifying comes first, because its three verdicts are not the emitter's
+  //    two. A host with no Omarchy template is not a failure — the pin has no
+  //    meaning there — so that case exits 0 and *names the skip*; an Omarchy host
+  //    with no override file is a failure, because the palette it will render is
+  //    the unpacked one the light-theme measurement refuses.
+  if (verify) {
+    if (!existsSync(sourcePath)) {
+      console.log(
+        `ground: not this host — no Omarchy template at ${sourcePath}; the pin cannot be judged here.`,
+      );
+      return 0;
+    }
+    if (!existsSync(target)) {
+      console.error(`ground: NOT INSTALLED — ${target} is absent.`);
+      console.error(`  the theme owns the surface; okuda's palette is the unpacked one.`);
+      console.error(`  fix: bun scripts/omarchy-theme.ts --install`);
+      return 1;
+    }
+    const expected = pinValues(referencePair());
+    const rows = verifyPin(readFileSync(sourcePath, "utf8"), readFileSync(target, "utf8"), expected);
+    const held = rows.every((r) => r.held);
+    const text = verifyText(rows, `${target} ← ${sourcePath}`);
+    if (held) console.log(text);
+    else console.error(text);
+    return held ? 0 : 1;
+  }
 
   if (!existsSync(sourcePath)) {
     console.error(
