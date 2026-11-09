@@ -50,8 +50,8 @@ const DECLARED: Record<string, { why: string; review: string }> = {
     why: "BRF-TELEVISION-PREVIEW — parked on television #999 (fzf-style pane envs); the branch dies unmerged when the FZF_PREVIEW_COLUMNS gap closes upstream",
     review: "2026-11-15",
   },
-  "feat/legibility-surface": {
-    why: "BRF-OWN-SURFACE — the legibility instruments, mid-work in a live session; landing it owes a renumber first, because its ADR-088 ordinal collides with ADR-GATE-RUNS-FILE-088 on main. Lands when its session pushes it; dies unmerged if the surface pair is landed from another direction",
+  "docs-reflow-quarantine": {
+    why: "One commit from the legibility branch, held back from landing: 'Update docs' reflows two audit documents and deletes a section from a published essay, and its message names nothing. It lands as a reviewed edit (or not at all) — the rest of that branch landed, so this is a decision about prose, not about code",
     review: "2026-11-22",
   },
 };
