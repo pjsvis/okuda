@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**18 live · 159 archived · 26 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 4 silent · 10 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**19 live · 159 archived · 27 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 5 silent · 10 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -15,6 +15,7 @@ Nothing waits on these and no Thing records them. The question per row is **what
 | BRF-PROBES-TIER | 5d | Establish Registered `probes/` Tier for Exploratory Python |
 | BRF-CHOICE-LIST | -8d | The choice list — a document that is a setting, and the ac |
 | BRF-TEMPORAL-WINDOW | -8d | The temporal window — the date the reader already types, a |
+| BRF-FGP-CARD | -16d | The FGP card — the pair painted into the cells, so a surfa |
 | BRF-SURFACE-PLAN | -16d | The surface plan — the pair's lifecycle as bytes, and noth |
 
 ### Ticketed, live — the load-bearing set
@@ -70,6 +71,7 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 | BRF-GATE-RUNS-FILE | · open | The gate runs the file it checked | — |
 | BRF-SURFACE-PICKER | · open | The surface picker — calibrate the figure-ground pair interactively, commit it to the pin | — |
 | BRF-SURFACE-PLAN | · open | The surface plan — the pair's lifecycle as bytes, and nothing else | — |
+| BRF-FGP-CARD | · open | The FGP card — the pair painted into the cells, so a surface can be seen | — |
 
 ## Ready — specced, next up
 

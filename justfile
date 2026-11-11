@@ -518,6 +518,11 @@ surface *args:
     #!/usr/bin/env bash
     exec bun scripts/contrast.ts --surface "$@"
 
+# The FGP card
+[group('build')]
+fgp *args:
+    @bun scripts/fgp-card.ts {{args}}
+
 # Palette ranking
 [group('build')]
 ranking *args:
