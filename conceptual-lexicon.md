@@ -477,6 +477,25 @@ something was deleted.
   could use it verbatim — and it is recorded here first because this silo paid for
   it in two fights. Promotion to `system.md`'s lexicon is a separate act.
 
+* **The prize in the park**: a prize that is small, undivided, and **located from
+  the start**, while several parties pursue it on partial maps that are each
+  individually correct. The correctness of the maps is what sustains the chase:
+  nobody's route is wrong, so no refutation stops anyone, and the whole cost
+  lands in the pursuit. **Test:** write the prize in one line, from where the
+  work began. If you can, everything after that line is delivery and its size is
+  the finding; if you cannot, it is work, and this term does not apply — a
+  chase-shaped word for an engineering problem is the frame doing the thinking.
+  **Prior art:** the structure of Kramer's *It's a Mad, Mad, Mad, Mad World*
+  (1963) — a dying man's directions, a dozen correct fragmentary maps, and a
+  small pile in a park — and this silo's own count for one pair of hexes
+  (`decisions/073-the-glass-owns-its-ink.md`, the process finding: six commits
+  and two ADRs for two hexes, with the decisive sentence available in round
+  one). Complement of **ventilator**: that names apparatus that cannot be
+  paused, this names the smallness of what the apparatus is chasing.
+  *Register:* by the inclusion test this term reads **general** — another silo
+  could use it verbatim — and it is recorded here first because this silo paid
+  for it in a November.
+
 ---
 
 ## Register open — the gathering

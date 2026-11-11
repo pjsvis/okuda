@@ -3,6 +3,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { configFile, FLOOR, floor, gateFails, gateRows, gateText, NOT_ON_GROUND, PAIR, PAIRS, REFERENCE_RUNG, referencePair, surfaceDir, surfaceDirText, surfaceFails, surfaceVerdict, themePair } from "../scripts/contrast";
 import { pinSurface } from "../scripts/herdr-theme";
+import { hexOf, plistValue, rexClues } from "../scripts/probe-surface";
 
 /** BRF-SURFACE-PAIR: two readings, one answer. The control runs first — the
  *  reference pair must clear both — because a detector whose control fails is
@@ -258,5 +259,121 @@ describe("the surface gate — every admissible rung, not the recommended one", 
         : r,
     );
     expect(gateFails(forged)).toBe(true);
+  });
+});
+
+/** ── Rex for Mac: the pair is two dereferences away ────────────────────────
+ *  The control runs first here too: a theme in the app's own catalogue that
+ *  states the reference pair must clear both readings before the resolver is
+ *  believed about the light slot, which is the measured defect (`#fafafa` /
+ *  `#333940`: 16 roles under the floor, `just surface`). The resolver is given
+ *  text, never the machine's files, so these tests cannot pass by reading this
+ *  Mac. */
+const REX_CATALOG = JSON.stringify([
+  { id: "control", name: "Control", appearance: "dark", source: { background: "#221f1c", foreground: "#d6cfc4" } },
+  { id: "other", name: "Other", appearance: "dark", source: { background: "#0d1117", foreground: "#e6edf3" } },
+]);
+
+/** An XML property list with the keys Rex actually writes. `data` is wrapped the
+ *  way a plist wraps it, so the whitespace stripping is exercised. */
+function prefs(o: {
+  darkThemeID?: string;
+  lightThemeID?: string;
+  customThemes?: unknown[];
+  fade?: string;
+  p3?: boolean;
+}): string {
+  const lines: string[] = [];
+  const add = (k: string, v: string) => lines.push(`\t<key>${k}</key>\n\t${v}`);
+  if (o.darkThemeID) add("Workspace.darkThemeID", `<string>${o.darkThemeID}</string>`);
+  if (o.lightThemeID) add("Workspace.lightThemeID", `<string>${o.lightThemeID}</string>`);
+  if (o.customThemes) {
+    const b64 = Buffer.from(JSON.stringify(o.customThemes)).toString("base64").replace(/(.{60})/g, "$1\n\t");
+    add("Workspace.customThemes", `<data>\n\t${b64}\n\t</data>`);
+  }
+  if (o.fade) add("Workspace.inactivePaneFadeMode", `<string>${o.fade}</string>`);
+  if (o.p3 !== undefined) add("Workspace.terminalUsesDisplayP3", o.p3 ? "<true/>" : "<false/>");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0">\n<dict>\n${lines.join("\n")}\n</dict>\n</plist>\n`;
+}
+
+/** A custom theme as Rex stores one: sRGB triples behind a P3 wrapper. */
+function customTheme(id: string, name: string, bg: [number, number, number], fg: [number, number, number]) {
+  const color = ([r, g, b]: [number, number, number]) => ({
+    colorSpace: "display-p3",
+    red: r,
+    green: g,
+    blue: b,
+    alpha: 1,
+    srgbFallback: { colorSpace: "srgb", red: r, green: g, blue: b, alpha: 1 },
+  });
+  return { id, name, appearance: "light", source: { manual: {} }, palette: { background: color(bg), foreground: color(fg) } };
+}
+
+describe("Rex for Mac — the pair is in the preferences, twice", () => {
+  test("the control passes first: a catalogue theme stating the reference pair clears both readings", () => {
+    const clues = rexClues(prefs({ darkThemeID: "control" }), REX_CATALOG);
+    expect(clues.length).toBe(1);
+    expect(clues[0]!.pair).toEqual({ bg: REF.bg, fg: REF.fg });
+    const v = surfaceVerdict(clues[0]!.pair!);
+    expect(v.readable).toBe(true);
+    expect(v.navigable).toBe(true);
+  });
+
+  test("the defect: the light slot names a light pair, and that class fails", () => {
+    const clues = rexClues(
+      prefs({ darkThemeID: "other", lightThemeID: "custom-1", customThemes: [customTheme("custom-1", "Light one", [0.98, 0.98, 0.98], [0.2, 0.223529, 0.25098])] }),
+      REX_CATALOG,
+    );
+    const light = clues.find((c) => c.path.includes("light appearance"))!;
+    // srgbFallback is what the instrument judges: the hex, not the P3 components.
+    expect(light.pair).toEqual({ bg: "#fafafa", fg: "#333940" });
+    const v = surfaceVerdict(light.pair!);
+    expect(v.readable).toBe(false);
+    expect(v.navigable).toBe(false);
+    // ...and the difference between the two slots is reported, not left to be discovered.
+    expect(light.note).toContain("re-ranks");
+  });
+
+  test("an unresolvable theme is refused, not guessed", () => {
+    const clues = rexClues(prefs({ darkThemeID: "not-installed" }), REX_CATALOG);
+    expect(clues[0]!.pair).toBeNull();
+    expect(clues[0]!.note).toContain("not guessed");
+  });
+
+  test("an absent catalogue does not read as an absent theme", () => {
+    // A custom theme is resolvable without the bundle; a shipped id is not, and the
+    // two must not be confused when the app is not installed.
+    const own = customTheme("custom-2", "Mine", [0.13, 0.12, 0.11], [0.84, 0.81, 0.77]);
+    expect(rexClues(prefs({ darkThemeID: "custom-2", customThemes: [own] }), null)[0]!.pair).toEqual({
+      bg: "#211f1c",
+      fg: "#d6cfc4",
+    });
+    expect(rexClues(prefs({ darkThemeID: "control" }), null)[0]!.pair).toBeNull();
+  });
+
+  test("the fade and the colour space are reported as facts about the host", () => {
+    const faded = rexClues(prefs({ darkThemeID: "control", fade: "both", p3: true }), REX_CATALOG)[0]!;
+    expect(faded.nonFlat.join()).toContain("inactive panes faded (both)");
+    expect(faded.note).toContain("Display P3");
+    const clean = rexClues(prefs({ darkThemeID: "control", fade: "none", p3: false }), REX_CATALOG)[0]!;
+    expect(clean.nonFlat).toEqual([]);
+    expect(clean.note).toBeUndefined();
+  });
+
+  test("plistValue reads the four types a preference here can be", () => {
+    expect(plistValue(prefs({ darkThemeID: "merino-dark" }), "Workspace.darkThemeID")).toBe("merino-dark");
+    expect(plistValue(prefs({ p3: true }), "Workspace.terminalUsesDisplayP3")).toBe("true");
+    expect(plistValue('<key>k</key>\n<integer>0</integer>', "k")).toBe("0");
+    expect(plistValue('<key>k</key>\n<data>\nYWJj\nZGVm\n</data>', "k")).toBe("YWJjZGVm");
+    expect(plistValue("<dict></dict>", "k")).toBeNull();
+  });
+
+  test("hexOf prefers the sRGB declaration, which is the space the instrument measures", () => {
+    expect(hexOf("#0d1117")).toBe("#0d1117");
+    expect(hexOf("0D1117")).toBe("#0d1117");
+    expect(hexOf({ red: 1, green: 1, blue: 1 })).toBe("#ffffff");
+    expect(hexOf({ red: 0.9804, green: 0.2, blue: 0.2235, srgbFallback: { red: 1, green: 1, blue: 1 } })).toBe("#ffffff");
+    expect(hexOf("not a colour")).toBeNull();
+    expect(hexOf(undefined)).toBeNull();
   });
 });

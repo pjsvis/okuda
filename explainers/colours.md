@@ -199,12 +199,13 @@ not select it, because selecting it is the person's act.
 A pinned pair only helps if the thing that moves the surface *re-applies* it.
 That is the difference between a paste and a delivery:
 
-| host | where the pair lands | survives a theme switch? |
-|---|---|---|
-| Ghostty, hand-edited | `~/.config/ghostty/config` → `background` / `foreground` | yes — nothing rewrites it |
-| Ghostty, re-themed desktop | `~/.config/omarchy/themed/ghostty.conf.tpl`, `just ground --omarchy --install` | **yes — re-applied by the very thing that changes the surface** |
-| Herdr UI | `~/.config/herdr-app/themes/gloam.json`, `just herdr-theme --install`, selected by hand | only while the picker is not carrying the pair |
-| anything else | nothing | `just surface-probe` says so, which is the point |
+| host | where the pair lands | survives a theme switch? | pair settable **without** a theme? |
+|---|---|---|---|
+| Ghostty, hand-edited | `~/.config/ghostty/config` → `background` / `foreground` | yes — nothing rewrites it | **yes** — two keys of their own |
+| Ghostty, re-themed desktop | `~/.config/omarchy/themed/ghostty.conf.tpl`, `just ground --omarchy --install` | **yes — re-applied by the very thing that changes the surface** | yes — through the template |
+| Herdr UI | `~/.config/herdr-app/themes/gloam.json`, `just herdr-theme --install`, selected by hand | only while the picker is not carrying the pair | **no** — the pair is a field of a theme |
+| Rex for Mac | nothing: `Workspace.darkThemeID` and `lightThemeID` name a theme | only while both appearance slots name the same theme | **no** — `set_theme` would be the orthogonality, and it is inert |
+| anything else | nothing | `just surface-probe` says so, which is the point | — ask it |
 
 The re-themed case is the one the paste fails. Omarchy regenerates
 `~/.local/state/omarchy/current/theme/ghostty.conf` on every switch from a
@@ -246,6 +247,35 @@ dark desktop, which is why the complaint only arrives with a light one. Against
 flexoki-light, **16 of 21** on-ground roles fall under 3:1; against
 catppuccin-latte, **19**. That is the class a pin removes, and it is why the pin is
 offered rather than argued.
+
+## The test for a host that calls itself a terminal
+
+> **Can it be told a background and a foreground without being told a theme?**
+
+A theme that carries the pair has collapsed two axes into one — the **surface**
+and the **palette** — and with them the rank, because the pair is what every role
+is ranked against. So the question is not administrable taste, and the answer is
+not a preference: a host that answers *no* is not refusing a setting, it is
+refusing to let the order be stated.
+
+Ghostty answers in two keys, which is why it stays the reference the instrument
+measures against rather than merely the first host it was tuned on (`rung 0` is
+its shipped default, `scripts/contrast.ts`). Omarchy answers through a template
+that re-applies. **Herdr answers no**: the pair is a field of a theme JSON, so
+`just herdr-theme` exists to copy a theme and rewrite three of its fields.
+**Rex answers no twice over**: the pair is a theme field *per appearance*, so the
+ink can move with no document changed, and the per-block `set_theme` that would
+have been the orthogonality is accepted and does nothing — measured, ten pins
+with the control failing first, 2026-11-10. Rex's two slots are read, not
+assumed: `just surface-probe` resolves each one through the app's own catalogue
+or its `customThemes` and prints both readings (`rexClues`,
+`scripts/probe-surface.ts`) — a host that states its pair twice is a host whose
+rank can be moved twice.
+
+The ask, for the next app that arrives calling itself a terminal: **separate the
+surface from the palette, and no appearance mode may carry the surface.** It is a
+structural request with a measurement behind it, which is the only kind that has
+landed, or is likely to.
 
 ## The proposals
 

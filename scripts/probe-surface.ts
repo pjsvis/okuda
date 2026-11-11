@@ -18,6 +18,20 @@
 //  make the effective ground a range rather than a value, so the pair becomes a bound
 //  (docs/ideas.md, `translucent-ground`).
 //
+//  **Rex for Mac states its pair in no config file.** It names a theme in two
+//  preferences (`Workspace.darkThemeID`, `Workspace.lightThemeID`), and the theme
+//  is either shipped inside the app bundle or carried in `Workspace.customThemes`
+//  as NSData-wrapped JSON. So the pair is two dereferences away and both are
+//  supplied by the machine — the prefs plist and the app's own theme catalogue
+//  (`rexClues`). Two further preferences re-rank whatever it names: an
+//  inactive-pane fade makes the ground a range, and Display P3 changes the colour
+//  the hex is read as. Both are reported, neither is judged here.
+//
+//  Rex's per-block `com.superlogical.terminal.set_theme` is **not read here**
+//  because it cannot be read anywhere: the method is accepted and inert in
+//  Rex Beta 0.1.0, and the terminal answers no OSC 10/11 query (`td-855e0d`).
+//  A theme named in the preferences is the only pair Rex can be asked for.
+//
 //  Usage:
 //    bun scripts/probe-surface.ts                  # this machine
 //    bun scripts/probe-surface.ts host             # over ssh, read-only
@@ -43,6 +57,20 @@ export const CANDIDATES = [
   // Herdr's themes are a directory; `just themes` audits those.
 ];
 
+/** Rex for Mac keeps its pair in the app's preferences, not in a dotfile: two
+ *  theme IDs, and the themes themselves in the bundle or in `customThemes`. */
+export const REX_PREFS = "Library/Preferences/com.superlogical.rex.plist";
+
+/** The app bundles that ship a theme catalogue, in the order to try them. Rex is
+ *  in beta, so the bundle is named for the channel; both are read for the same
+ *  reason the terminal list above is a list. */
+export const REX_CATALOGS = [
+  "/Applications/Rex Beta.app/Contents/Resources/SuperUI_SuperDesignTokens.bundle/Contents/Resources/themes.json",
+  "/Applications/Rex.app/Contents/Resources/SuperUI_SuperDesignTokens.bundle/Contents/Resources/themes.json",
+  join(homedir(), "Applications/Rex Beta.app/Contents/Resources/SuperUI_SuperDesignTokens.bundle/Contents/Resources/themes.json"),
+  join(homedir(), "Applications/Rex.app/Contents/Resources/SuperUI_SuperDesignTokens.bundle/Contents/Resources/themes.json"),
+];
+
 /** The flatness keys: any of these and the ground is a range, not a value. */
 const NOT_FLAT = /(background[-_]opacity|background[-_]blur|background[-_]image|opacity\s*=|blur\s*=)/i;
 
@@ -51,6 +79,10 @@ export interface Clue {
   pair: { bg: string; fg: string } | null;
   /** Keys that make the effective ground a range. Empty means flat. */
   nonFlat: string[];
+  /** A fact about the host that changes how the pair should be read without
+   *  being a second pair — a colour space, or an appearance slot that moves it.
+   *  Printed under the reading; never a verdict of its own. */
+  note?: string;
   /** `background`/`foreground` lines present but commented: the menu with nothing
    *  selected. The most common state of a machine somebody has "done something"
    *  to and cannot remember what. */
@@ -149,6 +181,167 @@ function readPath(target: string | null, path: string): string | null {
   }
 }
 
+// ── Rex for Mac: two dereferences to a pair ──────────────────────────────────
+
+/** A theme in either shape Rex stores: shipped (`source.background` is a hex) or
+ *  custom (`palette.background` is an sRGB triple, with a Display-P3 sibling). */
+export interface RexTheme {
+  id?: string;
+  name?: string;
+  appearance?: string;
+  source?: { background?: unknown; foreground?: unknown };
+  palette?: { background?: unknown; foreground?: unknown };
+}
+
+/** One value out of an XML property list, as text. The four types a preference
+ *  here can be: `string`, `data`, `true`/`false`, and `integer`. A `data` value
+ *  is base64 with the plist's own line breaks in it, so the whitespace goes.
+ *  Pure, so the shapes are unit-tested without a file. */
+export function plistValue(xml: string, key: string): string | null {
+  const at = xml.indexOf(`<key>${key}</key>`);
+  if (at < 0) return null;
+  const rest = xml.slice(at + key.length + "<key></key>".length);
+  const typed = rest.match(/^\s*<(string|data|integer|real)>([\s\S]*?)<\/\1>/);
+  if (typed) return typed[1] === "data" ? typed[2]!.replace(/\s+/g, "") : typed[2]!;
+  const bool = rest.match(/^\s*<(true|false)\s*\/>/);
+  return bool ? bool[1]! : null;
+}
+
+/** A colour as Rex stores it → `#rrggbb`, or null. Accepts a hex string (the
+ *  shipped catalogue), an sRGB triple (a custom theme's `palette`), and the
+ *  P3-wrapped form whose `srgbFallback` is the honest reading: this instrument
+ *  measures sRGB, so the sRGB declaration is what it judges. */
+export function hexOf(color: unknown): string | null {
+  if (typeof color === "string") {
+    const m = color.match(/^#?([0-9a-f]{6})$/i);
+    return m ? `#${m[1]!.toLowerCase()}` : null;
+  }
+  if (color && typeof color === "object") {
+    const c = color as { srgbFallback?: unknown; red?: number; green?: number; blue?: number };
+    if (c.srgbFallback !== undefined) return hexOf(c.srgbFallback);
+    if ([c.red, c.green, c.blue].every((v) => typeof v === "number")) {
+      return `#${[c.red!, c.green!, c.blue!]
+        .map((v) => Math.round(Math.min(1, Math.max(0, v)) * 255).toString(16).padStart(2, "0"))
+        .join("")}`;
+    }
+  }
+  return null;
+}
+
+/** A theme's pair, in either shape. Null when it states neither. */
+export function rexThemePair(t: RexTheme): { bg: string; fg: string } | null {
+  const bg = hexOf(t.source?.background) ?? hexOf(t.palette?.background);
+  const fg = hexOf(t.source?.foreground) ?? hexOf(t.palette?.foreground);
+  return bg && fg ? { bg, fg } : null;
+}
+
+/** One shipped theme, by id, out of the app's catalogue. Null when the catalogue
+ *  is absent, malformed, or does not carry the id — an unresolvable theme is not
+ *  guessed at. */
+export function rexCatalogTheme(catalogJson: string | null, id: string): RexTheme | null {
+  if (!catalogJson) return null;
+  try {
+    const arr = JSON.parse(catalogJson) as RexTheme[];
+    return Array.isArray(arr) ? (arr.find((t) => t.id === id) ?? null) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The custom themes, out of the prefs. Rex stores them as NSData, which the XML
+ *  plist shows as base64-wrapped JSON — the same array shape as the catalogue,
+ *  with `palette` instead of `source`. */
+export function rexCustomThemes(prefsXml: string): RexTheme[] {
+  const b64 = plistValue(prefsXml, "Workspace.customThemes");
+  if (!b64) return [];
+  try {
+    const arr = JSON.parse(Buffer.from(b64, "base64").toString("utf8")) as RexTheme[];
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Rex's pair, per appearance slot, as clues the same reading judges. Two slots
+ *  and not one, because they are two pairs and the difference between them is a
+ *  finding: an appearance switch moves the ink with no document having changed.
+ *  Pure — the plist text and the catalogue text in, clues out. */
+export function rexClues(prefsXml: string, catalogJson: string | null): Clue[] {
+  const custom = rexCustomThemes(prefsXml);
+  const fade = plistValue(prefsXml, "Workspace.inactivePaneFadeMode");
+  const p3 = plistValue(prefsXml, "Workspace.terminalUsesDisplayP3") === "true";
+  const slots: [string, string][] = [
+    ["Workspace.darkThemeID", "dark"],
+    ["Workspace.lightThemeID", "light"],
+  ];
+
+  const resolved = slots.map(([key, appearance]) => {
+    const id = plistValue(prefsXml, key);
+    if (!id) return null;
+    const shipped = rexCatalogTheme(catalogJson, id);
+    const own = custom.find((t) => t.id === id) ?? null;
+    const theme = shipped ?? own;
+    return { key, appearance, id, theme, pair: theme ? rexThemePair(theme) : null };
+  });
+  const pairs = resolved.filter((r) => r?.pair).map((r) => r!.pair!);
+  const moved = pairs.length > 1 && pairs.some((p) => p.bg !== pairs[0]!.bg || p.fg !== pairs[0]!.fg);
+
+  const out: Clue[] = [];
+  for (const r of resolved) {
+    if (!r) continue;
+    const notes: string[] = [];
+    if (!r.theme) {
+      notes.push(
+        `theme \"${r.id}\" resolves in neither the app catalogue nor Workspace.customThemes — not guessed`,
+      );
+    }
+    if (moved) {
+      notes.push(
+        `the two appearance slots name different pairs (dark ${pairs[0]!.bg} / light ${pairs[pairs.length - 1]!.bg}) — an appearance switch re-ranks the page`,
+      );
+    }
+    if (p3) {
+      notes.push(
+        "hexes are read as Display P3 (terminalUsesDisplayP3) — this judges the sRGB declaration, not the painted colour",
+      );
+    }
+    out.push({
+      path: `rex · ${r.appearance} appearance · ${r.theme?.name ?? r.id} (${r.key.replace("Workspace.", "")})`,
+      pair: r.pair,
+      nonFlat: fade && fade !== "none" ? [`inactive panes faded (${fade})`] : [],
+      commented: 0,
+      ...(notes.length > 0 ? { note: notes.join("; ") } : {}),
+    });
+  }
+  return out;
+}
+
+/** The prefs, as XML, by asking `plutil` to convert them. Not read directly: the
+ *  file is binary and carries NSData, which no JSON conversion will take. Absent
+ *  on any machine without Rex, which is absent, not an error. */
+function readRexPrefs(target: string | null): string | null {
+  if (target !== null) return null; // a Mac app's prefs are local to the Mac
+  const path = join(homedir(), REX_PREFS);
+  if (!existsSync(path)) return null;
+  try {
+    return execFileSync("plutil", ["-convert", "xml1", "-o", "-", path], { encoding: "utf8" });
+  } catch {
+    return null;
+  }
+}
+
+function readRexCatalog(): string | null {
+  for (const path of REX_CATALOGS) {
+    if (!existsSync(path)) continue;
+    try {
+      return readFileSync(path, "utf8");
+    } catch {
+      /* an unreadable bundle is absent for this purpose */
+    }
+  }
+  return null;
+}
+
 function main(argv: string[]): number {
   const asJson = argv.includes("--json");
   const target = argv.find((a) => !a.startsWith("--")) ?? null;
@@ -171,6 +364,9 @@ function main(argv: string[]): number {
       if (child !== null && child !== "") clues.push(clue(`${rel} → ${inc}`, child));
     }
   }
+
+  const prefs = readRexPrefs(target);
+  if (prefs !== null) clues.push(...rexClues(prefs, readRexCatalog()));
 
   const rows = clues.map((c) => ({
     ...c,
@@ -205,6 +401,7 @@ function main(argv: string[]): number {
     if (r.nonFlat.length > 0) {
       console.log(`  ground is NOT FLAT: ${r.nonFlat.join(", ")} — the pair is a bound, not a fact`);
     }
+    if (r.note) console.log(`  note: ${r.note}`);
     if (!v.readable || !v.navigable) console.log(surfaceText(v, PAIR).split("\n").filter((l) => l.startsWith("  ")).join("\n"));
   }
   return 0;
