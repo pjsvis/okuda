@@ -60,72 +60,11 @@
  * missing instrument is not a verdict — facade-lint's rule).
  */
 
-const ESC = "\x1b";
-const ST = `${ESC}\\`;
-const BEL = "\x07";
-
-/** The nine facts the probe is allowed to know about its host. Named reads, one
- *  at a time, so no environment object is ever handed around. */
-export interface Host {
-  TERM?: string | undefined;
-  COLORTERM?: string | undefined;
-  TERM_PROGRAM?: string | undefined;
-  TMUX?: string | undefined;
-  STY?: string | undefined;
-  HERDR_ENV?: string | undefined;
-  HERDR_PANE_ID?: string | undefined;
-  ZELLIJ?: string | undefined;
-  WEZTERM_PANE?: string | undefined;
-}
-
-export function hostFacts(): Host {
-  return {
-    TERM: process.env.TERM,
-    COLORTERM: process.env.COLORTERM,
-    TERM_PROGRAM: process.env.TERM_PROGRAM,
-    TMUX: process.env.TMUX,
-    STY: process.env.STY,
-    HERDR_ENV: process.env.HERDR_ENV,
-    HERDR_PANE_ID: process.env.HERDR_PANE_ID,
-    ZELLIJ: process.env.ZELLIJ,
-    WEZTERM_PANE: process.env.WEZTERM_PANE,
-  };
-}
-
-/** `rgb:R/G/B` with each channel 1–4 hex digits, or `#rrggbb`. Both spellings are
- *  in the wild: xterm-family hosts answer in `rgb:`, several newer ones in hex. */
-export function parseOscReply(reply: string, code: number): { hex: string | null; raw: string } | null {
-  // \e]11;rgb:1e1e/1e1e/2e2e\e\\   |   \e]10;#cdd6f4\a
-  const re = new RegExp(`\\x1b\\]${code};([^\\x07\\x1b]*)(?:${ESC}\\\\|${BEL})`);
-  const m = reply.match(re);
-  if (!m) return null;
-  const raw = m[1]!;
-  const rgb = raw.match(/^rgb:([0-9a-f]{1,4})\/([0-9a-f]{1,4})\/([0-9a-f]{1,4})$/i);
-  if (rgb) {
-    const scale = (s: string): string => {
-      // X11's `rgb:` syntax: each component is a *fraction of the maximum
-      // representable in its width*, not a left-aligned bit pattern. So `f` is
-      // 15/15 = 1.0, not 0xf000/0xffff — the difference between #ff0088 and
-      // #ef007c for a one-digit reply. Real hosts answer in 2 or 4 digits, but a
-      // parse that is only right for the common case is a parse that lies quietly.
-      const max = (1 << (4 * s.length)) - 1;
-      return Math.round((parseInt(s, 16) / max) * 255).toString(16).padStart(2, "0");
-    };
-    return { hex: `#${scale(rgb[1]!)}${scale(rgb[2]!)}${scale(rgb[3]!)}`, raw };
-  }
-  const hex = raw.match(/^#[0-9a-f]{6}$/i);
-  return hex ? { hex: raw.toLowerCase(), raw } : { hex: null, raw };
-}
-
-/** The hosts whose answers cannot be trusted to describe the outermost glass. */
-export function multiplexer(host: Host): string | null {
-  if (host.TMUX) return "tmux";
-  if (host.STY) return "screen";
-  if (host.HERDR_ENV || host.HERDR_PANE_ID) return "herdr";
-  if (host.ZELLIJ) return "zellij";
-  if (host.WEZTERM_PANE) return "wezterm";
-  return null;
-}
+// The facts a lifecycle is allowed to know, and the reply parse, live with the
+// lifecycle (`src/surface-plan.ts`): the probe is one caller of that tenancy, not
+// the owner of it. Two derivations of `rgb:` scaling would drift, and the drift
+// would show up as a colour rather than an error.
+import { ESC, ST, hostFacts, multiplexer, parseOscReply } from "../src/surface-plan";
 
 /** One query: write the request, collect bytes until the reply parses or the
  *  deadline passes. Returns the latency, the parse, and every byte seen — the

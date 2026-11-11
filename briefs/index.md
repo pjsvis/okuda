@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-11 | BRF-SURFACE-PLAN | open | The surface plan — the pair's lifecycle as bytes, and nothing else | 2026-11-11-brief-surface-plan.md |
 | 2026-11-08 | BRF-EDITOR-HINT | ready | The editor hint — open where I'm reading, and forward the author's coordinate | 2026-11-08-brief-editor-hint.md |
 | 2026-11-08 | BRF-GATE-RUNS-FILE | open | The gate runs the file it checked | 2026-11-08-brief-gate-runs-file.md |
 | 2026-11-05 | BRF-CAHIER-BINARY | open | The cahier binary — the compositor, compiled and shipped | 2026-11-05-brief-cahier-binary.md |

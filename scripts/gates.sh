@@ -55,6 +55,9 @@ GATES=(
   "contrast|bun scripts/contrast.ts --surface --gate"
   "ground|bun scripts/omarchy-theme.ts --verify --gate"
   "lightcard|bun scripts/lightcard.ts --gate"
+  # The pair's lifecycle, pure: inherit emits no byte, the give-back is the host's
+  # own string, and the order is fg-then-bg on both halves. No terminal required.
+  "surface|bun test tests/surface-plan.test.ts"
 )
 
 if [[ "${1:-}" == "--list" ]]; then

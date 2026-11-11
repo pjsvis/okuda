@@ -224,7 +224,10 @@ describe("the OSC probe — the parse, which is the half a gate can hold", () =>
   // The IO half needs a terminal and cannot be gated; the parse is the half that
   // turns bytes into a claim, so it is the half that gets tests. Imported last so
   // the file reads in the order the instruments were built.
-  const { parseOscReply, multiplexer } = require("../scripts/probe-osc") as typeof import("../scripts/probe-osc");
+  // The reply parse and the multiplexer test live with the lifecycle now
+  // (`src/surface-plan.ts`), and the probe is one caller of it — so the gate holds
+  // the module, and the probe cannot drift from what this test asserts.
+  const { parseOscReply, multiplexer } = require("../src/surface-plan") as typeof import("../src/surface-plan");
 
   test("both spellings in the wild: xterm's rgb: and the newer hex form", () => {
     expect(parseOscReply("\x1b]11;rgb:1e1e/1e1e/2e2e\x1b\\", 11)).toEqual({

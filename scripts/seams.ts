@@ -76,6 +76,18 @@ const POLICY: Policy[] = [
   { key: "tui.ts env:OKUDA_FRAME_LOG", rung: "control", why: "the frame trace IS the second instrument — the reading that settled the widening jolt (ADR-WIDENING-LAG-054)" },
   { key: "tui.ts env:TMUX", rung: "declare", why: "presence selects the multiplexer path for a dereference" },
   { key: "width.ts env:FZF_PREVIEW_COLUMNS", rung: "declare", why: "the preview pane hands us its width; its presence means 'you are in a preview'" },
+  // ── the glass's identity, as the host states it. The pair's tenancy reads
+  //    nine facts and no more, one at a time — a wholesale environment read is
+  //    how values nobody wanted end up in a transcript (src/surface-plan.ts).
+  { key: "surface-plan.ts env:TERM", rung: "declare", why: "the terminal family; the reply's spelling is checked, not assumed" },
+  { key: "surface-plan.ts env:COLORTERM", rung: "declare", why: "capability, read beside TERM and never trusted alone" },
+  { key: "surface-plan.ts env:TERM_PROGRAM", rung: "declare", why: "the app's own name — an app that proxies its panes is why the multiplexer test exists" },
+  { key: "surface-plan.ts env:TMUX", rung: "declare", why: "presence is the refusal: a proxied reply describes a pane, not the glass" },
+  { key: "surface-plan.ts env:STY", rung: "declare", why: "the same refusal, screen's marker" },
+  { key: "surface-plan.ts env:HERDR_ENV", rung: "declare", why: "the same refusal, Herdr's marker" },
+  { key: "surface-plan.ts env:HERDR_PANE_ID", rung: "declare", why: "the same refusal, the pane identity Herdr exports" },
+  { key: "surface-plan.ts env:ZELLIJ", rung: "declare", why: "the same refusal, zellij's marker" },
+  { key: "surface-plan.ts env:WEZTERM_PANE", rung: "declare", why: "the same refusal, wezterm's marker" },
   { key: "cli.ts env:OKUDA_SYMBOLS", rung: "declare", why: "the symbol repertoire is chosen by the principal and never inferred from the face (BRF-SYMBOL-PLAIN); an ambient default would make the page machine-dependent" },
   // ── tty — the glass. It can lie (Bun's columns=0), so it is never trusted
   //    to a single reading.
