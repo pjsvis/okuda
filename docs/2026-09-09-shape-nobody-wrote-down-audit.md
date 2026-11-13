@@ -171,12 +171,19 @@ article's case study.
 
 The article is right, it is well-argued, and it is the rare case where
 "relevant to our process" means *it is describing the load-bearing
-assumption of our process and the precise way it fails*. It does not
+assumption of our process and the precise way it fails*. 
+
+It does not
 refute the Edinburgh Protocol or the okuda knowledge system — both are
 by-product systems and work fine *as long as the human is the decider*.
+
 It does refute the comfortable version where the agent decides and the
-docs transmit. The line to hold: the human forms the expectation and
-meets the outcome; the agent is the steam engine, not James Watt. The
+docs transmit. 
+
+The line to hold: the human forms the expectation and
+meets the outcome; the agent is the steam engine, not James Watt. 
+
+The
 moment that inverts, every document downstream is decorated Stuff, and no
 quantity of it closes the gap — because the gap was the shape, and the
 shape went with the deciding.

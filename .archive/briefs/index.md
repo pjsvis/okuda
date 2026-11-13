@@ -11,6 +11,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 |---|---|---|---|---|
 | 2026-11-15 | BRF-RUNG-PANEL | done | The rung panel — one document, nine grounds, one grid | 2026-11-15-brief-rung-panel.md |
 | 2026-11-11 | BRF-SURFACE-PICKER | rejected | The surface picker — calibrate the figure-ground pair interactively, commit it to the pin | 2026-11-11-brief-surface-picker.md |
+| 2026-11-08 | BRF-EDITOR-HINT | rejected | The editor hint — open where I'm reading, and forward the author's coordinate | 2026-11-08-brief-editor-hint.md |
 | 2026-11-05 | BRF-COUNT-BASELINE-TOKENS | done | Per-token baselines — the count-parity swap hole, closed | 2026-11-05-brief-count-baseline-tokens.md |
 | 2026-11-05 | BRF-FIRST-CONTACT | done | First contact — the check log names its gate, and the board stops lying | 2026-11-05-brief-first-contact.md |
 | 2026-11-05 | BRF-HTML-PACKAGE | done | The package — a document and its one-hop closure, in one file | 2026-11-05-brief-html-package.md |

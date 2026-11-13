@@ -6,7 +6,7 @@ callsign: BRF-EDITOR-HINT
 # Brief: The editor hint — open where I'm reading, and forward the author's coordinate
 
 **Date:** 2026-11-08
-**Status:** Ready
+**Status:** Rejected — 2026-11-12, the operator's call: the `88` actuator spinning up Zed is good enough, and the two-panel composition (`gloam-edit` + `okuda --watch`) already closes the loop. The line hint is a quality-of-life improvement on a composition that works; the cost of building it (the `lineOf` function, the precedence rule, the `AGENTS.md` amendment) is not justified by the comfort it buys. Archived, not deleted — refile if the scroll-to-source gap becomes a daily annoyance. See `ADR-COMPOSE-DONT-BUILD-091`.
 
 ---
 

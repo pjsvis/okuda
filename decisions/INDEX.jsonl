@@ -87,3 +87,4 @@
 {"file":"088-a-gate-runs-the-file-it-checked.md","date":"2026-11-08","status":"Accepted","summary":"A gate runs the file it checked","meta":{},"callsign":"ADR-GATE-RUNS-FILE-088"}
 {"file":"089-a-gate-does-not-race-its-own-pipe.md","date":"2026-11-08","status":"Accepted","summary":"A gate does not race its own plumbing","meta":{},"callsign":"ADR-GATE-NO-RACE-089"}
 {"file":"090-the-legibility-surface.md","date":"2026-11-05","status":"Accepted","summary":"The legibility surface — headroom is a reading, the pin is verified, the light card is derived","meta":{},"callsign":"ADR-LEGIBILITY-SURFACE-090"}
+{"file":"091-compose-dont-build.md","date":"2026-11-12","status":"Accepted","summary":"Compose, don't build — the editor stays a real editor","meta":{},"callsign":"ADR-COMPOSE-DONT-BUILD-091"}

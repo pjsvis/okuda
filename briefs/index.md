@@ -9,9 +9,9 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-12 | BRF-CODE-EDITOR-HINT | open | The editor hint — `88` opens a code file where you're reading | 2026-11-12-brief-editor-hint.md |
 | 2026-11-11 | BRF-FGP-CARD | open | The FGP card — the pair painted into the cells, so a surface can be seen | 2026-11-11-brief-fgp-card.md |
 | 2026-11-11 | BRF-SURFACE-PLAN | open | The surface plan — the pair's lifecycle as bytes, and nothing else | 2026-11-11-brief-surface-plan.md |
-| 2026-11-08 | BRF-EDITOR-HINT | ready | The editor hint — open where I'm reading, and forward the author's coordinate | 2026-11-08-brief-editor-hint.md |
 | 2026-11-08 | BRF-GATE-RUNS-FILE | open | The gate runs the file it checked | 2026-11-08-brief-gate-runs-file.md |
 | 2026-11-05 | BRF-CAHIER-BINARY | open | The cahier binary — the compositor, compiled and shipped | 2026-11-05-brief-cahier-binary.md |
 | 2026-11-05 | BRF-OWN-SURFACE | ready | Own the glass for the session — the pair taken at entry and given back at exit | 2026-11-05-brief-own-surface.md |

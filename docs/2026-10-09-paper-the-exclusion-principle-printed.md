@@ -42,39 +42,59 @@ artefact this silo has produced. Three measurements say why, and none of them is
 a matter of taste.
 
 **1. The ghost is the signature of justification, achieved without stretching a
-space.** Fixed measure + word-boundary wrap + monospace quantises the ragged
-right edge into single-character nicks: mid-block lines sat within **2.4
+space.** 
+
+Fixed measure + word-boundary wrap + monospace quantises the ragged
+right edge into single-character nicks: 
+
+mid-block lines sat within **2.4
 characters** of the measure across the 101 prose lines sampled; the only visibly
-short lines were the **29 block-final ones** (29 blocks, 29 of them). Flush body,
+short lines were the **29 block-final ones** (29 blocks, 29 of them). 
+
+Flush body,
 short last line — that *is* the visual signature of justified typesetting, and it
 dissolves on inspection because the nicks genuinely vary and no line's internal
-spacing is distorted. A proportional face would show a wavy margin and kill it.
+spacing is distorted. 
 
-**2. The restfulness is block-level air, not line-level leading.** The leading is
+A proportional face would show a wavy margin and kill it.
+
+**2. The restfulness is block-level air, not line-level leading.** 
+
+The leading is
 tight — 1.18 at 10pt, where a book wants 1.3–1.45 — while **24% of the lines are
 blank**, because the loose-layout rule puts a blank after every block regardless
-of source tightness. The air is *between* units and never *within* them: a dense
+of source tightness. 
+
+The air is *between* units and never *within* them: a dense
 four-line run, a landing strip, another run. That is why the eye roams and then
 lands on something the eye can hold at once. It is the fermata, at page scale.
 
 **3. Both channels survive, and they are the reason it scans and reads.** The
-grid serves the close read; the mirrored role hues serve the scan. That pairing
+grid serves the close read; the mirrored role hues serve the scan. 
+
+That pairing
 was at risk: flattening the ink to black-on-white would have made a perfectly
-*legible* page whose *hierarchy* was gone. The mirror is what kept it — which is
+*legible* page whose *hierarchy* was gone. 
+
+The mirror is what kept it — which is
 the strongest argument for having refused a light mode.
 
 ## The lessons
 
 **L1 — A medium is a sink, not a renderer.** The reading path is portable by
 construction: colour, no cursor control, width already decided. So a medium is a
-question about *where the bytes go*, never about how to render. Three media have
+question about *where the bytes go*, never about how to render. 
+
+Three media have
 now confirmed it: e-ink needed nothing, paper needed a printer, and the browser
 was assessed and refused. Nothing needed a second renderer.
 
 **L2 — A delegated decision needs an owner in every medium.** chroma classifies
 and lets *the terminal* supply the hues — correct on glass, and fatal on paper,
 where 130 class codes per document were silently dropped. e-ink needed
-`--width` (no terminal size). Paper needed the silcrow receipt *dropped* (no
+`--width` (no terminal size). 
+
+Paper needed the silcrow receipt *dropped* (no
 resolution) and a 16-colour table (no terminal theme). **Every medium must supply
 the owner of any decision the renderer delegates.**
 
@@ -82,60 +102,90 @@ the owner of any decision the renderer delegates.**
 produced a page that looked finished. So did the census that summarised instead
 of enumerating; so did `columns=0` falling back to 80; so did the registry row
 reporting "all in sync"; so did a claim that a badge was TTY-gated when the bytes
-said otherwise. Five instances in one day, one shape: **a component that skips
+said otherwise. 
+
+Five instances in one day, one shape: **a component that skips
 what it does not recognise, and reports success.** This is the silo's signature
 defect and it is invisible to a green gate by construction.
 
 **L4 — Look at the artefact.** Every defect that mattered on this rung was found
 by looking at a printed page: the clipped right edge (nine columns lost per line),
 the badge swallowed by a background clamp, the quote cue disagreeing with its own
-text, the missing chroma classes. 700 tests were green through all four. Tests
+text, the missing chroma classes. 
+
+700 tests were green through all four. Tests
 verify *behaviour*; an artefact is a different kind of object, and "render it and
 look at it" is a milestone, not a nicety.
 
 **L5 — The instrument is the likelier liar.** Five corrections in one day, four
 of them in the *measuring apparatus*: a census used as an enumeration, a lint
 invocation, a claim about paint gating, a regex that matched `color:#…` inside
-`background-color:#…`. When a test fails and the artefact has already been looked
+`background-color:#…`. 
+
+When a test fails and the artefact has already been looked
 at, read the assertion before the code. The reader's apparatus is an instrument of
   the same kind, and it drifts silently — see **L11**.
 
 **L6 — A default is a statement about the medium.** 100 columns packed more text
 per sheet and read *worse* (9pt, tighter margins); 80 columns is the printer's
-own width, and at 80 the type takes the full 10pt cap. The more capable-looking
+own width, and at 80 the type takes the full 10pt cap. 
+
+The more capable-looking
 default was the worse artefact. Pick defaults by looking at the page.
 
 **L7 — Derive, don't enumerate.** The type size derives from the column count
-(so a clip is impossible rather than untested). The ink derives from the palette
+(so a clip is impossible rather than untested). 
+
+**The ink** derives from the palette
 by mirroring plus a contrast floor (so legibility is a guarantee, not a
-coincidence). A background is a *mark* iff it equals its foreground (so nobody
-maintains a list of "things that are badges"). The receipt is dropped because
+coincidence). 
+
+**A background** is a *mark* iff it equals its foreground (so nobody
+maintains a list of "things that are badges"). 
+
+**The receipt** is dropped because
 paper cannot resolve a pointer (a rule, not a case). No tables to keep in sync.
 
 **L8 — Derive, don't store.** No light palette, because a second palette is a
-second source of truth for the roles and would drift from the first. The silcrow
+second source of truth for the roles and would drift from the first. 
+
+The silcrow
 numbers cannot go on paper because they are render-time allocations: a durable
-artefact carrying them is *guaranteed* to disagree with the next render. Both
+artefact carrying them is *guaranteed* to disagree with the next render. 
+
+Both
 refusals are the same rule as `reg-sync`'s: the ledger mirrors the document, and
 derived data is recomputed, never stored.
 
 **L9 — The medium's constraints are its virtues.** Paper is opaque and charges by
-the page, so it forced the ink mirror. It cannot animate, so it *only* shows —
-which is why it found defects the terminal never would. It holds still, so the
+the page, so it forced the ink mirror. 
+
+It cannot animate, so it *only* shows —
+which is why it found defects the terminal never would. 
+
+It holds still, so the
 reader sets the tempo: **a page is the ultimate fermata.** e-ink's slowness bought
-the same thing. None of these were costs to work around; they were the reason to
+the same thing. 
+
+None of these were costs to work around; they were the reason to
 do it.
 
 **L10 — "Professional" is a social claim; a reader cannot cash it.** It says
 *this was done by someone paid, in a recognised idiom* — and it is unfalsifiable.
+
 The page's claims are perceptual and testable: it scans, it lands, it holds.
+
 Worth being blunt about: **"professional" is the shite register** — it optimises
 for how the artefact is read *socially* rather than how it is read *by an eye*.
 
-**L11 — The reader's apparatus is in the system.** The operator, reading the
+**L11 — The reader's apparatus is in the system.** 
+
+The operator, reading the
 printed document on glass: *"all of a sudden the whiteness seemed less white and
 more light sepia … the whole page seemed to have changed its relative brightness
-and become more comfortable and subdued and still very legible."* **The file had
+and become more comfortable and subdued and still very legible."* 
+
+**The file had
 not changed** — the page's white is `#ffffff` and has been since the ink transform
 — so the change was in the apparatus: the display's own colour management (True
 Tone and Night Shift move the white point continuously, by design
@@ -159,9 +209,13 @@ Two consequences, pointing in opposite directions:
 
 Hutchins' frame is the right one, and this silo already keeps it
 (`docs/cognition-in-the-wild.md`): the unit of analysis is representational state
-*propagating between media*, not the page and not the reader. The relay here runs
+*propagating between media*, not the page and not the reader. 
+
+The relay here runs
 render → PDF page → display pipeline → retina → comprehension, and the silo owns
-the first two links only. **The observation is evidence that the other three are
+the first two links only. 
+
+**The observation is evidence that the other three are
 in the system** — a display's white is an emissive, blue-biased stand-in for
 paper's reflected, warm one, which is why an eye left alone walks it toward sepia,
 and why that felt *restful* rather than wrong.
@@ -171,26 +225,35 @@ and why that felt *restful* rather than wrong.
 Gutenberg's 42-line Bible is the first great piece of typographic *machinery* in
 the West, and the property it was built to buy is one sentence long: **a column
 flush on both sides, with even grey between the words.** He bought it in metal.
+
 The B42's case held **around 290 separate sorts** — Bechtel's inventory counts 53
 capitals, 158 lowercase (many carrying an abbreviation mark), **79 ligatures**, 4
 abbreviations and 5 punctuation marks, ≈299 in all; Columbia says "nearly three
-hundred". Zapf's estimate is the one that prices the purchase: **about 60 sorts
+hundred". 
+
+Zapf's estimate is the one that prices the purchase: **about 60 sorts
 would have sufficed** to set the same text without caring about the right edge.
 
 The mechanism was not glyph-stretching — that is Adobe's descendant, and
-typographers argue it degrades the page. It was **narrower variants** of letters,
+typographers argue it degrades the page. 
+
+It was **narrower variants** of letters,
 cast with their corners trimmed so they could tuck against a neighbour's serif and
 recover fractions of an em; plus the 79 ligatures; plus manuscript abbreviations;
 plus punctuation hanging into the margin; plus, by the tradition's account, a
 single space of one width (Eng's measurements dispute that the spaces were in fact
-uniform — the point holds either way). Many mechanisms, one property, a fivefold
+uniform — the point holds either way). 
+
+Many mechanisms, one property, a fivefold
 surcharge on type. And part of the motive was **market**: a new technology had to
 match high-grade manuscript to be accepted at all.
 
 **We get that property for nothing.** A monospace grid quantises the ragged right
 edge into single-character nicks — measured above at a mean of 2.4 characters
 against the measure, with only each block's last line visibly short — which the
-eye fuses into a boundary. Flush body, short final line: the signature of
+eye fuses into a boundary. 
+
+Flush body, short final line: the signature of
 justification, produced without stretching a space, a glyph, or a sort.
 
 |  | Gutenberg, 1455 | okuda, 2026 |
@@ -206,9 +269,13 @@ measure or lose it.)*
 
 **The rule the curve gives: machinery buys what the medium will not give.** And
 because the work is *invisible* when it is done well — a grid, a flush edge, even
-grey — a market can see and price only the **visible additions**. That is where
+grey — a market can see and price only the **visible additions**. 
+
+That is where
 the churn comes from: not villainy and not stupidity, but **an incentive that can
-only pay for what shows.** Gutenberg's 290 sorts were partly necessity and partly
+only pay for what shows.** 
+
+Gutenberg's 290 sorts were partly necessity and partly
 a sales argument; the web's stack is the same argument at a higher frequency.
 
 The test to apply to any machinery, ours included: **does it replace a given with
@@ -218,7 +285,9 @@ re-derives it is the surcharge.
 *Sources consulted 2026-10-09; the primary texts were not read. **290 / ~60:**
 Hermann Zapf, "About micro-typography and the hz-program", Electronic Publishing
 6(3), 1993, as quoted by Torbjørn Eng. **The inventory:** Guy Bechtel, Gutenberg
-(Fayard, 1992), pp. 331, 442, via the BnF's Gallica note on the B42. **"Nearly
+(Fayard, 1992), pp. 331, 442, via the BnF's Gallica note on the B42.*
+
+***"Nearly
 three hundred":** Columbia University Libraries, "Type to Print". **The narrower
 variants, the hanging punctuation, and the objection to glyph scaling:** Eng,
 "InDesign, the hz-program and Gutenberg's secret".*

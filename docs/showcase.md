@@ -9,7 +9,6 @@ A single document that exercises every element of the closed Okuda Markdown gram
 > No light mode. Dark is the only mode, because the terminal emits signal, not
 > background noise. 
 
----
 
 ## Structure: headings
 
@@ -18,15 +17,12 @@ A single document that exercises every element of the closed Okuda Markdown gram
 
 The viewer owns the layout. Under ADR-007, okuda matches Glow's heading rendering at every level — the marker count signals depth, and the blue bold is uniform across H1–H6. There is no collapse; a deep heading is still a heading.
 
----
-
 ## Prose: paragraphs and soft returns
 
 This is a single paragraph split across two source lines. The soft return between them becomes a hard break — no trailing double-space tax.
 
 Inline styles carry the semantic load: **bold for emphasis**, *italic for asides*, ~~strikethrough for the discarded~~, and `` `inline code` `` for the literal. A [hyperlink to the origin](https://example.com/origin) renders as rose link text plus a visible cyan-underlined URL — the URL is always on screen (see *Links: browser invocation* below). An image `![rejected alt](pic.png)` becomes `[image: rejected alt]`; the viewer renders text, not pixels.
 
----
 
 ## Links: browser invocation
 
@@ -42,7 +38,6 @@ detection and click-to-browser handoff:
 Ctrl/Cmd+Click (or plain click, terminal-dependent) on any URL above
 should hand off to the browser.
 
----
 
 ## Code: fences are verbatim — and elided, never wrapped
 
@@ -67,9 +62,12 @@ def elide(line: str, width: int) -> str:
     return line[: width - 1] + "…"
 ```
 
-A tagged fence is coloured (BRF-FENCE-COLOUR): `chroma` classifies the tokens, the terminal's own palette supplies the hues — the tool classifies, the terminal themes, and no TrueColor Kool-Aid rides the code. The fences above, rendered, are the proof. An untagged fence stays exactly as it was; an unknown tag renders untagged (chroma never rejects an unknown lexer — it colours plaintext white, silently — so the alias table decides, not a guess); the binary absent, the code renders uncoloured and the viewer never dies with the coloriser. And a source file is a one-fence document: `okuda src/render.ts` renders the renderer, coloured.
+A tagged fence is coloured (BRF-FENCE-COLOUR): `chroma` classifies the tokens, the terminal's own palette supplies the hues — the tool classifies, the terminal themes, and no TrueColor Kool-Aid rides the code. The fences above, rendered, are the proof. 
 
----
+An untagged fence stays exactly as it was; an unknown tag renders untagged (chroma never rejects an unknown lexer — it colours plaintext white, silently — so the alias table decides, not a guess); the binary absent, the code renders uncoloured and the viewer never dies with the coloriser. 
+
+And a source file is a one-fence document: okuda src/render.ts renders the renderer, coloured.
+
 
 ## Diagrams: mermaid → ASCII
 
@@ -101,7 +99,6 @@ And beneath each diagram, one muted indicator line: `⋮ mermaid source elided`.
 
 A fence may carry its own caption — a leading `title:` line in the mermaid source — and the caption joins the notice on the same line: `⋮ The cycle · source elided`. The clause is shorter there because this line is never wrapped, so the title's length is the notice's budget: `mermaid source elided` fits beneath an untitled diagram, and beneath the silo's longest caption the notice elides at the body's own budget — a long caption is cut with `…`, never allowed to push the line past the glass. Every diagram states the elision either way.
 
----
 
 ## Quotes: single-level, muted
 
@@ -111,7 +108,6 @@ A fence may carry its own caption — a leading `title:` line in the mermaid sou
 
 Nested blockquotes collapse to a single pipe; the grammar refuses to draw a staircase of `>` glyphs that no one reads.
 
----
 
 ## Lists: loose, nested, capped
 
@@ -148,7 +144,6 @@ Task lists are rejected — the checkbox markup stays literal text:
 - [ ] this is not a task list, it is an unordered item
 - [x] and this is too
 
----
 
 ## Tables: loose rows, semantic colour
 
@@ -161,7 +156,6 @@ Task lists are rejected — the checkbox markup stays literal text:
 
 Alignment is honoured per-column: right, left, centre. Overflow splits by surface kind (ADR-022's scope gate): a **menu** (jump-wired, three columns) lays out right-anchored by role — the number holds the far right edge, the callsign its stable home, the slug truncates with `…` then suppresses as the terminal narrows; widening reverses the ladder. A **prose table** wraps in-cell — a truncated reason loses the point, a wrapped one keeps it; the operator widens. (`decisions/022-right-anchored-role-layout.md`, superseding `decisions/014-table-elision-over-shrink-wrap.md` for the generic case.)
 
----
 
 ## Glyphs: joy with a job
 
@@ -227,7 +221,6 @@ astral-plane emoji whose width terminals disagree on. The status-led
 list above is the exception that proves the rule: its glyphs carry state
 no other marker holds, one job each. Joy that costs alignment is not joy.
 
----
 
 ## Rejected elements
 
@@ -237,17 +230,14 @@ this looks like indented code but okuda treats it as prose, because four-space f
 
 Inline `<em>HTML</em>` is stripped silently; the tags vanish, the text remains. Footnotes and raw HTML blocks produce nothing. No error, no raw markup — the viewer degrades to text, never to noise.
 
----
 
 ## Width: wrap, bypass, elide
 
 Body text wraps at the terminal column count. Mermaid ASCII bypasses wrapping entirely, because wrapping a diagram destroys its meaning. Code fences never wrap either — a line that would exceed the content width is elided with `…` at the cut (td-b81597): one line stays one line, and widening restores the bytes. Resize the terminal and re-render; the prose reflows, the art holds, the code tells the truth about where it was cut.
 
----
 
 ## Closing rule
 
----
 
 That is the whole grammar. Nothing more is promised; nothing more is wanted.
 

@@ -320,9 +320,9 @@ Treating the artifact as the single source of truth turns the entire design sess
 * **Eliminates the "Working Memory Tax":** In standard freeform chat, you and the agent waste context tokens carrying forward old assumptions, corrected ideas, and stale snippets. The live document *is* the working memory. If an insight isn't written into the document, it effectively doesn't exist.
 * **Cheap Scrubbing and Resetting:** Complex architecture problems are rarely linear. When you hit a dead end, you don't fight to salvage a broken model. Because the artifact is lightweight (a concise diagram and a few paragraphs), the cost to "scrub and new-up" is nearly zero. You revert the file, keep the lessons learned, and restart with a clean state.
 * **Shared Grounding:** Humans and LLMs both suffer from divergence when discussing abstract systems without visual boundaries. Looking at the exact same rendered ASCII state machine in the right-hand pane forces immediate alignment:
-```
-[Document State N] ──(Shared Discussion & Critique)──> [Document State N+1]
 
+```
+[Document State N] ──> (Shared Discussion & Critique) ──> [Document State N+1]
 ```
 
 
