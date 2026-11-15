@@ -67,7 +67,7 @@ The zero-gravity case is the same claim pointed at physics.
 
 **And reasoning can make it worse before better.** More steps inside the wrong
 frame yield more elaborate wrong detail plus a post-hoc justification. That is
-CSN mechanised: the narrative fills the gap and the trace launders it. A long
+Compulsive Narrative Syndrom (CNS) mechanised: the narrative fills the gap and the trace launders it. A long
 chain of thought with no explicit frame check raises *confidence*, not
 correctness.
 
