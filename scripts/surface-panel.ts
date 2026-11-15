@@ -210,10 +210,14 @@ const labelStrip = (w: number, lines: string[], fg: string, bg: string): string 
 // ── The build ─────────────────────────────────────────────────────────
 
 const OUT = "docs/2026-11-15-rung-panel.png";
-const keepCells = process.argv.includes("--cells");
-const cellDir = process.argv[process.argv.length - 1].startsWith("/")
-  ? process.argv[process.argv.length - 1]
-  : "/tmp/rung-cells";
+// --cells <dir> keeps the cells; the default is a fixed tmp path. argv[last]
+// is the script path when no args are passed — a path that starts with "/" —
+// and rmSync on it deleted the script and left a directory of cells in its
+// place, caught by the first `just rung-panel` smoke. Never derive from
+// argv positions; parse the flag.
+const cellsIdx = process.argv.indexOf("--cells");
+const keepCells = cellsIdx >= 0;
+const cellDir = keepCells ? process.argv[cellsIdx + 1]! : "/tmp/rung-cells";
 if (!keepCells && existsSync(cellDir)) rmSync(cellDir, { recursive: true });
 mkdirSync(cellDir, { recursive: true });
 

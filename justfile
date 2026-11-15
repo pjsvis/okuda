@@ -602,6 +602,16 @@ contrast-doc:
 palette-swatch-doc:
     @./okuda docs/2026-09-05-palette-swatch.md --tui
 
+# Rung panel generator
+[group('build')]
+rung-panel:
+    @bun scripts/surface-panel.ts
+
+# Rung panel viewer
+[group('build')]
+rung-panel-doc:
+    @./okuda docs/2026-11-15-rung-panel.md --tui
+
 # Chip dogfood
 [group('build')]
 chip:
