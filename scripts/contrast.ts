@@ -120,6 +120,57 @@ export const oklch = (hex: string): Oklch => {
 /** OKLCH lightness (the L of `oklch(L C H)`), the axis every caller wanted. */
 export const oklchL = (hex: string): number => oklch(hex).L;
 
+export interface Rendered {
+  /** The hex the browser (or terminal) will actually paint. */
+  hex: string;
+  /** True when the requested colour fell outside sRGB and was clipped. */
+  clipped: boolean;
+  /** The L the **rounded hex** achieves, which is what renders. The request and
+   *  the artefact differ by up to half a quantisation step, and a perturbation
+   *  reported on its request would be reporting a colour nobody can paint. */
+  L: number;
+  /** The achieved chroma and hue of the artefact. At C 0.017 one 8-bit step is
+   *  worth several degrees of hue, so the request's hue is held *approximately*
+   *  and the drift is a measurement rather than a hidden rounding. */
+  C: number;
+  h: number;
+}
+
+/** **The inverse.** A perturbation is stated in OKLCH — "raise the ink to
+ *  L 0.89, hue held" — and every consumer here takes a hex, so the round trip
+ *  has to exist: `oklch(L C h)` → linear sRGB → gamma → 8-bit.
+ *
+ *  Gamut is reported, never silently clamped: a warm chroma at `L` 0.95 has no
+ *  sRGB representative, and a `clipped` flag is the difference between "we moved
+ *  the ink" and "we moved the ink as far as the display allows". */
+export const fromOklch = ({ L, C, h }: Oklch): Rendered => {
+  const rad = (h * Math.PI) / 180;
+  const A = C * Math.cos(rad);
+  const B = C * Math.sin(rad);
+  const l = L + 0.3963377774 * A + 0.2158037573 * B;
+  const m = L - 0.1055613458 * A - 0.0638541728 * B;
+  const s = L - 0.0894841775 * A - 1.291485548 * B;
+  const l3 = l * l * l;
+  const m3 = m * m * m;
+  const s3 = s * s * s;
+  const rl = 4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3;
+  const gl = -1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3;
+  const bl = -0.0041960863 * l3 - 0.7034186147 * m3 + 1.707614701 * s3;
+  const clipped = [rl, gl, bl].some((v) => v < -1e-4 || v > 1 + 1e-4);
+  const enc = (v: number): number => {
+    const c = Math.min(1, Math.max(0, v));
+    const g = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+    return Math.round(g * 255);
+  };
+  const hex =
+    "#" +
+    [enc(rl), enc(gl), enc(bl)]
+      .map((v) => v.toString(16).padStart(2, "0"))
+      .join("");
+  const achieved = oklch(hex);
+  return { hex, clipped, L: achieved.L, C: achieved.C, h: achieved.h };
+};
+
 /** **The triple, as the page states it** — one atomic field, so it wraps at a
  *  space and never inside a number. An achromatic colour prints no hue: white's
  *  `C` is 0.000 and its angle is arithmetic noise, and a number with no referent
@@ -188,30 +239,36 @@ export interface Row {
   refused?: string;
 }
 
-export function rows(): Row[] {
+/** **Everything one pair measures**, in one place. `rows()` and the
+ *  perturbation read the *same* function, so a candidate pair and a shipped rung
+ *  cannot be measured by two subtly different instruments — which is the whole
+ *  reason a perturbation is comparable to the set it perturbs. */
+export function measurePair(pair: Pair): Row {
   const p = okudaPalette();
-  return PAIRS.map((pair) => {
-    const watched = Object.fromEntries(
-      WATCHED.map((r) => [r, ratio(p[r] ?? "#000000", pair.bg)]),
-    );
-    const ink = ratio(pair.fg, pair.bg);
-    return {
-      n: pair.n,
-      name: pair.name,
-      bg: pair.bg,
-      fg: pair.fg,
-      ratio: ink,
-      lBg: oklchL(pair.bg),
-      lFg: oklchL(pair.fg),
-      lift: oklchL(pair.fg) - oklchL(pair.bg),
-      yBg: luminance(pair.bg),
-      yFg: luminance(pair.fg),
-      watched,
-      ruleShare: (watched["muted"] ?? 0) / ink,
-      goldShare: (watched["strong"] ?? 0) / ink,
-      refused: pair.refused,
-    };
-  });
+  const watched = Object.fromEntries(WATCHED.map((r) => [r, ratio(p[r] ?? "#000000", pair.bg)]));
+  const ink = ratio(pair.fg, pair.bg);
+  const lBg = oklchL(pair.bg);
+  const lFg = oklchL(pair.fg);
+  return {
+    n: pair.n,
+    name: pair.name,
+    bg: pair.bg,
+    fg: pair.fg,
+    ratio: ink,
+    lBg,
+    lFg,
+    lift: lFg - lBg,
+    yBg: luminance(pair.bg),
+    yFg: luminance(pair.fg),
+    watched,
+    ruleShare: (watched["muted"] ?? 0) / ink,
+    goldShare: (watched["strong"] ?? 0) / ink,
+    refused: pair.refused,
+  };
+}
+
+export function rows(): Row[] {
+  return PAIRS.map(measurePair);
 }
 
 /** One rung, as the page states it — a single line whose fields are atomic, so
@@ -1103,6 +1160,89 @@ export function surfaceDirText(res: { rows: ThemeRow[]; noPair: string[] }, refP
   return out.join("\n");
 }
 
+// ── The perturbation: one knob, held everything else ────────────────
+//
+//  A perturbation is a **direction**, not a candidate palette: hold the ground,
+//  hold the ink's hue and chroma, and move one number. Its value is that the
+//  measures move for one reason, so what each measure is *for* finally shows.
+//  The first one run (2026-11-15) raises the ink's lightness on the reference
+//  ground — the direction three corpora pointed at, and the only knob on the
+//  panel page with a field behind it.
+
+export interface Perturbation {
+  /** The rung it derives from, so a candidate is never orphaned from its base. */
+  base: number;
+  /** What was asked for, in OKLCH. */
+  asked: Oklch;
+  /** Whether sRGB could paint it. */
+  clipped: boolean;
+  row: Row;
+}
+
+/** **The ink ladder:** the reference ground, the reference ink's hue and chroma
+ *  held, and only `L` raised. Steps of 0.017–0.028 rather than round numbers,
+ *  because the interesting boundary is not round: prose passes 11 (the band's
+ *  ceiling) somewhere between the first and second step, and passes 12 (the stop
+ *  rule) between the third and the fourth. */
+export function perturbInk(
+  steps: number[] = [0.857, 0.876, 0.891, 0.909, 0.930, 0.950],
+): Perturbation[] {
+  const base = PAIRS.find((p) => p.n === REFERENCE_RUNG) ?? PAIRS[4]!;
+  const ink = oklch(base.fg);
+  return steps.map((L, i) => {
+    const asked = { L, C: ink.C, h: ink.h };
+    const made = fromOklch(asked);
+    return {
+      base: base.n,
+      asked,
+      clipped: made.clipped,
+      row: measurePair({ n: i, name: `ink L ${L.toFixed(3)}`, bg: base.bg, fg: made.hex }),
+    };
+  });
+}
+
+/** The perturbation as text: one line per step, then what each column did and
+ *  what would stop it. Reported, never gated — a candidate is not a rung. */
+export function perturbText(ps: Perturbation[] = perturbInk()): string {
+  const pad = (s: string, n: number): string => s.padEnd(n);
+  const base = ps[0]!.row;
+  const out: string[] = [];
+  const drift = ps.map((p) => Math.abs(p.row.fg === "" ? 0 : oklch(p.row.fg).h - p.asked.h));
+  const worstDrift = Math.max(...drift.filter((d) => d < 180), 0);
+  out.push(
+    `perturbation — ink L raised on rung ${ps[0]!.base}'s ground ${base.bg} · ` +
+      `hue ${ps[0]!.asked.h.toFixed(0)}° and chroma ${ps[0]!.asked.C.toFixed(3)} held in the request`,
+  );
+  out.push(
+    `held approximately in the artefact: 8-bit quantisation at C ${ps[0]!.asked.C.toFixed(3)} ` +
+      `moves the hue by up to ${worstDrift.toFixed(1)}° — the hex is the referent, the request is the intent.`,
+  );
+  out.push("");
+  out.push(
+    pad("asked", 7) + pad("hex", 9) + pad("got", 7) + pad("Y_fg", 7) + pad("prose", 7) +
+      pad("lift", 7) + pad("gold", 7) + pad("g-share", 9) + "stands",
+  );
+  for (const p of ps) {
+    const r = p.row;
+    out.push(
+      pad(p.asked.L.toFixed(3), 7) +
+        pad(r.fg, 9) +
+        pad(r.lFg.toFixed(3), 7) +
+        pad(r.yFg.toFixed(3), 7) +
+        pad(`${r.ratio.toFixed(1)}:1`, 7) +
+        pad(r.lift.toFixed(3), 7) +
+        pad((r.watched["strong"] ?? 0).toFixed(2), 7) +
+        pad(r.goldShare.toFixed(2), 9) +
+        STANDING_MARK[standing(r)] +
+        (p.clipped ? "  ✗ clipped by the display" : ""),
+    );
+  }
+  out.push("");
+  out.push("rules and amber are unmoved: both are measured against the ground, and the ground is held.");
+  out.push(`band ceiling ${BAND.prose[1]}:1 · stop rule 12:1 · ceiling ground L ${CEILING_L}`);
+  return out.join("\n");
+}
+
 // ── The corpus: a host's whole collection, on our axes ───────────────
 //
 //  `--theme-dir` asks *does this theme survive our palette*; the census asks
@@ -1253,6 +1393,12 @@ function main(): void {
     const i = argv.indexOf(flag);
     return i >= 0 ? argv[i + 1] : undefined;
   };
+  if (argv.includes("--perturb")) {
+    const ps = perturbInk();
+    if (json) console.log(JSON.stringify(ps, null, 2));
+    else console.log(perturbText(ps));
+    return;
+  }
   const corpusDirArg = argAfter("--corpus");
   if (corpusDirArg !== undefined) {
     const rows = corpusRows(corpusDirArg);

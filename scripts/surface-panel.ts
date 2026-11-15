@@ -34,13 +34,12 @@
 import { mkdirSync, writeFileSync, existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import {
-  PAIRS,
   STANDING_MARK,
   measureLines,
   okudaPalette,
+  perturbInk,
   rows,
   standing,
-  type Pair,
   type Row,
 } from "./contrast";
 import { renderDocument } from "../src/render";
@@ -98,15 +97,27 @@ const contrast = (a: Hex, b: Hex): number =>
 A ratio is luminance-only; L is what the eye is doing. Read both.
 `;
 
-// ── The rungs ─────────────────────────────────────────────────────────
+// ── Which cells ───────────────────────────────────────────────────────
+//
+//  Two grids, one compositor. The rung panel shows nine *grounds* at one ink; the
+//  perturbation shows one ground at six *inks*. Both are the same experiment —
+//  hold everything but one number — so they are the same code with a different
+//  cell list, and whatever a reader learns from one they can test against the
+//  other.
 
-/** The admissible rungs, in ladder order — rung 7 is refused, excluded. */
-const RUNGS: Pair[] = PAIRS.filter((p) => !p.refused);
+const PERTURB = process.argv.includes("--perturb");
 
-/** The measurements, keyed by rung. Read from the instrument rather than
- *  recomputed here: a label that did its own arithmetic could disagree with the
- *  page beside it, and then the grid would be showing two truths. */
-const MEASURED: Map<number, Row> = new Map(rows().map((r) => [r.n, r]));
+/** **The cells, as rows.** Read from the instrument rather than recomputed here:
+ *  a label that did its own arithmetic could disagree with the page beside it,
+ *  and then the grid would be showing two truths. In perturb mode the cells are
+ *  the ink ladder, whose names already carry the lightness that defines them. */
+const CELLS: Row[] = PERTURB
+  ? perturbInk().map((p) => p.row)
+  : rows().filter((r) => !r.refused);
+
+/** Columns per grid row: nine rungs read as 3×3, six inks as 2×3 (a pair per row,
+ *  because the comparison here is *between two inks*, not across a ladder). */
+const COLS = PERTURB ? 2 : 3;
 
 /** The label strip is 13px monospace in a 708px pane — ~90 columns. The standing
  *  mark is right-aligned to a fixed column so the eye can scan one tier down the
@@ -247,7 +258,9 @@ const labelStrip = (w: number, lines: string[], fg: string, bg: string): string 
 
 // ── The build ─────────────────────────────────────────────────────────
 
-const OUT = "docs/2026-11-15-rung-panel.png";
+const OUT = PERTURB
+  ? "docs/2026-11-15-ink-perturbation.png"
+  : "docs/2026-11-15-rung-panel.png";
 // --cells <dir> keeps the cells; the default is a fixed tmp path. argv[last]
 // is the script path when no args are passed — a path that starts with "/" —
 // and rmSync on it deleted the script and left a directory of cells in its
@@ -283,12 +296,10 @@ const run = (cmd: string[]): void => {
 };
 
 const shots: string[] = [];
-for (const r of RUNGS) {
-  const n = r.n;
-  const row = MEASURED.get(n)!;
+for (const [n, row] of CELLS.entries()) {
   const tier = STANDING_MARK[standing(row)];
   const base = join(cellDir, `cell-${n}`);
-  const page = htmlPage(bodyHtml, r.bg, r.fg, CELL_H);
+  const page = htmlPage(bodyHtml, row.bg, row.fg, CELL_H);
   writeFileSync(`${base}.html`, page);
   run([
     BROWSER, "--headless=new", "--disable-gpu", "--no-sandbox",
@@ -301,10 +312,11 @@ for (const r of RUNGS) {
   // the first cut hardcoded it and the third line was silently clipped, which a
   // static image cannot tell you: the strip just looked like it had two lines.
   const lines = [
-    `rung ${n} · ${r.name}`.padEnd(LABEL_COLS - tier.length) + tier,
+    `${PERTURB ? "cell" : "rung"} ${PERTURB ? n + 1 : row.n} · ${row.name}`
+      .padEnd(LABEL_COLS - tier.length) + tier,
     ...measureLines(row),
   ];
-  const strip = labelStrip(CELL_W, lines, r.fg, r.bg);
+  const strip = labelStrip(CELL_W, lines, row.fg, row.bg);
   writeFileSync(`${base}-label.html`, strip);
   run([
     BROWSER, "--headless=new", "--disable-gpu", "--no-sandbox",
@@ -317,23 +329,32 @@ for (const r of RUNGS) {
   const unit = `${base}-unit.png`;
   run(["magick", `${base}-label.png`, `${base}.png`, "-append", unit]);
   shots.push(unit);
-  console.log(`rung ${n}: ${r.bg}/${r.fg} → cell (${CELL_W}x${CELL_H + stripHeight(3)})`);
+  console.log(`cell ${n}: ${row.bg}/${row.fg} → ${CELL_W}x${CELL_H + stripHeight(3)}`);
 }
 
-const TITLE = [
-  "okuda · the rung panel · one document, nine admissible grounds",
-  "rungs 0–6, 8, 9 of scripts/contrast.ts PAIRS · rung 7 refused (reads as emitted light)",
-  "ink identical across cells — the pair is the only variable",
-  "labels: oklch L C h° (ground, ink) · lift = ink L − ground L · prose · rules · share · amber",
-  "mark: ✓ band — ground L 0.24–0.26 at 10–11:1 · ○ region — ground L ≤ 0.29, prose ≥ 7:1 · ✗ outside",
-];
+const TITLE = PERTURB
+  ? [
+      "okuda · the ink perturbation · one ground, six inks · the first knob the corpus endorses",
+      "rung 8's ground #221f1c held · the ink's hue (79°) and chroma (0.017) held · only L moves, 0.857 → 0.949",
+      "the pair is the only variable — whatever differs between two cells is the ink's lightness",
+      "labels: oklch L C h° (ground, ink) · lift = ink L − ground L · prose · rules · share · gold · amber",
+      "mark: ✓ band — ground L 0.24–0.26 at 10–11:1 · ○ region — ground L ≤ 0.29, prose ≥ 7:1 · ✗ outside",
+    ]
+  : [
+      "okuda · the rung panel · one document, nine admissible grounds",
+      "rungs 0–6, 8, 9 of scripts/contrast.ts PAIRS · rung 7 refused (reads as emitted light)",
+      "ink identical across cells — the pair is the only variable",
+      "labels: oklch L C h° (ground, ink) · lift = ink L − ground L · prose · rules · share · gold · amber",
+      "mark: ✓ band — ground L 0.24–0.26 at 10–11:1 · ○ region — ground L ≤ 0.29, prose ≥ 7:1 · ✗ outside",
+    ];
+const GRID_W = CELL_W * COLS + 64;
 {
-  const strip = labelStrip(CELL_W * 3 + 64, TITLE, palette.muted!, "#161311");
+  const strip = labelStrip(GRID_W, TITLE, palette.muted!, "#161311");
   writeFileSync(`${cellDir}/title.html`, strip);
   run([
     BROWSER, "--headless=new", "--disable-gpu", "--no-sandbox",
     "--hide-scrollbars", "--force-device-scale-factor=1",
-    `--window-size=${CELL_W * 3 + 64},${stripHeight(TITLE.length)}`,
+    `--window-size=${GRID_W},${stripHeight(TITLE.length)}`,
     `--screenshot=${cellDir}/title.png`, `file://${cellDir}/title.html`,
   ]);
 }
@@ -345,10 +366,10 @@ const TITLE = [
 // same geometry: an 8px border on every unit is the 16px gap.
 const BG = "#161311";
 const rowPaths: string[] = [];
-for (let i = 0; i < shots.length; i += 3) {
-  const rowPath = `${cellDir}/row-${i / 3}.png`;
+for (let i = 0; i < shots.length; i += COLS) {
+  const rowPath = `${cellDir}/row-${i / COLS}.png`;
   run([
-    "magick", ...shots.slice(i, i + 3),
+    "magick", ...shots.slice(i, i + COLS),
     "-bordercolor", BG, "-border", "8", "+append", rowPath,
   ]);
   rowPaths.push(rowPath);

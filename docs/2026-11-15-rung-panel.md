@@ -187,6 +187,81 @@ blue, against a warm walk). It is the last variable the palette still has, and
 the companion page parks it here deliberately — decide it at the ground you
 settle on, not before.
 
+## The first perturbation, run — the ink raised
+
+The direction the corpus endorsed, taken: rung 8's ground `#221f1c` held, the
+ink's hue (79°) and chroma (0.017) held, only `L` moved. Six inks, one variable,
+which is what makes each column readable as a cause rather than a coincidence.
+
+![the ink perturbation](2026-11-15-ink-perturbation.png)
+
+Columns: **ink asked** the OKLCH `L` requested · **hex** what sRGB could paint ·
+**Y_fg** the light the ink emits · **prose** WCAG ratio · **lift** · **gold** and
+**gold share** · **ours** the tier.
+
+Hue and chroma are held **in the request, not exactly in the artefact**: at
+`C` 0.017 a single 8-bit step is worth up to 3.2° of hue, so the sixth row's ink
+is 76° where 79° was asked. `fromOklch` reports the achieved triple and
+`just contrast --perturb` prints the drift — the hex is the referent, the request
+is the intent.
+
+| ink asked | hex | Y_fg | prose | lift | gold | gold share | ours |
+|---|---|---|---|---|---|---|---|
+| 0.857 | #d6cfc4 | 0.629 | 10.6:1 | 0.616 | 7.28 | 0.69 | ✓ band |
+| 0.876 | #dcd5ca | 0.671 | 11.3:1 | 0.634 | 7.28 | 0.65 | ○ region |
+| 0.891 | #e1dacf | 0.707 | 11.8:1 | 0.649 | 7.28 | 0.62 | ○ region |
+| 0.909 | #e7e0d5 | 0.751 | 12.5:1 | 0.668 | 7.28 | 0.58 | ○ region |
+| 0.930 | #eee7dc | 0.805 | 13.4:1 | 0.689 | 7.28 | 0.55 | ○ region |
+| 0.950 | #f5ede2 | 0.855 | 14.1:1 | 0.708 | 7.28 | 0.52 | ○ region |
+
+**Two columns move and one is measured against the wrong thing.**
+
+- **The hierarchy improves, monotonically.** `gold share` falls 0.69 → 0.52 as
+  the ink rises. The gold's own ratio does not move at all (7.28 — it is measured
+  against the ground, and the ground is held), so the effect is purely relative:
+  a brighter body makes the bold lead *quieter*. A bold lead that is 0.52 of the
+  prose is more of a lead than one at 0.69, and rung 5's 0.99 was the canary.
+- **Separation improves.** `lift` 0.616 → 0.708, which is the whole point of the
+  direction: more ink does not just add light, it adds distance.
+- **The cost is emitted light, and only that.** `Y_fg` 0.629 → 0.855 (+36%). This
+  is the halation axis, and no instrument here can rank it — the panel exists
+  because the eye can.
+- **`rules` and `amber` are unmoved** (2.14, 12.6 on every row): both are measured
+  against the ground, and the ground is held. A perturbation that moved them
+  would not be one knob.
+
+**And the band refuses all five candidates on a number that got better.** Every
+step past 0.876 leaves `✓ band`, because the band requires prose ≤ 11:1 — yet the
+thing that pushed prose up here is *more separation*, which is the good. The
+prose ceiling was read off the two winners (10.1 and 10.6) and written as an
+interval; the perturbation shows it is a **description of where the winners
+happened to sit**, not a guard.
+
+◆ **The stop rule — "stop when prose re-passes about 12:1" — is route-blind.** It
+was written for the *ground* route, where passing 12:1 means a ground darker than
+anything the reader liked. On the *ink* route, 12:1 is reached by adding
+separation and light, and the corpus median ink (0.912) sits at prose 12.5. So the
+rule describes the ground and mis-describes the ink, which is why step 4 is
+`○ region` and step 1 is not `✓ band`.
+
+Two honest consequences, and neither is a palette decision:
+
+- **The band's prose interval is a description; the guards are the ceiling and the
+  floor.** If the interval is kept as a guard it will refuse the one move that
+  improves the hierarchy. That is a decision to take (an ADR), not a sentence to
+  quietly rewrite.
+- **What bounds the ink route is `Y_fg`, not prose.** The control's ink is 1.000
+  and was called *harsh*; rung 8's is 0.629; the corpus median is ≈0.76. A
+  plausible guard is `Y_fg ≤ 0.80`, which admits steps 1–5 and refuses the last —
+  a number from the halation axis, which is the axis the eye actually complains
+  on.
+
+The candidate this leaves standing is **step 3, ink `#e1dacf` at `L` 0.891**
+(prose 11.8, lift 0.649, gold share 0.62, `Y_fg` 0.707). It is inside the corpus
+median, inside the `Y_fg ≤ 0.80` guard, and it improves two columns while costing
+one. No eye has judged it yet — that is the next walk, one rung a day, against a
+fixed reference.
+
 ## The dimensions that are significant — the opinion
 
 What the grid actually varies, in order of how much it buys:

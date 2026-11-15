@@ -607,8 +607,22 @@ palette-swatch:
 
 # Ground pairs, measured
 [group('build')]
-contrast:
-    @bun scripts/contrast.ts
+contrast *args:
+    #!/usr/bin/env bash
+    # Bare is the census the ground page is pinned against; `--perturb`,
+    # `--corpus`, `--surface` and the rest are the same instrument's other doors.
+    # `"$@"` keeps the caller's words whole.
+    exec bun scripts/contrast.ts "$@"
+
+# Ink perturbation
+[group('build')]
+perturb:
+    @bun scripts/contrast.ts --perturb
+
+# Ink perturbation grid
+[group('build')]
+perturb-panel:
+    @bun scripts/surface-panel.ts --perturb
 
 # Ground pairs, pasteable
 [group('build')]
