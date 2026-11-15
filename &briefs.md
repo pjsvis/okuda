@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**17 live · 157 archived · 24 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 3 silent · 10 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**17 live · 158 archived · 24 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 4 silent · 0 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -15,24 +15,11 @@ Nothing waits on these and no Thing records them. The question per row is **what
 | BRF-PROBES-TIER | 5d | Establish Registered `probes/` Tier for Exploratory Python |
 | BRF-CHOICE-LIST | -8d | The choice list — a document that is a setting, and the ac |
 | BRF-TEMPORAL-WINDOW | -8d | The temporal window — the date the reader already types, a |
+| BRF-OWN-SURFACE | -10d | Own the glass for the session — the pair taken at entry an |
 
 ### Ticketed, live — the load-bearing set
 
-A row here is the only kind with an owner already: something outside
-this table is waiting on it.
-
-| brief | age | asks |
-|---|---|---|
-| BRF-PERIMETER-GATE | 38d | The perimeter gate — the moira group holds only recipes th |
-| BRF-PERIMETER-RUNNER | 38d | The perimeter runner — the tuning recipes and their artifa |
-| BRF-PERIMETER-SILO | 38d | The perimeter silo — the speech doctrine and its records l |
-| BRF-PRINCIPAL-CLERK | 12d | The principal and the clerk — the three-way triage |
-| BRF-SEARCH-ROW | 10d | The search row — the contract, frozen by the probe |
-| BRF-PAIR-DELIVERED | -8d | The pair, delivered where it lands — the re-themer's own o |
-| BRF-FONT-COVERAGE | -9d | The codepoints we emit, against the fonts that must draw t |
-| BRF-CAHIER-BINARY | -10d | The cahier binary — the compositor, compiled and shipped |
-| BRF-OWN-SURFACE | -10d | Own the glass for the session — the pair taken at entry an |
-| BRF-PLATFORM-PACKAGES | -10d | The platform packages — the binaries ride npm under `@poly |
+_none_
 
 
 <!-- decide:end -->

@@ -48,11 +48,10 @@ const BASE = "main";
 const DECLARED: Record<string, { why: string; review: string }> = {
   "feat/television-preview": {
     why: "BRF-TELEVISION-PREVIEW — parked on television #999 (fzf-style pane envs); the branch dies unmerged when the FZF_PREVIEW_COLUMNS gap closes upstream",
-    review: "2026-11-15",
-  },
-  "docs-reflow-quarantine": {
-    why: "One commit from the legibility branch, held back from landing: 'Update docs' reflows two audit documents and deletes a section from a published essay, and its message names nothing. It lands as a reviewed edit (or not at all) — the rest of that branch landed, so this is a decision about prose, not about code",
-    review: "2026-11-22",
+    // reviewed 2026-11-15 (rung-panel session): branch healthy, mirrored on
+    // origin, one commit; the gap is upstream's to close and unverifiable
+    // from here — re-dated, not resolved.
+    review: "2026-12-15",
   },
 };
 
