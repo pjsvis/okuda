@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**19 live · 160 archived · 28 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 5 silent · 10 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**20 live · 160 archived · 29 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 5 silent · 10 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -73,6 +73,7 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 | BRF-SURFACE-PLAN | · open | The surface plan — the pair's lifecycle as bytes, and nothing else | — |
 | BRF-FGP-CARD | · open | The FGP card — the pair painted into the cells, so a surface can be seen | — |
 | BRF-CODE-EDITOR-HINT | · open | The editor hint — `88` opens a code file where you're reading | — |
+| BRF-LAUNCH-CONTRACT | · open | The launch contract — the pair declared at startup, and the clone hands over all three fields | — |
 
 ## Ready — specced, next up
 

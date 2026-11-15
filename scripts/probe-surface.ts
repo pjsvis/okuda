@@ -37,7 +37,7 @@
 //    bun scripts/probe-surface.ts host             # over ssh, read-only
 //    bun scripts/probe-surface.ts host --json
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { PAIR, surfaceText, surfaceVerdict, FLOOR, floor } from "./contrast";
@@ -60,6 +60,18 @@ export const CANDIDATES = [
 /** Rex for Mac keeps its pair in the app's preferences, not in a dotfile: two
  *  theme IDs, and the themes themselves in the bundle or in `customThemes`. */
 export const REX_PREFS = "Library/Preferences/com.superlogical.rex.plist";
+
+/** Herdr's themes are a directory of JSON files, and its selection is a key in
+ *  `settings.json` — the one host on this desk whose pair is a file readable
+ *  without asking the app anything. */
+export const HERDR_THEMES = ".config/herdr-app/themes";
+export const HERDR_SETTINGS = ".config/herdr-app/settings.json";
+/** The selection, and it is neither `settings.json` nor the picker: each shown
+ *  layout carries its own look — `{"theme": {"light": ..., "dark": ...}}` — and
+ *  the name resolves to `themes/<name>.json`. Found 2026-11-13 after a picker
+ *  search came up empty; the earlier hint (settings.json) was a claim, not a
+ *  reading. */
+export const HERDR_LAYOUT_STATE = ".config/herdr-app/layouts/.state";
 
 /** The app bundles that ship a theme catalogue, in the order to try them. Rex is
  *  in beta, so the bundle is named for the channel; both are read for the same
@@ -319,6 +331,131 @@ export function rexClues(prefsXml: string, catalogJson: string | null): Clue[] {
 /** The prefs, as XML, by asking `plutil` to convert them. Not read directly: the
  *  file is binary and carries NSData, which no JSON conversion will take. Absent
  *  on any machine without Rex, which is absent, not an error. */
+/** Herdr's themes, as the same reading. Two facts per theme that the pair alone
+ *  does not carry: whether it is *selected* (a key in `settings.json`, absent
+ *  when the picker was used), and whether it carries the 16 ANSI slots. A pin
+ *  carries three keys and sixteen slots — the slots are what Rex's own entry
+ *  lacked when its selection was dropped, so the count is printed, not inferred.
+ *  Pure: the settings text and the theme files in, clues out. */
+export function herdrLayoutLook(
+  layout: string,
+  text: string,
+): { layout: string; light: string | null; dark: string | null } {
+  try {
+    const j = JSON.parse(text) as { theme?: { light?: string; dark?: string } };
+    return { layout, light: j.theme?.light ?? null, dark: j.theme?.dark ?? null };
+  } catch {
+    return { layout, light: null, dark: null };
+  }
+}
+
+export function herdrClues(
+  settings: string | null,
+  themes: { path: string; text: string }[],
+  looks: { layout: string; light: string | null; dark: string | null }[] = [],
+): Clue[] {
+  let selected: string | null = null;
+  if (settings) {
+    try {
+      const j = JSON.parse(settings) as { theme?: string };
+      selected = typeof j.theme === "string" ? j.theme : null;
+    } catch {
+      /* a malformed settings file is a reading, not a crash */
+    }
+  }
+  const out: Clue[] = [];
+  for (const t of themes) {
+    const c = clue(t.path, t.text);
+    let ansi = 0;
+    try {
+      const j = JSON.parse(t.text) as { ansi?: unknown[] };
+      ansi = Array.isArray(j.ansi) ? j.ansi.length : 0;
+    } catch {
+      /* counted as zero */
+    }
+    const notes: string[] = [];
+    const named = t.path.split("/").pop()!.replace(/\.json$/, "");
+    const selectedBy = looks.flatMap((l) =>
+      [
+        l.dark === named ? `${l.layout} (dark)` : null,
+        l.light === named ? `${l.layout} (light)` : null,
+      ].filter((x): x is string => x !== null),
+    );
+    // Three sources, in the order they win: the layout's look, then
+    // `settings.json`, then nothing. Reported in that order so a reader cannot
+    // mistake the weakest for the strongest.
+    if (selectedBy.length > 0) notes.push(`in force: layout look ${selectedBy.join(", ")}`);
+    if (selected === named) notes.push("settings.json names it (a layout look still wins)");
+    if (selectedBy.length === 0 && selected !== named) {
+      notes.push(
+        selected === null && looks.length === 0
+          ? "no `theme` key in settings.json and no layout state to read — nothing names it"
+          : "nothing names it: not a layout look, not settings.json",
+      );
+    }
+    notes.push(
+      ansi === 16
+        ? "16 ANSI slots, so the palette is carried, not derived"
+        : `${ansi} ANSI slot(s) — a pin carries 16; the host may refuse to derive a palette from three keys`,
+    );
+    out.push({ ...c, note: notes.join("; ") });
+  }
+  return out;
+}
+
+/** Herdr's theme files, read locally or over ssh. A directory, not a file —
+ *  which is why it is not in `CANDIDATES`. */
+function readHerdrThemes(target: string | null): { path: string; text: string }[] {
+  const home = homedir();
+  const list = (): string[] => {
+    try {
+      if (target === null) {
+        const dir = join(home, HERDR_THEMES);
+        if (!existsSync(dir)) return [];
+        return readdirSync(dir).filter((f) => f.endsWith(".json"));
+      }
+      const raw = execFileSync("ssh", [target, `ls "$HOME/${HERDR_THEMES}" 2>/dev/null`], {
+        encoding: "utf8",
+      });
+      return raw.split("\n").filter((f) => f.endsWith(".json"));
+    } catch {
+      return [];
+    }
+  };
+  return list()
+    .map((name) => ({ path: `${HERDR_THEMES}/${name}`, text: readOne(target, `${HERDR_THEMES}/${name}`) }))
+    .filter((t): t is { path: string; text: string } => typeof t.text === "string" && t.text !== "");
+}
+
+/** Each shown layout's look, read from `layouts/.state/*.json`. */
+function readHerdrLooks(
+  target: string | null,
+): { layout: string; light: string | null; dark: string | null }[] {
+  const home = homedir();
+  const list = (): string[] => {
+    try {
+      if (target === null) {
+        const dir = join(home, HERDR_LAYOUT_STATE);
+        if (!existsSync(dir)) return [];
+        return readdirSync(dir).filter((f) => f.endsWith(".json"));
+      }
+      const raw = execFileSync("ssh", [target, `ls "$HOME/${HERDR_LAYOUT_STATE}" 2>/dev/null`], {
+        encoding: "utf8",
+      });
+      return raw.split("\n").filter((f) => f.endsWith(".json"));
+    } catch {
+      return [];
+    }
+  };
+  return list()
+    .map((f) => ({
+      name: f.replace(/\.json$/, ""),
+      text: readOne(target, `${HERDR_LAYOUT_STATE}/${f}`),
+    }))
+    .filter((l): l is { name: string; text: string } => typeof l.text === "string" && l.text !== "")
+    .map((l) => herdrLayoutLook(l.name, l.text));
+}
+
 function readRexPrefs(target: string | null): string | null {
   if (target !== null) return null; // a Mac app's prefs are local to the Mac
   const path = join(homedir(), REX_PREFS);
@@ -364,6 +501,10 @@ function main(argv: string[]): number {
       if (child !== null && child !== "") clues.push(clue(`${rel} → ${inc}`, child));
     }
   }
+
+  clues.push(
+    ...herdrClues(readOne(target, HERDR_SETTINGS), readHerdrThemes(target), readHerdrLooks(target)),
+  );
 
   const prefs = readRexPrefs(target);
   if (prefs !== null) clues.push(...rexClues(prefs, readRexCatalog()));

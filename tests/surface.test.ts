@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { configFile, FLOOR, floor, gateFails, gateRows, gateText, NOT_ON_GROUND, PAIR, PAIRS, REFERENCE_RUNG, referencePair, surfaceDir, surfaceDirText, surfaceFails, surfaceVerdict, themePair } from "../scripts/contrast";
-import { pinSurface } from "../scripts/herdr-theme";
-import { hexOf, plistValue, rexClues } from "../scripts/probe-surface";
+import { pinSurface, resolveTarget, selectInLayout, selectionHint } from "../scripts/herdr-theme";
+import { herdrClues, herdrLayoutLook, hexOf, plistValue, rexClues } from "../scripts/probe-surface";
 
 /** BRF-SURFACE-PAIR: two readings, one answer. The control runs first — the
  *  reference pair must clear both — because a detector whose control fails is
@@ -375,5 +375,110 @@ describe("Rex for Mac — the pair is in the preferences, twice", () => {
     expect(hexOf({ red: 0.9804, green: 0.2, blue: 0.2235, srgbFallback: { red: 1, green: 1, blue: 1 } })).toBe("#ffffff");
     expect(hexOf("not a colour")).toBeNull();
     expect(hexOf(undefined)).toBeNull();
+  });
+});
+
+describe("probe-surface — Herdr's pair is a file, so the probe dereferences it", () => {
+  const theme = (bg: string, fg: string, slots = 16) =>
+    JSON.stringify({ background: bg, foreground: fg, cursor: fg, ansi: Array(slots).fill("#000000") });
+
+  test("a theme with 16 slots is read as carried, not derived", () => {
+    const [c] = herdrClues(null, [{ path: ".config/herdr-app/themes/gloam.json", text: theme("#221f1c", "#d6cfc4") }]);
+    expect(c!.pair).toEqual({ bg: "#221f1c", fg: "#d6cfc4" });
+    expect(c!.note).toContain("16 ANSI slots");
+    expect(c!.note).toContain("no `theme` key in settings.json");
+  });
+
+  test("a three-key pin says so: the slot count is the Rex failure made visible", () => {
+    const [c] = herdrClues(null, [{ path: ".config/herdr-app/themes/probe.json", text: theme("#f000c8", "#7cfc00", 0) }]);
+    expect(c!.note).toContain("0 ANSI slot(s)");
+    expect(c!.note).toContain("may refuse to derive a palette");
+  });
+
+  test("the note says which source names a theme, strongest first", () => {
+    const settings = JSON.stringify({ theme: "gloam", appearance: "dark" });
+    const clues = herdrClues(
+      settings,
+      [
+        { path: ".config/herdr-app/themes/gloam.json", text: theme("#221f1c", "#d6cfc4") },
+        { path: ".config/herdr-app/themes/win98.json", text: theme("#ffffff", "#c0c0c0") },
+      ],
+      // a layout look wins over settings.json, so it is named first and by name
+      [herdrLayoutLook("main", JSON.stringify({ theme: { light: "paper", dark: "gloam" } }))],
+    );
+    const gloam = clues.find((c) => c.path.endsWith("gloam.json"))!;
+    const win98 = clues.find((c) => c.path.endsWith("win98.json"))!;
+    expect(gloam.note).toContain("in force: layout look main (dark)");
+    expect(gloam.note).toContain("settings.json names it (a layout look still wins)");
+    expect(win98.note).toContain("nothing names it");
+  });
+
+  test("a malformed settings file is a reading, not a crash", () => {
+    const [c] = herdrClues("{ not json", [{ path: ".config/herdr-app/themes/gloam.json", text: theme("#221f1c", "#d6cfc4") }]);
+    expect(c!.pair).toEqual({ bg: "#221f1c", fg: "#d6cfc4" });
+    expect(c!.note).toContain("no `theme` key");
+  });
+});
+
+describe("herdr-theme — every flag reaches the script", () => {
+  // Found 2026-11-13: `argAfter` was defined as (argv, flag) and called as
+  // `argAfter("--rung")`, so every flag was silently ignored — the tool always
+  // pinned the reference rung. `--install` still worked, because it is a boolean
+  // read from `argv.includes`. A flag that is accepted and ignored is a knob
+  // that lies, so the test runs the script rather than the parser.
+  const run = (args: string[]) =>
+    JSON.parse(
+      Bun.spawnSync(["bun", "scripts/herdr-theme.ts", ...args], {
+        stdout: "pipe",
+        stderr: "pipe",
+      }).stdout.toString(),
+    ) as { background: string; foreground: string };
+
+  test("--rung 4 pins rung 4's pair, not the reference pair", () => {
+    const t = run(["--rung", "4"]);
+    expect(t.background).toBe(PAIRS[4]!.bg);
+    expect(t.foreground).toBe(PAIRS[4]!.fg);
+  });
+
+  test("--bg/--fg override the rung, hex and hash intact through the shell", () => {
+    const t = run(["--bg", "#F000C8", "--fg", "#7CFC00"]);
+    expect(t.background).toBe("#F000C8");
+    expect(t.foreground).toBe("#7CFC00");
+  });
+});
+
+describe("herdr-theme — --install names its target, and never guesses one", () => {
+  test("a name resolves inside themes/, a path is taken as given", () => {
+    expect(resolveTarget("probe-loud", "/themes")).toBe(join("/themes", "probe-loud.json"));
+    expect(resolveTarget("/tmp/x.json", "/themes")).toBe("/tmp/x.json");
+  });
+
+  test("a bare --install refuses instead of overwriting the standing theme", () => {
+    const r = Bun.spawnSync(["bun", "scripts/herdr-theme.ts", "--install"], {
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    expect(r.exitCode).toBe(2);
+    expect(r.stderr.toString()).toContain("--install needs a target");
+  });
+});
+
+describe("herdr-theme — the selection is the layout's look, not settings.json", () => {
+  const state = JSON.stringify({ theme: { light: "paper", dark: "gloam" }, nodes: { sidebar: 1 } });
+
+  test("--select both sets both slots and carries every other key through", () => {
+    const out = JSON.parse(selectInLayout(state, "probe-loud", "both"));
+    expect(out.theme).toEqual({ light: "probe-loud", dark: "probe-loud" });
+    expect(out.nodes).toEqual({ sidebar: 1 });
+  });
+
+  test("--select dark leaves the light look alone", () => {
+    const out = JSON.parse(selectInLayout(state, "probe-loud", "dark"));
+    expect(out.theme).toEqual({ light: "paper", dark: "probe-loud" });
+  });
+
+  test("the hint names the layout, because settings.json is overridden by it", () => {
+    expect(selectionHint("gloam")).toContain("--select gloam --layout main");
+    expect(selectionHint("gloam")).toContain("beats settings.json");
   });
 });

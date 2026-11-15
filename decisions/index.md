@@ -9,6 +9,8 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-13 | ADR-PAIR-HAS-A-HOME-092 | Accepted | The pair lives with the glass — a generated pin, not a process parameter | 092-the-pair-has-a-home.md |
+| 2026-11-13 | ADR-HERDR-REFERENCE-093 | Accepted | Herdr is the reference host for the pair; Rex is demoted with a receipt | 093-herdr-is-the-reference-host.md |
 | 2026-11-12 | ADR-COMPOSE-DONT-BUILD-091 | Accepted | Compose, don't build — the editor stays a real editor | 091-compose-dont-build.md |
 | 2026-11-08 | ADR-GATE-RUNS-FILE-088 | Accepted | A gate runs the file it checked | 088-a-gate-runs-the-file-it-checked.md |
 | 2026-11-08 | ADR-GATE-NO-RACE-089 | Accepted | A gate does not race its own plumbing | 089-a-gate-does-not-race-its-own-pipe.md |

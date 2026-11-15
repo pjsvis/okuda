@@ -510,7 +510,8 @@ fonts *args:
 # Surface probe
 [group('build')]
 surface-probe *args:
-    @bun scripts/probe-surface.ts {{args}}
+    #!/usr/bin/env bash
+    exec bun scripts/probe-surface.ts "$@"
 
 # Surface pair
 [group('build')]
@@ -521,7 +522,20 @@ surface *args:
 # The FGP card
 [group('build')]
 fgp *args:
-    @bun scripts/fgp-card.ts {{args}}
+    #!/usr/bin/env bash
+    exec bun scripts/fgp-card.ts "$@"
+
+# Host pin
+[group('build')]
+pin *args:
+    #!/usr/bin/env bash
+    exec bun scripts/rex-theme.ts "$@"
+
+# Install the pin
+[group('build')]
+pin-install *args:
+    #!/usr/bin/env bash
+    exec bun scripts/rex-theme.ts --install "$@"
 
 # Palette ranking
 [group('build')]
@@ -538,7 +552,8 @@ headroom *args:
 # Host theme
 [group('build')]
 herdr-theme *args:
-    @bun scripts/herdr-theme.ts {{args}}
+    #!/usr/bin/env bash
+    exec bun scripts/herdr-theme.ts "$@"
 
 # Colour audit
 [group('build')]
