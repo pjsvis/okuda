@@ -501,6 +501,16 @@ themes *args:
     # the caller's words whole.
     exec bun scripts/contrast.ts --theme-dir "$@"
 
+# Corpus census
+[group('build')]
+corpus *args:
+    #!/usr/bin/env bash
+    # A host's shipped collection, on our axes. No argument is the machine's own
+    # Ghostty, which is the corpus most readers of this silo actually have; any
+    # other directory is the caller's to name.
+    dir="${1:-/Applications/Ghostty.app/Contents/Resources/ghostty/themes}"
+    exec bun scripts/contrast.ts --corpus "$dir"
+
 # Font coverage
 [group('build')]
 fonts *args:

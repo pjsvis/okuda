@@ -93,12 +93,42 @@ export const ratio = (a: string, b: string): number => {
 };
 
 /** OKLCH lightness (the L of `oklch(L C H)`), via sRGB → linear → LMS → Lab. */
-export const oklchL = (hex: string): number => {
+export interface Oklch {
+  /** Perceptual lightness, 0–1. */
+  L: number;
+  /** Chroma. Below about 0.002 the colour is achromatic, and its hue is noise. */
+  C: number;
+  /** Hue angle in degrees, 0–360. Meaningless when `C` is noise. */
+  h: number;
+}
+
+/** The whole triple, via sRGB → linear → LMS → Lab → LCh. `L` alone is the
+ *  comfort axis; `h` is the character (warm grounds ~67°, cool ~264°) and `C`
+ *  is why the warm grounds read soft — they carry a third of the chroma. */
+export const oklch = (hex: string): Oklch => {
   const [r, g, b] = hex2rgb(hex).map(lin) as [number, number, number];
   const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
   const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
   const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
-  return 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s;
+  const L = 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s;
+  const A = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
+  const B = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+  const h = (Math.atan2(B, A) * 180) / Math.PI;
+  return { L, C: Math.hypot(A, B), h: h < 0 ? h + 360 : h };
+};
+
+/** OKLCH lightness (the L of `oklch(L C H)`), the axis every caller wanted. */
+export const oklchL = (hex: string): number => oklch(hex).L;
+
+/** **The triple, as the page states it** — one atomic field, so it wraps at a
+ *  space and never inside a number. An achromatic colour prints no hue: white's
+ *  `C` is 0.000 and its angle is arithmetic noise, and a number with no referent
+ *  on a page that shows numbers is a defect (the engine reads it as meaning).
+ *  Measured: `#ffffff` → `1.000 0.000   —`, `#d6cfc4` → `0.857 0.017  79°`. */
+export const oklchText = (hex: string): string => {
+  const { L, C, h } = oklch(hex);
+  const angle = C < 0.002 ? "  —" : `${String(Math.round(h)).padStart(3)}°`;
+  return `${L.toFixed(3)} ${C.toFixed(3)} ${angle}`;
 };
 
 /** The okuda preset's own roles, read from the shipped palette file so the
@@ -110,7 +140,20 @@ export const okudaPalette = (): Palette =>
 
 /** The roles whose survival a ground must not cost: structure, then the two
  *  loudest declarative roles. */
-export const WATCHED = ["muted", "diagram-border", "heading", "state-todo"] as const;
+/** **The roles the specimen paints, in the order the eye meets them.**
+ *  `muted` is the structure (rules, pipes); `diagram-border` and `heading` are
+ *  the middle voices; `state-todo` is the amber the first reader watched as an
+ *  early warning; `strong` and `blockquote` are the **gold** — added 2026-11-15,
+ *  when the specimen grew bold leads and a quote, because a role painted on the
+ *  page and not measured is the same defect as a number with no referent. */
+export const WATCHED = [
+  "muted",
+  "diagram-border",
+  "heading",
+  "state-todo",
+  "strong",
+  "blockquote",
+] as const;
 
 export interface Row {
   n: number;
@@ -120,6 +163,23 @@ export interface Row {
   ratio: number;
   lBg: number;
   lFg: number;
+  /** The ink's perceptual lift over the ground (fg L − bg L). The ratio
+   *  conflates this with the pair's absolute light: 11:1 on a dim page and 11:1
+   *  on a bright one are one number and two experiences. `lift` is the
+   *  separation on its own, and it is the axis the eye resolves. */
+  lift: number;
+  /** WCAG relative luminance — **physical** light, not perceptual lightness.
+   *  The page is mostly ground, so `yBg` is the light it emits; glare is a
+   *  property of this number and not of `L`. Rung 8 emits 56% of the control's
+   *  light while reading at 10.6:1 rather than 14.0:1, and rung 7 emits 167%. */
+  yBg: number;
+  /** The ink's emitted light — the halation axis. Held at 0.629 across the warm
+   *  walk; 1.000 at the control, which is why pure white reads harsh. */
+  yFg: number;
+  /** The gold's share of the prose: `strong` ÷ ink. Below 1 the bold leads stay
+   *  subordinate to the paragraph, which is the same hierarchy rule as `share`
+   *  one role over. Rung 5 sits at 0.99 — the canary. */
+  goldShare: number;
   /** Each watched role's ratio against this ground. */
   watched: Record<string, number>;
   /** `muted` as a fraction of the ink's contrast: below 1 the hierarchy holds
@@ -143,8 +203,12 @@ export function rows(): Row[] {
       ratio: ink,
       lBg: oklchL(pair.bg),
       lFg: oklchL(pair.fg),
+      lift: oklchL(pair.fg) - oklchL(pair.bg),
+      yBg: luminance(pair.bg),
+      yFg: luminance(pair.fg),
       watched,
       ruleShare: (watched["muted"] ?? 0) / ink,
+      goldShare: (watched["strong"] ?? 0) / ink,
       refused: pair.refused,
     };
   });
@@ -160,6 +224,127 @@ export function rungLine(r: Row): string {
     `${r.ratio.toFixed(1)}:1 · L ${r.lFg.toFixed(3)} · ` +
     `rules ${(r.watched["muted"] ?? 0).toFixed(2)} · share ${r.ruleShare.toFixed(2)}`
   );
+}
+
+// ── The band ────────────────────────────────────────────────────────────
+//
+//  Four numbers on three axes, and the reader's verdicts on the record
+//  (`docs/2026-10-28-the-ground-you-read-on.md:95`) reduce to one of them.
+//  The band is **not a box** and not a score: it is a ceiling on one axis, a
+//  floor on another, and a smaller interval where both are satisfied without
+//  excess. Naming all three is what lets a reader place a new pair without
+//  re-reading the verdicts.
+
+/** **The ceiling.** Above this the ground is a lit rectangle competing with the
+ *  room, not an absence of light: the control sits at 0.293 and read too bright,
+ *  rung 7 at 0.347 read as *emitted light* — both above, both rejected, and both
+ *  rejected on the ground alone. */
+export const CEILING_L = 0.29;
+
+/** **The floor.** Below about 7:1 prose stops being read as prose. It was never
+ *  the discriminator in this set — every rejected rung clears it — which is the
+ *  finding: the ground chose, and the ratio only vetoes. */
+export const FLOOR_PROSE = 7;
+
+/** **The comfortable band** — the interval the two winners share, and the one
+ *  the ground page states in prose. Narrow on purpose: 6 (0.258) and 8 (0.242)
+ *  sit inside it, 4 (0.272) and 5 (0.235) are kept but outside, and 9 (0.219)
+ *  is the last step before the stop rule trips at 0.20 / 12:1. */
+export const BAND = {
+  groundL: [0.24, 0.26],
+  prose: [10, 11],
+} as const;
+
+export type Standing = "comfort" | "region" | "outside";
+
+/** Where a pair stands. **Region** is the set a principal may actually sit at
+ *  (the ground under the ceiling, the prose over the floor); **comfort** is the
+ *  smaller interval inside it that the measured walk settled on. A pair can be
+ *  kept and not comfortable — rung 5 is — so the two tiers are named apart
+ *  rather than collapsed into one verdict. Pure. */
+export function standing(r: Row): Standing {
+  const inBand =
+    r.lBg >= BAND.groundL[0] && r.lBg <= BAND.groundL[1] &&
+    r.ratio >= BAND.prose[0] && r.ratio <= BAND.prose[1];
+  if (inBand) return "comfort";
+  if (r.lBg <= CEILING_L && r.ratio >= FLOOR_PROSE) return "region";
+  return "outside";
+}
+
+/** The standing, as a four-character mark — the right-hand column of the panel,
+ *  where nine cells are compared by eye in one glance. */
+export const STANDING_MARK: Readonly<Record<Standing, string>> = {
+  comfort: "✓ band",
+  region: "○ region",
+  outside: "✗ outside",
+};
+
+/** Walk the ladder and count: how many rungs sit in each tier. Derived, so the
+ *  page that prints it cannot disagree with the axes it was derived from. */
+export function tiers(rs: Row[] = rows()): Record<Standing, number[]> {
+  const out: Record<Standing, number[]> = { comfort: [], region: [], outside: [] };
+  for (const r of rs) if (!r.refused) out[standing(r)].push(r.n);
+  return out;
+}
+
+/** **The pair, measured, as the panel labels it** — two atomic lines: the ground's
+ *  OKLCH and the ratios that read it, then the ink's OKLCH and the lift between
+ *  them. Two renderings, one source: the PNG's label strips and the panel page's
+ *  rung list are both this function, which is why the picture and the page cannot
+ *  quote different numbers. */
+/** **One rung, as the panel page states it.** A list item rather than a table row
+ *  for the same reason the ground page is a list: ten columns wrap mid-value, and
+ *  a number split across two lines is a lie about a measurement. Every field here
+ *  is a space-separated atom, so the line breaks between fields or not at all.
+ *
+ *  The measurement is `measureLines` **verbatim** — the same strings the PNG's
+ *  label strips carry — so the picture and the page cannot quote different
+ *  numbers, and there is no third renderer to keep honest. */
+export function panelLine(r: Row): string {
+  return [
+    `- **${r.n} · ${r.name}** — ${STANDING_MARK[standing(r)]}`,
+    ...measureLines(r).map((line) => `  - ${line}`),
+  ].join("\n");
+}
+
+/** The ladder's panel lines, in ladder order, refused rung excluded — it is not
+ *  in the panel, and a legibility reading of a glare refusal answers a question
+ *  nobody asked. */
+export function panelLines(rs: Row[] = rows()): string[] {
+  return rs.filter((r) => !r.refused).map(panelLine);
+}
+
+/** The three tiers as the page states them: the interval, and the rungs that sit
+ *  in it. Derived from `tiers()`, so a rung cannot be listed under a tier it does
+ *  not measure into. */
+export function tierLines(rs: Row[] = rows()): string[] {
+  const t = tiers(rs);
+  return [
+    `- **✓ band** — ground L ${BAND.groundL[0]}–${BAND.groundL[1]} **and** prose ` +
+      `${BAND.prose[0]}–${BAND.prose[1]}:1 · rungs **${t.comfort.join(", ") || "none"}**`,
+    `- **○ region** — ground L ≤ ${CEILING_L} **and** prose ≥ ${FLOOR_PROSE}:1, kept but not ` +
+      `comfortable · rungs **${t.region.join(", ") || "none"}**`,
+    `- **✗ outside** — a ground above the ceiling or prose under the floor · rungs ` +
+      `**${t.outside.join(", ") || "none"}**`,
+  ];
+}
+
+/** **The measurement, in three lines: the ground, the ink, the hierarchy.** Two
+ *  numbers sit on each axis now, because each pair says something the other
+ *  cannot: `oklch L` is perception and `Y` is light — the ratio is built from
+ *  `Y`, and glare is a property of `Y` alone. A reader who knows only `L` will
+ *  believe a deep ground is darkening gently; in light it is halving.
+ *
+ *  The third line is the hierarchy: how far each decorative role sits *below* the
+ *  prose. Above 1 and the decoration out-shouts the paragraph it annotates. */
+export function measureLines(r: Row): [string, string, string] {
+  return [
+    `bg ${r.bg} oklch ${oklchText(r.bg)} · Y ${r.yBg.toFixed(3)} · prose ${r.ratio.toFixed(1)}:1`,
+    `fg ${r.fg} oklch ${oklchText(r.fg)} · Y ${r.yFg.toFixed(3)} · lift ${r.lift.toFixed(3)}`,
+    `rules ${(r.watched["muted"] ?? 0).toFixed(2)} · share ${r.ruleShare.toFixed(2)} · ` +
+      `gold ${(r.watched["strong"] ?? 0).toFixed(2)} · gold share ${r.goldShare.toFixed(2)} · ` +
+      `amber ${(r.watched["state-todo"] ?? 0).toFixed(1)}`,
+  ];
 }
 
 /** The paste block: a whole Ghostty fragment, every line commented, so pasting
@@ -666,45 +851,151 @@ export function headroomText(
   return out.join("\n");
 }
 
-/** A host theme file, read for the pair it supplies. Herdr's `themes/<name>.json`
- *  carries `background` and `foreground`, which is exactly the surface and the
- *  ink okuda inherits and cannot see. Returns null when the file does not carry
- *  a usable pair — a theme for the app's chrome alone has nothing to report. */
-export function themePair(path: string): { bg: string; fg: string } | null {
+// ── The readers: one per spelling a host uses ────────────────────────
+//
+//  A theme file is a host's answer to "what colour is the page", and the hosts
+//  we can see disagree about the grammar. Three spellings exist in the wild, so
+//  there are three readers here — and a fourth host gets a fourth branch, never
+//  a fourth instrument. Measured 2026-11-15: 819 Ghostty theme files in
+//  `/Applications/Ghostty.app/Contents/Resources/ghostty/themes`, 6 variants in
+//  every Zed theme file, and Herdr's flat JSON.
+
+export interface ThemeVariant {
+  /** The variant's own name where the file gives one, else the file's. */
+  name: string;
+  bg: string;
+  fg: string;
+  /** Only Zed states this; the other spellings leave it undefined. */
+  appearance?: "dark" | "light";
+}
+
+/** A hex, normalised to six digits. Zed writes eight (`#1d2021ff` — an alpha
+ *  byte), the terminals write six, and a pair is a pair: the alpha is dropped
+ *  rather than carried, because every consumer here paints opaque. */
+const sixHex = (v: unknown): string | null => {
+  if (typeof v !== "string") return null;
+  const m = /^#([0-9a-f]{6})(?:[0-9a-f]{2})?$/i.exec(v.trim());
+  return m ? `#${m[1]!.toLowerCase()}` : null;
+};
+
+/** JSONC → JSON. Zed's theme files carry `//` comments and trailing commas, so
+ *  `JSON.parse` refuses them — which is why the first attempt at reading Zed
+ *  returned nothing and looked like a missing file. Strings are respected: a
+ *  `//` inside a colour or a name is not a comment. */
+export function jsonc(text: string): string {
+  let out = "";
+  let inStr = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i]!;
+    if (inStr) {
+      out += c;
+      if (c === "\\") {
+        out += text[++i] ?? "";
+        continue;
+      }
+      if (c === '"') inStr = false;
+      continue;
+    }
+    if (c === '"') {
+      inStr = true;
+      out += c;
+      continue;
+    }
+    if (c === "/" && text[i + 1] === "/") {
+      while (i < text.length && text[i] !== "\n") i++;
+      out += "\n";
+      continue;
+    }
+    if (c === "/" && text[i + 1] === "*") {
+      i += 2;
+      while (i < text.length && !(text[i] === "*" && text[i + 1] === "/")) i++;
+      i++;
+      continue;
+    }
+    out += c;
+  }
+  return out.replace(/,\s*([}\]])/g, "$1");
+}
+
+/** **Zed's spelling.** One file, many themes: `themes[]`, each with a `style`
+ *  object whose keys are dotted (`editor.background`, `editor.foreground`). A
+ *  Zed theme that omits either is chrome-only for our purposes and skipped —
+ *  not defaulted, because a default here would invent a pair the host never
+ *  declared. */
+const zedVariants = (text: string): ThemeVariant[] => {
+  let raw: { themes?: unknown };
+  try {
+    raw = JSON.parse(jsonc(text)) as { themes?: unknown };
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(raw.themes)) return [];
+  const out: ThemeVariant[] = [];
+  for (const t of raw.themes as { name?: unknown; appearance?: unknown; style?: unknown }[]) {
+    const style = (t?.style ?? {}) as Record<string, unknown>;
+    const bg = sixHex(style["editor.background"]);
+    const fg = sixHex(style["editor.foreground"]);
+    if (!bg || !fg) continue;
+    out.push({
+      name: typeof t.name === "string" ? t.name : "untitled",
+      bg,
+      fg,
+      appearance: t.appearance === "light" ? "light" : "dark",
+    });
+  }
+  return out;
+};
+
+/** **Every pair a theme file spells.** Herdr writes flat JSON (`background`,
+ *  `foreground`), Ghostty and Gruvbox write their own config (`key = value`), and
+ *  Zed writes one file holding many themes. An unreadable file yields `[]` — a
+ *  file that is a theme for the app's chrome alone has nothing to report, and
+ *  saying so beats defaulting. Pure but for the read. */
+export function themeVariants(path: string): ThemeVariant[] {
   let text: string;
   try {
     text = readFileSync(path, "utf8");
   } catch {
-    return null;
+    return [];
   }
-  // Two syntaxes, because the two hosts we have met disagree about what a theme
-  // is: Herdr writes JSON, Ghostty writes its own config (a theme there is
-  // "simply another configuration file"). Both name the pair in the same two
-  // words, so one reader serves both — and a host that invents a third spelling
-  // gets its own branch here rather than a new instrument.
+  const named = path.split("/").pop() ?? path;
+
+  const zed = zedVariants(text);
+  if (zed.length) return zed;
+
   let bg: string | null = null;
   let fg: string | null = null;
-  const flat = text.trimStart().startsWith("{");
-  if (flat) {
+  if (text.trimStart().startsWith("{")) {
     try {
-      const raw = JSON.parse(text) as { background?: unknown; foreground?: unknown };
-      bg = typeof raw.background === "string" ? raw.background : null;
-      fg = typeof raw.foreground === "string" ? raw.foreground : null;
+      const raw = JSON.parse(jsonc(text)) as { background?: unknown; foreground?: unknown };
+      bg = sixHex(raw.background);
+      fg = sixHex(raw.foreground);
     } catch {
-      return null;
+      return [];
     }
   } else {
     // `key = value`, `#` comments, whitespace tolerated. The first assignment of
     // each wins: a config file may repeat a key, and the terminal is the authority
     // on which one it honours — we take the earliest rather than invent a rule.
     for (const line of text.split("\n")) {
-      const m = line.match(/^\s*(background|foreground)\s*=\s*(#[0-9a-fA-F]{6})\s*(?:#.*)?$/);
+      const m = line.match(/^\s*(background|foreground)\s*=\s*(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8})\s*(?:#.*)?$/);
       if (!m) continue;
-      if (m[1] === "background" && bg === null) bg = m[2]!;
-      if (m[1] === "foreground" && fg === null) fg = m[2]!;
+      if (m[1] === "background" && bg === null) bg = sixHex(m[2]);
+      if (m[1] === "foreground" && fg === null) fg = sixHex(m[2]);
     }
   }
-  return bg && fg && /^#[0-9a-f]{6}$/i.test(bg) && /^#[0-9a-f]{6}$/i.test(fg) ? { bg, fg } : null;
+  return bg && fg ? [{ name: named, bg, fg }] : [];
+}
+
+/** A host theme file, read for **the** pair it supplies. `themes/<name>.json`
+ *  carries `background` and `foreground`, which is exactly the surface and the
+ *  ink okuda inherits and cannot see. Returns null when the file does not carry
+ *  a usable pair. A multi-variant file answers with its first variant — Zed's
+ *  flagship — so a caller that needs the count asks `themeVariants`, and a
+ *  caller that needs one pair is not forced to know the difference. */
+export function themePair(path: string): { bg: string; fg: string } | null {
+  const first = themeVariants(path)[0];
+  return first ? { bg: first.bg, fg: first.fg } : null;
 }
 
 export interface ThemeRow extends SurfaceVerdict {
@@ -812,6 +1103,145 @@ export function surfaceDirText(res: { rows: ThemeRow[]; noPair: string[] }, refP
   return out.join("\n");
 }
 
+// ── The corpus: a host's whole collection, on our axes ───────────────
+//
+//  `--theme-dir` asks *does this theme survive our palette*; the census asks
+//  *what does the field look like*, which is a different question and the one a
+//  band has to be defended against. It exists because our band turned out to
+//  hold three of Ghostty's 635 dark themes: a band that is a percentile is not
+//  the same claim as a band that is a rule, and only a corpus can say which one
+//  you have.
+
+export interface CorpusRow {
+  /** The file, or `file › variant` when one file carries many themes. */
+  name: string;
+  bg: string;
+  fg: string;
+  dark: boolean;
+  lBg: number;
+  lFg: number;
+  yBg: number;
+  prose: number;
+  lift: number;
+  cBg: number;
+  hBg: number;
+  tier: Standing;
+}
+
+/** Every pair in every theme file in a directory. A Zed file contributes all of
+ *  its variants — collapsing six themes to one would answer a question nobody
+ *  asked and lose the five that disagree. */
+export function corpusRows(dir: string): CorpusRow[] {
+  const out: CorpusRow[] = [];
+  for (const name of readdirSync(dir).sort()) {
+    if (name.startsWith(".")) continue;
+    const variants = themeVariants(join(dir, name));
+    for (const v of variants) {
+      const lBg = oklchL(v.bg);
+      const lFg = oklchL(v.fg);
+      const prose = ratio(v.fg, v.bg);
+      const ground = oklch(v.bg);
+      out.push({
+        name: variants.length > 1 ? `${name} › ${v.name}` : name,
+        bg: v.bg,
+        fg: v.fg,
+        dark: lBg < 0.5,
+        lBg,
+        lFg,
+        yBg: luminance(v.bg),
+        prose,
+        lift: lFg - lBg,
+        cBg: ground.C,
+        hBg: ground.h,
+        tier: standing({ lBg, ratio: prose } as Row),
+      });
+    }
+  }
+  return out;
+}
+
+/** A quantile by nearest rank — the same convention a reader uses when they say
+ *  "the middle half": no interpolation, so every number printed is a number some
+ *  theme actually has. */
+export function quantile(xs: number[], p: number): number {
+  const s = [...xs].sort((a, b) => a - b);
+  if (s.length === 0) return Number.NaN;
+  return s[Math.min(s.length - 1, Math.max(0, Math.floor(p * (s.length - 1))))]!;
+}
+
+export interface CorpusStat {
+  n: number;
+  min: number;
+  p10: number;
+  p25: number;
+  med: number;
+  p75: number;
+  p90: number;
+  max: number;
+}
+
+export function corpusStat(xs: number[]): CorpusStat {
+  return {
+    n: xs.length,
+    min: quantile(xs, 0),
+    p10: quantile(xs, 0.1),
+    p25: quantile(xs, 0.25),
+    med: quantile(xs, 0.5),
+    p75: quantile(xs, 0.75),
+    p90: quantile(xs, 0.9),
+    max: quantile(xs, 1),
+  };
+}
+
+/** The census, as text: the five axes that matter, by quantile, for dark and
+ *  light grounds separately — because the band's language is a dark-ground
+ *  language and a corpus that mixes the polarities would average a lie. */
+export function corpusText(rows: CorpusRow[]): string {
+  const pad = (s: string, n: number): string => s.padEnd(n);
+  const out: string[] = [];
+  const dark = rows.filter((r) => r.dark);
+  const light = rows.filter((r) => !r.dark);
+  out.push(`corpus — ${rows.length} pair(s): ${dark.length} dark ground(s), ${light.length} light`);
+
+  const statLine = (label: string, xs: number[], digits: number): string => {
+    const s = corpusStat(xs);
+    const f = (v: number): string => v.toFixed(digits).padStart(7);
+    return pad(label, 12) + ["min", "p10", "p25", "med", "p75", "p90", "max"]
+      .map((k) => `${f(s[k as keyof CorpusStat] as number)}`)
+      .join(" ");
+  };
+
+  for (const [label, set] of [["DARK", dark], ["LIGHT", light]] as const) {
+    if (set.length === 0) continue;
+    const tiers = { comfort: 0, region: 0, outside: 0 } as Record<Standing, number>;
+    for (const r of set) tiers[r.tier]++;
+    out.push("");
+    out.push(`── ${label} (n=${set.length}) · ours: ✓ band ${tiers.comfort} · ○ region ${tiers.region} · ✗ outside ${tiers.outside}`);
+    out.push(pad("", 12) + ["min", "p10", "p25", "med", "p75", "p90", "max"].map((k) => k.padStart(7)).join(" "));
+    out.push(statLine("ground L", set.map((r) => r.lBg), 3));
+    out.push(statLine("ink L", set.map((r) => r.lFg), 3));
+    out.push(statLine("prose", set.map((r) => r.prose), 1));
+    out.push(statLine("lift", set.map((r) => r.lift), 3));
+    out.push(statLine("Y ground", set.map((r) => r.yBg), 3));
+    out.push(statLine("C ground", set.map((r) => r.cBg), 3));
+    const chromatic = set.filter((r) => r.cBg >= 0.002);
+    const warm = chromatic.filter((r) => r.hBg < 180).length;
+    out.push(
+      pad("ground hue", 12) +
+        `warm ${warm} · cool ${chromatic.length - warm} · neutral ${set.length - chromatic.length}`,
+    );
+    // The band is a **dark-ground** instrument: its ceiling is a claim about
+    // light, and a light ground is nothing but light. Reported, not adjudicated.
+    if (label === "LIGHT") {
+      out.push(pad("", 12) + "the tiers are a dark-ground reading — a light ground is all above the ceiling, so this row is not a verdict.");
+    }
+  }
+  out.push("");
+  out.push("quantiles are nearest-rank — every figure printed is a theme that exists.");
+  out.push("tiers are `standing()`: ✓ band (ground L 0.24–0.26 at 10–11:1) ⊂ ○ region ⊂ ✗ outside.");
+  return out.join("\n");
+}
+
 function main(): void {
   const argv = process.argv.slice(2);
   const json = argv.includes("--json");
@@ -823,6 +1253,14 @@ function main(): void {
     const i = argv.indexOf(flag);
     return i >= 0 ? argv[i + 1] : undefined;
   };
+  const corpusDirArg = argAfter("--corpus");
+  if (corpusDirArg !== undefined) {
+    const rows = corpusRows(corpusDirArg);
+    if (json) console.log(JSON.stringify(rows, null, 2));
+    else console.log(corpusText(rows));
+    if (rows.length === 0) process.exitCode = 1;
+    return;
+  }
   const themeDir = argAfter("--theme-dir");
   if (themeDir !== undefined) {
     const refForDir = referencePair(

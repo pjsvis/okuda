@@ -10,6 +10,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
 | 2026-11-15 | DBF-RUNG-PANEL | done | The rung panel shipped in one session — and its two silent-failure bugs (unchecked exits, destructive argv default) were caught by its own recipes, not its brief | 2026-11-15-debrief-rung-panel.md |
+| 2026-11-15 | DBF-CORPUS-PRIOR | done | Debrief: the readers and the corpus — the band turned out to be a percentile | 2026-11-15-debrief-the-readers-and-the-corpus.md |
 | 2026-11-09 | DBF-MACHINE-FORK | done | Debrief: The machine forked itself, and every gate stayed green | 2026-11-09-debrief-the-machine-forked-itself.md |
 | 2026-11-08 | DBF-GATE-SUBJECT | done | Debrief: A verdict is a fact about its subject — two gates that were not | 2026-11-08-debrief-a-verdict-about-its-subject.md |
 | 2026-11-05 | DBF-FIRST-CONTACT | done | Debrief: First contact — the log got shorter, the board got honest, the protocol got general | 2026-11-05-debrief-first-contact.md |
