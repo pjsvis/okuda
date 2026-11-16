@@ -42,7 +42,7 @@ the two words in this heading.
 | **01** | frame | frame mode — j/k and space/b step one glass page |
 | **02** | slide | sliding mode — the continuous surface, the default |
 | **03** | freeze | the document stays still; r re-renders on demand |
-| **88** | edit | this document, in the editor |
+| **88** | edit | this document, in the editor — at the line you're reading (code: the row; markdown: the heading you're under) |
 | **99** | clone | this document becomes main of a new instance, via the host |
 | **00** | exit | quit the control plane — the screen releases — the last press |
 
@@ -56,6 +56,14 @@ input on the number row (ADR-032). What `88` opens it in is a
 directly — it hands the file to a running app and returns, so no
 terminal is spun up for it; a terminal editor (vi and friends) rides
 the `ghostty-edit` integration, where a login shell can find it.
+
+Both editors open at the line you were reading, when the editor's grammar
+takes a line. A code file renders 1:1, so the viewport's top row is the
+line; a markdown file resolves the heading whose section holds the
+viewport, and forwards that heading's source line. The hint is derived
+from the glass at the keypress — never written on the page, never stored —
+so `ADR-LINE-IS-PROSE-078` holds: the address is the path, the line is
+prose. An editor without a line grammar opens at the top, as before.
 
 ### The reserved pockets
 

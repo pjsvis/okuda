@@ -154,7 +154,7 @@ const EXILED_EXTS = new Set(["jsonl"]);
  *  render is not an authored fence: it is scanned in code mode (a `regions`
  *  predicate) where this exclusion is skipped, and its marker is the distinct
  *  `okuda-codevec`, painted after colour and before elision. */
-function fenceRanges(source: string): Array<[number, number]> {
+export function fenceRanges(source: string): Array<[number, number]> {
   const ranges: Array<[number, number]> = [];
   let pos = 0;
   let open: number | null = null;
@@ -172,7 +172,7 @@ function fenceRanges(source: string): Array<[number, number]> {
   return ranges;
 }
 
-const inFence = (pos: number, ranges: Array<[number, number]>): boolean =>
+export const inFence = (pos: number, ranges: Array<[number, number]>): boolean =>
   ranges.some(([a, b]) => pos >= a && pos < b);
 
 /** Reference occurrences: every reference-shaped span in the document,

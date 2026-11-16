@@ -18,11 +18,12 @@
 import { detectColorMode, makeStyler, type Styler } from "./ansi";
 import { annotateSource, appendReferences, deriveReferences, CLONE_TOKEN } from "./vectors";
 
-import { cloneArgs, editArgs, resolveEditor } from "./clone";
+import { cloneArgs, editArgs, resolveEditor, type EditHint } from "./clone";
+import { headingSourceLine } from "./heading";
 import { frameBounds, headingLines, pageStep, paragraphStarts, snapFrame } from "./frames";
 import { readOnlyActive, splitKeyEvents, verbFor, type Verb } from "./keygrammar";
 import { loadPalette, type Palette } from "./palette";
-import { MIN_RENDER_WIDTH, RE_CITED_PATH, renderDocument, wrapWholeFile, regionsForFile } from "./render";
+import { isWholeFileFence, MIN_RENDER_WIDTH, RE_CITED_PATH, renderDocument, wrapWholeFile, regionsForFile } from "./render";
 import { isWithinRoot } from "./root";
 import { basename, dirname, isAbsolute, join, resolve } from "node:path";
 import { appendFileSync, existsSync } from "node:fs";
@@ -936,8 +937,15 @@ export async function runTui(opts: TuiOptions): Promise<void> {
    *  terminal editor rides the clone grammar's terminal integration,
    *  where the login shell can find it (the spawn-boundary lesson,
    *  clone.ts). The file is the contract: nothing mutates here, the
-   *  editor owns the write. */
-  const edit = (): void => {
+   *  editor owns the write.
+   *
+   *  The hint is derived at the keypress, not stored: a code file maps
+   *  1:1 to its source (viewport top − 1, `BRF-CODE-EDITOR-HINT`); a markdown
+   *  file resolves the viewport's frame heading by ordinal
+   *  (`BRF-HEADING-EDITOR-HINT`). Both are glass state forwarded to the
+   *  editor — never an authored coordinate, never a map. The flash names
+   *  neither, so the line stays a comfort and never a promise. */
+  const edit = async (): Promise<void> => {
     if (readOnlyActive()) {
       flash("read-only: edit disabled");
       return;
@@ -945,7 +953,26 @@ export async function runTui(opts: TuiOptions): Promise<void> {
     const doc = currentFile;
     const editor = resolveEditor();
     const integration = process.env.OKUDA_CLONE ?? "ghostty-edit";
-    const spec = editArgs(doc, integration, editor);
+    // Derive before the spawn; a failed read degrades to no hint, never to
+    // a guessed line. The source is re-read at the keypress so the hint
+    // matches the file the editor will open, not a stale earlier fetch.
+    let hint: EditHint | null = null;
+    const height = contentHeight(opts.rows);
+    if (isWholeFileFence(doc)) {
+      // Measured 2026-11-16: source line 1 renders at 0-based index 2
+      // (header + blank). The viewport's top line is therefore source
+      // `scroll - 1`; clamp to line 1 at the top of the document — the
+      // sibling brief's rule, so the first frame still gets a hint.
+      const line = Math.max(1, scroll - 1);
+      hint = { line };
+    } else {
+      const fetch = await readSource(doc);
+      if (fetch.ok) {
+        const line = headingSourceLine(fetch.text, lines, scroll, height);
+        if (line !== null) hint = { line };
+      }
+    }
+    const spec = editArgs(doc, integration, editor, process.platform, process.cwd(), undefined, hint);
     if ("error" in spec) {
       flash(`edit: ${spec.error}`);
       return;
@@ -1259,7 +1286,7 @@ export async function runTui(opts: TuiOptions): Promise<void> {
       frozen = true;
       flash("frozen — the document stays still (r re-renders)");
     },
-    edit: () => edit(),
+    edit: () => { void edit(); },
     clone: () => clone(),
   };
 

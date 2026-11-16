@@ -221,6 +221,87 @@ describe("the editor — the declaration chain (88)", () => {
     }));
   });
 
+  test("a null hint is today's argv, byte for byte — every editor", () => {
+    const zed = editArgs(
+      "docs/x.md", "ghostty-edit",
+      { name: "zed", args: ["--wait"], path: "/usr/local/bin/zed", gui: true },
+      "darwin", "/silo", undefined, null,
+    );
+    expect(zed).toEqual({ cmd: "/usr/local/bin/zed", args: ["--wait", "/silo/docs/x.md"] });
+    withoutTerminalEnv(() => withEnv({ TERMINAL: "ghostty" }, () => {
+      const vi = editArgs(
+        "docs/x.md", "ghostty-edit",
+        { name: "vi", args: [], path: "/usr/bin/vi", gui: false },
+        "darwin", "/silo", "/bin/zsh", null,
+      ) as { cmd: string; args: string[] };
+      expect(vi.args[4]).toBe('vi "/silo/docs/x.md"');
+    }));
+  });
+
+  test("zed and subl take path:line", () => {
+    for (const name of ["zed", "subl"]) {
+      const spec = editArgs(
+        "src/tui.ts", "ghostty-edit",
+        { name, args: [], path: `/usr/local/bin/${name}`, gui: true },
+        "darwin", "/silo", undefined, { line: 47 },
+      );
+      expect(spec).toEqual({ cmd: `/usr/local/bin/${name}`, args: ["/silo/src/tui.ts:47"] });
+    }
+  });
+
+  test("code and cursor take -g path:line", () => {
+    for (const name of ["code", "cursor"]) {
+      const spec = editArgs(
+        "src/tui.ts", "ghostty-edit",
+        { name, args: [], path: `/usr/local/bin/${name}`, gui: true },
+        "darwin", "/silo", undefined, { line: 47 },
+      );
+      expect(spec).toEqual({ cmd: `/usr/local/bin/${name}`, args: ["-g", "/silo/src/tui.ts:47"] });
+    }
+  });
+
+  test("a declared editor's arguments ride BEFORE the hinted path", () => {
+    const spec = editArgs(
+      "docs/x.md", "ghostty-edit",
+      { name: "zed --wait", args: ["--wait"], path: "/usr/local/bin/zed", gui: true },
+      "darwin", "/silo", undefined, { line: 12 },
+    );
+    expect(spec).toEqual({ cmd: "/usr/local/bin/zed", args: ["--wait", "/silo/docs/x.md:12"] });
+  });
+
+  test("an unknown GUI declaration degrades to the plain path", () => {
+    const spec = editArgs(
+      "docs/x.md", "ghostty-edit",
+      { name: "mate", args: [], path: "/usr/bin/mate", gui: true },
+      "darwin", "/silo", undefined, { line: 12 },
+    );
+    expect(spec).toEqual({ cmd: "/usr/bin/mate", args: ["/silo/docs/x.md"] });
+  });
+
+  test("the vim family takes +line before the path, inside the login shell", () => {
+    withoutTerminalEnv(() => withEnv({ TERMINAL: "ghostty" }, () => {
+      for (const name of ["vi", "vim", "nvim"]) {
+        const spec = editArgs(
+          "src/tui.ts", "ghostty-edit",
+          { name, args: [], path: `/usr/bin/${name}`, gui: false },
+          "darwin", "/silo", "/bin/zsh", { line: 47 },
+        ) as { cmd: string; args: string[] };
+        expect(spec.args[4]).toBe(`${name} +47 "/silo/src/tui.ts"`);
+      }
+    }));
+  });
+
+  test("an unknown terminal editor keeps the plain command — hint discarded", () => {
+    withoutTerminalEnv(() => withEnv({ TERMINAL: "ghostty" }, () => {
+      const spec = editArgs(
+        "docs/x.md", "ghostty-edit",
+        { name: "micro", args: [], path: "/usr/bin/micro", gui: false },
+        "darwin", "/silo", "/bin/zsh", { line: 9 },
+      ) as { cmd: string; args: string[] };
+      expect(spec.args[4]).toBe('micro "/silo/docs/x.md"');
+    }));
+  });
+
   test("a declared editor that is NOT on PATH still goes through the shell", () => {
     // The terminal is the test's argument too: the ambient $TERMINAL wins
     // before the darwin bundle, and this box sets it (DBF-OMARCHY-TOOLCHAIN).

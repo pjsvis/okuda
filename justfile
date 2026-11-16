@@ -320,6 +320,11 @@ palette-audit:
 dogfood-pending:
     @expect scripts/dogfood-pending.exp
 
+# Editor hint dogfood
+[group('dogfood')]
+dogfood-hint:
+    @expect scripts/dogfood-heading-hint.exp
+
 # ── Silcrow look gate ──────────────────────────────
 
 [group('dogfood')]

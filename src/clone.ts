@@ -129,10 +129,43 @@ export function resolveEditor(
   return { name: "vi", args: [], path: which("vi"), gui: false };
 }
 
+/** A source line derived from the glass at the keypress — never an authored
+ *  coordinate and never stored (`ADR-LINE-IS-PROSE-078`, `ADR-091`'s amendment).
+ *  The editor owns the grammar: okuda forwards the number and forgets it. */
+export interface EditHint {
+  line: number;
+}
+
+/** The editor grammars that accept a line hint, and the shape each takes.
+ *  The GUI set is split: `path:line` for zed/subl, `-g path:line` for
+ *  code/cursor. The terminal set takes `+line` before the path. Anything
+ *  else — including `OKUDA_EDITOR` naming a command we do not recognise —
+ *  degrades to the plain path; the hint is discarded, never guessed at. */
+const HINT_COLON = new Set(["zed", "subl"]);
+const HINT_GOTO = new Set(["code", "cursor"]);
+const HINT_PLUS = new Set(["vi", "vim", "nvim", "view"]);
+
+const baseName = (name: string): string => basename(name.split(/\s+/)[0] ?? "");
+
+/** Append a line hint to an editor argv. `null` returns the path alone —
+ *  byte for byte today's argv, so an editor with no grammar, or a reader with
+ *  no hint, never sees a changed command. Pure. */
+function withHint(args: string[], path: string, editor: string, hint: EditHint | null): string[] {
+  if (!hint || hint.line < 1) return [...args, path];
+  const name = baseName(editor);
+  if (HINT_COLON.has(name)) return [...args, `${path}:${hint.line}`];
+  if (HINT_GOTO.has(name)) return [...args, "-g", `${path}:${hint.line}`];
+  return [...args, path]; // unknown editor — plain path, hint discarded
+}
+
 /** Resolve the edit verb (88) to a spawn spec: a GUI editor directly
  *  (its declared arguments ride along, so `VISUAL=zed --wait` is still
  *  `zed`), a terminal editor through the clone grammar's terminal
- *  integration, where the login shell can find it. Pure. */
+ *  integration, where the login shell can find it. Pure.
+
+ *  `hint` is the derived source line from `BRF-CODE-EDITOR-HINT` /
+ *  `BRF-HEADING-EDITOR-HINT`. It crosses no seam as data: only the argv
+ *  carries it, and `null` produces today's argv exactly. */
 export function editArgs(
   doc: string,
   integration: string,
@@ -140,11 +173,12 @@ export function editArgs(
   platform: string = process.platform,
   cwd: string = process.cwd(),
   shell?: string,
+  hint: EditHint | null = null,
 ): CloneSpec {
   if (editor.gui && editor.path) {
-    return { cmd: editor.path, args: [...editor.args, resolve(cwd, doc)] };
+    return { cmd: editor.path, args: withHint(editor.args, resolve(cwd, doc), editor.name, hint) };
   }
-  return cloneArgs(integration, doc, platform, cwd, editor.name, shell);
+  return cloneArgs(integration, doc, platform, cwd, editor.name, shell, hint);
 }
 
 /** The shell a terminal integration spawns through. The environment is read
@@ -229,10 +263,15 @@ export function cloneArgs(
   cwd: string = process.cwd(),
   editor?: string,
   shell?: string,
+  hint: EditHint | null = null,
 ): CloneSpec {
   const editCmd = (doc: string): string => {
     const ed = editor ?? process.env.OKUDA_EDITOR ?? process.env.EDITOR ?? "vi";
-    return `${ed} ${shellQuote(doc)}`;
+    // `+line` before the path, and only for the editors whose grammar takes
+    // it. An unknown declaration keeps the plain command — the hint is
+    // discarded rather than handed to a command that may not understand it.
+    const at = hint && hint.line >= 1 && HINT_PLUS.has(baseName(ed)) ? ` +${hint.line}` : "";
+    return `${ed}${at} ${shellQuote(doc)}`;
   };
   switch (integration) {
     // ── clone verbs (99) ──
@@ -271,12 +310,11 @@ export function cloneArgs(
       return { error: "the `edit-terminal` integration is macOS-only — use ghostty-edit or tmux" };
     }
     case "ghostty-edit": {
-      const ed = editor ?? process.env.OKUDA_EDITOR ?? process.env.EDITOR ?? "vi";
       const term = resolveTerminal(platform);
       if ("error" in term) return term;
       return {
         cmd: term.cmd,
-        args: [...term.args, "-e", loginShell(shell), "-i", "-c", `${ed} ${shellQuote(resolve(cwd, doc))}`],
+        args: [...term.args, "-e", loginShell(shell), "-i", "-c", editCmd(resolve(cwd, doc))],
       };
     }
     default:
