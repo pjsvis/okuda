@@ -9,7 +9,6 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
-| 2026-11-16 | BRF-HEADING-EDITOR-HINT | open | The heading hint — `88` opens a markdown file at the section you're reading | 2026-11-16-brief-heading-editor-hint.md |
 | 2026-11-13 | BRF-LAUNCH-CONTRACT | open | The launch contract — the pair declared at startup, and the clone hands over all three fields | 2026-11-13-brief-launch-contract.md |
 | 2026-11-12 | BRF-CODE-EDITOR-HINT | open | The editor hint — `88` opens a code file where you're reading | 2026-11-12-brief-editor-hint.md |
 | 2026-11-11 | BRF-FGP-CARD | open | The FGP card — the pair painted into the cells, so a surface can be seen | 2026-11-11-brief-fgp-card.md |

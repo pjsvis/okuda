@@ -6,7 +6,7 @@ callsign: BRF-HEADING-EDITOR-HINT
 # Brief: The heading hint — `88` opens a markdown file at the section you're reading
 
 **Date:** 2026-11-16
-**Status:** Open
+**Status:** Done
 **Warrant:** operator call, 2026-11-16 — smoke tested in-session before writing
 
 ---
@@ -99,6 +99,7 @@ Every real heading resolves to its own source line at every width. Every viewpor
 - **Nothing is stored.** The ordinal is computed from two lists held for one call. `ADR-LINE-IS-PROSE-078`'s objection was a *copy of a fact* that rots; there is no copy here.
 - **The chip is load-bearing.** Drop the chip test and a table row becomes a heading. Drop the fence test and a shell comment becomes one. Both failure modes were measured, not imagined.
 - **Probes are in `tmp/`**, gitignored: `heading-anchor-probe.ts`, `heading-anchor-probe2.ts`, `heading-ordinal-probe.ts`, `anchor-groundtruth.ts`, `heading-delta-final.ts`. They are evidence, not deliverables; the acceptance tests are the durable form.
+- **Measured at delivery (2026-11-16):** 706 documents × a width of 80 — delta 0 in 120, delta 1 in 582, delta outside `{0,1}` in **4** (`decisions/TEMPLATE.md`, `docs/ssh-and-gemini.md`, `docs/2026-10-08-ai-human-development-workflow-06.md`, `.archive/briefs/2026-09-30-brief-fence-discipline.md`). In all four the source holds headings inside a fence that the renderer still paints as headings — the two subsystems disagree about what is a fence. AC4's guard does its job: those documents return `null`, so `88` opens at the top, today's behaviour, never at a guessed line. Closing the renderer/`fenceRanges` divergence belongs to a separate brief; this one refuses rather than guesses.
 
 ## Related
 

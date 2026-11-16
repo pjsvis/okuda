@@ -18,4 +18,3 @@
 {"file":"2026-11-11-brief-surface-plan.md","date":"2026-11-11","status":"open","summary":"The surface plan — the pair's lifecycle as bytes, and nothing else","meta":{},"callsign":"BRF-SURFACE-PLAN"}
 {"file":"2026-11-12-brief-editor-hint.md","date":"2026-11-12","status":"open","summary":"The editor hint — `88` opens a code file where you're reading","meta":{},"callsign":"BRF-CODE-EDITOR-HINT"}
 {"file":"2026-11-13-brief-launch-contract.md","date":"2026-11-13","status":"open","summary":"The launch contract — the pair declared at startup, and the clone hands over all three fields","meta":{},"callsign":"BRF-LAUNCH-CONTRACT"}
-{"file":"2026-11-16-brief-heading-editor-hint.md","date":"2026-11-16","status":"open","summary":"The heading hint — `88` opens a markdown file at the section you're reading","meta":{},"callsign":"BRF-HEADING-EDITOR-HINT"}

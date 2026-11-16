@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-16 | BRF-HEADING-EDITOR-HINT | done | The heading hint — `88` opens a markdown file at the section you're reading | 2026-11-16-brief-heading-editor-hint.md |
 | 2026-11-15 | BRF-RUNG-PANEL | done | The rung panel — one document, nine grounds, one grid | 2026-11-15-brief-rung-panel.md |
 | 2026-11-11 | BRF-SURFACE-PICKER | rejected | The surface picker — calibrate the figure-ground pair interactively, commit it to the pin | 2026-11-11-brief-surface-picker.md |
 | 2026-11-08 | BRF-EDITOR-HINT | rejected | The editor hint — open where I'm reading, and forward the author's coordinate | 2026-11-08-brief-editor-hint.md |
