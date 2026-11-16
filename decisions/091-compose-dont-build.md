@@ -15,6 +15,13 @@ the hint derived from the scroll position (not an authored coordinate). The
 files is a viewer-side actuator enhancement, not an editor-side brief. The
 `BRF-TUI-LIVE` and `BRF-SRC-LINE-LEDGER` rejections stand. See the amendment
 in **Decision** below.
+**Amended 2026-11-16:** a second viewer-side actuator enhancement is admitted —
+`BRF-HEADING-EDITOR-HINT` (`briefs/2026-11-16-brief-heading-editor-hint.md`),
+which derives a markdown file's source line from the **ordinal of the heading
+whose frame holds the viewport**. Like the scroll-position hint, it is computed
+from the glass at the keypress and stored nowhere, so it is neither an authored
+coordinate nor the map `ADR-LINE-IS-PROSE-078` refused. The refusal to build an
+editor inside okuda is unchanged. See the second amendment in **Decision**.
 **Enforced by:** `nothing — advice` — the decision is a refusal to build; no
 gate enforces a non-implementation. The `88` actuator's existing behaviour
 (`src/tui.ts:940`, `editArgs` in `src/clone.ts:136`) is the live instrument; this
@@ -60,6 +67,21 @@ built. `88` to Zed (or `$EDITOR`) is sufficient.**
 > enhancement** (the `88` key forwards the viewport's line to the editor),
 > not an editor-side brief (which would build editing machinery inside okuda).
 > The `BRF-TUI-LIVE` and `BRF-SRC-LINE-LEDGER` rejections stand unchanged.
+
+> **Amendment (2026-11-16):** `BRF-HEADING-EDITOR-HINT` extends the exception
+> from code files to markdown, by a different derivation. A code file's render
+> maps 1:1 to its source (`scroll - 2`); a markdown file's does not. The smoke
+> test measured the alternative the first refusal leaned on — a viewport-line
+> text anchor — at **11% exact, 89% far misses** on a ground-truth fixture,
+> because the anchor lands on wrapped fragments that recur. What does survive
+> render exactly is the **heading ordinal**: groups of badge rows in the render
+> and `^#{1,6} ` headings outside fences in the source are the same list in the
+> same order (6 documents × 4 widths, exact at every width). The frame heading's
+> ordinal is forwarded as the line — derived, not authored; computed, not
+> stored. The synthetic `## References` receipt is excluded by the count delta
+> (rendered = source or source + 1), never by name. The constraint below is
+> widened to name this second shape. Search in Zed still costs seconds; what
+> changed is that the cost need not be paid, not that the editor was built.
 
 The `88` actuator opens the file the reader is standing in. The editor owns
 the write, the syntax tree, the symbol search, the language server — everything
@@ -116,6 +138,11 @@ of what the rejection weighed, not as present law.
   > brief proposed. The refile's hint is a **live scroll position**, which
   > cannot rot — it is correct at the keypress and gone the moment after. For
   > code files the gap closes; for markdown files it stands (no constant offset).
+  > *Amended 2026-11-16:* the markdown gap closes too, by heading ordinal rather
+  > than constant offset. The prose anchor was measured first and rejected — 11%
+  > exact on a ground-truth fixture, because wrapped fragments recur. Headings
+  > are short, structurally marked in both spaces, and preserved through render;
+  > the Nth in each list is the same section at every width tested (60–120).
 - **Scroll-reset on save in the streaming `--watch` persists.** The preview
   pane jumps to the top on every save. Accepted: the content being written is
   at the top of the writer's attention anyway.
@@ -129,14 +156,20 @@ of what the rejection weighed, not as present law.
   enhancement that forwards the glass's own state (scroll position, cursor
   position) to the editor is not an editor-side brief — it touches the `88`
   actuator, not the editor. `BRF-CODE-EDITOR-HINT` (the refile) is this
-  exception.
+  exception. **Amended 2026-11-16:** `BRF-HEADING-EDITOR-HINT` is the second —
+  heading ordinal for markdown files, derived from the glass's structure. The
+  test is unchanged: glass state, computed at the keypress, stored nowhere.
 - **`88`'s `editArgs` signature may accept a `hint`** when the hint is derived
-  from the glass's state (scroll position for code files where the offset is a
-  measured constant). An authored coordinate (`:NNN` from prose) is not
-  permitted — that is `ADR-LINE-IS-PROSE-078`'s rule, unamended.
+  from the glass's state — the code-file scroll position (offset a measured
+  constant) **or the markdown frame's heading ordinal** (amended 2026-11-16).
+  An authored coordinate (`:NNN` from prose) is not permitted — that is
+  `ADR-LINE-IS-PROSE-078`'s rule, unamended.
 
 ## Related
 
+- Brief: `briefs/2026-11-16-brief-heading-editor-hint.md` —
+  `BRF-HEADING-EDITOR-HINT`, the markdown sibling (heading ordinal, no authored
+  coordinate, no map)
 - Brief: `briefs/2026-11-12-brief-editor-hint.md` — `BRF-CODE-EDITOR-HINT`,
   the refile (code files only, scroll position, no authored coordinate)
 - Brief: `.archive/briefs/2026-11-08-brief-editor-hint.md` — `BRF-EDITOR-HINT`,

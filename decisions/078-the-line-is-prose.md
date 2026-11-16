@@ -128,6 +128,10 @@ person to propose a coordinate deserves to know it was tried, measured and refus
 - **A citation no longer takes you to the row.** For a 2,700-line file that is a
   real loss: the reader lands at the top and must search or switch to the editor.
   Accepted, because the alternative was a promise the corpus could not keep.
+  > *Noted 2026-11-16:* `BRF-HEADING-EDITOR-HINT` narrows the search half — `88`
+  > can forward the frame's heading line to the editor. The citation still arrives
+  > at the **top of the file**; nothing on the page promises a row, and no authored
+  > coordinate and no map cross the seam. This decision is unamended.
 - **The corpus still holds 327 line hints**, now pure prose. They will rot exactly as
   before; the difference is that nothing on the glass says they will not.
 - **The record carries two same-day reversals** — this and 074's amendment — which
@@ -137,7 +141,9 @@ person to propose a coordinate deserves to know it was tried, measured and refus
 **Constraints this imposes:**
 
 - **No gutter, no arrival, no line in the map** — the coordinate is prose, in every
-  mode, on every flag.
+  mode, on every flag. A line derived at the keypress from the glass's own
+  structure (heading ordinal, `BRF-HEADING-EDITOR-HINT`) is neither a line in
+  the map nor an authored coordinate; it is stored nowhere. Held 2026-11-16.
 - **Three boundaries, pinned by tests.** The gold ends at the extension, the span
   covers the mention, the target is the path. Changing one needs the other two read.
 - **The finder may not gate a judgement.** Its subject is a hint; a hint past EOF is
@@ -153,6 +159,9 @@ person to propose a coordinate deserves to know it was tried, measured and refus
 - ADR: `ADR-MAIN-DOCUMENT-031` — *one destination, one silcrow*, back to the path
 - ADR: `ADR-SILCROW-PATHS-045` — the W2 rule (suffix swallowed, target stripped),
   restored
+- Brief: `briefs/2026-11-16-brief-heading-editor-hint.md` —
+  `BRF-HEADING-EDITOR-HINT`; the editor line is derived from a heading ordinal,
+  not from prose or a stored map (2026-11-16)
 - `AGENTS.md`, *Scope Discipline* — the clause that generalises this reversal:
   **reading, not editing; orientation versus lookup**; any feature that needs an
   index belongs to the editor
