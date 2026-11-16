@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { compareRanking, referencePair, themePair } from "../scripts/contrast";
-import { pinSurface, settingsHint, type HostTheme } from "../scripts/herdr-theme";
+import { pinSurface, selectionHint, type HostTheme } from "../scripts/herdr-theme";
 
 /** The ranking instrument's two obligations, and the order they come in: the
  *  **control must pass first** — the reference pair compared with itself reports
@@ -90,8 +90,14 @@ describe("pinSurface — a pin, not a redesign", () => {
     expect(out.selection).toBe(source.selection);
   });
 
-  test("the hint names the setting, and refuses the picker for the pair", () => {
-    expect(settingsHint("gloam")).toContain('"theme": "gloam"');
-    expect(settingsHint("gloam")).toContain("picker overrides");
+  test("the hint names the layout look, and refuses settings.json for the pair", () => {
+    // ADR-093 / the 2026-11-15 measurement: the picker writes its choice
+    // where this probe cannot read, and settings.json alone changes nothing.
+    // The hint points at --select in a named layout instead — the old
+    // settings.json assertion was a claim the glass disproved.
+    const hint = selectionHint("gloam", "main");
+    expect(hint).toContain("--select gloam");
+    expect(hint).toContain("--layout main");
+    expect(hint).toContain("settings.json alone changes nothing");
   });
 });
