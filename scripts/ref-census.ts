@@ -53,13 +53,12 @@ const DECLARED: Record<string, { why: string; review: string }> = {
     // from here — re-dated, not resolved.
     review: "2026-12-15",
   },
-  "docs-reflow-quarantine": {
-    why: "one commit, 'Update docs', held by ADR-LEGIBILITY-SURFACE-090 — it deletes a section from docs/2026-08-26-the-fog-was-the-point.md ('Plot is imagery that remembers what it meant') and reflows docs/tables*.md; the subject names none of it, so it lands as a reviewed edit under its own subject or it is dropped, and never as a fast-forward",
-    // reviewed 2026-11-15 (rebase session): the four code commits are already in
-    // main; only this prose commit is left, and it is static — the review is one
-    // question to the operator, not more work.
-    review: "2026-11-22",
-  },
+  // `docs-reflow-quarantine` was declared here from 2026-11-15 and dropped
+  // 2026-11-24 on the operator's call: its unique commit is refused, and the
+  // commits survive as the tag `archive/docs-reflow-quarantine`. A dropped
+  // declaration is not a recital — the refusal is carried by the tag's message
+  // and by the ADR-LEGIBILITY-SURFACE-090 annotation, which is where a reader
+  // asking "what happened to that siding" is sent.
 };
 
 /** One branch, as the census reads it. Pure data: the git calls happen in the

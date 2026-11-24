@@ -12,6 +12,16 @@ date: 2026-11-05
 control) and two gate rows: `bash scripts/gates.sh ground` and
 `bash scripts/gates.sh lightcard`
 
+**Amended 2026-11-24 — the siding is gone, the refusal is not.** The
+`docs-reflow-quarantine` branch that the declaration held has been dropped on the
+operator's call. Its unique commit was `Update docs` — a deletion from
+`docs/2026-08-26-the-fog-was-the-point.md` under a subject that named nothing, which
+is why it was never landed. The four commits survive as the tag
+`archive/docs-reflow-quarantine`, so the refusal stays dereferenceable
+(`ADR-DOCUMENT-LIFECYCLE-057`, the keep-class). The declaration's review date
+(2026-11-22) elapsed unread, which is precisely what an expired declaration reports:
+nothing was watching.
+
 ## Context
 
 `ADR-GLASS-INK-073` closed the brightness family by splitting the surface: the
