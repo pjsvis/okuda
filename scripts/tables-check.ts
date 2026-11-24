@@ -86,6 +86,7 @@
 import { renderDocument } from "../src/render";
 import { stripANSI, displayWidth } from "../src/width";
 import { readFileSync } from "node:fs";
+import { inQuarantine } from "./td-id-lint";
 
 const RULE = /^\s*─{10,}\s*$/;
 const PIPE = "│";
@@ -148,7 +149,7 @@ function siloFiles(): string[] {
   return out.stdout
     .toString()
     .split("\n")
-    .filter((f) => f.length > 0 && !f.startsWith(".archive/"));
+    .filter((f) => f.length > 0 && !f.startsWith(".archive/") && !inQuarantine(f));
 }
 
 // ── source parsing ───────────────────────────────────────────────────

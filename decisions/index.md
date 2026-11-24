@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-24 | ADR-INTAKE-QUARANTINE-094 | Accepted | New arrives in quarantine — `docs/new/`, and the gates that decline to read it | 094-intake-quarantine.md |
 | 2026-11-13 | ADR-PAIR-HAS-A-HOME-092 | Accepted | The pair lives with the glass — a generated pin, not a process parameter | 092-the-pair-has-a-home.md |
 | 2026-11-13 | ADR-HERDR-REFERENCE-093 | Accepted | Herdr is the reference host for the pair; Rex is demoted with a receipt | 093-herdr-is-the-reference-host.md |
 | 2026-11-12 | ADR-COMPOSE-DONT-BUILD-091 | Accepted | Compose, don't build — the editor stays a real editor | 091-compose-dont-build.md |

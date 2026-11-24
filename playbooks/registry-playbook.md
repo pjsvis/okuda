@@ -182,6 +182,96 @@ See **the seam rule** in `system.md` and `docs/2026-10-10-the-seam.md`.
 
 ---
 
+## Admission — the entrance
+
+A document written outside the silo — an agent's reply, an operator's paste, a
+foreign export — is written without the context that would make it fit: the
+tiers, the playbook, the renderer's actual behaviour. The fit is not a property of
+the author, it is a pass somebody runs. The exit has its checklist; the entrance
+has four questions, asked in order, and a document can answer 2 to 4 and still be
+refused by 1.
+
+| question | checkable | asks |
+| --- | --- | --- |
+| **1. Tier** | no | Which tier's question does it answer? |
+| **2. Register** | partly | Record, addressed, ephemeral? |
+| **3. Claims** | yes | Does each claim name its instrument? |
+| **4. Carriers** | no | Is it already said by something read? |
+
+The tiers are owned by `playbooks/playbooks-playbook.md`; the registers and their
+obligations by `ADR-DOCUMENT-LIFECYCLE-057`.
+
+**A failed tier question is a refusal, not a placement.** A document that answers
+no tier's question has not arrived at the wrong address, it has not arrived: a
+playbook-shaped essay in `docs/` is an idea or a message wearing a date. Renaming
+it into a tier is how the silo acquires a fourth authoring guide.
+
+**The claims question has teeth.** `scripts/date-lint.ts` (name and date agree),
+`just prose-check --leaks` (emphasis that survived the render), `just
+tables-check` (a table that shatters at 80), `scripts/citation-census.ts`. These
+are the built half of the question and none of them reads for *meaning*: a
+sentence asserting how the renderer behaves passes every gate and can still be
+false, so the trial reads the claims and re-derives them from `src/`.
+
+**The instrument we do not have.** Question 4 is answered by reading, and reading
+misses duplicates. Measured 2026-11-24 on one pasted "agent authoring guidelines":
+three of its rules were already owned by `playbooks/authoring-playbook.md`, four of
+its claims about the renderer were contradicted by `src/`, and it answered no
+tier's question. A containment meter — n-gram overlap against the corpus — is
+*proposed*, not built; it would find a duplicate's sentences, and no meter finds a
+duplicate's claims.
+
+### Imported documents: the original lands first
+
+An imported artefact — signed, official, or merely written by someone without the
+silo — is evidence before it is content. Land it **unmodified**, with its landed
+date and its `Source:`, then make the edits in a second commit. The diff is the
+trial's record: it shows what the silo changed, and therefore what the author
+could not have known. Editing in place first destroys the only evidence of the
+gap, and *"we tidied it"* is not a claim a stranger can check.
+
+Our own agent, writing in this silo, is edited directly: there is no original
+worth preserving, and a two-commit ritual on our own prose is ceremony.
+
+### Where an imported document lands: `docs/new/`
+
+An imported original is committed **as it arrived**, in `docs/new/`
+(`ADR-INTAKE-QUARANTINE-094`). The folder is the quarantine register: the path says
+*not yet trialled*, so no reader is told a staged file is ours, and the trial has a
+queue that can be listed rather than remembered.
+
+**It is not a fifth register.** It is the record register at its first step — a
+committed document that owes its landed date and its `Source:`, which is what an
+import already owes (`PLY-AUTHORING`, the date-first rule). What `new/` adds is a
+verdict pending, and the path is the only place that says so. The word *quarantine*
+is already taken by the branch declaration; that one holds a **commit** awaiting a
+review, this one holds a **document** awaiting a trial.
+
+**The exit is a move.** Admission is a `git mv` out of `docs/new/` into `docs/`,
+keeping the landed date in the name; a refusal deletes the file instead. A move cannot leave two copies, so the drift
+hazard that would have needed a meter never arises, and git keeps the original as
+received — `ADR-DOCUMENT-LIFECYCLE-057`'s *the operation is a move, not a deletion*,
+applied at the entrance.
+
+**The document gates are blind to it on purpose.** A foreign original's faults are
+the trial's findings, not the gate's failures, so `scripts/td-id-lint.ts`
+(`QUARANTINE`) excludes the folder from the prose, date, census, table, elision and
+retired-term scans, and `scripts/html-batch.ts` declines to publish it. Declared in
+one predicate because the gates enumerate three ways — a flat walk, `git ls-files`,
+and a recursive walk — and an exclusion living in one of them is an accident
+waiting for the next refactor.
+
+**The falsifier.** If `docs/new/` holds a file that has been through two sessions
+untrialled, the folder has failed as a queue: triage it that sitting, or drop the
+folder. A quarantine nobody processes is a skip with better branding.
+
+### The verdicts
+
+- **Accept** — it answers a tier's question, its register is right, its claims are true.
+- **Edit-then-accept** — right tier, wrong claims; edit, and cite what proved each edit.
+- **Extract-then-delete** — the tier question fails but a sentence survives. It goes into the container that will be read (a playbook entry, an idea in the ledger) and only then is the document removed: the warrant must be *carried*, not named (`ADR-DOCUMENT-LIFECYCLE-057`).
+- **Refuse** — nothing survives the reading, and the refusal says why.
+
 ## The lifecycle — the exit
 
 The registers, their obligations and the predicates are owned by

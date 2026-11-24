@@ -23,6 +23,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { artefactName, splitFrontMatter } from "./html-naming.ts";
 import { siloRoot } from "../src/root.ts";
+import { inQuarantine } from "./td-id-lint";
 
 const args = process.argv.slice(2);
 const build = args.includes("--build");
@@ -58,6 +59,8 @@ for (const tier of tiers) {
   const dir = join(root, tier);
   if (!existsSync(dir)) continue;
   for (const abs of walk(dir)) {
+    const rel = relative(root, abs);
+    if (inQuarantine(rel)) continue; // the quarantine register — see QUARANTINE
     const { meta } = splitFrontMatter(readFileSync(abs, "utf8"));
     docs.push({
       source: relative(root, abs),

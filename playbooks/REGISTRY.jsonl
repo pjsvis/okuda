@@ -22,3 +22,4 @@
 {"file":"registry-playbook.md","date":"2026-09-14","status":"canonical","summary":"Document index system: JSONL schema, reg-sync workflow, status conventions","meta":{"source":"blog-posts"},"callsign":"PLY-REGISTRY"}
 {"file":"silo-playbook.md","date":"2026-08-20","status":"canonical","summary":"Minimum viable silo: playbooks-first structure, on-demand folders, justfile lexicon, system.md constitution, .archive scaling","meta":{"source":"blog-posts","adapted":"2026-08-20 generalised from blog-specific import"},"callsign":"PLY-SILO"}
 {"file":"td-playbook.md","date":"2026-08-20","status":"canonical","summary":"td task management: session startup, claiming work, pre-commit gate, branch hygiene","meta":{"source":"blog-posts"},"callsign":"PLY-TD"}
+{"file":"yaye-playbook.md","date":"","status":"canonical","summary":"The Yaye Review Playbook","meta":{},"callsign":"PLY-YAYE"}

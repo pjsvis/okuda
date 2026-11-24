@@ -29,6 +29,22 @@ export const TD_ID = /\btd-[a-f0-9]{6,8}\b/gi;
  *  about the notation, not a use of it. */
 export const EXEMPT_FILES = new Set(["playbooks/td-playbook.md", "decisions/TEMPLATE.md"]);
 
+/** The quarantine register — `docs/new/`: imported documents awaiting their
+ *  admission trial (`playbooks/registry-playbook.md`, *Admission — the entrance*;
+ *  `ADR-INTAKE-QUARANTINE-094`). A foreign original is evidence, so it is
+ *  committed exactly as it arrived, and its faults are the trial's findings
+ *  rather than the gate's failures.
+ *
+ *  Excluded from every document gate **on purpose**, and declared here because
+ *  the gates enumerate three different ways — this walk, `git ls-files`, and the
+ *  recursive walk in `html-batch.ts`. An exclusion that lives in one of them is
+ *  an accident waiting for the next refactor, which is exactly how the folder
+ *  would have been half-gated: invisible to `scannedFiles` (the walk is one
+ *  level deep) and visible to `git ls-files`. */
+export const QUARANTINE = "docs/new/";
+export const inQuarantine = (p: string): boolean =>
+  p.replace(/^\.\//, "").startsWith(QUARANTINE);
+
 /** Registry dirs + docs/ + root files; *.jsonl registries included.
  *  Exported: one scan set, two gates (this lint + the callsign
  *  checksum) — no drift between what each gate sees. */
@@ -41,6 +57,7 @@ export function scannedFiles(): string[] {
       const p = join(d, f);
       if (!statSync(p).isFile()) continue;
       if (f === "index.md") continue; // generated — echoes baselined entries
+      if (inQuarantine(p)) continue; // the quarantine register — see QUARANTINE
       if (f.endsWith(".md") || f === "INDEX.jsonl" || f === "REGISTRY.jsonl") out.push(p);
     }
   }

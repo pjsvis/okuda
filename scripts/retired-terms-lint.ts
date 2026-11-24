@@ -30,6 +30,7 @@
 import { readFileSync } from "node:fs";
 import { join, basename, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { inQuarantine } from "./td-id-lint";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -123,7 +124,7 @@ function tree(): string[] {
     .decode(out.stdout)
     .split("\n")
     .map((s) => s.trim())
-    .filter((s) => s.length > 0);
+    .filter((s) => s.length > 0 && !inQuarantine(s));
 }
 
 function main(): void {

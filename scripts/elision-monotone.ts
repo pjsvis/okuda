@@ -72,6 +72,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { renderDocument, BAND_CONTENT } from "../src/render";
 import { displayWidth, stripANSI } from "../src/width";
+import { inQuarantine } from "./td-id-lint";
 
 const args = new Set(process.argv.slice(2));
 const GATE = args.has("--gate") || args.has("--strict");
@@ -259,7 +260,7 @@ async function main(): Promise<void> {
   const files = Bun.spawnSync(["git", "ls-files", "*.md"], { stdout: "pipe" })
     .stdout.toString()
     .split("\n")
-    .filter((s) => s.trim() !== "");
+    .filter((s) => s.trim() !== "" && !inQuarantine(s));
 
   /** A rendering pass is subprocess-bound (the mermaid pipe spawns per fence), so
    *  a small pool buys most of the wall clock back. Renders are pure, and one
