@@ -58,6 +58,11 @@ GATES=(
   # The pair's lifecycle, pure: inherit emits no byte, the give-back is the host's
   # own string, and the order is fg-then-bg on both halves. No terminal required.
   "surface|bun test tests/surface-plan.test.ts tests/fgp-card.test.ts"
+  # The renderer's rejections and exemptions, pure: what is markup and what is
+  # text, what a code span keeps, what an HTML block loses. These were run by
+  # hand only (`just test`) until ADR-MARKUP-VOCABULARY-095 needed its control
+  # to be a gate rather than a habit.
+  "markup|bun test tests/render.test.ts"
 )
 
 if [[ "${1:-}" == "--list" ]]; then

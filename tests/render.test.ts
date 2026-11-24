@@ -581,6 +581,34 @@ describe("render — rejections (no crash, no raw markup)", () => {
     expect(out).toContain("Title");
   });
 
+  // td-110cf6 — markup is a vocabulary, not a shape (ADR-MARKUP-VOCABULARY-095).
+  // A tag shape is not evidence of markup: `<file>` is a placeholder, and
+  // `<details>` inside a code span is the subject of a decision record.
+  test("a placeholder is text, not markup — prose", async () => {
+    const out = await render("Pass a <file> and a <callsign> here.");
+    expect(out).toContain("<file>");
+    expect(out).toContain("<callsign>");
+  });
+
+  test("a code span is verbatim, tags included", async () => {
+    const out = await render("Run `git mv <file> <dir>` and see `<details>`.");
+    expect(out).toContain("<file>");
+    expect(out).toContain("<dir>");
+    expect(out).toContain("<details>");
+  });
+
+  test("a real element is stripped in prose and kept in code", async () => {
+    const out = await render("about <details> here, and `<details>` there");
+    expect(out.match(/<details>/g)?.length).toBe(1);
+  });
+
+  test("an unknown element renders as text, never as noise", async () => {
+    // The safe direction: an unlisted tag is visible prose, not a deletion.
+    const out = await render('`<speak><prosody rate="slow">x</prosody></speak>`');
+    expect(out).toContain("<speak>");
+    expect(out).toContain('rate="slow"');
+  });
+
   test("footnote renders as literal text", async () => {
     const out = await render("Text[^1]\n\n[^1]: the note");
     expect(out).toContain("[^1]");

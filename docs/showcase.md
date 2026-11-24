@@ -228,7 +228,20 @@ The grammar is closed. Indented code is not code — it is a paragraph:
 
 this looks like indented code but okuda treats it as prose, because four-space fences are a footgun.
 
-Inline `<em>HTML</em>` is stripped silently; the tags vanish, the text remains. Footnotes and raw HTML blocks produce nothing. No error, no raw markup — the viewer degrades to text, never to noise.
+Inline HTML is stripped where it is markup: an `<em>emphasis</em>` tag in prose leaves
+its text and loses its tag. A block-level tag at the start of a line opens an HTML
+block, and the block is discarded whole. Footnotes produce nothing. No error, no raw
+markup — the viewer degrades to text, never to noise.
+
+**Amended 2026-11-24 — `ADR-MARKUP-VOCABULARY-095`.** This said *"the tags vanish"*
+without qualification, and that was true of the matcher it described, which took *any*
+letter-initial tag shape for markup. Two consequences went unremarked until they were
+measured: a placeholder is not HTML and vanished as if it were — `<file>`, `<callsign>`,
+`<query>`, roughly 200 of them across 47 documents — and a **code span** was stripped
+too, though CommonMark makes it verbatim, so this silo's own decision record about
+`<details>` and `<dialog>` rendered with both tags deleted from its title. Markup is now
+a vocabulary rather than a shape, and code is verbatim: **a tag shape renders as text
+unless it names an element the platform would have parsed.**
 
 
 ## Width: wrap, bypass, elide

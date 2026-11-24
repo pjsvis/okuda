@@ -21,7 +21,9 @@ import {
   PARSER_OPTIONS,
   RE_CODE_TOKEN,
   RE_DESCRIBED_TOKEN,
-  RE_INLINE_HTML,
+  RE_HTML_TAG,
+  RE_HTML_BLOCK_TAG,
+  RE_HTML_COMMENT,
   RE_MERMAID_TOKEN,
   RE_PB_TAG,
   RE_RHS_TOKEN,
@@ -68,7 +70,7 @@ function stripVector(children: string): { slug: string; num: string; live: boole
   const legacy = children.match(/%{1,2}okuda-rhs:(\d{1,2})%{1,2}/);
   const m = vec ?? legacy;
   if (!m) return null;
-  const slug = children.replace(/%{1,2}okuda-(?:vector|rhs):(\d{1,2})%{1,2}/, "").replace(RE_INLINE_HTML, "").trim();
+  const slug = children.replace(/%{1,2}okuda-(?:vector|rhs):(\d{1,2})%{1,2}/, "").replace(RE_HTML_TAG, "").replace(RE_HTML_COMMENT, "").trim();
   return { slug, num: m[1]!, live: vec !== null };
 }
 
@@ -691,7 +693,8 @@ export async function renderDocument(
   // `___`) line directly under non-blank text is a setext h2 underline, not
   // a thematic break. Headers use hashes (gravitas, not underlines); insert
   // a blank line before the rule so Bun.markdown sees a paragraph + hr.
-  const source2 = neutraliseSetext(source1);
+  const source1b = stripMarkupOutsideCode(source1);
+  const source2 = neutraliseSetext(source1b);
 
   // Pre-pass 2.5: inline math glyphs (BRF-MATH-GLYPHS). It runs on the
   // SOURCE, not in the `text` handler the brief named: a probe on bun
@@ -1284,7 +1287,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // paint colours for the known guest types (vectors, state glyphs)
       // so they survive. The heading role owns the run; guests borrow
       // and hand back via keepHeading (td-290433 / BRF-HEADING-ANSI-STRIP).
-      let clean = stripANSI(stripHtml(children));
+      let clean = stripANSI(stripComments(children));
       // Re-apply vector paint: §NN → vector-coloured §NN
       clean = clean.replace(/§(\d+)/g, (_m, n: string) =>
         styler.roleBold("vector", `\u00a7${n}`));
@@ -1356,9 +1359,9 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // the authored numbers are not honored).
       const v = stripVector(children);
       if (v) {
-        if (!v.live) return bodyInk(wrapBlock(stripHtml(v.slug)).join("\n"), ctx) + "\n\n";
+        if (!v.live) return bodyInk(wrapBlock(stripComments(v.slug)).join("\n"), ctx) + "\n\n";
         const badge = `\u00a7${v.num}`;
-        const slugLines = wrapBlock(stripHtml(v.slug));
+        const slugLines = wrapBlock(stripComments(v.slug));
         const avail = Math.max(width - 2 - badge.length - 1, 8);
         const body = elideToWidth(slugLines.join(" "), avail);
         return bodyInk(body, ctx) + " " + styler.roleBold("vector", badge) + "\n\n";
@@ -1369,7 +1372,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // `stripVector`'s paragraph branch below never fires.)
       const address = addressLine(children, ctx);
       if (address !== null) return bodyInk(address, ctx);
-      const lines = wrapBlock(stripHtml(children));
+      const lines = wrapBlock(stripComments(children));
       return bodyInk(lines.join("\n"), ctx) + "\n\n";
     },
 
@@ -1378,7 +1381,7 @@ function handlers(ctx: Ctx): Record<string, (children: string, meta?: any) => st
       // the wire tag — the td handler consumes it as the menu-pattern
       // mark; residuals are swept by stripTags at finalize. (td-b81597.)
       if (RE_RHS_WIRE.test(children)) return TAG_RHS_WIRE;
-      let out = stripHtml(children);
+      let out = stripComments(children);
       // Vector markers (ADR-031) — table cells route through here, not
       // the paragraph handler: live tokens paint as rose silcrows, legacy
       // tokens strip silently (retired, not honored).
@@ -1580,8 +1583,64 @@ function ensureTable(ctx: Ctx): TableState {
   return ctx.table;
 }
 
-function stripHtml(s: string): string {
-  return s.replace(RE_INLINE_HTML, "");
+/** Comments only. Real HTML *elements* are removed by the pre-pass, where the
+ *  renderer still knows which bytes are code (pre-pass 2.4) — a handler cannot
+ *  know, because Bun delivers fenced and codespan content to `text` before its
+ *  own handler sees it. Stripping tags here as well would delete a tag the
+ *  author put in a code span on purpose, which is how a decision record lost
+ *  the two tags it was about (td-110cf6). */
+function stripComments(s: string): string {
+  return s.replace(RE_HTML_COMMENT, "");
+}
+
+/** Pre-pass 2.4 — real HTML where it is markup: prose, and never code.
+ *
+ *  Two exemptions, both structural for the reason above: a fence state machine
+ *  and a backtick split. A code span (or a fence) is verbatim by CommonMark, so
+ *  `<details>` inside backticks is text the author meant to show — and in
+ *  `decisions/081` it is the *subject* of the decision. Comments are left for
+ *  the handlers, because the table menu wiring must be recognised before it is
+ *  swept (`RE_RHS_WIRE`, ADR-RIGHT-ANCHORED-022). */
+export function stripMarkupOutsideCode(source: string): string {
+  if (!source.includes("<")) return source;
+  const lines = source.split("\n");
+  let fence: string | null = null;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!;
+    if (fence === null) {
+      const open = RE_FENCE_OPEN.exec(line);
+      if (open) {
+        fence = open[1]!;
+        continue;
+      }
+      lines[i] = markupOutsideCodeSpans(line);
+    } else if (closesFence(line, fence)) {
+      fence = null;
+    }
+  }
+  return lines.join("\n");
+}
+
+/** The line half of pre-pass 2.4: element tags in prose, code spans untouched. */
+function markupOutsideCodeSpans(line: string): string {
+  let out = "";
+  let last = 0;
+  for (const m of line.matchAll(/`+[^`]*`+/g)) {
+    const at = m.index ?? 0;
+    out += stripInlineTags(line.slice(last, at), last === 0) + m[0];
+    last = at + m[0].length;
+  }
+  return out + stripInlineTags(line.slice(last), last === 0);
+}
+
+/** Inline tags go; a block-level tag that opens the line stays, because the
+ *  parser dismisses the block whole and stripping the tag first would leave its
+ *  text standing (`RE_HTML_BLOCK_TAG`). */
+function stripInlineTags(seg: string, atLineStart: boolean): string {
+  return seg.replace(RE_HTML_TAG, (tag: string, offset: number) => {
+    const opensBlock = atLineStart && seg.slice(0, offset).trim() === "" && RE_HTML_BLOCK_TAG.test(tag);
+    return opensBlock ? tag : "";
+  });
 }
 
 // ── Inline math glyphs (BRF-MATH-GLYPHS) ─────────────────────────────

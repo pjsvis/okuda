@@ -13,8 +13,9 @@
       "needs": 250
     },
     "docs/2026-10-08-ai-human-development-workflow-08.md": {
-      "cuts": 6,
-      "needs": 320
+      "cuts": 8,
+      "needs": 320,
+      "reason": "A fenced block carries two <Elicitation …/> records: not HTML, so the old shape matcher deleted them inside code as well. Now that code is verbatim (ADR-MARKUP-VOCABULARY-095) they render in full, two lines longer than the glass at 160 — the residue grew because content stopped being silently dropped."
     },
     "docs/diagram-monster.md": {
       "cuts": 11,

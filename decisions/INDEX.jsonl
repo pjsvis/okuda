@@ -91,3 +91,4 @@
 {"file":"092-the-pair-has-a-home.md","date":"2026-11-13","status":"Accepted","summary":"The pair lives with the glass — a generated pin, not a process parameter","meta":{},"callsign":"ADR-PAIR-HAS-A-HOME-092"}
 {"file":"093-herdr-is-the-reference-host.md","date":"2026-11-13","status":"Accepted","summary":"Herdr is the reference host for the pair; Rex is demoted with a receipt","meta":{},"callsign":"ADR-HERDR-REFERENCE-093"}
 {"file":"094-intake-quarantine.md","date":"2026-11-24","status":"Accepted","summary":"New arrives in quarantine — `docs/new/`, and the gates that decline to read it","meta":{},"callsign":"ADR-INTAKE-QUARANTINE-094"}
+{"file":"095-markup-is-a-vocabulary.md","date":"2026-11-24","status":"Accepted","summary":"Markup is a vocabulary, not a shape — and a code span is verbatim","meta":{},"callsign":"ADR-MARKUP-VOCABULARY-095"}

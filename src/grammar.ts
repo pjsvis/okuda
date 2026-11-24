@@ -26,11 +26,64 @@ export const PARSER_OPTIONS = {
   noIndentedCodeBlocks: true,
 } as const;
 
-/** Inline HTML spans — stripped silently (grammar: Raw HTML → No).
- *  Also matches HTML comments `<!-- … -->` so compositors can hide
- *  jump-resolver wiring (paths) from the rendered output while
- *  `extractJumps` reads it from source. */
-export const RE_INLINE_HTML = /<!--[\s\S]*?-->|<\/?[A-Za-z][^<>\n]*>/g;
+/** HTML comments — stripped silently, so compositors can hide jump-resolver
+ *  wiring (paths) from the rendered output while `extractJumps` reads it from
+ *  source. Comments, and only comments, are stripped inside code: a comment is
+ *  markup by definition, and the `text` handler must see it before the table
+ *  menu wiring does (`RE_RHS_WIRE`, ADR-RIGHT-ANCHORED-022). */
+export const RE_HTML_COMMENT = /<!--[\s\S]*?-->/g;
+
+/** The closed grammar's HTML vocabulary: the tags that ARE markup.
+ *
+ *  A tag shape is not evidence of markup. `<file>`, `<callsign>`, `<query>` are
+ *  placeholders, and `<speak>`/`<prosody>` are SSML in a document *about* SSML —
+ *  none of them is HTML, and stripping them is silent data loss. Measured
+ *  2026-11-24: 258 tag-shaped tokens in the corpus, ~200 of them placeholders
+ *  across 47 documents, plus the entire SSML vocabulary of one; `git mv <file>`
+ *  rendered as *git mv ,*. A decision record titled "`:target` over `<details>`
+ *  and `<dialog>`" rendered with both tags deleted (td-110cf6).
+ *
+ *  So the matcher is a vocabulary, not a shape: the renderer strips what the
+ *  platform would have parsed, and leaves everything else to the author. A tag
+ *  missing from this list renders as text — visible, which is the safe
+ *  direction; a placeholder listed here would vanish, which is not. */
+const HTML_ELEMENTS = [
+  "html", "head", "body", "title", "base", "link", "meta", "style", "script",
+  "noscript", "template", "slot", "div", "span", "p", "a", "em", "strong", "b",
+  "i", "u", "s", "small", "sub", "sup", "mark", "code", "pre", "kbd", "samp",
+  "var", "q", "cite", "abbr", "dfn", "time", "data", "del", "ins", "br", "hr",
+  "wbr", "img", "picture", "source", "video", "audio", "track", "iframe",
+  "embed", "object", "param", "canvas", "map", "area", "svg", "path", "g",
+  "circle", "rect", "line", "polyline", "polygon", "text", "tspan", "defs",
+  "use", "ul", "ol", "li", "dl", "dt", "dd", "menu", "table", "caption",
+  "thead", "tbody", "tfoot", "tr", "td", "th", "colgroup", "col", "h1", "h2",
+  "h3", "h4", "h5", "h6", "hgroup", "header", "footer", "nav", "main", "aside",
+  "section", "article", "figure", "figcaption", "blockquote", "details",
+  "summary", "dialog", "form", "input", "button", "select", "option",
+  "optgroup", "textarea", "label", "fieldset", "legend", "progress", "meter",
+  "output", "ruby", "rt", "rp", "bdi", "bdo", "address", "center", "font",
+  "marquee", "big", "tt", "strike", "dir", "search",
+] as const;
+
+/** A block-level element at the start of a line opens an **HTML block**, which
+ *  CommonMark and Bun discard whole (`html()` → null). The pre-pass must leave
+ *  those tags for the parser, or stripping them first turns a discarded block
+ *  into a paragraph of its text — measured 2026-11-24 on both prose settle
+ *  tests, ``<div>`` around a line. The list is CommonMark's own block-start
+ *  condition, not a taste. */
+export const RE_HTML_BLOCK_TAG = new RegExp(
+  `^</?(?:address|article|aside|base|basefont|blockquote|body|caption|center|col|` +
+    `colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|footer|` +
+    `form|frame|frameset|h1|h2|h3|h4|h5|h6|head|header|hr|html|iframe|legend|li|` +
+    `main|menu|menuitem|nav|noframes|ol|optgroup|option|p|param|search|section|` +
+    `summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul|script|style|pre|` +
+    `noscript|template|textarea|canvas|video|audio|svg)\\b[^<>\\n]*>`,
+  "i",
+);
+
+/** An open tag, a close tag or a self-closing tag of a NAMED element. The
+ *  `\b` after the alternation is what keeps `<p>` from eating `<param>`. */
+export const RE_HTML_TAG = new RegExp(`</?(?:${HTML_ELEMENTS.join("|")})\\b[^<>\\n]*>`, "gi");
 
 /**
  * ── String-tag protocol ─────────────────────────────────────────────
