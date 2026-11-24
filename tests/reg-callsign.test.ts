@@ -148,6 +148,23 @@ describe("renderIndexDoc", () => {
     expect(rows[1]).toContain("| BRF-OLD | open | Older | a.md |");
     expect(renderIndexDoc("briefs", entries)).toBe(doc); // deterministic
   });
+
+  test("same day: the higher number is the later document, and sits above", () => {
+    // A date alone ties; append order is not a reading order.
+    const entries = [
+      { file: "094-intake-quarantine.md", date: "2026-11-24", status: "Accepted", summary: "Older" },
+      { file: "095-markup-is-a-vocabulary.md", date: "2026-11-24", status: "Accepted", summary: "Newer" },
+    ];
+    const rows = renderIndexDoc("decisions", entries)
+      .split("\n")
+      .filter((l) => l.startsWith("| 2026"));
+    expect(rows[0]).toContain("095-markup-is-a-vocabulary.md");
+    expect(rows[1]).toContain("094-intake-quarantine.md");
+    // and the order does not depend on the order they were handed in
+    expect(renderIndexDoc("decisions", [...entries].reverse())).toBe(
+      renderIndexDoc("decisions", entries),
+    );
+  });
 });
 
 describe("findCallsignCollisions (ADR-025 clause 4 — the duplicate-callsign lint)", () => {

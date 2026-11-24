@@ -592,7 +592,13 @@ function syncOne(name: string, fix: boolean, csMap: Map<string, string>): { miss
  *  can parse. Pure. */
 export function renderIndexDoc(tier: string, entries: Entry[]): string {
   const rows = [...entries]
-    .sort((a, b) => b.date.localeCompare(a.date) || a.file.localeCompare(b.file))
+    // Recency first, then filename DESCENDING. For a numbered tier the higher
+    // number is the later document, so a day that carried 094 and 095 reads
+    // newest-first instead of leaving the tie to the store's append order —
+    // which is not a reading order, and only looked like a rule by luck. For a
+    // date-named tier there is no later among same-day records; descending is
+    // then merely deterministic, which is the whole claim.
+    .sort((a, b) => b.date.localeCompare(a.date) || b.file.localeCompare(a.file))
     .map((e) => `| ${e.date} | ${e.callsign ?? ""} | ${e.status} | ${e.summary.replace(/\|/g, "\\|")} | ${e.file} |`);
   return [
     "---",

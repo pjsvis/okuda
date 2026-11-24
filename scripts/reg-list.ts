@@ -54,7 +54,11 @@ const names = args.includes("--all") || args.length === 0
 
 let total = 0;
 for (const name of names) {
-  const entries = load(name).sort((a, b) => b.date.localeCompare(a.date));
+  // Same rule as the index (`renderIndexDoc`): newest first, then filename
+  // descending — a tie left to append order is a coin flip that reads as a rule.
+  const entries = load(name).sort(
+    (a, b) => b.date.localeCompare(a.date) || b.file.localeCompare(a.file),
+  );
   total += entries.length;
   console.log(`\n${name} (${entries.length})`);
   if (entries.length === 0) {
