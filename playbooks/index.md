@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-22 | PLY-YAYE | canonical | Review a project's paper trail as a film — intent, pivots, execution — and name the villain to write out next | yaye-playbook.md |
 | 2026-11-05 | PLY-NPM-COMMISSIONING | canonical | The npm Commissioning Playbook | npm-commissioning-playbook.md |
 | 2026-11-04 | PLY-OMARCHY | canonical | Omarchy playbook — the host that re-themes itself | omarchy-playbook.md |
 | 2026-11-02 | PLY-PUBLISHING | canonical | Two packages, two orders, no remembered dist-tags — what ships, what CI gates, and the four things that were nearly wrong | publishing-playbook.md |
@@ -33,4 +34,3 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 | 2026-08-20 | PLY-SILO | canonical | Minimum viable silo: playbooks-first structure, on-demand folders, justfile lexicon, system.md constitution, .archive scaling | silo-playbook.md |
 | 2026-08-20 | PLY-TD | canonical | td task management: session startup, claiming work, pre-commit gate, branch hygiene | td-playbook.md |
 |  | PLY-DATA-DISPLAY | canonical | The Data Display Playbook | data-display-playbook.md |
-|  | PLY-YAYE | canonical | The Yaye Review Playbook | yaye-playbook.md |
