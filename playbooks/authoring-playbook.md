@@ -151,6 +151,19 @@ not for long quoted passages. If the quote is more than ~3 lines of argument,
 it belongs in the body prose. The pipe is for the aphorism, the maxim, the
 definition — the thing you'd underline.
 
+**A quote carries prose only.** The renderer takes the quote's inner text and
+re-wraps it as text (`src/render.ts:2260`: `splitRaw` → `wrapANSI`), so block
+structure inside the pipe is flattened rather than styled: consecutive paragraphs
+merge into one line, a list collapses to inline `• item • item`, and a table
+arrives as pipe text with its rule inline. Fenced blocks survive as raw lines,
+which means a mermaid fence is echoed, never drawn. Measured 2026-11-24 on a
+worked example that quoted its own table — the proof disappeared, and the example
+became the wall it was written to forbid.
+
+**Authoring rule.** Never put a table, a list or a diagram inside a quote: the
+proof has to stand on the page it describes. To set an example apart, use a
+heading and blank lines.
+
 ## The muted source echo
 
 A mermaid fence renders as two layers: the ASCII art (borders recede,
@@ -390,8 +403,11 @@ Add here as they surface from dogfooding. Each entry: the pattern, why it earns 
 - **Render the document before shipping it.** Code is dogfooded; prose was not,
   and two defects shipped in one brief on 2026-10-08 because nobody opened it — a
   hard-wrapped `Context` that rendered as an eight-line wall, and strong spans that
-  failed to parse (`**Date:**/frontmatter` prints its asterisks). Open every
-  document once before it lands. Leading.
+  failed to parse. Open every document once before it lands. Leading.
+  - **Annotated 2026-11-24: the specimen healed, the class did not.** The strong span
+    in a frontmatter label now parses, so the example above no longer leaks. The class
+    is the **unclosed span**: emphasis opened and never closed still prints its
+    asterisks, which is what `prose-check --strict-leaks` reads for.
 - **Loose lists.** Discrete blocks, reduced scan tension. Calming.
 - **Hash headers only.** Unambiguous structure, LCARS-tab rendering. Calming.
 - **Front matter elided.** Provenance is not content. Calming.

@@ -99,6 +99,20 @@ width the cells wrap mid-word, and **`say` treats a line break as a word boundar
 therefore broken for the ear always — silently, with no elision notice. Full
 guidance: `playbooks/authoring-playbook.md`.
 
+## A mark is silent, and it says so to the eye only
+
+Decorative marks reach the voice as nothing at all. Measured 2026-11-24 with
+`say -o` and `afinfo`: *"◆ The rule holds ███ and the reader can name it."* and
+*"The rule holds and the reader can name it."* are both **2.252 s** — the glyphs
+are dropped, not spoken, and not even a pause is spent on them.
+
+So the cost of art in prose is not noise, it is **silence**: a mark that carries
+meaning to the eye carries none to the ear, and the loss is invisible in the
+sound. The rule that follows is about emission, which is ours: keep decorative
+Unicode and ASCII art out of prose paragraphs, and let a mark mean only what the
+words beside it already say. What to do with a mark that *is* the meaning is
+`speak-md`'s to decide, not ours (ADR-PERIMETER-039).
+
 ## The specimen tier
 
 A copyrighted passage **never enters the tree**. `tmp/` is gitignored

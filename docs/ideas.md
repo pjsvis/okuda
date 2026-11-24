@@ -170,3 +170,32 @@ The outcome is `open`, `promoted: <callsign>`, or `refused: <why>`.
   200% page zoom differ not at all — i.e. the terminal was magnified rather than
   resized — or the first report of clipped content at an increased zoom. The detector
   costs one command and needs no instrument from us, which is why the idea waits.
+
+- **`uneven-u`** · 2026-11-24 · `prose` · **open**
+  A section's argument could move on a fixed ladder — frame the puzzle, push in, set the
+  stage, show the proof, pull back — so that a document written that way is read in one
+  pass where a wall of prose stops the eye. The moves earn their place on their own, if
+  they do. **The source:** Eric Hayot, *The Elements of Academic Style* (Columbia UP,
+  2014, ISBN 9780231168014) — the *uneven U*, level 4 down to 1 then up to 5 — reached
+  here through [The Writer's Bloc Ep. 5, *The Uneven
+  U*](https://www.youtube.com/watch?v=HeeO1aklH2k) (published 24 Sep 2020, 22 min long),
+  which discusses Hayot directly. Hayot is cited at book level: the chapter was not read
+  from here. Raised from a pasted "agent authoring guidelines" that failed its admission
+  trial on 2026-11-24 — no tier, and four claims about the renderer contradicted by
+  `src/` — where this ladder was the one sentence that survived extraction.
+  **Trigger:** a document written to the ladder is read without a wall *and* the reader
+  can name each section's move without the author's annotation. The refusal is the other outcome and
+  costs five documents: five written this way with no fall in `just prose-check`'s
+  tallest units, and the ladder is a count dressed as a rhythm.
+
+- **`admission-containment`** · 2026-11-24 · `process` · **open**
+  The admission trial's fourth question — *is this already said by a Thing that will
+  be read?* — could be answered by a meter instead of by reading: n-gram overlap of a
+  new document against the corpus, reported as the documents it rhymes with. Reading
+  misses duplicates, and a duplicate's cost is not the wasted page but the drift, which
+  starts the day it lands (`playbooks/registry-playbook.md`, no parallel stores).
+  **Trigger:** a second new document duplicates a rule a playbook already owns, or a
+  reader finds a duplicate that the trial's reading missed. The trigger has fired once:
+  four restated rules in one pasted guide, 2026-11-24. No meter exists, and the ceiling
+  of the idea is that it can find a duplicate's *sentences*, never a duplicate's
+  *claims*.
