@@ -29,6 +29,7 @@ is a finding, not a gap in the table.
 | `fzf` | 0.73.1 (macOS) · 0.74.5 (Linux) | Fuzzy picker — runtime dep of the `gloam` launcher (both modes) | 2026-10-22 | `search-smoke.sh` |
 | `rg` | 15.1.0 (macOS) · 15.2.0 (Linux) | Source for both `gloam` picker modes — file list, body shortlist, registry prefilter | 2026-10-22 | `search-smoke.sh` |
 | `fd` | 10.4.2 | ~~File finder — preferred by `gloam`~~ RETIRED from the launcher path (BRF-CONTENT-SHORTLIST) | 2026-08-27 | — (retired) |
+| `npm` | 11.19.1 (macOS) · 11.x on the runner (Node 24) | The publish path — `npm publish`, `npm view` (`PLY-PUBLISHING`) | 2026-11-25 | `release.yml` asserts the 11.5.1 floor **and exits 1 below it** — the assertion has not run: no tag has reached it |
 
 \* Self-reports as `mermaid-tui 0.1.0`, lives at `~/.local/bin/` — binary
 name and package name differ. The origin doc's `spacex-mermaid` is stale;
@@ -190,6 +191,35 @@ not rely on that metadata — see `decisions/005-render-engine-string-protocols.
 Bun was bumped 1.3.8 → 1.4.0 on 2026-08-27; the `listItem` metadata gap was
 not re-checked (the renderer doesn't depend on it), but the bump did surface
 a separate runtime defect — see the Bun `--compile` note below.
+
+## The publish path's tool — npm (verified 2026-11-25)
+
+npm is the release path's dependency, not the build's or the runtime's: nothing
+here needs it to compile, test, or render. Its floor is **11.5.1**, because
+below that OIDC trusted publishing is unavailable and the publish fails as
+`ENEEDAUTH`, which reads like a permissions problem and is not one — so the
+workflow asserts the version rather than letting the message mislead.
+
+◆ **From npm v12, an install script in a published package silently does not
+run.** v12 (GA 2026-07, [the
+announcement](https://github.blog/changelog/2026-07-08-npm-install-time-security-and-gat-bypass2fa-deprecation/))
+turns `allowScripts` off and `--allow-git` / `--allow-remote` to `none` by
+default, so `preinstall`/`install`/`postinstall` and implicit `node-gyp`
+builds become opt-in for every consumer.
+
+- **The constraint:** a published package ships **no lifecycle script**. The
+  family already complies by construction — the binaries arrive as platform
+  packages, so nothing is built or fetched at install time
+  (`ADR-FAMILY-DISTRIBUTION-083`).
+- **Publish-time hooks are not affected.** `packages/testcard`'s `prepack` runs
+  on `npm pack` and `npm publish`, both of which are still ours to run.
+- **What the failure looks like if this is broken later:** not an error. The
+  package installs, the binary is absent or stale, and the user reports the
+  symptom. It is the same shape as `columns=0` — a silent regression the tool
+  reports as success.
+- **Not yet load-bearing here:** this machine runs 11.19.1 and CI pins Node 24,
+  so v12's defaults are not in force on either. They will be when the runner
+  image moves, and the constraint costs nothing to hold now.
 
 ## Bun `--compile` columns=0 defect (load-bearing workaround)
 
