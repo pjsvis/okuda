@@ -2,7 +2,7 @@
 
 <!-- decide:begin (derived — do not hand-edit) -->
 
-**20 live · 161 archived · 30 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 5 silent · 10 ticketed. *Converged: nothing to reconcile, only decisions left.*
+**21 live · 161 archived · 31 tabled** — 0 to move · 0 disagreeing · 0 phantom · 0 editorial · 6 silent · 10 ticketed. *Converged: nothing to reconcile, only decisions left.*
 
 *Derived by `scripts/brief-queue.ts --write`; do not hand-edit. Regenerate: `just decide`.*
 
@@ -17,6 +17,7 @@ Nothing waits on these and no Thing records them. The question per row is **what
 | BRF-TEMPORAL-WINDOW | -8d | The temporal window — the date the reader already types, a |
 | BRF-FGP-CARD | -16d | The FGP card — the pair painted into the cells, so a surfa |
 | BRF-SURFACE-PLAN | -16d | The surface plan — the pair's lifecycle as bytes, and noth |
+| BRF-CAHIER-MATH | -30d | The cahier's maths — the export gets the second dimension |
 
 ### Ticketed, live — the load-bearing set
 
@@ -75,6 +76,7 @@ Settled briefs are not here: they live in `.archive/briefs/` with their own inde
 | BRF-CODE-EDITOR-HINT | · open | The editor hint — `88` opens a code file where you're reading | — |
 | BRF-LAUNCH-CONTRACT | · open | The launch contract — the pair declared at startup, and the clone hands over all three fields | — |
 | BRF-HEADING-EDITOR-HINT | · open | The heading hint — `88` opens a markdown file at the section you're reading | — |
+| BRF-CAHIER-MATH | · open | The cahier's maths — the export gets the second dimension | — |
 
 ## Ready — specced, next up
 
