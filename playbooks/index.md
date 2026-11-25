@@ -9,8 +9,8 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-25 | PLY-NPM-COMMISSIONING | canonical | The npm Commissioning Playbook | npm-commissioning-playbook.md |
 | 2026-11-22 | PLY-YAYE | canonical | Review a project's paper trail as a film — intent, pivots, execution — and name the villain to write out next | yaye-playbook.md |
-| 2026-11-05 | PLY-NPM-COMMISSIONING | canonical | The npm Commissioning Playbook | npm-commissioning-playbook.md |
 | 2026-11-04 | PLY-OMARCHY | canonical | Omarchy playbook — the host that re-themes itself | omarchy-playbook.md |
 | 2026-11-02 | PLY-PUBLISHING | canonical | Two packages, two orders, no remembered dist-tags — what ships, what CI gates, and the four things that were nearly wrong | publishing-playbook.md |
 | 2026-10-12 | PLY-CRAFT | canonical | The craft pass — the comment probe, the surfaces to wander, and the failure modes | craft-playbook.md |

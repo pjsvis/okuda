@@ -1,7 +1,7 @@
 ---
 type: Playbook
 callsign: PLY-NPM-COMMISSIONING
-date: 2026-11-05
+date: 2026-11-25
 ---
 
 # The npm Commissioning Playbook
@@ -20,16 +20,35 @@ Read it when you are about to create a scope. Add to it every time one is made.
 | unscoped | `okuda` | the world — first come, globally unique |
 | scoped | `@polyvis/testcard` | the scope's owner; package names under it are yours |
 
-**What the registry actually held, measured 2026-11-05:** the account `polyvis`
-maintains exactly one package, `amalfa@1.5.1`, and nothing from this tree —
-`okuda`, `@polyvis/testcard` and `@polyvis/okuda` were all 404. The account is
-real; the tree's packages are planned. **A playbook states the registry's state
-as measured — with the date and the lookup — because a plan described in a
+**What the registry actually held, measured 2026-11-25:** one package,
+`amalfa@1.5.1`, and nothing from this tree — `okuda`, `@polyvis/testcard` and
+`@polyvis/okuda` are all 404, and a `scope:polyvis` search returns `0`. The
+namespace is **unspent**, which is the only reason its shape is still a decision
+rather than a deprecation pointer. **A playbook states the registry's state as
+measured — with the date and the lookup — because a plan described in a
 registry's voice is the one claim this file exists to stop.**
 
 That is still why a new scope — not a new unscoped name — is the way the family
 grows: **a scope owns a namespace, so a new product never races the world for a
 name.**
+
+## Where this location stands — measured 2026-11-25
+
+The shapes above are general; this is the one location, as it is. Each row is a
+lookup or a screen, and the two marked ⸮ are the ones no lookup can answer.
+
+| Thing | State |
+|---|---|
+| the scope `@polyvis` | ✓ claimed, and nothing published under it |
+| who owns it | ⸮ the account now answers to `pjsgloam`; org vs user unverified from outside |
+| this tree's packages | ☐ none published; every name still free |
+| the second factor | ✓ enabled, 1 security key |
+| recovery codes | ⸮ unverified, and no `skate` key holds them |
+| trusted publishing | ☐ not configured — deliberately, it expires in two days |
+| this machine's login | ✗ none; `npm whoami` answers 401 |
+
+◆ The ⸮ rows are read from the UI while logged in, and until then they are not
+facts. The ✗ row is what makes the first publish a human's job.
 
 ## The principle — commission the scope, then the first package, then the pipeline
 
@@ -67,14 +86,26 @@ token, which is a fact about the machine and must not be read as a fact about th
 scope — and to set the account's 2FA and publishing-access posture, because that
 posture is the entire guarantee once a token route exists.
 
-Verify the owner with no login at all, straight from the registry:
+**Verify the owner with no login at all — and not with the maintainer search.**
+`text=maintainer:<name>` is keyed on a *username*, and the rename below rewrites
+the maintainer field to the new one, so after a migration that search returns
+**empty precisely because the migration succeeded** — and an empty list reads
+comfortably as "the account is new". Read the packument's own two fields
+instead:
 
 ```bash
-curl -s 'https://registry.npmjs.org/-/v1/search?text=maintainer:polyvis&size=20' | jq -r '.objects[].package.name'
+curl -s https://registry.npmjs.org/amalfa \
+  | jq -c '{publishes_now: .maintainers,
+            published_then: .versions[.["dist-tags"].latest]._npmUser}'
 ```
 
-The packages it returns are the ones the account can already publish; an empty
-list means the account is new, not absent.
+Two names answer two questions: the top level is **who may publish now**, a
+version's `_npmUser` is **who published then** — frozen, because a packument is
+append-only and history is never republished. The two differing *is* the
+signature of a rename or a migration, and it needs no credentials to see.
+
+**Measured 2026-11-25:** `publishes_now` `[{name: pjsgloam}]`, `published_then`
+`{name: polyvis}` — same email on both. One account, two names.
 
 **An organisation is the other kind of location, and a user can become one.**
 npm documents the move ([migrating a user scope to an org
@@ -92,6 +123,13 @@ Three costs, and the third is why it happens **before the first publish**:
 - **package ownership moves** into the org;
 - the move is **irreversible**.
 
+**What the move leaves in the registry**, measured 2026-11-25 on an account that
+took the path: the top-level maintainer field carries the **new** username, every
+version snapshot keeps the **old** one, and `text=maintainer:<oldname>` returns
+nothing. Nothing was republished. The old name survives inside the packument's
+history and nowhere else — which makes that history the only rename-proof witness
+the registry keeps.
+
 A user's scope cannot be *shared* with a second human; an org's membership can.
 That is the whole reason to make the move, and it is a bus-factor decision, not
 a naming one.
@@ -104,11 +142,32 @@ Publishing requires 2FA on the account, or a granular access token with **bypass
 second factor sits on the publish path, and losing it is an outage of the
 namespace, not a nuisance.
 
+**The token route is being withdrawn, so do not plan around it.** The
+[2026-07-08 changelog](https://github.blog/changelog/2026-07-08-npm-install-time-security-and-gat-bypass2fa-deprecation/)
+names both halves: a bypass-2FA token loses account, package and organisation
+management from early August 2026 — creating tokens, generating recovery codes,
+changing 2FA, package access, maintainers, trusted publishing, org and team
+membership — and loses direct publish around January 2027, keeping only *stage*,
+which a human 2FA approval releases. *(The dates are the announcement's; the
+deployment is not observed from here.)* The
+end state this playbook already aims at is the one that survives: **CI publishes
+under OIDC, the BOOTSTRAP publish is interactive with a one-time password, and
+no long-lived publish token exists anywhere.** Every other route is on a clock.
+
 **Two independent factors, not one.** npm supports several at once — an
 authenticator app *and* a security key or WebAuthn biometric
 ([enhanced 2FA](https://github.blog/news-insights/product-news/enhanced-2fa-experience-for-your-npm-account/)).
 One factor is a phone; two are a property of the account. A dead app then costs a
 convenience instead of an outage.
+
+**Measured 2026-11-25 on this account:** *enabled for authorization and
+publishing*, **1 security key**, no authenticator-app entry. So the posture is
+one authenticator, and — if the codes were saved — one way back.
+
+◆ **One key plus recovery codes is complete, and that is not a contradiction.**
+Two authenticators buy a working *login* when one dies; the codes buy the
+*account* when the last one does. Different failures, and the codes are the
+cheaper half: they cost no ceremony at all.
 
 **Recovery codes are the only way back without the device**, and they must live
 away from it. This silo's key store is where they belong — `skate`, under a name
@@ -124,14 +183,40 @@ Authenticator does not export TOTP seeds at all. So a broken install takes its
 seeds with it — which is why one of the two factors should be a key that does not
 live in an app.
 
+### Adding a second factor, when the ceremony refuses
+
+npm's second factor is a **WebAuthn security key**; the docs describe security
+keys and nothing else, so an **authenticator-app seed is not on offer** on the
+current surface. Three refusals follow, and none of their messages names a
+cause. *(Measured 2026-11-25. The right column is the reading consistent with the
+message, not a log — the browser's own error is the only thing that would
+confirm it.)*
+
+| Symptom | What it is | Do |
+|---|---|---|
+| macOS offers "Save a passkey" | the **platform authenticator** — Touch ID via iCloud Keychain — which npm accepts as a key, biometrics included | accept it, or cancel and expect the whole ceremony to abort |
+| "device registration failed" | the ceremony ended without a credential: a cancelled sheet, no authenticator chosen, or one the authenticator already holds | run one ceremony to completion; a key cannot be registered twice — WebAuthn excludes a credential it already has ([registration](https://www.w3.org/TR/webauthn-3/#sect-registering-a-new-credential)) |
+| a QR code no authenticator app will read | a **FIDO cross-device handoff**, not a TOTP seed; the passkey stays on the phone and is used in place | point the iPhone's *Camera* app at it — Google Authenticator expects `otpauth://` and is right to refuse |
+
+◆ **The laptop cannot scan its own screen.** "Use the camera on your iPhone" is
+addressed to the phone; reading it as an instruction to the Mac is what makes the
+loop feel like a wormhole.
+
+**The cheap exit is the recovery codes**, which need no authenticator at all:
+Modify 2FA → **Manage Recovery Codes** shows the set and offers *Regenerate
+Code* — and regenerating **invalidates every previous code**, so regenerate only
+when the old set is lost, then save the new one before closing the tab.
+
 ### The ladder when the device is gone
 
 Cheapest first, and **none of these needs the authenticator**
 ([recovering your 2FA-enabled
 account](https://docs.npmjs.com/recovering-your-2fa-enabled-account/)):
 
-1. **Look for the entry.** npm's TOTP issuer is `npm`; an unlabelled tile is the
-   classic near-miss.
+1. **Look for the entry.** A legacy account may hold a TOTP seed under the issuer
+   `npm`, and an unlabelled tile is the classic near-miss. An account enrolled on
+   the current surface has none, because npm's factor is a WebAuthn key — so on a
+   security-key-only account there is no app entry, and nothing was missed.
 2. **Recovery codes**, from wherever they were stored at setup.
 3. **npm's own reset**, which is email-verified: sign in → on the 2FA page click
    *"Use a recovery code or request a reset"* → *"Try recovering your account"* →
@@ -183,6 +268,13 @@ npmjs.com → package → Settings → **Trusted publishing** → GitHub Actions
   npm treats a publish-time tag as a dist-tag operation
   (`PLY-PUBLISHING` records this as a watch item, not yet verified here).
 
+**The owner string is the GitHub side, not the npm scope** — and in this tree
+they differ by one character: the repository is `github.com/pjsvis/okuda` while
+the npm scope is `@polyvis`. The config wants **`pjsvis/okuda`**, character for
+character, with workflow filename **`release.yml`** — `.yml`, not `.yaml`. Point
+the trusted publisher at `polyvis/okuda` and every publish is refused with the
+generic mismatch message, which cannot tell you which of the three fields lied.
+
 Then Settings → **Publishing access** → require 2FA and disallow tokens.
 
 ## What the scope does not decide
@@ -216,6 +308,10 @@ just release-status                          # the sequence's own reading
 | provenance missing | repo private, or published without OIDC | both must hold; verify the repo is public |
 | a one-time password is demanded and the device is gone | the second factor is lost | the email-verified reset above; expect the 72-hour hold |
 | creating the org offers to *migrate* the user | the org name is an existing username — the documented user→org path | accept deliberately: the username changes and package ownership moves |
+| a token stops being able to publish, or to configure anything | the bypass-2FA deprecation: management from Aug 2026, direct publish from about Jan 2027, per its schedule | OIDC for CI; interactive 2FA for anything that configures |
+| a 2FA setup QR that no authenticator app accepts | it is a FIDO cross-device handoff, not a TOTP seed | scan it with the phone's camera, or use the recovery codes |
+| adding a key says "device registration failed" | the ceremony was abandoned, or that key is already registered | one ceremony to completion; a key cannot be registered twice |
+| the maintainer search returns nothing | a rename or migration rewrote the field — not an absent account | read the packument's `maintainers` against a version's `_npmUser` |
 
 ## Related
 
