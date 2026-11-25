@@ -190,6 +190,18 @@ when no argument is given, so it never reaches `argv` — and `argv` is what she
 history records. The same form renames a key without either name touching a
 command line.
 
+◆ **A recovery code cannot be tested, only trusted.** Using one starts the
+72-hour hold, so the vault's verifiable properties are *how many* and *whether
+the whole set came from one regeneration* — never *whether it still works*. A
+lone survivor of a superseded set is therefore the worst case: plausible,
+unverifiable, and dead, since regenerating voids every earlier code.
+
+**Measured 2026-11-25:** the vault held one code — a spare, of unknown vintage.
+The rule that follows is *a set is trusted by provenance, not by preservation*:
+regenerate, store the whole set at the moment it is produced, and **delete the
+survivor** rather than keep it beside the new one. An older code adds no
+recoverability, only the appearance of it.
+
 **Link the GitHub account.** npm's recovery documentation names it as the
 verification shortcut, and it is two minutes
 ([account recovery options](https://docs.npmjs.com/configuring-two-factor-authentication/)).
