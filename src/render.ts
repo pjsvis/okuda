@@ -2083,39 +2083,45 @@ function closesFence(line: string, fence: string): boolean {
   return m !== null && m[1]![0] === fence[0] && m[1]!.length >= fence.length;
 }
 
-/** Apply the math pass to the segments of a line outside code spans. */
-function mathOutsideCodeSpans(
+/** Rewrite the segments of a line outside code spans. The backtick split is
+ *  structural: the parser will not say which `text` events are code. */
+function rewriteOutsideCodeSpans(
   line: string,
-  mark?: (span: string) => string,
-  weight?: (t: string) => string,
-  plain?: boolean,
+  rewrite: (segment: string) => string,
 ): string {
   let out = "";
   let last = 0;
   for (const m of line.matchAll(/`+[^`]*`+/g)) {
     const at = m.index ?? 0;
-    const seg = mathGlyphs(line.slice(last, at), mark, weight);
-    out += (plain ? plainSymbols(seg) : seg) + m[0];
+    out += rewrite(line.slice(last, at)) + m[0];
     last = at + m[0].length;
   }
-  const tail = mathGlyphs(line.slice(last), mark, weight);
-  return out + (plain ? plainSymbols(tail) : tail);
+  return out + rewrite(line.slice(last));
 }
 
-/** The math pass over a whole source. Fenced blocks and code spans are
- *  skipped, everything else is offered to the span translator. Both
- *  exemptions are structural — a fence state machine and a backtick
- *  split — because the parser will not say which `text` events are code
- *  (see pre-pass 2.5 in `renderDocument`). */
-export function applyMathGlyphs(
+/** Map over every inline math span in a source, outside fenced blocks and
+ *  code spans. `fn` returns the replacement, or `null` to leave the span
+ *  exactly as authored.
+ *
+ *  This is the **segmenter**, once, and the policies over it are callers: the
+ *  terminal asks the glyph table (`applyMathGlyphs`), the cahier asks pandoc
+ *  for MathML (`scripts/html-package.ts`). Two policies over one classifier —
+ *  the same rule `chroma` follows for colour, and the reason this is exported
+ *  rather than copied: a second span splitter would be a second set of rules
+ *  for what counts as code.
+ *
+ *  `fn` sees **every** span, including command-free ones. The currency guard
+ *  (`costs $5 and $10`) is a policy, not a segmentation rule, so it lives in
+ *  the caller that needs it. */
+export function mapMathSpans(
   source: string,
-  mark?: (span: string) => string,
-  weight?: (t: string) => string,
+  fn: (whole: string, body: string) => string | null,
   plain?: boolean,
 ): string {
-  // A page with no `$` still needs the plain pass: the state vocabulary lives in
-  // tables and plans, not in maths.
-  if (!source.includes("$") && !plain) return source;
+  const rewrite = (segment: string): string => {
+    const out = segment.replace(RE_MATH_SPAN, (whole, body: string) => fn(whole, body) ?? whole);
+    return plain ? plainSymbols(out) : out;
+  };
   const lines = source.split("\n");
   let fence: string | null = null;
   for (let i = 0; i < lines.length; i++) {
@@ -2126,12 +2132,36 @@ export function applyMathGlyphs(
         fence = open[1]!;
         continue;
       }
-      lines[i] = mathOutsideCodeSpans(line, mark, weight, plain);
+      lines[i] = rewriteOutsideCodeSpans(line, rewrite);
     } else if (closesFence(line, fence)) {
       fence = null;
     }
   }
   return lines.join("\n");
+}
+
+/** The math pass over a whole source: the glyph table's policy over
+ *  `mapMathSpans`. A span with every command in the table is transliterated;
+ *  a span with no command at all is not evidence of maths and stays as
+ *  authored (the currency guard); anything else is shown whole, and marked
+ *  when a `mark` is supplied. */
+export function applyMathGlyphs(
+  source: string,
+  mark?: (span: string) => string,
+  weight?: (t: string) => string,
+  plain?: boolean,
+): string {
+  // A page with no `$` still needs the plain pass: the state vocabulary lives in
+  // tables and plans, not in maths.
+  if (!source.includes("$") && !plain) return source;
+  return mapMathSpans(
+    source,
+    (whole, body) => {
+      if (!RE_HAS_ESCAPE.test(body)) return null; // the currency guard
+      return mathSpanBody(body, weight) ?? (mark ? mark(whole) : null);
+    },
+    plain,
+  );
 }
 
 /** Described diagram block — prose from diagram-describe, rendered as a
