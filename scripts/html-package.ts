@@ -334,6 +334,26 @@ function redundantHrPass(html: string): string {
 // renderer paints after a reference (src/vectors.ts), and in prose it is a
 // section number. It stays text.
 
+/** A table is structure, not prose, so it may outrun the measure — the measure
+ *  is 80ch, so a six-column table overruns it on ANY window width. The page
+ *  must not scroll sideways to reveal it; the TABLE scrolls, inside the paper.
+ *
+ *  `ADR-TABLE-EDGE-CUT-055` asks for the table WHOLE. Its edge cut was the
+ *  terminal's answer because a terminal cannot scroll; a browser can, so
+ *  "whole" arrives through a window instead of by truncation.
+ *
+ *  `tabindex` makes the window reachable by keyboard: a container that clips
+ *  and cannot be focused is a table a keyboard reader cannot finish reading. */
+const RE_TABLE = /<table(\s[^>]*)?>([\s\S]*?)<\/table>/g;
+
+function wrapTablesPass(html: string): string {
+  return html.replace(
+    RE_TABLE,
+    (_m, attrs: string | undefined, body: string) =>
+      `<div class="table-scroll" tabindex="0"><table${attrs ?? ""}>${body}</table></div>`,
+  );
+}
+
 const RE_ADDRESS_LINE_HTML =
   /<p>(?:§(\d{1,2})\s+([\w][\w/.-]*\.md)|([\w][\w/.-]*\.md)\s+§(\d{1,2}))<\/p>/g;
 
@@ -553,6 +573,7 @@ html = await mermaidPass(html, WIDTH);
 html = await codeFencePass(html);
 html = stateGlyphPass(html);
 html = redundantHrPass(html);
+html = wrapTablesPass(html);
 
 const refs = new Map<string, Ref>(); // id → ref
 const byPath = new Map<string, string>(); // resolved path → id
@@ -632,7 +653,7 @@ function addRef(path: string, num: string | null): string | null {
     num,
     title,
     callsign: callsigns.find((c) => c.path === path)?.callsign ?? null,
-    body: docRefPass(stateGlyphPass(redundantHrPass(body))),
+    body: wrapTablesPass(docRefPass(stateGlyphPass(redundantHrPass(body)))),
   });
   byPath.set(path, id);
   return id;

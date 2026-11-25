@@ -44,6 +44,16 @@ writeFileSync(
 
 - **Loose.** A loose list item, which is the house form.
 
+A table may outrun the measure — the measure is a character count, so a wide one
+does so on any window — and it scrolls inside the paper rather than taking the
+page with it, with a shadow that reports the clip:
+
+| Register | What it carries | Where it lives | Who reads it | Why it is separate | What breaks without it |
+|---|---|---|---|---|---|
+| the desk | the page's own ground | outside the measure | the eye at the edge | it is not the document | the page reads as unbounded |
+| the ground | the paper the prose sits on | the measure, plus a shoulder | the reader | it is the document's own field | a table would sit on the desk |
+| the window | a wide table's scroll | the measure, never past it | the reader who continues | a terminal cannot scroll, a browser can | the paper's edge cuts the table in half |
+
 A tagged fence is coloured by chroma, the same classifier the terminal uses:
 
 \`\`\`ts
@@ -333,6 +343,28 @@ const probe = () =>
           silcrowFromTable: text.includes('§'),
         };
       })(),
+      // A wide table must scroll INSIDE the paper, not take the page with it.
+      // Measured on the WINDOW rather than the table: a wide table inside a
+      // clipped scroller still reports a wide box, and that width never reaches
+      // the reader's eye.
+      wideTable: (() => {
+        const scs = [...document.querySelectorAll('main .table-scroll')];
+        const clipped = scs.filter(s => s.scrollWidth > s.clientWidth + 1);
+        const mainRight = document.querySelector('main').getBoundingClientRect().right;
+        return {
+          windows: scs.length,
+          clipped: clipped.length,
+          insidePaper: clipped.every(s => s.getBoundingClientRect().right <= mainRight + 1),
+          pageScroll: document.scrollingElement.scrollWidth,
+          viewport: window.innerWidth,
+          // The clip reports itself: covers attached local over shadows attached
+          // scroll, so a shadow appears only where the cover has slid away.
+          layers: clipped.length
+            ? (getComputedStyle(clipped[0]).backgroundImage.match(/gradient/g) || []).length
+            : 0,
+          focusable: clipped.every(s => s.tabIndex >= 0),
+        };
+      })(),
     };
   })()`);
 
@@ -393,6 +425,11 @@ const checks: Array<[string, boolean, string]> = [
   ["a currency pair stays prose", closed.math.currencyIntact === true, `intact ${closed.math.currencyIntact}`],
   ["no raw TeX is left in prose", closed.math.rawTex === 0, `${closed.math.rawTex} span(s)`],
   ["the page carries no fetching script", closed.math.externalScripts === 0, `${closed.math.externalScripts} script[src]`],
+  ["the page does not scroll sideways", closed.wideTable.pageScroll <= closed.wideTable.viewport, `${closed.wideTable.pageScroll} vs viewport ${closed.wideTable.viewport}`],
+  ["a wide table has a window of its own", closed.wideTable.clipped > 0, `${closed.wideTable.clipped}/${closed.wideTable.windows} clipped`],
+  ["the window stays inside the paper", closed.wideTable.insidePaper === true, `inside ${closed.wideTable.insidePaper}`],
+  ["the clip reports itself", closed.wideTable.layers >= 4, `${closed.wideTable.layers} gradient layer(s)`],
+  ["the window is reachable by keyboard", closed.wideTable.focusable === true, `focusable ${closed.wideTable.focusable}`],
   ["the page carries no @font-face", closed.math.fontFaces === 0, `${closed.math.fontFaces} face(s)`],
   ["a loose list's bold lead takes the key colour", closed.looseBoldLead === "rgb(224, 180, 92)", `${closed.looseBoldLead} vs ${closed.tableKey}`],
   ["a heading carries its LHS badge", closed.headingBadge?.content === '"#"', `content ${closed.headingBadge?.content}`],

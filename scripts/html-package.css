@@ -384,12 +384,41 @@ blockquote p:last-child {
 
 /* ── Tables: the structured glance ─────────────────────────────────── */
 
+/* The window a wide table is read through. The measure is 80ch, so a table
+ * narrower than that is untouched and a table wider than that scrolls HERE
+ * rather than taking the page with it — measured 2026-11-25: four tables on the
+ * habitat specification ran 583px past the paper on every window width, and the
+ * page carried a horizontal scrollbar at 375px of overflow. */
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  /* The scroll must be reachable without a pointer. */
+  scrollbar-width: thin;
+  /* THE CLIP REPORTS ITSELF, in CSS and in geometry rather than by a script.
+   * Four background layers: a ground-coloured COVER at each end, attached
+   * `local` so it moves with the content, over a SHADOW attached `scroll` so it
+   * stays put. The shadow is visible only where the cover has slid away from
+   * it — so a shadow at the right edge means "there is more table this way",
+   * and a table that fits shows nothing at all. A conditional element that
+   * reports a real condition. */
+  background:
+    linear-gradient(to right, var(--okuda-ground) 30%, transparent) left center / 2rem 100% no-repeat local,
+    linear-gradient(to left, var(--okuda-ground) 30%, transparent) right center / 2rem 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(0, 0, 0, 0.5), transparent) left center / 0.9rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, 0.5), transparent) right center / 0.9rem 100% no-repeat scroll;
+}
+
+.table-scroll:focus-visible {
+  outline: 1px solid var(--okuda-muted);
+  outline-offset: 3px;
+}
+
 table {
   border-collapse: collapse;
   margin: var(--okuda-gap) 0;
   /* A table is structure, not prose: it may outrun the measure, and the
-   * page scrolls rather than the cells reflowing into a shape the author
-   * never wrote. */
+   * TABLE scrolls rather than the cells reflowing into a shape the author
+   * never wrote. What it may not do is take the page with it. */
   max-width: 100%;
 }
 

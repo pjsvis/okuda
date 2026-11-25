@@ -93,3 +93,4 @@
 {"file":"094-intake-quarantine.md","date":"2026-11-24","status":"Accepted","summary":"New arrives in quarantine — `docs/new/`, and the gates that decline to read it","meta":{},"callsign":"ADR-INTAKE-QUARANTINE-094"}
 {"file":"095-markup-is-a-vocabulary.md","date":"2026-11-24","status":"Accepted","summary":"Markup is a vocabulary, not a shape — and a code span is verbatim","meta":{},"callsign":"ADR-MARKUP-VOCABULARY-095"}
 {"file":"096-the-export-identifies-more-maths.md","date":"2026-11-25","status":"Accepted","summary":"The export identifies more maths than the terminal — and the guard stays","meta":{},"callsign":"ADR-EXPORT-IDENTIFIES-096"}
+{"file":"097-the-table-window.md","date":"2026-11-25","status":"Accepted","summary":"A wide table scrolls inside the paper, and says so","meta":{},"callsign":"ADR-TABLE-WINDOW-097"}
