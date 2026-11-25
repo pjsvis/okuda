@@ -44,8 +44,8 @@ habitat specification that forced `ADR-MATH-GRAMMAR-076` (`25c8365`), 26,191 B,
 157 inline spans, 25 distinct commands. Measured 2026-11-25 on this machine,
 `pandoc 3.11`, `Google Chrome 153`.
 
-**The layout, measured in Chrome** (`tmp/spike-cahier-math.ts`, a throwaway
-spike): the same document rendered two ways, wrapped in the real cahier CSS.
+**The layout, measured in Chrome** (`spike-cahier-math`, a throwaway script in
+the gitignored `tmp/` tier — named without its path, see Notes): the same document rendered two ways, wrapped in the real cahier CSS.
 Markup counts say the converter ran; **boxes** say the browser rendered it, so
 the probe measures geometry — a fraction counts only when the denominator sits
 below the numerator.
@@ -61,7 +61,8 @@ below the numerator.
 | body bytes | 27,888 | 74,135 (**2.66×**) |
 | whole-document conversion | — | **0.07 s** |
 
-**The census — the ADR question, made a list.** (`tmp/spike-span-census.ts`.
+**The census — the ADR question, made a list.** (`spike-span-census`, same
+scratch tier.
 The population is the renderer's own: fenced blocks and code spans stripped
 first, `src/render.ts:2087`. The first run of this spike omitted that and
 harvested `$(pwd)/okuda` out of a fence — a span the renderer never reaches,
@@ -216,25 +217,30 @@ A CDN KaTeX would have amended that row; MathML does not touch it.
 
 ## Work Plan
 
-1. [x] **Measure before touching code.** Done — `tmp/spike-cahier-math.ts`. 157/157
+1. [x] **Measure before touching code.** Done — `spike-cahier-math`. 157/157
    laid out, 2/2 fractions stacked, 39/39 superscripts raised, 11/11 accents above,
    0 raw spans. Markup counts and geometry both taken.
-2. [x] **Confirm the guard in both directions.** Done — `tmp/spike-span-census.ts`.
+2. [x] **Confirm the guard in both directions.** Done — `spike-span-census`.
    177 prose spans: 142 agree, 25 pandoc-only (24 command-free), **1 okuda-only
    (`$\S$`)**. The predicted `$x and $y` divergence does not exist.
-3. [ ] **Implement the three-stage ladder** (`mathMlPass`) in
-   `scripts/html-package.ts`, shaped like `mermaidPass`: one `pandoc` call for the
-   document, one per panel body, a present/absent branch, the marked-span fallback
-   to `applyMathGlyphs`, and a named degrade to today's single-pass output.
-   Targeted by `<span class="math inline">`, never by scanning for `$`.
-4. [ ] **Measure the byte cost on a large cahier.** `just html decisions/index.md`
-   — 80 panels, 687 KiB today. Record the delta against the 2 MiB default
-   (`scripts/html-package.ts:517`) and against `--max-panels`.
-5. [ ] **Extend `just html-verify`** with the maths checks: `<math>` present, no
-   raw `$` in rendered prose, guarantee table unamended, `#ref-27` still resolves.
-6. [ ] **The ADR**: the `$x$ and $y` divergence — adopt pandoc's identification for
-   export, keep okuda's for the terminal, or declare one rule for both. Two viable
-   options; record the choice and its reason.
+3. [x] **Implement the three-stage ladder.** Done — it lives in
+   `scripts/cahier-math.ts`, not inline in `html-package.ts`, because the script
+   cannot be imported and the ladder has to be testable. Shaped like `mermaidPass`:
+   one `pandoc` call for a document, one for a panel body, a present/absent branch,
+   the marked-span fallback, and a degrade to today's single-pass output. Targeted
+   by `<span class="math inline">`, never by scanning for `$`.
+4. [x] **Measure the byte cost on a large cahier.** Done. `decisions/index.md` —
+   94 panels, 800.9 KiB — is **byte-identical**: it contains no maths at all, and
+   the pass short-circuits on the `$` scan. On the evidence document the page goes
+   53,269 → 97,443 B. The risk this step existed to bound did not materialise.
+5. [x] **Extend `just html-verify`.** Done — 35 checks → **43**, all green, the
+   guarantee table unamended. The maths checks measure geometry in Chrome: a
+   fraction counts as rendered only when the denominator sits below the numerator.
+6. [x] **The ADR.** Done — `ADR-EXPORT-IDENTIFIES-096`. The divergence is not
+   `$x$ and $y` (that prediction was wrong, see Evidence); it is the command-free
+   class, and the decision is that **the export may identify more than the terminal**
+   because a false positive costs a serif digit while a false negative costs a
+   visible dollar sign.
 7. [ ] **`scripts/doctor.ts`, surfaced as `cahier doctor`.** Probe `pandoc`,
    `chroma`, `mermaid-to-md`; print `tool · version · present/absent ·
    consequence`; `--json` emits the same fields. Exit 0 always; `--strict` exits 1
@@ -242,38 +248,42 @@ A CDN KaTeX would have amended that row; MathML does not touch it.
 8. [ ] **Derive `DEPENDENCIES.md`'s version cells** from the probe and add the
    drift gate: a `just` recipe fails when a `Version`/presence cell disagrees with
    the machine. `Purpose` and `Proven by` are untouched.
-9. [ ] Registry: `just reg-sync-fix`, review the derived entry.
+9. [x] Registry: `just reg-sync-fix` run; the derived rows reviewed.
 
 ## Acceptance Criteria
 
-1. `just check` green.
+1. `just check` green — **met**, 28/28 gates, 1214 tests.
 2. `just html-verify` green, including the new maths checks — the guarantee table's
-   rows are **all still true**, with no row amended.
+   rows are **all still true**, with no row amended — **met**, 43 checks.
 3. On `docs/2026-10-30-server-blades-in-space.md`: **157 `<math>` elements**, **2
    `<mfrac>`**, **0** remaining literal `$…$` spans in rendered prose — measured in
-   Chrome by box, not by markup.
-4. **No regression on `$\S$`**: it renders `§`, not a literal `$\S$`. This is the
-   one span the corpus census found where okuda beats the converter, and it is the
-   reason the ladder has a third stage.
+   Chrome by box, not by markup — **met** (157 / 2 / 0, and 157 laid out).
+4. **No regression on `$\S$`**: it renders `§`, not a literal `$\S$` — **met**, by
+   test and by browser check.
 5. **The currency pair survives**: `costs $5 and $10` renders as prose, and the
-   `$5 and $` pair it leaves in the converted text is never entered by stage 3 — a
-   test asserts the span-wrapper rule, not the happy path.
-4. With `pandoc` removed from `PATH`, `just html <file>` output is **byte-for-byte
-   identical** to today's — a test pins the comparison.
-5. `costs $5 and $10` and `Cost: $5.` render as prose in the cahier, by test.
-6. The published file contains **no** `<script>`, no `http://` or `https://` asset
-   reference, and no `@font-face` — asserted by a check in `html-package-verify.ts`.
-9. `src/render.ts` is unchanged; `tests/math-glyphs.test.ts` does not move.
-10. `cahier doctor` names every rung with its consequence, and `--json` parses. On
-   this machine it reports `pandoc` present (maths: MathML). With a rung removed
-   from `PATH`, the row reads absent and its consequence reads the degrade — a test
-   pins both.
-11. `cahier doctor --strict` exits 1 on a degraded rung, 0 on a full one — a test
-   pins the exit codes.
-12. The `DEPENDENCIES.md` drift gate fails when a version cell is edited by hand to
-   disagree with the probe, and passes when the file is regenerated.
-13. `ADR-MATH-GRAMMAR-076` is not amended. If the maths ADR of step 6 concludes
-   otherwise, 076 is **referenced**, not rewritten.
+   `$5 and $` pair the conversion leaves behind is never entered by stage 3 — a test
+   asserts the span-wrapper rule, not the happy path — **met**.
+6. With `pandoc` removed from `PATH`, the output is **byte-for-byte identical** to
+   today's — **met**, verified against a HEAD worktree (`cmp` clean, 53,269 B both).
+7. The published file carries no `<script src>`, no `http://`/`https://` asset
+   reference and no `@font-face` — **met**, three checks in `html-package-verify.ts`.
+   *Corrected:* this criterion first said *no `<script>` at all*, which the cahier
+   fails by design — it ships one **inline** script, the close control's toggle. The
+   invariant is that nothing is **fetched**, which is what the check now asserts.
+8. `tests/math-glyphs.test.ts` does not move (42 tests, unchanged) — **met**. The
+   same criterion's claim that `src/render.ts` stays unchanged did **not** hold: the
+   ladder needed the segmenter, and copying it would have made a second classifier.
+   `mapMathSpans` was extracted from `applyMathGlyphs` and both policies now run over
+   it. Behaviour is pinned by the 42 existing tests plus the 16 new ones.
+9. `cahier doctor` names every rung with its consequence, and `--json` parses. With a
+   rung removed from `PATH`, the row reads absent and its consequence reads the
+   degrade — a test pins both.
+10. `cahier doctor --strict` exits 1 on a degraded rung, 0 on a full one — a test
+    pins the exit codes.
+11. The `DEPENDENCIES.md` drift gate fails when a version cell is edited by hand to
+    disagree with the probe, and passes when the file is regenerated.
+12. `ADR-MATH-GRAMMAR-076` is not amended — **met**; `ADR-EXPORT-IDENTIFIES-096`
+    references it and lands beside it.
 
 ## Notes
 
@@ -284,10 +294,18 @@ A CDN KaTeX would have amended that row; MathML does not touch it.
   Three findings, no one of which was reachable by argument. The ladder replaced
   the swap.
 - **The spikes are scratch and stay out of the tree.** `tmp/` is gitignored, so
-  `tmp/spike-cahier-math.ts` and `tmp/spike-span-census.ts` are evidence a reader
-  cannot see without running them. Their numbers are in this brief for that reason;
-  the scripts are re-runnable instructions, not artefacts. If the census proves
-  worth keeping, it graduates to `scripts/` as its own brief.
+  `spike-cahier-math` and `spike-span-census` are evidence a reader cannot see
+  without running them. Their numbers are in this brief for that reason; the
+  scripts are re-runnable instructions, not artefacts. If the census proves worth
+  keeping, it graduates to `scripts/` as its own brief.
+- **A cited path is a promise, so a gitignored one must not be written as a path.**
+  Found 2026-11-25 by publishing this brief: the cahier resolved `tmp/…` and
+  packaged both spikes as **published panels** (14 refs, against HEAD's 12) — a
+  dereferenceable reference to a file that will be deleted. The scratch tier is not
+  a citation target, and the fix is authoring, not code: name the script, do not
+  write its path. The general rule this instance gives: **only committable paths
+  are citeable**, which is the audit surface's own condition — a reference the
+  reader cannot dereference tomorrow is not a reference.
 - **The backstop, recorded as a permission.** The operator's call, 2026-11-25:
   *"if you want or need to render your file in another viewer go ahead."* Reading a
   document in MarkText, or any other renderer, is **permitted and needs no code**.
@@ -323,6 +341,10 @@ A CDN KaTeX would have amended that row; MathML does not touch it.
 
 ## Related
 
+- `decisions/096-the-export-identifies-more-maths.md` — `ADR-EXPORT-IDENTIFIES-096`,
+  the decision this phase produced
+- `scripts/cahier-math.ts` — the ladder, testable because it is a module
+- `tests/cahier-math.test.ts` — 16 tests, each naming a span from the census
 - `decisions/076-a-grammar-not-an-engine.md` — `ADR-MATH-GRAMMAR-076`, referenced
   and unamended: the terminal keeps the table
 - `docs/2026-11-05-the-cahier.md:28` — the guarantee row this must not amend

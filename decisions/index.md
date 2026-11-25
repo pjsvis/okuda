@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-25 | ADR-EXPORT-IDENTIFIES-096 | Accepted | The export identifies more maths than the terminal — and the guard stays | 096-the-export-identifies-more-maths.md |
 | 2026-11-24 | ADR-MARKUP-VOCABULARY-095 | Accepted | Markup is a vocabulary, not a shape — and a code span is verbatim | 095-markup-is-a-vocabulary.md |
 | 2026-11-24 | ADR-INTAKE-QUARANTINE-094 | Accepted | New arrives in quarantine — `docs/new/`, and the gates that decline to read it | 094-intake-quarantine.md |
 | 2026-11-13 | ADR-HERDR-REFERENCE-093 | Accepted | Herdr is the reference host for the pair; Rex is demoted with a receipt | 093-herdr-is-the-reference-host.md |
