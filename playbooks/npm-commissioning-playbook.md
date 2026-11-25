@@ -35,20 +35,22 @@ name.**
 ## Where this location stands — measured 2026-11-25
 
 The shapes above are general; this is the one location, as it is. Each row is a
-lookup or a screen, and the two marked ⸮ are the ones no lookup can answer.
+lookup or a screen, the ✓ rows were checked, and the row marked ⸮ is the one no
+lookup can answer.
 
 | Thing | State |
 |---|---|
 | the scope `@polyvis` | ✓ claimed, and nothing published under it |
-| who owns it | ⸮ the account now answers to `pjsgloam`; org vs user unverified from outside |
+| who owns it | ⸮ the login answers `pjsgloam`; whether `polyvis` is an org or a user scope is unverified from outside |
 | this tree's packages | ☐ none published; every name still free |
-| the second factor | ✓ enabled, 1 security key |
-| recovery codes | ✓ held in `skate` as `npm_recovery_code`; how many, unverified |
+| the second factor | ✓ enabled; 1 key, and it is the **platform authenticator** — Touch ID, not a token |
+| recovery codes | ✓ the whole set, 5 codes, in `skate` as `npm_recovery_code`; count matched the page, 2026-11-25 |
 | trusted publishing | ☐ not configured — deliberately, it expires in two days |
-| this machine's login | ✗ none; `npm whoami` answers 401 |
+| this machine's login | ✓ `pjsgloam`; `npm login` prompts for the fingerprint and succeeds |
 
-◆ The ⸮ rows are read from the UI while logged in, and until then they are not
-facts. The ✗ row is what makes the first publish a human's job.
+◆ The ⸮ row is read from the UI while logged in, and until then it is not a
+fact. The ☐ rows under *this tree's packages* are what make the first publish a
+human's job.
 
 ## The principle — commission the scope, then the first package, then the pipeline
 
@@ -105,7 +107,9 @@ append-only and history is never republished. The two differing *is* the
 signature of a rename or a migration, and it needs no credentials to see.
 
 **Measured 2026-11-25:** `publishes_now` `[{name: pjsgloam}]`, `published_then`
-`{name: polyvis}` — same email on both. One account, two names.
+`{name: polyvis}` — same email on both. One account, two names, and an
+interactive login here answers `pjsgloam`: the rename is on the front door, not
+only in the packument.
 
 **An organisation is the other kind of location, and a user can become one.**
 npm documents the move ([migrating a user scope to an org
@@ -162,12 +166,20 @@ convenience instead of an outage.
 
 **Measured 2026-11-25 on this account:** *enabled for authorization and
 publishing*, **1 security key**, no authenticator-app entry. So the posture is
-one authenticator, and — if the codes were saved — one way back.
+one authenticator and one way back: the codes, verified at five.
 
 ◆ **One key plus recovery codes is complete, and that is not a contradiction.**
 Two authenticators buy a working *login* when one dies; the codes buy the
 *account* when the last one does. Different failures, and the codes are the
 cheaper half: they cost no ceremony at all.
+
+**Which kind of key was enrolled changes the arithmetic, so check it.** Measured
+2026-11-25: the key is the **platform authenticator** — `npm login` prompts for
+a Touch ID fingerprint. Legitimate, and a different risk: the factor is a property
+of *this Mac and its Apple ID*, not a token in a drawer, so a dead laptop takes
+the factor with it. That is why the codes are not belt-and-braces here but the
+only way back — and why a physical key is worth adding when the ceremony
+cooperates.
 
 **Recovery codes are the only way back without the device**, and they must live
 away from it. This silo's key store is where they belong — `skate`, under a name
