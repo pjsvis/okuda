@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-25 | ADR-SILCROW-IN-THE-CAHIER-098 | Accepted | The cahier's silcrow is `#`, and it takes no keyboard actuator | 098-the-silcrow-in-the-cahier.md |
 | 2026-11-25 | ADR-TABLE-WINDOW-097 | Accepted | A wide table scrolls inside the paper, and says so | 097-the-table-window.md |
 | 2026-11-25 | ADR-EXPORT-IDENTIFIES-096 | Accepted | The export identifies more maths than the terminal — and the guard stays | 096-the-export-identifies-more-maths.md |
 | 2026-11-24 | ADR-MARKUP-VOCABULARY-095 | Accepted | Markup is a vocabulary, not a shape — and a code span is verbatim | 095-markup-is-a-vocabulary.md |
