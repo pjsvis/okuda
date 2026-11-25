@@ -34,11 +34,14 @@ import {
   applyMathGlyphs,
   classifyChar,
   extractDiagramArt,
+  mapMathSpans,
   RE_CITED_PATH,
   STATE_GLYPH_ROLE,
   wrapWholeFile,
 } from "../src/render.ts";
 import { loadCallsigns, resolveAmongCallsigns, siloRoot } from "../src/root.ts";
+import { mathsPass } from "./cahier-math.ts";
+import { escapeHtml, unescapeHtml } from "./html-escape.ts";
 import { styleBlock } from "./html-palette.ts";
 import { artefactName, splitFrontMatter } from "./html-naming.ts";
 
@@ -86,31 +89,6 @@ async function mermaidArt(source: string, width: number): Promise<string | null>
 const RE_MERMAID_FENCE =
   /<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/g;
 
-function unescapeHtml(s: string): string {
-  return s
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, "&");
-}
-
-function escapeHtml(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-/** The inverse, for text read back out of generated HTML. A title
- *  containing `&lt;details&gt;` was escaped twice and rendered as
- *  `&amp;lt;details&amp;gt;` — the double-escape, 2026-11-05. */
-function unescapeHtml(s: string): string {
-  return s
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, "&");
-}
-
 /** Colour the art by channel, run-length: borders recede, arrows lead, text
  *  sits in the foreground. `classifyChar` is okuda's own classifier, so the
  *  HTML and the terminal cannot disagree about what a border is. */
@@ -141,6 +119,8 @@ function paintDiagram(art: string): string {
     })
     .join("\n");
 }
+
+// ── POST-pass 1a: mermaid fences → ASCII art ──────────────────────────
 
 async function mermaidPass(html: string, width: number): Promise<string> {
   const fences = [...html.matchAll(RE_MERMAID_FENCE)];
@@ -563,8 +543,8 @@ const anchors = [docDir, root];
 const archiveAnchors = [docDir, root].map((a) => resolve(a, ".archive"));
 const callsigns = loadCallsigns(root);
 
-// PRE-pass: maths glyphs, before the parser sees them.
-let html = Bun.markdown.html(applyMathGlyphs(source));
+// PRE-pass: maths → MathML where the converter can, glyphs where it cannot.
+let html = Bun.markdown.html(mathsPass(source));
 
 // POST-passes, in order: fences first (they introduce protected regions),
 // then glyphs, then references — and the doc-ref gold LAST, because it
@@ -627,7 +607,7 @@ function addRef(path: string, num: string | null): string | null {
     // one fence, its comments as prose (wrapWholeFile, src/render.ts:1175) —
     // so the panel does the same rather than parsing TypeScript as markdown.
     body = Bun.markdown.html(
-      applyMathGlyphs(
+      mathsPass(
         path.endsWith(".md")
           ? splitFrontMatter(text).body
           : wrapWholeFile(path, text),

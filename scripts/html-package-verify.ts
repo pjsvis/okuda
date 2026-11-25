@@ -53,6 +53,11 @@ function elide(line: string, width: number): string {
 }
 \`\`\`
 
+Maths is asserted in the browser, not in the markup: $\\frac{3\\mu}{2R^3} \\approx \\zeta$
+is a stacked fraction, $T^4$ is a real superscript, and $\\S$ — the span the
+converter refuses and the glyph table rescues — must still read as a section
+mark. A currency pair stays prose: costs $5 and $10 for two.
+
 This fixture cites itself: fixture.md, and must not grow a panel — the reader is
 already there. A bare silcrow §27 in prose stays prose, and an inline reference to
 decisions/027-temperament-is-downstream-of-discipline.md becomes a link. A code
@@ -285,6 +290,49 @@ const probe = () =>
         ...[...document.querySelectorAll('[src]')].map(e => e.getAttribute('src')),
         ...[...document.querySelectorAll('link[rel=stylesheet]')].map(e => e.getAttribute('href')),
       ].filter(Boolean),
+      // Maths. The claim is LAYOUT, not markup: a <mfrac> in the DOM says the
+      // converter ran, and the denominator sitting below the numerator says the
+      // browser rendered it. Those are two different truths about the same tag.
+      math: (() => {
+        const all = [...document.querySelectorAll('math')];
+        const rect = (el) => (el ? el.getBoundingClientRect() : null);
+        const frac = document.querySelector('math mfrac');
+        const [fn, fd] = frac ? [...frac.children] : [];
+        const n = rect(fn), d = rect(fd);
+        const sup = document.querySelector('math msup');
+        const [sb, se] = sup ? [...sup.children] : [];
+        const br = rect(sb), er = rect(se);
+        // PROSE means prose: a code fence in a panel legitimately carries raw
+        // TeX (RE_MATH_SPAN and its dollar delimiters), and counting it would make the
+        // assertion unpassable rather than true.
+        const bare = document.body.cloneNode(true);
+        bare.querySelectorAll('code, pre, math').forEach(e => e.remove());
+        const text = bare.textContent || '';
+        return {
+          count: all.length,
+          laidOut: all.filter(m => {
+            const r = m.getBoundingClientRect();
+            return r.width > 0 && r.height > 0;
+          }).length,
+          fracStacked: !!n && !!d && d.top >= n.bottom - 2,
+          fracHeight: frac ? Math.round(frac.getBoundingClientRect().height) : 0,
+          supRaised: !!br && !!er && er.top < br.top + 1,
+          // The artefact carries ONE inline script by design — the close
+          // control's toggle, which adds no history entry. What must not appear
+          // is a script that FETCHES: that is what breaks the single-file
+          // invariant, and it is the same rule externalAssets enforces.
+          externalScripts: document.querySelectorAll('script[src]').length,
+          fontFaces: [...document.styleSheets]
+            .flatMap(s => { try { return [...s.cssRules]; } catch { return []; } })
+            .filter(r => r.constructor.name === 'CSSFontFaceRule').length,
+          // Raw TeX left in prose is the failure this pass exists to remove:
+          // a backslash immediately after a dollar. The currency pair carries
+          // no backslash, so this assertion cannot confuse the two.
+          rawTex: (text.match(/\\$\\\\[a-zA-Z]/g) || []).length,
+          currencyIntact: text.includes('costs $5 and $10'),
+          silcrowFromTable: text.includes('§'),
+        };
+      })(),
     };
   })()`);
 
@@ -338,6 +386,14 @@ const checks: Array<[string, boolean, string]> = [
   ["front matter becomes a byline", closed.byline === "BRF-FIXTURE · Brief · 2026-11-05", `byline ${closed.byline}`],
   ["front matter does not leak into the body", closed.frontMatterLeaked === false, `leaked ${closed.frontMatterLeaked}`],
   ["the file fetches no external asset", closed.externalAssets.length === 0, `${closed.externalAssets.length} found`],
+  ["maths is laid out, not merely marked up", closed.math.laidOut === closed.math.count && closed.math.count >= 2, `${closed.math.laidOut}/${closed.math.count} laid out`],
+  ["a fraction stacks two rows", closed.math.fracStacked && closed.math.fracHeight > 20, `stacked ${closed.math.fracStacked}, ${closed.math.fracHeight}px`],
+  ["a superscript sits above its base", closed.math.supRaised === true, `raised ${closed.math.supRaised}`],
+  ["the table rescues the converter's decline (§)", closed.math.silcrowFromTable === true, `§ ${closed.math.silcrowFromTable}`],
+  ["a currency pair stays prose", closed.math.currencyIntact === true, `intact ${closed.math.currencyIntact}`],
+  ["no raw TeX is left in prose", closed.math.rawTex === 0, `${closed.math.rawTex} span(s)`],
+  ["the page carries no fetching script", closed.math.externalScripts === 0, `${closed.math.externalScripts} script[src]`],
+  ["the page carries no @font-face", closed.math.fontFaces === 0, `${closed.math.fontFaces} face(s)`],
   ["a loose list's bold lead takes the key colour", closed.looseBoldLead === "rgb(224, 180, 92)", `${closed.looseBoldLead} vs ${closed.tableKey}`],
   ["a heading carries its LHS badge", closed.headingBadge?.content === '"#"', `content ${closed.headingBadge?.content}`],
   ["a heading carries its RHS chip", closed.headingChip?.content === '"█"' && closed.headingChip?.position === "absolute", `${closed.headingChip?.content} ${closed.headingChip?.position}`],
