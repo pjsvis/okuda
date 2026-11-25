@@ -9,7 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
-| 2026-11-25 | BRF-CAHIER-MATH | open | The cahier's maths — the export gets the second dimension | 2026-11-25-brief-cahier-math.md |
+| 2026-11-25 | BRF-CAHIER-MATH | in_progress | The cahier's maths — the export gets the second dimension | 2026-11-25-brief-cahier-math.md |
 | 2026-11-13 | BRF-LAUNCH-CONTRACT | open | The launch contract — the pair declared at startup, and the clone hands over all three fields | 2026-11-13-brief-launch-contract.md |
 | 2026-11-12 | BRF-CODE-EDITOR-HINT | open | The editor hint — `88` opens a code file where you're reading | 2026-11-12-brief-editor-hint.md |
 | 2026-11-11 | BRF-SURFACE-PLAN | open | The surface plan — the pair's lifecycle as bytes, and nothing else | 2026-11-11-brief-surface-plan.md |

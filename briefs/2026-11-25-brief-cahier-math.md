@@ -6,7 +6,7 @@ callsign: BRF-CAHIER-MATH
 # Brief: The cahier's maths — the export gets the second dimension
 
 **Date:** 2026-11-25
-**Status:** Open
+**Status:** In Progress — phase 1 measured 2026-11-25; the design changed as a result.
 **Warrant:** operator call, 2026-11-25 — no ledger entry.
 
 ---
@@ -39,21 +39,46 @@ receipt for the rung this brief adds. Two rungs degraded silently before it
 
 ## Evidence
 
-Measured 2026-11-25 on this machine, `pandoc 3.11`. The evidence document is
-`docs/2026-10-30-server-blades-in-space.md` — the orbital habitat specification
-that forced `ADR-MATH-GRAMMAR-076` (`25c8365`), 26,275 B, 157 inline spans, 25
-distinct commands.
+The evidence document is `docs/2026-10-30-server-blades-in-space.md` — the orbital
+habitat specification that forced `ADR-MATH-GRAMMAR-076` (`25c8365`), 26,191 B,
+157 inline spans, 25 distinct commands. Measured 2026-11-25 on this machine,
+`pandoc 3.11`, `Google Chrome 153`.
 
-| reading | value |
-|---|---|
-| `pandoc -f markdown -t html`: `<math>` elements | **157 / 157** |
-| `<mfrac>` | **2** — both fraction equations |
-| `<msup>` / `<msub>` / `<mover>` | 39 / 46 / 11 |
-| whole-document export | **0.07 s** |
-| output size | 26,275 B → 74,380 B (2.83×) |
-| okuda's current answer: spans left literal | **11**, all command-free, 3 relation-bearing |
-| currency guard: `costs $5 and $10 for two.` | pandoc leaves it **literal** ✓ |
-| currency guard: `Cost: $5.` | pandoc leaves it **literal** ✓ |
+**The layout, measured in Chrome** (`tmp/spike-cahier-math.ts`, a throwaway
+spike): the same document rendered two ways, wrapped in the real cahier CSS.
+Markup counts say the converter ran; **boxes** say the browser rendered it, so
+the probe measures geometry — a fraction counts only when the denominator sits
+below the numerator.
+
+| reading | A: glyph pass | B: pandoc MathML |
+|---|---|---|
+| `<math>` elements | 0 | **157** |
+| laid out (box > 0) | 0 | **157** |
+| `<mfrac>` — and stacked | 0 / — | **2 / 2** (28 px, 31 px) |
+| `<msup>` — and raised | 0 / — | **39 / 39** |
+| `<mover>` — and above the base | 0 / — | **11 / 11** |
+| raw `$…$` left in prose | **11** | **0** |
+| body bytes | 27,888 | 74,135 (**2.66×**) |
+| whole-document conversion | — | **0.07 s** |
+
+**The census — the ADR question, made a list.** (`tmp/spike-span-census.ts`.
+The population is the renderer's own: fenced blocks and code spans stripped
+first, `src/render.ts:2087`. The first run of this spike omitted that and
+harvested `$(pwd)/okuda` out of a fence — a span the renderer never reaches,
+which would have inflated the gain. Recorded because the error was in the
+instrument, not the subject.)
+
+| verdict | spans | of 177 |
+|---|---|---|
+| both rules agree it is maths | 142 | 80% |
+| **pandoc identifies, okuda declines** | **25** | **14%** |
+| okuda identifies, pandoc declines | **1** | 1% |
+| both decline | 9 | 5% |
+
+69 files, 177 distinct prose spans. The 25 are all inspected, not sampled: 24
+are command-free (`$V$`, `$T^4$`, `$H_2O$`, `$Z=13$`, `$O(1)$`, `$\min(80, H-4)$`)
+and one is a table gap (`$\min$`). The single regression is **`$\S$`** — okuda
+renders `§`, pandoc's converter declines it. That one span decides the design.
 
 **The ADR-076 failure does not reproduce, and the reason is the writer.**
 076 recorded `texmath` at 122/124 because it *"refuses `\frac` outright in its
@@ -71,8 +96,24 @@ cannot reach them. Pandoc *does* identify them (`H_2O` → `<msub><mi>H</mi><mn>
 the closing `$` not be followed by a digit. **Its guard is not weaker than ours on
 the case the guard exists for.**
 
-**The one behaviour difference that must be decided rather than inherited:**
-`costs $x and $y` — pandoc treats it as maths; okuda's guard does not. See Scope.
+**A predicted divergence that does not exist.** This brief first claimed the
+decision was `costs $x and $y`, where pandoc would see maths and okuda would not.
+Measured: pandoc leaves it literal too — its rule needs the closing `$` to be
+preceded by a non-space. `costs $x and $y` fails that test, as `from $5 to $10.`
+and `$5-$10` do. **The prediction was reasoning without measurement, and it was
+wrong.** The real divergence is the command-free class above.
+
+**And the command-free class cannot be split by a rule.** `$H_2O$` and `$PATH$`
+are the same shape. What separates them in this corpus is not a test but a list:
+the 24 are `V`, `A`, `L`, `N`, `T`, `W`, `Z`, `T^4`, `B_4C`, `H_2O`, `Z=1`, `Z=13`,
+`Z=82`, `O(1)`, `O(N)`, `-1`, `1`, `11`, `16,041`, `22, 33, …`, `(X, Y)`, `H < 84`,
+`< 1:2`, `> 2:1` — and four of them (`$1$`, `$11$`, `$16,041$`, `$22, 33, …$`)
+are **prose numbers, not maths**. Pandoc typesets them anyway. In an export
+artefact that is the *benign* direction: the reader sees `16,041` rather than the
+literal `$16,041$` that the guard leaves in their face today. **A false positive
+costs a serif digit; a false negative costs a visible dollar sign.** That
+asymmetry is the reason the export may accept a broader identification than the
+terminal — and it is why the terminal's guard must not change.
 
 **Why the 173 ms objection does not apply.** `ADR-MATH-GRAMMAR-076` rejected
 `pandoc -t plain` at *"173 ms/frame for a document, on a renderer whose instrument
@@ -108,9 +149,22 @@ A CDN KaTeX would have amended that row; MathML does not touch it.
 
 **In:**
 
-- The maths pre-pass in `scripts/html-package.ts` at both sites (`:567` document,
-  `:630` panel body): LaTeX → MathML via `pandoc`, replacing `applyMathGlyphs`
-  **in the export path only**.
+- **The three-stage ladder** in `scripts/html-package.ts` at both sites (`:567`
+  document, `:630` panel body). Not a swap — each stage strictly narrows:
+  1. `pandoc -f markdown -t html` converts every span it identifies to MathML.
+     This is where `\frac`, `\oint`, `\sum` limits and the command-free class are
+     won.
+  2. Spans pandoc declines come back **labelled**: `<span class="math inline">$…$</span>`,
+     with a `[WARNING]` on stderr. The decline is legible in the DOM, which is
+     `ADR-MATH-GRAMMAR-076`'s mark arriving for free.
+  3. On **those spans only**, `applyMathGlyphs` runs. `$\S$` → `§`; anything it
+     still cannot resolve keeps the existing codespan mark.
+
+  **Stage 3 must enter by the span wrapper, never by scanning for `$`.**
+  `costs $5 and $10` survives conversion as literal text, and a naive
+  `applyMathGlyphs(pandocOutput)` finds the pair `$5 and $` in it. It happens to be
+  safe today because the guard requires a backslash command — safe by accident is
+  not safe. Targeting `<span class="math inline">` makes it safe by structure.
 - The degrade: `pandoc` absent or failing → `applyMathGlyphs`, today's output
   byte for byte. The house pattern is already two rungs deep — `chroma` and
   `mermaid-to-md`, *"the tool stays a shell over them and degrades without them"*
@@ -162,16 +216,17 @@ A CDN KaTeX would have amended that row; MathML does not touch it.
 
 ## Work Plan
 
-1. [ ] **Measure before touching code.** Export the evidence document with a local
-   spike that swaps the pre-pass, and record: `<math>` count, `mfrac` count, total
-   bytes, and the Chrome rendering of `\frac`, `\sum`, `\vec`, `\hat`. Confirm 157/157
-   and that no span regresses to raw `$…$`.
-2. [ ] **Confirm the currency guard in both directions.** `costs $5 and $10`,
-   `Cost: $5.`, `costs $x and $y`, `$H_2O$`, `$Z=13$`. Record pandoc's answer and
-   okuda's side by side. This is the ADR's table.
-3. [ ] **Implement `mathMlPass`** in `scripts/html-package.ts`, shaped like
-   `mermaidPass`: one `pandoc` call for the document, one per panel body, a
-   present/absent branch, and a named degrade to `applyMathGlyphs`.
+1. [x] **Measure before touching code.** Done — `tmp/spike-cahier-math.ts`. 157/157
+   laid out, 2/2 fractions stacked, 39/39 superscripts raised, 11/11 accents above,
+   0 raw spans. Markup counts and geometry both taken.
+2. [x] **Confirm the guard in both directions.** Done — `tmp/spike-span-census.ts`.
+   177 prose spans: 142 agree, 25 pandoc-only (24 command-free), **1 okuda-only
+   (`$\S$`)**. The predicted `$x and $y` divergence does not exist.
+3. [ ] **Implement the three-stage ladder** (`mathMlPass`) in
+   `scripts/html-package.ts`, shaped like `mermaidPass`: one `pandoc` call for the
+   document, one per panel body, a present/absent branch, the marked-span fallback
+   to `applyMathGlyphs`, and a named degrade to today's single-pass output.
+   Targeted by `<span class="math inline">`, never by scanning for `$`.
 4. [ ] **Measure the byte cost on a large cahier.** `just html decisions/index.md`
    — 80 panels, 687 KiB today. Record the delta against the 2 MiB default
    (`scripts/html-package.ts:517`) and against `--max-panels`.
@@ -195,26 +250,44 @@ A CDN KaTeX would have amended that row; MathML does not touch it.
 2. `just html-verify` green, including the new maths checks — the guarantee table's
    rows are **all still true**, with no row amended.
 3. On `docs/2026-10-30-server-blades-in-space.md`: **157 `<math>` elements**, **2
-   `<mfrac>`**, **0** remaining literal `$…$` spans in rendered prose.
+   `<mfrac>`**, **0** remaining literal `$…$` spans in rendered prose — measured in
+   Chrome by box, not by markup.
+4. **No regression on `$\S$`**: it renders `§`, not a literal `$\S$`. This is the
+   one span the corpus census found where okuda beats the converter, and it is the
+   reason the ladder has a third stage.
+5. **The currency pair survives**: `costs $5 and $10` renders as prose, and the
+   `$5 and $` pair it leaves in the converted text is never entered by stage 3 — a
+   test asserts the span-wrapper rule, not the happy path.
 4. With `pandoc` removed from `PATH`, `just html <file>` output is **byte-for-byte
    identical** to today's — a test pins the comparison.
 5. `costs $5 and $10` and `Cost: $5.` render as prose in the cahier, by test.
 6. The published file contains **no** `<script>`, no `http://` or `https://` asset
    reference, and no `@font-face` — asserted by a check in `html-package-verify.ts`.
-7. `src/render.ts` is unchanged; `tests/math-glyphs.test.ts` does not move.
-8. `cahier doctor` names every rung with its consequence, and `--json` parses. On
+9. `src/render.ts` is unchanged; `tests/math-glyphs.test.ts` does not move.
+10. `cahier doctor` names every rung with its consequence, and `--json` parses. On
    this machine it reports `pandoc` present (maths: MathML). With a rung removed
    from `PATH`, the row reads absent and its consequence reads the degrade — a test
    pins both.
-9. `cahier doctor --strict` exits 1 on a degraded rung, 0 on a full one — a test
+11. `cahier doctor --strict` exits 1 on a degraded rung, 0 on a full one — a test
    pins the exit codes.
-10. The `DEPENDENCIES.md` drift gate fails when a version cell is edited by hand to
-    disagree with the probe, and passes when the file is regenerated.
-11. `ADR-MATH-GRAMMAR-076` is not amended. If the maths ADR of step 6 concludes
+12. The `DEPENDENCIES.md` drift gate fails when a version cell is edited by hand to
+   disagree with the probe, and passes when the file is regenerated.
+13. `ADR-MATH-GRAMMAR-076` is not amended. If the maths ADR of step 6 concludes
    otherwise, 076 is **referenced**, not rewritten.
 
 ## Notes
 
+- **Phase 1 changed the design, and that is the phase working.** The brief opened
+  proposing a swap of the pre-pass. The measurement found (a) a benign
+  false-positive class in the converter, (b) one span where okuda wins, and (c) a
+  `$5 and $` pair in the converted output that a naive second stage would scan.
+  Three findings, no one of which was reachable by argument. The ladder replaced
+  the swap.
+- **The spikes are scratch and stay out of the tree.** `tmp/` is gitignored, so
+  `tmp/spike-cahier-math.ts` and `tmp/spike-span-census.ts` are evidence a reader
+  cannot see without running them. Their numbers are in this brief for that reason;
+  the scripts are re-runnable instructions, not artefacts. If the census proves
+  worth keeping, it graduates to `scripts/` as its own brief.
 - **The backstop, recorded as a permission.** The operator's call, 2026-11-25:
   *"if you want or need to render your file in another viewer go ahead."* Reading a
   document in MarkText, or any other renderer, is **permitted and needs no code**.

@@ -18,4 +18,4 @@
 {"file":"2026-11-11-brief-surface-plan.md","date":"2026-11-11","status":"open","summary":"The surface plan — the pair's lifecycle as bytes, and nothing else","meta":{},"callsign":"BRF-SURFACE-PLAN"}
 {"file":"2026-11-12-brief-editor-hint.md","date":"2026-11-12","status":"open","summary":"The editor hint — `88` opens a code file where you're reading","meta":{},"callsign":"BRF-CODE-EDITOR-HINT"}
 {"file":"2026-11-13-brief-launch-contract.md","date":"2026-11-13","status":"open","summary":"The launch contract — the pair declared at startup, and the clone hands over all three fields","meta":{},"callsign":"BRF-LAUNCH-CONTRACT"}
-{"file":"2026-11-25-brief-cahier-math.md","date":"2026-11-25","status":"open","summary":"The cahier's maths — the export gets the second dimension","meta":{},"callsign":"BRF-CAHIER-MATH"}
+{"file":"2026-11-25-brief-cahier-math.md","date":"2026-11-25","status":"in_progress","summary":"The cahier's maths — the export gets the second dimension","meta":{},"callsign":"BRF-CAHIER-MATH"}
