@@ -493,3 +493,19 @@ Protocol-wide terms of art: the ones another silo could also use. Cited terms in
   stretch means either the surface is clean or the pass is not happening. Worked
   instance: `src/keygrammar.ts` and its zone table; `68cb5c2` (a comment whose
   referent had moved).
+
+* **The degrade test**: the one question that separates a **capability** from an
+  **output** — *remove the dependency; can the thing still be made?* An assistant
+  works on the **demand** side: it changes what is worth attempting and how much
+  attention is left to attempt it with, and it does not supply the hand. So where
+  the hand was already there the gain is a craft skill; where it was not, the gain
+  is a transaction. **Test:** state what remains when the tool is absent. If
+  nothing, what increased was output, and it does not survive the tool. Worked
+  instance: an operator's A6 notebook cover, whose pinkie-grip flap was knowledge
+  no model could have supplied — the hand was there first. **The fallacy the test
+  catches:** generalising *"it raised my craft"* to a population without the
+  priors, which is **frame defaulting** in the pedagogic register. *Prior art:*
+  `docs/2026-11-25-the-degrade-test.md`; the export's byte-identical degrade and
+  the ladder's exercised third stage (`ADR-EXPORT-IDENTIFIES-096`); **frame
+  defaulting**; **predictably adequate** (a raised floor is the demand-side gain —
+  variance compressed, ceiling unchanged).
