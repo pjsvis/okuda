@@ -43,7 +43,7 @@ lookup or a screen, and the two marked ⸮ are the ones no lookup can answer.
 | who owns it | ⸮ the account now answers to `pjsgloam`; org vs user unverified from outside |
 | this tree's packages | ☐ none published; every name still free |
 | the second factor | ✓ enabled, 1 security key |
-| recovery codes | ⸮ unverified, and no `skate` key holds them |
+| recovery codes | ✓ held in `skate` as `npm_recovery_code`; how many, unverified |
 | trusted publishing | ☐ not configured — deliberately, it expires in two days |
 | this machine's login | ✗ none; `npm whoami` answers 401 |
 
@@ -171,7 +171,12 @@ cheaper half: they cost no ceremony at all.
 
 **Recovery codes are the only way back without the device**, and they must live
 away from it. This silo's key store is where they belong — `skate`, under a name
-(`npm_recovery_codes`), never read into a transcript.
+(`npm_recovery_code`, measured 2026-11-25), never read into a transcript.
+
+**A name is a designation, and the referent is a set.** Each code is one-use, so
+*one* code is one recovery and *ten* are a habit — and `skate list -k` shows the
+name while nothing shows the count. If the stored value is a single code, the
+vault holds a spare rather than a recovery; regenerate and store the set.
 
 **Link the GitHub account.** npm's recovery documentation names it as the
 verification shortcut, and it is two minutes
