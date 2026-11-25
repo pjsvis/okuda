@@ -45,6 +45,15 @@ const known = new Set<string>([...live, ...archive].map((e) => e.callsign));
 // The editor moves it from there; this map is the only default.
 const SECTION: Record<string, string> = {
   open: "Open queue",
+  // `in_progress` was missing from both tables, so a brief with work in it
+  // rendered as `· open` in the Open queue — and the gate passed, because the
+  // glyph fell through to a default rather than failing. Found 2026-11-25 by
+  // setting BRF-CAHIER-MATH to In Progress and watching nothing change.
+  //
+  // It defaults to `Open queue`, not to `In flight`: that heading's own
+  // qualifier is *partially landed, has commits*, and started-but-uncommitted
+  // is neither. The SECTION names position; the GLYPH names state.
+  in_progress: "Open queue",
   // The heading already exists by hand (BRF-AMP-TABLE): the vocabulary was the
   // half that lagged. The map is prefix-based, so it matches that heading.
   ready: "Ready — specced, next up",
@@ -54,6 +63,9 @@ const SECTION: Record<string, string> = {
 };
 const GLYPH: Record<string, string> = {
   open: "· open",
+  // The same state glyph the In-flight row already uses — state is the glyph's
+  // job, position is the section's.
+  in_progress: "◆ partial",
   ready: "▸ ready",
   done: "✓ done",
   parked: "↓ parked",
