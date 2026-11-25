@@ -9,6 +9,7 @@ Generated from the registry by `reg-sync --fix`; hand-edits are overwritten.
 
 | Date | Callsign | Status | Document | File |
 |---|---|---|---|---|
+| 2026-11-25 | DBF-SECOND-DIMENSION | done | Debrief: The cahier's maths — the export gets the second dimension | 2026-11-25-debrief-the-second-dimension.md |
 | 2026-11-24 | DBF-INTAKE-QUARANTINE | done | Debrief: the intake quarantine — a document on trial, and the folder that holds the next one | 2026-11-24-debrief-the-intake-quarantine.md |
 | 2026-11-15 | DBF-CORPUS-PRIOR | done | Debrief: the readers and the corpus — the band turned out to be a percentile | 2026-11-15-debrief-the-readers-and-the-corpus.md |
 | 2026-11-15 | DBF-RUNG-PANEL | done | The rung panel shipped in one session — and its two silent-failure bugs (unchecked exits, destructive argv default) were caught by its own recipes, not its brief | 2026-11-15-debrief-rung-panel.md |
