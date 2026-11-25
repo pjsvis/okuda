@@ -174,9 +174,21 @@ away from it. This silo's key store is where they belong — `skate`, under a na
 (`npm_recovery_code`, measured 2026-11-25), never read into a transcript.
 
 **A name is a designation, and the referent is a set.** Each code is one-use, so
-*one* code is one recovery and *ten* are a habit — and `skate list -k` shows the
-name while nothing shows the count. If the stored value is a single code, the
-vault holds a spare rather than a recovery; regenerate and store the set.
+one code is one recovery and the full set is a habit — while `skate list -k`
+shows the name and nothing shows the count. Count the **tokens**, which are what
+a code is, by splitting the fetched value on whitespace and counting the
+non-empty ones: `tr -s ' \n' '\n' | grep -c '[[:alnum:]]'`.
+
+**`wc -l` is not that instrument** — it counts *newlines*, so ten codes on one
+line with a trailing newline report `1`. Compare the token count against the
+number the npm page shows under *Manage Recovery Codes*: the page is the
+referent, the vault is the copy, and a mismatch means regenerate and store the
+whole set.
+
+**Store it by pipe, never by argument.** `skate set` reads the value from stdin
+when no argument is given, so it never reaches `argv` — and `argv` is what shell
+history records. The same form renames a key without either name touching a
+command line.
 
 **Link the GitHub account.** npm's recovery documentation names it as the
 verification shortcut, and it is two minutes
